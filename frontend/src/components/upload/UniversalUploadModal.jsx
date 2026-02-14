@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../constants/routes';
 import { useAuthModal } from '../../context/AuthModalContext';
 import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
-import fileTypesStackIcon from '../../assets/file-types-stack.svg';
-import mobileUploadIllustration from '../../assets/file-types-stack.svg';
+import dropzoneIllustration from '../../assets/dropzone-files-illustration.svg';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 // ✅ REFACTORED: Use unified upload service (replaces folderUploadService + presignedUploadService)
@@ -1449,8 +1448,8 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
             height: isMobile ? 36 : 32,
             minWidth: isMobile ? 36 : 32,
             minHeight: isMobile ? 36 : 32,
-            right: isMobile ? 8 : -16,
-            top: isMobile ? 8 : -16,
+            right: isMobile ? 8 : 12,
+            top: isMobile ? 8 : 12,
             position: 'absolute',
             background: 'white',
             borderRadius: 100,
@@ -1523,30 +1522,16 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           >
             <input {...getInputProps()} />
 
-            {/* File Types Stack Icon - use PNG on mobile, SVG on desktop */}
+            {/* File Types Illustration */}
             <img
-              src={isMobile ? mobileUploadIllustration : fileTypesStackIcon}
-              alt="File Types"
+              src={dropzoneIllustration}
+              alt=""
               style={{
-                width: isMobile ? 120 : 200,
-                maxWidth: isMobile ? 120 : 200,
+                width: isMobile ? 140 : 180,
                 height: 'auto',
+                objectFit: 'contain',
                 display: 'block',
                 marginBottom: 8,
-                filter: isMobile ? 'brightness(0) invert(0.4)' : 'brightness(0) invert(0.4) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))',
-                transition: 'transform 0.3s ease, filter 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                if (!isMobile) {
-                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
-                  e.currentTarget.style.filter = 'brightness(0) invert(0.4) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isMobile) {
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                  e.currentTarget.style.filter = 'brightness(0) invert(0.4) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))';
-                }
               }}
             />
 

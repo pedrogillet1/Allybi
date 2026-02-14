@@ -8,7 +8,7 @@ const API_URL = getApiBaseUrl();
 // socket.io-client expects an http(s) origin, not ws(s).
 const normalizeSocketOrigin = (raw) => {
   const v = String(raw || '').trim();
-  if (!v) return 'http://localhost:5000';
+  if (!v) return 'http://localhost:5002';
   if (v.startsWith('ws://')) return `http://${v.slice('ws://'.length)}`;
   if (v.startsWith('wss://')) return `https://${v.slice('wss://'.length)}`;
   return v;
@@ -695,6 +695,14 @@ export const deleteConversation = async (conversationId) => {
 };
 
 /**
+ * Update conversation title
+ */
+export const updateConversationTitle = async (conversationId, title) => {
+  const response = await api.patch(`/conversations/${conversationId}`, { title });
+  return response.data;
+};
+
+/**
  * Delete all conversations
  */
 export const deleteAllConversations = async () => {
@@ -1006,6 +1014,7 @@ export default {
   sendAdaptiveMessage,
   sendAdaptiveMessageStreaming,
   deleteConversation,
+  updateConversationTitle,
   deleteAllConversations,
   deleteEmptyConversations,
   joinConversation,

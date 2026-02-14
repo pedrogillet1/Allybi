@@ -497,6 +497,12 @@ code {
   backface-visibility: hidden;
 }
 
+/* Skeleton shimmer animation for loading states */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 /* Spinning animation for processing indicators */
 @keyframes spin {
   from {

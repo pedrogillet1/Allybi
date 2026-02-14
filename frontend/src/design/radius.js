@@ -4,6 +4,9 @@ const radius = {
   lg: '12px',     // 12px - file rows, dropdowns, lists
   xl: '14px',     // 14px - cards, modals, category chips (Koda standard)
   xxl: '16px',    // 16px - floating elements (help bubble, dialogs)
+  card: '16px',   // 16px - card containers (Home redesign)
+  row: '12px',    // 12px - table/list rows
+  pill: '9999px', // pill-shaped elements
   full: '9999px'  // 9999px - pills, round buttons
 };
 

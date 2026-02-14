@@ -49,6 +49,11 @@ import api from '../../services/api';
 import chatService from '../../services/chatService';
 import CategoryIcon from '../library/CategoryIcon';
 import FileBreakdownDonut from '../shared/FileBreakdownDonut';
+import SmartCategoriesCard from '../home/SmartCategoriesCard';
+import IntegrationsCard from '../home/IntegrationsCard';
+import FileInsightsCard from '../home/FileInsightsCard';
+import RecentlyAddedCard from '../home/RecentlyAddedCard';
+import ContinueCard from '../home/ContinueCard';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';
 import txtIcon from '../../assets/txt-icon.png';
@@ -131,6 +136,7 @@ const Documents = () => {
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [itemToRename, setItemToRename] = useState(null);
   const [droppedFiles, setDroppedFiles] = useState(null);
+  const [movingFromCategoryId, setMovingFromCategoryId] = useState(null);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [categoriesRefreshKey, setCategoriesRefreshKey] = useState(0);
   const [dragOverCategoryId, setDragOverCategoryId] = useState(null);
@@ -590,7 +596,7 @@ const Documents = () => {
         onDragLeave={handlePageDragLeave}
       >
         {/* Header - Title Row */}
-        <div style={{minHeight: isMobile ? 56 : 84, paddingLeft: isMobile ? 16 : 32, paddingRight: isMobile ? 16 : 32, paddingTop: isMobile ? 'max(env(safe-area-inset-top), 0px)' : 0, paddingBottom: 0, background: 'white', borderBottom: '1px #E6E6EC solid', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexShrink: 0}}>
+        <div style={{minHeight: isMobile ? 56 : 72, paddingLeft: isMobile ? 16 : 48, paddingRight: isMobile ? 16 : 48, paddingTop: isMobile ? 'max(env(safe-area-inset-top), 0px)' : 0, paddingBottom: 0, background: 'white', borderBottom: '1px #E6E6EC solid', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexShrink: 0}}>
           {isSelectMode ? (
             <>
               {/* Left: Back arrow + Documents title */}
@@ -634,9 +640,9 @@ const Documents = () => {
               </div>
             </>
           ) : (
-            <div style={{color: '#32302C', fontSize: isMobile ? 18 : 20, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', textTransform: 'capitalize', lineHeight: isMobile ? '24px' : '30px', textAlign: 'left', flex: 1}}>
+            <h1 style={{color: '#32302C', fontSize: isMobile ? 18 : 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 600, lineHeight: isMobile ? '24px' : '30px', margin: 0, flex: 1, letterSpacing: '-0.01em'}}>
               {t('documents.welcomeBack', { name: user && (user.firstName || user.lastName) ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : user?.email?.split('@')[0] || t('common.user') })}
-            </div>
+            </h1>
           )}
           <div style={{display: isMobile && !isSelectMode ? 'none' : 'flex', alignItems: 'center', gap: 12}}>
             {isSelectMode ? (
@@ -732,7 +738,7 @@ const Documents = () => {
                 <div
                   style={{
                     position: 'relative',
-                    height: isMobile ? 44 : 52,
+                    height: 44,
                     display: 'flex',
                     alignItems: 'center',
                     flex: isMobile ? 1 : 'none',
@@ -754,7 +760,7 @@ const Documents = () => {
                     style={{
                       height: '100%',
                       width: isMobile ? '100%' : 'auto',
-                      minWidth: isMobile ? 'auto' : 280,
+                      minWidth: isMobile ? 'auto' : 360,
                       paddingLeft: 46,
                       paddingRight: isMobile ? 16 : 56,
                       background: '#F5F5F5',
@@ -1100,12 +1106,12 @@ const Documents = () => {
                 <button
                   onClick={() => setShowUniversalUploadModal(true)}
                   aria-label={t('documents.uploadDocument')}
-                  style={{height: isMobile ? 44 : 52, width: isMobile ? 44 : 'auto', paddingLeft: isMobile ? 0 : 18, paddingRight: isMobile ? 0 : 18, paddingTop: 10, paddingBottom: 10, background: '#F5F5F5', borderRadius: 100, border: '1px #E6E6EC solid', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', flexShrink: 0, transition: 'transform 180ms ease, box-shadow 180ms ease'}}
-                  onMouseEnter={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'; }}}
-                  onMouseLeave={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}}
+                  style={{height: isMobile ? 44 : 44, width: isMobile ? 44 : 'auto', paddingLeft: isMobile ? 0 : 20, paddingRight: isMobile ? 0 : 20, paddingTop: 0, paddingBottom: 0, background: '#181818', borderRadius: 9999, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', flexShrink: 0, transition: 'background 120ms ease, transform 160ms cubic-bezier(0.2,0.8,0.2,1)', color: 'white'}}
+                  onMouseEnter={(e) => { if (!isMobile) { e.currentTarget.style.background = '#0F0F0F'; e.currentTarget.style.transform = 'translateY(-1px)'; }}}
+                  onMouseLeave={(e) => { if (!isMobile) { e.currentTarget.style.background = '#181818'; e.currentTarget.style.transform = 'translateY(0)'; }}}
                 >
-                  <UploadIcon style={{width: isMobile ? 20 : 24, height: isMobile ? 20 : 24, filter: 'brightness(0) invert(0.2)'}} aria-hidden="true" />
-                  {!isMobile && <div style={{color: '#32302C', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '24px'}}>{t('documents.uploadDocument')}</div>}
+                  <UploadIcon style={{width: 18, height: 18, filter: 'brightness(0) invert(1)'}} aria-hidden="true" />
+                  {!isMobile && <span style={{fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 600, lineHeight: '20px'}}>Upload</span>}
                 </button>
               </>
             )}
@@ -1177,847 +1183,98 @@ const Documents = () => {
         )}
 
         {/* Scrollable Content */}
-        <div className="scrollable-content documents-content" style={{flex: 1, minHeight: 0, padding: isMobile ? 12 : 32, paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 120, overflowY: isMobile ? 'hidden' : 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 24, maxWidth: '100%', boxSizing: 'border-box', WebkitOverflowScrolling: 'touch'}}>
-          {/* Smart Categories - Wrapping grid */}
-          <div key={categoriesRefreshKey} style={{display: 'flex', flexDirection: 'column', gap: isMobile ? 8 : 12}}>
-            {/* Section header */}
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-              <h2 style={{color: '#32302C', fontSize: isMobile ? 16 : 18, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', lineHeight: '26px', margin: 0}}>
-                {t('documents.smartCategories')}
-              </h2>
-              {categories.length > 3 && (
-                <button
-                  onClick={() => navigate(ROUTES.DOCUMENTS)}
-                  aria-label={t('documents.seeAllCategories')}
-                  style={{
-                    color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600',
-                    cursor: 'pointer', background: 'none', border: 'none', padding: '4px 0',
-                    transition: 'opacity 0.15s ease', display: 'flex', alignItems: 'center', gap: 4
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-                  onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                >
-                  {t('documents.seeAllCategories')}
-                  <ArrowIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} aria-hidden="true" />
-                </button>
-              )}
-            </div>
+        <div className="scrollable-content documents-content" style={{flex: 1, minHeight: 0, padding: isMobile ? 12 : 48, paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 120, overflowY: isMobile ? 'hidden' : 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 24, maxWidth: 1440, margin: '0 auto', width: '100%', boxSizing: 'border-box', WebkitOverflowScrolling: 'touch'}}>
 
-            {/* Wrapping CSS grid */}
-            <div
-              role="list"
-              aria-label={t('documents.smartCategories')}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, minmax(0, 1fr))',
-                gap: isMobile ? 10 : 24,
-                overflow: 'visible'
-              }}
-            >
-              {/* "+ Add New Smart Category" card - same style as other cards */}
-              <button
-                role="listitem"
-                onClick={() => setIsModalOpen(true)}
-                aria-label={t('documents.addNewCategory')}
-                style={{
-                  height: isMobile ? 72 : 96,
-                  padding: isMobile ? '12px 16px' : '16px 20px',
-                  background: 'white',
-                  borderRadius: 16,
-                  border: '1px solid #E6E6EC',
-                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  flexDirection: 'row',
-                  gap: isMobile ? 10 : 14,
-                  cursor: 'pointer',
-                  boxSizing: 'border-box',
-                  transition: 'transform 180ms ease, box-shadow 180ms ease'
+          {/* Row 1: Categories (8col) + Integrations (4col) */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
+            gap: 24,
+            alignItems: 'stretch',
+          }}>
+            <div key={categoriesRefreshKey}>
+              <SmartCategoriesCard
+                categories={categories}
+                onCreateCategory={() => setIsModalOpen(true)}
+                onEditCategory={(cat) => { setEditingCategory(cat); setShowEditModal(true); }}
+                onDeleteCategory={(catId) => { setItemToDelete({ type: 'category', id: catId, name: categories.find(c => c.id === catId)?.name }); setShowDeleteModal(true); }}
+                onUploadToCategory={(catId) => { setUploadCategoryId(catId); setShowUniversalUploadModal(true); }}
+                onMoveCategoryDocuments={(catId) => {
+                  setMovingFromCategoryId(catId);
+                  setShowCategoryModal(true);
                 }}
-                onMouseEnter={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06)'; }}}
-                onMouseLeave={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04)'; }}}
-                onMouseDown={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.06), 0 1px 6px rgba(0, 0, 0, 0.03)'; }}}
-                onMouseUp={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06)'; }}}
-              >
-                <span style={{fontSize: isMobile ? 28 : 38, lineHeight: 1, color: '#7A7A7A', flexShrink: 0}} aria-hidden="true">+</span>
-                <span style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '1.3', whiteSpace: 'nowrap'}}>{t('documents.addNewCategory')}</span>
-              </button>
-              {[...categories].sort((a, b) => {
-                // Non-empty categories first (descending by fileCount), then alphabetical
-                if (a.fileCount > 0 && b.fileCount === 0) return -1;
-                if (a.fileCount === 0 && b.fileCount > 0) return 1;
-                if (a.fileCount > 0 && b.fileCount > 0) return b.fileCount - a.fileCount;
-                return a.name.localeCompare(b.name);
-              }).map((category, index) => (
-                <div
-                  key={`${category.id}-${category.emoji}`}
-                  role="listitem"
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setDragOverCategoryId(category.id);
-                  }}
-                  onDragLeave={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setDragOverCategoryId(null);
-                  }}
-                  onDrop={async (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setDragOverCategoryId(null);
-
-                    try {
-                      const data = JSON.parse(e.dataTransfer.getData('application/json'));
-                      if (data.type === 'document') {
-                        await moveToFolder(data.id, category.id);
-                      }
-                    } catch (error) {
-                      console.error('Error handling drop:', error);
+                onDownloadCategory={async (cat) => {
+                  try {
+                    showSuccess(t('alerts.preparingFolderDownload', { name: cat.name }));
+                    const response = await api.get(`/api/folders/${cat.id}/download`, { responseType: 'blob' });
+                    const url = window.URL.createObjectURL(response.data);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `${cat.name}.zip`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                  } catch (error) {
+                    showError(t('alerts.failedToDownload'));
+                  }
+                }}
+                categoryMenuOpen={categoryMenuOpen}
+                setCategoryMenuOpen={setCategoryMenuOpen}
+                categoryMenuPosition={categoryMenuPosition}
+                setCategoryMenuPosition={setCategoryMenuPosition}
+                onDragOverCategory={(id) => setDragOverCategoryId(id)}
+                onDragLeaveCategory={() => setDragOverCategoryId(null)}
+                onDropOnCategory={async (e, categoryId) => {
+                  setDragOverCategoryId(null);
+                  try {
+                    const data = JSON.parse(e.dataTransfer.getData('application/json'));
+                    if (data.type === 'document') {
+                      await moveToFolder(data.id, categoryId);
                     }
-                  }}
-                  style={{
-                    padding: isMobile ? '12px 16px' : '16px 20px',
-                    height: isMobile ? 72 : 96,
-                    background: dragOverCategoryId === category.id ? '#F0F0F0' : 'white',
-                    borderRadius: 16,
-                    border: dragOverCategoryId === category.id ? '2px dashed #32302C' : '1px solid #E6E6EC',
-                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04)',
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    gap: isMobile ? 12 : 14,
-                    transition: 'transform 180ms ease, box-shadow 180ms ease, background 180ms ease, border 180ms ease',
-                    position: 'relative',
-                    boxSizing: 'border-box',
-                    zIndex: categoryMenuOpen === category.id ? 99999 : 1,
-                    cursor: 'pointer'
-                  }}
-                  onMouseEnter={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06)'; }}}
-                  onMouseLeave={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04)'; }}}
-                  onMouseDown={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.06), 0 1px 6px rgba(0, 0, 0, 0.03)'; }}}
-                  onMouseUp={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06)'; }}}
-                >
-                  <div onClick={() => navigate(buildRoute.category(category.name.toLowerCase().replace(/\s+/g, '-')))} style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: isMobile ? 12 : 14, flex: 1, cursor: 'pointer', minWidth: 0, textAlign: 'left'}}>
-                    <div style={{width: isMobile ? 40 : 48, height: isMobile ? 40 : 48, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                      <CategoryIcon emoji={category.emoji} size={isMobile ? 36 : 42} />
-                    </div>
-                    <div style={{display: 'flex', flexDirection: 'column', gap: 3, flex: 1, alignItems: 'flex-start', minWidth: 0}}>
-                      <div style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '1.3', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%'}}>{category.name}</div>
-                      <div style={{color: category.fileCount ? '#6C6B6E' : '#A2A2A7', fontSize: isMobile ? 12 : 13, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '1.3'}}>
-                        {category.fileCount || 0} {category.fileCount === 1 ? 'File' : 'Files'}
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{position: 'relative'}} data-category-menu>
-                    <button
-                      data-category-id={category.id}
-                      aria-label={`Options for ${category.name}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const clickedId = e.currentTarget.getAttribute('data-category-id');
-                        if (categoryMenuOpen === clickedId) {
-                          setCategoryMenu({ id: null, top: 0, left: 0 });
-                        } else {
-                          const buttonRect = e.currentTarget.getBoundingClientRect();
-                          const dropdownHeight = 160;
-                          const dropdownWidth = 160;
-                          const spaceBelow = window.innerHeight - buttonRect.bottom;
-                          const openUpward = spaceBelow < dropdownHeight && buttonRect.top > dropdownHeight;
-                          let leftPos = buttonRect.right - dropdownWidth;
-                          leftPos = Math.max(8, Math.min(leftPos, window.innerWidth - dropdownWidth - 8));
-                          setCategoryMenu({
-                            id: clickedId,
-                            top: openUpward ? buttonRect.top - dropdownHeight - 4 : buttonRect.bottom + 4,
-                            left: leftPos
-                          });
-                        }
-                      }}
-                      style={{
-                        width: 32,
-                        height: 32,
-                        background: 'transparent',
-                        borderRadius: '50%',
-                        border: 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        flexShrink: 0,
-                        transition: 'transform 180ms ease'
-                      }}
-                      onMouseEnter={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1.1)'; }}
-                      onMouseLeave={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1)'; }}
-                    >
-                      <DotsIcon style={{width: 20, height: 20, filter: 'brightness(0) invert(0.2)'}} aria-hidden="true" />
-                    </button>
-                    {(() => {
-                      const sortedCategories = [...categories].sort((a, b) => {
-                        if (a.fileCount > 0 && b.fileCount === 0) return -1;
-                        if (a.fileCount === 0 && b.fileCount > 0) return 1;
-                        if (a.fileCount > 0 && b.fileCount > 0) return b.fileCount - a.fileCount;
-                        return a.name.localeCompare(b.name);
-                      });
-                      const targetIndex = sortedCategories.findIndex(c => c.id === categoryMenuOpen);
-                      return targetIndex >= 0 && targetIndex === index && (
-                        <div
-                          onClick={(e) => e.stopPropagation()}
-                          style={{
-                            position: 'absolute',
-                            right: 0,
-                            top: '100%',
-                            marginTop: 4,
-                            background: 'white',
-                            borderRadius: 12,
-                            border: '1px solid #E6E6EC',
-                            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-                            zIndex: 100,
-                            minWidth: 160,
-                            overflow: 'hidden'
-                          }}>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const cat = categories.find(c => c.id === categoryMenuOpen);
-                              if (cat) {
-                                setEditingCategory(cat);
-                                setShowEditModal(true);
-                              }
-                              setCategoryMenuOpen(null);
-                            }}
-                            style={{
-                              width: '100%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 8,
-                              padding: '10px 14px',
-                              background: 'transparent',
-                              border: 'none',
-                              borderBottom: '1px solid #F5F5F5',
-                              cursor: 'pointer',
-                              fontSize: 14,
-                              fontFamily: 'Plus Jakarta Sans',
-                              fontWeight: '500',
-                              color: '#32302C',
-                              transition: 'background 0.2s ease',
-                              textAlign: 'left'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                          >
-                            <EditIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
-                            {t('common.edit')}
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (categoryMenuOpen) {
-                                setUploadCategoryId(categoryMenuOpen);
-                                setShowUniversalUploadModal(true);
-                              }
-                              setCategoryMenuOpen(null);
-                            }}
-                            style={{
-                              width: '100%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 8,
-                              padding: '10px 14px',
-                              background: 'transparent',
-                              border: 'none',
-                              borderBottom: '1px solid #F5F5F5',
-                              cursor: 'pointer',
-                              fontSize: 14,
-                              fontFamily: 'Plus Jakarta Sans',
-                              fontWeight: '500',
-                              color: '#32302C',
-                              transition: 'background 0.2s ease',
-                              textAlign: 'left'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                          >
-                            <UploadIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
-                            {t('common.upload')}
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const cat = categories.find(c => c.id === categoryMenuOpen);
-                              if (cat) {
-                                setItemToDelete({ type: 'category', id: cat.id, name: cat.name });
-                                setShowDeleteModal(true);
-                              }
-                              setCategoryMenuOpen(null);
-                            }}
-                            style={{
-                              width: '100%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 8,
-                              padding: '10px 14px',
-                              background: 'transparent',
-                              border: 'none',
-                              cursor: 'pointer',
-                              fontSize: 14,
-                              fontFamily: 'Plus Jakarta Sans',
-                              fontWeight: '500',
-                              color: '#D92D20',
-                              transition: 'background 0.2s ease',
-                              textAlign: 'left'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                          >
-                            <TrashCanIcon style={{width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)'}} />
-                            {t('common.delete')}
-                          </button>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                </div>
-              ))}
+                  } catch (error) {
+                    console.error('Error handling drop:', error);
+                  }
+                }}
+                dragOverCategoryId={dragOverCategoryId}
+              />
             </div>
+            {!isMobile && <IntegrationsCard />}
           </div>
 
-          {/* File Breakdown - Full width card */}
-          <div style={{width: '100%', maxWidth: '100%', boxSizing: 'border-box'}}>
-            <FileBreakdownDonut showEncryptionMessage={false} />
+          {/* Row 2: Continue (8col) + File Insights (4col) */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
+            gap: 24,
+            alignItems: 'stretch',
+          }}>
+            <ContinueCard onUpload={() => setShowUniversalUploadModal(true)} />
+            {!isMobile && <FileInsightsCard />}
           </div>
 
-          {/* Recently Added - Full width card below */}
-          <div style={{width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: isMobile ? 16 : 24, background: 'white', borderRadius: isMobile ? 14 : 20, border: '1px solid #E6E6EC', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04)', display: 'flex', flexDirection: 'column', overflow: 'visible'}}>
-              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? 12 : 24}}>
-                <div style={{color: '#32302C', fontSize: isMobile ? 16 : 18, fontFamily: 'Plus Jakarta Sans', fontWeight: '700'}}>{t('documents.recentlyAdded')}</div>
-                {contextDocuments.length > 8 && (
-                  <div
-                    onClick={() => navigate(ROUTES.DOCUMENTS)}
-                    style={{color: '#171717', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', lineHeight: '22.40px', cursor: 'pointer'}}
-                  >
-                    {t('common.seeAll')}
-                  </div>
-                )}
-              </div>
+          {/* Mobile-only: stacked cards */}
+          {isMobile && (
+            <>
+              <IntegrationsCard />
+              <FileInsightsCard />
+            </>
+          )}
 
-              {contextDocuments.length > 0 ? (
-                <div style={{display: 'flex', flexDirection: 'column', gap: 0, flex: 1, overflowY: 'auto', overflow: 'visible', minHeight: 0, position: 'relative'}}>
-                  {/* Table Header */}
-                  {!isMobile && (
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '2fr 1fr 1fr 1fr 50px',
-                      gap: 12,
-                      padding: '10px 14px',
-                      borderBottom: '1px solid #E6E6EC',
-                      marginBottom: 8
-                    }}>
-                      {[
-                        { key: 'name', label: t('documents.tableHeaders.name') },
-                        { key: 'type', label: t('documents.tableHeaders.type') },
-                        { key: 'size', label: t('documents.tableHeaders.size') },
-                        { key: 'date', label: t('documents.tableHeaders.date') }
-                      ].map(col => (
-                        <div
-                          key={col.key}
-                          onClick={() => {
-                            if (sortColumn === col.key) {
-                              setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-                            } else {
-                              setSortColumn(col.key);
-                              setSortDirection('asc');
-                            }
-                          }}
-                          style={{
-                            color: sortColumn === col.key ? '#171717' : '#6C6B6E',
-                            fontSize: 11,
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontWeight: '600',
-                            textTransform: 'uppercase',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 4,
-                            userSelect: 'none'
-                          }}
-                        >
-                          {col.label}
-                          {sortColumn === col.key && (
-                            <span style={{ fontSize: 10 }}>
-                              {sortDirection === 'asc' ? '▲' : '▼'}
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                      <div></div>
-                    </div>
-                  )}
-                  {(() => {
-                    // Helper function to get file type for sorting
-                    const getFileTypeForSort = (doc) => {
-                      const filename = doc?.filename || '';
-                      const ext = filename.match(/\.([^.]+)$/)?.[1]?.toUpperCase() || '';
-                      return ext || 'File';
-                    };
-
-                    // Show 8 most recently added documents (sorted by createdAt descending)
-                    const allDocsSorted = [...contextDocuments].sort((a, b) =>
-                      new Date(b.createdAt) - new Date(a.createdAt)
-                    );
-                    const docsToShow = allDocsSorted.slice(0, 8);
-                    return docsToShow.map((doc, index) => {
-                    // ✅ Check document status for visual indicators
-                    const isUploading = doc.status === 'uploading';
-                    // Processing status hidden - documents should display normally
-                    // const isProcessing = doc.status === 'processing';
-                    const isCompleted = doc.status === 'completed';
-                    // Failed badge hidden - documents work fine regardless of embedding status
-                    // const isFailed = doc.status === 'failed';
-
-                    const getFileIcon = (doc) => {
-                      // Prioritize MIME type over file extension (more reliable for encrypted filenames)
-                      const mimeType = doc?.mimeType || '';
-                      const filename = doc?.filename || '';
-
-                      // DEBUG: Log MIME type and filename for video files
-                      if (mimeType.startsWith('video/') || filename.match(/\.(mov|mp4)$/i)) {
-                        console.log('🎬 Video file detected (Recently Added):', { filename, mimeType });
-                      }
-
-                      // ========== VIDEO FILES ==========
-                      // QuickTime videos (.mov) - MUST check before generic video check
-                      if (mimeType === 'video/quicktime') {
-                        console.log('✅ Returning movIcon for (Recently Added):', filename);
-                        return movIcon; // Blue MOV icon
-                      }
-
-                      // MP4 videos - specific check only
-                      if (mimeType === 'video/mp4') {
-                        console.log('✅ Returning mp4Icon for (Recently Added):', filename);
-                        return mp4Icon; // Pink MP4 icon
-                      }
-
-                      // Other video types - use generic video icon (mp4)
-                      if (mimeType.startsWith('video/')) {
-                        console.log('⚠️  Generic video type, returning mp4Icon for (Recently Added):', filename, mimeType);
-                        return mp4Icon;
-                      }
-
-                      // ========== AUDIO FILES ==========
-                      if (mimeType.startsWith('audio/') || mimeType === 'audio/mpeg' || mimeType === 'audio/mp3') {
-                        return mp3Icon;
-                      }
-
-                      // ========== DOCUMENT FILES ==========
-                      if (mimeType === 'application/pdf') return pdfIcon;
-                      if (mimeType.includes('word') || mimeType.includes('msword')) return docIcon;
-                      if (mimeType.includes('sheet') || mimeType.includes('excel')) return xlsIcon;
-                      if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) return pptxIcon;
-                      if (mimeType === 'text/plain' || mimeType === 'text/csv') return txtIcon;
-
-                      // ========== IMAGE FILES ==========
-                      if (mimeType.startsWith('image/')) {
-                        if (mimeType.includes('jpeg') || mimeType.includes('jpg')) return jpgIcon;
-                        if (mimeType.includes('png')) return pngIcon;
-                        return pngIcon; // Default for other images
-                      }
-
-                      // ========== FALLBACK: Extension-based check ==========
-                      // (For files where MIME type is not set or is generic)
-                      if (filename) {
-                        const ext = filename.toLowerCase();
-                        // Documents
-                        if (ext.match(/\.(pdf)$/)) return pdfIcon;
-                        if (ext.match(/\.(doc|docx)$/)) return docIcon;
-                        if (ext.match(/\.(xls|xlsx)$/)) return xlsIcon;
-                        if (ext.match(/\.(ppt|pptx)$/)) return pptxIcon;
-                        if (ext.match(/\.(txt)$/)) return txtIcon;
-
-                        // Images
-                        if (ext.match(/\.(jpg|jpeg)$/)) return jpgIcon;
-                        if (ext.match(/\.(png)$/)) return pngIcon;
-
-                        // Videos
-                        if (ext.match(/\.(mov)$/)) return movIcon;
-                        if (ext.match(/\.(mp4)$/)) return mp4Icon;
-
-                        // Audio
-                        if (ext.match(/\.(mp3|wav|aac|m4a)$/)) return mp3Icon;
-
-                        // Adobe Premiere Pro / Video editing files use generic file icon
-                        // .prproj, .pek, .cfa - let them fall through to default
-                      }
-
-                      // Final fallback - for unknown/binary files (including .prproj, .pek, .cfa)
-                      return txtIcon;
-                    };
-
-                    const formatBytes = (bytes) => {
-                      if (bytes === 0) return '0 B';
-                      const sizes = ['B', 'KB', 'MB', 'GB'];
-                      const i = Math.floor(Math.log(bytes) / Math.log(1024));
-                      return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
-                    };
-
-                    const getFileType = (doc) => {
-                      const mimeType = doc?.mimeType || '';
-                      const filename = doc?.filename || '';
-
-                      // Get extension from filename
-                      const ext = filename.match(/\.([^.]+)$/)?.[1]?.toUpperCase() || '';
-
-                      if (mimeType === 'application/pdf' || ext === 'PDF') return 'PDF';
-                      if (ext === 'DOC') return 'DOC';
-                      if (ext === 'DOCX') return 'DOCX';
-                      if (ext === 'XLS') return 'XLS';
-                      if (ext === 'XLSX') return 'XLSX';
-                      if (ext === 'PPT') return 'PPT';
-                      if (ext === 'PPTX') return 'PPTX';
-                      if (ext === 'TXT') return 'TXT';
-                      if (ext === 'CSV') return 'CSV';
-                      if (ext === 'PNG') return 'PNG';
-                      if (ext === 'JPG' || ext === 'JPEG') return 'JPG';
-                      if (ext === 'GIF') return 'GIF';
-                      if (ext === 'WEBP') return 'WEBP';
-                      if (ext === 'MP4') return 'MP4';
-                      if (ext === 'MOV') return 'MOV';
-                      if (ext === 'AVI') return 'AVI';
-                      if (ext === 'MKV') return 'MKV';
-                      if (ext === 'MP3') return 'MP3';
-                      if (ext === 'WAV') return 'WAV';
-                      if (ext === 'AAC') return 'AAC';
-                      if (ext === 'M4A') return 'M4A';
-
-                      return ext || 'File';
-                    };
-
-                    return (
-                      <div
-                        key={doc.id}
-                        className="document-row"
-                        draggable
-                        onDragStart={(e) => {
-                          e.dataTransfer.setData('application/json', JSON.stringify({
-                            type: 'document',
-                            id: doc.id
-                          }));
-                          e.dataTransfer.effectAllowed = 'move';
-                        }}
-                        onDragEnd={(e) => {
-                          e.currentTarget.style.opacity = '1';
-                        }}
-                        onClick={() => navigate(buildRoute.document(doc.id))}
-                        style={isMobile ? {
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 12,
-                          padding: 10,
-                          borderRadius: 14,
-                          background: 'white',
-                          border: '1px solid #E6E6EC',
-                          cursor: 'pointer',
-                          marginBottom: 8,
-                          position: 'relative',
-                          overflow: openDropdownId === doc.id ? 'visible' : 'hidden',
-                          zIndex: openDropdownId === doc.id ? 99999 : 1,
-                          minHeight: 72,
-                          boxSizing: 'border-box'
-                        } : {
-                          display: 'grid',
-                          gridTemplateColumns: '2fr 1fr 1fr 1fr 50px',
-                          gap: 12,
-                          alignItems: 'center',
-                          padding: '10px 14px',
-                          borderRadius: 14,
-                          background: 'white',
-                          border: '1px solid #E6E6EC',
-                          cursor: 'pointer',
-                          transition: 'background 0.15s ease',
-                          marginBottom: 8,
-                          position: 'relative',
-                          overflow: openDropdownId === doc.id ? 'visible' : 'hidden',
-                          zIndex: openDropdownId === doc.id ? 99999 : 1
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!isUploading && !isMobile) {
-                            e.currentTarget.style.background = '#F7F7F9';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isUploading && !isMobile) {
-                            e.currentTarget.style.background = 'white';
-                          }
-                        }}
-                      >
-                        {/* Grey progress fill background */}
-                        {isUploading && (
-                          <div style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            height: '100%',
-                            width: `${doc.uploadProgress || 0}%`,
-                            background: '#E8E8E8',
-                            borderRadius: 14,
-                            transition: 'width 0.3s ease-out',
-                            zIndex: 0
-                          }} />
-                        )}
-                        {isMobile ? (
-                          <>
-                            <img
-                              src={getFileIcon(doc)}
-                              alt="File icon"
-                              style={{
-                                width: 40,
-                                height: 40,
-                                aspectRatio: '1/1',
-                                imageRendering: 'auto',
-                                objectFit: 'contain',
-                                shapeRendering: 'geometricPrecision',
-                                position: 'relative',
-                                zIndex: 1
-                              }}
-                            />
-                            <div style={{flex: 1, overflow: 'hidden', position: 'relative', zIndex: 1}}>
-                              <div style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-                                {cleanDocumentName(doc.filename)}
-                              </div>
-                              <div style={{color: '#6C6B6E', fontSize: 12, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', marginTop: 5}}>
-                                {isUploading
-                                  ? `${formatBytes(doc.fileSize)} – ${Math.round(doc.uploadProgress || 0)}% uploaded`
-                                  : `${formatBytes(doc.fileSize)} • ${new Date(doc.createdAt).toLocaleDateString()}`
-                                }
-                              </div>
-                              {/* Failed badge hidden - documents work fine regardless of embedding status */}
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            {/* Name Column */}
-                            <div style={{display: 'flex', alignItems: 'center', gap: 12, overflow: 'hidden', position: 'relative', zIndex: 1}}>
-                              <img
-                                src={getFileIcon(doc)}
-                                alt="File icon"
-                                style={{width: 40, height: 40, flexShrink: 0, imageRendering: 'auto', objectFit: 'contain'}}
-                              />
-                              <div style={{display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
-                                <div style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-                                  {cleanDocumentName(doc.filename)}
-                                </div>
-                                {isUploading && (
-                                  <div style={{fontSize: 13, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', fontWeight: '500', marginTop: 2}}>
-                                    {formatBytes(doc.fileSize)} – {Math.round(doc.uploadProgress || 0)}% uploaded
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                            {/* Type Column */}
-                            <div style={{color: '#6C6B6E', fontSize: 13, fontFamily: 'Plus Jakarta Sans', position: 'relative', zIndex: 1}}>{isUploading ? '' : getFileType(doc)}</div>
-                            {/* Size Column */}
-                            <div style={{color: '#6C6B6E', fontSize: 13, fontFamily: 'Plus Jakarta Sans', position: 'relative', zIndex: 1}}>{isUploading ? '' : formatBytes(doc.fileSize)}</div>
-                            {/* Date Column */}
-                            <div style={{color: '#6C6B6E', fontSize: 13, fontFamily: 'Plus Jakarta Sans', position: 'relative', zIndex: 1}}>{isUploading ? '' : new Date(doc.createdAt).toLocaleDateString()}</div>
-                          </>
-                        )}
-                        <div style={{position: 'relative', flexShrink: 0}} data-dropdown>
-                          <button
-                            ref={(el) => {
-                              if (el) dropdownRefs.current[doc.id] = el;
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (openDropdownId === doc.id) {
-                                setOpenDropdownId(null);
-                              } else {
-                                // Calculate if dropdown should open up or down
-                                const buttonRect = e.currentTarget.getBoundingClientRect();
-                                const dropdownHeight = 200; // Approximate dropdown height
-                                const spaceBelow = window.innerHeight - buttonRect.bottom;
-                                const spaceAbove = buttonRect.top;
-
-                                // Open upward if not enough space below and more space above
-                                if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
-                                  setDropdownDirection('up');
-                                } else {
-                                  setDropdownDirection('down');
-                                }
-                                setOpenDropdownId(doc.id);
-                              }
-                            }}
-                            onMouseEnter={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1.1)'; }}
-                            onMouseLeave={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1)'; }}
-                            style={{
-                              width: 32,
-                              height: 32,
-                              background: 'transparent',
-                              borderRadius: '50%',
-                              border: 'none',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              cursor: 'pointer',
-                              transition: 'transform 0.2s ease'
-                            }}
-                          >
-                            <DotsIcon style={{width: 24, height: 24, pointerEvents: 'auto', filter: 'brightness(0) invert(0.2)'}} />
-                          </button>
-
-                          {openDropdownId === doc.id && (
-                            <div
-                              data-dropdown
-                              onClick={(e) => e.stopPropagation()}
-                              style={{
-                                position: 'absolute',
-                                right: 0,
-                                ...(dropdownDirection === 'up'
-                                  ? { bottom: '100%', marginBottom: 4 }
-                                  : { top: '100%', marginTop: 4 }),
-                                background: 'white',
-                                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-                                borderRadius: 12,
-                                border: '1px solid #E6E6EC',
-                                zIndex: 99999,
-                                minWidth: 160,
-                                overflow: 'hidden'
-                              }}
-                            >
-                              <div style={{padding: 8, display: 'flex', flexDirection: 'column', gap: 0}}>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDownload(doc);
-                                  }}
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 6,
-                                    padding: '10px 14px',
-                                    background: 'transparent',
-                                    border: 'none',
-                                    borderRadius: 6,
-                                    cursor: 'pointer',
-                                    fontSize: 14,
-                                    fontFamily: 'Plus Jakarta Sans',
-                                    fontWeight: '500',
-                                    color: '#32302C',
-                                    transition: 'background 0.2s ease',
-                                    textAlign: 'left',
-                                    width: '100%'
-                                  }}
-                                  onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                >
-                                  <DownloadIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
-                                  {t('common.download')}
-                                </button>
-
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleRename(doc);
-                                  }}
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 6,
-                                    padding: '10px 14px',
-                                    background: 'transparent',
-                                    border: 'none',
-                                    borderRadius: 6,
-                                    cursor: 'pointer',
-                                    fontSize: 14,
-                                    fontFamily: 'Plus Jakarta Sans',
-                                    fontWeight: '500',
-                                    color: '#32302C',
-                                    transition: 'background 0.2s ease',
-                                    textAlign: 'left',
-                                    width: '100%'
-                                  }}
-                                  onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                >
-                                  <EditIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
-                                  {t('common.rename')}
-                                </button>
-
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleAddToCategory(doc);
-                                  }}
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 6,
-                                    padding: '10px 14px',
-                                    background: 'transparent',
-                                    border: 'none',
-                                    borderRadius: 6,
-                                    cursor: 'pointer',
-                                    fontSize: 14,
-                                    fontFamily: 'Plus Jakarta Sans',
-                                    fontWeight: '500',
-                                    color: '#32302C',
-                                    transition: 'background 0.2s ease',
-                                    textAlign: 'left',
-                                    width: '100%'
-                                  }}
-                                  onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                >
-                                  <AddIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
-                                  {t('common.move')}
-                                </button>
-
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setOpenDropdownId(null); // Close dropdown immediately
-                                    setItemToDelete({ type: 'document', id: doc.id, name: doc.filename });
-                                    setShowDeleteModal(true);
-                                  }}
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 6,
-                                    padding: '10px 14px',
-                                    background: 'transparent',
-                                    border: 'none',
-                                    borderRadius: 6,
-                                    cursor: 'pointer',
-                                    fontSize: 14,
-                                    fontFamily: 'Plus Jakarta Sans',
-                                    fontWeight: '500',
-                                    color: '#D92D20',
-                                    transition: 'background 0.2s ease',
-                                    textAlign: 'left',
-                                    width: '100%'
-                                  }}
-                                  onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
-                                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                >
-                                  <TrashCanIcon style={{ width: 20, height: 20, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' }} />
-                                  {t('common.delete')}
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  });
-                  })()}
-                </div>
-              ) : (
-                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 200}}>
-                  <div style={{color: '#6C6B6E', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '500'}}>{t('documents.noDocuments')}</div>
-                </div>
-              )}
-            </div>
-          </div>
+          {/* Row 3: Recently Added — full width */}
+          <RecentlyAddedCard
+            documents={contextDocuments}
+            loading={loading}
+            onRetry={refreshAll}
+            onDownload={handleDownload}
+            onRename={handleRename}
+            onAddToCategory={handleAddToCategory}
+            onDelete={(doc) => {
+              setItemToDelete({ type: 'document', id: doc.id, name: doc.filename });
+              setShowDeleteModal(true);
+            }}
+          />
+        </div>
 
         {/* Drag and Drop Overlay - light background with black text */}
         {isDraggingOver && (
@@ -2122,24 +1379,44 @@ const Documents = () => {
           setShowCategoryModal(false);
           setSelectedDocumentForCategory(null);
           setSelectedCategoryId(null);
+          setMovingFromCategoryId(null);
         }}
         uploadedDocuments={
-          isSelectMode && selectedDocuments.size > 0
-            ? contextDocuments.filter(doc => selectedDocuments.has(doc.id))
-            : (selectedDocumentForCategory ? [selectedDocumentForCategory] : [])
+          movingFromCategoryId
+            ? []
+            : isSelectMode && selectedDocuments.size > 0
+              ? contextDocuments.filter(doc => selectedDocuments.has(doc.id))
+              : (selectedDocumentForCategory ? [selectedDocumentForCategory] : [])
         }
-        showFilesSection={!!selectedDocumentForCategory || (isSelectMode && selectedDocuments.size > 0)}
-        categories={getRootFolders().filter(f => f.name.toLowerCase() !== 'recently added').map(f => ({
-          ...f,
-          fileCount: getDocumentCountByFolder(f.id)
-        }))}
+        showFilesSection={!movingFromCategoryId && (!!selectedDocumentForCategory || (isSelectMode && selectedDocuments.size > 0))}
+        categories={getRootFolders()
+          .filter(f => f.name.toLowerCase() !== 'recently added')
+          .filter(f => f.id !== movingFromCategoryId)
+          .map(f => ({
+            ...f,
+            fileCount: getDocumentCountByFolder(f.id)
+          }))}
         selectedCategoryId={selectedCategoryId}
         onCategorySelect={setSelectedCategoryId}
         onCreateNew={() => {
           setShowCategoryModal(false);
           setShowCreateFromMoveModal(true);
         }}
-        onConfirm={handleCategorySelection}
+        onConfirm={movingFromCategoryId ? async () => {
+          if (!selectedCategoryId) return;
+          const destId = selectedCategoryId;
+          const srcId = movingFromCategoryId;
+          const docsInSrc = contextDocuments.filter(d => d.folderId === srcId);
+          setShowCategoryModal(false);
+          setSelectedCategoryId(null);
+          setMovingFromCategoryId(null);
+          try {
+            await Promise.all(docsInSrc.map(d => moveToFolder(d.id, destId)));
+            showSuccess(t('toasts.filesMovedSuccessfully', { count: docsInSrc.length }));
+          } catch (error) {
+            showError(t('toasts.failedToAddDocumentsToCategory'));
+          }
+        } : handleCategorySelection}
       />
 
       {/* Edit Category Modal */}
@@ -2171,8 +1448,9 @@ const Documents = () => {
         onClose={() => {
           setShowUniversalUploadModal(false);
           setDroppedFiles(null);
+          setUploadCategoryId(null);
         }}
-        categoryId={null}
+        categoryId={uploadCategoryId}
         onUploadComplete={() => {
           // No manual refresh needed - context auto-updates!
         }}
@@ -2255,15 +1533,11 @@ const Documents = () => {
 
       {/* Ask Allybi Floating Button - with minimize support (desktop only) */}
       {!isMobile && (askKodaMinimized ? (
-        /* Minimized state: small icon button */
+        /* Minimized state: small icon button → navigate to chat */
         <button
-          onClick={() => {
-            setAskKodaMinimized(false);
-            localStorage.removeItem('askKodaMinimized');
-            setShowAskKoda(true);
-          }}
-          aria-label={t('documentViewer.needHelpFindingSomething')}
-          title={t('documentViewer.needHelpFindingSomething')}
+          onClick={() => navigate(ROUTES.CHAT)}
+          aria-label="Open chat"
+          title="Open chat"
           style={{
             position: 'absolute',
             right: 32,

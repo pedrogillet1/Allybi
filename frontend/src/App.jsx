@@ -51,6 +51,10 @@ import MobileBottomNav from './components/app-shell/MobileBottomNav';
 import SwipeableTabViewport from './components/app-shell/SwipeableTabViewport';
 import AuthModalShell from './components/auth/AuthModalShell';
 import SignedOutSignInButton from './components/auth/SignedOutSignInButton';
+import LandingPage from './components/landing/LandingPage';
+import IntegrationsPage from './components/integrations/IntegrationsPage';
+import GmailDetailPage from './components/integrations/GmailDetailPage';
+import LegalPage from './components/legal/LegalPage';
 
 // Dev-only Chat Contract Harness
 import ChatContractHarness from './pages/ChatContractHarness';
@@ -129,6 +133,13 @@ function AppContent() {
               <Route path={ROUTES.VERIFY_RECOVERY_EMAIL} element={<VerifyRecoveryEmail />} />
               <Route path={ROUTES.VERIFY_RECOVERY_PHONE} element={<VerifyRecoveryPhone />} />
 
+              {/* Legal pages (public) */}
+              <Route path={ROUTES.TERMS_OF_USE} element={<LegalPage />} />
+              <Route path={ROUTES.PRIVACY_POLICY} element={<LegalPage />} />
+
+              {/* Public pages */}
+              <Route path={ROUTES.LANDING} element={<LandingPage />} />
+
               {/* Public background: chat is always renderable */}
               <Route path="/" element={<ChatScreen />} />
               <Route path={ROUTES.CHAT} element={<ChatScreen />} />
@@ -145,6 +156,8 @@ function AppContent() {
               <Route path={ROUTES.DASHBOARD} element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path={ROUTES.SETTINGS} element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path={ROUTES.FILE_TYPE} element={<ProtectedRoute><FileTypeDetail /></ProtectedRoute>} />
+              <Route path={ROUTES.INTEGRATIONS} element={<ProtectedRoute><IntegrationsPage /></ProtectedRoute>} />
+              <Route path={ROUTES.INTEGRATIONS_GMAIL} element={<ProtectedRoute><GmailDetailPage /></ProtectedRoute>} />
               <Route path={ROUTES.UPGRADE} element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
 
               {/* DEV-ONLY ROUTES */}

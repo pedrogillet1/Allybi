@@ -23,6 +23,8 @@ import { ReactComponent as MoveIcon } from '../../assets/add.svg';
 import { ReactComponent as DeleteIcon } from '../../assets/Trash can-red.svg';
 import LayeredFolderIcon from '../folders/LayeredFolderIcon';
 import FolderBrowserModal from '../folders/FolderBrowserModal';
+import CategoryIcon from '../library/CategoryIcon';
+import { ROUTES } from '../../constants/routes';
 import api from '../../services/api';
 // ✅ REFACTORED: Use unified upload service (replaces folderUploadService + presignedUploadService)
 import unifiedUploadService from '../../services/unifiedUploadService';
@@ -40,9 +42,8 @@ import movIcon from '../../assets/mov.png';
 import mp4Icon from '../../assets/mp4.png';
 import mp3Icon from '../../assets/mp3.svg';
 import folderIcon from '../../assets/folder_icon.svg';
-import fileTypesStackIcon from '../../assets/file-types-stack.svg';
-import mobileUploadIllustration from '../../assets/file-types-stack.svg';
 import filesIcon from '../../assets/files-icon.svg';
+import dropzoneIllustration from '../../assets/dropzone-files-illustration.svg';
 import { generateThumbnail, supportsThumbnail } from '../../utils/files/thumbnailGenerator';
 import { encryptFile, encryptData } from '../../utils/security/encryption';
 import { extractText } from '../../utils/files/textExtraction';
@@ -50,6 +51,33 @@ import { encryptionWorkerManager } from '../../utils/security/encryptionWorkerMa
 import '../chat/streaming/StreamingAnimation.css';
 import { useAuth } from '../../context/AuthContext';
 import pLimit from 'p-limit';
+
+// ─── Single source of truth for supported upload formats ───
+const SUPPORTED_FORMATS = [
+  { key: 'pdf',  label: 'PDF',  icon: pdfIcon,  kind: 'doc' },
+  { key: 'doc',  label: 'DOCX', icon: docIcon,  kind: 'doc',  exts: ['.doc', '.docx'] },
+  { key: 'pptx', label: 'PPTX', icon: pptxIcon, kind: 'presentation', exts: ['.ppt', '.pptx'] },
+  { key: 'xlsx', label: 'XLSX', icon: xlsIcon,  kind: 'sheet', exts: ['.xls', '.xlsx'] },
+  { key: 'jpg',  label: 'JPG',  icon: jpgIcon,  kind: 'image', exts: ['.jpg', '.jpeg'] },
+  { key: 'png',  label: 'PNG',  icon: pngIcon,  kind: 'image' },
+  { key: 'mp3',  label: 'MP3',  icon: mp3Icon,  kind: 'media' },
+  { key: 'mp4',  label: 'MP4',  icon: mp4Icon,  kind: 'media' },
+];
+
+// Build the accept map from SUPPORTED_FORMATS for useDropzone
+const DROPZONE_ACCEPT = {
+  'application/pdf': ['.pdf'],
+  'application/msword': ['.doc'],
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+  'application/vnd.ms-powerpoint': ['.ppt'],
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx'],
+  'application/vnd.ms-excel': ['.xls'],
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+  'image/jpeg': ['.jpg', '.jpeg'],
+  'image/png': ['.png'],
+  'audio/mpeg': ['.mp3'],
+  'video/mp4': ['.mp4'],
+};
 
 /**
  * Filter Mac hidden files before upload
@@ -227,6 +255,8 @@ const formatFileSize = (bytes) => {
   return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 };
 
+const MAX_VISIBLE_DESTINATIONS = 6;
+
 const UploadHub = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -271,9 +301,15 @@ const UploadHub = () => {
   const [itemToRename, setItemToRename] = useState(null);
   const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [showFormatsModal, setShowFormatsModal] = useState(false);
   const [isLibraryExpanded, setIsLibraryExpanded] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [modalSearchQuery, setModalSearchQuery] = useState('');
+  const [destinationSearchQuery, setDestinationSearchQuery] = useState('');
+  const [expandedCategories, setExpandedCategories] = useState(new Set());
+  const [showAllDestinationsModal, setShowAllDestinationsModal] = useState(false);
+  const [expandedModalCategories, setExpandedModalCategories] = useState(new Set());
+  const [allDestModalSearch, setAllDestModalSearch] = useState('');
   const embeddingTimeoutsRef = useRef({}); // Track embedding timeouts for slow processing warnings
   const [folderBrowserModal, setFolderBrowserModal] = useState({
     isOpen: false,
@@ -524,6 +560,15 @@ const UploadHub = () => {
     return emojiMap[categoryName] || '📁';
   };
 
+  const toggleCategoryExpand = (catId, setter = setExpandedCategories) => {
+    setter(prev => {
+      const next = new Set(prev);
+      if (next.has(catId)) next.delete(catId);
+      else next.add(catId);
+      return next;
+    });
+  };
+
   // ⚡ PERFORMANCE: Compute derived data with useMemo (after getEmojiForCategory is defined)
   const topLevelFolders = useMemo(() => {
     return folders.filter(f =>
@@ -533,13 +578,68 @@ const UploadHub = () => {
 
   const categories = useMemo(() => {
     return folders
-      .filter(folder => folder.name.toLowerCase() !== 'recently added')
+      .filter(folder => !folder.parentFolderId && folder.name.toLowerCase() !== 'recently added')
       .map(folder => ({
         id: folder.id,
         name: folder.name,
-        emoji: folder.emoji || getEmojiForCategory(folder.name)
+        emoji: folder.emoji || getEmojiForCategory(folder.name),
       }));
   }, [folders]);
+
+  const getSubfolders = (parentId) => {
+    return folders
+      .filter(f => f.parentFolderId === parentId)
+      .map(f => ({ id: f.id, name: f.name, emoji: f.emoji || null }));
+  };
+
+  // Recursive check: does any descendant of parentId match the query?
+  const hasMatchingDescendant = (parentId, q) => {
+    const children = folders.filter(f => f.parentFolderId === parentId);
+    return children.some(c =>
+      c.name.toLowerCase().includes(q) || hasMatchingDescendant(c.id, q)
+    );
+  };
+
+  const filteredCategories = useMemo(() => {
+    if (!destinationSearchQuery.trim()) return categories;
+    const q = destinationSearchQuery.trim().toLowerCase();
+    return categories.filter(cat => {
+      if (cat.name.toLowerCase().includes(q)) return true;
+      return hasMatchingDescendant(cat.id, q);
+    });
+  }, [categories, destinationSearchQuery, folders]);
+
+  // Auto-expand ancestors of matching folders at any depth
+  useEffect(() => {
+    if (!destinationSearchQuery.trim()) return;
+    const q = destinationSearchQuery.trim().toLowerCase();
+    const toExpand = new Set();
+    // Recursively find folders whose children match, and mark them for expand
+    const findAndExpand = (parentId) => {
+      const children = folders.filter(f => f.parentFolderId === parentId);
+      let anyMatch = false;
+      children.forEach(child => {
+        const childMatches = child.name.toLowerCase().includes(q);
+        const descendantMatches = findAndExpand(child.id);
+        if (childMatches || descendantMatches) {
+          toExpand.add(parentId);
+          anyMatch = true;
+        }
+      });
+      return anyMatch;
+    };
+    categories.forEach(cat => findAndExpand(cat.id));
+    if (toExpand.size > 0) {
+      setExpandedCategories(prev => new Set([...prev, ...toExpand]));
+    }
+  }, [destinationSearchQuery, categories, folders]);
+
+  // Helper to resolve destination name from an id (searches ALL folders, not just root categories)
+  const getDestinationName = (destId) => {
+    if (!destId) return 'No category';
+    const folder = folders.find(f => f.id === destId);
+    return folder?.name || 'No category';
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -650,12 +750,15 @@ const UploadHub = () => {
       }
 
       // Just add files to the list without uploading
+      const destId = selectedDestinationRef.current || null;
+      const destName = getDestinationName(destId);
       const pendingFiles = supportedFiles.map(file => ({
         file,
         status: 'pending',
         progress: 0,
         error: null,
-        category: 'Uncategorized', // Default category
+        folderId: destId,
+        category: destName,
         path: file.path || file.name, // Preserve folder structure
         folderPath: file.path ? file.path.substring(0, file.path.lastIndexOf('/')) : null
       }));
@@ -665,47 +768,7 @@ const UploadHub = () => {
         setUploadingFiles(prev => [...pendingFiles, ...prev]);
       });
     },
-    accept: {
-      // Documents
-      'application/pdf': ['.pdf'],
-      'application/msword': ['.doc'],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
-      'application/vnd.ms-excel': ['.xls'],
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
-      'application/vnd.ms-powerpoint': ['.ppt'],
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx'],
-      'application/vnd.oasis.opendocument.text': ['.odt'],
-      'application/vnd.oasis.opendocument.spreadsheet': ['.ods'],
-      'application/vnd.oasis.opendocument.presentation': ['.odp'],
-      'text/plain': ['.txt'],
-      'text/csv': ['.csv'],
-      'application/rtf': ['.rtf'],
-      // Images
-      'image/jpeg': ['.jpg', '.jpeg'],
-      'image/png': ['.png'],
-      'image/gif': ['.gif'],
-      'image/webp': ['.webp'],
-      'image/svg+xml': ['.svg'],
-      'image/bmp': ['.bmp'],
-      'image/tiff': ['.tiff', '.tif'],
-      // Archives
-      'application/zip': ['.zip'],
-      'application/x-rar-compressed': ['.rar'],
-      'application/x-7z-compressed': ['.7z'],
-      'application/x-tar': ['.tar'],
-      'application/gzip': ['.gz'],
-      // Videos
-      'video/mp4': ['.mp4'],
-      'video/mpeg': ['.mpeg', '.mpg'],
-      'video/quicktime': ['.mov'],
-      'video/x-msvideo': ['.avi'],
-      'video/x-matroska': ['.mkv'],
-      // Audio
-      'audio/mpeg': ['.mp3'],
-      'audio/wav': ['.wav'],
-      'audio/ogg': ['.ogg'],
-      'audio/mp4': ['.m4a'],
-    },
+    accept: DROPZONE_ACCEPT,
     maxSize: 500 * 1024 * 1024, // 500MB max file size
     multiple: true,
     noClick: true,
@@ -788,12 +851,15 @@ const UploadHub = () => {
         return;
       }
 
+      const destId2 = selectedDestinationRef.current || null;
+      const destName2 = getDestinationName(destId2);
       const pendingFiles = filteredFiles.map(file => ({
         file,
         status: 'pending',
         progress: 0,
         error: null,
-        category: 'Uncategorized',
+        folderId: destId2,
+        category: destName2,
         path: file.path || file.name,
         folderPath: file.path ? file.path.substring(0, file.path.lastIndexOf('/')) : null
       }));
@@ -976,7 +1042,7 @@ const UploadHub = () => {
                 return f;
               }));
             },
-            null // categoryId - will be auto-categorized
+            null // categoryId - none selected
           );
 
           // Upload complete — track processing until all docs are ready
@@ -1438,6 +1504,8 @@ const UploadHub = () => {
     });
 
     // Create folder entries (ONE entry per folder, not per file)
+    const destIdFolder = selectedDestinationRef.current || null;
+    const destNameFolder = getDestinationName(destIdFolder);
     const folderEntries = [];
     for (const folder of folderStructure.values()) {
       if (folder.files.length > UPLOAD_CONFIG.MAX_FOLDER_FILES) {
@@ -1452,7 +1520,8 @@ const UploadHub = () => {
         status: 'pending',
         progress: 0,
         error: null,
-        category: 'Uncategorized',
+        folderId: destIdFolder,
+        category: destNameFolder,
         fileCount: folder.files.length,
         totalSize: totalSize
       });
@@ -1487,12 +1556,15 @@ const UploadHub = () => {
 
     if (supportedFiles.length === 0) return;
 
+    const destId3 = selectedDestinationRef.current || null;
+    const destName3 = getDestinationName(destId3);
     const pendingFiles = supportedFiles.map(file => ({
       file,
       status: 'pending',
       progress: 0,
       error: null,
-      category: 'Uncategorized',
+      folderId: destId3,
+      category: destName3,
       path: file.path || file.name,
       folderPath: file.path ? file.path.substring(0, file.path.lastIndexOf('/')) : null
     }));
@@ -1506,58 +1578,24 @@ const UploadHub = () => {
   };
 
   // Handle scanned document completion (mobile scanner)
-  const handleScanComplete = async (pdfFile) => {
+  const handleScanComplete = (pdfFile) => {
     if (!pdfFile) return;
 
-    // Add to uploading files with pending status
+    const destIdScan = selectedDestinationRef.current || null;
+    const destNameScan = getDestinationName(destIdScan);
     const pendingFile = {
       file: pdfFile,
       status: 'pending',
       progress: 0,
       error: null,
-      category: 'Uncategorized',
+      folderId: destIdScan,
+      category: destNameScan,
       path: pdfFile.name
     };
 
     startTransition(() => {
       setUploadingFiles(prev => [pendingFile, ...prev]);
     });
-
-    // Start upload using unified upload service
-    try {
-      totalFilesToUploadRef.current += 1;
-
-      const result = await unifiedUploadService.uploadSingleFile(
-        pdfFile,
-        null, // No folder specified, will go to root
-        (progress) => {
-          // Update progress during upload (0-50%)
-          setUploadingFiles(prev => prev.map(f =>
-            f.file === pdfFile
-              ? { ...f, progress: progress * 0.5, status: 'uploading' }
-              : f
-          ));
-        }
-      );
-
-      // Update with document ID for processing tracking
-      setUploadingFiles(prev => prev.map(f =>
-        f.file === pdfFile
-          ? { ...f, documentId: result.documentId, status: 'processing', progress: 50 }
-          : f
-      ));
-
-      // Refresh documents list
-      await fetchAllData();
-    } catch (error) {
-      console.error('Scan upload failed:', error);
-      setUploadingFiles(prev => prev.map(f =>
-        f.file === pdfFile
-          ? { ...f, status: 'failed', error: error.message }
-          : f
-      ));
-      showUploadError([pdfFile.name]);
-    }
   };
 
   // Removed toggleCategorySelection - using MoveToCategoryModal's built-in selection now
@@ -2003,20 +2041,120 @@ const UploadHub = () => {
     );
   };
 
+  const pendingCount = uploadingFiles.filter(f => f.status === 'pending').length;
+  const uploadingCount = uploadingFiles.filter(f => f.status === 'uploading' || f.status === 'processing').length;
+  const completedCount = uploadingFiles.filter(f => f.status === 'completed').length;
+  const hasFiles = uploadingFiles.length > 0;
+
+  // Destination selection — null means no category selected yet
+  const [selectedDestination, setSelectedDestination] = useState(null);
+  const selectedDestinationRef = useRef(null);
+  selectedDestinationRef.current = selectedDestination; // always fresh for closures
+  const destinationInitRef = useRef(false);
+  if (!destinationInitRef.current && categories.length > 0 && !selectedDestination) {
+    const allybiSpecifics = categories.find(c => c.name.toLowerCase() === 'allybi specifics');
+    if (allybiSpecifics) {
+      destinationInitRef.current = true;
+      Promise.resolve().then(() => setSelectedDestination(allybiSpecifics.id));
+    } else {
+      destinationInitRef.current = true;
+    }
+  }
+
+  // ── Shared recursive renderer for destination folder tree ──
+  const renderDestinationRow = (folder, depth, expandedSet, expandSetter, opts = {}) => {
+    const isSelected = selectedDestination === folder.id;
+    const subs = getSubfolders(folder.id);
+    const hasSubs = subs.length > 0;
+    const isExpanded = expandedSet.has(folder.id);
+    const isRoot = depth === 0;
+    const leftPad = isRoot ? 12 : 12 + (depth * 28);
+    const iconSize = isRoot ? 28 : 20;
+    const rowHeight = isRoot ? 48 : 40;
+    const fSize = isRoot ? 14 : 13;
+
+    return (
+      <React.Fragment key={folder.id}>
+        <button
+          onClick={() => {
+            const newId = isSelected ? null : folder.id;
+            setSelectedDestination(newId);
+            setUploadingFiles(prev => prev.map(f =>
+              f.status === 'pending' ? { ...f, folderId: newId, category: newId ? folder.name : 'No category' } : f
+            ));
+            if (opts.closeModal) opts.closeModal();
+          }}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8, height: rowHeight,
+            paddingLeft: leftPad, paddingRight: 12,
+            background: isSelected ? '#F5F5F5' : 'transparent',
+            border: isSelected ? '1px solid #E6E6EC' : '1px solid transparent',
+            borderRadius: 12, cursor: 'pointer', transition: 'all 150ms ease',
+            textAlign: 'left', width: '100%', flexShrink: 0,
+          }}
+          onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = '#F5F5F5'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = isSelected ? '#F5F5F5' : 'transparent'; }}>
+          {/* Chevron or spacer */}
+          {hasSubs ? (
+            <span
+              role="button"
+              aria-label={isExpanded ? 'Collapse subfolders' : 'Expand subfolders'}
+              onClick={(e) => { e.stopPropagation(); toggleCategoryExpand(folder.id, expandSetter); }}
+              style={{
+                width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0, cursor: 'pointer', borderRadius: 4,
+                transition: 'background 120ms ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#E6E6EC'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 150ms ease' }}>
+                <path d="M6 4l4 4-4 4" stroke="#A2A2A7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
+          ) : (
+            <span style={{ width: 16, flexShrink: 0 }} />
+          )}
+          {/* Icon: CategoryIcon for root, folder icon for nested */}
+          {isRoot ? (
+            <CategoryIcon emoji={folder.emoji} size={iconSize} />
+          ) : (
+            <img src={folderIcon} alt="" aria-hidden="true" style={{ width: iconSize, height: iconSize, flexShrink: 0, filter: 'brightness(0) invert(0.35)' }} />
+          )}
+          <span style={{
+            fontSize: fSize, fontWeight: '500', color: '#32302C',
+            fontFamily: 'Plus Jakarta Sans, sans-serif', flex: 1,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            lineHeight: '20px', marginLeft: isRoot ? 4 : 2,
+          }}>
+            {folder.name}
+          </span>
+          {isSelected && (
+            <CheckIcon style={{ width: 16, height: 16, flexShrink: 0, filter: 'brightness(0) invert(0.2)' }} />
+          )}
+        </button>
+        {/* Recursive children */}
+        {hasSubs && isExpanded && subs.map(sub =>
+          renderDestinationRow(sub, depth + 1, expandedSet, expandSetter, opts)
+        )}
+      </React.Fragment>
+    );
+  };
+
   return (
     <div data-page="upload-hub" className="upload-hub-page" style={{
       width: '100%',
       height: isMobile ? 'auto' : '100vh',
       minHeight: isMobile ? '100vh' : 'auto',
-      background: '#F5F5F5',
+      background: '#F1F0EF',
       overflow: isMobile ? 'visible' : 'hidden',
       display: 'flex',
-      flexDirection: isMobile ? 'column' : 'row'
+      flexDirection: isMobile ? 'column' : 'row',
     }}>
       <LeftNav onNotificationClick={() => setShowNotificationsPopup(true)} />
 
-      {/* Left Sidebar - Library - Hidden on mobile */}
-      {!isMobile && <div style={{
+      {/* Dead library sidebar hidden */}
+      {false && <div style={{
         width: isLibraryExpanded ? 314 : 64,
         background: 'white',
         borderRight: '1px solid #E6E6EC',
@@ -2681,768 +2819,875 @@ const UploadHub = () => {
         )}
       </div>}
 
-      {/* Main Upload Area */}
+      {/* ═══ MAIN CONTENT ═══ */}
       <div
         onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          background: '#F4F4F6',
-          position: 'relative',
-          overflowY: 'auto'
+          flex: 1, display: 'flex', flexDirection: 'column',
+          background: '#F1F0EF', position: 'relative', overflowY: 'auto',
         }}
       >
-        {/* Header */}
+        {/* Header — 72px, matches Home */}
         <div data-upload-header="true" className="mobile-sticky-header" style={{
-          height: isMobile ? 56 : 84,
-          paddingLeft: isMobile ? 16 : 24,
-          paddingRight: isMobile ? 16 : 24,
-          background: 'white',
-          borderBottom: '1px solid #E6E6EC',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          height: isMobile ? 56 : 72,
+          paddingLeft: isMobile ? 16 : 48, paddingRight: isMobile ? 16 : 48,
+          background: 'white', borderBottom: '1px solid #E6E6EC',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           flexShrink: 0,
           position: isMobile ? 'sticky' : 'relative',
-          top: isMobile ? 0 : 'auto',
-          zIndex: isMobile ? 10 : 'auto'
+          top: isMobile ? 0 : 'auto', zIndex: isMobile ? 10 : 'auto',
         }}>
           <h2 style={{
-            fontSize: isMobile ? 18 : 20,
-            fontWeight: '700',
-            color: '#32302C',
-            margin: 0,
-            fontFamily: 'Plus Jakarta Sans',
-            lineHeight: '30px',
-            textTransform: 'capitalize',
-            textAlign: 'left',
-            flex: isMobile ? 1 : 'auto'
+            fontSize: isMobile ? 18 : 20, fontWeight: '600', color: '#32302C', margin: 0,
+            fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '30px',
           }}>
-            Upload Hub
+            Upload
           </h2>
         </div>
 
-        {/* Content */}
+        {/* Content rail — max 1440px, padding 48px */}
         <div className="upload-hub-content scrollable-content" style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: isMobile ? 16 : '24px 24px 24px 24px',
-          paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 24,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: uploadingFiles.length > 0 ? 'flex-start' : 'center',
-          alignItems: uploadingFiles.length > 0 ? 'stretch' : 'center',
-          WebkitOverflowScrolling: 'touch'
+          flex: 1, overflowY: 'auto',
+          padding: isMobile ? 16 : '24px 48px',
+          paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 120,
+          maxWidth: 1440, width: '100%', margin: '0 auto',
+          WebkitOverflowScrolling: 'touch',
         }}>
-          {/* Drag-drop zone */}
-          <div {...getRootProps()} className="koda-welcome-enter" style={{
-            border: isMobile ? '2px solid #E6E6EC' : 'none',
-            outline: isMobile ? 'none' : '1px #E6E6EC solid',
-            outlineOffset: '-1px',
-            borderRadius: isMobile ? 16 : 20,
-            padding: isMobile ? 16 : 48,
-            textAlign: 'center',
-            marginBottom: uploadingFiles.length > 0 ? 24 : 0,
-            cursor: 'pointer',
-            background: 'white',
-            flexShrink: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            transition: 'all 0.3s ease-out',
-            maxWidth: isMobile ? '100%' : 800,
-            minHeight: isMobile ? 'auto' : 400,
-            alignSelf: 'center',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)'
-          }}
-          onMouseEnter={(e) => {
-            const img = e.currentTarget.querySelector('.file-types-icon');
-            if (img) {
-              img.style.transform = 'translateY(-4px) scale(1.02)';
-              img.style.filter = 'brightness(0) invert(0.4) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.2))';
-            }
-          }}
-          onMouseLeave={(e) => {
-            const img = e.currentTarget.querySelector('.file-types-icon');
-            if (img) {
-              img.style.transform = 'translateY(0) scale(1)';
-              img.style.filter = 'brightness(0) invert(0.4) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))';
-            }
-          }}
-          >
-            <input {...getInputProps()} />
-            {/* Inner gray container for mobile (matches popup design) */}
-            {isMobile ? (
-              <div style={{
-                width: '100%',
-                padding: 24,
-                background: '#F5F5F5',
-                borderRadius: 16,
-                outline: '1px #E6E6EC solid',
-                outlineOffset: '-1px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 8
+          {/* Row 1: Add files (2fr) + Destination (1fr) */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
+            gridTemplateRows: isMobile ? 'auto auto' : '440px',
+            gap: 24,
+          }}>
+
+            {/* ═══ LEFT: Add files Card (span 8) ═══ */}
+            <div {...getRootProps()} style={{
+              background: 'white', borderRadius: 16, border: '1px solid #E6E6EC',
+              boxShadow: '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)',
+              padding: 24, display: 'flex', flexDirection: 'column',
+              transition: 'border-color 120ms ease-out, background 120ms ease-out',
+              cursor: 'default', overflow: 'hidden',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#D0D0D5'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E6E6EC'; }}
+            >
+              <input {...getInputProps()} />
+
+              {/* Card header */}
+              <h3 style={{
+                margin: 0, fontSize: 16, fontWeight: '600', color: '#32302C',
+                fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '24px',
+              }}>Add files</h3>
+              <p style={{
+                margin: '4px 0 0', fontSize: 13, color: '#6C6B6E',
+                fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '20px',
               }}>
-                <img
-                  src={mobileUploadIllustration}
-                  alt="File Types"
-                  className="file-types-icon"
-                  style={{
-                    width: 120,
-                    height: 'auto',
-                    margin: '0 auto 16px',
-                    filter: 'brightness(0) invert(0.4)'
-                  }}
-                />
-                <h3 style={{fontSize: 16, fontWeight: '600', color: '#111827', margin: '0 0 8px 0', fontFamily: 'Plus Jakarta Sans'}}>{t('upload.tapToUpload')}</h3>
-                <p style={{fontSize: 13, color: '#6B7280', margin: '0 0 16px 0', lineHeight: 1.5, fontFamily: 'Plus Jakarta Sans'}}>{t('upload.allFileTypesSupported')}</p>
-                <div style={{display: 'flex', gap: 8, flexDirection: 'column', width: '100%', maxWidth: 200}}>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                    style={{
-                      height: 48,
-                      paddingLeft: 18,
-                      paddingRight: 18,
-                      background: 'white',
-                      border: 'none',
-                      borderRadius: 100,
-                      outline: '1px #E6E6EC solid',
-                      outlineOffset: '-1px',
-                      fontSize: 15,
-                      fontWeight: '600',
-                      color: '#323232',
-                      cursor: 'pointer',
-                      fontFamily: 'Plus Jakarta Sans',
-                      width: '100%'
-                    }}
-                  >
-                    {t('upload.selectFiles')}
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setShowScanner(true); }}
-                    style={{
-                      height: 44,
-                      paddingLeft: 16,
-                      paddingRight: 16,
-                      background: '#181818',
-                      border: 'none',
-                      borderRadius: 100,
-                      fontSize: 14,
-                      fontWeight: '600',
-                      color: 'white',
-                      cursor: 'pointer',
-                      fontFamily: 'Plus Jakarta Sans',
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8
-                    }}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M3 7V5a2 2 0 0 1 2-2h2" />
-                      <path d="M17 3h2a2 2 0 0 1 2 2v2" />
-                      <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
-                      <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
-                      <rect x="7" y="7" width="10" height="10" rx="1" />
-                    </svg>
-                    {t('upload.scanDocument', 'Scan Document')}
-                  </button>
+                Drag &amp; drop files or folders. Max 500 MB per file.
+              </p>
+
+              {isMobile ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, width: '100%', marginTop: 20 }}>
+                  <div style={{ display: 'flex', gap: 8, flexDirection: 'column', width: '100%', maxWidth: 220 }}>
+                    <button onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                      style={{ height: 44, background: '#181818', border: 'none', borderRadius: 9999, fontSize: 14, fontWeight: '600', color: 'white', cursor: 'pointer', fontFamily: 'Plus Jakarta Sans, sans-serif', width: '100%' }}>
+                      Select files
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); setShowScanner(true); }}
+                      style={{ height: 44, background: 'white', border: '1px solid #E6E6EC', borderRadius: 9999, fontSize: 14, fontWeight: '600', color: '#32302C', cursor: 'pointer', fontFamily: 'Plus Jakarta Sans, sans-serif', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                        <path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                        <rect x="7" y="7" width="10" height="10" rx="1"/>
+                      </svg>
+                      Scan
+                    </button>
+                  </div>
                 </div>
+              ) : (
+                /* ── Dropzone surface — fills remaining card height ── */
+                <div
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Drop files here or press Enter to select files"
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); fileInputRef.current?.click(); } }}
+                  style={{
+                    flex: 1, marginTop: 16, borderRadius: 12,
+                    background: '#F5F5F5', border: '1px dashed #E6E6EC',
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center',
+                    position: 'relative', minHeight: 0,
+                    transition: 'border-color 180ms ease, background 180ms ease',
+                    outline: 'none',
+                  }}
+                  onFocus={(e) => { e.currentTarget.style.boxShadow = '0 0 0 2px rgba(50,48,44,0.12)'; }}
+                  onBlur={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
+                >
+                  {/* File type illustration */}
+                  <img src={dropzoneIllustration} alt="" style={{ width: 180, height: 86, objectFit: 'contain', marginBottom: 16 }} />
+
+                  {/* Headline */}
+                  <p style={{
+                    margin: 0, fontSize: 15, fontWeight: '600', color: '#32302C',
+                    fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '22px',
+                  }}>
+                    Drop files here
+                  </p>
+                  <p style={{
+                    margin: '4px 0 0', fontSize: 13, color: '#6C6B6E',
+                    fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '20px',
+                  }}>
+                    or choose from your computer
+                  </p>
+
+                  {/* Buttons */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 16 }}>
+                    <button onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                      style={{
+                        height: 40, padding: '0 20px', background: '#181818', border: 'none',
+                        borderRadius: 9999, fontSize: 14, fontWeight: '600', color: 'white',
+                        cursor: 'pointer', fontFamily: 'Plus Jakarta Sans, sans-serif',
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'background 120ms ease', flexShrink: 0,
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = '#0F0F0F'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = '#181818'; }}>
+                      Select files
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); folderInputRef.current?.click(); }}
+                      style={{
+                        height: 40, padding: '0 20px', background: 'white', border: '1px solid #E6E6EC',
+                        borderRadius: 9999, fontSize: 14, fontWeight: '600', color: '#32302C',
+                        cursor: 'pointer', fontFamily: 'Plus Jakarta Sans, sans-serif',
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'background 120ms ease', flexShrink: 0,
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = '#ECECEC'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'white'; }}>
+                      Select folder
+                    </button>
+                  </div>
+
+                  {/* Supported formats footer — bottom of dropzone */}
+                  <div style={{
+                    position: 'absolute', bottom: 12, left: 0, right: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+                  }}>
+                    <span style={{ fontSize: 11, color: '#A2A2A7', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', lineHeight: '16px' }}>
+                      Supports PDF, DOCX, PPTX, XLSX, JPG, PNG, MP3, MP4
+                    </span>
+                    <span style={{ fontSize: 11, color: '#A2A2A7', lineHeight: '16px' }}>·</span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setShowFormatsModal(true); }}
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                        fontSize: 11, fontWeight: '600', color: '#6C6B6E',
+                        fontFamily: 'Plus Jakarta Sans, sans-serif',
+                        transition: 'color 120ms ease', lineHeight: '16px',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = '#32302C'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = '#6C6B6E'; }}
+                    >
+                      View all
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Hidden inputs */}
+              <input ref={fileInputRef} type="file" multiple onChange={handleFileSelect} style={{ display: 'none' }} />
+              <input ref={folderInputRef} type="file" webkitdirectory="" directory="" multiple onChange={handleFolderSelect} style={{ display: 'none' }} />
+            </div>
+
+            {/* ═══ RIGHT: Destination Card (span 4) ═══ */}
+            <div style={{
+              background: 'white', borderRadius: 16, border: '1px solid #E6E6EC',
+              boxShadow: '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)',
+              display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0,
+            }}>
+              {/* ── Header ── */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 24px 0', flexShrink: 0 }}>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '24px' }}>
+                  Destination
+                </h3>
+                {categories.length > 0 && (
+                  <button onClick={() => setShowNewCategoryModal(true)}
+                    aria-label="Create new category"
+                    style={{
+                      height: 36, padding: '0 14px', background: '#F5F5F5', border: '1px solid #E6E6EC',
+                      borderRadius: 9999, cursor: 'pointer', fontSize: 13, fontWeight: '600',
+                      color: '#32302C', fontFamily: 'Plus Jakarta Sans, sans-serif',
+                      transition: 'background 120ms ease',
+                      display: 'inline-flex', alignItems: 'center', gap: 4,
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#ECECEC'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = '#F5F5F5'; }}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="#32302C" strokeWidth="1.8" strokeLinecap="round"/></svg>
+                    New
+                  </button>
+                )}
               </div>
-            ) : (
-              <>
-                {/* File types stack icon - desktop */}
-                <img
-                  src={fileTypesStackIcon}
-                  alt="File Types"
-                  className="file-types-icon"
-                  style={{
-                    width: 200,
-                    height: 'auto',
-                    margin: '0 auto 16px',
-                    filter: 'brightness(0) invert(0.4) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))',
-                    transition: 'transform 0.3s ease, filter 0.3s ease'
-                  }}
-                />
-                <h3 style={{fontSize: 18, fontWeight: '600', color: '#111827', margin: '0 0 8px 0', fontFamily: 'Plus Jakarta Sans'}}>{t('upload.dragAndDrop')}</h3>
-                <p style={{fontSize: 14, color: '#6B7280', margin: '0 0 24px 0', lineHeight: 1.5, fontFamily: 'Plus Jakarta Sans'}}>{t('upload.uploadFilesOrFolders')}<br/>{t('upload.allFileTypesSupportedPerFile')}</p>
-                <div style={{display: 'flex', gap: 12, flexDirection: 'row'}}>
+
+              {categories.length === 0 ? (
+                /* ── State A: No categories — empty state ── */
+                <div style={{ padding: '32px 24px 24px', textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                  <p style={{ margin: 0, fontSize: 15, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '22px' }}>
+                    No categories yet
+                  </p>
+                  <p style={{ margin: '6px 0 0', fontSize: 13, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '20px' }}>
+                    Create one to organize uploads.
+                  </p>
                   <button
-                    onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                    onClick={() => setShowNewCategoryModal(true)}
                     style={{
-                      height: 52,
-                      paddingLeft: 18,
-                      paddingRight: 18,
-                      background: 'white',
-                      border: 'none',
-                      borderRadius: 100,
-                      outline: '1px #E6E6EC solid',
-                      outlineOffset: '-1px',
-                      fontSize: 16,
-                      fontWeight: '600',
-                      color: '#323232',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s',
-                      fontFamily: 'Plus Jakarta Sans'
+                      marginTop: 20, height: 44, padding: '0 24px', width: '100%',
+                      background: '#181818', border: 'none', borderRadius: 9999,
+                      cursor: 'pointer', fontSize: 14, fontWeight: '600', color: 'white',
+                      fontFamily: 'Plus Jakarta Sans, sans-serif',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                      transition: 'background 120ms ease',
                     }}
-                  >
-                    {t('upload.selectFiles')}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#333'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = '#181818'; }}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="white" strokeWidth="1.8" strokeLinecap="round"/></svg>
+                    Create category
                   </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); folderInputRef.current?.click(); }}
-                    style={{
-                      height: 52,
-                      paddingLeft: 18,
-                      paddingRight: 18,
-                      background: 'white',
-                      border: 'none',
-                      borderRadius: 100,
-                      outline: '1px #E6E6EC solid',
-                      outlineOffset: '-1px',
-                      fontSize: 16,
-                      fontWeight: '600',
-                      color: '#323232',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s',
-                      fontFamily: 'Plus Jakarta Sans'
-                    }}
-                  >
-                    {t('upload.selectFolder')}
-                  </button>
+                  <p style={{
+                    marginTop: 12, fontSize: 12, color: '#A2A2A7',
+                    fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px',
+                  }}>
+                    You can also upload without a category.
+                  </p>
                 </div>
-              </>
-            )}
-            {/* Hidden file inputs - work for both mobile and desktop */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              onChange={handleFileSelect}
-              style={{display: 'none'}}
-            />
-            <input
-              ref={folderInputRef}
-              type="file"
-              webkitdirectory=""
-              directory=""
-              multiple
-              onChange={handleFolderSelect}
-              style={{display: 'none'}}
-            />
-          </div>
-
-          {/* Upload progress list */}
-          {uploadingFiles.length > 0 && (
-            <div style={{display: 'flex', flexDirection: 'column', gap: isMobile ? 8 : 12, width: '100%', maxWidth: 800, alignSelf: 'center'}}>
-              {uploadingFiles.map((f, index) => {
-                const isError = f.status === 'failed';
-                const progressWidth = f.status === 'completed' ? 100 : (f.progress || 0);
-
-                return (
-                  <div
-                    key={index}
-                    onClick={() => f.isFolder && f.status === 'pending' && handleOpenFolderBrowser(index)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: isMobile ? 10 : 16,
-                      padding: isMobile ? '10px 12px' : 16,
-                      background: 'white',
-                      outline: isError ? '2px solid #EF4444' : 'none',
-                      outlineOffset: '-2px',
-                      border: `1px solid ${isError ? '#EF4444' : '#E5E7EB'}`,
-                      borderRadius: 12,
-                      transition: 'box-shadow 0.15s, border-color 0.15s',
-                      position: 'relative',
-                      cursor: f.isFolder && f.status === 'pending' ? 'pointer' : 'default',
-                      overflow: 'hidden'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (f.isFolder && f.status === 'pending') {
-                        e.currentTarget.style.borderColor = '#D1D5DB';
-                        e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (f.isFolder && f.status === 'pending') {
-                        e.currentTarget.style.borderColor = isError ? '#EF4444' : '#E5E7EB';
-                        e.currentTarget.style.boxShadow = 'none';
-                      }
-                    }}
-                  >
-                    {/* Grey progress fill background */}
-                    {(f.status === 'uploading' || f.status === 'processing' || f.status === 'completed') && (
-                      <div style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        height: '100%',
-                        width: `${progressWidth}%`,
-                        background: 'rgba(169, 169, 169, 0.12)',
-                        borderRadius: 12,
-                        transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                        zIndex: 0
-                      }} />
-                    )}
-                    {/* Icon (File or Folder) */}
-                    <div style={{
-                      width: 48,
-                      height: 48,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                      position: 'relative',
-                      zIndex: 1
-                    }}>
-                      {f.isFolder ? (
-                        <img src={folderIcon} alt="Folder" style={{width: 44, height: 44, filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'}} />
-                      ) : (
-                        <img
-                          src={getFileIcon(f.file.name)}
-                          alt="File icon"
+              ) : (
+                /* ── State B: Has categories — search + list ── */
+                <>
+                  {/* ── Search input ── */}
+                  <div style={{ padding: '16px 24px 0' }}>
+                      <div style={{ position: 'relative' }}>
+                        <SearchIcon style={{
+                          width: 16, height: 16, position: 'absolute', left: 14, top: 12,
+                          filter: 'brightness(0) invert(0.4)', pointerEvents: 'none',
+                        }} />
+                        <input
+                          type="text"
+                          placeholder="Search categories..."
+                          value={destinationSearchQuery}
+                          onChange={(e) => setDestinationSearchQuery(e.target.value)}
                           style={{
-                            width: 44,
-                            height: 44,
-                            imageRendering: 'auto',
-                            objectFit: 'contain',
-                            shapeRendering: 'geometricPrecision',
-                            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+                            width: '100%', height: 40, padding: '0 14px 0 38px',
+                            background: '#F5F5F5', border: '1px solid #E6E6EC',
+                            borderRadius: 9999, outline: 'none', fontSize: 14,
+                            fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500',
+                            color: '#32302C', boxSizing: 'border-box',
+                            transition: 'border-color 150ms ease, box-shadow 150ms ease',
                           }}
+                          onFocus={(e) => { e.target.style.borderColor = '#A2A2A7'; e.target.style.boxShadow = '0 0 0 2px rgba(50,48,44,0.1)'; }}
+                          onBlur={(e) => { e.target.style.borderColor = '#E6E6EC'; e.target.style.boxShadow = 'none'; }}
                         />
-                      )}
+                      </div>
                     </div>
 
-                    {/* Details (File or Folder) */}
-                    <div style={{flex: 1, minWidth: 0}}>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginBottom: isMobile ? 2 : 4
-                      }}>
-                        <p style={{
-                          fontSize: 14,
-                          fontWeight: '500',
-                          color: '#111827',
-                          margin: 0,
-                          fontFamily: 'Plus Jakarta Sans',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          flex: 1
-                        }}>{cleanDocumentName(f.isFolder ? f.folderName : f.file.name)}</p>
-                        <div style={{display: 'flex', gap: 8, alignItems: 'center'}}>
-                          {isError && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Reset status to pending and retry immediately
-                                setUploadingFiles(prev => prev.map((file, idx) =>
-                                  idx === index ? { ...file, status: 'pending', progress: 0, error: null } : file
-                                ));
-                                // Trigger upload again immediately
-                                handleConfirmUpload();
-                              }}
-                              style={{
-                                padding: '6px 12px',
-                                background: '#EF4444',
-                                border: '1px solid #EF4444',
-                                borderRadius: 8,
-                                cursor: 'pointer',
-                                fontSize: 12,
-                                fontWeight: '600',
-                                color: 'white',
-                                flexShrink: 0,
-                                transition: 'all 0.15s',
-                                fontFamily: 'Plus Jakarta Sans'
-                              }}
-                              onMouseEnter={(e) => e.currentTarget.style.background = '#DC2626'}
-                              onMouseLeave={(e) => e.currentTarget.style.background = '#EF4444'}
-                            >
-                              Retry Upload
-                            </button>
-                          )}
-                          {f.status === 'completed' && (
-                            <div style={{position: 'relative'}}>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const identifier = f.isFolder ? f.folderName : f.file.name;
-                                  setOpenDropdownId(openDropdownId === identifier ? null : identifier);
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = '#E6E6EC'}
-                                onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-                                style={{
-                                  width: 32,
-                                  height: 32,
-                                  background: 'white',
-                                  borderRadius: '50%',
-                                  border: '1px solid #E6E6EC',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  cursor: 'pointer',
-                                  fontSize: 18,
-                                  fontWeight: '700',
-                                  color: '#32302C',
-                                  transition: 'background 0.2s ease'
-                                }}
-                              >
-                                ⋯
-                              </button>
+                  {/* ── Category list (recursive expandable tree) ── */}
+                  <div style={{ padding: '12px 24px 0', flex: 1, minHeight: 0, overflowY: 'auto' }}>
+                    {filteredCategories.length === 0 ? (
+                      <div style={{ padding: '20px 0', textAlign: 'center' }}>
+                        <p style={{ margin: 0, fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>No matching categories</p>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {filteredCategories.map(cat =>
+                          renderDestinationRow(cat, 0, expandedCategories, setExpandedCategories)
+                        )}
+                      </div>
+                    )}
+                  </div>
 
-                              {openDropdownId === (f.isFolder ? f.folderName : f.file.name) && (
-                                <div
-                                  data-dropdown
-                                  style={{
-                                    position: 'absolute',
-                                    top: '100%',
-                                    right: 0,
-                                    marginTop: 4,
-                                    background: 'white',
-                                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-                                    borderRadius: 12,
-                                    border: '1px solid #E6E6EC',
-                                    zIndex: 1001,
-                                    minWidth: 160,
-                                    overflow: 'hidden',
-                                    padding: 8
-                                  }}
-                                >
-                                  <div style={{display: 'flex', flexDirection: 'column', gap: 1}}>
-                                    <button
-                                      onClick={async (e) => {
-                                        e.stopPropagation();
-                                        try {
-                                          const response = await api.get(`/api/documents/${f.documentId}/stream?download=true`, {
-                                            responseType: 'blob'
-                                          });
-                                          const url = window.URL.createObjectURL(new Blob([response.data]));
-                                          const link = document.createElement('a');
-                                          link.href = url;
-                                          link.setAttribute('download', f.file.name);
-                                          document.body.appendChild(link);
-                                          link.click();
-                                          link.remove();
-                                          setOpenDropdownId(null);
-                                        } catch (error) {
-                                          showError(t('alerts.failedToDownloadFile'));
-                                        }
-                                      }}
-                                      style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 6,
-                                        width: '100%',
-                                        padding: '10px 14px',
-                                        background: 'transparent',
-                                        border: 'none',
-                                        borderRadius: 6,
-                                        cursor: 'pointer',
-                                        fontSize: 14,
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        fontWeight: '500',
-                                        color: '#32302C',
-                                        transition: 'background 0.2s ease',
-                                        textAlign: 'left'
-                                      }}
-                                      onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                    >
-                                      Download
-                                    </button>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setItemToRename({ type: 'document', id: f.documentId, name: f.file.name });
-                                        setShowRenameModal(true);
-                                        setOpenDropdownId(null);
-                                      }}
-                                      style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 6,
-                                        width: '100%',
-                                        padding: '10px 14px',
-                                        background: 'transparent',
-                                        border: 'none',
-                                        borderRadius: 6,
-                                        cursor: 'pointer',
-                                        fontSize: 14,
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        fontWeight: '500',
-                                        color: '#32302C',
-                                        transition: 'background 0.2s ease',
-                                        textAlign: 'left'
-                                      }}
-                                      onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                    >
-                                      Rename
-                                    </button>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setOpenDropdownId(null);
-                                        setShowCategoryModal(f.documentId || (f.isFolder ? f.folderName : f.file.name));
-                                      }}
-                                      style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 6,
-                                        width: '100%',
-                                        padding: '10px 14px',
-                                        background: 'transparent',
-                                        border: 'none',
-                                        borderRadius: 6,
-                                        cursor: 'pointer',
-                                        fontSize: 14,
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        fontWeight: '500',
-                                        color: '#32302C',
-                                        transition: 'background 0.2s ease',
-                                        textAlign: 'left'
-                                      }}
-                                      onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                    >
-                                      Move
-                                    </button>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setItemToDelete({
-                                          type: 'uploadedFile',
-                                          documentId: f.documentId,
-                                          name: f.file.name,
-                                          folderName: f.isFolder ? f.folderName : null,
-                                          isFolder: f.isFolder
-                                        });
-                                        setShowDeleteModal(true);
-                                      }}
-                                      style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 6,
-                                        width: '100%',
-                                        padding: '10px 14px',
-                                        background: 'transparent',
-                                        border: 'none',
-                                        borderRadius: 6,
-                                        cursor: 'pointer',
-                                        fontSize: 14,
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        fontWeight: '500',
-                                        color: '#D92D20',
-                                        transition: 'background 0.2s ease',
-                                        textAlign: 'left'
-                                      }}
-                                      onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
-                                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                    >
-                                      Delete
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                          {f.status !== 'completed' && (
-                            <button
-                              onClick={() => removeUploadingFile(f.isFolder ? f.folderName : f.file.name)}
-                              style={{
-                                width: 24,
-                                height: 24,
-                                border: 'none',
-                                background: 'transparent',
-                                borderRadius: 4,
-                                cursor: 'pointer',
-                                fontSize: 16,
-                                color: '#9CA3AF',
-                                flexShrink: 0,
-                                transition: 'all 0.15s',
-                                fontFamily: 'Plus Jakarta Sans'
-                              }}
-                            >
-                              ✕
-                            </button>
-                          )}
+                  {/* ── "See all" link ── */}
+                  {!destinationSearchQuery.trim() && categories.length > MAX_VISIBLE_DESTINATIONS && (
+                    <div style={{ padding: '8px 24px 12px', flexShrink: 0 }}>
+                      <button
+                        onClick={() => { setAllDestModalSearch(''); setShowAllDestinationsModal(true); }}
+                        style={{
+                          background: 'none', border: 'none', padding: 0,
+                          cursor: 'pointer', fontSize: 12, fontWeight: '600',
+                          color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif',
+                          transition: 'color 120ms ease',
+                          display: 'inline-flex', alignItems: 'center', gap: 4,
+                          lineHeight: '18px',
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = '#32302C'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = '#6C6B6E'; }}>
+                        See all categories
+                        <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5l3.5 3.5-3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* ── Keep folder structure toggle ── */}
+                  {uploadingFiles.some(f => f.isFolder) && (
+                    <div style={{ borderTop: '1px solid #E6E6EC', margin: '0 24px', paddingTop: 12, paddingBottom: 8, flexShrink: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: 14, fontWeight: '500', color: '#32302C', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '20px' }}>
+                          Keep folder structure
+                        </span>
+                        <div style={{
+                          width: 36, height: 20, borderRadius: 10,
+                          background: '#E6E6EC', cursor: 'pointer',
+                          position: 'relative', transition: 'background 150ms ease',
+                        }}>
+                          <div style={{
+                            width: 16, height: 16, borderRadius: '50%', background: 'white',
+                            position: 'absolute', top: 2, left: 2,
+                            transition: 'left 150ms ease',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                          }} />
                         </div>
                       </div>
-
-                      <p style={{
-                        fontSize: 13,
-                        color: isError ? '#EF4444' : (f.status === 'uploading' ? '#A0A0A0' : '#6B7280'),
-                        margin: 0,
-                        fontFamily: 'Plus Jakarta Sans'
-                      }}>
-                        {isError ? (
-                          'Failed to upload. Try again.'
-                        ) : f.isFolder ? (
-                          f.status === 'pending' ? (
-                            `${f.fileCount} file${f.fileCount !== 1 ? 's' : ''} • ${formatFileSize(f.totalSize)} • ${f.category || 'Uncategorized'}`
-                          ) : f.status === 'uploading' || f.status === 'processing' ? (
-                            f.stage && f.stage !== 'Preparing...'
-                              ? `${f.stage} – ${Math.round(progressWidth)}%`
-                              : progressWidth > 5
-                                ? `${formatFileSize(f.totalSize)} – ${Math.round(progressWidth)}%`
-                                : `${f.stage || 'Preparing...'}`
-                          ) : f.status === 'completed' ? (
-                            `${f.fileCount} file${f.fileCount !== 1 ? 's' : ''} • ${formatFileSize(f.totalSize)} • Uploaded`
-                          ) : (
-                            `${f.fileCount} file${f.fileCount !== 1 ? 's' : ''} • ${formatFileSize(f.totalSize)} • ${f.category || 'Uncategorized'}`
-                          )
-                        ) : f.status === 'pending' ? (
-                          `${formatFileSize(f.file.size)} • ${f.category || 'Uncategorized'}`
-                        ) : f.status === 'completed' ? (
-                          `${formatFileSize(f.file.size)} • ${f.category || 'Uncategorized'}`
-                        ) : f.status === 'processing' ? (
-                          f.statusMessage || 'Processing document...'
-                        ) : (
-                          `${formatFileSize(f.file.size)} – ${Math.round(progressWidth)}% uploaded`
-                        )}
-                      </p>
-
                     </div>
+                  )}
+
+                  {/* ── Footer: contextual helper text ── */}
+                  <div style={{
+                    borderTop: '1px solid #E6E6EC', marginTop: 'auto',
+                    padding: '12px 24px 16px', flexShrink: 0,
+                  }}>
+                    <p style={{
+                      margin: 0, fontSize: 12, color: '#6C6B6E',
+                      fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px',
+                    }}>
+                      {selectedDestination
+                        ? `Uploading to: ${getDestinationName(selectedDestination)}`
+                        : 'No category selected \u2014 uploads go to Recently Added.'}
+                    </p>
                   </div>
-                );
-              })}
+                </>
+              )}
             </div>
-          )}
+
+          </div>
+
+          {/* Row 2: Files card (span 12, full width) */}
+          <div style={{
+            background: 'white', borderRadius: 16, border: '1px solid #E6E6EC',
+            boxShadow: '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)',
+            padding: 24, marginTop: 24,
+          }}>
+            {/* Files header */}
+            {(() => {
+              const isUploading = uploadingFiles.some(f => f.status === 'uploading' || f.status === 'processing');
+              const isAllDone = hasFiles && uploadingFiles.every(f => f.status === 'completed' || f.status === 'failed');
+
+              // Subtitle copy
+              let subtitle = '';
+              if (isUploading) subtitle = 'Uploading\u2026';
+              else if (isAllDone) subtitle = 'Uploaded.';
+              else if (pendingCount > 0 && selectedDestination) subtitle = `Uploading to ${getDestinationName(selectedDestination)}.`;
+              else if (pendingCount > 0) subtitle = 'No category selected \u2014 uploads go to Recently Added.';
+
+              return (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: hasFiles ? 16 : 0 }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: 16, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '24px' }}>
+                      Files{hasFiles ? ` (${uploadingFiles.length})` : ''}
+                    </h3>
+                    {subtitle && (
+                      <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px' }}>
+                        {subtitle}
+                      </p>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {isAllDone && (
+                      <button onClick={() => setUploadingFiles([])}
+                        style={{
+                          height: 36, padding: '0 16px', background: 'white', border: '1px solid #E6E6EC',
+                          borderRadius: 9999, cursor: 'pointer', fontSize: 13, fontWeight: '600',
+                          color: '#32302C', fontFamily: 'Plus Jakarta Sans, sans-serif',
+                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                          transition: 'background 120ms ease',
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = 'white'; }}>
+                        Clear
+                      </button>
+                    )}
+                    {(() => {
+                      const canUpload = pendingCount > 0;
+                      return (
+                        <button
+                          disabled={!canUpload}
+                          onClick={canUpload ? handleConfirmUpload : undefined}
+                          style={{
+                            height: 36, padding: '0 18px',
+                            background: '#181818',
+                            opacity: canUpload ? 1 : 0.4,
+                            border: 'none', borderRadius: 9999, cursor: canUpload ? 'pointer' : 'not-allowed',
+                            fontSize: 13, fontWeight: '600', color: 'white',
+                            fontFamily: 'Plus Jakarta Sans, sans-serif',
+                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                            transition: 'opacity 120ms ease, background 120ms ease',
+                          }}
+                          onMouseEnter={(e) => { if (canUpload) e.currentTarget.style.background = '#333'; }}
+                          onMouseLeave={(e) => { if (canUpload) e.currentTarget.style.background = '#181818'; }}>
+                          {canUpload ? `Upload (${pendingCount})` : 'Upload'}
+                        </button>
+                      );
+                    })()}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Empty state — table rhythm */}
+            {!hasFiles && (
+              <div style={{ marginTop: 8 }}>
+                <p style={{
+                  margin: '0 0 16px', fontSize: 13, color: '#6C6B6E',
+                  fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '20px',
+                }}>
+                  Selected files appear here before upload.
+                </p>
+                {/* Table header */}
+                <div style={{
+                  display: 'grid', gridTemplateColumns: '1fr 200px 100px 80px 44px',
+                  gap: 12, padding: '0 12px', marginBottom: 4,
+                }}>
+                  {['Name', 'Destination', 'Status', 'Size', ''].map((col, ci) => (
+                    <span key={ci} style={{
+                      fontSize: 12, fontWeight: '600', color: '#6C6B6E',
+                      fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px',
+                      textAlign: col === 'Size' ? 'right' : 'left',
+                    }}>{col}</span>
+                  ))}
+                </div>
+                {/* Skeleton rows */}
+                {[
+                  { nameW: 160, destW: 100, statusW: 56, sizeW: 40 },
+                  { nameW: 130, destW: 80, statusW: 56, sizeW: 36 },
+                  { nameW: 180, destW: 90, statusW: 56, sizeW: 44 },
+                  { nameW: 110, destW: 110, statusW: 56, sizeW: 32 },
+                ].map((row, i) => (
+                  <div key={i} style={{
+                    display: 'grid', gridTemplateColumns: '1fr 200px 100px 80px 44px',
+                    gap: 12, height: 48, padding: '0 12px', alignItems: 'center',
+                    opacity: 0.22 - i * 0.04, pointerEvents: 'none',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ width: 24, height: 24, background: '#E6E6EC', borderRadius: 4, flexShrink: 0 }} />
+                      <div style={{ height: 10, width: row.nameW, background: '#E6E6EC', borderRadius: 4 }} />
+                    </div>
+                    <div style={{ height: 10, width: row.destW, background: '#E6E6EC', borderRadius: 4 }} />
+                    <div style={{ height: 10, width: row.statusW, background: '#E6E6EC', borderRadius: 4 }} />
+                    <div style={{ height: 10, width: row.sizeW, background: '#E6E6EC', borderRadius: 4, marginLeft: 'auto' }} />
+                    <div />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Populated rows */}
+            {hasFiles && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {uploadingFiles.map((f, index) => {
+                  const isError = f.status === 'failed';
+                  const isComplete = f.status === 'completed';
+                  const isUploading = f.status === 'uploading' || f.status === 'processing';
+                  const isPending = f.status === 'pending';
+                  const progressWidth = isComplete ? 100 : (f.progress || 0);
+
+                  let chipLabel = 'Ready';
+                  let chipColor = '#6C6B6E';
+                  let chipBg = '#F5F5F5';
+                  if (isError) { chipLabel = 'Error'; chipColor = '#D92D20'; chipBg = '#FEF3F2'; }
+                  else if (isComplete) { chipLabel = 'Done'; chipColor = '#34A853'; chipBg = '#F0FDF4'; }
+                  else if (isUploading) { chipLabel = `${Math.round(progressWidth)}%`; chipColor = '#181818'; chipBg = '#F5F5F5'; }
+
+                  return (
+                    <div key={index}
+                      onClick={() => f.isFolder && isPending && handleOpenFolderBrowser(index)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 12,
+                        height: 48, padding: '0 12px',
+                        borderRadius: 12, position: 'relative', overflow: 'hidden',
+                        cursor: f.isFolder && isPending ? 'pointer' : 'default',
+                        transition: 'background 150ms ease',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                    >
+                      {isUploading && (
+                        <div style={{
+                          position: 'absolute', top: 0, left: 0, height: '100%',
+                          width: `${progressWidth}%`, background: 'rgba(24,24,24,0.04)',
+                          borderRadius: 12, transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1)', zIndex: 0,
+                        }} />
+                      )}
+
+                      <div style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, position: 'relative', zIndex: 1 }}>
+                        {f.isFolder ? (
+                          <CategoryIcon emoji={null} size={28} />
+                        ) : (
+                          <img src={getFileIcon(f.file.name)} alt="" style={{ width: 28, height: 28, objectFit: 'contain' }} />
+                        )}
+                      </div>
+
+                      <div style={{ flex: 1, minWidth: 0, position: 'relative', zIndex: 1 }}>
+                        <p style={{
+                          fontSize: 14, fontWeight: '500', color: '#32302C', margin: 0,
+                          fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '20px',
+                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                        }}>
+                          {cleanDocumentName(f.isFolder ? f.folderName : f.file.name)}
+                        </p>
+                        <p style={{
+                          fontSize: 12, color: isError ? '#D92D20' : '#6C6B6E', margin: '1px 0 0',
+                          fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px',
+                        }}>
+                          {isError ? 'Upload failed' : f.isFolder
+                            ? `${f.fileCount} file${f.fileCount !== 1 ? 's' : ''} \u00B7 ${formatFileSize(f.totalSize)}`
+                            : formatFileSize(f.file?.size)}
+                        </p>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, position: 'relative', zIndex: 1 }}>
+                        <span style={{
+                          fontSize: 11, fontWeight: '600', color: chipColor, background: chipBg,
+                          padding: '2px 8px', borderRadius: 9999, fontFamily: 'Plus Jakarta Sans, sans-serif',
+                          lineHeight: '18px', whiteSpace: 'nowrap',
+                        }}>
+                          {chipLabel}
+                        </span>
+
+                        {isError && (
+                          <button onClick={(e) => {
+                            e.stopPropagation();
+                            setUploadingFiles(prev => prev.map((file, idx) => idx === index ? { ...file, status: 'pending', progress: 0, error: null } : file));
+                          }}
+                          style={{ padding: '2px 8px', background: 'none', border: '1px solid #D92D20', borderRadius: 9999, cursor: 'pointer', fontSize: 11, fontWeight: '600', color: '#D92D20', fontFamily: 'Plus Jakarta Sans, sans-serif', transition: 'background 150ms ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = '#FEF3F2'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
+                            Retry
+                          </button>
+                        )}
+
+                        {isComplete && (
+                          <div style={{ position: 'relative' }}>
+                            <button onClick={(e) => { e.stopPropagation(); const id = f.isFolder ? f.folderName : f.file.name; setOpenDropdownId(openDropdownId === id ? null : id); }}
+                              style={{ width: 28, height: 28, background: 'transparent', borderRadius: '50%', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 16, color: '#6C6B6E', transition: 'background 150ms ease' }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = '#E6E6EC'; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
+                              &#x22EF;
+                            </button>
+                            {openDropdownId === (f.isFolder ? f.folderName : f.file.name) && (
+                              <div data-dropdown style={{ position: 'absolute', top: '100%', right: 0, marginTop: 4, background: 'white', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', borderRadius: 12, border: '1px solid #E6E6EC', zIndex: 1001, minWidth: 160, padding: 8 }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                  {[
+                                    { label: 'Download', icon: <DownloadIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />, color: '#32302C', action: async (e) => { e.stopPropagation(); try { const response = await api.get(`/api/documents/${f.documentId}/stream?download=true`, { responseType: 'blob' }); const url = window.URL.createObjectURL(new Blob([response.data])); const link = document.createElement('a'); link.href = url; link.setAttribute('download', f.file.name); document.body.appendChild(link); link.click(); link.remove(); setOpenDropdownId(null); } catch (error) { showError(t('alerts.failedToDownloadFile')); } }},
+                                    { label: 'Rename', icon: <RenameIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />, color: '#32302C', action: (e) => { e.stopPropagation(); setItemToRename({ type: 'document', id: f.documentId, name: f.file.name }); setShowRenameModal(true); setOpenDropdownId(null); }},
+                                    { label: 'Move', icon: <MoveIcon style={{ width: 16, height: 16 }} />, color: '#32302C', action: (e) => { e.stopPropagation(); setOpenDropdownId(null); setShowCategoryModal(f.documentId || (f.isFolder ? f.folderName : f.file.name)); }},
+                                    { label: 'Delete', icon: <DeleteIcon style={{ width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(7149%) hue-rotate(355deg) brightness(91%) contrast(89%)' }} />, color: '#D92D20', action: (e) => { e.stopPropagation(); setItemToDelete({ type: 'uploadedFile', documentId: f.documentId, name: f.file.name, folderName: f.isFolder ? f.folderName : null, isFolder: f.isFolder }); setShowDeleteModal(true); }},
+                                  ].map(item => (
+                                    <button key={item.label} onClick={item.action}
+                                      style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '8px 12px', background: 'transparent', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', color: item.color, transition: 'background 150ms ease', textAlign: 'left' }}
+                                      onMouseEnter={(e) => { e.currentTarget.style.background = item.color === '#D92D20' ? '#FEF3F2' : '#F5F5F5'; }}
+                                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
+                                      {item.icon}{item.label}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {isPending && (
+                          <button onClick={(e) => { e.stopPropagation(); removeUploadingFile(f.isFolder ? f.folderName : f.file.name); }}
+                            aria-label="Remove file"
+                            style={{
+                              width: 44, height: 44, border: 'none', background: 'transparent',
+                              borderRadius: '50%', cursor: 'pointer', fontSize: 14, color: '#6C6B6E',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              transition: 'background 150ms ease',
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = '#E6E6EC'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
+                            &#x2715;
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Footer with Upload Buttons - Always show when files are present */}
-        {uploadingFiles.length > 0 && (
-          <div style={{
-            padding: isMobile ? '12px 16px 40px 16px' : '24px 24px 24px 24px',
-            borderTop: 'none',
-            background: '#F4F4F6',
-            display: 'flex',
-            justifyContent: 'center',
-            gap: isMobile ? 8 : 12,
-            maxWidth: 800,
-            alignSelf: 'center',
-            width: '100%'
-          }}>
-            <button
-              onClick={() => setUploadingFiles([])}
-              disabled={uploadingFiles.filter(f => f.status === 'uploading').length > 0}
-              style={{
-                flex: 1,
-                padding: '14px 24px',
-                background: 'white',
-                color: '#111827',
-                border: '1px solid #E5E7EB',
-                borderRadius: 100,
-                fontSize: 16,
-                fontWeight: '600',
-                cursor: uploadingFiles.filter(f => f.status === 'uploading').length > 0 ? 'not-allowed' : 'pointer',
-                transition: 'background 0.15s',
-                fontFamily: 'Plus Jakarta Sans',
-                opacity: uploadingFiles.filter(f => f.status === 'uploading').length > 0 ? 0.5 : 1
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleConfirmUpload}
-              disabled={uploadingFiles.filter(f => f.status === 'uploading').length > 0 || uploadingFiles.filter(f => f.status === 'pending').length === 0}
-              style={{
-                flex: 1,
-                padding: '14px 24px',
-                background: '#111827',
-                color: 'white',
-                border: 'none',
-                borderRadius: 100,
-                fontSize: 16,
-                fontWeight: '600',
-                cursor: (uploadingFiles.filter(f => f.status === 'uploading').length > 0 || uploadingFiles.filter(f => f.status === 'pending').length === 0) ? 'not-allowed' : 'pointer',
-                transition: 'background 0.15s',
-                fontFamily: 'Plus Jakarta Sans',
-                opacity: (uploadingFiles.filter(f => f.status === 'uploading').length > 0 || uploadingFiles.filter(f => f.status === 'pending').length === 0) ? 0.5 : 1
-              }}
-            >
-              {uploadingFiles.filter(f => f.status === 'uploading').length > 0
-                ? `Uploading ${uploadingFiles.filter(f => f.status === 'uploading').length} Document${uploadingFiles.filter(f => f.status === 'uploading').length > 1 ? 's' : ''}...`
-                : `Confirm Upload`
-              }
-            </button>
-          </div>
-        )}
-
-        {/* Drag and Drop Overlay - light background with black text */}
+        {/* Drag overlay */}
         {isDraggingOver && (
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(255, 255, 255, 0.95)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 24,
-              zIndex: 9999,
-              pointerEvents: 'none',
-              animation: 'fadeIn 0.2s ease-in'
-            }}
-          >
-            <style>
-              {`
-                @keyframes fadeIn {
-                  from { opacity: 0; }
-                  to { opacity: 1; }
-                }
-              `}
-            </style>
-            <img
-              src={filesIcon}
-              alt="Files"
-              style={{
-                width: 400,
-                height: 'auto',
-                opacity: 1.0,
-                transform: 'scale(1.05)',
-                transition: 'opacity 250ms ease-out, transform 250ms ease-out'
-              }}
-            />
-            <div
-              style={{
-                color: '#32302C',
-                fontSize: 32,
-                fontFamily: 'Plus Jakarta Sans',
-                fontWeight: '700',
-                textAlign: 'center'
-              }}
-            >
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(255,255,255,0.95)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24, zIndex: 9999, pointerEvents: 'none', animation: 'fadeIn 0.2s ease-in' }}>
+            <style>{`@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`}</style>
+            <img src={filesIcon} alt="" style={{ width: 300, height: 'auto' }} />
+            <div style={{ color: '#32302C', fontSize: 30, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', textAlign: 'center', lineHeight: '40px' }}>
               {t('upload.dropFilesHere')}
             </div>
-            <div
-              style={{
-                color: '#6C6B6E',
-                fontSize: 18,
-                fontFamily: 'Plus Jakarta Sans',
-                fontWeight: '500',
-                textAlign: 'center'
-              }}
-            >
+            <div style={{ color: '#6C6B6E', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', textAlign: 'center', lineHeight: '24px' }}>
               {t('upload.releaseToUpload')}
             </div>
           </div>
         )}
       </div>
+
+      {/* Supported Formats Modal */}
+      {showFormatsModal && (
+        <div
+          onClick={() => setShowFormatsModal(false)}
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 10000, animation: 'fadeIn 0.15s ease-in',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'white', borderRadius: 16, width: '100%', maxWidth: 560,
+              maxHeight: '80vh', overflow: 'hidden', display: 'flex', flexDirection: 'column',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.12), 0 24px 48px rgba(0,0,0,0.16)',
+              margin: isMobile ? 16 : 0,
+            }}
+          >
+            {/* Modal header */}
+            <div style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              padding: '20px 24px', borderBottom: '1px solid #E6E6EC',
+            }}>
+              <div>
+                <h3 style={{
+                  margin: 0, fontSize: 18, fontWeight: '600', color: '#32302C',
+                  fontFamily: 'Plus Jakarta Sans, sans-serif',
+                }}>
+                  Supported formats
+                </h3>
+                <p style={{
+                  margin: '2px 0 0', fontSize: 12, color: '#6C6B6E',
+                  fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px',
+                }}>
+                  Max 500 MB per file.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowFormatsModal(false)}
+                aria-label="Close"
+                style={{
+                  width: 32, height: 32, border: 'none', background: 'transparent',
+                  borderRadius: '50%', cursor: 'pointer', fontSize: 18, color: '#6C6B6E',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'background 120ms ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              >
+                &#x2715;
+              </button>
+            </div>
+            {/* Modal body — 2-column grid */}
+            <div style={{ padding: 24, overflowY: 'auto' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px 32px' }}>
+                {[
+                  { title: 'Documents', formats: SUPPORTED_FORMATS.filter(f => f.kind === 'doc') },
+                  { title: 'Presentations', formats: SUPPORTED_FORMATS.filter(f => f.kind === 'presentation') },
+                  { title: 'Spreadsheets', formats: SUPPORTED_FORMATS.filter(f => f.kind === 'sheet') },
+                  { title: 'Images', formats: SUPPORTED_FORMATS.filter(f => f.kind === 'image') },
+                  { title: 'Media', formats: SUPPORTED_FORMATS.filter(f => f.kind === 'media') },
+                ].map((group) => (
+                  <div key={group.title}>
+                    <h4 style={{
+                      margin: '0 0 10px', fontSize: 13, fontWeight: '600', color: '#32302C',
+                      fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '20px',
+                    }}>
+                      {group.title}
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {group.formats.map((fmt) => (
+                        <div key={fmt.key} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <img src={fmt.icon} alt="" style={{ width: 24, height: 24, objectFit: 'contain', flexShrink: 0 }} />
+                          <span style={{
+                            fontSize: 14, fontWeight: '500', color: '#32302C',
+                            fontFamily: 'Plus Jakarta Sans, sans-serif',
+                          }}>
+                            {fmt.label}
+                          </span>
+                          {fmt.exts && (
+                            <span style={{ fontSize: 12, color: '#A2A2A7', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+                              {fmt.exts.join(', ')}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* See All Destinations Modal */}
+      {showAllDestinationsModal && (
+        <div
+          onClick={() => setShowAllDestinationsModal(false)}
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)', display: 'flex',
+            justifyContent: 'center', alignItems: 'center',
+            zIndex: 10000, animation: 'fadeIn 0.15s ease-in',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'white', borderRadius: 16, width: '100%',
+              maxWidth: 480, maxHeight: '80vh', overflow: 'hidden',
+              display: 'flex', flexDirection: 'column',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.12), 0 24px 48px rgba(0,0,0,0.16)',
+              margin: isMobile ? 16 : 0,
+            }}
+          >
+            {/* Modal header */}
+            <div style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              padding: '20px 24px 0',
+            }}>
+              <h3 style={{
+                margin: 0, fontSize: 18, fontWeight: '600', color: '#32302C',
+                fontFamily: 'Plus Jakarta Sans, sans-serif',
+              }}>
+                All categories
+              </h3>
+              <button
+                onClick={() => setShowAllDestinationsModal(false)}
+                aria-label="Close"
+                style={{
+                  width: 32, height: 32, border: 'none', background: 'transparent',
+                  borderRadius: '50%', cursor: 'pointer', fontSize: 18, color: '#6C6B6E',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'background 120ms ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
+                &#x2715;
+              </button>
+            </div>
+
+            {/* Modal search */}
+            <div style={{ padding: '16px 24px' }}>
+              <div style={{ position: 'relative' }}>
+                <SearchIcon style={{
+                  width: 16, height: 16, position: 'absolute', left: 14, top: 12,
+                  filter: 'brightness(0) invert(0.4)', pointerEvents: 'none',
+                }} />
+                <input
+                  type="text"
+                  placeholder="Search categories..."
+                  value={allDestModalSearch}
+                  onChange={(e) => setAllDestModalSearch(e.target.value)}
+                  autoFocus
+                  style={{
+                    width: '100%', height: 40, padding: '0 14px 0 38px',
+                    background: '#F5F5F5', border: '1px solid #E6E6EC',
+                    borderRadius: 9999, outline: 'none', fontSize: 14,
+                    fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500',
+                    color: '#32302C', boxSizing: 'border-box',
+                    transition: 'border-color 150ms ease, box-shadow 150ms ease',
+                  }}
+                  onFocus={(e) => { e.target.style.borderColor = '#A2A2A7'; e.target.style.boxShadow = '0 0 0 2px rgba(50,48,44,0.1)'; }}
+                  onBlur={(e) => { e.target.style.borderColor = '#E6E6EC'; e.target.style.boxShadow = 'none'; }}
+                />
+              </div>
+            </div>
+
+            {/* Modal category list (recursive expandable tree) */}
+            <div style={{
+              flex: 1, overflowY: 'auto', padding: '0 24px',
+              display: 'flex', flexDirection: 'column', gap: 2,
+            }}>
+              {(() => {
+                const mq = allDestModalSearch.trim().toLowerCase();
+                const modalFiltered = mq
+                  ? categories.filter(c => {
+                      if (c.name.toLowerCase().includes(mq)) return true;
+                      return hasMatchingDescendant(c.id, mq);
+                    })
+                  : categories;
+
+                if (modalFiltered.length === 0) {
+                  return (
+                    <div style={{ padding: '20px 0', textAlign: 'center' }}>
+                      <p style={{ margin: 0, fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+                        No matching categories
+                      </p>
+                    </div>
+                  );
+                }
+
+                // Auto-expand ancestors of matching folders (recursive)
+                if (mq) {
+                  const toExpand = [];
+                  const findModal = (parentId) => {
+                    const children = folders.filter(f => f.parentFolderId === parentId);
+                    let anyMatch = false;
+                    children.forEach(child => {
+                      const childMatches = child.name.toLowerCase().includes(mq);
+                      const descendantMatches = findModal(child.id);
+                      if (childMatches || descendantMatches) {
+                        if (!expandedModalCategories.has(parentId)) toExpand.push(parentId);
+                        anyMatch = true;
+                      }
+                    });
+                    return anyMatch;
+                  };
+                  modalFiltered.forEach(cat => findModal(cat.id));
+                  if (toExpand.length > 0) {
+                    Promise.resolve().then(() => setExpandedModalCategories(prev => new Set([...prev, ...toExpand])));
+                  }
+                }
+
+                return modalFiltered.map(cat =>
+                  renderDestinationRow(cat, 0, expandedModalCategories, setExpandedModalCategories, { closeModal: () => setShowAllDestinationsModal(false) })
+                );
+              })()}
+            </div>
+
+            {/* Modal footer: Create new category */}
+            <div style={{
+              borderTop: '1px solid #E6E6EC', padding: '16px 24px',
+              flexShrink: 0,
+            }}>
+              <button
+                onClick={() => { setShowAllDestinationsModal(false); setShowNewCategoryModal(true); }}
+                style={{
+                  width: '100%', height: 44, background: '#F5F5F5',
+                  border: '1px solid #E6E6EC', borderRadius: 9999,
+                  cursor: 'pointer', fontSize: 14, fontWeight: '600',
+                  color: '#32302C', fontFamily: 'Plus Jakarta Sans, sans-serif',
+                  transition: 'background 120ms ease',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#ECECEC'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = '#F5F5F5'; }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="#32302C" strokeWidth="1.8" strokeLinecap="round"/></svg>
+                Create new category
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Notifications are now handled by the unified ToastProvider */}
 

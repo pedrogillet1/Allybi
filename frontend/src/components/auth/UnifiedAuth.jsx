@@ -609,7 +609,7 @@ const UnifiedAuth = ({ variant = 'page' }) => {
         {isSignupMode && (
           <div style={{textAlign: 'center', fontSize: 14}}>
             <span style={{color: '#6C6B6E'}}>{t('auth.signup.termsAgree')} </span>
-            <Link to="/terms" style={{
+            <Link to="/legal/terms" style={{
               fontWeight: '600',
               color: '#181818',
               textDecoration: 'none'
@@ -617,7 +617,7 @@ const UnifiedAuth = ({ variant = 'page' }) => {
               {t('auth.signup.terms')}
             </Link>
             <span style={{color: '#6C6B6E'}}> {t('auth.signup.and')} </span>
-            <Link to="/privacy" style={{
+            <Link to="/legal/privacy" style={{
               fontWeight: '600',
               color: '#181818',
               textDecoration: 'none'

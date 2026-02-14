@@ -27,6 +27,7 @@ import movIcon from '../../assets/mov.png';
 import mp4Icon from '../../assets/mp4.png';
 import mp3Icon from '../../assets/mp3.svg';
 import folderIcon from '../../assets/folder_icon.svg';
+import dropzoneIllustration from '../../assets/dropzone-files-illustration.svg';
 
 const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
   const { t } = useTranslation();
@@ -346,45 +347,8 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                 cursor: 'pointer'
               }}
             >
-              {/* Document Icon */}
-              <div style={{ width: 85.38, height: 80, position: 'relative' }}>
-                <div style={{
-                  width: 72.95,
-                  height: 61.73,
-                  paddingTop: 9.62,
-                  paddingBottom: 7.22,
-                  paddingLeft: 3.78,
-                  paddingRight: 3.78,
-                  left: 6.22,
-                  top: 8.76,
-                  position: 'absolute',
-                  background: 'white',
-                  boxShadow: '0px 1.6px 1.6px 1.2px rgba(68, 68, 68, 0.16)',
-                  overflow: 'hidden',
-                  borderRadius: 4.13,
-                  outline: '0.34px #EDEDED solid',
-                  outlineOffset: '-0.34px',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                  gap: 1.60,
-                  display: 'flex'
-                }}>
-                  <div style={{ width: 64.40, height: 2.41, background: '#E2E2E0', borderRadius: 6.41 }} />
-                  <div style={{ width: 25.89, height: 2.41, background: '#E2E2E0', borderRadius: 6.41 }} />
-                </div>
-                <div style={{
-                  width: 85.38,
-                  height: 51.75,
-                  left: 0,
-                  top: 28.25,
-                  position: 'absolute',
-                  background: 'linear-gradient(180deg, rgba(67, 67, 67, 0.60) 0%, rgba(0, 0, 0, 0.60) 66%)',
-                  boxShadow: '0px 0.38px 1.5px rgba(255, 255, 255, 0.25) inset',
-                  backdropFilter: 'blur(9.38px)',
-                  borderRadius: 4
-                }} />
-              </div>
+              {/* File Types Illustration */}
+              <img src={dropzoneIllustration} alt="" style={{ width: 180, height: 'auto', objectFit: 'contain' }} />
 
               {/* Text */}
               <div style={{
@@ -545,45 +509,8 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                   display: 'flex'
                 }}
               >
-                {/* Document Icon */}
-                <div style={{ width: 85.38, height: 80, position: 'relative' }}>
-                  <div style={{
-                    width: 72.95,
-                    height: 61.73,
-                    paddingTop: 9.62,
-                    paddingBottom: 7.22,
-                    paddingLeft: 3.78,
-                    paddingRight: 3.78,
-                    left: 6.22,
-                    top: 8.76,
-                    position: 'absolute',
-                    background: 'white',
-                    boxShadow: '0px 1.6px 1.6px 1.2px rgba(68, 68, 68, 0.16)',
-                    overflow: 'hidden',
-                    borderRadius: 4.13,
-                    outline: '0.34px #EDEDED solid',
-                    outlineOffset: '-0.34px',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-start',
-                    alignItems: 'flex-start',
-                    gap: 1.60,
-                    display: 'flex'
-                  }}>
-                    <div style={{ width: 64.40, height: 2.41, background: '#E2E2E0', borderRadius: 6.41 }} />
-                    <div style={{ width: 25.89, height: 2.41, background: '#E2E2E0', borderRadius: 6.41 }} />
-                  </div>
-                  <div style={{
-                    width: 85.38,
-                    height: 51.75,
-                    left: 0,
-                    top: 28.25,
-                    position: 'absolute',
-                    background: 'linear-gradient(180deg, rgba(67, 67, 67, 0.60) 0%, rgba(0, 0, 0, 0.60) 66%)',
-                    boxShadow: '0px 0.38px 1.5px rgba(255, 255, 255, 0.25) inset',
-                    backdropFilter: 'blur(9.38px)',
-                    borderRadius: 4
-                  }} />
-                </div>
+                {/* File Types Illustration */}
+                <img src={dropzoneIllustration} alt="" style={{ width: 180, height: 'auto', objectFit: 'contain' }} />
 
                 {/* Text */}
                 <div style={{

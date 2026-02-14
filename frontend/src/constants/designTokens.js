@@ -81,6 +81,8 @@ export const shadows = {
   md: '0 2px 8px rgba(0, 0, 0, 0.1)',
   lg: '0 4px 6px -2px rgba(16, 24, 40, 0.03)',
   xl: '0 8px 16px rgba(0, 0, 0, 0.15)',
+  cardSpec: '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)',
+  cardSpecHover: '0 2px 4px rgba(24,24,24,0.08), 0 16px 28px rgba(24,24,24,0.10)',
 };
 
 export const zIndex = {

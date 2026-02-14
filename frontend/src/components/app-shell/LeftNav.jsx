@@ -10,6 +10,7 @@ import { ReactComponent as LogoutIcon } from '../../assets/Logout-white.svg';
 import notificationSidebarIcon from '../../assets/notification-sidebar-icon.svg';
 import settingsSidebarIcon from '../../assets/settings-sidebar-icon.svg';
 import uploadSidebarIcon from '../../assets/upload.svg';
+import integrationsSidebarIcon from '../../assets/integrations-sidebar-icon.svg';
 import { ReactComponent as SignoutIcon } from '../../assets/signout.svg';
 import logoutSidebarIcon from '../../assets/logout-sidebar-icon.svg';
 import { ReactComponent as ExpandIcon } from '../../assets/expand.svg';
@@ -393,6 +394,42 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                     }}
                                 >
                                     {t('nav.upload')}
+                                </span>
+                            )}
+                        </div>
+                    </SidebarTooltip>
+
+                    {/* Integrations */}
+                    <SidebarTooltip text="Integrations" show={!isExpanded}>
+                        <div
+                            onClick={() => navigate(ROUTES.INTEGRATIONS)}
+                            style={getButtonStyle(location.pathname === ROUTES.INTEGRATIONS)}
+                            onMouseEnter={(e) => handleButtonHover(e, location.pathname === ROUTES.INTEGRATIONS)}
+                            onMouseLeave={(e) => handleButtonLeave(e, location.pathname === ROUTES.INTEGRATIONS)}
+                            role="button"
+                            tabIndex={0}
+                            aria-label="Integrations"
+                            aria-current={location.pathname === ROUTES.INTEGRATIONS ? 'page' : undefined}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    navigate(ROUTES.INTEGRATIONS);
+                                }
+                            }}
+                        >
+                            <div style={{ width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <img src={integrationsSidebarIcon} alt="" style={{ width: 26, height: 26, filter: 'brightness(0) invert(1)' }} />
+                            </div>
+                            {isExpanded && (
+                                <span
+                                    style={{
+                                        color: 'white',
+                                        fontSize: '16px',
+                                        fontWeight: typography.bodyStrong.weight,
+                                        fontFamily: typography.body.family,
+                                    }}
+                                >
+                                    Integrations
                                 </span>
                             )}
                         </div>

@@ -827,9 +827,29 @@ export default function AllybiEditingToolbar({
               : null}
           </div>
         ) : null}
-        {iconBtn('Zoom out', MinusIcon, zoomOut)}
+        <button
+          type="button"
+          className="toolbar-btn icon-btn"
+          title="Zoom out"
+          onMouseDown={(e) => { e.preventDefault(); zoomOut(); }}
+          disabled={(zoom ?? 100) <= 50}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M4 8H12" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
         <div className="zoom-display">{clamp(zoom ?? 100, 50, 200)}%</div>
-        {iconBtn('Zoom in', PlusIcon, zoomIn)}
+        <button
+          type="button"
+          className="toolbar-btn icon-btn"
+          title="Zoom in"
+          onMouseDown={(e) => { e.preventDefault(); zoomIn(); }}
+          disabled={(zoom ?? 100) >= 200}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 4V12M4 8H12" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
       </div>
     </div>
   );

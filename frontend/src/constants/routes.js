@@ -40,12 +40,23 @@ export const ROUTES = {
   SETTINGS: '/s/w6d4h8',
   UPGRADE: '/u/q8f2m7',
 
+  // Integrations
+  INTEGRATIONS: '/i/n4k8p2',
+  INTEGRATIONS_GMAIL: '/i/n4k8p2/gmail',
+
   // Dynamic routes (use with parameters)
   CATEGORY: '/c/t5k9n3/:categoryName',
   FOLDER: '/f/h2r6p8/:folderId',
   DOCUMENT: '/d/m4w8j2/:documentId',
   DOCUMENT_STUDIO: '/d/m4w8j2/:documentId/studio',
   FILE_TYPE: '/f/v7q3k5/:fileType',
+
+  // Legal pages
+  TERMS_OF_USE: '/legal/terms',
+  PRIVACY_POLICY: '/legal/privacy',
+
+  // Public pages
+  LANDING: '/l/k7m9p3',
 
   // Admin routes
   ADMIN_LOGIN: '/x/l9m3k6',

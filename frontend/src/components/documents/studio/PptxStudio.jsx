@@ -1350,11 +1350,15 @@ export default function PptxStudio() {
               <div className="toolbar-divider" />
 
               <button className="toolbar-btn icon-btn" title="Zoom out" onMouseDown={(e) => { e.preventDefault(); setZoom((z) => clamp(z - 10, 50, 200)); }}>
-                <img src={MinusIcon} alt="" />
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M4 8H12" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </button>
               <div className="pptx-studio-zoom">{clamp(zoom, 50, 200)}%</div>
               <button className="toolbar-btn icon-btn" title="Zoom in" onMouseDown={(e) => { e.preventDefault(); setZoom((z) => clamp(z + 10, 50, 200)); }}>
-                <img src={PlusIcon} alt="" style={{ filter: 'brightness(0) invert(0.2)' }} />
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 4V12M4 8H12" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </button>
             </div>
           </div>
