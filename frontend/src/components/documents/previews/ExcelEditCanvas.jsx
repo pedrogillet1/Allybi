@@ -1294,7 +1294,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
 
   useEffect(() => {
     const key = selectedInfo
-      ? `${String(selectedInfo?.targetId || '')}||${String(selectedInfo?.beforeText || '')}`
+      ? `${String(selectedInfo?.targetId || '')}||${String(selectedInfo?.beforeText || '')}||${JSON.stringify(selectedInfo?.format || {})}`
       : '';
     if (key === lastEmittedSelectedInfoKeyRef.current) return;
     lastEmittedSelectedInfoKeyRef.current = key;

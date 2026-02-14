@@ -702,6 +702,9 @@ router.get("/:id/editing/docx-html", rateLimitMiddleware, async (req: any, res: 
   if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
 
   try {
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
     const doc = await prisma.document.findFirst({
       where: { id: req.params.id, userId },
       select: { id: true, filename: true, encryptedFilename: true, mimeType: true },

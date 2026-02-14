@@ -355,7 +355,13 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     setError('');
     setStatusMsg('');
     try {
-      const res = await api.get(`/api/documents/${docId}/editing/docx-html`);
+      const res = await api.get(`/api/documents/${docId}/editing/docx-html`, {
+        params: { ts: Date.now() },
+        headers: {
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache',
+        },
+      });
       const nextBlocks = Array.isArray(res.data?.blocks) ? res.data.blocks : [];
       setBlocks(nextBlocks);
       onBlocksLoadedRef.current?.(nextBlocks);
@@ -1079,6 +1085,48 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     return true;
   }, [findParagraphEl, setUndoState]);
 
+  const acceptDraft = useCallback(({ draftId }) => {
+    if (!draftId) return false;
+    const snap = draftSnapshotsRef.current.get(draftId);
+    if (!snap) return false;
+
+    const paragraphs = snap?.paragraphs && typeof snap.paragraphs === 'object'
+      ? snap.paragraphs
+      : snap?.paragraphId
+        ? { [snap.paragraphId]: { html: snap.html || '' } }
+        : {};
+
+    const ids = Object.keys(paragraphs || {});
+    if (!ids.length) {
+      draftSnapshotsRef.current.delete(draftId);
+      return false;
+    }
+
+    const nextTextByPid = new Map();
+    for (const pid of ids) {
+      const el = findParagraphEl(pid);
+      if (!el) continue;
+      clearDraftDecoration(el);
+      const currentHtml = sanitizeDocxRichHtml(el.innerHTML || '');
+      baselineHtmlRef.current.set(pid, currentHtml);
+      nextTextByPid.set(pid, (el.innerText || '').replace(/\u00A0/g, ' '));
+      try { setUndoState(pid, currentHtml, { clearHistory: true }); } catch {}
+    }
+
+    if (nextTextByPid.size) {
+      setBlocks((prev) => (Array.isArray(prev)
+        ? prev.map((b) => {
+            const pid = String(b?.paragraphId || '');
+            if (!pid || !nextTextByPid.has(pid)) return b;
+            return { ...b, text: String(nextTextByPid.get(pid) || '') };
+          })
+        : prev));
+    }
+
+    draftSnapshotsRef.current.delete(draftId);
+    return true;
+  }, [findParagraphEl, setUndoState]);
+
   const scrollToTarget = useCallback((paragraphId) => {
     const el = findParagraphEl(paragraphId);
     if (!el) return false;
@@ -1386,6 +1434,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     applySpanPatches,
     applyParagraphPatches,
     discardDraft,
+    acceptDraft,
     scrollToTarget,
     restoreSelection,
     getViewerSelectionV2,
@@ -1412,6 +1461,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     applySpanPatches,
     applyParagraphPatches,
     discardDraft,
+    acceptDraft,
     scrollToTarget,
     applyParagraphStyleFromSelection,
     applyUndoRedo,

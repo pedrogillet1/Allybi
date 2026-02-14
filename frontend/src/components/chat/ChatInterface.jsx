@@ -1398,15 +1398,12 @@ export default function ChatInterface({
     const a = viewerDraftApproval || null;
     if (!a) return null;
     const hasPendingApproval = Number(a.count || 0) > 0;
-    const hasUndo = Boolean(a.undoAvailable && typeof a.onUndo === "function");
-    if (!hasPendingApproval && !hasUndo) return null;
+    if (!hasPendingApproval) return null;
 
     const count = Number(a.count || 0);
     const subtitle = String(a.subtitle || "").trim();
     const isApplying = Boolean(a.isApplying);
-    const meta = hasPendingApproval
-      ? `${count} draft change${count === 1 ? "" : "s"}${subtitle ? ` · ${subtitle}` : ""}`
-      : (subtitle || "Last change applied");
+    const meta = `${count} draft change${count === 1 ? "" : "s"}${subtitle ? ` · ${subtitle}` : ""}`;
 
     return (
       <div
@@ -1426,7 +1423,7 @@ export default function ChatInterface({
       >
         <div style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 2 }}>
           <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontSize: 12, fontWeight: 950, color: "#111827" }}>
-            {hasPendingApproval ? "Approve edit?" : "Undo available"}
+            Approve edit?
           </div>
           <div
             style={{
@@ -1445,75 +1442,48 @@ export default function ChatInterface({
         </div>
 
         <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 8 }}>
-          {hasPendingApproval ? (
-            <>
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => { if (!isApplying) a.onReject?.(); }}
-                disabled={isApplying}
-                style={{
-                  height: 30,
-                  padding: "0 12px",
-                  borderRadius: 999,
-                  border: "1px solid #E6E6EC",
-                  background: "white",
-                  cursor: isApplying ? "default" : "pointer",
-                  fontFamily: "Plus Jakarta Sans, sans-serif",
-                  fontWeight: 900,
-                  fontSize: 12,
-                  color: "#111827",
-                }}
-                title="No (discard)"
-              >
-                No
-              </button>
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => { if (!isApplying) a.onApprove?.(); }}
-                disabled={isApplying}
-                style={{
-                  height: 30,
-                  padding: "0 12px",
-                  borderRadius: 999,
-                  border: "1px solid #111827",
-                  background: "#111827",
-                  cursor: isApplying ? "default" : "pointer",
-                  fontFamily: "Plus Jakarta Sans, sans-serif",
-                  fontWeight: 900,
-                  fontSize: 12,
-                  color: "white",
-                }}
-                title="Yes (apply)"
-              >
-                Yes
-              </button>
-            </>
-          ) : null}
-          {hasUndo ? (
-            <button
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => { if (!isApplying) a.onUndo?.(); }}
-              disabled={isApplying}
-              style={{
-                height: 30,
-                padding: "0 12px",
-                borderRadius: 999,
-                border: "1px solid #111827",
-                background: "white",
-                cursor: isApplying ? "default" : "pointer",
-                fontFamily: "Plus Jakarta Sans, sans-serif",
-                fontWeight: 900,
-                fontSize: 12,
-                color: "#111827",
-              }}
-              title="Undo last change"
-            >
-              Undo
-            </button>
-          ) : null}
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => { if (!isApplying) a.onReject?.(); }}
+            disabled={isApplying}
+            style={{
+              height: 30,
+              padding: "0 12px",
+              borderRadius: 999,
+              border: "1px solid #E6E6EC",
+              background: "white",
+              cursor: isApplying ? "default" : "pointer",
+              fontFamily: "Plus Jakarta Sans, sans-serif",
+              fontWeight: 900,
+              fontSize: 12,
+              color: "#111827",
+            }}
+            title="No (discard)"
+          >
+            No
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => { if (!isApplying) a.onApprove?.(); }}
+            disabled={isApplying}
+            style={{
+              height: 30,
+              padding: "0 12px",
+              borderRadius: 999,
+              border: "1px solid #111827",
+              background: "#111827",
+              cursor: isApplying ? "default" : "pointer",
+              fontFamily: "Plus Jakarta Sans, sans-serif",
+              fontWeight: 900,
+              fontSize: 12,
+              color: "white",
+            }}
+            title="Yes (apply)"
+          >
+            Yes
+          </button>
         </div>
       </div>
     );

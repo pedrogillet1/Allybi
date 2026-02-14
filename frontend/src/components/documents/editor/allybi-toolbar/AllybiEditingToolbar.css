@@ -386,6 +386,11 @@
   overflow: visible; /* allow dropdowns/popovers */
 }
 
+/* Excel needs the full width — sheet nav far-left, formatting, then value bar. */
+.allybi-toolbar-center:has(.allybi-excel-row) {
+  max-width: none;
+}
+
 .allybi-toolbar-zoom {
   position: absolute;
   right: 16px;
@@ -443,13 +448,13 @@
 
 .allybi-excel-row {
   width: 100%;
-  max-width: 1100px;
+  max-width: none;
   padding: 0 130px 0 16px; /* right padding reserves space for the absolutely-positioned zoom controls */
-  margin: 0 auto;
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 10px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .allybi-excel-left {
@@ -457,37 +462,83 @@
   align-items: center;
   gap: 6px;
   flex: 0 0 auto;
-  min-width: 260px;
+}
+
+.allybi-excel-sheet-combo {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+  padding: 0 6px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.allybi-excel-sheet-combo .toolbar-btn.icon-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+}
+
+.allybi-excel-sheet-combo .toolbar-btn.icon-btn:hover {
+  background: rgba(17, 24, 39, 0.06);
+  border: none;
 }
 
 .toolbar-select.allybi-excel-sheet-select {
-  height: 32px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  background-color: #ffffff;
+  height: 26px;
+  border-radius: 6px;
+  border: none;
+  background-color: transparent;
   font-weight: 850;
-  max-width: 220px;
+  max-width: 180px;
+  padding: 2px 22px 2px 6px;
+  background-position: right 2px center;
+  background-size: 14px;
 }
 
-.allybi-excel-sheetcount {
+.toolbar-select.allybi-excel-sheet-select:hover {
+  background-color: rgba(17, 24, 39, 0.06);
+  border: none;
+}
+
+.toolbar-select.allybi-excel-sheet-select:focus {
+  box-shadow: none;
+  border: none;
+}
+
+.allybi-excel-sheet-combo-count {
   font-family: inherit;
   font-weight: 850;
-  font-size: 12px;
-  color: #6b7280;
-  padding: 6px 8px;
-  border-radius: 999px;
-  border: 1px solid #eef2f7;
-  background: rgba(249, 250, 251, 0.9);
+  font-size: 11px;
+  color: #9ca3af;
   white-space: nowrap;
+  padding: 0 2px 0 4px;
+  border-left: 1px solid #e5e7eb;
 }
 
 .allybi-excel-center {
   flex: 1 1 auto;
-  min-width: 260px;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  overflow: hidden;
+  overflow: visible; /* allow font/color dropdowns to render */
+}
+
+/* Formatting controls group: undo/redo | font | size | B I U | color */
+.allybi-excel-formatting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+/* B / I / U buttons in the Excel toolbar get visible borders to match DOCX style. */
+.allybi-excel-formatting .toolbar-btn.icon-btn.allybi-xl-fmt-btn {
+  border: 1px solid #d1d5db;
 }
 
 .toolbar-btn.icon-btn.allybi-excel-logo-btn {
@@ -620,11 +671,8 @@
 }
 
 @media (max-width: 980px) {
-  .allybi-excel-sheetcount {
+  .allybi-excel-sheet-combo-count {
     display: none;
-  }
-  .allybi-excel-left {
-    min-width: 210px;
   }
 }
 

@@ -547,6 +547,9 @@ const DocumentViewer = () => {
   const [excelFontFamily, setExcelFontFamily] = useState('Calibri');
   const [excelFontSizePt, setExcelFontSizePt] = useState(11);
   const [excelColorHex, setExcelColorHex] = useState('#000000');
+  const [excelBold, setExcelBold] = useState(false);
+  const [excelItalic, setExcelItalic] = useState(false);
+  const [excelUnderline, setExcelUnderline] = useState(false);
   const excelCanApply = useMemo(() => {
     if (!excelSelectedInfo?.a1) return false;
     const draft = String(excelDraftValue ?? '');
@@ -718,7 +721,7 @@ const DocumentViewer = () => {
       });
       setActiveDraftId(entryId);
 
-      const domain = String(s?.domain || '').trim();
+      const domain = String(s?.domain || '').trim().toLowerCase();
       if (domain === 'docx') {
         const start = Date.now();
         while (!cancelled && !docxCanvasRef.current && Date.now() - start < 2600) {
@@ -2755,7 +2758,7 @@ const DocumentViewer = () => {
   };
 
   const draftIntoCanvas = async (draftId, session) => {
-    const domain = String(session?.domain || '');
+    const domain = String(session?.domain || '').trim().toLowerCase();
     const targetId = getEditTargetId(session);
     const afterText = getDraftAfterText(session);
     if (domain === 'docx' && session?.bundle && Array.isArray(session?.bundlePatches)) {
@@ -2811,7 +2814,7 @@ const DocumentViewer = () => {
   };
 
   const discardDraftInCanvas = async (draftId, session) => {
-    const domain = String(session?.domain || '');
+    const domain = String(session?.domain || '').trim().toLowerCase();
     try {
       if (domain === 'docx') return Boolean(await docxCanvasRef.current?.discardDraft?.({ draftId }));
       if (domain === 'sheets') return Boolean(await excelCanvasRef.current?.discardDraftOps?.({ draftId }));
@@ -2822,7 +2825,7 @@ const DocumentViewer = () => {
   };
 
   const scrollToDraftTarget = async (session) => {
-    const domain = String(session?.domain || '');
+    const domain = String(session?.domain || '').trim().toLowerCase();
     const targetId = getEditTargetId(session);
     if (!targetId) return;
     try {
@@ -2831,7 +2834,7 @@ const DocumentViewer = () => {
   };
 
   const spotlightDraftTarget = (session) => {
-    const domain = String(session?.domain || '');
+    const domain = String(session?.domain || '').trim().toLowerCase();
     const scope = String(session?.scope || '').trim().toLowerCase();
     const explicitTargetId = String(session?.target?.id || session?.targetId || '').trim();
     const resolutionReason = String(session?.target?.resolutionReason || '').trim().toLowerCase();
@@ -2992,12 +2995,12 @@ const DocumentViewer = () => {
   };
 
   const applyEditSession = async (entryId, session) => {
-    if (!session?.documentId) return;
+    if (!session?.documentId) return false;
     patchEditEntry(entryId, { status: 'applying', error: '' });
     setEditorStatusMsg('Applying edit…');
 
     try {
-      const sessionDomain = String(session?.domain || '').trim();
+      const sessionDomain = String(session?.domain || '').trim().toLowerCase();
 
       if (sessionDomain === 'sheets') {
         const ops = parseSheetsOpsFromSession(session);
@@ -3010,20 +3013,20 @@ const DocumentViewer = () => {
           clearFrozenSelection({ preserveExcelSelection: true });
           setEditorStatusMsg('Applied.');
           setTimeout(() => setEditorStatusMsg(''), 900);
-          return;
+          return true;
         }
         const op = String(session?.operator || '').trim().toUpperCase();
         if (op === 'COMPUTE' || op === 'COMPUTE_BUNDLE' || op === 'CREATE_CHART') {
           const err = 'Draft has no valid spreadsheet operations. Please retry the command with an explicit range.';
           patchEditEntry(entryId, { status: 'failed', error: err });
           setEditorStatusMsg(err);
-          return;
+          return false;
         }
       }
 
       // DOCX bundle edits: draft paragraph patches into the canvas for a preview,
       // then apply once to create a single new revision.
-      if (String(session?.domain) === 'docx' && String(session?.operator) === 'EDIT_DOCX_BUNDLE' && session?.bundle && Array.isArray(session?.bundlePatches)) {
+      if (sessionDomain === 'docx' && String(session?.operator) === 'EDIT_DOCX_BUNDLE' && session?.bundle && Array.isArray(session?.bundlePatches)) {
         await docxCanvasRef.current?.applyParagraphPatches?.({ draftId: entryId, patches: session.bundlePatches });
         const res = await applyEdit({
           instruction: String(session.instruction || '').trim() || `Bulk edit in viewer: ${cleanDocumentName(document?.filename)}`,
@@ -3038,26 +3041,33 @@ const DocumentViewer = () => {
           userConfirmed: true,
         });
         const revisionId = res?.result?.revisionId || res?.result?.restoredRevisionId || res?.revisionId || null;
+        if (!revisionId) {
+          const err = 'Apply failed: no revision was created for this DOCX change.';
+          patchEditEntry(entryId, { status: 'failed', error: err });
+          setEditorStatusMsg(err);
+          return false;
+        }
         patchEditEntry(entryId, { status: 'applied', revisionId, appliedAt: new Date().toISOString() });
         if (revisionId && document?.id && revisionId !== document.id) {
           clearFrozenSelection();
           try { sessionStorage.setItem('koda_toolbar_sync_paragraph', session?.bundlePatches?.[0]?.paragraphId || session?.target?.id || session?.targetHint || ''); } catch {}
           navigate(buildRoute.document(revisionId));
-          return;
+          return true;
         }
-        await docxCanvasRef.current?.reload?.();
+        const accepted = await docxCanvasRef.current?.acceptDraft?.({ draftId: entryId });
+        if (!accepted) await docxCanvasRef.current?.reload?.();
         clearFrozenSelection();
         syncToolbarAfterDocxReload(session?.bundlePatches?.[0]?.paragraphId || session?.target?.id || session?.targetHint);
         setEditorStatusMsg('Applied.');
         setTimeout(() => setEditorStatusMsg(''), 900);
-        return;
+        return true;
       }
 
       // DOCX selection edits: apply patches into the live canvas (preserves surrounding formatting),
       // then commit affected paragraph(s) with proposedHtml.
       const patches = Array.isArray(session?.patches) ? session.patches : [];
       const applyMode = String(session?.applyMode || '').trim();
-      if (String(session?.domain) === 'docx' && applyMode === 'prefer_client' && patches.length) {
+      if (sessionDomain === 'docx' && applyMode === 'prefer_client' && patches.length) {
         const paragraphIds = Array.from(new Set(patches.map((p) => String(p?.paragraphId || '')).filter(Boolean)));
         // Ensure the draft is reflected in the canvas (in case user skipped preview).
         await docxCanvasRef.current?.applySpanPatches?.({ draftId: entryId, patches });
@@ -3069,15 +3079,29 @@ const DocumentViewer = () => {
         if (!committed?.ok) {
           patchEditEntry(entryId, { status: 'failed', error: committed?.error || 'Apply failed.' });
           setEditorStatusMsg('');
-          return;
+          return false;
         }
-        patchEditEntry(entryId, { status: 'applied', revisionId: committed?.revisionId || session?.documentId || null, appliedAt: new Date().toISOString() });
-        await docxCanvasRef.current?.reload?.();
+        const committedRevisionId = committed?.revisionId || null;
+        if (!committedRevisionId) {
+          const err = 'Apply failed: no revision was created for this DOCX change.';
+          patchEditEntry(entryId, { status: 'failed', error: err });
+          setEditorStatusMsg(err);
+          return false;
+        }
+        patchEditEntry(entryId, { status: 'applied', revisionId: committedRevisionId, appliedAt: new Date().toISOString() });
+        if (document?.id && committedRevisionId !== document.id) {
+          clearFrozenSelection();
+          try { sessionStorage.setItem('koda_toolbar_sync_paragraph', session?.patches?.[0]?.paragraphId || session?.target?.id || session?.targetHint || ''); } catch {}
+          navigate(buildRoute.document(committedRevisionId));
+          return true;
+        }
+        const accepted = await docxCanvasRef.current?.acceptDraft?.({ draftId: entryId });
+        if (!accepted) await docxCanvasRef.current?.reload?.();
         clearFrozenSelection();
         syncToolbarAfterDocxReload(session?.patches?.[0]?.paragraphId || session?.target?.id || session?.targetHint);
         setEditorStatusMsg('Applied.');
         setTimeout(() => setEditorStatusMsg(''), 900);
-        return;
+        return true;
       }
 
       const resolveViewerTarget = () => {
@@ -3119,7 +3143,7 @@ const DocumentViewer = () => {
       const res = await applyEdit({
         instruction: String(session.instruction || '').trim() || `Edit in viewer: ${cleanDocumentName(document?.filename)}`,
         operator: String(session?.canonicalOperator || session?.operator || '').trim(),
-        domain: session.domain,
+        domain: sessionDomain || session.domain,
         documentId: session.documentId,
         targetHint: session?.targetHint || undefined,
         target: resolvedTarget || undefined,
@@ -3136,27 +3160,34 @@ const DocumentViewer = () => {
       if (res?.requiresUserChoice) {
         patchEditEntry(entryId, { status: 'blocked', error: 'This change needs review (target/confirmation).' });
         setEditorStatusMsg('');
-        return;
+        return false;
       }
 
       const revisionId = res?.result?.revisionId || res?.result?.restoredRevisionId || null;
+      if (sessionDomain === 'docx' && !revisionId) {
+        const err = 'Apply failed: no revision was created for this DOCX change.';
+        patchEditEntry(entryId, { status: 'failed', error: err });
+        setEditorStatusMsg(err);
+        return false;
+      }
       patchEditEntry(entryId, { status: 'applied', revisionId, appliedAt: new Date().toISOString() });
 
       // If edits create a new revision doc, open it; otherwise reload current preview.
       if (revisionId && document?.id && revisionId !== document.id) {
         clearFrozenSelection();
-        if (String(session.domain) === 'docx') {
+        if (sessionDomain === 'docx') {
           try { sessionStorage.setItem('koda_toolbar_sync_paragraph', session?.target?.id || session?.targetHint || ''); } catch {}
         }
         navigate(buildRoute.document(revisionId));
-        return;
+        return true;
       }
 
-      if (String(session.domain) === 'docx') {
-        await docxCanvasRef.current?.reload?.();
-      } else if (String(session.domain) === 'sheets') {
+      if (sessionDomain === 'docx') {
+        const accepted = await docxCanvasRef.current?.acceptDraft?.({ draftId: entryId });
+        if (!accepted) await docxCanvasRef.current?.reload?.();
+      } else if (sessionDomain === 'sheets') {
         await excelCanvasRef.current?.reload?.();
-      } else if (String(session.domain) === 'slides') {
+      } else if (sessionDomain === 'slides') {
         setPreviewVersion((v) => v + 1);
         try {
           const r = await api.get(`/api/documents/${session.documentId}/editing/slides-model`);
@@ -3166,14 +3197,15 @@ const DocumentViewer = () => {
         } catch {}
       }
 
-      if (String(session.domain) === 'sheets') {
+      if (sessionDomain === 'sheets') {
         clearFrozenSelection({ preserveExcelSelection: true });
       } else {
         clearFrozenSelection();
       }
-      if (String(session.domain) === 'docx') syncToolbarAfterDocxReload(session?.target?.id || session?.targetHint);
+      if (sessionDomain === 'docx') syncToolbarAfterDocxReload(session?.target?.id || session?.targetHint);
       setEditorStatusMsg('Applied.');
       setTimeout(() => setEditorStatusMsg(''), 900);
+      return true;
     } catch (e) {
       const msg =
         e?.response?.data?.error?.message ||
@@ -3182,6 +3214,7 @@ const DocumentViewer = () => {
         'Apply failed.';
       patchEditEntry(entryId, { status: 'failed', error: msg });
       setEditorStatusMsg('');
+      return false;
     }
   };
 
@@ -3260,7 +3293,7 @@ const DocumentViewer = () => {
         const minConf = typeof editingPolicy?.silentExecuteConfidence === 'number' ? editingPolicy.silentExecuteConfidence : 0.9;
         const autoApplyComputeBundles = Boolean(editingPolicy?.autoApplyComputeBundles);
         const isSheetsCompute =
-          String(s?.domain || '').trim() === 'sheets' &&
+          String(s?.domain || '').trim().toLowerCase() === 'sheets' &&
           (runtimeOp === 'COMPUTE_BUNDLE' || runtimeOp === 'COMPUTE' || runtimeOp === 'CREATE_CHART');
 
         const viewerAutoApplyEnabled = Boolean(editingPolicy?.autoApplyInViewer);
@@ -3287,45 +3320,6 @@ const DocumentViewer = () => {
   };
 
   // NOTE: These are computed inline (no hooks) because DocumentViewer has early returns.
-  const activeDraft = (() => {
-    const list = Array.isArray(draftEdits) ? draftEdits : [];
-    if (activeDraftId) return list.find((d) => d?.id === activeDraftId) || list[0] || null;
-    return list[0] || null;
-  })();
-
-  const pendingDraftCount = (() => {
-    const list = Array.isArray(draftEdits) ? draftEdits : [];
-    return list.filter((d) => d && (d.status === 'drafted' || d.status === 'applying')).length;
-  })();
-  const lastAppliedEntry = (() => {
-    const list = Array.isArray(editSessionsQueue) ? editSessionsQueue : [];
-    return list.find((e) => e && e.status === 'applied') || null;
-  })();
-
-  const applyActiveDraft = async () => {
-    const d = activeDraft;
-    if (!d?.id || !d?.session) return;
-    setDraftEdits((prev) => (Array.isArray(prev) ? prev.map((x) => (x?.id === d.id ? { ...x, status: 'applying' } : x)) : prev));
-    patchEditEntry(d.id, { status: 'applying', error: '' });
-    await applyEditSession(d.id, d.session);
-    // If apply did not navigate away, clear any non-committing draft overlays.
-    try { await discardDraftInCanvas(d.id, d.session); } catch {}
-    // Successful applyEditSession may navigate; still clear local draft state defensively.
-    setDraftEdits((prev) => (Array.isArray(prev) ? prev.filter((x) => x?.id !== d.id) : prev));
-    setActiveDraftId((prev) => (prev === d.id ? '' : prev));
-  };
-
-  const discardActiveDraft = async () => {
-    const d = activeDraft;
-    if (!d?.id || !d?.session) return;
-    await discardDraftInCanvas(d.id, d.session);
-    // Discard should leave the preview clean: remove the frozen selection overlay highlight.
-    try { clearFrozenSelection(); } catch {}
-    patchEditEntry(d.id, { status: 'discarded' });
-    setDraftEdits((prev) => (Array.isArray(prev) ? prev.filter((x) => x?.id !== d.id) : prev));
-    setActiveDraftId((prev) => (prev === d.id ? '' : prev));
-  };
-
   const editorAskTab = (
     <div style={{ height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
       <ChatInterface
@@ -3356,27 +3350,6 @@ const DocumentViewer = () => {
         focusNonce={viewerFocusNonce}
         onAssistantFinal={onEditorAssistantFinal}
         apiRef={viewerChatApiRef}
-        viewerDraftApproval={
-          pendingDraftCount
-            ? {
-                count: pendingDraftCount,
-                subtitle: String(activeDraft?.session?.locationLabel || activeDraft?.session?.target?.label || '').trim() || 'Change ready',
-                isApplying: activeDraft?.status === 'applying',
-                onApprove: () => applyActiveDraft(),
-                onReject: () => discardActiveDraft(),
-                undoAvailable: Boolean(lastAppliedEntry),
-                onUndo: lastAppliedEntry ? (() => undoEditEntry(lastAppliedEntry)) : undefined,
-              }
-            : (lastAppliedEntry
-              ? {
-                  count: 0,
-                  subtitle: String(lastAppliedEntry?.session?.locationLabel || lastAppliedEntry?.session?.target?.label || '').trim() || 'Last change applied',
-                  isApplying: false,
-                  undoAvailable: true,
-                  onUndo: () => undoEditEntry(lastAppliedEntry),
-                }
-              : null)
-        }
       />
     </div>
   );
@@ -3675,10 +3648,17 @@ const DocumentViewer = () => {
         excelFontFamily={excelFontFamily}
         excelFontSizePt={excelFontSizePt}
         excelColorHex={excelColorHex}
+        excelBold={excelBold}
+        excelItalic={excelItalic}
+        excelUnderline={excelUnderline}
         onExcelFormatChange={(fmt) => {
+          if (fmt?.undo || fmt?.redo) return;
           if (fmt?.fontFamily) setExcelFontFamily(fmt.fontFamily);
           if (fmt?.fontSizePt != null) setExcelFontSizePt(fmt.fontSizePt);
           if (fmt?.color) setExcelColorHex(fmt.color);
+          if (typeof fmt?.bold === 'boolean') setExcelBold(fmt.bold);
+          if (typeof fmt?.italic === 'boolean') setExcelItalic(fmt.italic);
+          if (typeof fmt?.underline === 'boolean') setExcelUnderline(fmt.underline);
           excelCanvasRef.current?.applyFormat?.(fmt);
         }}
         excelStatusMsg={currentFileType === 'excel' ? editorStatusMsg : ''}
@@ -3834,6 +3814,9 @@ const DocumentViewer = () => {
 	                            setExcelFontFamily(fmt?.fontFamily || 'Calibri');
 	                            setExcelFontSizePt(fmt?.fontSizePt ?? 11);
 	                            setExcelColorHex(fmt?.color || '#000000');
+	                            setExcelBold(fmt?.bold ?? false);
+	                            setExcelItalic(fmt?.italic ?? false);
+	                            setExcelUnderline(fmt?.underline ?? false);
 	                          }}
 		                          onLiveSelectionChange={handleExcelLiveSelectionChange}
 		                          onAskAllybi={handleExcelAskAllybi}
