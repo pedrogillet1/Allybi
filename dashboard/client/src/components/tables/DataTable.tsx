@@ -16,7 +16,7 @@ interface DataTableProps<T> {
   onRowClick?: (row: T) => void;
 }
 
-export function DataTable<T extends Record<string, unknown>>({
+export function DataTable<T extends object>({
   columns,
   data,
   loading = false,
@@ -114,7 +114,7 @@ export function DataTable<T extends Record<string, unknown>>({
                   >
                     {col.render
                       ? col.render(row)
-                      : String(row[col.key] ?? "-")}
+                      : String((row as Record<string, unknown>)[col.key] ?? "-")}
                   </td>
                 ))}
               </tr>

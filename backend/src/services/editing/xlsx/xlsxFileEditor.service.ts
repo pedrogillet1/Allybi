@@ -150,7 +150,7 @@ export class XlsxFileEditorService {
 
     const cell = ws.getCell(a1);
     // Infer column number format before overwriting so numeric values keep currency/pct/etc.
-    const numFmt = inferColumnNumFmt(ws, cell.row, cell.col);
+    const numFmt = inferColumnNumFmt(ws, Number((cell as any).row), Number((cell as any).col));
     cell.value = parseSimpleValue(proposedText) as any;
     if (numFmt && (typeof cell.value === "number" || (cell.value && typeof cell.value === "object" && "formula" in cell.value))) {
       cell.numFmt = numFmt;
@@ -172,8 +172,8 @@ export class XlsxFileEditorService {
     const grid = parseTsvOrCsvGrid(proposedText);
     const [startCell] = a1.split(":");
     const start = ws.getCell(startCell);
-    const startRow = start.row;
-    const startCol = start.col;
+    const startRow = Number((start as any).row);
+    const startCol = Number((start as any).col);
 
     for (let r = 0; r < grid.length; r += 1) {
       for (let c = 0; c < grid[r].length; c += 1) {
@@ -250,8 +250,8 @@ export class XlsxFileEditorService {
         if (!ws) throw new Error(`Sheet not found: ${sheetName}`);
         const [startRef] = a1.split(":");
         const anchor = ws.getCell(startRef);
-        const startRow = anchor.row;
-        const startCol = anchor.col;
+        const startRow = Number((anchor as any).row);
+        const startCol = Number((anchor as any).col);
         const rect = parseA1RectOnWorksheet(ws, a1);
         const firstRow = Array.isArray(values?.[0]) ? values[0] : [];
         const scalarFill = (values.length === 1 && firstRow.length === 1) ? firstRow[0] : undefined;
@@ -299,7 +299,7 @@ export class XlsxFileEditorService {
         const ws = wb.getWorksheet(sheetName);
         if (!ws) throw new Error(`Sheet not found: ${sheetName}`);
         const fCell = ws.getCell(a1);
-        const numFmt = inferColumnNumFmt(ws, fCell.row, fCell.col);
+        const numFmt = inferColumnNumFmt(ws, Number((fCell as any).row), Number((fCell as any).col));
         fCell.value = { formula } as any;
         if (numFmt) fCell.numFmt = numFmt;
       } else if (kind === "create_table") {
