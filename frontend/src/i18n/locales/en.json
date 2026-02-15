@@ -254,6 +254,8 @@
     "mobileHeadline": "Ask Allybi about your files",
     "footerSecure": "Secure and private workspace.",
     "footerImportantInfo": "Check important info.",
+    "footerPrivacyPolicy": "Privacy Policy.",
+    "footerTermsOfUse": "Terms of Use.",
     "footerCookiePreferences": "See Cookie Preferences.",
     "welcomeMessages": [
       "What do you want to find in your files?",

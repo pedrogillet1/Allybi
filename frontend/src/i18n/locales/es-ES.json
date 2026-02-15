@@ -243,6 +243,8 @@
   "chat": {
     "footerSecure": "Espacio de trabajo seguro y privado.",
     "footerImportantInfo": "Consulta información importante.",
+    "footerPrivacyPolicy": "Política de Privacidad.",
+    "footerTermsOfUse": "Términos de Uso.",
     "footerCookiePreferences": "Ver preferencias de cookies.",
     "documentSources": "Fuentes del Documento ({{count}})",
     "webSources": "Fuentes Web ({{count}})",

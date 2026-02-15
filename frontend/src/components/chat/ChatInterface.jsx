@@ -5521,9 +5521,28 @@ export default function ChatInterface({
               </a>
               {' '}
               <a
-                href="https://www.getkoda.io/cookies.html"
-                target="_blank"
-                rel="noopener noreferrer"
+                href={ROUTES.PRIVACY_POLICY}
+                onClick={(e) => { e.preventDefault(); navigate(ROUTES.PRIVACY_POLICY); }}
+                style={{ color: '#9CA3AF', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#6C6B6E'; e.currentTarget.style.textDecoration = 'underline'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = '#9CA3AF'; e.currentTarget.style.textDecoration = 'none'; }}
+              >
+                {t('chat.footerPrivacyPolicy')}
+              </a>
+              {' '}
+              <a
+                href={ROUTES.TERMS_OF_USE}
+                onClick={(e) => { e.preventDefault(); navigate(ROUTES.TERMS_OF_USE); }}
+                style={{ color: '#9CA3AF', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#6C6B6E'; e.currentTarget.style.textDecoration = 'underline'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = '#9CA3AF'; e.currentTarget.style.textDecoration = 'none'; }}
+              >
+                {t('chat.footerTermsOfUse')}
+              </a>
+              {' '}
+              <a
+                href={`${ROUTES.SETTINGS}?section=about`}
+                onClick={(e) => { e.preventDefault(); navigate(`${ROUTES.SETTINGS}?section=about`); }}
                 style={{ color: '#9CA3AF', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s' }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = '#6C6B6E'; e.currentTarget.style.textDecoration = 'underline'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = '#9CA3AF'; e.currentTarget.style.textDecoration = 'none'; }}
