@@ -14,13 +14,11 @@ export default function FileInsightsCard() {
 
   const scrollRef = useRef(null);
   const [canScrollRight, setCanScrollRight] = useState(false);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
 
   const checkScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
     setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
-    setCanScrollLeft(el.scrollLeft > 2);
   }, []);
 
   useEffect(() => {
@@ -120,22 +118,7 @@ export default function FileInsightsCard() {
             }}
           />
         )}
-        {/* Left fade */}
-        {needsCarousel && canScrollLeft && (
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              bottom: 0,
-              width: 72,
-              background: 'linear-gradient(to left, rgba(255,255,255,0) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,1) 100%)',
-              zIndex: 2,
-              pointerEvents: 'none',
-            }}
-          />
-        )}
+        {/* Left fade removed — first icon must always be fully visible */}
 
         <div
           ref={scrollRef}
