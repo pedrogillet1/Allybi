@@ -44,6 +44,10 @@ function wantsHtml(req: Request): boolean {
   return accept.includes('text/html');
 }
 
+function oauthFrontendRedirectBase(): string {
+  return (process.env.FRONTEND_URL || 'http://localhost:3000').replace(/\/+$/, '');
+}
+
 function oauthResultHtml(opts: { provider: string; ok: boolean; title: string; detail?: string }): string {
   const provider = opts.provider;
   const title = opts.title;
@@ -84,12 +88,20 @@ function oauthResultHtml(opts: { provider: string; ok: boolean; title: string; d
       </div>
     </div>
     <script>
+      var sent = false;
       try {
         if (window.opener && !window.opener.closed) {
           window.opener.postMessage({ type: 'koda_oauth_done', provider: '${provider}', ok: ${opts.ok ? 'true' : 'false'} }, '*');
+          sent = true;
         }
       } catch (e) {}
-      setTimeout(() => { try { window.close(); } catch (e) {} }, 250);
+      // Fallback: write to localStorage so the parent can detect via 'storage' event.
+      // This works even when window.opener is null (cross-origin navigation kills it).
+      try {
+        localStorage.setItem('koda_oauth_complete', JSON.stringify({ provider: '${provider}', ok: ${opts.ok ? 'true' : 'false'}, t: Date.now() }));
+      } catch (e) {}
+      // Give postMessage time to be received before auto-closing.
+      setTimeout(function() { try { window.close(); } catch (e) {} }, sent ? 600 : 1500);
     </script>
   </body>
 </html>`;
@@ -133,7 +145,10 @@ function mapHandlerError(error: string): { code: string; status: number } {
   if (e.includes('not registered')) return { code: 'CONNECTOR_NOT_REGISTERED', status: 503 };
   if (e.includes('invalid connector context')) return { code: 'INVALID_CONTEXT', status: 400 };
   if (e.includes('queue unavailable')) return { code: 'QUEUE_UNAVAILABLE', status: 503 };
-  return { code: 'INTEGRATION_ERROR', status: 400 };
+  if (e.includes('token') || e.includes('expired') || e.includes('refresh')) return { code: 'TOKEN_ERROR', status: 401 };
+  if (e.includes('not authenticated') || e.includes('unauthorized')) return { code: 'AUTH_ERROR', status: 401 };
+  // Server-side failures (API errors, sync failures) should be 500, not 400
+  return { code: 'INTEGRATION_ERROR', status: 500 };
 }
 
 export class IntegrationsController {
@@ -250,15 +265,8 @@ export class IntegrationsController {
       }
 
       if (wantsHtml(req)) {
-        res.status(200).type('html').send(
-          oauthResultHtml({
-            provider: providerRaw,
-            ok: true,
-            title: 'You are connected',
-            detail: 'Koda can now access this connector.',
-          }),
-        );
-        return res as unknown as Response;
+        const frontendBase = oauthFrontendRedirectBase();
+        return res.redirect(`${frontendBase}/integrations?oauth_connected=${providerRaw}`) as unknown as Response;
       }
 
       return sendOk(res, { provider: providerRaw, connected: true, result: callbackResult ?? null });
@@ -266,15 +274,9 @@ export class IntegrationsController {
       const message = error instanceof Error ? error.message : 'Connector OAuth callback failed.';
       const mapped = mapHandlerError(message);
       if (wantsHtml(req)) {
-        res.status(mapped.status).type('html').send(
-          oauthResultHtml({
-            provider: providerRaw,
-            ok: false,
-            title: 'Connection failed',
-            detail: message,
-          }),
-        );
-        return res as unknown as Response;
+        const frontendBase = oauthFrontendRedirectBase();
+        const encodedError = encodeURIComponent(message);
+        return res.redirect(`${frontendBase}/integrations?oauth_error=${providerRaw}&detail=${encodedError}`) as unknown as Response;
       }
       return sendErr(res, mapped.code, message, mapped.status);
     }
@@ -287,20 +289,32 @@ export class IntegrationsController {
     const providers = listConnectorProviders();
     const providerStatuses = await Promise.all(
       providers.map(async (provider) => {
-        const result = await this.connectorHandler.execute({
-          action: 'status',
-          provider,
-          context,
-        });
+        try {
+          const result = await this.connectorHandler.execute({
+            action: 'status',
+            provider,
+            context,
+          });
 
-        const env = validateConnectorEnv(provider);
-        return {
-          provider,
-          capabilities: getConnectorCapabilities(provider),
-          env,
-          ok: result.ok,
-          ...(result.ok ? { status: result.data } : { error: result.error }),
-        };
+          const env = validateConnectorEnv(provider);
+          return {
+            provider,
+            capabilities: getConnectorCapabilities(provider),
+            env,
+            ok: result.ok,
+            ...(result.ok ? { status: result.data } : { error: result.error }),
+          };
+        } catch (e) {
+          // Don't let one provider failure break the entire status response
+          const env = validateConnectorEnv(provider);
+          return {
+            provider,
+            capabilities: getConnectorCapabilities(provider),
+            env,
+            ok: false,
+            error: e instanceof Error ? e.message : 'Status check failed',
+          };
+        }
       }),
     );
 
@@ -317,15 +331,24 @@ export class IntegrationsController {
     if (!context) return sendErr(res, 'AUTH_UNAUTHORIZED', 'Not authenticated.', 401);
 
     const forceResync = Boolean((req.body as Record<string, unknown> | undefined)?.forceResync);
-    const result = await this.connectorHandler.execute({
-      action: 'sync',
-      provider: providerRaw,
-      context,
-      forceResync,
-    });
+
+    let result;
+    try {
+      result = await this.connectorHandler.execute({
+        action: 'sync',
+        provider: providerRaw,
+        context,
+        forceResync,
+      });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Sync failed unexpectedly';
+      console.error(`[Integrations] Sync error for ${providerRaw}:`, msg);
+      return sendErr(res, 'SYNC_FAILED', msg, 500);
+    }
 
     if (!result.ok) {
       const mapped = mapHandlerError(result.error || 'sync failed');
+      console.warn(`[Integrations] Sync failed for ${providerRaw}: ${result.error}`);
       return sendErr(res, mapped.code, result.error || 'Failed to schedule sync.', mapped.status);
     }
 

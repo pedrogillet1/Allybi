@@ -243,43 +243,12 @@ export class ConnectorHandlerService {
       return { ok: false, action: "sync", provider, error: "Sync service does not expose a sync method." };
     }
 
-    const out = await Promise.resolve(
-      syncFn.call(syncService, {
-        userId: req.context.userId,
-        correlationId: req.context.correlationId,
-        forceResync: req.forceResync === true,
-      }),
-    );
-
-    return {
-      ok: true,
-      action: "sync",
-      provider,
-      data: {
-        mode: "direct",
-        result: out ?? null,
-      },
-    };
-  }
-
-  private async enqueueSync(userId: string, provider: ConnectorProvider, forceResync: boolean): Promise<ConnectorHandlerResult> {
     try {
-      const reqFn = (globalThis as unknown as { require?: (id: string) => unknown }).require;
-      const mod = reqFn ? (reqFn("../../../queues/connector.queue") as Record<string, unknown>) : null;
-      const enqueueFn = mod
-        ? (mod.addConnectorSyncJob || mod.enqueueConnectorSync)
-        : null;
-
-      if (!isFn(enqueueFn)) {
-        return { ok: false, action: "sync", provider, error: "Queue module loaded but enqueue function is missing." };
-      }
-
-      const job = await Promise.resolve(
-        enqueueFn({
-          userId,
-          provider,
-          cursor: null,
-          forceResync,
+      const out = await Promise.resolve(
+        syncFn.call(syncService, {
+          userId: req.context.userId,
+          correlationId: req.context.correlationId,
+          forceResync: req.forceResync === true,
         }),
       );
 
@@ -288,11 +257,47 @@ export class ConnectorHandlerService {
         action: "sync",
         provider,
         data: {
-          mode: "queued",
-          jobId: (job as Record<string, unknown>)?.id ?? null,
+          mode: "direct",
+          result: out ?? null,
         },
       };
-    } catch {
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`[ConnectorHandler] Direct sync failed for ${provider}: ${msg}`);
+      return { ok: false, action: "sync", provider, error: `Sync failed: ${msg}` };
+    }
+  }
+
+  private async enqueueSync(userId: string, provider: ConnectorProvider, forceResync: boolean): Promise<ConnectorHandlerResult> {
+    try {
+      const mod = await import("../../../queues/connector.queue");
+      const enqueueFn = mod.addConnectorSyncJob ?? mod.enqueueConnectorSync;
+
+      if (!isFn(enqueueFn)) {
+        return { ok: false, action: "sync", provider, error: "Queue enqueue function not found." };
+      }
+
+      const job = await enqueueFn({
+        userId,
+        provider,
+        cursor: null,
+        forceResync,
+      });
+
+      console.log(`[ConnectorHandler] Sync job enqueued for ${provider}: ${job?.id}`);
+
+      return {
+        ok: true,
+        action: "sync",
+        provider,
+        data: {
+          mode: "queued",
+          jobId: job?.id ?? null,
+        },
+      };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`[ConnectorHandler] Queue unavailable for ${provider}, falling back to direct sync: ${msg}`);
       return { ok: false, action: "sync", provider, error: "Connector queue unavailable." };
     }
   }

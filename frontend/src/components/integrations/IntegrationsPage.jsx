@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 import { useIntegrationStatus } from '../../hooks/useIntegrationStatus';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -32,19 +32,6 @@ const PROVIDER_META = {
   },
 };
 
-function formatSyncTime(iso) {
-  if (!iso) return 'Never';
-  const d = new Date(iso);
-  const now = new Date();
-  const diff = now - d;
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'Just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-}
-
 function Spinner({ size = 16 }) {
   return (
     <div
@@ -67,10 +54,11 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
   const meta = PROVIDER_META[provider];
   if (!meta) return null;
 
-  const { connected, expired, connecting, syncing, error, lastSyncAt, indexedDocuments } = status;
+  const { connected, expired, connecting, error } = status;
 
   let state = 'disconnected';
   if (connecting) state = 'connecting';
+  else if (!connected && error) state = 'connect_error';
   else if (expired) state = 'revoked';
   else if (connected && error) state = 'error';
   else if (connected) state = 'connected';
@@ -78,6 +66,7 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
   const statusColor = {
     disconnected: '#6C6B6E',
     connecting: '#6C6B6E',
+    connect_error: '#D92D20',
     connected: '#34A853',
     error: '#D92D20',
     revoked: '#D92D20',
@@ -86,6 +75,7 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
   const statusText = {
     disconnected: 'Not connected',
     connecting: 'Connecting...',
+    connect_error: 'Connection failed',
     connected: 'Connected',
     error: 'Sync failed',
     revoked: 'Permission revoked',
@@ -130,17 +120,15 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
         {meta.description}
       </div>
 
-      {/* Stats (when connected) */}
-      {connected && !expired && (
-        <div style={{ display: 'flex', gap: 24, padding: '8px 0', borderTop: '1px solid #F5F5F5' }}>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 500, color: '#6C6B6E', fontFamily: FONT }}>Last sync</div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: '#32302C', fontFamily: FONT }}>{formatSyncTime(lastSyncAt)}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 500, color: '#6C6B6E', fontFamily: FONT }}>Indexed</div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: '#32302C', fontFamily: FONT }}>{indexedDocuments || 0} items</div>
-          </div>
+      {!!error && (
+        <div style={{
+          fontSize: 12,
+          color: '#D92D20',
+          fontFamily: FONT,
+          lineHeight: '18px',
+          marginTop: -8,
+        }}>
+          {String(error)}
         </div>
       )}
 
@@ -218,31 +206,6 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
               </button>
             )}
             <button
-              onClick={() => syncing ? null : onSync(provider)}
-              disabled={syncing}
-              style={{
-                height: 40,
-                padding: '0 20px',
-                borderRadius: 9999,
-                background: 'white',
-                border: '1px solid #E6E6EC',
-                color: syncing ? '#6C6B6E' : '#32302C',
-                cursor: syncing ? 'not-allowed' : 'pointer',
-                fontFamily: FONT,
-                fontWeight: 600,
-                fontSize: 14,
-                transition: 'background 120ms ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-              }}
-              onMouseEnter={e => { if (!syncing) e.currentTarget.style.background = '#F5F5F5'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'white'; }}
-            >
-              {syncing && <Spinner size={14} />}
-              {syncing ? 'Syncing...' : 'Sync now'}
-            </button>
-            <button
               onClick={() => onDisconnect(provider)}
               style={{
                 height: 40,
@@ -310,6 +273,29 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
           </>
         )}
 
+        {state === 'connect_error' && (
+          <button
+            onClick={() => onConnect(provider)}
+            style={{
+              height: 40,
+              padding: '0 20px',
+              borderRadius: 9999,
+              background: 'white',
+              border: '1px solid #D92D20',
+              color: '#D92D20',
+              cursor: 'pointer',
+              fontFamily: FONT,
+              fontWeight: 600,
+              fontSize: 14,
+              transition: 'background 120ms ease',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#FEF3F2'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'white'; }}
+          >
+            Retry connect
+          </button>
+        )}
+
         {state === 'revoked' && (
           <button
             onClick={() => onConnect(provider)}
@@ -339,8 +325,50 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
 
 export default function IntegrationsPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = useIsMobile();
-  const { providers, loading, connectProvider, disconnectProvider, syncNow } = useIntegrationStatus();
+  const { providers, loading, connectProvider, disconnectProvider, syncNow, refetch } = useIntegrationStatus();
+
+  // Handle OAuth callback redirect: when the backend redirects the popup here
+  // with ?oauth_connected=<provider>, signal the opener and close the popup.
+  useEffect(() => {
+    const connectedProvider = searchParams.get('oauth_connected');
+    const errorProvider = searchParams.get('oauth_error');
+    if (!connectedProvider && !errorProvider) return;
+
+    const provider = connectedProvider || errorProvider;
+    const ok = Boolean(connectedProvider);
+
+    // Write to localStorage so the opener (polling it) picks up the signal.
+    try {
+      localStorage.setItem(
+        'koda_oauth_complete',
+        JSON.stringify({ provider, ok, t: Date.now() }),
+      );
+    } catch {}
+
+    // Try postMessage to opener (works if window.opener survived cross-origin nav).
+    try {
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage(
+          { type: 'koda_oauth_done', provider, ok },
+          window.location.origin,
+        );
+      }
+    } catch {}
+
+    // Clean the query params so a page refresh doesn't re-trigger.
+    setSearchParams({}, { replace: true });
+
+    // If we're in a popup, close it after a short delay.
+    const isPopup = window.opener || window.name.startsWith('koda_');
+    if (isPopup) {
+      setTimeout(() => { try { window.close(); } catch {} }, 600);
+    } else {
+      // Not a popup — user navigated directly. Just refresh status.
+      refetch();
+    }
+  }, [searchParams, setSearchParams, refetch]);
 
   return (
     <div style={{

@@ -176,7 +176,7 @@ export class GmailSyncService {
             threadId: msg.threadId,
             historyId: msg.historyId,
             snippet: msg.snippet,
-            gmailAddress: profile.emailAddress,
+            gmailAddress: profile.emailAddress ?? undefined,
           },
         });
       }
@@ -193,7 +193,7 @@ export class GmailSyncService {
     );
 
     cursorFile.providers.gmail = {
-      historyId: profile.historyId || prior.historyId,
+      historyId: (profile.historyId as string | undefined) || prior.historyId,
       lastSyncAt: new Date().toISOString(),
     };
 
@@ -272,8 +272,13 @@ export class GmailSyncService {
     try {
       return await this.tokenVault.getValidAccessToken(userId, 'gmail');
     } catch {
-      const refreshed = await this.gmailOAuth.refreshAccessToken(userId);
-      return refreshed.accessToken;
+      try {
+        const refreshed = await this.gmailOAuth.refreshAccessToken(userId);
+        return refreshed.accessToken;
+      } catch (refreshErr) {
+        const msg = refreshErr instanceof Error ? refreshErr.message : String(refreshErr);
+        throw new Error(`Gmail token refresh failed: ${msg}`);
+      }
     }
   }
 

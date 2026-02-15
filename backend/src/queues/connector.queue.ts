@@ -69,8 +69,24 @@ export function startConnectorWorker(handler: (job: Job<ConnectorSyncJobData>) =
     {
       connection,
       concurrency: Number(process.env.CONNECTOR_WORKER_CONCURRENCY || 5),
+      lockDuration: 300_000,
+      stalledInterval: 60_000,
+      maxStalledCount: 2,
     },
   );
+
+  connectorWorker.on('ready', () => {
+    console.log('[ConnectorWorker] Worker READY and listening for jobs');
+  });
+  connectorWorker.on('completed', (job) => {
+    console.log(`[ConnectorWorker] Job ${job.id} COMPLETED`);
+  });
+  connectorWorker.on('failed', (job, err) => {
+    console.error(`[ConnectorWorker] Job ${job?.id} FAILED: ${err.message}`);
+  });
+  connectorWorker.on('error', (err) => {
+    console.error(`[ConnectorWorker] Worker ERROR: ${String(err)}`);
+  });
 }
 
 export async function stopConnectorWorker(): Promise<void> {

@@ -34,21 +34,27 @@ registerConnector('slack', {
 });
 
 async function runJob(job: Job<ConnectorSyncJobData>): Promise<void> {
-  const module = await getConnector(job.data.provider);
-  const syncService = module.syncService as { sync?: (input: any) => Promise<any>; runSync?: (input: any) => Promise<any> } | undefined;
+  try {
+    const module = await getConnector(job.data.provider);
+    const syncService = module.syncService as { sync?: (input: any) => Promise<any>; runSync?: (input: any) => Promise<any> } | undefined;
 
-  const fn = syncService?.sync || syncService?.runSync;
-  if (!fn) {
-    throw new Error(`Sync service not available for provider ${job.data.provider}`);
+    const fn = syncService?.sync || syncService?.runSync;
+    if (!fn) {
+      throw new Error(`Sync service not available for provider ${job.data.provider}`);
+    }
+
+    await fn.call(syncService, {
+      userId: job.data.userId,
+      forceResync: job.data.forceResync,
+      correlationId: `connector-worker:${job.id}`,
+      conversationId: `connector-worker:${job.data.userId}`,
+      clientMessageId: String(job.id || Date.now()),
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`[ConnectorWorker] Sync job ${job.id} failed for ${job.data.provider}: ${msg}`);
+    throw err;
   }
-
-  await fn.call(syncService, {
-    userId: job.data.userId,
-    forceResync: job.data.forceResync,
-    correlationId: `connector-worker:${job.id}`,
-    conversationId: `connector-worker:${job.data.userId}`,
-    clientMessageId: String(job.id || Date.now()),
-  });
 }
 
 export function startWorker(): void {

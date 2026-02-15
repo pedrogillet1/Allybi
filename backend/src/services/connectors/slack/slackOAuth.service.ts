@@ -279,7 +279,9 @@ export class SlackOAuthService {
     if (candidate && this.isAllowedRedirectOverride(candidate)) return candidate;
 
     const envUri = asString(process.env.SLACK_REDIRECT_URI);
-    return envUri || null;
+    if (envUri) return envUri;
+    const allowlist = this.getAllowedRedirectUris();
+    return allowlist[0] || null;
   }
 
   private resolveRedirectUri(callbackUrl?: string): string | null {
@@ -287,18 +289,40 @@ export class SlackOAuthService {
     const candidate = asString(callbackUrl);
     if (!candidate) return envUri || null;
 
-    // Only allow overrides in development to unblock localhost HTTP/HTTPS mismatch.
-    if (process.env.NODE_ENV !== 'development') return envUri || null;
+    // Allow overrides only when they are explicitly allowlisted.
+    // This supports localhost and VPS callback URLs while keeping redirect_uri server-controlled.
     if (!this.isAllowedRedirectOverride(candidate)) return envUri || null;
     return candidate;
   }
 
+  private getAllowedRedirectUris(): string[] {
+    const direct = asString(process.env.SLACK_REDIRECT_URI);
+    const csv = asString(process.env.SLACK_REDIRECT_URIS);
+    const items = [
+      ...(direct ? [direct] : []),
+      ...((csv || "")
+        .split(",")
+        .map((x) => x.trim())
+        .filter(Boolean)),
+    ];
+    return Array.from(new Set(items));
+  }
+
   private isAllowedRedirectOverride(candidate: string): boolean {
     try {
-      const url = new URL(candidate);
-      if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
-      if (!['localhost', '127.0.0.1'].includes(url.hostname)) return false;
-      return url.pathname === '/api/integrations/slack/callback';
+      const cand = new URL(candidate);
+      if (cand.protocol !== 'http:' && cand.protocol !== 'https:') return false;
+      if (cand.pathname !== '/api/integrations/slack/callback') return false;
+
+      const allowlist = this.getAllowedRedirectUris();
+      return allowlist.some((raw) => {
+        try {
+          const u = new URL(raw);
+          return u.origin === cand.origin && u.pathname === cand.pathname;
+        } catch {
+          return false;
+        }
+      });
     } catch {
       return false;
     }

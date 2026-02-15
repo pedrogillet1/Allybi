@@ -45,76 +45,82 @@ export class ConnectorsIngestionService {
     const results: ConnectorIngestionResultItem[] = [];
 
     for (const item of items) {
-      const normalized = this.normalize(item);
+      try {
+        const normalized = this.normalize(item);
 
-      // Idempotency by deterministic filename per source item.
-      const filename = this.buildFilename(normalized);
-      const existing = await prisma.document.findFirst({
-        where: {
-          userId: ctx.userId,
-          filename,
-        },
-        select: { id: true },
-      });
-
-      if (existing) {
-        results.push({ sourceId: normalized.sourceId, documentId: existing.id, status: 'existing' });
-        continue;
-      }
-
-      const documentId = cryptoRandomId(normalized);
-      const textContent = this.buildTextPayload(normalized);
-      const storageKey = `users/${ctx.userId}/connectors/${normalized.sourceType}/${documentId}/${filename}`;
-      const fileHash = createHash('sha256').update(textContent).digest('hex');
-
-      await uploadFile(storageKey, Buffer.from(textContent, 'utf8'), 'text/plain');
-
-      await prisma.$transaction(async (tx) => {
-        await tx.document.create({
-          data: {
-            id: documentId,
+        // Idempotency by deterministic filename per source item.
+        const filename = this.buildFilename(normalized);
+        const existing = await prisma.document.findFirst({
+          where: {
             userId: ctx.userId,
             filename,
-            encryptedFilename: storageKey,
-            fileSize: Buffer.byteLength(textContent, 'utf8'),
-            mimeType: 'text/plain',
-            fileHash,
-            status: 'uploaded',
-            displayTitle: normalized.title,
-            rawText: textContent,
-            renderableContent: textContent,
-            language: 'en',
           },
+          select: { id: true },
         });
 
-        await tx.documentMetadata.create({
-          data: {
-            documentId,
-            extractedText: textContent,
-            wordCount: wordCount(textContent),
-            characterCount: textContent.length,
-            summary: normalized.title,
-            creationDate: normalized.timestamp,
-            modificationDate: normalized.timestamp,
-            entities: JSON.stringify({
-              actors: normalized.actors,
-              labelsOrChannel: normalized.labelsOrChannel,
-            }),
-            classification: normalized.sourceType,
-            topics: JSON.stringify(normalized.labelsOrChannel),
-          },
+        if (existing) {
+          results.push({ sourceId: normalized.sourceId, documentId: existing.id, status: 'existing' });
+          continue;
+        }
+
+        const documentId = deterministicDocumentId(ctx.userId, normalized);
+        const textContent = this.buildTextPayload(normalized);
+        const storageKey = `users/${ctx.userId}/connectors/${normalized.sourceType}/${documentId}/${filename}`;
+        const fileHash = createHash('sha256').update(textContent).digest('hex');
+
+        await uploadFile(storageKey, Buffer.from(textContent, 'utf8'), 'text/plain');
+
+        await prisma.$transaction(async (tx) => {
+          await tx.document.create({
+            data: {
+              id: documentId,
+              userId: ctx.userId,
+              filename,
+              encryptedFilename: storageKey,
+              fileSize: Buffer.byteLength(textContent, 'utf8'),
+              mimeType: 'text/plain',
+              fileHash,
+              status: 'uploaded',
+              displayTitle: normalized.title,
+              rawText: textContent,
+              renderableContent: textContent,
+              language: 'en',
+            },
+          });
+
+          await tx.documentMetadata.create({
+            data: {
+              documentId,
+              extractedText: textContent,
+              wordCount: wordCount(textContent),
+              characterCount: textContent.length,
+              summary: normalized.title,
+              creationDate: normalized.timestamp,
+              modificationDate: normalized.timestamp,
+              entities: JSON.stringify({
+                actors: normalized.actors,
+                labelsOrChannel: normalized.labelsOrChannel,
+              }),
+              classification: normalized.sourceType,
+              topics: JSON.stringify(normalized.labelsOrChannel),
+            },
+          });
         });
-      });
 
-      await this.enqueueOrIndexFallback({
-        documentId,
-        userId: ctx.userId,
-        filename,
-        mimeType: 'text/plain',
-        encryptedFilename: storageKey,
-      }, textContent);
+        await this.enqueueOrIndexFallback({
+          documentId,
+          userId: ctx.userId,
+          filename,
+          mimeType: 'text/plain',
+          encryptedFilename: storageKey,
+        }, textContent);
 
-      results.push({ sourceId: normalized.sourceId, documentId, status: 'created' });
+        results.push({ sourceId: normalized.sourceId, documentId, status: 'created' });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error(`[ConnectorsIngestion] Failed to ingest item ${item.sourceType}:${item.sourceId}: ${msg}`);
+        // Continue processing remaining items instead of aborting the entire sync.
+      }
     }
 
     return results;
@@ -203,8 +209,9 @@ export class ConnectorsIngestionService {
   }
 }
 
-function cryptoRandomId(item: ConnectorDocument): string {
-  const seed = `${item.sourceType}:${item.sourceId}:${item.timestamp.toISOString()}`;
+function deterministicDocumentId(userId: string, item: ConnectorDocument): string {
+  // Include userId to avoid cross-user primary-key collisions when provider/source IDs overlap.
+  const seed = `${userId}:${item.sourceType}:${item.sourceId}`;
   return createHash('sha256').update(seed).digest('hex').slice(0, 32);
 }
 

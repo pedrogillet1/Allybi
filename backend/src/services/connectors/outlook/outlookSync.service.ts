@@ -102,12 +102,10 @@ export class OutlookSyncService {
           (newToken) => { accessToken = newToken; },
         );
       } catch (err) {
-        // Skip folders that fail (e.g. permission denied on system folders).
+        // Skip folders that fail (permission denied, token errors, timeouts, etc.).
         const msg = err instanceof Error ? err.message : String(err);
-        if (msg.includes('404') || msg.includes('MailboxNotEnabledForRESTAPI') || msg.includes('ErrorItemNotFound')) {
-          continue;
-        }
-        throw err;
+        console.warn(`[OutlookSync] Skipping folder "${folder.displayName}" (${folder.id}): ${msg}`);
+        continue;
       }
 
       const docs = this.mapMessages(messages, folder.displayName);
@@ -196,8 +194,13 @@ export class OutlookSyncService {
     try {
       return await this.tokenVault.getValidAccessToken(userId, 'outlook');
     } catch {
-      const refreshed = await this.outlookOAuth.refreshAccessToken(userId);
-      return refreshed.accessToken;
+      try {
+        const refreshed = await this.outlookOAuth.refreshAccessToken(userId);
+        return refreshed.accessToken;
+      } catch (refreshErr) {
+        const msg = refreshErr instanceof Error ? refreshErr.message : String(refreshErr);
+        throw new Error(`Outlook token refresh failed: ${msg}`);
+      }
     }
   }
 
