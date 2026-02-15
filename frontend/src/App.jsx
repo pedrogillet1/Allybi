@@ -55,6 +55,7 @@ import LandingPage from './components/landing/LandingPage';
 import IntegrationsPage from './components/integrations/IntegrationsPage';
 import GmailDetailPage from './components/integrations/GmailDetailPage';
 import LegalPage from './components/legal/LegalPage';
+import FirstDocumentUpload from './components/onboarding/FirstDocumentUpload';
 
 // Dev-only Chat Contract Harness
 import ChatContractHarness from './pages/ChatContractHarness';
@@ -175,6 +176,7 @@ function AppContent() {
               <Route path={ROUTES.INTEGRATIONS} element={<ProtectedRoute><IntegrationsPage /></ProtectedRoute>} />
               <Route path={ROUTES.INTEGRATIONS_GMAIL} element={<ProtectedRoute><GmailDetailPage /></ProtectedRoute>} />
               <Route path={ROUTES.UPGRADE} element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
+              <Route path={ROUTES.FIRST_UPLOAD} element={<ProtectedRoute><FirstDocumentUpload /></ProtectedRoute>} />
 
               {/* DEV-ONLY ROUTES */}
               {process.env.NODE_ENV === 'development' && (

@@ -196,6 +196,10 @@ const UnifiedAuth = ({ variant = 'page' }) => {
         setAuthState(response.user);
 
         console.log('✅ User registered and logged in successfully');
+        // Set flag so new users go to first-upload onboarding
+        if (!localStorage.getItem(STORAGE_KEYS.FIRST_UPLOAD_DONE)) {
+          localStorage.setItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD, 'true');
+        }
         completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
       } else {
         console.error('Unexpected response format:', response);

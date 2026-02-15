@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AUTH_MODES, DEFAULT_AUTH_REDIRECT, ROUTES, buildRoute } from '../constants/routes';
+import { AUTH_MODES, DEFAULT_AUTH_REDIRECT, ROUTES, STORAGE_KEYS, buildRoute } from '../constants/routes';
 import { subscribeAuthModalEvents } from '../utils/authModalBus';
 import { useAuth } from './AuthContext';
 
@@ -111,6 +111,15 @@ export function AuthModalProvider({ children }) {
     setDismissed(false);
     safeSessionRemove(DISMISSED_KEY);
 
+    // Check if this is a first-time upload redirect (new user onboarding)
+    const pendingFirstUpload = localStorage.getItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD);
+    if (pendingFirstUpload === 'true') {
+      localStorage.removeItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD);
+      setReturnTo(null);
+      navigate(ROUTES.FIRST_UPLOAD, { replace: true });
+      return;
+    }
+
     const target = sanitizeReturnTo(returnTo) || fallback || DEFAULT_AUTH_REDIRECT;
     setReturnTo(null);
     navigate(target, { replace: true });
@@ -130,6 +139,16 @@ export function AuthModalProvider({ children }) {
     }
 
     if (!isAuthPathname(location.pathname)) return;
+
+    // Check for first-time upload redirect in safety net too
+    const pendingFirstUpload = localStorage.getItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD);
+    if (pendingFirstUpload === 'true') {
+      localStorage.removeItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD);
+      setReturnTo(null);
+      navigate(ROUTES.FIRST_UPLOAD, { replace: true });
+      return;
+    }
+
     const target = sanitizeReturnTo(returnTo) || DEFAULT_AUTH_REDIRECT;
     setReturnTo(null);
     navigate(target, { replace: true });

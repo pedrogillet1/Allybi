@@ -40,6 +40,9 @@ export const ROUTES = {
   SETTINGS: '/s/w6d4h8',
   UPGRADE: '/u/q8f2m7',
 
+  // Onboarding
+  FIRST_UPLOAD: '/o/f7u3k9',
+
   // Integrations
   INTEGRATIONS: '/i/n4k8p2',
   INTEGRATIONS_GMAIL: '/i/n4k8p2/gmail',
@@ -94,4 +97,6 @@ export const DEFAULT_AUTH_REDIRECT = ROUTES.CHAT;
 export const STORAGE_KEYS = {
   HAS_VISITED: 'koda_has_visited',
   LAST_AUTH_MODE: 'koda_last_auth_mode',
+  PENDING_FIRST_UPLOAD: 'koda_pending_first_upload',
+  FIRST_UPLOAD_DONE: 'koda_first_upload_done',
 };

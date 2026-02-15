@@ -234,6 +234,9 @@
     }
   },
   "chat": {
+    "footerSecure": "Espacio de trabajo seguro y privado.",
+    "footerImportantInfo": "Consulta información importante.",
+    "footerCookiePreferences": "Ver preferencias de cookies.",
     "documentSources": "Fuentes del Documento ({{count}})",
     "webSources": "Fuentes Web ({{count}})",
     "noDocumentsReferenced": "No se referenciaron documentos para esta respuesta.",
@@ -1534,6 +1537,18 @@
     "withPage": "{{name}} (Página {{page}})",
     "jumpToPage": "Haz clic para ir a la página {{page}} en {{name}}",
     "preview": "Haz clic para previsualizar: {{name}}"
+  },
+  "firstUpload": {
+    "title": "Sube tu primer documento",
+    "subtitle": "Comienza subiendo un documento a Allybi. Puedes arrastrar y soltar archivos o explorar tu computadora.",
+    "dropzoneText": "Arrastra y suelta o haz clic para subir",
+    "browseFiles": "Explorar archivos",
+    "supportedFormats": "PDF, DOCX, TXT, XLSX, PPTX, JPG, PNG, MP3, MP4, MOV",
+    "back": "Atrás",
+    "skip": "Omitir",
+    "continue": "Continuar",
+    "uploading": "Subiendo...",
+    "uploaded": "Subido"
   },
   "allybi": {
     "stage": {

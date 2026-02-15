@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { ROUTES, DEFAULT_AUTH_REDIRECT, buildRoute, AUTH_MODES } from '../../constants/routes';
+import { ROUTES, DEFAULT_AUTH_REDIRECT, STORAGE_KEYS, buildRoute, AUTH_MODES } from '../../constants/routes';
 import { useAuthModal } from '../../context/AuthModalContext';
 
 const OAuthCallback = ({ variant = 'page' }) => {
@@ -76,8 +76,11 @@ const OAuthCallback = ({ variant = 'page' }) => {
           // This prevents race condition where ProtectedRoute checks auth before storage is ready
           await new Promise(resolve => setTimeout(resolve, 50));
 
-          // Navigate to chat after successful OAuth login
-          // Use replace: true to prevent going back to the callback URL
+          // Set flag so new OAuth users go to first-upload onboarding
+          if (!localStorage.getItem(STORAGE_KEYS.FIRST_UPLOAD_DONE)) {
+            localStorage.setItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD, 'true');
+          }
+          // Navigate after successful OAuth login
           completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
         } else {
           throw new Error('Failed to fetch user data');

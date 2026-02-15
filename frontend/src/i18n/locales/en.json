@@ -245,6 +245,9 @@
   },
   "chat": {
     "mobileHeadline": "Ask Allybi about your files",
+    "footerSecure": "Secure and private workspace.",
+    "footerImportantInfo": "Check important info.",
+    "footerCookiePreferences": "See Cookie Preferences.",
     "welcomeMessages": [
       "What do you want to find in your files?",
       "What can I pull up for you?",
@@ -1535,6 +1538,18 @@
     "withPage": "{{name}} (Page {{page}})",
     "jumpToPage": "Click to jump to page {{page}} in {{name}}",
     "preview": "Click to preview: {{name}}"
+  },
+  "firstUpload": {
+    "title": "Upload your first document",
+    "subtitle": "Start by uploading a document to Allybi. You can drag and drop files or browse your computer.",
+    "dropzoneText": "Drag and drop or click to upload",
+    "browseFiles": "Browse files",
+    "supportedFormats": "PDF, DOCX, TXT, XLSX, PPTX, JPG, PNG, MP3, MP4, MOV",
+    "back": "Back",
+    "skip": "Skip",
+    "continue": "Continue",
+    "uploading": "Uploading...",
+    "uploaded": "Uploaded"
   },
   "allybi": {
     "stage": {

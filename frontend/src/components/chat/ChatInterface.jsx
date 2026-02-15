@@ -8,7 +8,7 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import { useIsKeyboardVisible } from "../../hooks/useVisualViewportVars";
 import { useAuth } from "../../context/AuthContext";
 import { useAuthGate } from "../auth/ProtectedRoute";
-import { buildRoute, AUTH_MODES } from "../../constants/routes";
+import { buildRoute, AUTH_MODES, ROUTES } from "../../constants/routes";
 
 import unifiedUploadService from "../../services/unifiedUploadService";
 import { UPLOAD_CONFIG } from "../../config/upload.config";
@@ -32,7 +32,7 @@ import MessageActions from "./messages/MessageActions";
 import useStageLabel from "./messages/useStageLabel";
 import FollowUpChips from "./followups/FollowUpChips";
 import StreamingWelcomeMessage from "./streaming/StreamingWelcomeMessage";
-import ChatEmptyState from "./ChatEmptyState";
+// ChatEmptyState removed — empty state rendered inline below
 import kodaIcon from "../../assets/main-logo-b.svg";
 import kodaIconBlack from "../../assets/koda-dark-knot.svg";
 import thinkingVideo from "../../assets/koda-animation-final.mp4";
@@ -3795,7 +3795,7 @@ export default function ChatInterface({
         minHeight: 0,
         display: "flex",
         flexDirection: "column",
-        background: "#F4F4F6",
+        background: "#F1F0EF",
         position: "relative",
         width: "100%",
         height: "100%",
@@ -4028,7 +4028,7 @@ export default function ChatInterface({
         <div
           style={{
             // Allow cards (emails, previews, etc.) to breathe; keep centered.
-            maxWidth: isViewerVariant ? '100%' : (isMobile ? '100%' : 1180),
+            maxWidth: isViewerVariant ? '100%' : (isMobile ? '100%' : 960),
             margin: isViewerVariant ? '0' : '0 auto',
             width: '100%',
             height: '100%',
@@ -4208,7 +4208,7 @@ export default function ChatInterface({
                             />
                           )}
                         </div>
-                        <div className="message-content" data-testid="assistant-message-content" style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'stretch', flex: 1, maxWidth: '100%', marginTop: suppressPlainFileMatch ? -2 : 0}}>
+                        <div className="message-content" data-testid="assistant-message-content" style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'stretch', flex: 1, maxWidth: isMobile ? '100%' : 'min(100%, 720px)', marginTop: suppressPlainFileMatch ? -2 : 0}}>
                           {(() => {
                             const dp = m.deckProgress || null;
                             const hasDeckProgress = Boolean(dp && (dp.total || dp.deck));
@@ -4733,7 +4733,7 @@ export default function ChatInterface({
                                 isRegenerating={isStreaming && m.id === lastAssistant?.id}
                               />
                               {Array.isArray(m.followups) && m.followups.length > 0 && (
-                                <div style={{ marginTop: 4 }}>
+                                <div className="koda-followup-chips" style={{ marginTop: 4 }}>
                                   <FollowUpChips
                                     chips={m.followups}
                                     onSelect={(chip) => {
@@ -4906,7 +4906,7 @@ export default function ChatInterface({
           paddingBottom: isMobile
             ? "calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 80px)"
             : "20px",
-          background: "#F4F4F6",
+          background: "#F1F0EF",
           borderTop: "none",
         }}
       >
@@ -5083,7 +5083,20 @@ export default function ChatInterface({
                   background: "white",
                 }}
               >
-                <style>{`.chat-v3-textarea::placeholder { color: #9CA3AF; }`}</style>
+                <style>{`
+                  .chat-v3-textarea::placeholder { color: #9CA3AF; }
+                  .assistant-message .koda-msg-actions,
+                  .assistant-message .koda-followup-chips {
+                    opacity: 0;
+                    transition: opacity 0.15s ease;
+                  }
+                  .assistant-message:hover .koda-msg-actions,
+                  .assistant-message:focus-within .koda-msg-actions,
+                  .assistant-message:hover .koda-followup-chips,
+                  .assistant-message:focus-within .koda-followup-chips {
+                    opacity: 1;
+                  }
+                `}</style>
                 <textarea
                   ref={inputRef}
                   data-chat-input="true"
@@ -5171,9 +5184,9 @@ export default function ChatInterface({
                             left: 0,
                             zIndex: 50,
                             background: "white",
-                            borderRadius: 14,
+                            borderRadius: 12,
                             border: "1px solid #E6E6EC",
-                            boxShadow: "0 16px 40px rgba(0,0,0,0.14), 0 6px 16px rgba(0,0,0,0.08)",
+                            boxShadow: "0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)",
                             padding: 6,
                             minWidth: 220,
                           }}
@@ -5214,7 +5227,6 @@ export default function ChatInterface({
                             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                           >
                             <span>Upload files</span>
-                            <span style={{ fontSize: 12, fontWeight: 700, color: "#71717A" }}>⌘U</span>
                           </button>
                           <button
                             type="button"
@@ -5247,7 +5259,6 @@ export default function ChatInterface({
                             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                           >
                             <span>Upload folder</span>
-                            <span style={{ fontSize: 12, fontWeight: 700, color: "#71717A" }}>Browse</span>
                           </button>
 
                           <div style={{ height: 1, background: "#F3F4F6", margin: "4px 6px" }} />
@@ -5333,22 +5344,6 @@ export default function ChatInterface({
                                 onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
                               >
                                 <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
-                                  <span style={{
-                                    width: 18,
-                                    height: 18,
-                                    borderRadius: 6,
-                                    border: isActive ? "1.5px solid #18181B" : "1.5px solid #D4D4D8",
-                                    background: isActive ? "#18181B" : "white",
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    flexShrink: 0,
-                                    transition: "background 0.15s, border-color 0.15s",
-                                  }}>
-                                    {isActive ? (
-                                      <svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1.5 4.5L4 7L9.5 1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                                    ) : null}
-                                  </span>
                                   <img src={opt.icon} alt={opt.label} width={26} height={26} style={{ flexShrink: 0, objectFit: "contain" }} />
                                   <span>{opt.label}</span>
                                 </span>
@@ -5544,20 +5539,29 @@ export default function ChatInterface({
             paddingBottom: 2,
           }}>
             <ShieldIcon style={{ width: 14, height: 14, flexShrink: 0, filter: 'brightness(0) invert(0.2)' }} />
-            <span style={{ maxWidth: isMobile ? 520 : 820 }}>
-              {(() => {
-                const msg = String(t('fileBreakdown.encryptionMessage') || '');
-                const parts = msg.split('Allybi');
-                if (parts.length <= 1) return msg;
-                return parts.map((p, idx) => (
-                  <React.Fragment key={`${idx}:${p}`}>
-                    {p}
-                    {idx < parts.length - 1 ? (
-                      <span style={{ color: '#111827', fontWeight: 900 }}>Allybi</span>
-                    ) : null}
-                  </React.Fragment>
-                ));
-              })()}
+            <span>
+              {t('chat.footerSecure')}
+              {' '}
+              <a
+                href={`${ROUTES.SETTINGS}?section=about`}
+                onClick={(e) => { e.preventDefault(); navigate(`${ROUTES.SETTINGS}?section=about`); }}
+                style={{ color: '#9CA3AF', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#6C6B6E'; e.currentTarget.style.textDecoration = 'underline'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = '#9CA3AF'; e.currentTarget.style.textDecoration = 'none'; }}
+              >
+                {t('chat.footerImportantInfo')}
+              </a>
+              {' '}
+              <a
+                href="https://www.getkoda.io/privacy.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#9CA3AF', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#6C6B6E'; e.currentTarget.style.textDecoration = 'underline'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = '#9CA3AF'; e.currentTarget.style.textDecoration = 'none'; }}
+              >
+                {t('chat.footerCookiePreferences')}
+              </a>
             </span>
           </div>
         </div>

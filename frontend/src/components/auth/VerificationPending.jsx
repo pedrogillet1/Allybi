@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { DEFAULT_AUTH_REDIRECT, ROUTES } from '../../constants/routes';
+import { DEFAULT_AUTH_REDIRECT, ROUTES, STORAGE_KEYS } from '../../constants/routes';
 import phoneIcon from '../../assets/phone-icon.svg';
 import { useAuthModal } from '../../context/AuthModalContext';
 
@@ -40,6 +40,10 @@ const VerificationPending = ({ variant = 'page' }) => {
             console.log('✅ Phone verified, registration complete!');
             console.log('User:', response.user);
 
+            // Set flag so new users go to first-upload onboarding
+            if (!localStorage.getItem(STORAGE_KEYS.FIRST_UPLOAD_DONE)) {
+                localStorage.setItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD, 'true');
+            }
             // Registration complete, close modal and return user to intended destination.
             completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
         } catch (error) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import LeftNav from './LeftNav';
@@ -12,7 +12,6 @@ import { ReactComponent as HideIcon } from '../../assets/Hide.svg';
 import { ReactComponent as CheckCircleIcon } from '../../assets/check-circle.svg';
 import api from '../../services/api';
 import LogoutModal from '../auth/LogoutModal';
-import { ROUTES } from '../../constants/routes';
 import IntegrationsCard from '../home/IntegrationsCard';
 import FileInsightsCard from '../home/FileInsightsCard';
 
@@ -72,6 +71,11 @@ const Icons = {
       <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   ),
+  externalLink: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+    </svg>
+  ),
 };
 
 const SECTION_ICONS = {
@@ -83,7 +87,6 @@ const SECTION_ICONS = {
 // ═══════════════════════════════════════════════
 const Settings = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { showSuccess, showError } = useNotifications();
   const { documents: contextDocuments, refreshAll } = useDocuments();
@@ -389,13 +392,15 @@ const Settings = () => {
         icon={Icons.fileText}
         title={t('settings.termsOfUse')}
         desc={t('settings.termsOfUseDesc')}
-        onClick={() => navigate(ROUTES.TERMS_OF_USE)}
+        onClick={() => window.open('https://www.getkoda.io/terms.html', '_blank', 'noopener,noreferrer')}
+        right={<span style={{ color: C.muted, display: 'flex' }}>{Icons.externalLink}</span>}
       />
       <Row
         icon={Icons.fileText}
         title={t('settings.privacyPolicy')}
         desc={t('settings.privacyPolicyDesc')}
-        onClick={() => navigate(ROUTES.PRIVACY_POLICY)}
+        onClick={() => window.open('https://www.getkoda.io/privacy.html', '_blank', 'noopener,noreferrer')}
+        right={<span style={{ color: C.muted, display: 'flex' }}>{Icons.externalLink}</span>}
         isLast
       />
     </div>

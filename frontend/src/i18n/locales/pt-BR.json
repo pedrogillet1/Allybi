@@ -234,6 +234,9 @@
     }
   },
   "chat": {
+    "footerSecure": "Espaço de trabalho seguro e privado.",
+    "footerImportantInfo": "Confira informações importantes.",
+    "footerCookiePreferences": "Ver preferências de cookies.",
     "welcomeMessages": [
       "O que você quer encontrar nos seus arquivos?",
       "O que você quer que eu abra para você?",
@@ -1503,6 +1506,18 @@
     "withPage": "{{name}} (Página {{page}})",
     "jumpToPage": "Clique para ir à página {{page}} em {{name}}",
     "preview": "Clique para visualizar: {{name}}"
+  },
+  "firstUpload": {
+    "title": "Envie seu primeiro documento",
+    "subtitle": "Comece enviando um documento para o Allybi. Você pode arrastar e soltar arquivos ou navegar no seu computador.",
+    "dropzoneText": "Arraste e solte ou clique para enviar",
+    "browseFiles": "Procurar arquivos",
+    "supportedFormats": "PDF, DOCX, TXT, XLSX, PPTX, JPG, PNG, MP3, MP4, MOV",
+    "back": "Voltar",
+    "skip": "Pular",
+    "continue": "Continuar",
+    "uploading": "Enviando...",
+    "uploaded": "Enviado"
   },
   "allybi": {
     "stage": {
