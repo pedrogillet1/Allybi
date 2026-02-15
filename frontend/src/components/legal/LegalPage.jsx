@@ -16,19 +16,19 @@ const FALLBACK = {
     body: `Last updated: February 2026
 
 1. Acceptance of Terms
-By accessing or using Koda ("the Service"), you agree to be bound by these Terms of Use. If you do not agree to all the terms and conditions, you may not use the Service.
+By accessing or using Allybi ("the Service"), you agree to be bound by these Terms of Use. If you do not agree to all the terms and conditions, you may not use the Service.
 
 2. Use of the Service
-You may use Koda solely for lawful purposes and in accordance with these Terms. You agree not to use the Service in any way that violates any applicable law or regulation.
+You may use Allybi solely for lawful purposes and in accordance with these Terms. You agree not to use the Service in any way that violates any applicable law or regulation.
 
 3. User Accounts
 You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.
 
 4. Intellectual Property
-The Service and its original content, features, and functionality are owned by Koda and are protected by international copyright, trademark, and other intellectual property laws.
+The Service and its original content, features, and functionality are owned by Allybi and are protected by international copyright, trademark, and other intellectual property laws.
 
 5. User Content
-You retain ownership of any content you upload to the Service. By uploading content, you grant Koda a limited license to process, store, and display that content as necessary to provide the Service.
+You retain ownership of any content you upload to the Service. By uploading content, you grant Allybi a limited license to process, store, and display that content as necessary to provide the Service.
 
 6. Privacy
 Your use of the Service is also governed by our Privacy Policy.
@@ -37,13 +37,13 @@ Your use of the Service is also governed by our Privacy Policy.
 We may terminate or suspend your account at any time, without prior notice, for conduct that we believe violates these Terms or is harmful to other users, us, or third parties.
 
 8. Limitation of Liability
-The Service is provided "as is" without warranties of any kind. In no event shall Koda be liable for any indirect, incidental, special, or consequential damages.
+The Service is provided "as is" without warranties of any kind. In no event shall Allybi be liable for any indirect, incidental, special, or consequential damages.
 
 9. Changes to Terms
 We reserve the right to modify these Terms at any time. Continued use of the Service after changes constitutes acceptance of the new Terms.
 
 10. Contact
-If you have questions about these Terms, please contact us at support@getkoda.ai.`,
+If you have questions about these Terms, please contact us at info@allybi.co.`,
   },
   privacy: {
     title: 'Privacy Policy',
@@ -77,7 +77,7 @@ The Service is not intended for users under 16 years of age. We do not knowingly
 We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new policy on this page.
 
 10. Contact
-If you have questions about this Privacy Policy, please contact us at support@getkoda.ai.`,
+If you have questions about this Privacy Policy, please contact us at info@allybi.co.`,
   },
 };
 
@@ -96,7 +96,7 @@ export default function LegalPage() {
   useEffect(() => {
     let cancelled = false;
     const slug = isTerms ? 'terms-of-use' : 'privacy-policy';
-    const url = `https://getkoda.ai/${slug}`;
+    const url = `https://getkoda.ai/${slug}.html`;
 
     (async () => {
       try {

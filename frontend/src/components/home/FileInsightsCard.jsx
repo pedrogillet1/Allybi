@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { buildRoute } from '../../constants/routes';
 import { useDocuments } from '../../context/DocumentsContext';
@@ -12,9 +12,22 @@ export default function FileInsightsCard() {
   const isMobile = useIsMobile();
   const [hoveredType, setHoveredType] = useState(null);
 
-  // Take top 3 file types for prominent display
-  const topThree = breakdown.slice(0, 3);
-  // All types for the distribution bar
+  const scrollRef = useRef(null);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+    setCanScrollLeft(el.scrollLeft > 2);
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+  }, [breakdown, checkScroll]);
+
+  const needsCarousel = breakdown.length > 3;
   const allTypes = breakdown;
 
   if (total === 0) {
@@ -58,7 +71,14 @@ export default function FileInsightsCard() {
       flex: 1,
       display: 'flex',
       flexDirection: 'column',
+      overflow: 'hidden',
+      minWidth: 0,
     }}>
+      {/* Hide scrollbar */}
+      {needsCarousel && (
+        <style>{`.fi-carousel::-webkit-scrollbar { display: none; }`}</style>
+      )}
+
       {/* Title */}
       <h3 style={{
         margin: 0,
@@ -72,88 +92,147 @@ export default function FileInsightsCard() {
         File insights
       </h3>
 
-      {/* Top 3 file type icons — large, directly on card surface */}
+      {/* File type icons — scrollable carousel when > 3 types */}
       <div style={{
+        position: 'relative',
+        marginBottom: 24,
+        flex: 1,
         display: 'flex',
-        justifyContent: 'space-evenly',
-        gap: isMobile ? 24 : 32,
-        marginBottom: 20,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        /* bleed into card padding so fade reaches card edge */
+        marginLeft: needsCarousel ? -24 : 0,
+        marginRight: needsCarousel ? -24 : 0,
       }}>
-        {topThree.map(item => (
-          <button
-            key={item.type}
-            data-testid="file-insight-icon"
-            onClick={() => navigate(buildRoute.fileType(item.type))}
-            aria-label={`View ${item.label} files`}
+        {/* Right fade — peek effect */}
+        {needsCarousel && canScrollRight && (
+          <div
+            aria-hidden="true"
             style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'transform 160ms cubic-bezier(0.2,0.8,0.2,1)',
-              transform: hoveredType === item.type ? 'translateY(-2px)' : 'translateY(0)',
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              bottom: 0,
+              width: 72,
+              background: 'linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,1) 100%)',
+              zIndex: 2,
+              pointerEvents: 'none',
             }}
-            onMouseEnter={() => setHoveredType(item.type)}
-            onMouseLeave={() => setHoveredType(null)}
-          >
-            {item.icon ? (
-              <img
-                src={item.icon}
-                alt=""
-                style={{
-                  width: isMobile ? 52 : 64,
-                  height: isMobile ? 48 : 60,
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0 8px 12px rgba(0,0,0,0.18))',
-                }}
-              />
-            ) : (
-              <div style={{
-                width: isMobile ? 52 : 64,
-                height: isMobile ? 48 : 60,
-                background: item.color,
-                borderRadius: 12,
+          />
+        )}
+        {/* Left fade */}
+        {needsCarousel && canScrollLeft && (
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              width: 72,
+              background: 'linear-gradient(to left, rgba(255,255,255,0) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,1) 100%)',
+              zIndex: 2,
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+
+        <div
+          ref={scrollRef}
+          onScroll={checkScroll}
+          className={needsCarousel ? 'fi-carousel' : undefined}
+          style={{
+            display: 'flex',
+            gap: isMobile ? 24 : 36,
+            justifyContent: needsCarousel ? 'flex-start' : 'space-evenly',
+            overflowX: needsCarousel ? 'auto' : 'visible',
+            scrollSnapType: needsCarousel ? 'x mandatory' : undefined,
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            paddingLeft: needsCarousel ? 24 : 0,
+            paddingRight: needsCarousel ? 24 : 0,
+          }}
+        >
+          {breakdown.map(item => (
+            <button
+              key={item.type}
+              data-testid="file-insight-icon"
+              onClick={() => navigate(buildRoute.fileType(item.type))}
+              aria-label={`View ${item.label} files`}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontSize: 11,
-                fontWeight: 700,
-                fontFamily: 'Plus Jakarta Sans, sans-serif',
-              }}>
-                {item.label}
+                gap: 8,
+                flexShrink: 0,
+                minWidth: isMobile ? 64 : 72,
+                scrollSnapAlign: needsCarousel ? 'start' : undefined,
+                transition: 'transform 160ms cubic-bezier(0.2,0.8,0.2,1)',
+                transform: hoveredType === item.type ? 'translateY(-2px)' : 'translateY(0)',
+              }}
+              onMouseEnter={() => setHoveredType(item.type)}
+              onMouseLeave={() => setHoveredType(null)}
+            >
+              {item.icon ? (
+                <img
+                  src={item.icon}
+                  alt=""
+                  style={{
+                    width: isMobile ? 48 : 56,
+                    height: isMobile ? 44 : 52,
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 8px 12px rgba(0,0,0,0.18))',
+                  }}
+                />
+              ) : (
+                <div style={{
+                  width: isMobile ? 48 : 56,
+                  height: isMobile ? 44 : 52,
+                  background: item.color,
+                  borderRadius: 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  fontFamily: 'Plus Jakarta Sans, sans-serif',
+                }}>
+                  {item.label}
+                </div>
+              )}
+              <div style={{ textAlign: 'center' }}>
+                <div style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: '#32302C',
+                  fontFamily: 'Plus Jakarta Sans, sans-serif',
+                  lineHeight: '18px',
+                }}>
+                  {item.label}
+                </div>
+                <div style={{
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: '#6C6B6E',
+                  fontFamily: 'Plus Jakarta Sans, sans-serif',
+                  lineHeight: '16px',
+                }}>
+                  {item.count} · {item.percent}%
+                </div>
               </div>
-            )}
-            <div style={{ textAlign: 'center' }}>
-              <div style={{
-                fontSize: 14,
-                fontWeight: 600,
-                color: '#32302C',
-                fontFamily: 'Plus Jakarta Sans, sans-serif',
-                lineHeight: '20px',
-              }}>
-                {item.label}
-              </div>
-              <div style={{
-                fontSize: 12,
-                fontWeight: 500,
-                color: '#6C6B6E',
-                fontFamily: 'Plus Jakarta Sans, sans-serif',
-                lineHeight: '18px',
-              }}>
-                {item.count} · {item.percent}%
-              </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Distribution bar */}
-      <div style={{ marginBottom: 10 }}>
+      <div style={{ marginBottom: 12 }}>
         <div
           style={{
             height: 12,

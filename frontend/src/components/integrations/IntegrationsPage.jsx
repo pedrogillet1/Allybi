@@ -15,7 +15,7 @@ const PROVIDER_META = {
   gmail: {
     label: 'Gmail',
     icon: gmailSvg,
-    description: 'Connect your Gmail account to search and manage emails directly from Koda.',
+    description: 'Connect your Gmail account to search and manage emails directly from Allybi.',
     detailRoute: ROUTES.INTEGRATIONS_GMAIL,
   },
   outlook: {

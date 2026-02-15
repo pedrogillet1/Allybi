@@ -87,7 +87,7 @@ export default function LandingPage() {
         width: '100%',
         boxSizing: 'border-box',
       }}>
-        <img src={kodaLogo} alt="Koda" style={{ height: 28 }} />
+        <img src={kodaLogo} alt="Allybi" style={{ height: 28 }} />
         <div style={{ display: 'flex', gap: 12 }}>
           <button
             onClick={() => navigate(ROUTES.LOGIN)}

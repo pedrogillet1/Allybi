@@ -259,7 +259,7 @@ const SignUp = () => {
         <div style={{textAlign: 'center', fontSize: 14}}>
           <span style={{color: '#6C6B6E'}}>{t('auth.signup.termsAgree')} </span>
           <Link
-            to="/terms"
+            to={ROUTES.TERMS_OF_USE}
             style={{
               fontWeight: '600',
               color: '#181818',
@@ -273,7 +273,7 @@ const SignUp = () => {
           >{t('auth.signup.terms')}</Link>
           <span style={{color: '#6C6B6E'}}> {t('auth.signup.and')} </span>
           <Link
-            to="/privacy"
+            to={ROUTES.PRIVACY_POLICY}
             style={{
               fontWeight: '600',
               color: '#181818',

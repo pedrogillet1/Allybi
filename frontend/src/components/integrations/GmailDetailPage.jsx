@@ -436,10 +436,10 @@ function AllybiPanel({ email, onInsertDraft }) {
           fontWeight: 700,
           fontFamily: FONT,
         }}>
-          K
+          A
         </div>
         <div style={{ fontSize: 14, fontWeight: 600, color: '#32302C', fontFamily: FONT }}>
-          Koda AI
+          Allybi AI
         </div>
       </div>
 
@@ -533,7 +533,7 @@ function AllybiPanel({ email, onInsertDraft }) {
           value={query}
           onChange={e => setQuery(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAsk(); } }}
-          placeholder="Ask Koda..."
+          placeholder="Ask Allybi..."
           style={{
             flex: 1,
             height: 36,

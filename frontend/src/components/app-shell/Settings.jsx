@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useOnboarding } from '../../context/OnboardingContext';
 import { useAuth } from '../../context/AuthContext';
 import LeftNav from './LeftNav';
 import NotificationPanel from '../notifications/NotificationPanel';
@@ -14,6 +13,8 @@ import { ReactComponent as CheckCircleIcon } from '../../assets/check-circle.svg
 import api from '../../services/api';
 import LogoutModal from '../auth/LogoutModal';
 import { ROUTES } from '../../constants/routes';
+import IntegrationsCard from '../home/IntegrationsCard';
+import FileInsightsCard from '../home/FileInsightsCard';
 
 // ─── Tokens (identical to Home / Upload / Integrations) ───
 const F = 'Plus Jakarta Sans, sans-serif';
@@ -23,15 +24,6 @@ const C = {
   success: '#34A853', error: '#D92D20', errorBg: '#FEF3F2',
 };
 const SHADOW = '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)';
-
-// ─── Section nav config ───
-const SECTIONS = [
-  { key: 'general', label: 'General' },
-  { key: 'security', label: 'Account & Security' },
-  { key: 'preferences', label: 'Preferences' },
-  { key: 'storage', label: 'Storage' },
-  { key: 'about', label: 'About' },
-];
 
 // ── Inline SVG icons (20px, stroke 1.8, currentColor) ──
 const Icons = {
@@ -45,11 +37,6 @@ const Icons = {
       <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
     </svg>
   ),
-  settings: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
-    </svg>
-  ),
   database: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
@@ -58,16 +45,6 @@ const Icons = {
   info: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
-    </svg>
-  ),
-  user: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
-    </svg>
-  ),
-  monitor: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
     </svg>
   ),
   logOut: (
@@ -99,8 +76,6 @@ const Icons = {
 
 const SECTION_ICONS = {
   general: Icons.layers,
-  security: Icons.key,
-  preferences: Icons.settings,
   storage: Icons.database,
   about: Icons.info,
 };
@@ -112,8 +87,14 @@ const Settings = () => {
   const isMobile = useIsMobile();
   const { showSuccess, showError } = useNotifications();
   const { documents: contextDocuments, refreshAll } = useDocuments();
-  const { open: openOnboarding } = useOnboarding();
   const { updateUser: updateAuthUser } = useAuth();
+
+  // ─── Section nav config (inside component for i18n) ───
+  const SECTIONS = [
+    { key: 'general', label: t('settings.general') },
+    { key: 'storage', label: t('settings.storage') },
+    { key: 'about', label: t('settings.about') },
+  ];
 
   // ─── URL-based section nav ───
   const [searchParams, setSearchParams] = useSearchParams();
@@ -322,84 +303,75 @@ const Settings = () => {
   };
 
   // ═══════════════════════════════════════════════
-  //  SECTION RENDERERS (each = one card with rows)
+  //  SECTION RENDERERS
   // ═══════════════════════════════════════════════
 
   const renderGeneral = () => (
-    <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: SHADOW, overflow: 'hidden' }}>
-      <Row
-        icon={
-          profileImage
-            ? <img src={profileImage} alt="" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'cover' }} />
-            : <div style={{ width: 36, height: 36, borderRadius: 10, background: C.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontFamily: F, fontWeight: 700, fontSize: 15 }}>{getInitials(user)}</div>
-        }
-        title={displayName}
-        desc={user?.email || ''}
-        right={<Btn onClick={() => setShowProfileModal(true)}>Edit profile</Btn>}
-      />
-      <Row
-        icon={Icons.monitor}
-        title="Introduction to Allybi"
-        desc="Replay the onboarding walkthrough"
-        right={<Btn onClick={() => openOnboarding(0, 'settings')}>Replay</Btn>}
-      />
-      <Row
-        icon={Icons.logOut}
-        title="Sign out"
-        desc="Sign out of your Allybi account"
-        right={<Btn danger onClick={() => setShowLogoutModal(true)}>Sign out</Btn>}
-        isLast
-      />
-    </div>
-  );
-
-  const renderSecurity = () => (
-    <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: SHADOW, overflow: 'hidden' }}>
-      <Row
-        icon={Icons.key}
-        title="Password"
-        desc="Change your account password"
-        right={<Btn onClick={() => { setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); setShowPasswordModal(true); }}>Change</Btn>}
-        isLast
-      />
-    </div>
-  );
-
-  const renderPreferences = () => (
-    <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: SHADOW, overflow: 'hidden' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', minHeight: 60 }}>
-        <div style={{ width: 36, height: 36, borderRadius: 10, background: C.hover, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: C.muted }}>
-          {Icons.globe}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: C.text, fontFamily: F, lineHeight: '20px' }}>
-            Language & Region
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: SHADOW }}>
+        <Row
+          icon={
+            profileImage
+              ? <img src={profileImage} alt="" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'cover' }} />
+              : <div style={{ width: 36, height: 36, borderRadius: 10, background: C.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontFamily: F, fontWeight: 700, fontSize: 15 }}>{getInitials(user)}</div>
+          }
+          title={displayName}
+          desc={user?.email || ''}
+          right={<Btn onClick={() => setShowProfileModal(true)}>{t('settings.editProfile')}</Btn>}
+        />
+        <Row
+          icon={Icons.key}
+          title={t('settings.password')}
+          desc={t('settings.passwordDesc')}
+          right={<Btn onClick={() => { setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); setShowPasswordModal(true); }}>{t('settings.changePassword')}</Btn>}
+        />
+        {/* Language row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', minHeight: 60, borderBottom: `1px solid ${C.border}` }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: C.hover, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: C.muted }}>
+            {Icons.globe}
           </div>
-          <div style={{ fontSize: 13, fontWeight: 500, color: C.muted, fontFamily: F, lineHeight: '18px', marginTop: 1 }}>
-            Choose your preferred language
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: C.text, fontFamily: F, lineHeight: '20px' }}>
+              {t('settings.language.title')}
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: C.muted, fontFamily: F, lineHeight: '18px', marginTop: 1 }}>
+              {t('settings.language.desc')}
+            </div>
+          </div>
+          <div style={{ flexShrink: 0 }}>
+            <LanguageDropdown type="interface" variant="pill" />
           </div>
         </div>
-        <div style={{ flexShrink: 0 }}>
-          <LanguageDropdown type="interface" variant="pill" />
-        </div>
+        <Row
+          icon={Icons.logOut}
+          title={t('settings.signOut')}
+          desc={t('settings.signOutDesc')}
+          right={<Btn danger onClick={() => setShowLogoutModal(true)}>{t('settings.signOut')}</Btn>}
+          isLast
+        />
       </div>
+      <IntegrationsCard />
     </div>
   );
 
   const renderStorage = () => {
     const barColor = storagePct > 90 ? C.error : storagePct > 70 ? '#F59E0B' : C.primary;
     return (
-      <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: SHADOW, overflow: 'hidden', padding: '24px 20px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
-          <span style={{ fontSize: 26, fontWeight: 700, color: C.text, fontFamily: F }}>{fmtBytes(totalStorage)}</span>
-          <span style={{ fontSize: 14, fontWeight: 500, color: C.muted, fontFamily: F }}>of {fmtBytes(storageLimit)}</span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: SHADOW, overflow: 'hidden', padding: '24px 20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
+            <span style={{ fontSize: 26, fontWeight: 700, color: C.text, fontFamily: F }}>{fmtBytes(totalStorage)}</span>
+            <span style={{ fontSize: 14, fontWeight: 500, color: C.muted, fontFamily: F }}>{t('settings.storageOf', { limit: fmtBytes(storageLimit) })}</span>
+          </div>
+          <div style={{ height: 8, borderRadius: 4, background: C.hover, overflow: 'hidden' }}>
+            <div style={{ height: '100%', borderRadius: 4, background: barColor, width: `${Math.min(storagePct, 100)}%`, transition: 'width 500ms ease' }} />
+          </div>
+          <div style={{ marginTop: 14 }}>
+            <span style={{ fontSize: 13, fontWeight: 500, color: C.muted, fontFamily: F }}>{t('settings.storageUsed', { percent: storagePct.toFixed(1) })}</span>
+          </div>
         </div>
-        <div style={{ height: 8, borderRadius: 4, background: C.hover, overflow: 'hidden' }}>
-          <div style={{ height: '100%', borderRadius: 4, background: barColor, width: `${Math.min(storagePct, 100)}%`, transition: 'width 500ms ease' }} />
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14 }}>
-          <span style={{ fontSize: 13, fontWeight: 500, color: C.muted, fontFamily: F }}>{storagePct.toFixed(1)}% used</span>
-          <Btn onClick={() => navigate(ROUTES.DOCUMENTS)}>Manage storage</Btn>
+        <div className="settings-file-insights">
+          <FileInsightsCard />
         </div>
       </div>
     );
@@ -409,27 +381,27 @@ const Settings = () => {
     <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: SHADOW, overflow: 'hidden' }}>
       <Row
         icon={Icons.shield}
-        title="Version"
-        desc="Allybi Web App"
+        title={t('settings.version')}
+        desc={t('settings.versionDesc')}
         right={<span style={{ fontSize: 13, fontWeight: 600, color: C.muted, fontFamily: F }}>0.1.0 (Beta)</span>}
       />
       <Row
         icon={Icons.fileText}
-        title="Terms of Use"
-        desc="Read our terms and conditions"
+        title={t('settings.termsOfUse')}
+        desc={t('settings.termsOfUseDesc')}
         onClick={() => navigate(ROUTES.TERMS_OF_USE)}
       />
       <Row
         icon={Icons.fileText}
-        title="Privacy Policy"
-        desc="How we handle your data"
+        title={t('settings.privacyPolicy')}
+        desc={t('settings.privacyPolicyDesc')}
         onClick={() => navigate(ROUTES.PRIVACY_POLICY)}
         isLast
       />
     </div>
   );
 
-  const renderers = { general: renderGeneral, security: renderSecurity, preferences: renderPreferences, storage: renderStorage, about: renderAbout };
+  const renderers = { general: renderGeneral, storage: renderStorage, about: renderAbout };
 
   // ── Password field helper ──
   const PwField = ({ label, value, onChange, show, toggleShow, placeholder }) => (
@@ -465,11 +437,11 @@ const Settings = () => {
         }}>
           <div>
             <h1 style={{ margin: 0, fontSize: isMobile ? 18 : 20, fontWeight: 600, color: C.text, fontFamily: F, lineHeight: '30px' }}>
-              Settings
+              {t('settings.title')}
             </h1>
             {!isMobile && (
               <p style={{ margin: 0, fontSize: 13, fontWeight: 500, color: C.muted, fontFamily: F, lineHeight: '18px' }}>
-                Manage your account, preferences, and security.
+                {t('settings.headerSubtitle')}
               </p>
             )}
           </div>
@@ -497,29 +469,34 @@ const Settings = () => {
           </div>
         )}
 
+        {/* Constrain FileInsightsCard icon row in Settings — prevents wide space-evenly spreading */}
+        <style>{`
+          .settings-file-insights div:has(> [data-testid="file-insight-icon"]) {
+            justify-content: flex-start !important;
+          }
+        `}</style>
+
         {/* ── Content ── */}
-        <div style={{ flex: 1, padding: isMobile ? 16 : 48, overflowY: 'auto', maxWidth: 1060, width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '280px 1fr', gap: 24, alignItems: 'start' }}>
+        <div style={{ flex: 1, padding: isMobile ? 16 : '24px 48px', overflowY: 'auto', maxWidth: 1200, width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '220px 1fr', gap: 20, alignItems: 'start' }}>
 
             {/* ── Left: Section nav ── */}
             {!isMobile && (
-              <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: SHADOW, overflow: 'hidden', position: 'sticky', top: 0 }}>
-                <div style={{ padding: '16px 16px 8px', fontSize: 11, fontWeight: 700, color: C.muted, fontFamily: F, textTransform: 'uppercase', letterSpacing: '0.6px' }}>
-                  Sections
-                </div>
+              <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: SHADOW, overflow: 'hidden', position: 'sticky', top: 0, paddingTop: 8, paddingBottom: 8 }}>
                 {SECTIONS.map(s => {
                   const active = activeSection === s.key;
                   return (
                     <button key={s.key} onClick={() => setActiveSection(s.key)}
                       style={{
-                        display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                        display: 'flex', alignItems: 'center', gap: 10, width: 'calc(100% - 16px)',
                         height: 44, padding: '0 16px', border: 'none', textAlign: 'left',
                         background: active ? C.hover : 'transparent',
-                        borderLeft: active ? `2px solid ${C.primary}` : '2px solid transparent',
-                        cursor: 'pointer', transition: 'background 120ms ease, border-color 120ms ease',
+                        borderRadius: 10,
+                        margin: '0 8px',
+                        cursor: 'pointer', transition: 'background 120ms ease',
                       }}
                       onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = C.hover; }}
-                      onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}
+                      onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = active ? C.hover : 'transparent'; }}
                     >
                       <span style={{ color: active ? C.text : C.muted, display: 'flex', transition: 'color 120ms ease' }}>
                         {SECTION_ICONS[s.key]}
@@ -530,7 +507,6 @@ const Settings = () => {
                     </button>
                   );
                 })}
-                <div style={{ height: 8 }} />
               </div>
             )}
 
@@ -547,7 +523,7 @@ const Settings = () => {
         <div onClick={() => setShowProfileModal(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10000 }}>
           <div onClick={(e) => e.stopPropagation()} style={{ background: C.surface, borderRadius: 16, width: '100%', maxWidth: 460, maxHeight: '85vh', overflow: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.12), 0 24px 48px rgba(0,0,0,0.16)', margin: isMobile ? 16 : 0, padding: 28 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: C.text, fontFamily: F }}>Edit profile</h2>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: C.text, fontFamily: F }}>{t('settings.editProfile')}</h2>
               <button onClick={() => setShowProfileModal(false)} aria-label="Close"
                 style={{ width: 32, height: 32, border: 'none', background: 'transparent', borderRadius: '50%', cursor: 'pointer', fontSize: 18, color: C.muted, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 120ms ease' }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = C.hover; }}
@@ -614,7 +590,7 @@ const Settings = () => {
         <div onClick={() => setShowPasswordModal(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10000 }}>
           <div onClick={(e) => e.stopPropagation()} style={{ background: C.surface, borderRadius: 16, width: '100%', maxWidth: 460, maxHeight: '85vh', overflow: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.12), 0 24px 48px rgba(0,0,0,0.16)', margin: isMobile ? 16 : 0, padding: 28 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: C.text, fontFamily: F }}>Change password</h2>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: C.text, fontFamily: F }}>{t('settings.changePassword')}</h2>
               <button onClick={() => setShowPasswordModal(false)} aria-label="Close"
                 style={{ width: 32, height: 32, border: 'none', background: 'transparent', borderRadius: '50%', cursor: 'pointer', fontSize: 18, color: C.muted, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 120ms ease' }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = C.hover; }}
