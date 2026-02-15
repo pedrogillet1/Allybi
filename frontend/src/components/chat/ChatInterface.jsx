@@ -4028,7 +4028,7 @@ export default function ChatInterface({
         <div
           style={{
             // Allow cards (emails, previews, etc.) to breathe; keep centered.
-            maxWidth: isViewerVariant ? '100%' : (isMobile ? '100%' : 960),
+            maxWidth: isViewerVariant ? '100%' : (isMobile ? '100%' : 860),
             margin: isViewerVariant ? '0' : '0 auto',
             width: '100%',
             height: '100%',
@@ -4910,7 +4910,7 @@ export default function ChatInterface({
           borderTop: "none",
         }}
       >
-        <div style={{ maxWidth: 960, margin: "0 auto" }}>
+        <div style={{ maxWidth: 860, margin: "0 auto" }}>
           {/* Uploading previews */}
           {!isViewerVariant && uploading.length ? (
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
@@ -5420,38 +5420,6 @@ export default function ChatInterface({
                   accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.png,.jpg,.jpeg,.gif,.webp"
                 />
 
-                {/* Attach button */}
-                <motion.button
-                  type="button"
-                  onClick={() => {
-                    if (isUnauthenticated) {
-                      triggerAuthGate('upload');
-                      return;
-                    }
-                    fileInputRef.current?.click();
-                  }}
-                  aria-label="Attach files"
-                  whileHover={{ scale: 1.08, backgroundColor: "#F4F4F5" }}
-                  whileTap={{ scale: 0.95 }}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    padding: 10,
-                    borderRadius: 12,
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    transition: "color 0.15s",
-                  }}
-                >
-                  <img
-                    src={attachIcon}
-                    alt=""
-                    style={{ width: 20, height: 20, filter: "brightness(0) invert(0.2)" }}
-                  />
-                </motion.button>
-
                 {/* Send / Stop */}
                 {isStreaming ? (
                   <motion.button
@@ -5553,7 +5521,7 @@ export default function ChatInterface({
               </a>
               {' '}
               <a
-                href="https://www.getkoda.io/privacy.html"
+                href="https://www.getkoda.io/cookies.html"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: '#9CA3AF', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s' }}

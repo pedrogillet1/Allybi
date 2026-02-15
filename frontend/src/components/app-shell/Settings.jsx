@@ -76,6 +76,21 @@ const Icons = {
       <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
     </svg>
   ),
+  lock: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+    </svg>
+  ),
+  cookie: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/><circle cx="8" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="14" r="1" fill="currentColor"/><circle cx="15" cy="14" r="1" fill="currentColor"/>
+    </svg>
+  ),
+  checkSquare: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+    </svg>
+  ),
 };
 
 const SECTION_ICONS = {
@@ -380,31 +395,66 @@ const Settings = () => {
     );
   };
 
-  const renderAbout = () => (
-    <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: SHADOW, overflow: 'hidden' }}>
-      <Row
-        icon={Icons.shield}
-        title={t('settings.version')}
-        desc={t('settings.versionDesc')}
-        right={<span style={{ fontSize: 13, fontWeight: 600, color: C.muted, fontFamily: F }}>0.1.0 (Beta)</span>}
-      />
-      <Row
-        icon={Icons.fileText}
-        title={t('settings.termsOfUse')}
-        desc={t('settings.termsOfUseDesc')}
-        onClick={() => window.open('https://www.getkoda.io/terms.html', '_blank', 'noopener,noreferrer')}
-        right={<span style={{ color: C.muted, display: 'flex' }}>{Icons.externalLink}</span>}
-      />
-      <Row
-        icon={Icons.fileText}
-        title={t('settings.privacyPolicy')}
-        desc={t('settings.privacyPolicyDesc')}
-        onClick={() => window.open('https://www.getkoda.io/privacy.html', '_blank', 'noopener,noreferrer')}
-        right={<span style={{ color: C.muted, display: 'flex' }}>{Icons.externalLink}</span>}
-        isLast
-      />
-    </div>
-  );
+  const renderAbout = () => {
+    const extRight = <span style={{ color: C.muted, display: 'flex' }}>{Icons.externalLink}</span>;
+    const openUrl = (url) => () => window.open(url, '_blank', 'noopener,noreferrer');
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        {/* Version card */}
+        <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: SHADOW, overflow: 'hidden' }}>
+          <Row
+            icon={Icons.shield}
+            title={t('settings.version')}
+            desc={t('settings.versionDesc')}
+            right={<span style={{ fontSize: 13, fontWeight: 600, color: C.muted, fontFamily: F }}>0.1.0 (Beta)</span>}
+            isLast
+          />
+        </div>
+        {/* Legal & Policies card */}
+        <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: SHADOW, overflow: 'hidden' }}>
+          <div style={{ padding: '14px 20px 6px', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: C.muted, fontFamily: F }}>
+            {t('settings.legalAndPolicies')}
+          </div>
+          <Row
+            icon={Icons.fileText}
+            title={t('settings.termsOfService')}
+            desc={t('settings.termsOfServiceDesc')}
+            onClick={openUrl('https://www.getkoda.io/terms.html')}
+            right={extRight}
+          />
+          <Row
+            icon={Icons.shield}
+            title={t('settings.privacyPolicy')}
+            desc={t('settings.privacyPolicyDesc')}
+            onClick={openUrl('https://www.getkoda.io/privacy.html')}
+            right={extRight}
+          />
+          <Row
+            icon={Icons.cookie}
+            title={t('settings.cookiePolicy')}
+            desc={t('settings.cookiePolicyDesc')}
+            onClick={openUrl('https://www.getkoda.io/cookies.html')}
+            right={extRight}
+          />
+          <Row
+            icon={Icons.lock}
+            title={t('settings.securityPolicy')}
+            desc={t('settings.securityPolicyDesc')}
+            onClick={openUrl('https://www.getkoda.io/security.html')}
+            right={extRight}
+          />
+          <Row
+            icon={Icons.checkSquare}
+            title={t('settings.acceptableUsePolicy')}
+            desc={t('settings.acceptableUsePolicyDesc')}
+            onClick={openUrl('https://www.getkoda.io/acceptable-use.html')}
+            right={extRight}
+            isLast
+          />
+        </div>
+      </div>
+    );
+  };
 
   const renderers = { general: renderGeneral, storage: renderStorage, about: renderAbout };
 

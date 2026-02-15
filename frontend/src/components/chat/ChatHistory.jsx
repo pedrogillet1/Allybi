@@ -798,7 +798,7 @@ const ChatHistory = ({
           width: isExpanded ? 260 : 64,
           height: isMobile ? 'calc(100% - env(safe-area-inset-bottom) - 70px)' : '100%',
           padding: 20,
-          background: '#fff',
+          background: isExpanded ? '#fff' : '#F1F0EF',
           borderRight: '1px solid #E6E6EC',
           display: isMobile && !isExpanded ? 'none' : 'flex',
           flexDirection: 'column',
