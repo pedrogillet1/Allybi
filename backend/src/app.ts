@@ -52,11 +52,10 @@ app.set('trust proxy', 1);
  * CORS (must come first)
  * ----------------------------- */
 const allowedOrigins = [
-  'https://getkoda.ai',
-  'https://www.getkoda.ai',
-  'https://getkodabackend.com',
-  'https://www.getkodabackend.com',
-  'https://admin.getkodabackend.com',
+  'https://allybi.co',
+  'https://www.allybi.co',
+  'https://app.allybi.co',
+  'https://admin.allybi.co',
   // OAuth provider origins (Apple sends POST with Origin header)
   'https://appleid.apple.com',
   'https://accounts.google.com',
@@ -103,6 +102,10 @@ const corsOptions: cors.CorsOptions = {
     'x-request-id',
     'X-Admin-Key',
     'x-admin-key',
+    'Cache-Control',
+    'cache-control',
+    'Pragma',
+    'pragma',
   ],
   exposedHeaders: ['RateLimit-Limit', 'RateLimit-Remaining', 'RateLimit-Reset', 'Set-Cookie'],
   preflightContinue: false,

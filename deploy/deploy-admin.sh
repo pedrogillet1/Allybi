@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────────────────────
-# deploy-admin.sh — Build and deploy the Koda admin dashboard to VPS
+# deploy-admin.sh — Build and deploy the Allybi admin dashboard to VPS
 #
 # Usage:
 #   ./deploy/deploy-admin.sh                 # uses defaults
@@ -10,18 +10,18 @@
 #   - Nginx installed with lua module (nginx-extras or ngx_http_lua_module)
 #   - /etc/nginx/.htpasswd_koda_admin exists  (htpasswd -c ... admin_user)
 #   - /etc/nginx/koda_admin_key.txt           (echo -n 'KEY' > ...)
-#   - Certbot certs for getkodabackend.com
+#   - Certbot certs for admin.allybi.co
 # ─────────────────────────────────────────────────────────────────────────────
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-ADMIN_DIR="$PROJECT_ROOT/admin-dashboard"
+ADMIN_DIR="$PROJECT_ROOT/dashboard"
 BUILD_OUTPUT="$ADMIN_DIR/dist/public"
 
-VPS_HOST="${VPS_HOST:-root@getkodabackend.com}"
-VPS_WEB_ROOT="${VPS_WEB_ROOT:-/var/www/getkodabackend.com}"
+VPS_HOST="${VPS_HOST:-root@allybi.co}"
+VPS_WEB_ROOT="${VPS_WEB_ROOT:-/var/www/admin.allybi.co}"
 NGINX_CONF_DIR="${NGINX_CONF_DIR:-/etc/nginx/sites-enabled}"
 
 # ── Colors ───────────────────────────────────────────────────────────────────
@@ -52,8 +52,8 @@ info "Upload complete."
 
 # ── Step 3: Upload Nginx configs ─────────────────────────────────────────────
 info "Uploading Nginx configs..."
-scp "$SCRIPT_DIR/nginx/getkoda.ai.conf"           "$VPS_HOST:$NGINX_CONF_DIR/getkoda.ai.conf"
-scp "$SCRIPT_DIR/nginx/getkodabackend.com.conf"   "$VPS_HOST:$NGINX_CONF_DIR/getkodabackend.com.conf"
+scp "$SCRIPT_DIR/nginx/allybi.co.conf"            "$VPS_HOST:$NGINX_CONF_DIR/allybi.co.conf"
+scp "$SCRIPT_DIR/nginx/admin.allybi.co.conf"      "$VPS_HOST:$NGINX_CONF_DIR/admin.allybi.co.conf"
 info "Nginx configs uploaded."
 
 # ── Step 4: Set permissions ──────────────────────────────────────────────────

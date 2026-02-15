@@ -237,6 +237,24 @@ function fixCurrencyArtifacts(text) {
   return t;
 }
 
+function shouldSuppressPlainFileMatchAnswer({ isViewerVariant, userPrompt, sources, answerText }) {
+  if (isViewerVariant) return false;
+  const prompt = String(userPrompt || "").toLowerCase();
+  const answer = String(answerText || "").trim().toLowerCase();
+  const hasDocSources = Array.isArray(sources) && sources.length > 0;
+  if (!hasDocSources) return false;
+  const genericLeadInOnly =
+    /^the file(s)? that .*?:?$/.test(answer) ||
+    /^the document(s)? that .*?:?$/.test(answer) ||
+    /^arquivo(s)? que .*?:?$/.test(answer) ||
+    /^documento(s)? que .*?:?$/.test(answer);
+  const asksForMatchingFiles =
+    /\b(which|what|show|list|find|quais?|mostrar|listar|encontrar)\b/.test(prompt) &&
+    /\b(files?|documents?|arquivos?|documentos?|archivos?)\b/.test(prompt) &&
+    /\b(talk(?:s|ing)?\s+about|about|mention(?:s|ed|ing)?|include(?:s|d|ing)?|contain(?:s|ed|ing)?|related\s+to|sobre|falam?\s+de|menciona(?:m|r)?|inclu(?:i|em|ir)|cont[eé]m)\b/.test(prompt);
+  return asksForMatchingFiles || genericLeadInOnly;
+}
+
 function isNearBottom(el, thresholdPx = 120) {
   if (!el) return true;
   const { scrollTop, scrollHeight, clientHeight } = el;
@@ -840,6 +858,7 @@ function nextWorklogFromEvent(current, rawEvt) {
       status: "done",
       endedAt: now,
       steps: finalizeRunningSteps(base.steps, "done"),
+      collapsed: true,
       ...(evt.summary ? { summary: String(evt.summary) } : {}),
     };
   }
@@ -2517,7 +2536,7 @@ export default function ChatInterface({
             : null
         );
 
-    const meta =
+    const rawMeta =
       isViewerVariant
         ? {
             viewerMode: true,
@@ -2551,7 +2570,19 @@ export default function ChatInterface({
                 }
               : {}),
           }
-        : undefined;
+        : {
+            viewerMode: false,
+          };
+    const meta = (() => {
+      const next = rawMeta ? { ...rawMeta } : undefined;
+      if (!next) return undefined;
+      if (!isViewerVariant) {
+        delete next.viewerContext;
+        delete next.viewerSelection;
+        delete next.viewerHistory;
+      }
+      return next;
+    })();
 
     const body = {
       ...(isViewerVariant ? {} : { conversationId: realConversationId }),
@@ -4132,6 +4163,19 @@ export default function ChatInterface({
                 const isAssistant = m.role === "assistant";
                 const isError = m.status === "error";
                 const isStreamingMsg = m.status === "streaming";
+                const nearestUserForAssistant = isAssistant ? findNearestUserMessageForAssistant(m.id) : null;
+                const assistantBaseText = isAssistant
+                  ? fixCurrencyArtifacts(stripSourcesLabels(m.content || ""))
+                  : "";
+                const assistantCleanText = isAssistant && m.deckProgress
+                  ? stripSlidesDeckBoilerplate(assistantBaseText)
+                  : assistantBaseText;
+                const suppressPlainFileMatch = isAssistant && shouldSuppressPlainFileMatchAnswer({
+                  isViewerVariant,
+                  userPrompt: String(nearestUserForAssistant?.content || ""),
+                  sources: m.sources,
+                  answerText: assistantCleanText,
+                });
 
                 return (
                   <div
@@ -4164,7 +4208,7 @@ export default function ChatInterface({
                             />
                           )}
                         </div>
-                        <div className="message-content" data-testid="assistant-message-content" style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'stretch', flex: 1, maxWidth: '100%'}}>
+                        <div className="message-content" data-testid="assistant-message-content" style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'stretch', flex: 1, maxWidth: '100%', marginTop: suppressPlainFileMatch ? -2 : 0}}>
                           {(() => {
                             const dp = m.deckProgress || null;
                             const hasDeckProgress = Boolean(dp && (dp.total || dp.deck));
@@ -4194,6 +4238,8 @@ export default function ChatInterface({
                           {(() => {
                             const wl = m.worklog || null;
                             if (!wl) return null;
+                            // Progress/worklog cards are only shown in viewer/editor screens.
+                            if (!isViewerVariant) return null;
                             const steps = Array.isArray(wl.steps) ? wl.steps : [];
                             const narration = Array.isArray(wl.narration) ? wl.narration : [];
                             const isEditWorklog = String(wl.mode || "") === "editing";
@@ -4547,11 +4593,10 @@ export default function ChatInterface({
                                   fontFamily: "'Plus Jakarta Sans', sans-serif",
                                   fontWeight: 650,
                                   fontStyle: 'italic',
-                                  lineHeight: m.content ? '18px' : '32px',
-                                  height: m.content ? undefined : 32,
-                                  display: 'flex',
-                                  alignItems: 'center',
+                                  lineHeight: m.content ? '18px' : '20px',
+                                  display: 'block',
                                   fontSize: m.content ? 12 : 15,
+                                  marginTop: 0,
                                   marginBottom: m.content ? 6 : 0,
                                 }}>
                                   {stageText}
@@ -4600,7 +4645,14 @@ export default function ChatInterface({
                                       const base = isStreamingMsg
                                         ? (m.content || "")
                                         : fixCurrencyArtifacts(stripSourcesLabels(m.content || ""));
-                                      return m.deckProgress ? stripSlidesDeckBoilerplate(base) : base;
+                                      const cleaned = m.deckProgress ? stripSlidesDeckBoilerplate(base) : base;
+                                      if (shouldSuppressPlainFileMatchAnswer({
+                                        isViewerVariant,
+                                        userPrompt: String(nearestUserForAssistant?.content || ""),
+                                        sources: m.sources,
+                                        answerText: cleaned,
+                                      })) return "";
+                                      return cleaned;
                                     })();
 
                                     if (!String(mdContent || "").trim()) return null;
@@ -4661,7 +4713,7 @@ export default function ChatInterface({
 
                           {/* Source pill + action icons (Copy/Regenerate) */}
                           {!isStreamingMsg && !isError && m.answerMode !== 'nav_pills' ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10, width: '100%' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: suppressPlainFileMatch ? -2 : (String(assistantCleanText || "").trim() ? 10 : 0), width: '100%' }}>
                               {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded')) || m.answerMode === 'action_receipt') ? (
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                                   {renderSources(m)}

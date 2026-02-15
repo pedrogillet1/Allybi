@@ -100,11 +100,18 @@ function normalizeTitle(conv) {
   return t.length > 60 ? t.slice(0, 60) + '…' : t;
 }
 
+function isLoadingPlaceholderConversation(conv) {
+  const title = String(conv?.title ?? '').trim().toLowerCase();
+  return /^loading(?:\.{3}|…)?$/.test(title);
+}
+
 function normalizeConversations(raw) {
   const arr = Array.isArray(raw) ? raw : raw?.conversations ?? [];
   // Drop invalid IDs; keep empty titles as "New chat"
   return arr
     .filter((c) => c && c.id)
+    // Drop transient placeholder conversations used while hydrating the active thread.
+    .filter((c) => !isLoadingPlaceholderConversation(c))
     // Hide viewer/editor ephemeral threads from the main chat sidebar.
     // These are created by DocumentViewer edit mode and are intentionally separate from user chats.
     .filter((c) => {
@@ -246,7 +253,7 @@ const ChatHistory = ({
       setConversations((prev) => {
         // Preserve any locally known currentConversation if API is behind
         let merged = normalized;
-        if (currentConversation?.id) {
+        if (currentConversation?.id && !isLoadingPlaceholderConversation(currentConversation)) {
           const has = merged.some((c) => c.id === currentConversation.id);
           if (!has) merged = [currentConversation, ...merged].map((c) => ({ ...c, title: normalizeTitle(c) }));
         }
@@ -268,6 +275,7 @@ const ChatHistory = ({
   // Ensure currentConversation stays in list (ChatGPT behavior: new chats appear once real id exists)
   useEffect(() => {
     if (!currentConversation?.id) return;
+    if (isLoadingPlaceholderConversation(currentConversation)) return;
 
     setConversations((prev) => {
       const idx = prev.findIndex((c) => c.id === currentConversation.id);
@@ -275,7 +283,8 @@ const ChatHistory = ({
       const newUpdatedAt = currentConversation.updatedAt || new Date().toISOString();
 
       if (idx === -1) {
-        const updated = [{ ...currentConversation, title: newTitle, updatedAt: newUpdatedAt }, ...prev];
+        const updated = [{ ...currentConversation, title: newTitle, updatedAt: newUpdatedAt }, ...prev]
+          .filter((c) => !isLoadingPlaceholderConversation(c));
         safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
         return updated;
       }
@@ -293,8 +302,10 @@ const ChatHistory = ({
         title: newTitle,
         updatedAt: newUpdatedAt,
       };
-      safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(next));
-      return next;
+      // Defensive cleanup in case a stale placeholder was cached.
+      const sanitized = next.filter((c) => !isLoadingPlaceholderConversation(c));
+      safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(sanitized));
+      return sanitized;
     });
   }, [currentConversation?.id, currentConversation?.title, currentConversation?.updatedAt]);
 
@@ -302,10 +313,13 @@ const ChatHistory = ({
   useEffect(() => {
     if (!onConversationUpdate) return;
     onConversationUpdate((updatedConversation) => {
+      if (!updatedConversation || !updatedConversation.id) return;
+      if (isLoadingPlaceholderConversation(updatedConversation)) return;
       setConversations((prev) => {
         const idx = prev.findIndex((c) => c.id === updatedConversation.id);
         if (idx === -1) {
-          const next = [{ ...updatedConversation, title: normalizeTitle(updatedConversation) }, ...prev];
+          const next = [{ ...updatedConversation, title: normalizeTitle(updatedConversation) }, ...prev]
+            .filter((c) => !isLoadingPlaceholderConversation(c));
           safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(next));
           return next;
         }
@@ -316,8 +330,9 @@ const ChatHistory = ({
           title: normalizeTitle(updatedConversation),
           updatedAt: updatedConversation.updatedAt || new Date().toISOString(),
         };
-        safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(next));
-        return next;
+        const sanitized = next.filter((c) => !isLoadingPlaceholderConversation(c));
+        safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(sanitized));
+        return sanitized;
       });
     });
   }, [onConversationUpdate]);

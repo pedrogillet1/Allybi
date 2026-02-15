@@ -191,7 +191,10 @@ async function startServer() {
       'https://localhost:3000',
       'https://localhost:5000',
       'https://localhost:5173',
-      'https://getkoda.ai',
+      'https://allybi.co',
+      'https://www.allybi.co',
+      'https://app.allybi.co',
+      'https://admin.allybi.co',
       config.FRONTEND_URL,
     ].filter(Boolean) as string[];
 

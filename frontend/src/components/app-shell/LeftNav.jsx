@@ -66,9 +66,8 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
             setShowLogoutModal(true);
             setIsMobileMenuOpen(false);
         } else {
-            // Navigate to full login page (not modal)
             setIsMobileMenuOpen(false);
-            window.location.href = ROUTES.LOGIN;
+            emitAuthModalOpen({ mode: 'login' });
         }
     };
 

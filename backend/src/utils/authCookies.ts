@@ -5,7 +5,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 /**
  * Set HTTP-only auth cookies alongside JSON token responses.
  * Safari ITP can clear localStorage, so cookies provide a reliable fallback.
- * Same-origin (getkoda.ai) means SameSite=Lax works without issues.
+ * Same-origin (allybi.co) means SameSite=Lax works without issues.
  */
 export function setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
   res.cookie('koda_at', accessToken, {

@@ -2867,6 +2867,33 @@ export class PrismaChatService {
       && /\b(create|make|build|draw|generate|show)\b/.test(q);
   }
 
+  private parseExplicitEditCommand(message: string): { isExplicitEdit: boolean; strippedMessage: string } {
+    const raw = String(message || "");
+    const match = raw.match(/^\s*(edit|editar)\s*:\s*/i);
+    if (!match) {
+      return { isExplicitEdit: false, strippedMessage: raw };
+    }
+    return {
+      isExplicitEdit: true,
+      strippedMessage: raw.slice(match[0].length).trim(),
+    };
+  }
+
+  private hasEditDocumentContext(req: ChatRequest): boolean {
+    const attachedIds = Array.isArray(req.attachedDocumentIds) ? req.attachedDocumentIds : [];
+    if (attachedIds.some((id) => String(id || "").trim().length > 0)) return true;
+    const meta = (req.meta as any) || null;
+    const activeViewerDocId = String(meta?.viewerContext?.activeDocumentId || "").trim();
+    return activeViewerDocId.length > 0;
+  }
+
+  private normalChatEditGuidance(hasInstruction: boolean): string {
+    if (!hasInstruction) {
+      return "Use `edit:` followed by what to change, then open the document in the viewer to apply it.";
+    }
+    return "Open a document in the viewer to apply edits. In normal chat, edits run only when a document is open.";
+  }
+
   /* ---------------- Image Generation (Visual Attachments) ---------------- */
 
   private isImageGenerationRequest(message: string): boolean {
@@ -10589,6 +10616,49 @@ export class PrismaChatService {
       };
     }
 
+    const explicitEdit = this.parseExplicitEditCommand(req.message);
+    if (explicitEdit.isExplicitEdit) {
+      const hasInstruction = explicitEdit.strippedMessage.length > 0;
+      const editReq: ChatRequest = {
+        ...req,
+        message: explicitEdit.strippedMessage,
+      };
+      if (hasInstruction && this.hasEditDocumentContext(editReq)) {
+        const editHandled = await this.tryHandleEditingTurn({
+          traceId,
+          req: editReq,
+          conversationId,
+          history,
+        });
+        if (editHandled) return editHandled;
+      }
+
+      const text = this.normalChatEditGuidance(hasInstruction);
+      const userMsg = await this.createMessage({
+        conversationId,
+        role: "user",
+        content: req.message,
+        userId: req.userId,
+      });
+      const assistantMsg = await this.createMessage({
+        conversationId,
+        role: "assistant",
+        content: text,
+        userId: req.userId,
+        metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+      });
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        sources: [],
+        answerMode: "action_receipt",
+        answerClass: "NAVIGATION",
+        navType: null,
+      };
+    }
+
     // --- Slides / deck requests (Google Slides) ---
     if (this.isSlideOrDeckRequest(req.message)) {
       const userMsg = await this.createMessage({
@@ -11118,15 +11188,6 @@ export class PrismaChatService {
         navType: null,
       };
     }
-
-    // --- Editing intent dispatching (DOCX/XLSX) ---
-    const editHandled = await this.tryHandleEditingTurn({
-      traceId,
-      req,
-      conversationId,
-      history,
-    });
-    if (editHandled) return editHandled;
 
     // --- File Action Detection (bank-driven; safe confirmation for destructive ops) ---
     const fileOp = getFileActionExecutor().detectOperator(req.message);
@@ -12244,6 +12305,21 @@ export class PrismaChatService {
    */
   private isFileListingQuery(message: string): { isListing: boolean; lang: 'en' | 'pt' | 'es'; scope: 'all' | 'documents' | 'folders' } {
     const q = message.toLowerCase().trim();
+
+    // "Which files/documents talk about X?" is a semantic content search, not a library listing.
+    // Keep these queries in the RAG/doc-search path so we return relevant files only.
+    const hasSemanticDocConstraint =
+      /\b(talk(?:s|ing)?\s+about|about|regarding|related\s+to|mention(?:s|ed|ing)?|contain(?:s|ed|ing)?|include(?:s|d|ing)?)\b/.test(q) ||
+      /\b(sobre|relacionad[oa]s?\s+(?:a|com)|que\s+falam?\s+de|menciona(?:m|r)?|cont[eé]m|inclu(?:i|em|ir))\b/.test(q) ||
+      /\b(sobre|relacionad[oa]s?\s+con|que\s+hablan?\s+de|menciona(?:n|r)?|contien(?:e|en)|incluy(?:e|en))\b/.test(q);
+    const hasFolderLocationConstraint =
+      /\b(in|inside|under|within)\b.{0,32}\b(folder|folders)\b/.test(q) ||
+      /\b(na|no|dentro\s+da?|em)\b.{0,32}\b(pasta|pastas)\b/.test(q) ||
+      /\b(en|dentro\s+de)\b.{0,32}\b(carpeta|carpetas)\b/.test(q) ||
+      /\b(contents?\s+of|what(?:'s| is)?\s+in)\b.{0,48}\b(folder|pasta|carpeta)\b/.test(q);
+    if (hasSemanticDocConstraint && !hasFolderLocationConstraint) {
+      return { isListing: false, lang: 'en', scope: 'all' };
+    }
 
     // --- Scope detection helper: inspect matched text for what the user asked about ---
     const detectScope = (text: string): 'all' | 'documents' | 'folders' => {
@@ -14249,6 +14325,52 @@ export class PrismaChatService {
       };
     }
 
+    const explicitEdit = this.parseExplicitEditCommand(params.req.message);
+    if (explicitEdit.isExplicitEdit) {
+      const hasInstruction = explicitEdit.strippedMessage.length > 0;
+      const editReq: ChatRequest = {
+        ...params.req,
+        message: explicitEdit.strippedMessage,
+      };
+      if (hasInstruction && this.hasEditDocumentContext(editReq)) {
+        const editHandled = await this.tryHandleEditingTurn({
+          traceId,
+          req: editReq,
+          conversationId,
+          history,
+          sink: params.sink,
+          existingUserMsgId,
+        });
+        if (editHandled) return editHandled;
+      }
+
+      const text = this.normalChatEditGuidance(hasInstruction);
+      const userMsg = existingUserMsgId
+        ? { id: existingUserMsgId }
+        : await this.createMessage({ conversationId, role: "user", content: params.req.message, userId: params.req.userId });
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+        params.sink.write({ event: "delta", data: { text } } as any);
+      }
+      const assistantMsg = await this.createMessage({
+        conversationId,
+        role: "assistant",
+        content: text,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+      });
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        sources: [],
+        answerMode: "action_receipt",
+        answerClass: "NAVIGATION",
+        navType: null,
+      };
+    }
+
     // --- Slides / deck requests (Google Slides) ---
     const isSlidesDeck = this.isSlideOrDeckRequest(params.req.message);
     console.log('[StreamChat] isSlideOrDeckRequest:', isSlidesDeck, 'message:', params.req.message.slice(0, 50));
@@ -14885,17 +15007,6 @@ export class PrismaChatService {
         navType: null,
       };
     }
-
-    // --- Editing intent dispatching (DOCX/XLSX) ---
-    const editHandled = await this.tryHandleEditingTurn({
-      traceId,
-      req: params.req,
-      conversationId,
-      history,
-      sink: params.sink,
-      existingUserMsgId,
-    });
-    if (editHandled) return editHandled;
 
     // --- File Action Detection (bank-driven; safe confirmation for destructive ops) ---
     const fileOp = getFileActionExecutor().detectOperator(params.req.message);

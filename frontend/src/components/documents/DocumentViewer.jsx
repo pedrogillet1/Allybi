@@ -1781,7 +1781,7 @@ const DocumentViewer = () => {
 
     // Check if it's a relative API path (starts with /api/) or already a full backend URL
     const isRelativeApiPath = documentUrl.startsWith('/api/');
-    const isBackendUrl = documentUrl.includes('getkoda.ai') || documentUrl.includes('localhost:5000');
+    const isBackendUrl = documentUrl.includes('allybi.co') || documentUrl.includes('localhost:5000');
     const isCloudStorageUrl =
       documentUrl.includes('storage.googleapis.com') ||
       documentUrl.includes('googleapis.com/storage') ||

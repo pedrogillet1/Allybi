@@ -4,7 +4,7 @@ test('localhost smoke: prompt renders + Gmail connector start uses callbackUrl',
   await page.addInitScript(() => {
     localStorage.setItem('accessToken', 'e2e_access_token');
     localStorage.setItem('refreshToken', 'e2e_refresh_token');
-    localStorage.setItem('user', JSON.stringify({ id: 'e2e-user', email: 'e2e@getkoda.ai' }));
+    localStorage.setItem('user', JSON.stringify({ id: 'e2e-user', email: 'e2e@allybi.co' }));
   });
 
   // --- Backend mocks (no backend required for this smoke test) ---
@@ -14,7 +14,7 @@ test('localhost smoke: prompt renders + Gmail connector start uses callbackUrl',
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ user: { id: 'e2e-user', email: 'e2e@getkoda.ai' } }),
+      body: JSON.stringify({ user: { id: 'e2e-user', email: 'e2e@allybi.co' } }),
     });
   });
 
@@ -120,4 +120,3 @@ test('localhost smoke: prompt renders + Gmail connector start uses callbackUrl',
   // In dev we expect the callbackUrl override to be http://localhost:5000/api/integrations/gmail/callback
   expect(decodeURIComponent(seenGmailStartUrl || '')).toContain('http://localhost:5000/api/integrations/gmail/callback');
 });
-

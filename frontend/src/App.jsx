@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { DocumentsProvider } from './context/DocumentsContext';
 import { FileProvider } from './context/FileContext';
@@ -76,6 +76,22 @@ import {
 } from './components/admin';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 
+// Redirect legacy auth URLs (/login, /signup, /auth) → open modal at /
+function AuthRedirect({ defaultMode }) {
+  const navigate = useNavigate();
+  const authModal = useAuthModal();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const mode = params.get('mode') || defaultMode || 'login';
+    navigate('/', { replace: true });
+    authModal.open({ mode });
+  }, []);
+
+  return null;
+}
+
 // Inner component that uses NotificationsStore hook
 function AppContent() {
   const isMobile = useIsMobile();
@@ -92,9 +108,9 @@ function AppContent() {
     // Auth routes are now full pages, so use location directly
     const bgLocation = location;
 
-    // Auth modal is disabled - all auth routes render as full pages now
-    const modalVisible = false;
-    const modalContent = null;
+    // Auth modal overlay — driven by AuthModalContext
+    const modalVisible = authModal.isOpen;
+    const modalContent = <UnifiedAuth variant="modal" />;
 
     return (
       <>
@@ -112,10 +128,10 @@ function AppContent() {
               {/* ADMIN LOGIN — must be before AdminRoute catch-all */}
               <Route path={ROUTES.ADMIN_LOGIN} element={<AdminLogin />} />
 
-              {/* Full-page auth routes (not modal) */}
-              <Route path={ROUTES.LOGIN} element={<UnifiedAuth variant="page" />} />
-              <Route path={ROUTES.SIGNUP} element={<UnifiedAuth variant="page" />} />
-              <Route path={ROUTES.AUTH} element={<UnifiedAuth variant="page" />} />
+              {/* Legacy auth URLs → redirect to / and open modal */}
+              <Route path={ROUTES.LOGIN} element={<AuthRedirect defaultMode="login" />} />
+              <Route path={ROUTES.SIGNUP} element={<AuthRedirect defaultMode="signup" />} />
+              <Route path={ROUTES.AUTH} element={<AuthRedirect />} />
               <Route path={ROUTES.AUTHENTICATION} element={<Authentication variant="page" />} />
               <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmail variant="page" />} />
               <Route path={ROUTES.PHONE_NUMBER_PENDING} element={<PhoneNumberPending variant="page" />} />

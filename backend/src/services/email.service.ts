@@ -12,7 +12,7 @@ import { config } from '../config/env';
 
 const INFOBIP_BASE_URL = config.INFOBIP_BASE_URL;
 const INFOBIP_API_KEY = config.INFOBIP_API_KEY;
-const fromEmail = `Koda <${config.EMAIL_FROM || 'info@getkoda.ai'}>`;
+const fromEmail = `Allybi <${config.EMAIL_FROM || 'info@allybi.co'}>`;
 
 const emailServiceEnabled = !!(INFOBIP_BASE_URL && INFOBIP_API_KEY);
 

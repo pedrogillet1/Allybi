@@ -4,6 +4,7 @@ import api from "../../../services/api";
 import gmailSvg from "../../../assets/Gmail.svg";
 import outlookSvg from "../../../assets/outlook.svg";
 import paperclipSvg from "../../../assets/Paperclip.svg";
+import closeIcon from "../../../assets/x-close.svg";
 
 import "./EmailDraftActionCard.css";
 import AttachmentPickerModal from "../../documents/AttachmentPickerModal";

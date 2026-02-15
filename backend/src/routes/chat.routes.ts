@@ -186,6 +186,16 @@ router.post(
       ? language as "en" | "pt" | "es"
       : undefined;
 
+    const rawMeta = (parsed.data as any).meta as Record<string, unknown> | undefined;
+    const meta: Record<string, unknown> = {
+      ...(rawMeta || {}),
+      viewerMode: false,
+    };
+    // Never trust viewer-only context on the normal chat endpoint.
+    delete (meta as any).viewerContext;
+    delete (meta as any).viewerSelection;
+    delete (meta as any).viewerHistory;
+
     // SSE headers (set before try so finally can always end)
     res.writeHead(200, {
       "Content-Type": "text/event-stream; charset=utf-8",
@@ -196,7 +206,7 @@ router.post(
     res.flushHeaders();
 
     try {
-      const isViewerMode = Boolean((parsed.data as any)?.meta?.viewerMode);
+      const isViewerMode = Boolean((meta as any)?.viewerMode);
       // Always emit an initial stage frame for regular chat; viewer/edit mode has
       // task-specific progress events and should not flash generic retrieval labels.
       if (!isViewerMode) {
@@ -216,7 +226,6 @@ router.post(
 
       // Stream chat (persists user + assistant messages internally)
       const connectorContext = (parsed.data as any).connectorContext as Record<string, unknown> | undefined;
-      const meta = (parsed.data as any).meta as Record<string, unknown> | undefined;
       const context = (parsed.data as any).context as Record<string, unknown> | undefined;
 
       let result;
@@ -420,7 +429,14 @@ router.post(
 
     try {
       const connectorContext = (parsed.data as any).connectorContext as Record<string, unknown> | undefined;
-      const meta = (parsed.data as any).meta as Record<string, unknown> | undefined;
+      const rawMeta = (parsed.data as any).meta as Record<string, unknown> | undefined;
+      const meta: Record<string, unknown> = {
+        ...(rawMeta || {}),
+        viewerMode: false,
+      };
+      delete (meta as any).viewerContext;
+      delete (meta as any).viewerSelection;
+      delete (meta as any).viewerHistory;
       const context = (parsed.data as any).context as Record<string, unknown> | undefined;
       const chat = getChatService(req);
       const result = await chat.chat({
