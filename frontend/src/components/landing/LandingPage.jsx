@@ -5,7 +5,7 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 import gmailSvg from '../../assets/Gmail.svg';
 import outlookSvg from '../../assets/outlook.svg';
 import slackSvg from '../../assets/slack.svg';
-import kodaLogo from '../../assets/koda-logo_1.svg';
+import allybiKnotBlack from '../../assets/allybi-knot-black.svg';
 
 const FONT = 'Plus Jakarta Sans, sans-serif';
 
@@ -87,7 +87,12 @@ export default function LandingPage() {
         width: '100%',
         boxSizing: 'border-box',
       }}>
-        <img src={kodaLogo} alt="Allybi" style={{ height: 28 }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <img src={allybiKnotBlack} alt="" style={{ height: 26, width: 26 }} />
+          <span style={{ fontSize: 20, fontWeight: 700, color: '#181818', letterSpacing: '-0.02em' }}>
+            Allybi
+          </span>
+        </div>
         <div style={{ display: 'flex', gap: 12 }}>
           <button
             onClick={() => navigate(ROUTES.LOGIN)}
@@ -135,7 +140,7 @@ export default function LandingPage() {
           marginRight: 'auto',
           letterSpacing: '-0.02em',
         }}>
-          Ask questions across all your documents
+          Allybi helps teams search, edit, and automate work across business files
         </h1>
         <p style={{
           margin: '20px auto 0',
@@ -145,7 +150,7 @@ export default function LandingPage() {
           lineHeight: isMobile ? '24px' : '28px',
           maxWidth: 560,
         }}>
-          Get grounded answers backed by your own files. Upload once, ask anything, and Koda finds exactly what you need.
+          Connect tools like Gmail, Slack, and Outlook, then ask Allybi to find answers in your own documents and spreadsheets with clear, source-backed results.
         </p>
 
         <div style={{
@@ -179,7 +184,7 @@ export default function LandingPage() {
             onMouseEnter={e => { e.currentTarget.style.background = '#F5F5F5'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'white'; e.currentTarget.style.transform = 'translateY(0)'; }}
           >
-            Try Koda free
+            Try Allybi free
           </button>
         </div>
       </Section>
@@ -197,7 +202,7 @@ export default function LandingPage() {
             isMobile={isMobile}
             icon="&#9889;"
             title="Lightning fast"
-            description="Get answers in seconds, not minutes. Koda indexes your documents the moment you upload so you can search instantly."
+            description="Get answers in seconds, not minutes. Allybi indexes your files as soon as they are connected or uploaded."
           />
           <FeatureCard
             isMobile={isMobile}
@@ -209,7 +214,7 @@ export default function LandingPage() {
             isMobile={isMobile}
             icon="&#128274;"
             title="Version confidence"
-            description="Always know which version of a document an answer comes from. Koda tracks changes so you're never working with stale info."
+            description="Always know which version of a document an answer comes from. Allybi tracks updates so your team stays on current data."
           />
         </div>
       </Section>
@@ -240,7 +245,7 @@ export default function LandingPage() {
               margin: '12px 0 0', fontSize: 16, fontWeight: 400,
               color: '#55534E', lineHeight: '24px',
             }}>
-              We built Koda with privacy at its core. Your documents are encrypted, never used for training, and you stay in full control.
+              We built Allybi with privacy at its core. Your documents are encrypted, never used for model training, and you stay in full control.
             </p>
           </div>
           <div style={{
@@ -372,7 +377,41 @@ export default function LandingPage() {
         color: '#6C6B6E',
         lineHeight: '18px',
       }}>
-        &copy; {new Date().getFullYear()} Koda. All rights reserved.
+        <div style={{ marginBottom: 8 }}>
+          &copy; {new Date().getFullYear()} Allybi. All rights reserved.
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+          <button
+            onClick={() => navigate(ROUTES.PRIVACY_POLICY)}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              color: '#6C6B6E',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              fontFamily: FONT,
+              fontSize: 13,
+              padding: 0,
+            }}
+          >
+            Privacy Policy
+          </button>
+          <button
+            onClick={() => navigate(ROUTES.TERMS_OF_USE)}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              color: '#6C6B6E',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              fontFamily: FONT,
+              fontSize: 13,
+              padding: 0,
+            }}
+          >
+            Terms of Use
+          </button>
+        </div>
       </footer>
     </div>
   );

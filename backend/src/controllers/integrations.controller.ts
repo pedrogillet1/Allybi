@@ -83,7 +83,7 @@ function oauthResultHtml(opts: { provider: string; ok: boolean; title: string; d
         </div>
         <h1>${title}</h1>
         <p>${detail}</p>
-        <div class="muted">You can close this window and return to Koda.</div>
+        <div class="muted">You can close this window and return to Allybi.</div>
         <button class="btn" onclick="window.close()">Close</button>
       </div>
     </div>
@@ -198,7 +198,7 @@ export class IntegrationsController {
             provider: providerRaw,
             ok: false,
             title: 'Authorization code missing',
-            detail: 'Retry connecting from Koda.',
+            detail: 'Retry connecting from Allybi.',
           }),
         );
         return res as unknown as Response;

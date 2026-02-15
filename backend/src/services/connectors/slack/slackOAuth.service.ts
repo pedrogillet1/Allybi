@@ -314,6 +314,14 @@ export class SlackOAuthService {
       if (cand.protocol !== 'http:' && cand.protocol !== 'https:') return false;
       if (cand.pathname !== '/api/integrations/slack/callback') return false;
 
+      // Dev ergonomics: allow localhost callback overrides without requiring env allowlist sync.
+      if (
+        process.env.NODE_ENV === 'development' &&
+        (cand.hostname === 'localhost' || cand.hostname === '127.0.0.1')
+      ) {
+        return true;
+      }
+
       const allowlist = this.getAllowedRedirectUris();
       return allowlist.some((raw) => {
         try {

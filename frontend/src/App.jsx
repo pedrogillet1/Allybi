@@ -157,8 +157,8 @@ function AppContent() {
               {/* Public pages */}
               <Route path={ROUTES.LANDING} element={<LandingPage />} />
 
-              {/* Public background: chat is always renderable */}
-              <Route path="/" element={<ChatScreen />} />
+              {/* Public background: signed-out users land on homepage; authenticated users can open chat */}
+              <Route path="/" element={isAuthenticated ? <ChatScreen /> : <LandingPage />} />
               <Route path={ROUTES.CHAT} element={<ChatScreen />} />
 
               {/* Protected app routes */}
