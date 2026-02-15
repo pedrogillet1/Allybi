@@ -241,11 +241,10 @@
     }
   },
   "chat": {
-    "footerSecure": "Espacio de trabajo seguro y privado.",
-    "footerImportantInfo": "Consulta información importante.",
+    "footerSecure": "Tu espacio de trabajo es seguro con Allybi.",
     "footerPrivacyPolicy": "Política de Privacidad.",
     "footerTermsOfUse": "Términos de Uso.",
-    "footerCookiePreferences": "Ver preferencias de cookies.",
+    "footerCookiePreferences": "Preferencias de Cookies.",
     "documentSources": "Fuentes del Documento ({{count}})",
     "webSources": "Fuentes Web ({{count}})",
     "noDocumentsReferenced": "No se referenciaron documentos para esta respuesta.",

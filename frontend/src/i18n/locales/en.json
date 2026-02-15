@@ -252,11 +252,10 @@
   },
   "chat": {
     "mobileHeadline": "Ask Allybi about your files",
-    "footerSecure": "Secure and private workspace.",
-    "footerImportantInfo": "Check important info.",
+    "footerSecure": "Your workspace is secure with Allybi.",
     "footerPrivacyPolicy": "Privacy Policy.",
     "footerTermsOfUse": "Terms of Use.",
-    "footerCookiePreferences": "See Cookie Preferences.",
+    "footerCookiePreferences": "Cookie Preferences.",
     "welcomeMessages": [
       "What do you want to find in your files?",
       "What can I pull up for you?",

@@ -241,11 +241,10 @@
     }
   },
   "chat": {
-    "footerSecure": "Espaço de trabalho seguro e privado.",
-    "footerImportantInfo": "Confira informações importantes.",
+    "footerSecure": "Seu espaço de trabalho é seguro com Allybi.",
     "footerPrivacyPolicy": "Política de Privacidade.",
     "footerTermsOfUse": "Termos de Uso.",
-    "footerCookiePreferences": "Ver preferências de cookies.",
+    "footerCookiePreferences": "Preferências de Cookies.",
     "welcomeMessages": [
       "O que você quer encontrar nos seus arquivos?",
       "O que você quer que eu abra para você?",
