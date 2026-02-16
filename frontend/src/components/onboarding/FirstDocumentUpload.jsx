@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ROUTES, STORAGE_KEYS } from '../../constants/routes';
 import { useDocuments } from '../../context/DocumentsContext';
 import unifiedUploadService from '../../services/unifiedUploadService';
+import UploadProgressBar from '../upload/UploadProgressBar';
 import dropzoneIllustration from '../../assets/dropzone-files-illustration.svg';
 
 const DROPZONE_ACCEPT = {
@@ -311,51 +312,34 @@ export default function FirstDocumentUpload() {
 
                 {/* Status */}
                 {f.status === 'uploading' && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    flexShrink: 0,
-                  }}>
-                    <div style={{
-                      width: 80,
-                      height: 4,
-                      borderRadius: 9999,
-                      background: '#E6E6EC',
-                      overflow: 'hidden',
-                    }}>
-                      <div style={{
-                        width: `${f.progress}%`,
-                        height: '100%',
-                        background: '#32302C',
-                        borderRadius: 9999,
-                        transition: 'width 200ms ease',
-                      }} />
-                    </div>
-                    <span style={{ fontSize: 11, color: '#6C6B6E', whiteSpace: 'nowrap' }}>
-                      {f.progress}%
-                    </span>
+                  <div style={{ width: 100, flexShrink: 0 }}>
+                    <UploadProgressBar
+                      progress={f.progress}
+                      status="uploading"
+                      showStatus={false}
+                      variant="compact"
+                    />
                   </div>
                 )}
                 {f.status === 'uploaded' && (
-                  <span style={{
-                    fontSize: 12,
-                    fontWeight: 500,
-                    color: '#22C55E',
-                    flexShrink: 0,
-                  }}>
-                    {t('firstUpload.uploaded')}
-                  </span>
+                  <div style={{ width: 100, flexShrink: 0 }}>
+                    <UploadProgressBar
+                      progress={100}
+                      status="completed"
+                      showStatus={false}
+                      variant="compact"
+                    />
+                  </div>
                 )}
                 {f.status === 'error' && (
-                  <span style={{
-                    fontSize: 12,
-                    fontWeight: 500,
-                    color: '#EF4444',
-                    flexShrink: 0,
-                  }}>
-                    Error
-                  </span>
+                  <div style={{ width: 100, flexShrink: 0 }}>
+                    <UploadProgressBar
+                      progress={f.progress || 0}
+                      status="error"
+                      showStatus={false}
+                      variant="compact"
+                    />
+                  </div>
                 )}
 
                 {/* Remove button (only when not uploading) */}

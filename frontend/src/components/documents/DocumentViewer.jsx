@@ -1355,6 +1355,16 @@ const DocumentViewer = () => {
   const editingOpenRef = useRef(false);
   useEffect(() => { editingOpenRef.current = editingOpen; }, [editingOpen]);
 
+  const handleAskAllybiClick = useCallback((event) => {
+    if (event?.preventDefault) event.preventDefault();
+    if (event?.stopPropagation) event.stopPropagation();
+    if (!supportsViewerEditing) {
+      showInfo(t('documentViewer.comingSoon'));
+      return false;
+    }
+    return true;
+  }, [supportsViewerEditing, showInfo, t]);
+
   const toggleEditingPanel = useCallback(() => {
     const wasOpen = editingOpenRef.current;
     const next = !wasOpen;
@@ -4740,8 +4750,9 @@ const DocumentViewer = () => {
               </button>
             </div>
               <button
+                type="button"
                 onMouseDown={(e) => {
-                  e.preventDefault();
+                  if (!handleAskAllybiClick(e)) return;
                   if (!editingOpen) {
                     try { docxCanvasRef.current?.restoreSelection?.(); } catch {}
                     openEditingPanel({ seedSelection: true, focusInput: false });
@@ -4750,11 +4761,11 @@ const DocumentViewer = () => {
                   }
                 }}
               onClick={(e) => {
-                e.preventDefault();
+                handleAskAllybiClick(e);
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
+                  if (!handleAskAllybiClick(e)) return;
                   if (!editingOpen) {
                     openEditingPanel({ seedSelection: true, focusInput: false });
                   } else {
@@ -4928,11 +4939,11 @@ const DocumentViewer = () => {
         const y = Math.max(14, r.top - 46);
         return (
           <div data-ask-allybi-bubble style={{ position: 'fixed', top: y, left: x, zIndex: 3000 }}>
-	            <button
+            <button
+              type="button"
 	              onMouseDown={(e) => {
 	                // Keep the document selection visible when clicking the bubble.
-	                e.preventDefault();
-	                e.stopPropagation();
+                  if (!handleAskAllybiClick(e)) return;
 	                // Restore the last DOCX selection Range (some browsers shift selection on click/mouseup).
 	                try { docxCanvasRef.current?.restoreSelection?.(); } catch {}
 	                // Open on mousedown (like the header Ask button) to avoid selection drift.
@@ -4994,7 +5005,12 @@ const DocumentViewer = () => {
           </button>
           <div style={{ width: 14, height: 14, right: 44, top: 9, position: 'absolute', background: '#222222', borderRadius: 9999 }} />
           <button
+            type="button"
             onClick={() => {
+              if (!supportsViewerEditing) {
+                showInfo(t('documentViewer.comingSoon'));
+                return;
+              }
               toggleEditingPanel();
             }}
             style={{

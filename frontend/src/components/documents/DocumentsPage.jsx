@@ -1863,7 +1863,7 @@ const DocumentsPage = () => {
         }}
         categoryId={uploadCategoryId}
         onUploadComplete={() => {
-          // No manual refresh needed - context auto-updates!
+          refreshAll();
         }}
       />
 
@@ -1873,10 +1873,11 @@ const DocumentsPage = () => {
         onClose={() => {
           setShowUniversalUploadModal(false);
           setDroppedFiles(null);
+          refreshAll();
         }}
         categoryId={null}
         onUploadComplete={() => {
-          // No manual refresh needed - context auto-updates!
+          refreshAll();
         }}
         initialFiles={droppedFiles}
       />

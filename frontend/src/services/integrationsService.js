@@ -8,15 +8,10 @@ const CALLBACK_PATHS = {
   slack: '/api/integrations/slack/callback',
 };
 
-function shouldOverrideCallbackUrl() {
-  // Only override in local dev. In production, redirect URIs should be server-controlled.
-  if (process.env.NODE_ENV !== 'development') return false;
-  try {
-    const host = window?.location?.hostname;
-    return host === 'localhost' || host === '127.0.0.1';
-  } catch {
-    return false;
-  }
+function shouldSendCallbackUrlOverride() {
+  // Always send the connector callback URL derived from the configured API base.
+  // Backend still validates allowlisted redirect URIs before using it.
+  return true;
 }
 
 function getBaseOrigin() {
@@ -73,14 +68,10 @@ async function startConnect(provider) {
     throw new Error(`Unsupported connector provider: ${provider}`);
   }
 
-  // Security invariant: OAuth redirect_uri must be server-controlled (env),
-  // never derived from an arbitrary frontend URL.
-  //
-  // For local development, we allow passing a callbackUrl override so you can
-  // use `http://localhost:5000/...` without fighting `https://localhost/...`
-  // mismatches from stale envs.
+  // Send connector callback URL explicitly to avoid accidental routing to
+  // generic auth callbacks. Backend enforces redirect URI allowlist checks.
   const params = {};
-  if (shouldOverrideCallbackUrl() && CALLBACK_PATHS[normalized]) {
+  if (shouldSendCallbackUrlOverride() && CALLBACK_PATHS[normalized]) {
     params.callbackUrl = `${getBaseOrigin()}${CALLBACK_PATHS[normalized]}`;
   }
 

@@ -78,38 +78,85 @@ function base64UrlDecode(input: string): Buffer {
   return Buffer.from(normalized + pad, 'base64');
 }
 
+function getAllowedGmailCallbackUrls(): string[] {
+  const primary = (process.env.GOOGLE_GMAIL_CALLBACK_URL || '').trim();
+  const csv = (process.env.GOOGLE_GMAIL_CALLBACK_URLS || '').trim();
+  const items = [
+    ...(primary ? [primary] : []),
+    ...csv.split(',').map((x) => x.trim()).filter(Boolean),
+  ];
+  return Array.from(new Set(items));
+}
+
+function isAllowedGmailCallbackUrl(candidate?: string | null): boolean {
+  const raw = typeof candidate === 'string' ? candidate.trim() : '';
+  if (!raw) return false;
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
+    if (url.pathname !== '/api/integrations/gmail/callback') return false;
+
+    if (
+      process.env.NODE_ENV === 'development' &&
+      (url.hostname === 'localhost' || url.hostname === '127.0.0.1')
+    ) {
+      return true;
+    }
+
+    const allowlist = getAllowedGmailCallbackUrls();
+    return allowlist.some((allowedRaw) => {
+      try {
+        const allowed = new URL(allowedRaw);
+        return allowed.origin === url.origin && allowed.pathname === url.pathname;
+      } catch {
+        return false;
+      }
+    });
+  } catch {
+    return false;
+  }
+}
+
+function pickDefaultAllowedGmailCallbackUrl(): string | null {
+  const allowlist = getAllowedGmailCallbackUrls();
+  for (const candidate of allowlist) {
+    if (isAllowedGmailCallbackUrl(candidate)) return candidate;
+  }
+  return null;
+}
+
 function resolveOAuthConfig(): { clientId: string; clientSecret: string; callbackUrl: string } {
   // Prefer dedicated Gmail connector creds if provided (recommended, due to sensitive Gmail scopes).
   const clientId = (process.env.GOOGLE_GMAIL_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || '').trim();
   const clientSecret = (process.env.GOOGLE_GMAIL_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET || '').trim();
-  const callbackUrl = (process.env.GOOGLE_GMAIL_CALLBACK_URL || process.env.GOOGLE_CALLBACK_URL || '').trim();
+  const callbackUrlRaw = (process.env.GOOGLE_GMAIL_CALLBACK_URL || process.env.GOOGLE_CALLBACK_URL || '').trim();
 
-  if (!clientId || !clientSecret || !callbackUrl) {
+  if (!clientId || !clientSecret || !callbackUrlRaw) {
     throw new GmailOAuthError(
       'Missing GOOGLE_GMAIL_CLIENT_ID/SECRET/CALLBACK_URL (or GOOGLE_CLIENT_ID/SECRET/CALLBACK_URL) for Gmail OAuth.',
       'GMAIL_OAUTH_ENV_MISSING',
     );
   }
 
-  return { clientId, clientSecret, callbackUrl };
+  if (isAllowedGmailCallbackUrl(callbackUrlRaw)) {
+    return { clientId, clientSecret, callbackUrl: callbackUrlRaw };
+  }
+
+  const fallback = pickDefaultAllowedGmailCallbackUrl();
+  if (fallback) {
+    return { clientId, clientSecret, callbackUrl: fallback };
+  }
+
+  throw new GmailOAuthError(
+    'Invalid Gmail callback URL. Set GOOGLE_GMAIL_CALLBACK_URL (or *_URLS) to /api/integrations/gmail/callback.',
+    'GMAIL_OAUTH_CALLBACK_INVALID',
+  );
 }
 
 function resolveCallbackUrlOverride(candidate?: string | null): string | null {
   const raw = typeof candidate === 'string' ? candidate.trim() : '';
   if (!raw) return null;
-
-  // Only allow override in development to unblock localhost http/https mismatch.
-  if (process.env.NODE_ENV !== 'development') return null;
-
-  try {
-    const url = new URL(raw);
-    if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
-    if (!['localhost', '127.0.0.1'].includes(url.hostname)) return null;
-    if (url.pathname !== '/api/integrations/gmail/callback') return null;
-    return url.toString();
-  } catch {
-    return null;
-  }
+  return isAllowedGmailCallbackUrl(raw) ? raw : null;
 }
 
 function resolveStateSigningKey(): Buffer {

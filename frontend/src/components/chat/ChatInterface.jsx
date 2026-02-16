@@ -623,6 +623,7 @@ function InlineEditActions({ editSession, lang, onFileClick }) {
         targetHint: editSession.targetHint || undefined,
         target: editSession.target || undefined,
         beforeText: s(editSession.beforeText || editSession.diff?.before),
+        // Use canonical proposedText first. diff.after may be a shortened preview snippet.
         proposedText: s(editSession.proposedText || editSession.diff?.after),
         userConfirmed: true,
       });
@@ -4608,7 +4609,7 @@ export default function ChatInterface({
                                   fontStyle: 'italic',
                                   lineHeight: m.content ? '18px' : '20px',
                                   display: 'block',
-                                  fontSize: m.content ? 12 : 15,
+                                  fontSize: 15,
                                   marginTop: 0,
                                   marginBottom: m.content ? 6 : 0,
                                 }}>

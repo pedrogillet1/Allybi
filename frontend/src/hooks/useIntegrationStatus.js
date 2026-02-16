@@ -111,6 +111,9 @@ export function useIntegrationStatus() {
 
     const handleOAuthDone = () => {
       cleanup();
+      // Close the popup from the opener — more reliable than the popup
+      // trying window.close() on itself after cross-origin OAuth navigation.
+      try { if (popup && !popup.closed) popup.close(); } catch {}
       if (mountedRef.current) {
         setProviders(prev => ({
           ...prev,

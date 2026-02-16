@@ -83,7 +83,11 @@ async function localMetadata(key: string): Promise<{ size?: number; mimeType?: s
 let _gcs: GcsStorageService | null = null;
 
 function gcs(): GcsStorageService {
-  if (!_gcs) _gcs = new GcsStorageService();
+  if (!_gcs) {
+    _gcs = new GcsStorageService();
+    // Configure bucket CORS on first access so browser uploads work.
+    _gcs.ensureBucketCors().catch(() => {});
+  }
   return _gcs;
 }
 

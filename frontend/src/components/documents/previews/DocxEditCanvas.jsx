@@ -355,14 +355,45 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     setError('');
     setStatusMsg('');
     try {
-      const res = await api.get(`/api/documents/${docId}/editing/docx-html`, {
-        params: { ts: Date.now() },
-        headers: {
-          'Cache-Control': 'no-cache',
-          Pragma: 'no-cache',
-        },
-      });
-      const nextBlocks = Array.isArray(res.data?.blocks) ? res.data.blocks : [];
+      const normalizeBlocks = (rawBlocks) =>
+        (Array.isArray(rawBlocks) ? rawBlocks : []).map((b) => ({
+          paragraphId: b?.paragraphId,
+          text: String(b?.text || ''),
+          sectionPath: b?.sectionPath || null,
+          indexInSection: Number.isFinite(Number(b?.indexInSection)) ? Number(b.indexInSection) : null,
+          docIndex: Number.isFinite(Number(b?.docIndex)) ? Number(b.docIndex) : null,
+          styleFingerprint: b?.styleFingerprint || null,
+          styleName: b?.styleName || null,
+          headingLevel: Number.isFinite(Number(b?.headingLevel)) ? Number(b.headingLevel) : null,
+          numberingSignature: b?.numberingSignature || null,
+          alignment: b?.alignment || null,
+        }));
+
+      let res;
+      try {
+        res = await api.get(`/api/documents/${docId}/editing/docx-html`, {
+          params: { ts: Date.now() },
+          headers: {
+            'Cache-Control': 'no-cache',
+            Pragma: 'no-cache',
+          },
+        });
+      } catch (e) {
+        const status = Number(e?.response?.status || 0);
+        // Backward compatibility: some deployed backends do not expose /editing/docx-html.
+        // Fallback to /editing/anchors and build paragraph blocks client-side.
+        if (status !== 404) throw e;
+        const anchorsRes = await api.get(`/api/documents/${docId}/editing/anchors`, {
+          params: { ts: Date.now() },
+          headers: {
+            'Cache-Control': 'no-cache',
+            Pragma: 'no-cache',
+          },
+        });
+        res = { data: { blocks: normalizeBlocks(anchorsRes?.data?.paragraphs) } };
+      }
+
+      const nextBlocks = normalizeBlocks(res?.data?.blocks);
       setBlocks(nextBlocks);
       onBlocksLoadedRef.current?.(nextBlocks);
       // Initialize local baseline HTML so we can detect formatting-only changes without reloading.

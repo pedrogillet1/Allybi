@@ -19,7 +19,10 @@ const router = Router();
 
 let _gcs: GcsStorageService | null = null;
 function gcs(): GcsStorageService {
-  if (!_gcs) _gcs = new GcsStorageService();
+  if (!_gcs) {
+    _gcs = new GcsStorageService();
+    _gcs.ensureBucketCors().catch(() => {});
+  }
   return _gcs;
 }
 

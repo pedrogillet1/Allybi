@@ -42,12 +42,10 @@ export function getApiBaseUrl() {
     // If env is explicitly set for non-prod hosts, honor it.
     if (env) return env;
 
-    // Local dev default: use HTTPS (backend runs with mkcert TLS).
-    if (isLocalHost(host)) return `https://${host}:5000`;
-    // Local network (e.g. testing from mobile on same Wi-Fi):
-    // Use same-origin so requests go through the CRA dev proxy (/api → backend).
-    // This avoids self-signed cert issues on mobile devices.
-    if (isPrivateLanHost(host)) return '';
+    // Local dev & LAN: use same-origin so requests go through the CRA dev proxy
+    // (/api → backend:5000). This ensures cookies work (same origin) and avoids
+    // self-signed cert issues on mobile devices.
+    if (isLocalHost(host) || isPrivateLanHost(host)) return '';
     return origin;
   }
 
@@ -69,10 +67,11 @@ export function getWsBaseUrl() {
 
     if (env) return env;
 
-    // Local dev default: use WSS to match the HTTPS API default.
-    if (isLocalHost(host)) return `wss://${host}:5000`;
-    // LAN: use ws on same host (CRA proxy handles it).
-    if (isPrivateLanHost(host)) return `ws://${host}:3000`;
+    // Local dev & LAN: use same-origin websocket via CRA proxy.
+    if (isLocalHost(host) || isPrivateLanHost(host)) {
+      const port = window.location.port || (window.location.protocol === 'https:' ? '443' : '80');
+      return `ws://${host}:${port}`;
+    }
     return `${proto}//${window.location.host}`;
   }
 

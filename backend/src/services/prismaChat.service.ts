@@ -70,6 +70,12 @@ import type { DocxParagraphNode, EditDomain, EditOperator, ResolvedTarget } from
 import { extractXlsxWithAnchors } from './extraction/xlsxExtractor.service';
 import ExcelJS from 'exceljs';
 
+const VISIBLE_CHAT_DOC_FILTER = {
+  status: { notIn: ['failed', 'uploading', 'deleted', 'skipped'] },
+  parentVersionId: null,
+  encryptedFilename: { not: { contains: '/connectors/' } },
+};
+
 /* ---------------------------------------------
  * Minimal service contracts (align with controller)
  * -------------------------------------------- */
@@ -12121,7 +12127,7 @@ export class PrismaChatService {
     const documents = await prisma.document.findMany({
       where: {
         userId,
-        status: { notIn: ["failed", "uploading"] },
+        ...VISIBLE_CHAT_DOC_FILTER,
       },
       select: { filename: true, encryptedFilename: true, folderId: true },
       orderBy: { createdAt: "asc" },
@@ -12396,9 +12402,7 @@ export class PrismaChatService {
       prisma.document.findMany({
         where: {
           userId,
-          status: { notIn: ['failed', 'uploading'] },
-          // Connector artifacts must never appear as "Documents" in the library UI or chat listings.
-          encryptedFilename: { not: { contains: '/connectors/' } },
+          ...VISIBLE_CHAT_DOC_FILTER,
         },
         select: { id: true, filename: true, encryptedFilename: true, mimeType: true, folderId: true },
         orderBy: { createdAt: 'desc' },
@@ -12503,8 +12507,7 @@ export class PrismaChatService {
       prisma.document.findMany({
         where: {
           userId,
-          status: { notIn: ['failed', 'uploading'] },
-          encryptedFilename: { not: { contains: '/connectors/' } },
+          ...VISIBLE_CHAT_DOC_FILTER,
         },
         select: { id: true, filename: true, encryptedFilename: true, mimeType: true, folderId: true },
         orderBy: { createdAt: 'desc' },
@@ -12864,10 +12867,7 @@ export class PrismaChatService {
     const allDocs = await prisma.document.findMany({
       where: {
         userId,
-        status: { notIn: ['failed', 'uploading'] },
-        encryptedFilename: { not: { contains: '/connectors/' } },
-        // Exclude revision artifacts so the assistant edits the user's primary document.
-        parentVersionId: null,
+        ...VISIBLE_CHAT_DOC_FILTER,
         OR: searchTerms.flatMap(term => [
           { filename: { contains: term, mode: 'insensitive' as const } },
           { encryptedFilename: { contains: term, mode: 'insensitive' as const } },
@@ -13002,7 +13002,7 @@ export class PrismaChatService {
         orderBy: { name: 'asc' },
       }),
       prisma.document.findMany({
-        where: { userId, folderId, status: { notIn: ['failed', 'uploading'] } },
+        where: { userId, folderId, ...VISIBLE_CHAT_DOC_FILTER },
         select: { id: true, filename: true, encryptedFilename: true, mimeType: true },
         orderBy: { createdAt: 'desc' },
       }),
@@ -13012,7 +13012,7 @@ export class PrismaChatService {
     const folderDocCounts = await Promise.all(
       childFolders.map(async (f) => {
         const count = await prisma.document.count({
-          where: { userId, folderId: f.id, status: { notIn: ['failed', 'uploading'] } },
+          where: { userId, folderId: f.id, ...VISIBLE_CHAT_DOC_FILTER },
         });
         return { folderId: f.id, count };
       })
@@ -13063,7 +13063,7 @@ export class PrismaChatService {
 
       // Get docs in this folder
       const docs = await prisma.document.findMany({
-        where: { userId, folderId: currentId, status: { notIn: ['failed', 'uploading'] } },
+        where: { userId, folderId: currentId, ...VISIBLE_CHAT_DOC_FILTER },
         select: { id: true },
       });
       for (const d of docs) docIds.push(d.id);

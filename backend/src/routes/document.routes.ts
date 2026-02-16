@@ -29,6 +29,15 @@ import sheetsStudioRouter from "./sheetsStudio.routes";
 
 const router = Router();
 
+const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+function isDocxDocumentLike(input: { mimeType?: string | null; filename?: string | null }): boolean {
+  const mime = String(input?.mimeType || "").trim().toLowerCase();
+  if (mime === DOCX_MIME) return true;
+  const name = String(input?.filename || "").trim().toLowerCase();
+  return name.endsWith(".docx");
+}
+
 // pdf-parse (v2+) exports the PDFParse class which can parse bytes/URLs.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { PDFParse } = require("pdf-parse");
@@ -608,7 +617,7 @@ router.get("/:id/editing/anchors", rateLimitMiddleware, async (req: any, res: Re
     const mime = (doc.mimeType || "").toLowerCase();
     const bytes = await downloadFile(doc.encryptedFilename);
 
-    if (mime === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+    if (isDocxDocumentLike(doc)) {
       const anchors = new DocxAnchorsService();
       const paragraphs = await anchors.extractParagraphNodes(bytes);
       res.json({
@@ -659,8 +668,7 @@ router.get("/:id/editing/suggestions", rateLimitMiddleware, async (req: any, res
     if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
     if (!doc.encryptedFilename) { res.status(422).json({ error: "Document storage key missing" }); return; }
 
-    const mime = (doc.mimeType || "").toLowerCase();
-    if (mime !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+    if (!isDocxDocumentLike(doc)) {
       res.status(400).json({ error: "Suggestions are only available for DOCX files." });
       return;
     }
@@ -712,8 +720,7 @@ router.get("/:id/editing/docx-html", rateLimitMiddleware, async (req: any, res: 
     if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
     if (!doc.encryptedFilename) { res.status(422).json({ error: "Document storage key missing" }); return; }
 
-    const mime = (doc.mimeType || "").toLowerCase();
-    if (mime !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+    if (!isDocxDocumentLike(doc)) {
       res.status(400).json({ error: "docx-html is only available for DOCX files." });
       return;
     }

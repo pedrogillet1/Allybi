@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef, startTransition } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { getApiBaseUrl } from '../services/runtimeConfig';
 import api from '../services/api';
@@ -250,12 +250,11 @@ export const DocumentsProvider = ({ children }) => {
         cachedRecent = cachedRecent.filter(doc => !tombstoneIds.has(doc.id));
       }
 
-      // ✅ OPTIMIZATION: Use startTransition for cached data too
-      startTransition(() => {
-        setDocuments(cachedDocs);
-        setFolders(cachedFolders);
-        setRecentDocuments(cachedRecent);
-      });
+      // ✅ FIX: Apply cached data immediately (startTransition can defer updates
+      // causing stale data to persist across page navigations)
+      setDocuments(cachedDocs);
+      setFolders(cachedFolders);
+      setRecentDocuments(cachedRecent);
       return;
     }
 
@@ -332,13 +331,12 @@ export const DocumentsProvider = ({ children }) => {
         timestamp: now
       };
 
-      // ✅ OPTIMIZATION: Use startTransition for non-urgent state updates (save 500ms-1s)
-      // This allows React to prioritize urgent updates like user input
-      startTransition(() => {
-        setDocuments(filteredDocs);
-        setFolders(decryptedFolders);
-        setRecentDocuments(filteredRecent);
-      });
+      // ✅ FIX: Apply state immediately to avoid stale data across page navigations.
+      // startTransition deferrals caused the Home screen to show outdated documents
+      // when the Documents page had already fetched fresh data.
+      setDocuments(filteredDocs);
+      setFolders(decryptedFolders);
+      setRecentDocuments(filteredRecent);
 
     } catch (error) {
 
@@ -518,8 +516,8 @@ export const DocumentsProvider = ({ children }) => {
         }
         lastRefresh = Date.now();
 
-        // ✅ OPTIMIZATION: Use batched endpoint for refresh
-        fetchAllData();
+        // ✅ FIX: Force refresh to avoid stale cached data overwriting fresh state
+        fetchAllData(true);
       }, REFRESH_DELAY);
     };
 
@@ -1755,6 +1753,10 @@ export const DocumentsProvider = ({ children }) => {
 
   // Refresh all data
   const refreshAll = useCallback(async () => {
+
+    // ✅ FIX: Invalidate fetchAllData cache so stale cached data can't overwrite
+    // the fresh data we're about to fetch via individual endpoints.
+    cacheRef.current = { data: null, timestamp: 0 };
 
     // ✅ FIX: Wait for all promises to complete before returning
     // This ensures that when refreshAll() is called, it waits for all data to be loaded

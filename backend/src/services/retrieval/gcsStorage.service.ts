@@ -189,6 +189,41 @@ export class GcsStorageService {
   }
 
   // ===========================================================================
+  // CORS CONFIGURATION
+  // ===========================================================================
+
+  /**
+   * Ensure the GCS bucket has CORS configured for browser-based uploads.
+   * Safe to call on every boot — idempotent (overwrites with same config).
+   */
+  async ensureBucketCors(origins?: string[]): Promise<void> {
+    try {
+      const allowedOrigins = origins ?? [
+        'https://allybi.co',
+        'https://www.allybi.co',
+        'https://app.allybi.co',
+        ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+        'http://localhost:3000',
+      ];
+      // Deduplicate
+      const unique = [...new Set(allowedOrigins)];
+
+      await this.bucket().setCorsConfiguration([
+        {
+          origin: unique,
+          method: ['PUT', 'GET', 'HEAD', 'OPTIONS'],
+          responseHeader: ['Content-Type', 'Content-Length', 'x-goog-resumable'],
+          maxAgeSeconds: 3600,
+        },
+      ]);
+      console.log(`✅ GCS bucket CORS configured for: ${unique.join(', ')}`);
+    } catch (err) {
+      // Non-fatal — bucket may already have CORS or service account lacks storage.buckets.update.
+      console.warn('⚠️  Failed to set GCS bucket CORS (uploads may fail from browser):', (err as Error).message);
+    }
+  }
+
+  // ===========================================================================
   // RESUMABLE UPLOADS (GCS native)
   // ===========================================================================
 

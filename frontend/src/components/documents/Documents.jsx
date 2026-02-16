@@ -1462,7 +1462,7 @@ const Documents = () => {
         }}
         categoryId={uploadCategoryId}
         onUploadComplete={() => {
-          // No manual refresh needed - context auto-updates!
+          refreshAll();
         }}
       />
 
@@ -1473,10 +1473,11 @@ const Documents = () => {
           setShowUniversalUploadModal(false);
           setDroppedFiles(null);
           setUploadCategoryId(null);
+          refreshAll();
         }}
         categoryId={uploadCategoryId}
         onUploadComplete={() => {
-          // No manual refresh needed - context auto-updates!
+          refreshAll();
         }}
         initialFiles={droppedFiles}
       />
