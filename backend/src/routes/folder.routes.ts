@@ -138,10 +138,10 @@ router.patch("/:id", authMiddleware, rateLimitMiddleware, validate(folderUpdateS
   const folderId = req.params.id;
   if (!folderId) { res.status(400).json({ ok: false, error: { code: "VALIDATION_FOLDER_ID_REQUIRED", message: "Folder id is required." } }); return; }
 
-  const { name, emoji } = req.body;
+  const { name, emoji, parentId } = req.body;
 
-  if (!name && emoji === undefined) {
-    res.status(400).json({ ok: false, error: { code: "VALIDATION_UPDATE_REQUIRED", message: "Provide at least one of: name, emoji." } });
+  if (!name && emoji === undefined && parentId === undefined) {
+    res.status(400).json({ ok: false, error: { code: "VALIDATION_UPDATE_REQUIRED", message: "Provide at least one of: name, emoji, parentId." } });
     return;
   }
 
@@ -150,9 +150,16 @@ router.patch("/:id", authMiddleware, rateLimitMiddleware, validate(folderUpdateS
     const existing = await prisma.folder.findFirst({ where: { id: folderId, userId } });
     if (!existing) { res.status(404).json({ ok: false, error: { code: "FOLDER_NOT_FOUND", message: "Folder not found." } }); return; }
 
+    // Prevent moving a folder into itself
+    if (parentId && parentId === folderId) {
+      res.status(400).json({ ok: false, error: { code: "INVALID_PARENT", message: "Cannot move a folder into itself." } });
+      return;
+    }
+
     const updateData: any = {};
     if (name) updateData.name = name.trim();
     if (emoji !== undefined) updateData.emoji = emoji || null;
+    if (parentId !== undefined) updateData.parentFolderId = parentId || null;
 
     const folder = await prisma.folder.update({
       where: { id: folderId },

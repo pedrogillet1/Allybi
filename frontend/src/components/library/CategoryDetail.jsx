@@ -475,7 +475,6 @@ const CategoryDetail = () => {
     if (downloadingFolderId) return;
     setOpenFolderMenuId(null);
     setDownloadingFolderId(folder.id);
-    showInfo(t('alerts.preparingFolderDownload', { name: folder.name }));
     try {
       const response = await api.get(`/api/folders/${folder.id}/download`, {
         responseType: 'blob'
@@ -488,6 +487,7 @@ const CategoryDetail = () => {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      showSuccess(t('alerts.downloadedFile', { name: folder.name }));
     } catch (error) {
       showError(t('alerts.failedToDownload'));
     } finally {

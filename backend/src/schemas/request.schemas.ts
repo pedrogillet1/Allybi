@@ -104,6 +104,7 @@ export const folderUpdateSchema = z.object({
   emoji: z.string().max(20).nullable().optional(),
   color: z.string().max(20).optional(),
   description: z.string().max(1000).optional(),
+  parentId: z.string().uuid().nullable().optional(),
 }).passthrough();
 
 export const folderBulkSchema = z.object({

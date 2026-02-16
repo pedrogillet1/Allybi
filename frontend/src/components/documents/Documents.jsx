@@ -1205,7 +1205,6 @@ const Documents = () => {
                 }}
                 onDownloadCategory={async (cat) => {
                   try {
-                    showSuccess(t('alerts.preparingFolderDownload', { name: cat.name }));
                     const response = await api.get(`/api/folders/${cat.id}/download`, { responseType: 'blob' });
                     const url = window.URL.createObjectURL(response.data);
                     const link = document.createElement('a');
@@ -1215,6 +1214,7 @@ const Documents = () => {
                     link.click();
                     document.body.removeChild(link);
                     window.URL.revokeObjectURL(url);
+                    showSuccess(t('alerts.downloadedFile', { name: cat.name }));
                   } catch (error) {
                     showError(t('alerts.failedToDownload'));
                   }
