@@ -406,6 +406,7 @@ const DocumentViewer = () => {
     if (!document?.filename && !document?.mimeType) return 'unknown';
     return getFileType(document?.filename, document?.mimeType);
   }, [document?.filename, document?.mimeType]);
+  const supportsViewerEditing = currentFileType === 'word' || currentFileType === 'excel';
 
   // ---------------------------------------------------------------------------
   // Embedded editing panel (Ask Allybi -> assistant panel)
@@ -475,6 +476,10 @@ const DocumentViewer = () => {
   // Deep-link behavior: open editor + choose tab
   useEffect(() => {
     if (!initialEditOpenParam) return;
+    if (!supportsViewerEditing) {
+      showInfo(t('documentViewer.comingSoon'));
+      return;
+    }
     setEditingOpen(true);
     if (initialTabParam === 'targets' || initialTabParam === 'changes' || initialTabParam === 'ask') {
       setAssistantTab(initialTabParam);
@@ -483,18 +488,23 @@ const DocumentViewer = () => {
     }
     setViewerFocusNonce((n) => n + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialEditOpenParam, initialTabParam, documentId]);
+  }, [initialEditOpenParam, initialTabParam, documentId, supportsViewerEditing, showInfo, t]);
 
   // Deep-link behavior: load an edit_session into the viewer canvas/queue without
   // injecting an edit card into chat (viewer chat stays clean; Changes tab is the review surface).
   useEffect(() => {
     if (!injectedEditSession) return;
+    if (!supportsViewerEditing) {
+      showInfo(t('documentViewer.comingSoon'));
+      setInjectedEditSession(null);
+      return;
+    }
     setEditingOpen(true);
     setAssistantTab('changes');
     setViewerFocusNonce((n) => n + 1);
     setInjectedEditSessionForDraft(injectedEditSession);
     setInjectedEditSession(null);
-  }, [injectedEditSession]);
+  }, [injectedEditSession, supportsViewerEditing, showInfo, t]);
 
   // Session-only behavior: when leaving the document viewer (or switching docs),
   // delete the backing conversation so it never becomes part of the main chat universe.
@@ -1349,7 +1359,7 @@ const DocumentViewer = () => {
     const wasOpen = editingOpenRef.current;
     const next = !wasOpen;
 
-    if (next && currentFileType !== 'word' && currentFileType !== 'excel') {
+    if (next && !supportsViewerEditing) {
       showInfo(t('documentViewer.comingSoon'));
       return;
     }
@@ -1444,10 +1454,10 @@ const DocumentViewer = () => {
     }
     setShowAskKoda(false);
     try { sessionStorage.setItem('askKodaDismissed', 'true'); } catch {}
-  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, clearSelectionBubble, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, refreshFrozenOverlay, currentFileType, showInfo, t]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, clearSelectionBubble, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, refreshFrozenOverlay, supportsViewerEditing, showInfo, t]);
 
   const openEditingPanel = useCallback(({ seedSelection = true, focusInput = true } = {}) => {
-    if (currentFileType !== 'word' && currentFileType !== 'excel') {
+    if (!supportsViewerEditing) {
       showInfo(t('documentViewer.comingSoon'));
       return;
     }
@@ -1561,7 +1571,7 @@ const DocumentViewer = () => {
       }
     }
     if (focusInput) setViewerFocusNonce((n) => n + 1);
-  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, refreshFrozenOverlay, currentFileType, frozenSelection, liveViewerSelection, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, showInfo, t]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, refreshFrozenOverlay, supportsViewerEditing, frozenSelection, liveViewerSelection, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, showInfo, t]);
 
   // Measure container width for responsive PDF/DOCX sizing
   useEffect(() => {
@@ -3047,13 +3057,26 @@ const DocumentViewer = () => {
       // then apply once to create a single new revision.
       if (sessionDomain === 'docx' && String(session?.operator) === 'EDIT_DOCX_BUNDLE' && session?.bundle && Array.isArray(session?.bundlePatches)) {
         await docxCanvasRef.current?.applyParagraphPatches?.({ draftId: entryId, patches: session.bundlePatches });
+        let bundlePayloadText = String(session.proposedText || '').trim();
+        if (!bundlePayloadText) {
+          bundlePayloadText = JSON.stringify({ patches: session.bundlePatches });
+        } else {
+          try {
+            const parsed = JSON.parse(bundlePayloadText);
+            const hasPatches = Array.isArray(parsed?.patches) && parsed.patches.length > 0;
+            if (!hasPatches) bundlePayloadText = JSON.stringify({ patches: session.bundlePatches });
+          } catch {
+            bundlePayloadText = JSON.stringify({ patches: session.bundlePatches });
+          }
+        }
         const res = await applyEdit({
           instruction: String(session.instruction || '').trim() || `Bulk edit in viewer: ${cleanDocumentName(document?.filename)}`,
           operator: 'EDIT_DOCX_BUNDLE',
           domain: 'docx',
           documentId: session.documentId,
           beforeText: String(session.beforeText || '(bulk edit)'),
-          proposedText: String(session.proposedText || ''),
+          proposedText: bundlePayloadText,
+          bundlePatches: Array.isArray(session.bundlePatches) ? session.bundlePatches : undefined,
           idempotencyKey: `viewer:${entryId}:bundle`,
           expectedDocumentUpdatedAtIso: session?.baseDocumentUpdatedAtIso || undefined,
           expectedDocumentFileHash: session?.baseDocumentFileHash || undefined,
@@ -3167,7 +3190,8 @@ const DocumentViewer = () => {
         targetHint: session?.targetHint || undefined,
         target: resolvedTarget || undefined,
         beforeText: String(session.beforeText || '').trim() || '(empty)',
-        proposedText: String(session?.diff?.after || session.proposedText || '').trim() || '(empty)',
+        // Always prefer canonical proposedText. diff.after can be a UI snippet, not full paragraph content.
+        proposedText: String(session.proposedText || session?.diff?.after || '').trim() || '(empty)',
         idempotencyKey: `viewer:${entryId}:apply`,
         expectedDocumentUpdatedAtIso: session?.baseDocumentUpdatedAtIso || undefined,
         expectedDocumentFileHash: session?.baseDocumentFileHash || undefined,

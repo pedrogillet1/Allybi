@@ -19,6 +19,7 @@ import { SheetsTableService } from "./sheets/sheetsTable.service";
 import SheetsBridgeService from "./sheets/sheetsBridge.service";
 import { SheetsBridgeError } from "./sheets/sheetsBridge.service";
 import { SheetsClientError } from "./sheets/sheetsClient.service";
+import { looksLikeTruncatedSpanPayload } from "./docxSpanPayloadGuard";
 
 function asString(v: unknown): string | null {
   return typeof v === "string" && v.trim() ? v.trim() : null;
@@ -317,10 +318,21 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     const userId = input.userId.trim();
     const meta = input.metadata ?? {};
 
-    const op = asString(meta.operator) as EditOperatorLike | null;
+    let op = asString(meta.operator) as EditOperatorLike | null;
     if (!op) throw new Error("Missing edit operator in revision metadata.");
 
-    const targetId = asString(meta.targetId) ?? null;
+    const rawTargetId = asString(meta.targetId) ?? null;
+    const isSyntheticTarget = Boolean(rawTargetId?.startsWith("synthetic:"));
+    // Synthetic targets (e.g. "synthetic:bulk_sheet_edit") are placeholders from editHandler
+    // for operators that don't anchor to a specific cell — strip them so operator branches
+    // that require real cell references (Sheet1!A1) don't choke on them.
+    const targetId = isSyntheticTarget ? null : rawTargetId;
+    // When the target is synthetic but the operator resolved to a cell-anchored type
+    // (e.g. EDIT_CELL/EDIT_RANGE due to canonicalOperator normalization mismatch),
+    // reroute to COMPUTE_BUNDLE which handles bulk ops without a real target.
+    if (isSyntheticTarget && (op === "EDIT_CELL" || op === "EDIT_RANGE")) {
+      op = "COMPUTE_BUNDLE";
+    }
     const beforeText = asString(meta.beforeText) ?? null;
     const contentFormat = asString(meta.contentFormat) === "html" ? "html" : "plain";
 
@@ -384,6 +396,14 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       if (!targetId) throw new Error("EDIT_SPAN requires targetId.");
       // EDIT_SPAN still commits a full paragraph payload (plain or html), but the
       // intent/operator is used for auditability and policy.
+      if (contentFormat !== "html") {
+        const beforeMeta = asString(meta.beforeText) || "";
+        if (looksLikeTruncatedSpanPayload(beforeMeta, String(input.content || ""))) {
+          throw new Error(
+            "EDIT_SPAN received span-only content. Please retry the edit; the full sentence/paragraph must be preserved.",
+          );
+        }
+      }
       edited = await this.docxEditor.applyParagraphEdit(original, targetId, input.content, { format: contentFormat });
     } else if (op === "EDIT_DOCX_BUNDLE") {
       assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "EDIT_DOCX_BUNDLE");

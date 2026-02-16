@@ -242,7 +242,8 @@ export default function EditSessionCard({ session, onOpenDoc }) {
         beforeText: safeString(session.beforeText || beforeText || "(bulk edit)"),
         proposedText: isBundle
           ? rawProposedText
-          : (hasStructuredRawProposed && !manualEdit ? rawProposedText : safeString(draftAfter)),
+          // Prefer canonical proposedText; draftAfter may be a shortened diff rendering.
+          : safeString(rawProposedText || (hasStructuredRawProposed && !manualEdit ? rawProposedText : draftAfter)),
         userConfirmed: requiresConfirmation ? confirmed : true,
       };
 
