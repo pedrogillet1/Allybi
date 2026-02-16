@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, startTransition, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useDropzone } from 'react-dropzone';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 import LeftNav from '../app-shell/LeftNav';
 import NotificationPanel from '../notifications/NotificationPanel';
@@ -65,20 +64,6 @@ const SUPPORTED_FORMATS = [
 ];
 
 // Build the accept map from SUPPORTED_FORMATS for useDropzone
-const DROPZONE_ACCEPT = {
-  'application/pdf': ['.pdf'],
-  'application/msword': ['.doc'],
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
-  'application/vnd.ms-powerpoint': ['.ppt'],
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx'],
-  'application/vnd.ms-excel': ['.xls'],
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
-  'image/jpeg': ['.jpg', '.jpeg'],
-  'image/png': ['.png'],
-  'audio/mpeg': ['.mp3'],
-  'video/mp4': ['.mp4'],
-};
-
 /**
  * Filter Mac hidden files before upload
  * Mac creates .DS_Store, __MACOSX, and other system files that cause 400 errors
@@ -712,67 +697,8 @@ const UploadHub = () => {
     return hashHex;
   };
 
-  const { getRootProps, getInputProps, open} = useDropzone({
-    onDrop: (acceptedFiles) => {
-      // ⚡ PERFORMANCE: Start timing
-      const startTime = performance.now();
-
-      // ✅ CRITICAL: Filter Mac hidden files (.DS_Store, __MACOSX, etc.)
-      const filteredFiles = filterMacHiddenFiles(acceptedFiles);
-
-      if (filteredFiles.length === 0) {
-        return;
-      }
-
-      // 🔍 FILE-TYPE INTELLIGENCE: Analyze before adding to queue
-      const analysis = analyzeFileBatch(filteredFiles);
-      const notifications = determineNotifications(analysis);
-
-      // Show file-type notifications
-      notifications.forEach(notif => {
-        if (notif.type === 'unsupportedFiles') {
-          showUnsupportedFiles(notif.data);
-        } else if (notif.type === 'limitedSupportFiles') {
-          showLimitedSupportFiles(notif.data);
-        } else if (notif.type === 'fileTypeDetected') {
-          showFileTypeDetected(notif.data);
-        }
-      });
-
-      // Filter out unsupported files
-      const supportedFiles = filteredFiles.filter(file => {
-        const isUnsupported = analysis.unsupportedFiles.some(uf => uf.name === file.name);
-        return !isUnsupported;
-      });
-
-      if (supportedFiles.length === 0) {
-        return; // All files unsupported
-      }
-
-      // Just add files to the list without uploading
-      const destId = selectedDestinationRef.current || null;
-      const destName = getDestinationName(destId);
-      const pendingFiles = supportedFiles.map(file => ({
-        file,
-        status: 'pending',
-        progress: 0,
-        error: null,
-        folderId: destId,
-        category: destName,
-        path: file.path || file.name, // Preserve folder structure
-        folderPath: file.path ? file.path.substring(0, file.path.lastIndexOf('/')) : null
-      }));
-
-      // ⚡ PERFORMANCE: Use startTransition for non-urgent UI update
-      startTransition(() => {
-        setUploadingFiles(prev => [...pendingFiles, ...prev]);
-      });
-    },
-    accept: DROPZONE_ACCEPT,
-    maxSize: 500 * 1024 * 1024, // 500MB max file size
-    multiple: true,
-    noClick: true,
-  });
+  // Note: drag-and-drop is handled by custom handlers (handleDrop) on the main
+  // content container. Button file selection uses fileInputRef / folderInputRef.
 
   // Drag and drop overlay handlers
   const handleDragEnter = (e) => {
@@ -829,13 +755,17 @@ const UploadHub = () => {
         return;
       }
 
-      // Check folder file limits
+      // Apply selected destination and check folder file limits
+      const destId = selectedDestinationRef.current || null;
+      const destName = getDestinationName(destId);
       const allowed = [];
       for (const item of processedItems) {
         if (item.isFolder && item.fileCount > UPLOAD_CONFIG.MAX_FOLDER_FILES) {
           showError(`Folder "${item.folderName}" has ${item.fileCount} files. Maximum is ${UPLOAD_CONFIG.MAX_FOLDER_FILES} files per folder.`);
           continue;
         }
+        item.folderId = destId;
+        item.category = destName;
         allowed.push(item);
       }
       if (allowed.length === 0) return;
@@ -2865,7 +2795,7 @@ const UploadHub = () => {
           }}>
 
             {/* ═══ LEFT: Add files Card (span 8) ═══ */}
-            <div {...getRootProps()} style={{
+            <div style={{
               background: 'white', borderRadius: 16, border: '1px solid #E6E6EC',
               boxShadow: '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)',
               padding: 24, display: 'flex', flexDirection: 'column',
@@ -2875,7 +2805,6 @@ const UploadHub = () => {
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#D0D0D5'; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E6E6EC'; }}
             >
-              <input {...getInputProps()} />
 
               {/* Card header */}
               <h3 style={{
