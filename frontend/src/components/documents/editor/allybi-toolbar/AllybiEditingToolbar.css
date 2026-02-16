@@ -682,6 +682,72 @@
   }
 }
 
+@media (max-width: 768px) {
+  .formatting-toolbar.allybi-one-line {
+    height: auto;
+    min-height: 40px;
+    padding: 6px 8px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .allybi-toolbar-center {
+    max-width: none;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    justify-content: flex-start;
+  }
+
+  .allybi-excel-row {
+    min-width: max-content;
+    padding: 0;
+    gap: 6px;
+  }
+
+  .allybi-excel-center {
+    gap: 6px;
+  }
+
+  .allybi-excel-formatting {
+    gap: 6px;
+  }
+
+  .toolbar-btn.allybi-font-trigger,
+  .toolbar-btn.allybi-size-trigger {
+    height: 30px;
+    padding: 0 8px;
+    gap: 6px;
+  }
+
+  .allybi-font-label {
+    max-width: 76px;
+  }
+
+  .toolbar-btn.allybi-size-trigger .allybi-font-label {
+    min-width: 32px;
+  }
+
+  .toolbar-input.allybi-excel-value {
+    min-height: 30px;
+    height: 30px;
+    padding: 6px 8px;
+  }
+
+  .allybi-excel-status {
+    display: none;
+  }
+
+  .allybi-toolbar-zoom {
+    position: static;
+    right: auto;
+    top: auto;
+    transform: none;
+    margin-left: auto;
+    padding-right: 2px;
+  }
+}
+
 .allybi-font-menu {
   position: relative;
 }

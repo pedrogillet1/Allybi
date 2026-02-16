@@ -4,20 +4,20 @@ import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useAuthGate } from '../auth/ProtectedRoute';
 import { useAuthModal, isAuthPathname } from '../../context/AuthModalContext';
-import { TAB_CONFIG, getTabIndexFromPath } from '../../config/tabConfig';
+import { TAB_CONFIG } from '../../config/tabConfig';
 
-// Import icons - outline only
-import { ReactComponent as HouseIcon } from '../../assets/House.svg';
-import { ReactComponent as UploadIcon } from '../../assets/upload.svg';
-import { ReactComponent as MessageIcon } from '../../assets/Message circle.svg';
-import { ReactComponent as SettingsIcon } from '../../assets/Settings.svg';
+// Keep mobile nav icons aligned with desktop sidebar icon set.
+import homeSidebarIcon from '../../assets/home-sidebar-icon.svg';
+import uploadSidebarIcon from '../../assets/upload-sidebar-icon.svg';
+import chatSidebarIcon from '../../assets/chat-sidebar-icon.svg';
+import settingsSidebarIcon from '../../assets/settings-sidebar-icon.svg';
 
 // Icon map for dynamic rendering
 const ICON_MAP = {
-  home: HouseIcon,
-  upload: UploadIcon,
-  chat: MessageIcon,
-  settings: SettingsIcon,
+  home: homeSidebarIcon,
+  upload: uploadSidebarIcon,
+  chat: chatSidebarIcon,
+  settings: settingsSidebarIcon,
 };
 
 /**
@@ -33,15 +33,14 @@ const MobileBottomNav = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { triggerAuthGate, isUnauthenticated } = useAuthGate();
-  const { backgroundLocation } = useAuthModal();
+  const { backgroundLocation, isOpen: authModalOpen } = useAuthModal();
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
-  // Get current tab index for highlighting
+  // Resolve path against auth background location when modal routes are active.
   const effectivePathname =
     (isAuthPathname(location.pathname) && backgroundLocation?.pathname)
       ? backgroundLocation.pathname
       : location.pathname;
-  const currentTabIndex = getTabIndexFromPath(effectivePathname);
 
   // Mobile Keyboard Detection: Hide nav when keyboard opens
   useEffect(() => {
@@ -78,8 +77,8 @@ const MobileBottomNav = () => {
                       effectivePathname.startsWith('/v/') ||
                       effectivePathname.startsWith('/r/');
 
-  // Don't render on desktop or on auth pages
-  if (!isMobile || isAuthRoute) return null;
+  // Don't render on desktop, auth pages, or when auth modal is open
+  if (!isMobile || isAuthRoute || authModalOpen) return null;
 
   // Check if current path matches any of the item's paths
   const isActive = (tabConfig) => {
@@ -125,7 +124,7 @@ const MobileBottomNav = () => {
     >
       {TAB_CONFIG.map((tabConfig) => {
         const active = isActive(tabConfig);
-        const Icon = ICON_MAP[tabConfig.id];
+        const iconSrc = ICON_MAP[tabConfig.id];
 
         return (
           <div
@@ -159,12 +158,17 @@ const MobileBottomNav = () => {
                 transition: 'background 0.2s ease'
               }}
             >
-              {Icon && (
-                <Icon
+              {iconSrc && (
+                <img
+                  src={iconSrc}
+                  alt=""
+                  aria-hidden="true"
                   style={{
                     width: '20px',
                     height: '20px',
-                    color: '#FFFFFF'
+                    objectFit: 'contain',
+                    imageRendering: 'auto',
+                    WebkitFontSmoothing: 'antialiased',
                   }}
                 />
               )}
