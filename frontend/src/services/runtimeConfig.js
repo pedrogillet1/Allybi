@@ -9,35 +9,74 @@ function trimTrailingSlash(url) {
   return String(url || '').replace(/\/+$/, '');
 }
 
+function isLocalHost(host) {
+  return host === 'localhost' || host === '127.0.0.1';
+}
+
+function isPrivateLanHost(host) {
+  return /^(10|172\.(1[6-9]|2\d|3[01])|192\.168)\./.test(host);
+}
+
+function isKnownProdWebHost(host) {
+  return [
+    'allybi.co',
+    'www.allybi.co',
+    'app.allybi.co',
+    'getkoda.ai',
+    'www.getkoda.ai',
+    'app.getkoda.ai',
+  ].includes(String(host || '').toLowerCase());
+}
+
 export function getApiBaseUrl() {
   const env = trimTrailingSlash(process.env.REACT_APP_API_URL);
-  if (env) return env;
 
   // Browser context: choose a safe default based on hostname.
   if (typeof window !== 'undefined' && window.location) {
     const host = window.location.hostname;
-    // Local dev default: use HTTP to avoid self-signed cert issues (ERR_CERT_AUTHORITY_INVALID).
-    // If you have trusted local TLS, override with REACT_APP_API_URL=https://localhost:5000.
-    if (host === 'localhost' || host === '127.0.0.1') return `http://${host}:5002`;
-    return trimTrailingSlash(window.location.origin);
+    const origin = trimTrailingSlash(window.location.origin);
+
+    // In production web hosts, always use same-origin to avoid CORS/cookie redirects.
+    if (isKnownProdWebHost(host)) return origin;
+
+    // If env is explicitly set for non-prod hosts, honor it.
+    if (env) return env;
+
+    // Local dev default: use HTTPS (backend runs with mkcert TLS).
+    if (isLocalHost(host)) return `https://${host}:5000`;
+    // Local network (e.g. testing from mobile on same Wi-Fi):
+    // Use same-origin so requests go through the CRA dev proxy (/api → backend).
+    // This avoids self-signed cert issues on mobile devices.
+    if (isPrivateLanHost(host)) return '';
+    return origin;
   }
 
+  if (env) return env;
+
   // Node/tests fallback.
-  return 'http://localhost:5002';
+  return 'http://localhost:5000';
 }
 
 export function getWsBaseUrl() {
   const env = trimTrailingSlash(process.env.REACT_APP_WS_URL);
-  if (env) return env;
 
   if (typeof window !== 'undefined' && window.location) {
     const host = window.location.hostname;
     const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    // Local dev default: use WS (not WSS) to match the HTTP API default.
-    // Override with REACT_APP_WS_URL=wss://localhost:5000 if using trusted local TLS.
-    if (host === 'localhost' || host === '127.0.0.1') return `ws://${host}:5002`;
+
+    // In production web hosts, always use same-origin websocket endpoint.
+    if (isKnownProdWebHost(host)) return `${proto}//${window.location.host}`;
+
+    if (env) return env;
+
+    // Local dev default: use WSS to match the HTTPS API default.
+    if (isLocalHost(host)) return `wss://${host}:5000`;
+    // LAN: use ws on same host (CRA proxy handles it).
+    if (isPrivateLanHost(host)) return `ws://${host}:3000`;
     return `${proto}//${window.location.host}`;
   }
 
-  return 'ws://localhost:5002';
+  if (env) return env;
+
+  return 'ws://localhost:5000';
 }
