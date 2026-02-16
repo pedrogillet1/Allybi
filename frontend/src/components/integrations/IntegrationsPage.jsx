@@ -363,7 +363,15 @@ export default function IntegrationsPage() {
     // If we're in a popup, close it after a short delay.
     const isPopup = window.opener || window.name.startsWith('koda_');
     if (isPopup) {
-      setTimeout(() => { try { window.close(); } catch {} }, 600);
+      const closeSelf = () => {
+        try {
+          if (window.opener && !window.opener.closed) window.opener.focus();
+        } catch {}
+        try { window.close(); } catch {}
+        try { window.open('', '_self'); window.close(); } catch {}
+      };
+      setTimeout(closeSelf, 200);
+      setTimeout(closeSelf, 900);
     } else {
       // Not a popup — user navigated directly. Just refresh status.
       refetch();

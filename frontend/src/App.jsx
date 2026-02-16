@@ -51,7 +51,6 @@ import MobileBottomNav from './components/app-shell/MobileBottomNav';
 import SwipeableTabViewport from './components/app-shell/SwipeableTabViewport';
 import AuthModalShell from './components/auth/AuthModalShell';
 import SignedOutSignInButton from './components/auth/SignedOutSignInButton';
-import LandingPage from './components/landing/LandingPage';
 import IntegrationsPage from './components/integrations/IntegrationsPage';
 import GmailDetailPage from './components/integrations/GmailDetailPage';
 import LegalPage from './components/legal/LegalPage';
@@ -154,11 +153,8 @@ function AppContent() {
               <Route path={ROUTES.TERMS_OF_USE} element={<LegalPage />} />
               <Route path={ROUTES.PRIVACY_POLICY} element={<LegalPage />} />
 
-              {/* Public pages */}
-              <Route path={ROUTES.LANDING} element={<LandingPage />} />
-
-              {/* Public background: signed-out users land on homepage; authenticated users can open chat */}
-              <Route path="/" element={isAuthenticated ? <ChatScreen /> : <LandingPage />} />
+              {/* Root always goes to chat (login prompt if not authenticated) */}
+              <Route path="/" element={<ChatScreen />} />
               <Route path={ROUTES.CHAT} element={<ChatScreen />} />
 
               {/* Protected app routes */}

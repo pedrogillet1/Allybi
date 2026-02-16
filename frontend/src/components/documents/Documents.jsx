@@ -149,11 +149,15 @@ const Documents = () => {
   const {
     isSelectMode,
     selectedDocuments,
+    selectedFolders,
     toggleSelectMode,
     toggleDocument,
+    toggleFolder,
     selectAll,
     clearSelection,
-    isSelected
+    isSelected,
+    isFolderSelected,
+    totalSelected
   } = useDocumentSelection();
 
   // Force re-render when contextFolders changes
@@ -423,7 +427,8 @@ const Documents = () => {
     const categoryId = selectedCategoryId;
     const docForCategory = selectedDocumentForCategory;
     const docsToMove = isSelectMode ? Array.from(selectedDocuments) : null;
-    const docCount = selectedDocuments.size;
+    const foldersToMove = isSelectMode ? Array.from(selectedFolders) : [];
+    const moveCount = totalSelected;
 
     setShowCategoryModal(false);
     setSelectedDocumentForCategory(null);
@@ -431,11 +436,15 @@ const Documents = () => {
 
     try {
       // Handle bulk move when in select mode
-      if (isSelectMode && docsToMove && docsToMove.length > 0) {
-        Promise.all(docsToMove.map(docId => moveToFolder(docId, categoryId)));
-        showSuccess(t('toasts.filesMovedSuccessfully', { count: docCount }));
+      if (isSelectMode && (docsToMove?.length > 0 || foldersToMove.length > 0)) {
+        await Promise.all([
+          ...(docsToMove || []).map(docId => moveToFolder(docId, categoryId)),
+          ...foldersToMove.map(folderId => api.patch(`/api/folders/${folderId}`, { parentId: categoryId })),
+        ]);
+        showSuccess(t('toasts.filesMovedSuccessfully', { count: moveCount }));
         clearSelection();
         toggleSelectMode();
+        refreshAll();
       } else if (docForCategory) {
         // Move single document to folder (UI updates INSTANTLY via context!)
         moveToFolder(docForCategory.id, categoryId);
@@ -451,7 +460,8 @@ const Documents = () => {
   const handleCreateCategoryFromMove = async (category) => {
     // Capture state before closing modals
     const docsToMove = isSelectMode ? Array.from(selectedDocuments) : null;
-    const docCount = selectedDocuments.size;
+    const foldersToMove = isSelectMode ? Array.from(selectedFolders) : [];
+    const moveCount = totalSelected;
     const docForCategory = selectedDocumentForCategory;
 
     // Close both modals IMMEDIATELY for snappy UX
@@ -465,11 +475,15 @@ const Documents = () => {
       const newFolder = await createFolder(category.name, category.emoji);
 
       // Handle bulk move when in select mode
-      if (isSelectMode && docsToMove && docsToMove.length > 0) {
-        Promise.all(docsToMove.map(docId => moveToFolder(docId, newFolder.id)));
-        showSuccess(t('toasts.filesMovedSuccessfully', { count: docCount }));
+      if (isSelectMode && (docsToMove?.length > 0 || foldersToMove.length > 0)) {
+        await Promise.all([
+          ...(docsToMove || []).map(docId => moveToFolder(docId, newFolder.id)),
+          ...foldersToMove.map(folderId => api.patch(`/api/folders/${folderId}`, { parentId: newFolder.id })),
+        ]);
+        showSuccess(t('toasts.filesMovedSuccessfully', { count: moveCount }));
         clearSelection();
         toggleSelectMode();
+        refreshAll();
       } else if (docForCategory) {
         // Move single document to the new folder
         moveToFolder(docForCategory.id, newFolder.id);
@@ -650,44 +664,45 @@ const Documents = () => {
                 {/* Delete Button - Red style matching FileTypeDetail */}
                 <button
                   onClick={() => {
-                    if (selectedDocuments.size === 0) return;
+                    if (totalSelected === 0) return;
                     setItemToDelete({
-                      type: 'bulk-documents',
-                      ids: Array.from(selectedDocuments),
-                      count: selectedDocuments.size,
-                      name: `${selectedDocuments.size} document${selectedDocuments.size > 1 ? 's' : ''}`
+                      type: 'bulk',
+                      documentIds: Array.from(selectedDocuments),
+                      folderIds: Array.from(selectedFolders),
+                      count: totalSelected,
+                      name: `${totalSelected} item${totalSelected > 1 ? 's' : ''}`
                     });
                     setShowDeleteModal(true);
                   }}
-                  disabled={selectedDocuments.size === 0}
+                  disabled={totalSelected === 0}
                   style={{
                     height: 42,
                     paddingLeft: 18,
                     paddingRight: 18,
-                    background: selectedDocuments.size > 0 ? '#FEE2E2' : '#F5F5F5',
+                    background: totalSelected > 0 ? '#FEE2E2' : '#F5F5F5',
                     borderRadius: 100,
                     border: '1px solid #E6E6EC',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 8,
-                    cursor: selectedDocuments.size > 0 ? 'pointer' : 'not-allowed',
-                    opacity: selectedDocuments.size > 0 ? 1 : 0.5,
+                    cursor: totalSelected > 0 ? 'pointer' : 'not-allowed',
+                    opacity: totalSelected > 0 ? 1 : 0.5,
                     whiteSpace: 'nowrap'
                   }}
                 >
                   <TrashCanLightIcon style={{ width: 18, height: 18 }} />
                   <span style={{ color: '#D92D20', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', whiteSpace: 'nowrap' }}>
-                    {t('common.delete')}{selectedDocuments.size > 0 ? ` (${selectedDocuments.size})` : ''}
+                    {t('common.delete')}{totalSelected > 0 ? ` (${totalSelected})` : ''}
                   </span>
                 </button>
 
                 {/* Move Button - White style matching FileTypeDetail */}
                 <button
                   onClick={() => {
-                    if (selectedDocuments.size === 0) return;
+                    if (totalSelected === 0) return;
                     setShowCategoryModal(true);
                   }}
-                  disabled={selectedDocuments.size === 0}
+                  disabled={totalSelected === 0}
                   style={{
                     height: 42,
                     paddingLeft: 18,
@@ -698,14 +713,14 @@ const Documents = () => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: 8,
-                    cursor: selectedDocuments.size > 0 ? 'pointer' : 'not-allowed',
-                    opacity: selectedDocuments.size > 0 ? 1 : 0.5,
+                    cursor: totalSelected > 0 ? 'pointer' : 'not-allowed',
+                    opacity: totalSelected > 0 ? 1 : 0.5,
                     whiteSpace: 'nowrap'
                   }}
                 >
                   <AddIcon style={{ width: 18, height: 18, filter: 'brightness(0) invert(0.2)' }} />
                   <span style={{ color: '#32302C', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', whiteSpace: 'nowrap' }}>
-                    {t('common.move')}{selectedDocuments.size > 0 ? ` (${selectedDocuments.size})` : ''}
+                    {t('common.move')}{totalSelected > 0 ? ` (${totalSelected})` : ''}
                   </span>
                 </button>
 
@@ -1237,6 +1252,9 @@ const Documents = () => {
                   }
                 }}
                 dragOverCategoryId={dragOverCategoryId}
+                isSelectMode={isSelectMode}
+                onToggleFolder={toggleFolder}
+                isFolderSelected={isFolderSelected}
               />
             </div>
             {!isMobile && <IntegrationsCard />}
@@ -1273,6 +1291,9 @@ const Documents = () => {
               setItemToDelete({ type: 'document', id: doc.id, name: doc.filename });
               setShowDeleteModal(true);
             }}
+            isSelectMode={isSelectMode}
+            onToggleDocument={toggleDocument}
+            isDocumentSelected={isSelected}
           />
         </div>
 
@@ -1388,10 +1409,11 @@ const Documents = () => {
               ? contextDocuments.filter(doc => selectedDocuments.has(doc.id))
               : (selectedDocumentForCategory ? [selectedDocumentForCategory] : [])
         }
-        showFilesSection={!movingFromCategoryId && (!!selectedDocumentForCategory || (isSelectMode && selectedDocuments.size > 0))}
+        showFilesSection={!movingFromCategoryId && (!!selectedDocumentForCategory || (isSelectMode && totalSelected > 0))}
         categories={getRootFolders()
           .filter(f => f.name.toLowerCase() !== 'recently added')
           .filter(f => f.id !== movingFromCategoryId)
+          .filter(f => !selectedFolders.has(f.id))
           .map(f => ({
             ...f,
             fileCount: getDocumentCountByFolder(f.id)
@@ -1475,7 +1497,7 @@ const Documents = () => {
           setItemToDelete(null);
 
           // For bulk delete, clear selection and exit select mode IMMEDIATELY
-          if (itemToDeleteCopy.type === 'bulk-documents') {
+          if (itemToDeleteCopy.type === 'bulk-documents' || itemToDeleteCopy.type === 'bulk') {
             clearSelection();
             toggleSelectMode();
           }
@@ -1483,14 +1505,17 @@ const Documents = () => {
           // Delete in background - context will update UI instantly
           (async () => {
             try {
-              if (itemToDeleteCopy.type === 'bulk-documents') {
-                // Handle bulk deletion of selected documents
+              if (itemToDeleteCopy.type === 'bulk' || itemToDeleteCopy.type === 'bulk-documents') {
+                // Handle bulk deletion of selected documents and folders
+                const docIds = itemToDeleteCopy.documentIds || itemToDeleteCopy.ids || [];
+                const folderIds = itemToDeleteCopy.folderIds || [];
                 const deleteCount = itemToDeleteCopy.count;
 
-                // Delete all selected documents with proper error handling
-                const results = await Promise.allSettled(
-                  itemToDeleteCopy.ids.map(docId => deleteDocument(docId))
-                );
+                // Delete all selected documents and folders with proper error handling
+                const results = await Promise.allSettled([
+                  ...docIds.map(docId => deleteDocument(docId)),
+                  ...folderIds.map(folderId => deleteFolder(folderId)),
+                ]);
 
                 // Count successes and failures
                 const succeeded = results.filter(r => r.status === 'fulfilled').length;

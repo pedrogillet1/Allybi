@@ -115,6 +115,9 @@ export default function RecentlyAddedCard({
   onDragStart,
   onNavigateDocument,
   maxRows = 8,
+  isSelectMode = false,
+  onToggleDocument,
+  isDocumentSelected,
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -267,12 +270,13 @@ export default function RecentlyAddedCard({
           {!isMobile && (
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 120px 140px 140px 44px',
+              gridTemplateColumns: isSelectMode ? '36px 1fr 120px 140px 140px' : '1fr 120px 140px 140px 44px',
               gap: 12,
               padding: '10px 14px',
               borderBottom: '1px solid #E6E6EC',
               marginBottom: 4,
             }}>
+              {isSelectMode && <div />}
               {[
                 { key: 'name', label: t('documents.tableHeaders.name') },
                 { key: 'type', label: t('documents.tableHeaders.type') },
@@ -313,26 +317,33 @@ export default function RecentlyAddedCard({
                   )}
                 </button>
               ))}
-              <div />
+              {!isSelectMode && <div />}
             </div>
           )}
 
           {/* Rows */}
           {sortedDocs.map(doc => {
             const isUploading = doc.status === 'uploading';
+            const docSelected = isSelectMode && isDocumentSelected?.(doc.id);
 
             return (
               <div
                 key={doc.id}
-                draggable
+                draggable={!isSelectMode}
                 onDragStart={e => {
+                  if (isSelectMode) return;
                   e.dataTransfer.setData('application/json', JSON.stringify({ type: 'document', id: doc.id }));
                   e.dataTransfer.effectAllowed = 'move';
                   onDragStart?.(doc);
                 }}
                 onClick={() => {
-                  if (onNavigateDocument) onNavigateDocument(doc);
-                  else navigate(buildRoute.document(doc.id));
+                  if (isSelectMode) {
+                    onToggleDocument?.(doc.id);
+                  } else if (onNavigateDocument) {
+                    onNavigateDocument(doc);
+                  } else {
+                    navigate(buildRoute.document(doc.id));
+                  }
                 }}
                 style={isMobile ? {
                   display: 'flex',
@@ -340,7 +351,7 @@ export default function RecentlyAddedCard({
                   gap: 12,
                   padding: '0 10px',
                   borderRadius: 12,
-                  background: 'white',
+                  background: docSelected ? '#F0F0F0' : 'white',
                   cursor: 'pointer',
                   position: 'relative',
                   overflow: openDropdownId === doc.id ? 'visible' : 'hidden',
@@ -349,12 +360,12 @@ export default function RecentlyAddedCard({
                   boxSizing: 'border-box',
                 } : {
                   display: 'grid',
-                  gridTemplateColumns: '1fr 120px 140px 140px 44px',
+                  gridTemplateColumns: isSelectMode ? '36px 1fr 120px 140px 140px' : '1fr 120px 140px 140px 44px',
                   gap: 12,
                   alignItems: 'center',
                   padding: '0 14px',
                   borderRadius: 12,
-                  background: 'white',
+                  background: docSelected ? '#F0F0F0' : 'white',
                   cursor: 'pointer',
                   transition: 'background 120ms ease',
                   marginBottom: 0,
@@ -364,8 +375,8 @@ export default function RecentlyAddedCard({
                   height: 56,
                   boxSizing: 'border-box',
                 }}
-                onMouseEnter={e => { if (!isUploading && !isMobile) e.currentTarget.style.background = '#F5F5F5'; }}
-                onMouseLeave={e => { if (!isUploading && !isMobile) e.currentTarget.style.background = 'white'; }}
+                onMouseEnter={e => { if (!isUploading && !isMobile) e.currentTarget.style.background = docSelected ? '#E8E8E8' : '#F5F5F5'; }}
+                onMouseLeave={e => { if (!isUploading && !isMobile) e.currentTarget.style.background = docSelected ? '#F0F0F0' : 'white'; }}
               >
                 {/* Upload progress */}
                 {isUploading && (
@@ -377,8 +388,52 @@ export default function RecentlyAddedCard({
                   }} />
                 )}
 
+                {/* Selection checkbox */}
+                {isSelectMode && !isMobile && (
+                  <div style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: '50%',
+                    border: docSelected ? 'none' : '2px solid #D0D0D0',
+                    background: docSelected ? '#181818' : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    transition: 'all 160ms ease',
+                    zIndex: 1,
+                  }}>
+                    {docSelected && (
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 7L6 10L11 4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </div>
+                )}
+
                 {isMobile ? (
                   <>
+                    {isSelectMode && (
+                      <div style={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: '50%',
+                        border: docSelected ? 'none' : '2px solid #D0D0D0',
+                        background: docSelected ? '#181818' : 'transparent',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        transition: 'all 160ms ease',
+                        zIndex: 1,
+                      }}>
+                        {docSelected && (
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 7L6 10L11 4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </div>
+                    )}
                     <img src={getFileIcon(doc)} alt="" style={{ width: 32, height: 32, objectFit: 'contain', zIndex: 1 }} />
                     <div style={{ flex: 1, overflow: 'hidden', zIndex: 1 }}>
                       <div style={{ color: '#32302C', fontSize: 14, fontWeight: 600, fontFamily: 'Plus Jakarta Sans, sans-serif', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -412,7 +467,8 @@ export default function RecentlyAddedCard({
                   </>
                 )}
 
-                {/* Kebab menu */}
+                {/* Kebab menu - hidden in select mode */}
+                {!isSelectMode && (
                 <div style={{ position: 'relative', flexShrink: 0 }} data-dropdown>
                   <button
                     ref={el => { if (el) dropdownRefs.current[doc.id] = el; }}
@@ -510,6 +566,7 @@ export default function RecentlyAddedCard({
                     </div>
                   )}
                 </div>
+                )}
               </div>
             );
           })}

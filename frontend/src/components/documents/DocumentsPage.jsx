@@ -92,11 +92,15 @@ const DocumentsPage = () => {
   // Selection hook for Recently Added section
   const {
     selectedDocuments,
+    selectedFolders,
     isSelectMode,
     toggleSelectMode,
     toggleDocument,
+    toggleFolder,
     clearSelection,
-    isSelected
+    isSelected,
+    isFolderSelected,
+    totalSelected
   } = useDocumentSelection();
 
   // Only UI state remains local
@@ -295,7 +299,8 @@ const DocumentsPage = () => {
     const categoryId = selectedCategoryId;
     const docForCategory = selectedDocumentForCategory;
     const docsToMove = isSelectMode ? Array.from(selectedDocuments) : null;
-    const docCount = selectedDocuments.size;
+    const foldersToMove = isSelectMode ? Array.from(selectedFolders) : [];
+    const moveCount = totalSelected;
 
     // Close modal IMMEDIATELY for snappy UX
     setShowCategoryModal(false);
@@ -304,11 +309,15 @@ const DocumentsPage = () => {
 
     try {
       // Handle bulk move when in select mode
-      if (isSelectMode && docsToMove && docsToMove.length > 0) {
-        Promise.all(docsToMove.map(docId => moveToFolder(docId, categoryId)));
-        showSuccess(t('toasts.filesMovedSuccessfully', { count: docCount }));
+      if (isSelectMode && (docsToMove?.length > 0 || foldersToMove.length > 0)) {
+        await Promise.all([
+          ...(docsToMove || []).map(docId => moveToFolder(docId, categoryId)),
+          ...foldersToMove.map(folderId => api.patch(`/api/folders/${folderId}`, { parentId: categoryId })),
+        ]);
+        showSuccess(t('toasts.filesMovedSuccessfully', { count: moveCount }));
         clearSelection();
         toggleSelectMode();
+        refreshAll();
       } else if (docForCategory) {
         // Use context to move single document (instant UI update!)
         moveToFolder(docForCategory.id, categoryId);
@@ -493,9 +502,9 @@ const DocumentsPage = () => {
       >
         {/* Header */}
         <div data-documents-header="true" className="mobile-sticky-header" style={{
-          height: isMobile ? 56 : 84,
-          paddingLeft: isMobile ? 16 : spacing.xl,
-          paddingRight: isMobile ? 16 : spacing.xl,
+          minHeight: isMobile ? 56 : 72,
+          paddingLeft: isMobile ? 16 : 48,
+          paddingRight: isMobile ? 16 : 48,
           background: colors.white,
           borderBottom: `1px solid ${colors.gray[300]}`,
           display: 'flex',
@@ -510,22 +519,22 @@ const DocumentsPage = () => {
             <button
               onClick={() => fromChat ? navigate(-1) : navigate(ROUTES.HOME)}
               style={{
-                width: isMobile ? 36 : 42,
-                height: isMobile ? 36 : 42,
-                background: 'white',
-                borderRadius: 100,
-                outline: '1px #E6E6EC solid',
-                outlineOffset: '-1px',
+                width: isMobile ? 36 : 40,
+                height: isMobile ? 36 : 40,
+                background: '#F3F4F6',
+                borderRadius: 8,
+                border: '1px solid #E5E7EB',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                border: 'none',
                 transition: 'all 0.2s ease',
-                flexShrink: 0
+                flexShrink: 0,
+                padding: 0,
+                marginLeft: isMobile ? 0 : -28
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'white'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#E5E7EB'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = '#F3F4F6'; }}
             >
               <ArrowLeftIcon style={{ width: 18, height: 18, stroke: '#181818' }} />
             </button>
@@ -533,7 +542,7 @@ const DocumentsPage = () => {
               color: colors.gray[900],
               fontSize: isMobile ? 18 : typography.sizes.xl,
               fontFamily: typography.fontFamily,
-              fontWeight: typography.weights.bold,
+              fontWeight: typography.weights.semibold,
               textTransform: 'capitalize',
               lineHeight: typography.lineHeights.xl,
               textAlign: 'left',
@@ -549,43 +558,44 @@ const DocumentsPage = () => {
                 {/* Delete Button - Red style matching FileTypeDetail */}
                 <button
                   onClick={() => {
-                    if (selectedDocuments.size === 0) return;
+                    if (totalSelected === 0) return;
                     setItemToDelete({
-                      type: 'bulk-documents',
-                      ids: Array.from(selectedDocuments),
-                      count: selectedDocuments.size,
-                      name: `${selectedDocuments.size} document${selectedDocuments.size > 1 ? 's' : ''}`
+                      type: 'bulk',
+                      documentIds: Array.from(selectedDocuments),
+                      folderIds: Array.from(selectedFolders),
+                      count: totalSelected,
+                      name: `${totalSelected} item${totalSelected > 1 ? 's' : ''}`
                     });
                     setShowDeleteModal(true);
                   }}
-                  disabled={selectedDocuments.size === 0}
+                  disabled={totalSelected === 0}
                   style={{
                     height: 42,
                     paddingLeft: 18,
                     paddingRight: 18,
-                    background: selectedDocuments.size > 0 ? '#FEE2E2' : '#F5F5F5',
+                    background: totalSelected > 0 ? '#FEE2E2' : '#F5F5F5',
                     borderRadius: 100,
                     border: '1px solid #E6E6EC',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 8,
-                    cursor: selectedDocuments.size > 0 ? 'pointer' : 'not-allowed',
-                    opacity: selectedDocuments.size > 0 ? 1 : 0.5
+                    cursor: totalSelected > 0 ? 'pointer' : 'not-allowed',
+                    opacity: totalSelected > 0 ? 1 : 0.5
                   }}
                 >
                   <TrashCanLightIcon style={{ width: 18, height: 18 }} />
                   <span style={{ color: '#D92D20', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '600' }}>
-                    {t('documents.delete')}{selectedDocuments.size > 0 ? ` (${selectedDocuments.size})` : ''}
+                    {t('documents.delete')}{totalSelected > 0 ? ` (${totalSelected})` : ''}
                   </span>
                 </button>
 
                 {/* Move Button - White style matching FileTypeDetail */}
                 <button
                   onClick={() => {
-                    if (selectedDocuments.size === 0) return;
+                    if (totalSelected === 0) return;
                     setShowCategoryModal(true);
                   }}
-                  disabled={selectedDocuments.size === 0}
+                  disabled={totalSelected === 0}
                   style={{
                     height: 42,
                     paddingLeft: 18,
@@ -596,13 +606,13 @@ const DocumentsPage = () => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: 8,
-                    cursor: selectedDocuments.size > 0 ? 'pointer' : 'not-allowed',
-                    opacity: selectedDocuments.size > 0 ? 1 : 0.5
+                    cursor: totalSelected > 0 ? 'pointer' : 'not-allowed',
+                    opacity: totalSelected > 0 ? 1 : 0.5
                   }}
                 >
                   <AddIcon style={{ width: 18, height: 18, filter: 'brightness(0) invert(0.2)' }} />
                   <span style={{ color: '#32302C', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '600' }}>
-                    {t('documents.move')}{selectedDocuments.size > 0 ? ` (${selectedDocuments.size})` : ''}
+                    {t('documents.move')}{totalSelected > 0 ? ` (${totalSelected})` : ''}
                   </span>
                 </button>
 
@@ -634,7 +644,7 @@ const DocumentsPage = () => {
                 <div
                   style={{
                     position: 'relative',
-                    height: 52,
+                    height: 44,
                     display: 'flex',
                     alignItems: 'center',
                     transition: 'transform 0.15s ease',
@@ -759,41 +769,34 @@ const DocumentsPage = () => {
                 <button
                   onClick={toggleSelectMode}
                   style={{
-                    height: 52,
+                    height: 44,
                     paddingLeft: 18,
                     paddingRight: 18,
-                    paddingTop: 10,
-                    paddingBottom: 10,
                     background: '#F5F5F5',
-                    boxShadow: '0px 0px 8px 1px rgba(0, 0, 0, 0.02)',
-                    overflow: 'hidden',
                     borderRadius: 100,
-                    outline: '1px #E6E6EC solid',
-                    outlineOffset: '-1px',
+                    border: '1px #E6E6EC solid',
                     justifyContent: 'center',
                     alignItems: 'center',
                     gap: 6,
                     display: 'inline-flex',
-                    border: 'none',
                     cursor: 'pointer',
                     transition: 'all 0.2s'
                   }}
                 >
                   <div style={{
                     color: '#32302C',
-                    fontSize: 16,
+                    fontSize: 14,
                     fontFamily: 'Plus Jakarta Sans',
                     fontWeight: '600',
-                    lineHeight: '24px',
-                    wordWrap: 'break-word'
+                    lineHeight: '20px',
                   }}>
                     {t('documents.select')}
                   </div>
                 </button>
 
-                <div onClick={() => setShowUniversalUploadModal(true)} style={{height: 52, paddingLeft: 18, paddingRight: 18, paddingTop: 10, paddingBottom: 10, background: '#F5F5F5', borderRadius: 100, border: '1px #E6E6EC solid', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', transition: 'transform 0.2s ease, box-shadow 0.2s ease'}} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-                  <UploadIcon style={{width: 24, height: 24, filter: 'brightness(0) invert(0.2)'}} />
-                  <div style={{color: '#32302C', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '24px'}}>{t('dashboard.uploadDocument')}</div>
+                <div onClick={() => setShowUniversalUploadModal(true)} style={{height: 44, paddingLeft: 20, paddingRight: 20, background: '#181818', borderRadius: 9999, border: 'none', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', flexShrink: 0, transition: 'background 120ms ease, transform 160ms cubic-bezier(0.2,0.8,0.2,1)', color: 'white'}} onMouseEnter={(e) => { e.currentTarget.style.background = '#0F0F0F'; e.currentTarget.style.transform = 'translateY(-1px)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = '#181818'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+                  <UploadIcon style={{width: 18, height: 18, filter: 'brightness(0) invert(1)'}} />
+                  <span style={{fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 600, lineHeight: '20px'}}>Upload</span>
                 </div>
               </>
             )}
@@ -802,7 +805,7 @@ const DocumentsPage = () => {
         </div>
 
         {/* Scrollable Content */}
-        <div className="documents-content scrollable-content" style={{flex: 1, padding: spacing.xl, paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : spacing.xl, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: spacing.xl, WebkitOverflowScrolling: 'touch'}}>
+        <div className="documents-content scrollable-content" style={{flex: 1, padding: isMobile ? spacing.xl : 48, paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 48, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: spacing.xl, WebkitOverflowScrolling: 'touch'}}>
           {/* Smart Categories */}
           <div style={{display: 'flex', flexDirection: 'column', gap: spacing.md}}>
             <div style={{display: isMobile ? 'flex' : 'grid', flexDirection: isMobile ? 'column' : undefined, gridTemplateColumns: isMobile ? undefined : 'repeat(4, 1fr)', gap: spacing.md}}>
@@ -826,19 +829,24 @@ const DocumentsPage = () => {
                 </div>
                 <span style={{color: colors.gray[900], fontSize: typography.sizes.sm, fontFamily: typography.fontFamily, fontWeight: typography.weights.semibold, lineHeight: '19.60px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, minWidth: 0}}>{t('documents.newFolder')}</span>
               </div>
-              {categories.map((category, index) => (
+              {categories.map((category, index) => {
+                const folderSelected = isSelectMode && isFolderSelected(category.id);
+                return (
                 <div
                   key={index}
                   onDragOver={(e) => {
+                    if (isSelectMode) return;
                     e.preventDefault();
                     e.currentTarget.style.background = colors.primary[50];
                     e.currentTarget.style.border = `2px dashed ${colors.primary[800]}`;
                   }}
                   onDragLeave={(e) => {
+                    if (isSelectMode) return;
                     e.currentTarget.style.background = colors.white;
                     e.currentTarget.style.border = `1px solid ${colors.gray[300]}`;
                   }}
                   onDrop={async (e) => {
+                    if (isSelectMode) return;
                     e.preventDefault();
                     e.currentTarget.style.background = colors.white;
                     e.currentTarget.style.border = `1px solid ${colors.gray[300]}`;
@@ -866,26 +874,61 @@ const DocumentsPage = () => {
                       // On error, the moveToFolder function will rollback automatically
                     }
                   }}
+                  onClick={() => {
+                    if (isSelectMode) {
+                      toggleFolder(category.id);
+                    }
+                  }}
                   style={{
                     padding: isMobile ? '10px' : '14px 16px',
-                    background: 'white',
+                    background: folderSelected ? '#F0F0F0' : 'white',
                     borderRadius: isMobile ? 14 : radius.xl,
-                    border: isMobile ? '1px solid #E6E6EC' : `2px solid ${colors.gray[300]}`,
+                    border: folderSelected
+                      ? '2px solid #32302C'
+                      : isMobile ? '1px solid #E6E6EC' : `2px solid ${colors.gray[300]}`,
                     boxShadow: isMobile ? 'none' : '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: isMobile ? 12 : 12,
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                    transition: 'transform 0.2s ease, box-shadow 0.2s ease, background 160ms ease, border 160ms ease',
                     position: 'relative',
                     minHeight: 72,
                     height: isMobile ? 'auto' : 72,
                     boxSizing: 'border-box',
-                    zIndex: categoryMenuOpen === category.id ? 99999 : 1
+                    zIndex: categoryMenuOpen === category.id ? 99999 : 1,
+                    cursor: isSelectMode ? 'pointer' : 'default'
                   }}
                 >
-                  <div onClick={() => {
-                    navigate(buildRoute.folder(category.id));
-                  }} style={{display: 'flex', alignItems: 'center', gap: 12, flex: 1, cursor: 'pointer', minWidth: 0}} onMouseEnter={(e) => e.currentTarget.parentElement.style.transform = 'translateY(-2px)'} onMouseLeave={(e) => e.currentTarget.parentElement.style.transform = 'translateY(0)'}>
+                  {/* Selection checkmark */}
+                  {isSelectMode && (
+                    <div style={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: '50%',
+                      border: folderSelected ? 'none' : '2px solid #D0D0D0',
+                      background: folderSelected ? '#181818' : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      transition: 'all 160ms ease',
+                    }}>
+                      {folderSelected && (
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M3 7L6 10L11 4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </div>
+                  )}
+
+                  <div onClick={(e) => {
+                    if (isSelectMode) {
+                      e.stopPropagation();
+                      toggleFolder(category.id);
+                    } else {
+                      navigate(buildRoute.folder(category.id));
+                    }
+                  }} style={{display: 'flex', alignItems: 'center', gap: 12, flex: 1, cursor: 'pointer', minWidth: 0}} onMouseEnter={(e) => { if (!isSelectMode) e.currentTarget.parentElement.style.transform = 'translateY(-2px)'; }} onMouseLeave={(e) => { if (!isSelectMode) e.currentTarget.parentElement.style.transform = 'translateY(0)'; }}>
                     <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
                       <CategoryIcon emoji={category.emoji} size={isMobile ? 40 : 42} />
                     </div>
@@ -896,6 +939,8 @@ const DocumentsPage = () => {
                       </div>
                     </div>
                   </div>
+                  {/* Kebab menu - hidden in select mode */}
+                  {!isSelectMode && (
                   <div style={{position: 'relative'}} data-category-menu>
                     <button
                       onClick={(e) => {
@@ -1043,8 +1088,10 @@ const DocumentsPage = () => {
                       </div>
                     )}
                   </div>
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -1783,8 +1830,8 @@ const DocumentsPage = () => {
             ? contextDocuments.filter(doc => selectedDocuments.has(doc.id))
             : (selectedDocumentForCategory ? [selectedDocumentForCategory] : [])
         }
-        showFilesSection={!!selectedDocumentForCategory || (isSelectMode && selectedDocuments.size > 0)}
-        categories={availableCategories}
+        showFilesSection={!!selectedDocumentForCategory || (isSelectMode && totalSelected > 0)}
+        categories={availableCategories.filter(f => !selectedFolders.has(f.id))}
         selectedCategoryId={selectedCategoryId}
         onCategorySelect={setSelectedCategoryId}
         onCreateNew={() => {
@@ -1851,7 +1898,7 @@ const DocumentsPage = () => {
           setItemToDelete(null);
 
           // For bulk delete, clear selection and exit select mode IMMEDIATELY
-          if (itemToDeleteCopy.type === 'bulk-documents') {
+          if (itemToDeleteCopy.type === 'bulk-documents' || itemToDeleteCopy.type === 'bulk') {
             clearSelection();
             toggleSelectMode();
           }
@@ -1859,14 +1906,17 @@ const DocumentsPage = () => {
           // Delete in background - context will update UI instantly
           (async () => {
             try {
-              if (itemToDeleteCopy.type === 'bulk-documents') {
-                // Handle bulk deletion of selected documents
+              if (itemToDeleteCopy.type === 'bulk' || itemToDeleteCopy.type === 'bulk-documents') {
+                // Handle bulk deletion of selected documents and folders
+                const docIds = itemToDeleteCopy.documentIds || itemToDeleteCopy.ids || [];
+                const folderIds = itemToDeleteCopy.folderIds || [];
                 const deleteCount = itemToDeleteCopy.count;
 
-                // Delete all selected documents with proper error handling
-                const results = await Promise.allSettled(
-                  itemToDeleteCopy.ids.map(docId => deleteDocument(docId))
-                );
+                // Delete all selected documents and folders with proper error handling
+                const results = await Promise.allSettled([
+                  ...docIds.map(docId => deleteDocument(docId)),
+                  ...folderIds.map(folderId => deleteFolder(folderId)),
+                ]);
 
                 // Count successes and failures
                 const succeeded = results.filter(r => r.status === 'fulfilled').length;
@@ -1891,8 +1941,8 @@ const DocumentsPage = () => {
             }
           })();
         }}
-        itemName={itemToDelete?.type === 'bulk-documents' ? `${itemToDelete?.count}` : (itemToDelete?.name || 'this item')}
-        itemType={itemToDelete?.type === 'bulk-documents' ? 'multiple' : (itemToDelete?.type || 'item')}
+        itemName={itemToDelete?.type === 'bulk-documents' || itemToDelete?.type === 'bulk' ? `${itemToDelete?.count}` : (itemToDelete?.name || 'this item')}
+        itemType={itemToDelete?.type === 'bulk-documents' || itemToDelete?.type === 'bulk' ? 'multiple' : (itemToDelete?.type || 'item')}
       />
 
       {/* Rename Modal */}

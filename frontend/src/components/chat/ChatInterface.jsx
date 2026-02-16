@@ -2081,6 +2081,7 @@ export default function ChatInterface({
       const data = e?.data;
       if (!data || typeof data !== "object") return;
       if (data.type !== "koda_oauth_done") return;
+      setActivatingConnector(null);
       // Optimistically mark provider as connected so the pill appears instantly
       if (data.ok && data.provider) {
         setConnectorStatus((prev) => ({

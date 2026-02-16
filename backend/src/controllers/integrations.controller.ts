@@ -44,14 +44,33 @@ function wantsHtml(req: Request): boolean {
   return accept.includes('text/html');
 }
 
-function oauthFrontendRedirectBase(): string {
-  return (process.env.FRONTEND_URL || 'http://localhost:3000').replace(/\/+$/, '');
+function escapeHtml(value: string): string {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeJsString(value: string): string {
+  return String(value)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
 }
 
 function oauthResultHtml(opts: { provider: string; ok: boolean; title: string; detail?: string }): string {
-  const provider = opts.provider;
-  const title = opts.title;
-  const detail = opts.detail || '';
+  const provider = String(opts.provider || '');
+  const title = String(opts.title || '');
+  const detail = String(opts.detail || '');
+  const providerSafe = escapeHtml(provider);
+  const titleSafe = escapeHtml(title);
+  const detailSafe = escapeHtml(detail);
+  const providerJs = escapeJsString(provider);
   const statusColor = opts.ok ? '#16A34A' : '#DC2626';
   const statusText = opts.ok ? 'Connected' : 'Failed';
 
@@ -79,10 +98,10 @@ function oauthResultHtml(opts: { provider: string; ok: boolean; title: string; d
     <div class="wrap">
       <div class="card">
         <div class="row">
-          <div class="badge"><span class="dot"></span>${provider.toUpperCase()} ${statusText}</div>
+          <div class="badge"><span class="dot"></span>${providerSafe.toUpperCase()} ${statusText}</div>
         </div>
-        <h1>${title}</h1>
-        <p>${detail}</p>
+        <h1>${titleSafe}</h1>
+        <p>${detailSafe}</p>
         <div class="muted">You can close this window and return to Allybi.</div>
         <button class="btn" onclick="window.close()">Close</button>
       </div>
@@ -91,17 +110,24 @@ function oauthResultHtml(opts: { provider: string; ok: boolean; title: string; d
       var sent = false;
       try {
         if (window.opener && !window.opener.closed) {
-          window.opener.postMessage({ type: 'koda_oauth_done', provider: '${provider}', ok: ${opts.ok ? 'true' : 'false'} }, '*');
+          window.opener.postMessage({ type: 'koda_oauth_done', provider: '${providerJs}', ok: ${opts.ok ? 'true' : 'false'} }, '*');
+          try { window.opener.focus(); } catch (e) {}
           sent = true;
         }
       } catch (e) {}
       // Fallback: write to localStorage so the parent can detect via 'storage' event.
       // This works even when window.opener is null (cross-origin navigation kills it).
       try {
-        localStorage.setItem('koda_oauth_complete', JSON.stringify({ provider: '${provider}', ok: ${opts.ok ? 'true' : 'false'}, t: Date.now() }));
+        localStorage.setItem('koda_oauth_complete', JSON.stringify({ provider: '${providerJs}', ok: ${opts.ok ? 'true' : 'false'}, t: Date.now() }));
       } catch (e) {}
+      function closeSelf() {
+        try { window.close(); } catch (e) {}
+        // Safari/strict environments sometimes need a second strategy.
+        try { window.open('', '_self'); window.close(); } catch (e) {}
+      }
       // Give postMessage time to be received before auto-closing.
-      setTimeout(function() { try { window.close(); } catch (e) {} }, sent ? 600 : 1500);
+      setTimeout(closeSelf, sent ? 250 : 900);
+      setTimeout(closeSelf, 1600);
     </script>
   </body>
 </html>`;
@@ -265,8 +291,15 @@ export class IntegrationsController {
       }
 
       if (wantsHtml(req)) {
-        const frontendBase = oauthFrontendRedirectBase();
-        return res.redirect(`${frontendBase}/integrations?oauth_connected=${providerRaw}`) as unknown as Response;
+        res.status(200).type('html').send(
+          oauthResultHtml({
+            provider: providerRaw,
+            ok: true,
+            title: 'You are connected',
+            detail: 'Allybi can now access this connector.',
+          }),
+        );
+        return res as unknown as Response;
       }
 
       return sendOk(res, { provider: providerRaw, connected: true, result: callbackResult ?? null });
@@ -274,9 +307,15 @@ export class IntegrationsController {
       const message = error instanceof Error ? error.message : 'Connector OAuth callback failed.';
       const mapped = mapHandlerError(message);
       if (wantsHtml(req)) {
-        const frontendBase = oauthFrontendRedirectBase();
-        const encodedError = encodeURIComponent(message);
-        return res.redirect(`${frontendBase}/integrations?oauth_error=${providerRaw}&detail=${encodedError}`) as unknown as Response;
+        res.status(mapped.status >= 400 && mapped.status < 600 ? mapped.status : 400).type('html').send(
+          oauthResultHtml({
+            provider: providerRaw,
+            ok: false,
+            title: 'Connection failed',
+            detail: message || 'Something went wrong when authorizing Allybi.',
+          }),
+        );
+        return res as unknown as Response;
       }
       return sendErr(res, mapped.code, message, mapped.status);
     }
