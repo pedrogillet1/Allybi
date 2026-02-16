@@ -4,6 +4,7 @@ import { encryptData, decryptData } from '../utils/security/encryption';
 import { getApiBaseUrl, getWsBaseUrl } from './runtimeConfig';
 import { emitAuthModalOpen } from '../utils/authModalBus';
 const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
+const CSRF_COOKIE_NAME = 'koda_csrf';
 
 const API_URL = getApiBaseUrl();
 // socket.io-client expects an http(s) origin, not ws(s).
@@ -19,6 +20,19 @@ const WS_URL = normalizeSocketOrigin(getWsBaseUrl());
 const getCompatAccessToken = () => {
   if (!AUTH_LOCALSTORAGE_COMPAT) return null;
   return localStorage.getItem('accessToken') || localStorage.getItem('token');
+};
+
+const getCookieValue = (name) => {
+  if (typeof document === 'undefined') return null;
+  const needle = `${name}=`;
+  const parts = document.cookie.split(';');
+  for (const raw of parts) {
+    const entry = raw.trim();
+    if (entry.startsWith(needle)) {
+      return decodeURIComponent(entry.slice(needle.length));
+    }
+  }
+  return null;
 };
 
 // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Get encryption password from AuthContext
@@ -48,6 +62,16 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // Cookie-auth CSRF protection for mutating requests.
+  const method = String(config.method || 'get').toUpperCase();
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+    const csrfToken = getCookieValue(CSRF_COOKIE_NAME);
+    if (csrfToken && !config.headers['x-csrf-token']) {
+      config.headers['x-csrf-token'] = csrfToken;
+    }
+  }
+
   return config;
 });
 
