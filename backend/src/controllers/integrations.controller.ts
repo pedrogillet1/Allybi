@@ -103,10 +103,16 @@ function oauthResultHtml(opts: { provider: string; ok: boolean; title: string; d
         <h1>${titleSafe}</h1>
         <p>${detailSafe}</p>
         <div class="muted">You can close this window and return to Allybi.</div>
-        <button class="btn" onclick="window.close()">Close</button>
+        <button id="close-btn" class="btn">Close</button>
       </div>
     </div>
     <script>
+      var closeBtn = document.getElementById('close-btn');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', function () {
+          try { window.close(); } catch (e) {}
+        });
+      }
       var sent = false;
       try {
         if (window.opener && !window.opener.closed) {
@@ -131,6 +137,23 @@ function oauthResultHtml(opts: { provider: string; ok: boolean; title: string; d
     </script>
   </body>
 </html>`;
+}
+
+function sendOauthHtml(res: Response, statusCode: number, html: string): Response {
+  // OAuth popup callback must be allowed to execute inline completion script
+  // and keep window.opener available so the parent can close the popup.
+  res.removeHeader('Content-Security-Policy');
+  res.removeHeader('Cross-Origin-Opener-Policy');
+  res.removeHeader('Cross-Origin-Embedder-Policy');
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https:; img-src 'self' data: https:; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+  );
+  res.setHeader('Cross-Origin-Opener-Policy', 'unsafe-none');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  res.setHeader('Cache-Control', 'no-store, max-age=0');
+  res.status(statusCode).type('html').send(html);
+  return res as unknown as Response;
 }
 
 function asString(value: unknown): string | null {
@@ -219,7 +242,9 @@ export class IntegrationsController {
     const state = asString(req.query.state);
     if (!code) {
       if (wantsHtml(req)) {
-        res.status(400).type('html').send(
+        return sendOauthHtml(
+          res,
+          400,
           oauthResultHtml({
             provider: providerRaw,
             ok: false,
@@ -227,7 +252,6 @@ export class IntegrationsController {
             detail: 'Retry connecting from Allybi.',
           }),
         );
-        return res as unknown as Response;
       }
       return sendErr(res, 'MISSING_OAUTH_CODE', 'OAuth callback is missing code.', 400);
     }
@@ -291,7 +315,9 @@ export class IntegrationsController {
       }
 
       if (wantsHtml(req)) {
-        res.status(200).type('html').send(
+        return sendOauthHtml(
+          res,
+          200,
           oauthResultHtml({
             provider: providerRaw,
             ok: true,
@@ -299,7 +325,6 @@ export class IntegrationsController {
             detail: 'Allybi can now access this connector.',
           }),
         );
-        return res as unknown as Response;
       }
 
       return sendOk(res, { provider: providerRaw, connected: true, result: callbackResult ?? null });
@@ -307,7 +332,9 @@ export class IntegrationsController {
       const message = error instanceof Error ? error.message : 'Connector OAuth callback failed.';
       const mapped = mapHandlerError(message);
       if (wantsHtml(req)) {
-        res.status(mapped.status >= 400 && mapped.status < 600 ? mapped.status : 400).type('html').send(
+        return sendOauthHtml(
+          res,
+          mapped.status >= 400 && mapped.status < 600 ? mapped.status : 400,
           oauthResultHtml({
             provider: providerRaw,
             ok: false,
@@ -315,7 +342,6 @@ export class IntegrationsController {
             detail: message || 'Something went wrong when authorizing Allybi.',
           }),
         );
-        return res as unknown as Response;
       }
       return sendErr(res, mapped.code, message, mapped.status);
     }
