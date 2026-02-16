@@ -93,6 +93,11 @@ const getCompatAccessToken = () => {
 };
 const ENDPOINT = process.env.REACT_APP_CHAT_STREAM_ENDPOINT || `${API_BASE}/api/chat/stream`;
 const VIEWER_ENDPOINT = process.env.REACT_APP_CHAT_VIEWER_STREAM_ENDPOINT || `${API_BASE}/api/chat/viewer/stream`;
+const getCsrfToken = () => {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.split(";").map((c) => c.trim()).find((c) => c.startsWith("koda_csrf="));
+  return match ? decodeURIComponent(match.slice("koda_csrf=".length)) : null;
+};
 
 // Streaming cadence (frontend smoothing)
 const STREAM = {
@@ -863,7 +868,6 @@ function nextWorklogFromEvent(current, rawEvt) {
       status: "done",
       endedAt: now,
       steps: finalizeRunningSteps(base.steps, "done"),
-      collapsed: true,
       ...(evt.summary ? { summary: String(evt.summary) } : {}),
     };
   }
@@ -2646,12 +2650,14 @@ export default function ChatInterface({
 
     let response;
     try {
+      const csrfToken = getCsrfToken();
       response = await fetch(isViewerVariant ? VIEWER_ENDPOINT : ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "text/event-stream",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(csrfToken ? { "x-csrf-token": csrfToken } : {}),
         },
         credentials: "include",
         body: JSON.stringify(body),

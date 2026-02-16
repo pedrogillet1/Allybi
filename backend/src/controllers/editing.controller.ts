@@ -54,6 +54,30 @@ function asBoolean(value: unknown): boolean {
   return false;
 }
 
+function normalizeDocxBundleProposedText(
+  runtimeOperator: string | null | undefined,
+  proposedText: string | null,
+  rawBundlePatches: unknown,
+): string | null {
+  if (runtimeOperator !== 'EDIT_DOCX_BUNDLE') return proposedText;
+
+  const text = String(proposedText || '').trim();
+  if (text) {
+    try {
+      const parsed = JSON.parse(text);
+      if (Array.isArray(parsed?.patches)) return text;
+    } catch {
+      // Fall through to bundlePatches fallback.
+    }
+  }
+
+  if (Array.isArray(rawBundlePatches) && rawBundlePatches.length > 0) {
+    return JSON.stringify({ patches: rawBundlePatches });
+  }
+
+  return proposedText;
+}
+
 function userIdFromReq(req: Request): string | null {
   const typedReq = req as Request & { user?: { id?: string } };
   return asString(typedReq.user?.id);
@@ -337,7 +361,7 @@ export class EditingController {
     const domain = body.domain;
     const documentId = asString(body.documentId);
     const beforeText = asString(body.beforeText);
-    const proposedText = asString(body.proposedText);
+    const proposedTextRaw = asString(body.proposedText);
     const proposedHtml = asString(body.proposedHtml);
     const idempotencyKey = asString(body.idempotencyKey);
     const expectedDocumentUpdatedAtIso = asString(body.expectedDocumentUpdatedAtIso);
@@ -351,6 +375,8 @@ export class EditingController {
           targetHint: asString(body.targetHint) || null,
         })
       : { runtimeOperator: null, canonicalOperator: null };
+
+    const proposedText = normalizeDocxBundleProposedText(normalized.runtimeOperator, proposedTextRaw, body.bundlePatches);
 
     if (!instruction || !isEditDomain(domain) || !normalized.runtimeOperator || !documentId || !beforeText || !proposedText) {
       return sendErr(res, 'INVALID_PREVIEW_INPUT', 'instruction, domain, documentId, beforeText, and proposedText are required.', 400);
@@ -403,7 +429,7 @@ export class EditingController {
     const domain = body.domain;
     const documentId = asString(body.documentId);
     const beforeText = asString(body.beforeText);
-    const proposedText = asString(body.proposedText);
+    const proposedTextRaw = asString(body.proposedText);
     const proposedHtml = asString(body.proposedHtml);
     const idempotencyKey = asString(body.idempotencyKey);
     const expectedDocumentUpdatedAtIso = asString(body.expectedDocumentUpdatedAtIso);
@@ -417,6 +443,8 @@ export class EditingController {
           targetHint: asString(body.targetHint) || null,
         })
       : { runtimeOperator: null, canonicalOperator: null };
+
+    const proposedText = normalizeDocxBundleProposedText(normalized.runtimeOperator, proposedTextRaw, body.bundlePatches);
 
     if (!instruction || !isEditDomain(domain) || !normalized.runtimeOperator || !documentId || !beforeText || !proposedText) {
       return sendErr(res, 'INVALID_APPLY_INPUT', 'instruction, domain, documentId, beforeText, and proposedText are required.', 400);
