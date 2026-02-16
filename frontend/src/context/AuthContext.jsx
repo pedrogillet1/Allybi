@@ -5,6 +5,7 @@ import { generateRecoveryKey, encryptMasterKeyWithRecovery, isSecureContextAvail
 import { getApiBaseUrl } from '../services/runtimeConfig';
 
 const AuthContext = createContext(null);
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -21,23 +22,44 @@ export const AuthProvider = ({ children }) => {
   // Initialize auth state from localStorage or try session restore
   useEffect(() => {
     const initAuth = async () => {
+      // Cookie-first bootstrap (primary auth mode).
+      try {
+        const sessionRes = await fetch(`${API_BASE}/api/auth/session/bootstrap`, {
+          credentials: 'include',
+        });
+        if (sessionRes.ok) {
+          const sessionData = await sessionRes.json();
+          if (sessionData?.user) {
+            localStorage.setItem('user', JSON.stringify(sessionData.user));
+            setUser(sessionData.user);
+            setIsAuthenticated(true);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch {
+        // Continue through compatibility paths.
+      }
+
       const storedUser = authService.getCurrentUser();
       const authenticated = authService.isAuthenticated();
 
       if (storedUser && authenticated) {
-        // Validate token is still accepted by backend before trusting it.
-        // Prevents infinite 401 loops when localStorage has stale tokens.
-        const token = localStorage.getItem('accessToken');
-        if (token) {
+        // Validate cookie session (or legacy bearer token in compat mode).
+        const token = AUTH_LOCALSTORAGE_COMPAT ? localStorage.getItem('accessToken') : null;
+        if (AUTH_LOCALSTORAGE_COMPAT && token) {
           try {
             const check = await fetch(`${API_BASE}/api/auth/me`, {
               headers: { 'Authorization': `Bearer ${token}` },
+              credentials: 'include',
             });
             if (!check.ok) throw new Error('stale');
           } catch {
             // Token rejected — clear stale data, fall through to login
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
+            if (AUTH_LOCALSTORAGE_COMPAT) {
+              localStorage.removeItem('accessToken');
+              localStorage.removeItem('refreshToken');
+            }
             localStorage.removeItem('user');
             setLoading(false);
             return;
@@ -51,11 +73,12 @@ export const AuthProvider = ({ children }) => {
 
       // OAuth race condition: we have tokens but user data isn't in localStorage yet
       // This can happen during rapid OAuth redirect - fetch user from /me endpoint
-      const accessToken = localStorage.getItem('accessToken');
-      if (accessToken && !storedUser) {
+      const accessToken = AUTH_LOCALSTORAGE_COMPAT ? localStorage.getItem('accessToken') : null;
+      if (AUTH_LOCALSTORAGE_COMPAT && accessToken && !storedUser) {
         try {
           const meResponse = await fetch(`${API_BASE}/api/auth/me`, {
             headers: { 'Authorization': `Bearer ${accessToken}` },
+            credentials: 'include',
           });
 
           if (meResponse.ok) {
@@ -75,12 +98,13 @@ export const AuthProvider = ({ children }) => {
 
       // If we have a refreshToken, try to restore the session
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
+        const refreshToken = AUTH_LOCALSTORAGE_COMPAT ? localStorage.getItem('refreshToken') : null;
 
-        if (refreshToken) {
+        if (AUTH_LOCALSTORAGE_COMPAT && refreshToken) {
           const response = await fetch(`${API_BASE}/api/auth/refresh`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ refreshToken }),
           });
 
@@ -88,8 +112,10 @@ export const AuthProvider = ({ children }) => {
             const data = await response.json();
 
             if (data.accessToken && data.user) {
-              localStorage.setItem('accessToken', data.accessToken);
-              localStorage.setItem('refreshToken', data.refreshToken);
+              if (AUTH_LOCALSTORAGE_COMPAT) {
+                localStorage.setItem('accessToken', data.accessToken);
+                localStorage.setItem('refreshToken', data.refreshToken);
+              }
               localStorage.setItem('user', JSON.stringify(data.user));
 
               setUser(data.user);
@@ -97,20 +123,22 @@ export const AuthProvider = ({ children }) => {
               setLoading(false);
               return;
             } else {
-              localStorage.removeItem('refreshToken');
+              if (AUTH_LOCALSTORAGE_COMPAT) localStorage.removeItem('refreshToken');
             }
           } else {
-            localStorage.removeItem('refreshToken');
+            if (AUTH_LOCALSTORAGE_COMPAT) localStorage.removeItem('refreshToken');
           }
         }
       } catch (error) {
         console.warn('Session restore failed:', error);
-        localStorage.removeItem('refreshToken');
+        if (AUTH_LOCALSTORAGE_COMPAT) localStorage.removeItem('refreshToken');
       }
 
       // No valid session — clear any stale data and show login
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      if (AUTH_LOCALSTORAGE_COMPAT) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+      }
       localStorage.removeItem('user');
       setLoading(false);
     };
@@ -209,7 +237,8 @@ export const AuthProvider = ({ children }) => {
       const response = await authService.verifyPendingPhone(data);
 
       // Registration complete, set user and auth state
-      if (response.user && response.accessToken) {
+      // Backend returns { user, tokens: { accessToken, refreshToken } }
+      if (response.user && (response.tokens || response.accessToken)) {
         setUser(response.user);
         setIsAuthenticated(true);
       }

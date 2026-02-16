@@ -65,6 +65,12 @@ import TargetsTab from './editor/TargetsTab';
 import ChangesTab from './editor/ChangesTab';
 import { getDocxViewerSelectionV2, getDocxViewerSelectionV2ClientRects, getDocxViewerSelectionV2FromRange } from '../../utils/editor/docxSelectionModel';
 
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
+const getCompatAccessToken = () => {
+  if (!AUTH_LOCALSTORAGE_COMPAT) return null;
+  return localStorage.getItem('accessToken') || localStorage.getItem('token');
+};
+
 // Keep this at module scope: React render ordering + const TDZ can otherwise throw in dev builds.
 function getFileType(filename, mimeType) {
   const extension = (filename || '').split('.').pop()?.toLowerCase() || '';
@@ -1794,11 +1800,10 @@ const DocumentViewer = () => {
       setIsFetchingImage(true);
       setImageError(false);
 
-      const token = localStorage.getItem('accessToken');
+      const token = getCompatAccessToken();
       fetch(documentUrl, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
       })
         .then(response => {
           if (!response.ok) {
@@ -1841,12 +1846,10 @@ const DocumentViewer = () => {
 
     // For preview-pdf and stream endpoints (encrypted files), fetch with auth headers
     if (actualDocumentUrl.includes('/preview-pdf') || actualDocumentUrl.includes('/stream')) {
-      const token = localStorage.getItem('accessToken');
+      const token = getCompatAccessToken();
       return {
         url: actualDocumentUrl,
-        httpHeaders: {
-          'Authorization': `Bearer ${token}`
-        }
+        httpHeaders: token ? { 'Authorization': `Bearer ${token}` } : {},
       };
     }
 

@@ -44,6 +44,12 @@ import mp4Icon from '../../assets/mp4.png';
 import mp3Icon from '../../assets/mp3.svg';
 import filesIcon from '../../assets/files-icon.svg';
 
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
+const getCompatAccessToken = () => {
+  if (!AUTH_LOCALSTORAGE_COMPAT) return null;
+  return localStorage.getItem('accessToken') || localStorage.getItem('token');
+};
+
 // Document Thumbnail Component - simplified to just show file icons (thumbnails not in use)
 const DocumentThumbnail = ({ documentId, filename, width = 80, height = 80 }) => {
 
@@ -709,7 +715,7 @@ const CategoryDetail = () => {
     if (files.length === 0 || !currentFolderId) return;
 
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = getCompatAccessToken();
 
       for (const file of files) {
         // Calculate file hash
@@ -726,9 +732,8 @@ const CategoryDetail = () => {
 
         const response = await fetch(`${process.env.REACT_APP_API_URL}/api/documents/upload`, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
+          credentials: 'include',
+          headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
           body: formData
         });
 
@@ -757,7 +762,7 @@ const CategoryDetail = () => {
     if (files.length === 0 || !currentFolderId) return;
 
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = getCompatAccessToken();
 
       for (const file of files) {
         // Calculate file hash
@@ -774,9 +779,8 @@ const CategoryDetail = () => {
 
         const response = await fetch(`${process.env.REACT_APP_API_URL}/api/documents/upload`, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
+          credentials: 'include',
+          headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
           body: formData
         });
 

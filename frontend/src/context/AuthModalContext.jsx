@@ -68,18 +68,17 @@ export function AuthModalProvider({ children }) {
     setDismissed(false);
     safeSessionRemove(DISMISSED_KEY);
     setIsOpen(true);
-    if (mode === AUTH_MODES.LOGIN || mode === AUTH_MODES.SIGNUP) setPreferredMode(mode);
+    const resolvedMode =
+      mode === AUTH_MODES.LOGIN || mode === AUTH_MODES.SIGNUP
+        ? mode
+        : (preferredMode || AUTH_MODES.LOGIN);
+    setPreferredMode(resolvedMode);
     const safeRt = sanitizeReturnTo(rt);
     if (safeRt) setReturnTo(safeRt);
-    // If caller wants login/signup but we're on a legacy /login|/signup route, normalize.
-    if (mode && location.pathname === ROUTES.LOGIN) {
-      navigate(buildRoute.auth(AUTH_MODES.LOGIN), { replace: true });
-    }
-    if (mode && location.pathname === ROUTES.SIGNUP) {
-      navigate(buildRoute.auth(AUTH_MODES.SIGNUP), { replace: true });
-    }
+    // Route-based auth flow: opening auth should always navigate to auth page.
+    navigate(buildRoute.auth(resolvedMode), { replace: false });
     void reason;
-  }, [location.pathname, navigate, sanitizeReturnTo]);
+  }, [navigate, preferredMode, sanitizeReturnTo]);
 
   const close = useCallback(() => {
     setIsOpen(false);
@@ -111,7 +110,7 @@ export function AuthModalProvider({ children }) {
     setDismissed(false);
     safeSessionRemove(DISMISSED_KEY);
 
-    // Check if this is a first-time upload redirect (new user onboarding)
+    // New-user onboarding takes precedence for signup/verification flows.
     const pendingFirstUpload = localStorage.getItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD);
     if (pendingFirstUpload === 'true') {
       localStorage.removeItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD);
@@ -127,20 +126,21 @@ export function AuthModalProvider({ children }) {
 
   // Safety net: if we become authenticated while currently on an auth route,
   // force-exit to returnTo/fallback so the modal can't get "stuck".
+  // NOTE: isOpen/dismissed intentionally omitted from deps — this effect only
+  // *resets* them; including them causes an infinite render loop with the
+  // route-synced effect below.
   useEffect(() => {
     if (loading) return;
     if (!isAuthenticated) return;
 
     // Close any open modal state; authenticated users shouldn't see the auth modal.
-    if (isOpen) setIsOpen(false);
-    if (dismissed) {
-      setDismissed(false);
-      safeSessionRemove(DISMISSED_KEY);
-    }
+    setIsOpen(false);
+    setDismissed(false);
+    safeSessionRemove(DISMISSED_KEY);
 
     if (!isAuthPathname(location.pathname)) return;
 
-    // Check for first-time upload redirect in safety net too
+    // New-user onboarding takes precedence in safety net too.
     const pendingFirstUpload = localStorage.getItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD);
     if (pendingFirstUpload === 'true') {
       localStorage.removeItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD);
@@ -152,7 +152,8 @@ export function AuthModalProvider({ children }) {
     const target = sanitizeReturnTo(returnTo) || DEFAULT_AUTH_REDIRECT;
     setReturnTo(null);
     navigate(target, { replace: true });
-  }, [dismissed, isAuthenticated, isOpen, loading, location.pathname, navigate, returnTo, sanitizeReturnTo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, loading, location.pathname, navigate, returnTo, sanitizeReturnTo]);
 
   // Bridge: allow axios interceptors to open modal via event bus.
   useEffect(() => {
@@ -170,6 +171,28 @@ export function AuthModalProvider({ children }) {
       setBackgroundLocation(location);
     }
   }, [loading, location]);
+
+  // Route-synced modal state: in screen-based auth flow, treat auth routes as
+  // "open" state and non-auth routes as "closed" to keep consumers consistent.
+  // NOTE: isOpen/dismissed intentionally omitted from deps to prevent infinite
+  // render loops with the safety-net effect above.  React 18 bails out of
+  // re-renders when setState receives the same value, so unconditional sets
+  // are safe here.
+  useEffect(() => {
+    if (loading) return;
+    const onAuthRoute = isAuthPathname(location.pathname);
+    if (onAuthRoute) {
+      // If the user is already authenticated the safety-net effect will
+      // redirect them away from the auth route.
+      if (isAuthenticated) return;
+      setIsOpen(true);
+      setDismissed(false);
+      safeSessionRemove(DISMISSED_KEY);
+      return;
+    }
+    setIsOpen(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, loading, location.pathname]);
 
   const value = useMemo(() => ({
     isOpen,

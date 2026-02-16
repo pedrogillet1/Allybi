@@ -1,6 +1,8 @@
 import api, { resetAuthDead } from './api';
 import { getApiBaseUrl } from './runtimeConfig';
 
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
+
 const authService = {
   /**
    * Register a new user (creates pending user, requires verification)
@@ -34,8 +36,10 @@ const authService = {
 
       // Email verification now completes registration and returns tokens
       if (response.data.tokens && response.data.tokens.accessToken) {
-        localStorage.setItem('accessToken', response.data.tokens.accessToken);
-        localStorage.setItem('refreshToken', response.data.tokens.refreshToken);
+        if (AUTH_LOCALSTORAGE_COMPAT) {
+          localStorage.setItem('accessToken', response.data.tokens.accessToken);
+          localStorage.setItem('refreshToken', response.data.tokens.refreshToken);
+        }
         localStorage.setItem('user', JSON.stringify(response.data.user));
         localStorage.removeItem('pendingEmail'); // Clean up
       }
@@ -84,9 +88,13 @@ const authService = {
       const response = await api.post('/api/auth/pending/verify-phone', data);
 
       // Registration complete, store tokens and user data
-      if (response.data.accessToken) {
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
+      // Backend returns { user, tokens: { accessToken, refreshToken } }
+      const tokens = response.data.tokens;
+      if (tokens && tokens.accessToken) {
+        if (AUTH_LOCALSTORAGE_COMPAT) {
+          localStorage.setItem('accessToken', tokens.accessToken);
+          localStorage.setItem('refreshToken', tokens.refreshToken);
+        }
         localStorage.setItem('user', JSON.stringify(response.data.user));
         localStorage.removeItem('pendingEmail'); // Clean up
       }
@@ -117,8 +125,10 @@ const authService = {
 
       // Otherwise, store tokens and user data
       if (response.data.accessToken) {
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
+        if (AUTH_LOCALSTORAGE_COMPAT) {
+          localStorage.setItem('accessToken', response.data.accessToken);
+          localStorage.setItem('refreshToken', response.data.refreshToken);
+        }
         localStorage.setItem('user', JSON.stringify(response.data.user));
         resetAuthDead(); // allow interceptor to retry requests again
       }
@@ -139,8 +149,10 @@ const authService = {
       const response = await api.post('/api/auth/2fa/verify-login', data);
 
       if (response.data.accessToken) {
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
+        if (AUTH_LOCALSTORAGE_COMPAT) {
+          localStorage.setItem('accessToken', response.data.accessToken);
+          localStorage.setItem('refreshToken', response.data.refreshToken);
+        }
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
 
@@ -156,17 +168,18 @@ const authService = {
    */
   async logout() {
     try {
-      const refreshToken = localStorage.getItem('refreshToken');
-
-      if (refreshToken) {
-        await api.post('/api/auth/logout', { refreshToken });
-      }
+      const payload = AUTH_LOCALSTORAGE_COMPAT
+        ? { refreshToken: localStorage.getItem('refreshToken') || undefined }
+        : {};
+      await api.post('/api/auth/logout', payload);
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
       // Clear local storage regardless of API call success
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      if (AUTH_LOCALSTORAGE_COMPAT) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+      }
       localStorage.removeItem('user');
     }
   },
@@ -275,22 +288,12 @@ const authService = {
    * @returns {boolean}
    */
   isAuthenticated() {
+    const user = this.getCurrentUser();
+    if (user) return true;
+    if (!AUTH_LOCALSTORAGE_COMPAT) return false;
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
-    const user = this.getCurrentUser();
-
-    // If we have user data and access token, definitely authenticated
-    if (accessToken && user) {
-      return true;
-    }
-
-    // If we have tokens but no user yet (OAuth redirect race condition),
-    // consider authenticated - user data will be fetched/restored by AuthContext
-    if (accessToken && refreshToken) {
-      return true;
-    }
-
-    return false;
+    return !!(accessToken && refreshToken);
   },
 
   /**

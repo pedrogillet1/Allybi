@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../constants/routes';
 import emailIcon from '../../assets/email-icon.svg';
@@ -9,7 +9,11 @@ import phoneIcon from '../../assets/phone-icon.svg';
 const Authentication = ({ variant = 'page' }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const isModal = variant === 'modal';
+
+  // Forward state from signup/login (email, 2FA info) to verification pages
+  const forwardState = location.state || {};
 
   return (
     <div style={{
@@ -81,7 +85,7 @@ const Authentication = ({ variant = 'page' }) => {
 
         {/* Email Option */}
         <button
-          onClick={() => navigate(ROUTES.VERIFY_EMAIL)}
+          onClick={() => navigate(ROUTES.VERIFY_EMAIL, { state: forwardState })}
           style={{
             width: '100%',
             height: '52px',
@@ -105,7 +109,7 @@ const Authentication = ({ variant = 'page' }) => {
 
         {/* Phone Option */}
         <button
-          onClick={() => navigate(ROUTES.PHONE_NUMBER)}
+          onClick={() => navigate(ROUTES.PHONE_NUMBER, { state: forwardState })}
           style={{
             width: '100%',
             height: '52px',
