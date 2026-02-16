@@ -499,7 +499,7 @@ const Settings = () => {
     }}>
       <LeftNav onNotificationClick={() => setShowNotificationsPopup(true)} />
 
-      <div style={{ flex: 1, height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* ── Header ── */}
         <div style={{
           minHeight: isMobile ? 56 : 72, paddingLeft: isMobile ? 16 : 48, paddingRight: isMobile ? 16 : 48,
@@ -548,7 +548,7 @@ const Settings = () => {
         `}</style>
 
         {/* ── Content ── */}
-        <div style={{ flex: 1, minHeight: 0, padding: isMobile ? 16 : '24px 48px', overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch', maxWidth: 1200, width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
+        <div style={{ flex: 1, minHeight: 0, padding: isMobile ? '16px 16px 80px' : '24px 48px', overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch', maxWidth: 1200, width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '220px 1fr', gap: 20, alignItems: 'start' }}>
 
             {/* ── Left: Section nav ── */}
