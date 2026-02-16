@@ -20,7 +20,7 @@ export const OnboardingProvider = ({ children }) => {
 
   /**
    * Open the onboarding modal
-   * @param {number} startStep - Step to start at (0-2)
+   * @param {number} startStep - Step to start at (0-4)
    * @param {string} triggerSource - Where the modal was triggered from ('auto' | 'settings')
    */
   const open = useCallback((startStep = 0, triggerSource = 'auto') => {
@@ -54,10 +54,10 @@ export const OnboardingProvider = ({ children }) => {
 
   /**
    * Navigate to a specific step
-   * @param {number} step - Step index (0-2)
+   * @param {number} step - Step index (0-4)
    */
   const goToStep = useCallback((step) => {
-    if (step >= 0 && step <= 2) {
+    if (step >= 0 && step <= 4) {
       setCurrentStep(step);
     }
   }, []);
@@ -68,7 +68,7 @@ export const OnboardingProvider = ({ children }) => {
    */
   const next = useCallback(() => {
     setCurrentStep(prev => {
-      if (prev < 2) {
+      if (prev < 4) {
         return prev + 1;
       } else {
         // Close on last step - use setTimeout to avoid state update during render

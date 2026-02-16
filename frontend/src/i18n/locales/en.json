@@ -23,6 +23,8 @@
     "security": "Security",
     "notifications": "Notifications",
     "signOut": "Sign out",
+    "introToAllybi": "Intro to Allybi",
+    "introToAllybiDesc": "Replay the welcome walkthrough",
     "signOutDesc": "Sign out of your Allybi account",
     "password": "Password",
     "passwordDesc": "Change your account password",
@@ -253,9 +255,13 @@
   "chat": {
     "mobileHeadline": "Ask Allybi about your files",
     "footerSecure": "Your workspace is secure with Allybi.",
-    "footerPrivacyPolicy": "Privacy Policy.",
-    "footerTermsOfUse": "Terms of Use.",
+    "footerImportantInfo": "Check important info.",
+    "footerTerms": "Terms of Service.",
+    "footerPrivacy": "Privacy Policy.",
     "footerCookiePreferences": "Cookie Preferences.",
+    "modalCookiePolicy": "Cookie Policy",
+    "modalAcceptableUse": "Acceptable Use Policy",
+    "modalSecurityPrivacy": "Security & Privacy Policy",
     "welcomeMessages": [
       "What do you want to find in your files?",
       "What can I pull up for you?",
@@ -1507,6 +1513,20 @@
       "bullet3": "\"Show me the presentation from last week's meeting.\""
     },
     "slide3": {
+      "title": "Connect your tools.",
+      "subtitle": "Connect Gmail, Outlook, or Slack to search messages and attachments from one place.",
+      "bullet1": "Search emails and threads without leaving Allybi.",
+      "bullet2": "Find attachments buried in old conversations.",
+      "bullet3": "Your credentials stay private — we never store your passwords."
+    },
+    "slide4": {
+      "title": "Turn answers into tables and drafts.",
+      "subtitle": "Go beyond Q&A — generate structured output from your files.",
+      "bullet1": "Ask Allybi to build a comparison table from your documents.",
+      "bullet2": "Generate first drafts of memos, summaries, or reports.",
+      "bullet3": "Export results as DOCX, XLSX, or PPTX in one click."
+    },
+    "slide5": {
       "title": "You're ready.",
       "subtitle": "Upload a file and ask your first question.",
       "bullet1": "Use the text bar to ask anything about your files.",

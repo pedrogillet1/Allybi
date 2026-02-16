@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import slideImage from '../../assets/intro-modal-1.png';
+import slideImage from '../../assets/intro-slide2.svg';
 
 /**
  * Slide 1: Organizing documents isn't your job. It's mine.
@@ -23,7 +23,7 @@ const Slide1 = () => {
         letterSpacing: '0.5px',
         marginBottom: 2
       }}>
-        {t('onboarding.step', { current: 1, total: 3 })}
+        {t('onboarding.step', { current: 1, total: 5 })}
       </div>
 
       {/* Title */}
@@ -51,13 +51,13 @@ const Slide1 = () => {
         {t('onboarding.slide1.subtitle')}
       </div>
 
-      {/* Centered Image with fade overlays */}
+      {/* Centered Image */}
       <div style={{
         width: '100%',
         height: '300px',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         margin: '0 auto',
         position: 'relative',
         overflow: 'hidden'
@@ -69,32 +69,10 @@ const Slide1 = () => {
             width: 'auto',
             height: 'auto',
             maxWidth: '100%',
-            maxHeight: 368,
-            objectFit: 'contain',
-            marginTop: 4
+            maxHeight: 367,
+            objectFit: 'contain'
           }}
         />
-
-        {/* White fade overlay at top */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '20px',
-          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 30%, rgba(255, 255, 255, 0) 100%)',
-          pointerEvents: 'none'
-        }} />
-        {/* White fade overlay at bottom */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '20px',
-          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 70%, rgba(255, 255, 255, 1) 100%)',
-          pointerEvents: 'none'
-        }} />
       </div>
 
       {/* Bullets */}

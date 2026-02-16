@@ -109,7 +109,9 @@ function AppContent() {
     const bgLocation = location;
 
     // Auth modal overlay — driven by AuthModalContext
-    const modalVisible = authModal.isOpen;
+    // Suppress modal when already on a full-page auth route
+    const onAuthRoute = location.pathname.startsWith('/a/');
+    const modalVisible = authModal.isOpen && !onAuthRoute;
     const modalContent = <UnifiedAuth variant="modal" />;
 
     return (
@@ -129,8 +131,8 @@ function AppContent() {
               <Route path={ROUTES.ADMIN_LOGIN} element={<AdminLogin />} />
 
               {/* Legacy auth URLs → redirect to / and open modal */}
-              <Route path={ROUTES.LOGIN} element={<AuthRedirect defaultMode="login" />} />
-              <Route path={ROUTES.SIGNUP} element={<AuthRedirect defaultMode="signup" />} />
+              <Route path={ROUTES.LOGIN} element={<UnifiedAuth variant="page" />} />
+              <Route path={ROUTES.SIGNUP} element={<UnifiedAuth variant="page" />} />
               <Route path={ROUTES.AUTH} element={<AuthRedirect />} />
               <Route path={ROUTES.AUTHENTICATION} element={<Authentication variant="page" />} />
               <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmail variant="page" />} />

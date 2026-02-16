@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { buildRoute, AUTH_MODES } from '../../constants/routes';
+import { ROUTES } from '../../constants/routes';
 import emailIcon from '../../assets/email-icon.svg';
 
 function ForgotPasswordVerification({ variant = 'page' }) {
@@ -144,7 +144,7 @@ function ForgotPasswordVerification({ variant = 'page' }) {
         </div>
 
         <button
-          onClick={() => navigate(buildRoute.auth(AUTH_MODES.LOGIN))}
+          onClick={() => navigate(ROUTES.LOGIN)}
           onMouseEnter={() => setBackHover(true)}
           onMouseLeave={() => setBackHover(false)}
           style={{

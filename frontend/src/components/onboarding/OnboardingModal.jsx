@@ -4,16 +4,18 @@ import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
 import Slide1 from './Slide1';
 import Slide2 from './Slide2';
 import Slide3 from './Slide3';
+import Slide4 from './Slide4';
+import Slide5 from './Slide5';
 
 /**
  * OnboardingModal Component - Refined
  *
- * Desktop-only 3-step onboarding that can be triggered from:
+ * Desktop-only 5-step onboarding that can be triggered from:
  * - Chat screen (auto, first login)
  * - Settings page (manual replay)
  *
  * Props are provided by OnboardingProvider:
- * - currentStep: Current slide index (0-2)
+ * - currentStep: Current slide index (0-4)
  * - onNext: Go to next slide or complete
  * - onBack: Go to previous slide
  * - onSkip: Skip onboarding
@@ -57,7 +59,9 @@ const OnboardingModal = ({ currentStep, onNext, onBack, onSkip, onComplete, onGo
   const slides = [
     <Slide1 key="slide1" />,
     <Slide2 key="slide2" />,
-    <Slide3 key="slide3" />
+    <Slide3 key="slide3" />,
+    <Slide4 key="slide4" />,
+    <Slide5 key="slide5" />
   ];
 
   // Determine animation direction
@@ -224,7 +228,7 @@ const OnboardingModal = ({ currentStep, onNext, onBack, onSkip, onComplete, onGo
               gap: 8,
               alignItems: 'center'
             }}>
-              {[0, 1, 2].map((index) => (
+              {[0, 1, 2, 3, 4].map((index) => (
                 <div
                   key={index}
                   onClick={() => handleDotClick(index)}
@@ -306,7 +310,7 @@ const OnboardingModal = ({ currentStep, onNext, onBack, onSkip, onComplete, onGo
                 onMouseEnter={(e) => e.currentTarget.style.background = '#32302C'}
                 onMouseLeave={(e) => e.currentTarget.style.background = '#111827'}
               >
-                {currentStep === 2 ? t('onboarding.start') : t('onboarding.next')}
+                {currentStep === 4 ? t('onboarding.start') : t('onboarding.next')}
               </button>
             </div>
           </div>

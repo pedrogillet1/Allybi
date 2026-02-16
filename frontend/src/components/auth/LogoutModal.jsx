@@ -4,22 +4,20 @@ import { useTranslation } from 'react-i18next';
 import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useAuth } from '../../context/AuthContext';
-import { useAuthModal } from '../../context/AuthModalContext';
+import { ROUTES } from '../../constants/routes';
 
 const LogoutModal = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const authModal = useAuthModal();
 
   if (!isOpen) return null;
 
   const handleLogout = async () => {
     await logout();
     onClose();
-    navigate('/');
-    authModal.open({ mode: 'login' });
+    navigate(ROUTES.LOGIN, { replace: true });
   };
 
   return (

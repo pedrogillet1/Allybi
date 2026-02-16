@@ -23,6 +23,8 @@
     "security": "Segurança",
     "notifications": "Notificações",
     "signOut": "Sair",
+    "introToAllybi": "Introdução ao Allybi",
+    "introToAllybiDesc": "Repetir o tour de boas-vindas",
     "signOutDesc": "Sair da sua conta Allybi",
     "password": "Senha",
     "passwordDesc": "Alterar a senha da sua conta",
@@ -242,9 +244,13 @@
   },
   "chat": {
     "footerSecure": "Seu espaço de trabalho é seguro com Allybi.",
-    "footerPrivacyPolicy": "Política de Privacidade.",
-    "footerTermsOfUse": "Termos de Uso.",
+    "footerImportantInfo": "Confira informações importantes.",
+    "footerTerms": "Termos de serviço.",
+    "footerPrivacy": "Política de privacidade.",
     "footerCookiePreferences": "Preferências de Cookies.",
+    "modalCookiePolicy": "Política de cookies",
+    "modalAcceptableUse": "Política de uso aceitável",
+    "modalSecurityPrivacy": "Política de segurança e privacidade",
     "welcomeMessages": [
       "O que você quer encontrar nos seus arquivos?",
       "O que você quer que eu abra para você?",
@@ -1474,11 +1480,24 @@
       "bullet3": "Clique em qualquer linha para abrir o arquivo e me perguntar sobre ele."
     },
     "slide3": {
-      "title": "Envie seus arquivos e faça sua primeira pergunta.",
-      "subtitle": "Da próxima vez que precisar de um número, cláusula ou plano, basta me perguntar aqui.",
+      "title": "Conecte suas ferramentas.",
+      "subtitle": "Conecte Gmail, Outlook ou Slack para buscar mensagens e anexos em um só lugar.",
+      "bullet1": "Pesquise e-mails e conversas sem sair do Allybi.",
+      "bullet2": "Encontre anexos perdidos em conversas antigas.",
+      "bullet3": "Suas credenciais são privadas — nunca armazenamos suas senhas."
+    },
+    "slide4": {
+      "title": "Transforme respostas em tabelas e rascunhos.",
+      "subtitle": "Vá além de perguntas e respostas — gere resultados estruturados a partir dos seus arquivos.",
+      "bullet1": "Peça ao Allybi para criar uma tabela comparativa dos seus documentos.",
+      "bullet2": "Gere primeiros rascunhos de memorandos, resumos ou relatórios.",
+      "bullet3": "Exporte resultados como DOCX, XLSX ou PPTX em um clique."
+    },
+    "slide5": {
+      "title": "Você está pronto.",
+      "subtitle": "Envie um arquivo e faça sua primeira pergunta.",
       "bullet1": "Use a barra de texto para perguntar qualquer coisa sobre seus arquivos.",
-      "bullet2": "Clique no clipe de papel para enviar novos documentos.",
-      "bullet3": "Fale naturalmente — você não precisa de comandos especiais."
+      "bullet2": "Clique no clipe de papel para enviar novos documentos."
     },
     "settingsCard": {
       "title": "Introdução ao Allybi",

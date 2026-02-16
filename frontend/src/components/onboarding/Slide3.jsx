@@ -1,16 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import slideImage from '../../assets/intro-modal-3.png';
+import slideImage from '../../assets/intro-slide3.svg';
 
 /**
- * Slide 3: Send your files and ask your first question - Refined
+ * Slide 3: Connect your tools.
  *
- * Shows chat interface mockup with:
- * - Koda welcome bubble
- * - User example question
- * - Two stacked example questions (darker grey)
- * - "START HERE" label above input bar
- * - Highlighted input bar with pulse animation (1-2 second loop)
+ * Shows Gmail, Outlook, and Slack integration cards.
  */
 const Slide3 = () => {
   const { t } = useTranslation();
@@ -30,7 +25,7 @@ const Slide3 = () => {
         letterSpacing: '0.5px',
         marginBottom: 4
       }}>
-        {t('onboarding.step', { current: 3, total: 3 })}
+        {t('onboarding.step', { current: 3, total: 5 })}
       </div>
 
       {/* Title */}
@@ -58,27 +53,26 @@ const Slide3 = () => {
         {t('onboarding.slide3.subtitle')}
       </div>
 
-      {/* Centered Image with top and bottom fade */}
+      {/* Centered Image */}
       <div style={{
         width: '100%',
         height: '300px',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         margin: '0 auto',
         position: 'relative',
         overflow: 'hidden'
       }}>
         <img
           src={slideImage}
-          alt="Chat interface illustration"
+          alt="Integrations illustration"
           style={{
             width: 'auto',
             height: 'auto',
             maxWidth: '100%',
-            maxHeight: 345,
-            objectFit: 'contain',
-            marginTop: 60
+            maxHeight: 367,
+            objectFit: 'contain'
           }}
         />
       </div>
@@ -113,6 +107,18 @@ const Slide3 = () => {
         }}>
           <span style={{ color: '#6B7280' }}>•</span>
           <span>{t('onboarding.slide3.bullet2')}</span>
+        </div>
+        <div style={{
+          fontSize: 14,
+          fontWeight: '400',
+          color: '#111827',
+          fontFamily: 'Plus Jakarta Sans',
+          lineHeight: '22px',
+          display: 'flex',
+          gap: 8
+        }}>
+          <span style={{ color: '#6B7280' }}>•</span>
+          <span>{t('onboarding.slide3.bullet3')}</span>
         </div>
       </div>
     </div>

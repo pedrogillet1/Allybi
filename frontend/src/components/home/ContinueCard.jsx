@@ -123,9 +123,16 @@ export default function ContinueCard({ onUpload }) {
   const { data: conversationsData } = useConversations();
   const isMobile = useIsMobile();
 
+  // Show recently *viewed* documents (tracked via localStorage in DocumentViewer)
+  const viewHistory = React.useMemo(() => {
+    try { return JSON.parse(localStorage.getItem('documentViewHistory') || '{}'); }
+    catch { return {}; }
+  }, []);
+
   const recentDocs = (documents || [])
+    .filter(doc => viewHistory[doc.id])
     .slice()
-    .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
+    .sort((a, b) => (viewHistory[b.id] || 0) - (viewHistory[a.id] || 0))
     .slice(0, 4);
 
   const recentChats = (conversationsData?.conversations || [])
@@ -227,7 +234,7 @@ export default function ContinueCard({ onUpload }) {
               key={doc.id}
               iconSrc={getDocIcon(doc.filename)}
               label={cleanDocumentName(doc.filename)}
-              subtitle={formatTimeAgo(doc.updatedAt || doc.createdAt)}
+              subtitle={formatTimeAgo(viewHistory[doc.id] ? new Date(viewHistory[doc.id]).toISOString() : doc.updatedAt || doc.createdAt)}
               onClick={() => navigate(buildRoute.document(doc.id))}
             />
           ))}

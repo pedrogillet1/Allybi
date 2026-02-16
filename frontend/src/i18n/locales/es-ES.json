@@ -23,6 +23,8 @@
     "security": "Seguridad",
     "notifications": "Notificaciones",
     "signOut": "Cerrar sesión",
+    "introToAllybi": "Introducción a Allybi",
+    "introToAllybiDesc": "Repetir el recorrido de bienvenida",
     "signOutDesc": "Cerrar sesión de tu cuenta de Allybi",
     "password": "Contraseña",
     "passwordDesc": "Cambiar la contraseña de tu cuenta",
@@ -242,9 +244,13 @@
   },
   "chat": {
     "footerSecure": "Tu espacio de trabajo es seguro con Allybi.",
-    "footerPrivacyPolicy": "Política de Privacidad.",
-    "footerTermsOfUse": "Términos de Uso.",
+    "footerImportantInfo": "Consulta información importante.",
+    "footerTerms": "Términos de servicio.",
+    "footerPrivacy": "Política de privacidad.",
     "footerCookiePreferences": "Preferencias de Cookies.",
+    "modalCookiePolicy": "Política de cookies",
+    "modalAcceptableUse": "Política de uso aceptable",
+    "modalSecurityPrivacy": "Política de seguridad y privacidad",
     "documentSources": "Fuentes del Documento ({{count}})",
     "webSources": "Fuentes Web ({{count}})",
     "noDocumentsReferenced": "No se referenciaron documentos para esta respuesta.",
@@ -1505,11 +1511,24 @@
       "bullet3": "Haz clic en cualquier línea para abrir el archivo y preguntarme sobre él."
     },
     "slide3": {
-      "title": "Envía tus archivos y haz tu primera pregunta.",
-      "subtitle": "La próxima vez que necesites un número, cláusula o plan, solo pregúntame aquí.",
+      "title": "Conecta tus herramientas.",
+      "subtitle": "Conecta Gmail, Outlook o Slack para buscar mensajes y archivos adjuntos desde un solo lugar.",
+      "bullet1": "Busca correos e hilos sin salir de Allybi.",
+      "bullet2": "Encuentra adjuntos perdidos en conversaciones antiguas.",
+      "bullet3": "Tus credenciales son privadas — nunca almacenamos tus contraseñas."
+    },
+    "slide4": {
+      "title": "Convierte respuestas en tablas y borradores.",
+      "subtitle": "Ve más allá de preguntas y respuestas — genera resultados estructurados a partir de tus archivos.",
+      "bullet1": "Pide a Allybi que cree una tabla comparativa de tus documentos.",
+      "bullet2": "Genera primeros borradores de memorandos, resúmenes o informes.",
+      "bullet3": "Exporta resultados como DOCX, XLSX o PPTX en un clic."
+    },
+    "slide5": {
+      "title": "Estás listo.",
+      "subtitle": "Sube un archivo y haz tu primera pregunta.",
       "bullet1": "Usa la barra de texto para preguntar cualquier cosa sobre tus archivos.",
-      "bullet2": "Haz clic en el clip para subir nuevos documentos.",
-      "bullet3": "Habla naturalmente — no necesitas comandos especiales."
+      "bullet2": "Haz clic en el clip para subir nuevos documentos."
     },
     "settingsCard": {
       "title": "Introducción a Allybi",

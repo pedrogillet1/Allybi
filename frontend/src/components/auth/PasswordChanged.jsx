@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { buildRoute, AUTH_MODES } from '../../constants/routes';
+import { ROUTES } from '../../constants/routes';
 import { ReactComponent as CheckCircle } from '../../assets/check-circle.svg';
 
 const PasswordChanged = () => {
@@ -20,7 +20,7 @@ const PasswordChanged = () => {
                     <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#32302C', fontSize: 30, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', textTransform: 'capitalize', lineHeight: '40px'}}>{t('passwordChanged.congratulations')}</div>
                     <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#6C6B6E', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '24px'}}>{t('passwordChanged.passwordReset')}</div>
                 </div>
-                <button onClick={() => navigate(buildRoute.auth(AUTH_MODES.LOGIN))} style={{width: '100%', height: 52, background: 'rgba(24, 24, 24, 0.90)', borderRadius: 14, border: 'none', cursor: 'pointer'}}>
+                <button onClick={() => navigate(ROUTES.LOGIN)} style={{width: '100%', height: 52, background: 'rgba(24, 24, 24, 0.90)', borderRadius: 14, border: 'none', cursor: 'pointer'}}>
                     <div style={{color: 'white', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', textTransform: 'capitalize', lineHeight: '24px'}}>{t('passwordChanged.backToLogin')}</div>
                 </button>
             </div>

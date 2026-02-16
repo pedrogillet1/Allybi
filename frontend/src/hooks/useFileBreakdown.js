@@ -7,6 +7,7 @@ import pngIcon from '../assets/png-icon.png';
 import pptxIcon from '../assets/pptx.png';
 import movIcon from '../assets/mov.png';
 import mp4Icon from '../assets/mp4.png';
+import txtIcon from '../assets/txt-icon.png';
 
 const MAIN_TYPES = {
   pdf: 'pdf', docx: 'docx', doc: 'docx',
@@ -25,7 +26,7 @@ const COLOR_MAP = {
 const ICON_MAP = {
   png: pngIcon, jpg: jpgIcon, pdf: pdfIcon,
   docx: docIcon, xlsx: xlsIcon, pptx: pptxIcon,
-  mov: movIcon, mp4: mp4Icon, other: null,
+  mov: movIcon, mp4: mp4Icon, other: txtIcon,
 };
 
 const LABEL_MAP = {

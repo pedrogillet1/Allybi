@@ -1532,6 +1532,15 @@ export default function ChatInterface({
   const [allFilesListing, setAllFilesListing] = useState(null); // { items, breadcrumb } for "Show all" modal
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+
+  // Close info modal on Esc
+  useEffect(() => {
+    if (!showInfoModal) return;
+    const handleEsc = (e) => { if (e.key === 'Escape') setShowInfoModal(false); };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [showInfoModal]);
 
   // Smart scroll state
   const [atBottom, setAtBottom] = useState(true);
@@ -4029,7 +4038,7 @@ export default function ChatInterface({
         <div
           style={{
             // Allow cards (emails, previews, etc.) to breathe; keep centered.
-            maxWidth: isViewerVariant ? '100%' : (isMobile ? '100%' : 860),
+            maxWidth: isViewerVariant ? '100%' : (isMobile ? '100%' : 760),
             margin: isViewerVariant ? '0' : '0 auto',
             width: '100%',
             height: '100%',
@@ -4786,7 +4795,7 @@ export default function ChatInterface({
 	                                      ? (isLong ? "12px 14px" : "10px 12px")
 	                                      : (isLong ? "12px 14px" : "10px 14px"),
 	                                    borderRadius: isViewerVariant ? 16 : 18,
-	                                    background: "#000000",
+	                                    background: "#181818",
 	                                    color: "rgba(255,255,255,0.95)",
 	                                    fontSize: 14,
 	                                    fontFamily: "'Plus Jakarta Sans', sans-serif",
@@ -4911,7 +4920,7 @@ export default function ChatInterface({
           borderTop: "none",
         }}
       >
-        <div style={{ maxWidth: 860, margin: "0 auto" }}>
+        <div style={{ maxWidth: 760, margin: "0 auto" }}>
           {/* Uploading previews */}
           {!isViewerVariant && uploading.length ? (
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
@@ -5512,28 +5521,41 @@ export default function ChatInterface({
               {t('chat.footerSecure')}
               {' '}
               <a
-                href={ROUTES.PRIVACY_POLICY}
-                onClick={(e) => { e.preventDefault(); navigate(ROUTES.PRIVACY_POLICY); }}
+                href="#"
+                onClick={(e) => { e.preventDefault(); setShowInfoModal(true); }}
                 style={{ color: '#9CA3AF', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s' }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = '#6C6B6E'; e.currentTarget.style.textDecoration = 'underline'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = '#9CA3AF'; e.currentTarget.style.textDecoration = 'none'; }}
               >
-                {t('chat.footerPrivacyPolicy')}
+                {t('chat.footerImportantInfo')}
               </a>
               {' '}
               <a
-                href={ROUTES.TERMS_OF_USE}
-                onClick={(e) => { e.preventDefault(); navigate(ROUTES.TERMS_OF_USE); }}
+                href="https://www.getkoda.io/terms.html"
+                target="_blank"
+                rel="noopener noreferrer"
                 style={{ color: '#9CA3AF', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s' }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = '#6C6B6E'; e.currentTarget.style.textDecoration = 'underline'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = '#9CA3AF'; e.currentTarget.style.textDecoration = 'none'; }}
               >
-                {t('chat.footerTermsOfUse')}
+                {t('chat.footerTerms')}
               </a>
               {' '}
               <a
-                href={`${ROUTES.SETTINGS}?section=about`}
-                onClick={(e) => { e.preventDefault(); navigate(`${ROUTES.SETTINGS}?section=about`); }}
+                href="https://www.getkoda.io/privacy.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#9CA3AF', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#6C6B6E'; e.currentTarget.style.textDecoration = 'underline'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = '#9CA3AF'; e.currentTarget.style.textDecoration = 'none'; }}
+              >
+                {t('chat.footerPrivacy')}
+              </a>
+              {' '}
+              <a
+                href="https://www.getkoda.io/cookies.html"
+                target="_blank"
+                rel="noopener noreferrer"
                 style={{ color: '#9CA3AF', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s' }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = '#6C6B6E'; e.currentTarget.style.textDecoration = 'underline'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = '#9CA3AF'; e.currentTarget.style.textDecoration = 'none'; }}
@@ -5544,6 +5566,76 @@ export default function ChatInterface({
           </div>
         </div>
       </div>
+
+      {/* Important Info Modal */}
+      {showInfoModal && (
+        <div
+          onClick={() => setShowInfoModal(false)}
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)', zIndex: 1200,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#FFFFFF', borderRadius: 16, maxWidth: 420, width: '100%',
+              boxShadow: '0 24px 40px rgba(0,0,0,0.18)', padding: '24px 24px 20px',
+              display: 'flex', flexDirection: 'column', gap: 4
+            }}
+          >
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <div style={{ fontSize: 17, fontWeight: 600, color: '#111827', fontFamily: 'Plus Jakarta Sans' }}>
+                {t('chat.footerImportantInfo')}
+              </div>
+              <div
+                onClick={() => setShowInfoModal(false)}
+                style={{
+                  width: 28, height: 28, borderRadius: '50%', background: '#F5F5F5',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                  transition: 'background 0.15s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#E6E6EC'}
+                onMouseLeave={(e) => e.currentTarget.style.background = '#F5F5F5'}
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              </div>
+            </div>
+            {/* Policy rows */}
+            {[
+              { label: t('chat.footerTerms').replace(/\.$/, ''), url: 'https://www.getkoda.io/terms.html' },
+              { label: t('chat.footerPrivacy').replace(/\.$/, ''), url: 'https://www.getkoda.io/privacy.html' },
+              { label: t('chat.modalCookiePolicy'), url: 'https://www.getkoda.io/cookies.html' },
+              { label: t('chat.modalAcceptableUse'), url: 'https://www.getkoda.io/acceptable-use.html' },
+              { label: t('chat.modalSecurityPrivacy'), url: 'https://www.getkoda.io/security.html' },
+            ].map((item, i) => (
+              <a
+                key={i}
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '12px 12px', borderRadius: 10, textDecoration: 'none',
+                  color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: 500,
+                  transition: 'background 0.15s', cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              >
+                <span>{item.label}</span>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" style={{ flexShrink: 0, opacity: 0.5 }}>
+                  <path d="M5.25 2.625H2.625v8.75h8.75V8.75" stroke="#6B7280" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M8.75 1.75h3.5v3.5M8.75 5.25L12.25 1.75" stroke="#6B7280" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Preview modal */}
       <DocumentPreviewModal

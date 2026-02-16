@@ -14,6 +14,7 @@ import api from '../../services/api';
 import LogoutModal from '../auth/LogoutModal';
 import IntegrationsCard from '../home/IntegrationsCard';
 import FileInsightsCard from '../home/FileInsightsCard';
+import { useOnboarding } from '../../context/OnboardingContext';
 
 // ─── Tokens (identical to Home / Upload / Integrations) ───
 const F = 'Plus Jakarta Sans, sans-serif';
@@ -91,6 +92,11 @@ const Icons = {
       <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
     </svg>
   ),
+  playCircle: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
+    </svg>
+  ),
 };
 
 const SECTION_ICONS = {
@@ -106,6 +112,7 @@ const Settings = () => {
   const { showSuccess, showError } = useNotifications();
   const { documents: contextDocuments, refreshAll } = useDocuments();
   const { updateUser: updateAuthUser } = useAuth();
+  const { open: openOnboarding } = useOnboarding();
 
   // ─── Section nav config (inside component for i18n) ───
   const SECTIONS = [
@@ -361,6 +368,12 @@ const Settings = () => {
           </div>
         </div>
         <Row
+          icon={Icons.playCircle}
+          title={t('settings.introToAllybi')}
+          desc={t('settings.introToAllybiDesc')}
+          onClick={() => openOnboarding(0, 'settings')}
+        />
+        <Row
           icon={Icons.logOut}
           title={t('settings.signOut')}
           desc={t('settings.signOutDesc')}
@@ -533,7 +546,7 @@ const Settings = () => {
 
         {/* ── Content ── */}
         <div style={{ flex: 1, padding: isMobile ? 16 : '24px 48px', overflowY: 'auto', maxWidth: 1200, width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '220px 1fr', gap: 20, alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '260px 1fr', gap: 32, alignItems: 'start' }}>
 
             {/* ── Left: Section nav ── */}
             {!isMobile && (

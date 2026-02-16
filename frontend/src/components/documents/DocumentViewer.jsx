@@ -1939,6 +1939,13 @@ const DocumentViewer = () => {
         if (foundDocument) {
           setDocument(foundDocument);
 
+          // Record document view in localStorage for "Continue" card
+          try {
+            const viewHistory = JSON.parse(localStorage.getItem('documentViewHistory') || '{}');
+            viewHistory[documentId] = Date.now();
+            localStorage.setItem('documentViewHistory', JSON.stringify(viewHistory));
+          } catch (_) { /* ignore storage errors */ }
+
           // Store extracted text if available
           if (foundDocument.metadata && foundDocument.metadata.extractedText) {
             setExtractedText(foundDocument.metadata.extractedText);
