@@ -132,10 +132,12 @@ export default function FirstDocumentUpload() {
   return (
     <div style={{
       background: '#FFFFFF',
-      minHeight: '100vh',
+      minHeight: '100dvh',
       display: 'flex',
       flexDirection: 'column',
       fontFamily: 'Plus Jakarta Sans, sans-serif',
+      overflowY: 'auto',
+      WebkitOverflowScrolling: 'touch',
     }}>
       {/* Top bar: Back + Skip */}
       <div style={{
@@ -185,7 +187,7 @@ export default function FirstDocumentUpload() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '0 24px 48px',
+        padding: '0 24px calc(env(safe-area-inset-bottom) + 48px)',
         maxWidth: 560,
         width: '100%',
         margin: '0 auto',

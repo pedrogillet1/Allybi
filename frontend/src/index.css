@@ -1229,13 +1229,13 @@ button.btn-ghost:active:not(:disabled), .btn-ghost:active:not(:disabled) {
     font-family: 'Plus Jakarta Sans', sans-serif !important;
   }
 
-  /* All icons and labels are white (outline only, no fill) */
+  .mobile-bottom-nav-item .mobile-bottom-nav-item-icon img,
   .mobile-bottom-nav-item .mobile-bottom-nav-item-icon svg {
-    color: #FFFFFF !important;
-  }
-  .mobile-bottom-nav-item .mobile-bottom-nav-item-icon svg path {
-    fill: none !important;
-    stroke: #FFFFFF !important;
+    width: 20px !important;
+    height: 20px !important;
+    display: block !important;
+    object-fit: contain !important;
+    image-rendering: auto !important;
   }
 
   .mobile-bottom-nav-item .mobile-bottom-nav-item-label {

@@ -1198,7 +1198,7 @@ const Documents = () => {
         )}
 
         {/* Scrollable Content */}
-        <div className="scrollable-content documents-content" style={{flex: 1, minHeight: 0, padding: isMobile ? 12 : 48, paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 120, overflowY: isMobile ? 'hidden' : 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 24, maxWidth: 1440, margin: '0 auto', width: '100%', boxSizing: 'border-box', WebkitOverflowScrolling: 'touch'}}>
+        <div className="scrollable-content documents-content" style={{flex: 1, minHeight: 0, padding: isMobile ? 12 : 48, paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 120, overflowY: 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 24, maxWidth: 1440, margin: '0 auto', width: '100%', boxSizing: 'border-box', WebkitOverflowScrolling: 'touch'}}>
 
           {/* Row 1: Categories (8col) + Integrations (4col) */}
           <div style={{

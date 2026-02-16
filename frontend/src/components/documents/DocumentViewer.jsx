@@ -4193,6 +4193,7 @@ const DocumentViewer = () => {
               width: isMobile ? 36 : 42,
               height: isMobile ? 36 : 42,
               background: 'white',
+              color: '#181818',
               borderRadius: 100,
               outline: '1px #E6E6EC solid',
               outlineOffset: '-1px',
@@ -4211,7 +4212,7 @@ const DocumentViewer = () => {
               e.currentTarget.style.background = 'white';
             }}
           >
-            <ArrowLeftIcon style={{ width: 18, height: 18, stroke: '#181818' }} />
+            <ArrowLeftIcon style={{ width: 18, height: 18, color: '#181818' }} />
           </button>
 
           <div style={{ flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: isMobile ? 4 : 8, display: 'inline-flex', minWidth: 0, overflow: 'hidden' }}>

@@ -65,12 +65,15 @@ export default function FileInsightsCard() {
       borderRadius: 16,
       border: '1px solid #E6E6EC',
       boxShadow: '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)',
-      padding: 24,
-      flex: 1,
+      padding: isMobile ? 16 : 24,
+      flex: isMobile ? 'none' : 1,
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
       minWidth: 0,
+      maxWidth: '100%',
+      width: '100%',
+      boxSizing: 'border-box',
     }}>
       {/* Hide scrollbar */}
       {needsCarousel && (
@@ -93,17 +96,17 @@ export default function FileInsightsCard() {
       {/* File type icons — scrollable carousel when > 3 types */}
       <div style={{
         position: 'relative',
-        marginBottom: 24,
+        marginBottom: isMobile ? 16 : 24,
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         /* bleed into card padding so fade reaches card edge */
-        marginLeft: needsCarousel ? -24 : 0,
-        marginRight: needsCarousel ? -24 : 0,
+        marginLeft: needsCarousel && !isMobile ? -24 : 0,
+        marginRight: needsCarousel && !isMobile ? -24 : 0,
       }}>
         {/* Right fade — peek effect */}
-        {needsCarousel && canScrollRight && (
+        {needsCarousel && !isMobile && canScrollRight && (
           <div
             aria-hidden="true"
             style={{
@@ -135,6 +138,7 @@ export default function FileInsightsCard() {
             msOverflowStyle: 'none',
             paddingLeft: needsCarousel ? 24 : 0,
             paddingRight: needsCarousel ? 24 : 0,
+            boxSizing: 'border-box',
           }}
         >
           {breakdown.map(item => (
