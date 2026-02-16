@@ -6,7 +6,8 @@ export class APIError extends Error {
   constructor(
     public status: number,
     public statusText: string,
-    message: string
+    message: string,
+    public code?: string
   ) {
     super(message);
     this.name = "APIError";
@@ -25,6 +26,14 @@ export class ValidationError extends Error {
 
 interface FetchOptions extends RequestInit {
   params?: Record<string, string | undefined>;
+}
+
+function classifyProxyFailure(
+  endpoint: string,
+  status: number,
+  contentType: string
+): boolean {
+  return status === 500 && !contentType.includes("application/json") && endpoint.startsWith("/admin/");
 }
 
 function getAuthHeaders(): Record<string, string> {
@@ -64,10 +73,30 @@ async function fetchWithValidation<T>(
   });
 
   if (!response.ok) {
+    const contentType = response.headers.get("content-type") || "";
+    let errorData: Record<string, unknown> = {};
+    if (contentType.includes("application/json")) {
+      errorData = await response.json().catch(() => ({}));
+    } else {
+      const rawText = await response.text().catch(() => "");
+      if (rawText) errorData = { error: rawText };
+    }
+
+    const isProxyStyle500 = classifyProxyFailure(endpoint, response.status, contentType);
+    const proxyHint = isProxyStyle500
+      ? " Admin API proxy/backend unavailable. Confirm dashboard proxy target and backend on port 5001."
+      : "";
+
+    const baseMessage =
+      (errorData.message as string) ||
+      (errorData.error as string) ||
+      `API request failed: ${response.status} ${response.statusText}`;
+
     throw new APIError(
       response.status,
       response.statusText,
-      `API request failed: ${response.status} ${response.statusText}`
+      `${baseMessage}${proxyHint}`,
+      errorData.code as string | undefined
     );
   }
 

@@ -35,11 +35,11 @@ export default function AuthModalShell({ children, isVisible }) {
   }, [dismiss, isVisible]);
 
   const panelStyle = useMemo(() => ({
-    width: '100%',
+    width: isMobile ? 'calc(100% - 16px)' : '100%',
     maxWidth: isMobile ? '100%' : 520,
-    maxHeight: isMobile ? 'calc(var(--app-height, 100dvh) - 24px - env(safe-area-inset-top, 0px))' : '90vh',
+    maxHeight: isMobile ? 'calc(var(--app-height, 100dvh) - 16px)' : '90vh',
     background: '#FFFFFF',
-    borderRadius: isMobile ? '20px 20px 0 0' : 18,
+    borderRadius: 20,
     boxShadow: '0 24px 72px rgba(0, 0, 0, 0.20)',
     overflow: 'hidden',
     position: 'relative',
@@ -55,18 +55,21 @@ export default function AuthModalShell({ children, isVisible }) {
       aria-modal="true"
       style={{
         position: 'fixed',
-        inset: 0,
+        top: 0,
+        left: 0,
+        right: 0,
         width: '100%',
-        height: '100%',
+        height: isMobile ? 'var(--app-height, 100dvh)' : '100%',
         background: 'rgba(17, 19, 21, 0.55)',
         backdropFilter: 'blur(6px)',
         WebkitBackdropFilter: 'blur(6px)',
         display: 'flex',
         alignItems: isMobile ? 'flex-end' : 'center',
         justifyContent: 'center',
-        padding: isMobile ? 0 : 20,
+        padding: isMobile ? '8px 0' : 20,
         boxSizing: 'border-box',
         zIndex: 12000,
+        transition: isMobile ? 'height 200ms ease' : 'none',
       }}
       onMouseDown={() => dismiss()}
     >
@@ -108,8 +111,10 @@ export default function AuthModalShell({ children, isVisible }) {
         <div
           style={{
             width: '100%',
-            height: '100%',
+            flex: 1,
+            minHeight: 0,
             overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
           }}
         >
           {children}

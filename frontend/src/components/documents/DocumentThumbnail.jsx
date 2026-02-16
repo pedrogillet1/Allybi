@@ -12,6 +12,11 @@ import movIcon from '../../assets/mov.png';
 import mp4Icon from '../../assets/mp4.png';
 import mp3Icon from '../../assets/mp3.svg';
 import { hasCanvasSupport, safeCanvasOperation } from '../../utils/browser/browserUtils';
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
+const getCompatAccessToken = () => {
+    if (!AUTH_LOCALSTORAGE_COMPAT) return null;
+    return localStorage.getItem('accessToken') || localStorage.getItem('token');
+};
 
 // Set PDF.js worker - use jsdelivr CDN matching the installed pdfjs-dist version
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
@@ -172,11 +177,10 @@ const DocumentThumbnail = ({ document, width = 120, height = 160, showIcon = fal
         const generateThumbnail = async () => {
             try {
                 // Download and decrypt the document
-                const token = localStorage.getItem('accessToken');
+                const token = getCompatAccessToken();
                 const response = await fetch(`${process.env.REACT_APP_API_URL}/api/documents/${document.id}/download`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
+                    credentials: 'include',
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
                 });
 
                 if (!response.ok) {

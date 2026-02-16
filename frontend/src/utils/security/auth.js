@@ -1,21 +1,15 @@
 import { getApiBaseUrl } from '../../services/runtimeConfig';
 
 const API_URL = getApiBaseUrl();
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 
 /**
  * Check if token is expired and refresh if needed
  * Returns a valid authentication token
  */
 export async function getValidToken() {
-  // Use 'accessToken' to match existing api.js setup
-  const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-
-  if (!token) {
-    throw new Error('No token found. Please log in.');
-  }
-
-  // Token refresh is handled by api.js interceptor
-  return token;
+  if (!AUTH_LOCALSTORAGE_COMPAT) return null;
+  return localStorage.getItem('accessToken') || localStorage.getItem('token');
 }
 
 /**
@@ -29,11 +23,12 @@ export async function fetchWithAuth(url, options = {}) {
 
   const headers = {
     ...options.headers,
-    Authorization: `Bearer ${token}`,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
   const response = await fetch(fullUrl, {
     ...options,
+    credentials: 'include',
     headers,
   });
 
@@ -53,4 +48,3 @@ export function handleAuthError(error) {
   }
   return false;
 }
-

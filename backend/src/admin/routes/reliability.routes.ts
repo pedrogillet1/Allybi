@@ -7,6 +7,7 @@ import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { listErrors, listIngestionFailures, getReliabilityTimeseries } from '../../services/admin';
 import { parseRange, normalizeRange } from '../../services/admin/_shared/rangeWindow';
+import { getGoogleMetrics } from '../../services/admin/googleMetrics.service';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -33,9 +34,10 @@ router.get('/', async (req: Request, res: Response) => {
     const { from, to } = window;
 
     // Get error and failure data
-    const [errorsResult, ingestionResult] = await Promise.all([
+    const [errorsResult, ingestionResult, google] = await Promise.all([
       listErrors(prisma, { range, limit: 50 }),
       listIngestionFailures(prisma, { range, limit: 50 }),
+      getGoogleMetrics(prisma, window),
     ]);
 
     // Calculate KPIs from ModelCall table
@@ -43,7 +45,7 @@ router.get('/', async (req: Request, res: Response) => {
       where: { at: { gte: from, lt: to } },
       select: { durationMs: true, status: true },
       take: 100000,
-    });
+    }).catch(() => []);
 
     const latencies = modelCalls.map(c => c.durationMs ?? 0).filter(v => v > 0);
     const errorCount = modelCalls.filter(c => c.status === 'fail').length;
@@ -53,20 +55,20 @@ router.get('/', async (req: Request, res: Response) => {
     // Get message count
     const totalMessages = await prisma.message.count({
       where: { createdAt: { gte: from, lt: to } },
-    });
+    }).catch(() => 0);
 
     // Get active users (users with messages in time range)
     const activeUsersData = await prisma.message.groupBy({
       by: ['conversationId'],
       where: { createdAt: { gte: from, lt: to } },
-    });
+    }).catch(() => []);
     // Get unique user count from conversations
     const conversationIds = activeUsersData.map(d => d.conversationId);
     const conversationsWithUsers = await prisma.conversation.findMany({
       where: { id: { in: conversationIds } },
       select: { userId: true },
       distinct: ['userId'],
-    });
+    }).catch(() => []);
     const activeUsers = conversationsWithUsers.length;
 
     // Transform errors to match frontend LLMErrorItem format
@@ -106,6 +108,10 @@ router.get('/', async (req: Request, res: Response) => {
         },
         recentErrors,
         recentIngestionFailures,
+        google: {
+          cloudRun: google.cloudRun,
+          cloudSql: google.cloudSql,
+        },
       },
       meta: {
         cache: 'miss',

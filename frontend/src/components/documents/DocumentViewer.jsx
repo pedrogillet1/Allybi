@@ -350,7 +350,7 @@ const TextCodePreview = ({ url, document, zoom, t }) => {
 
 const DocumentViewer = () => {
   const { t } = useTranslation();
-  const { showSuccess, showError } = useNotifications();
+  const { showSuccess, showError, showInfo } = useNotifications();
   const { documentId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -1349,6 +1349,11 @@ const DocumentViewer = () => {
     const wasOpen = editingOpenRef.current;
     const next = !wasOpen;
 
+    if (next && currentFileType !== 'word' && currentFileType !== 'excel') {
+      showInfo(t('documentViewer.comingSoon'));
+      return;
+    }
+
     if (!next) {
       // Closing: unfreeze overlay and clear the bubble.
       setEditingOpen(false);
@@ -1439,9 +1444,13 @@ const DocumentViewer = () => {
     }
     setShowAskKoda(false);
     try { sessionStorage.setItem('askKodaDismissed', 'true'); } catch {}
-  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, clearSelectionBubble, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, refreshFrozenOverlay]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, clearSelectionBubble, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, refreshFrozenOverlay, currentFileType, showInfo, t]);
 
   const openEditingPanel = useCallback(({ seedSelection = true, focusInput = true } = {}) => {
+    if (currentFileType !== 'word' && currentFileType !== 'excel') {
+      showInfo(t('documentViewer.comingSoon'));
+      return;
+    }
     holdSelectionOverlayPosition(280);
     const hasActiveDomSelection = () => {
       try {
@@ -1552,7 +1561,7 @@ const DocumentViewer = () => {
       }
     }
     if (focusInput) setViewerFocusNonce((n) => n + 1);
-  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, refreshFrozenOverlay, currentFileType, frozenSelection, liveViewerSelection, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, refreshFrozenOverlay, currentFileType, frozenSelection, liveViewerSelection, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, showInfo, t]);
 
   // Measure container width for responsive PDF/DOCX sizing
   useEffect(() => {
@@ -3447,7 +3456,7 @@ const DocumentViewer = () => {
     return t.length <= n ? t : t.slice(0, n).trimEnd() + '…';
   };
 
-  const isEditableType = currentFileType !== 'image';
+  const isEditableType = currentFileType === 'word' || currentFileType === 'excel';
 
   const applyPptxRewrite = async () => {
     if (!document?.id) return;

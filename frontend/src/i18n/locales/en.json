@@ -10,7 +10,8 @@
     "signIn": "Sign In",
     "signUp": "Sign Up",
     "dashboard": "Dashboard",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "integrations": "Integrations"
   },
   "settings": {
     "cacheAndDocuments": "cache and all documents",
@@ -278,6 +279,7 @@
     "failedToSend": "Failed to send",
     "title": "Chat",
     "placeholder": "Ask Allybi anything about your documents...",
+    "inputPlaceholder": "Ask Allybi...",
     "send": "Send",
     "thinking": "Thinking...",
     "welcome": "Welcome to Allybi",
@@ -918,6 +920,7 @@
     "needHelpFindingSomething": "Need help finding something?",
     "documentDeleted": "Document deleted successfully",
     "failedToDelete": "Failed to delete document: {{error}}",
+    "comingSoon": "Editing for this file type is coming soon!",
     "createCategoryComingSoon": "Create category feature coming soon!",
     "failedToMoveDocument": "Failed to move document: {{error}}",
     "pageOfPages": "{{current}} of {{total}} pages",
@@ -1148,7 +1151,11 @@
     "clearHistory": "Clear History",
     "clearHistoryConfirm": "Clear Chat History?",
     "clearHistoryWarning": "This will permanently delete all your conversations. This action cannot be undone.",
-    "clearAll": "Clear All"
+    "clearAll": "Clear All",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "twoDaysAgo": "2 days ago",
+    "older": "Older"
   },
   "bulkActions": {
     "documentsSelected": "{{count}} document selected",
@@ -1627,6 +1634,183 @@
       },
       "validating": "Cross-checking details before I send…",
       "finalizing": "Final pass: formatting, structure, and delivery…"
+    }
+  },
+  "chatEmptyState": {
+    "heading": "What do you want to do?",
+    "subtitle": "Ask about your files, edit content, or use connected tools.",
+    "uploadFiles": "Upload files",
+    "tools": "Tools",
+    "openTools": "Open tools",
+    "usePrompt": "Use this prompt",
+    "prompts": {
+      "summarizePdf": { "label": "Summarize this PDF", "text": "Summarize the attached PDF in 5 bullets." },
+      "findClause": { "label": "Find a clause", "text": "Find the termination clause and quote it." },
+      "rewriteFormally": { "label": "Rewrite formally", "text": "Rewrite the highlighted paragraph to sound more formal and concise." },
+      "createSlide": { "label": "Create a slide", "text": "Create 1 slide summarizing the key points (title + 5 bullets)." },
+      "searchEmail": { "label": "Search email", "text": "Search my email for the latest thread about invoices and summarize it." },
+      "searchSlack": { "label": "Search Slack", "text": "Find Slack messages about project Orion from the last 30 days." }
+    },
+    "toolBadges": {
+      "gmailConnected": "Gmail connected",
+      "connectGmail": "Connect Gmail",
+      "slackConnected": "Slack connected",
+      "connectSlack": "Connect Slack"
+    }
+  },
+  "home": {
+    "fileInsights": {
+      "title": "File insights",
+      "emptyMessage": "Upload files to see insights",
+      "file": "file",
+      "files": "files",
+      "viewType": "View {{type}} files"
+    },
+    "integrations": {
+      "title": "Integrations",
+      "manage": "Manage",
+      "connect": "Connect",
+      "retry": "Retry",
+      "retryConnect": "Retry connect",
+      "reconnect": "Reconnect",
+      "connectProvider": "Connect {{provider}}",
+      "retrySyncProvider": "Retry sync for {{provider}}",
+      "retryConnectProvider": "Retry connect for {{provider}}",
+      "reconnectProvider": "Reconnect {{provider}}",
+      "status": {
+        "notConnected": "Not connected",
+        "connecting": "Connecting...",
+        "connectFailed": "Connection failed. Retry.",
+        "connected": "Connected",
+        "syncFailed": "Sync failed. Retry.",
+        "revoked": "Permission revoked"
+      }
+    },
+    "continue": {
+      "title": "Continue",
+      "documents": "Documents",
+      "chats": "Chats",
+      "untitledChat": "Untitled chat",
+      "getStarted": "Get started",
+      "getStartedMessage": "Upload a document to get started. Ask questions and get grounded answers.",
+      "uploadDocument": "Upload document",
+      "timeAgo": {
+        "justNow": "Just now",
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago"
+      }
+    },
+    "categories": {
+      "new": "New",
+      "seeAll": "See all",
+      "organizeTitle": "Organize your files",
+      "organizeMessage": "Create categories to keep your documents organized and easy to find.",
+      "createCategory": "Create category",
+      "viewAll": "View all categories",
+      "file": "File",
+      "files": "Files",
+      "menu": {
+        "edit": "Edit",
+        "uploadTo": "Upload to",
+        "moveTo": "Move to",
+        "download": "Download",
+        "delete": "Delete"
+      }
+    },
+    "recentlyAdded": {
+      "failedToLoad": "Failed to load files",
+      "retry": "Retry"
+    }
+  },
+  "uploadHub": {
+    "title": "Upload",
+    "addFiles": "Add files",
+    "dragDropDescription": "Drag & drop files or folders. Max 500 MB per file.",
+    "selectFiles": "Select files",
+    "selectFolder": "Select folder",
+    "scan": "Scan",
+    "dropFilesHere": "Drop files here",
+    "orChooseFromComputer": "or choose from your computer",
+    "supportedFormatsList": "Supports PDF, DOCX, PPTX, XLSX, JPG, PNG, MP3, MP4",
+    "viewAll": "View all",
+    "destination": "Destination",
+    "new": "New",
+    "noCategoriesYet": "No categories yet",
+    "createOneToOrganize": "Create one to organize uploads.",
+    "createCategory": "Create category",
+    "uploadWithoutCategory": "You can also upload without a category.",
+    "searchCategories": "Search categories...",
+    "noMatchingCategories": "No matching categories",
+    "seeAllCategories": "See all categories",
+    "uploadingTo": "Uploading to: {{name}}",
+    "noCategorySelected": "No category selected \u2014 uploads go to Recently Added.",
+    "uploading": "Uploading\u2026",
+    "uploaded": "Uploaded.",
+    "uploadingToName": "Uploading to {{name}}.",
+    "files": "Files",
+    "filesCount": "Files ({{count}})",
+    "clear": "Clear",
+    "uploadCount": "Upload ({{count}})",
+    "upload": "Upload",
+    "selectedFilesAppear": "Selected files appear here before upload.",
+    "tableHeaders": {
+      "name": "Name",
+      "destination": "Destination",
+      "status": "Status",
+      "size": "Size"
+    },
+    "ready": "Ready",
+    "error": "Error",
+    "done": "Done",
+    "uploadFailed": "Upload failed",
+    "retry": "Retry",
+    "supportedFormatsTitle": "Supported formats",
+    "maxFileSize": "Max 500 MB per file.",
+    "dropFilesAria": "Drop files here or press Enter to select files",
+    "createNewCategory": "Create new category",
+    "removeFile": "Remove file",
+    "noCategoryLabel": "No category",
+    "formatGroups": {
+      "documents": "Documents",
+      "presentations": "Presentations",
+      "spreadsheets": "Spreadsheets",
+      "images": "Images",
+      "media": "Media"
+    }
+  },
+  "integrationsPage": {
+    "title": "Integrations",
+    "description": "Connect your tools to search, manage, and interact with your data from one place.",
+    "backToHome": "Back to Home",
+    "connect": "Connect",
+    "connecting": "Connecting...",
+    "open": "Open",
+    "disconnect": "Disconnect",
+    "retrySync": "Retry sync",
+    "retryConnect": "Retry connect",
+    "reconnect": "Reconnect",
+    "status": {
+      "notConnected": "Not connected",
+      "connecting": "Connecting...",
+      "connectionFailed": "Connection failed",
+      "connected": "Connected",
+      "syncFailed": "Sync failed",
+      "revoked": "Permission revoked"
+    },
+    "providers": {
+      "gmail": {
+        "label": "Gmail",
+        "description": "Connect your Gmail account to search and manage emails directly from Allybi."
+      },
+      "outlook": {
+        "label": "Outlook",
+        "description": "Connect your Outlook account to access emails and calendar events."
+      },
+      "slack": {
+        "label": "Slack",
+        "description": "Connect Slack to search messages and share documents with your team."
+      }
     }
   }
 }

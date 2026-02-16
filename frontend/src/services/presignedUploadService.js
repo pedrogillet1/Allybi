@@ -588,7 +588,6 @@ export async function uploadFileWithResume(file, folderId = null, onProgress = n
  * @returns {Promise<Object>} - Upload result
  */
 async function uploadFileMultipart(file, folderId, uploadId, onProgress) {
-  const token = localStorage.getItem('token');
   const partCount = calculatePartCount(file.size);
 
   try {

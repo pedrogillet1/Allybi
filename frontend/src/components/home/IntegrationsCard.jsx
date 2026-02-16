@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../constants/routes';
 import { useIntegrationStatus } from '../../hooks/useIntegrationStatus';
 import gmailSvg from '../../assets/Gmail.svg';
@@ -29,7 +30,7 @@ function Spinner({ size = 16 }) {
   );
 }
 
-function ProviderRow({ provider, status, onConnect, onDisconnect, onSync }) {
+function ProviderRow({ provider, status, onConnect, onDisconnect, onSync, t }) {
   const meta = PROVIDER_META[provider];
   if (!meta) return null;
 
@@ -44,12 +45,12 @@ function ProviderRow({ provider, status, onConnect, onDisconnect, onSync }) {
   else if (connected) state = 'connected';
 
   const statusText = {
-    disconnected: 'Not connected',
-    connecting: 'Connecting...',
-    connect_error: 'Connection failed. Retry.',
-    connected: 'Connected',
-    error: 'Sync failed. Retry.',
-    revoked: 'Permission revoked',
+    disconnected: t('home.integrations.status.notConnected'),
+    connecting: t('home.integrations.status.connecting'),
+    connect_error: t('home.integrations.status.connectFailed'),
+    connected: t('home.integrations.status.connected'),
+    error: t('home.integrations.status.syncFailed'),
+    revoked: t('home.integrations.status.revoked'),
   }[state];
 
   const statusColor = {
@@ -113,7 +114,7 @@ function ProviderRow({ provider, status, onConnect, onDisconnect, onSync }) {
         {state === 'disconnected' && (
           <button
             onClick={() => onConnect(provider)}
-            aria-label={`Connect ${meta.label}`}
+            aria-label={t('home.integrations.connectProvider', { provider: meta.label })}
             style={{
               height: 32,
               padding: '0 14px',
@@ -130,7 +131,7 @@ function ProviderRow({ provider, status, onConnect, onDisconnect, onSync }) {
             onMouseEnter={e => { e.currentTarget.style.background = '#ECECEC'; }}
             onMouseLeave={e => { e.currentTarget.style.background = '#F5F5F5'; }}
           >
-            Connect
+            {t('home.integrations.connect')}
           </button>
         )}
 
@@ -138,7 +139,7 @@ function ProviderRow({ provider, status, onConnect, onDisconnect, onSync }) {
         {state === 'error' && (
           <button
             onClick={() => onSync(provider)}
-            aria-label={`Retry sync for ${meta.label}`}
+            aria-label={t('home.integrations.retrySyncProvider', { provider: meta.label })}
             style={{
               height: 32,
               padding: '0 14px',
@@ -155,14 +156,14 @@ function ProviderRow({ provider, status, onConnect, onDisconnect, onSync }) {
             onMouseEnter={e => { e.currentTarget.style.background = '#FEF3F2'; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'white'; }}
           >
-            Retry
+            {t('home.integrations.retry')}
           </button>
         )}
 
         {state === 'connect_error' && (
           <button
             onClick={() => onConnect(provider)}
-            aria-label={`Retry connect for ${meta.label}`}
+            aria-label={t('home.integrations.retryConnectProvider', { provider: meta.label })}
             style={{
               height: 32,
               padding: '0 14px',
@@ -179,14 +180,14 @@ function ProviderRow({ provider, status, onConnect, onDisconnect, onSync }) {
             onMouseEnter={e => { e.currentTarget.style.background = '#FEF3F2'; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'white'; }}
           >
-            Retry connect
+            {t('home.integrations.retryConnect')}
           </button>
         )}
 
         {state === 'revoked' && (
           <button
             onClick={() => onConnect(provider)}
-            aria-label={`Reconnect ${meta.label}`}
+            aria-label={t('home.integrations.reconnectProvider', { provider: meta.label })}
             style={{
               height: 32,
               padding: '0 14px',
@@ -203,7 +204,7 @@ function ProviderRow({ provider, status, onConnect, onDisconnect, onSync }) {
             onMouseEnter={e => { e.currentTarget.style.background = '#ECECEC'; }}
             onMouseLeave={e => { e.currentTarget.style.background = '#F5F5F5'; }}
           >
-            Reconnect
+            {t('home.integrations.reconnect')}
           </button>
         )}
       </div>
@@ -213,6 +214,7 @@ function ProviderRow({ provider, status, onConnect, onDisconnect, onSync }) {
 
 export default function IntegrationsCard() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { providers, loading, connectProvider, disconnectProvider, syncNow } = useIntegrationStatus();
 
   return (
@@ -242,7 +244,7 @@ export default function IntegrationsCard() {
           fontFamily: 'Plus Jakarta Sans, sans-serif',
           lineHeight: '24px',
         }}>
-          Integrations
+          {t('home.integrations.title')}
         </h3>
 
         <button
@@ -261,7 +263,7 @@ export default function IntegrationsCard() {
           onMouseEnter={e => { e.currentTarget.style.color = '#181818'; }}
           onMouseLeave={e => { e.currentTarget.style.color = '#55534E'; }}
         >
-          Manage
+          {t('home.integrations.manage')}
         </button>
       </div>
 
@@ -279,6 +281,7 @@ export default function IntegrationsCard() {
             onConnect={connectProvider}
             onDisconnect={disconnectProvider}
             onSync={syncNow}
+            t={t}
           />
         ))
       )}

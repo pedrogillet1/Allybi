@@ -83,6 +83,16 @@ export async function getTimeseries(
 
 async function calculateKpis(prisma: PrismaClient, window: TimeWindow): Promise<OverviewKpis> {
   const { from, to } = window;
+  const safe = async <T>(query: () => Promise<T>, fallback: T): Promise<T> => {
+    try {
+      return await query();
+    } catch (error) {
+      console.warn('[Admin][Overview] KPI query failed; using fallback value', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return fallback;
+    }
+  };
 
   // Run queries in parallel for performance
   const [
@@ -97,67 +107,91 @@ async function calculateKpis(prisma: PrismaClient, window: TimeWindow): Promise<
   ] = await Promise.all([
     // DAU: distinct users with activity
     supportsModel(prisma, 'usageEvent')
-      ? prisma.usageEvent.groupBy({
-          by: ['userId'],
-          where: { at: { gte: from, lt: to } },
-        })
+      ? safe(
+          () => prisma.usageEvent.groupBy({
+            by: ['userId'],
+            where: { at: { gte: from, lt: to } },
+          }),
+          []
+        )
       : [],
 
     // Messages count
     supportsModel(prisma, 'message')
-      ? prisma.message.count({
-          where: { createdAt: { gte: from, lt: to } },
-        })
+      ? safe(
+          () => prisma.message.count({
+            where: { createdAt: { gte: from, lt: to } },
+          }),
+          0
+        )
       : 0,
 
     // Conversations created
     supportsModel(prisma, 'conversation')
-      ? prisma.conversation.count({
-          where: { createdAt: { gte: from, lt: to } },
-        })
+      ? safe(
+          () => prisma.conversation.count({
+            where: { createdAt: { gte: from, lt: to } },
+          }),
+          0
+        )
       : 0,
 
     // Uploads (documents created)
     supportsModel(prisma, 'document')
-      ? prisma.document.count({
-          where: { createdAt: { gte: from, lt: to } },
-        })
+      ? safe(
+          () => prisma.document.count({
+            where: { createdAt: { gte: from, lt: to } },
+          }),
+          0
+        )
       : 0,
 
     // LLM calls and tokens
     supportsModel(prisma, 'modelCall')
-      ? prisma.modelCall.aggregate({
-          where: { at: { gte: from, lt: to } },
-          _count: { _all: true },
-          _sum: { totalTokens: true },
-        })
+      ? safe(
+          () => prisma.modelCall.aggregate({
+            where: { at: { gte: from, lt: to } },
+            _count: { _all: true },
+            _sum: { totalTokens: true },
+          }),
+          null
+        )
       : null,
 
     // Retrieval events for evidence quality
     supportsModel(prisma, 'retrievalEvent')
-      ? prisma.retrievalEvent.findMany({
-          where: { at: { gte: from, lt: to } },
-          select: { evidenceStrength: true, fallbackReasonCode: true },
-          take: 100000,
-        })
+      ? safe(
+          () => prisma.retrievalEvent.findMany({
+            where: { at: { gte: from, lt: to } },
+            select: { evidenceStrength: true, fallbackReasonCode: true },
+            take: 100000,
+          }),
+          []
+        )
       : [],
 
     // Ingestion events for failures
     supportsModel(prisma, 'ingestionEvent')
-      ? prisma.ingestionEvent.groupBy({
-          by: ['status'],
-          where: { at: { gte: from, lt: to } },
-          _count: true,
-        })
+      ? safe(
+          () => prisma.ingestionEvent.groupBy({
+            by: ['status'],
+            where: { at: { gte: from, lt: to } },
+            _count: true,
+          }),
+          []
+        )
       : [],
 
     // Latency data from model calls
     supportsModel(prisma, 'modelCall')
-      ? prisma.modelCall.findMany({
-          where: { at: { gte: from, lt: to }, durationMs: { not: null } },
-          select: { durationMs: true },
-          take: 10000,
-        })
+      ? safe(
+          () => prisma.modelCall.findMany({
+            where: { at: { gte: from, lt: to }, durationMs: { not: null } },
+            select: { durationMs: true },
+            take: 10000,
+          }),
+          []
+        )
       : [],
   ]);
 
@@ -171,9 +205,12 @@ async function calculateKpis(prisma: PrismaClient, window: TimeWindow): Promise<
   // Calculate LLM error rate
   let llmErrorRate = 0;
   if (supportsModel(prisma, 'modelCall') && llmCalls > 0) {
-    const errorCount = await prisma.modelCall.count({
-      where: { at: { gte: from, lt: to }, status: 'fail' },
-    });
+    const errorCount = await safe(
+      () => prisma.modelCall.count({
+        where: { at: { gte: from, lt: to }, status: 'fail' },
+      }),
+      0
+    );
     llmErrorRate = (errorCount / llmCalls) * 100;
   }
 

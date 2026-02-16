@@ -105,7 +105,7 @@ export default function SmartCategoriesCard({
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <path d="M7 1v12M1 7h12" stroke="#32302C" strokeWidth="2" strokeLinecap="round"/>
             </svg>
-            New
+            {t('home.categories.new')}
           </button>
 
           {categories.length > 3 && (
@@ -129,7 +129,7 @@ export default function SmartCategoriesCard({
               onMouseEnter={e => { e.currentTarget.style.color = '#181818'; }}
               onMouseLeave={e => { e.currentTarget.style.color = '#55534E'; }}
             >
-              See all
+              {t('home.categories.seeAll')}
               <ArrowIcon style={{ width: 14, height: 14, filter: 'brightness(0) invert(0.3)' }} aria-hidden="true" />
             </button>
           )}
@@ -160,13 +160,13 @@ export default function SmartCategoriesCard({
             fontSize: 16, fontWeight: 600, color: '#32302C',
             fontFamily: 'Plus Jakarta Sans, sans-serif',
           }}>
-            Organize your files
+            {t('home.categories.organizeTitle')}
           </div>
           <div style={{
             fontSize: 14, color: '#6C6B6E', maxWidth: 320,
             fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '20px',
           }}>
-            Create categories to keep your documents organized and easy to find.
+            {t('home.categories.organizeMessage')}
           </div>
           <button
             onClick={onCreateCategory}
@@ -187,7 +187,7 @@ export default function SmartCategoriesCard({
             onMouseEnter={e => { e.currentTarget.style.background = '#0F0F0F'; }}
             onMouseLeave={e => { e.currentTarget.style.background = '#181818'; }}
           >
-            Create category
+            {t('home.categories.createCategory')}
           </button>
         </div>
       ) : (
@@ -335,7 +335,7 @@ export default function SmartCategoriesCard({
                     fontWeight: 500,
                     lineHeight: '18px',
                   }}>
-                    {category.fileCount || 0} {category.fileCount === 1 ? 'File' : 'Files'}
+                    {category.fileCount || 0} {category.fileCount === 1 ? t('home.categories.file') : t('home.categories.files')}
                   </div>
                 </div>
               </div>
@@ -419,7 +419,7 @@ export default function SmartCategoriesCard({
               onMouseEnter={e => { e.currentTarget.style.background = '#ECECEC'; e.currentTarget.style.color = '#181818'; }}
               onMouseLeave={e => { e.currentTarget.style.background = '#F5F5F5'; e.currentTarget.style.color = '#55534E'; }}
             >
-              View all categories
+              {t('home.categories.viewAll')}
               <ArrowIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.3)' }} aria-hidden="true" />
             </button>
           )}
@@ -431,11 +431,11 @@ export default function SmartCategoriesCard({
         const cat = categories.find(c => c.id === categoryMenuOpen);
         if (!cat) return null;
         const menuItems = [
-          { label: 'Edit', icon: EditIcon, action: () => { onEditCategory?.(cat); setCategoryMenuOpen(null); }, color: '#32302C' },
-          { label: 'Upload to', icon: UploadIcon, action: () => { onUploadToCategory?.(cat.id); setCategoryMenuOpen(null); }, color: '#32302C' },
-          { label: 'Move to', icon: AddIcon, action: () => { onMoveCategoryDocuments?.(cat.id); setCategoryMenuOpen(null); }, color: '#32302C' },
-          { label: 'Download', icon: DownloadIcon, action: () => { onDownloadCategory?.(cat); setCategoryMenuOpen(null); }, color: '#32302C' },
-          { label: 'Delete', icon: TrashCanIcon, action: () => { onDeleteCategory?.(cat.id); setCategoryMenuOpen(null); }, color: '#D92D20' },
+          { label: t('home.categories.menu.edit'), icon: EditIcon, action: () => { onEditCategory?.(cat); setCategoryMenuOpen(null); }, color: '#32302C' },
+          { label: t('home.categories.menu.uploadTo'), icon: UploadIcon, action: () => { onUploadToCategory?.(cat.id); setCategoryMenuOpen(null); }, color: '#32302C' },
+          { label: t('home.categories.menu.moveTo'), icon: AddIcon, action: () => { onMoveCategoryDocuments?.(cat.id); setCategoryMenuOpen(null); }, color: '#32302C' },
+          { label: t('home.categories.menu.download'), icon: DownloadIcon, action: () => { onDownloadCategory?.(cat); setCategoryMenuOpen(null); }, color: '#32302C' },
+          { label: t('home.categories.menu.delete'), icon: TrashCanIcon, action: () => { onDeleteCategory?.(cat.id); setCategoryMenuOpen(null); }, color: '#D92D20' },
         ];
         return (
           <div

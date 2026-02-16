@@ -6,6 +6,8 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { listLlmCalls, getLlmSummary } from '../../services/admin';
+import { parseRange, normalizeRange } from '../../services/admin/_shared/rangeWindow';
+import { getGoogleMetrics } from '../../services/admin/googleMetrics.service';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -56,11 +58,16 @@ function calculateCallCost(model: string, promptTokens: number | null, completio
 router.get('/', async (req: Request, res: Response) => {
   try {
     const range = (req.query.range as string) || '7d';
+    const rangeKey = normalizeRange(range, '7d');
+    const window = parseRange(rangeKey);
 
-    const result = await getLlmSummary(prisma, { range });
+    const [result, google] = await Promise.all([
+      getLlmSummary(prisma, { range: rangeKey }),
+      getGoogleMetrics(prisma, window),
+    ]);
 
     // Get recent calls for cost calculation
-    const recentCalls = await listLlmCalls(prisma, { range, limit: 10000 });
+    const recentCalls = await listLlmCalls(prisma, { range: rangeKey, limit: 10000 });
 
     // Calculate total cost and cost per model
     let totalCostUsd = 0;
@@ -112,6 +119,7 @@ router.get('/', async (req: Request, res: Response) => {
           ...c,
           costUsd: calculateCallCost(c.model, c.promptTokens, c.completionTokens),
         })),
+        google: { gemini: google.gemini },
       },
       meta: {
         cache: 'miss',

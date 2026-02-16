@@ -56,9 +56,8 @@ const DeleteCategoryModal = ({ isOpen, onClose, onConfirm, category }) => {
     setError(null);
     try {
       const response = await fetch(`${API_URL}/folders/${category.id}/deletion-stats`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        credentials: 'include',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
       });
       if (!response.ok) {
         throw new Error('Failed to fetch deletion stats');

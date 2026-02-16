@@ -2,7 +2,6 @@ import crypto from 'crypto';
 import prisma from '../config/database';
 import { hashPassword, verifyPassword, validatePasswordStrength } from '../utils/password';
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
-import { hashToken } from '../utils/encryption';
 
 // ---------------------------------------------------------------------------
 // HMAC-SHA256 session hashing (matching authBridge.ts pattern)

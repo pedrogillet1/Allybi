@@ -490,13 +490,16 @@ const Settings = () => {
   // ═══════════════════════════════════════════════
   return (
     <div data-page="settings" style={{
-      width: '100%', height: isMobile ? 'auto' : '100vh', minHeight: isMobile ? '100vh' : 'auto',
-      background: C.bg, overflow: isMobile ? 'visible' : 'hidden',
+      width: '100%',
+      height: isMobile ? '100dvh' : '100vh',
+      minHeight: isMobile ? '100dvh' : 'auto',
+      background: C.bg,
+      overflow: 'hidden',
       display: 'flex', flexDirection: isMobile ? 'column' : 'row',
     }}>
       <LeftNav onNotificationClick={() => setShowNotificationsPopup(true)} />
 
-      <div style={{ flex: 1, height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', overflowY: 'auto', overflowX: 'hidden' }}>
+      <div style={{ flex: 1, height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* ── Header ── */}
         <div style={{
           minHeight: isMobile ? 56 : 72, paddingLeft: isMobile ? 16 : 48, paddingRight: isMobile ? 16 : 48,
@@ -545,8 +548,8 @@ const Settings = () => {
         `}</style>
 
         {/* ── Content ── */}
-        <div style={{ flex: 1, padding: isMobile ? 16 : '24px 48px', overflowY: 'auto', maxWidth: 1200, width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '260px 1fr', gap: 32, alignItems: 'start' }}>
+        <div style={{ flex: 1, minHeight: 0, padding: isMobile ? 16 : '24px 48px', overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch', maxWidth: 1200, width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '220px 1fr', gap: 20, alignItems: 'start' }}>
 
             {/* ── Left: Section nav ── */}
             {!isMobile && (

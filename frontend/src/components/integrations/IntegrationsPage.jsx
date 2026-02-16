@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../constants/routes';
 import { useIntegrationStatus } from '../../hooks/useIntegrationStatus';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -13,21 +14,15 @@ const FONT = 'Plus Jakarta Sans, sans-serif';
 
 const PROVIDER_META = {
   gmail: {
-    label: 'Gmail',
     icon: gmailSvg,
-    description: 'Connect your Gmail account to search and manage emails directly from Allybi.',
     detailRoute: ROUTES.INTEGRATIONS_GMAIL,
   },
   outlook: {
-    label: 'Outlook',
     icon: outlookSvg,
-    description: 'Connect your Outlook account to access emails and calendar events.',
     detailRoute: null,
   },
   slack: {
-    label: 'Slack',
     icon: slackSvg,
-    description: 'Connect Slack to search messages and share documents with your team.',
     detailRoute: null,
   },
 };
@@ -49,10 +44,13 @@ function Spinner({ size = 16 }) {
   );
 }
 
-function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onViewDetail }) {
+function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onViewDetail, t }) {
   const [hovered, setHovered] = useState(false);
   const meta = PROVIDER_META[provider];
   if (!meta) return null;
+
+  const label = t(`integrationsPage.providers.${provider}.label`);
+  const description = t(`integrationsPage.providers.${provider}.description`);
 
   const { connected, expired, connecting, error } = status;
 
@@ -73,12 +71,12 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
   }[state];
 
   const statusText = {
-    disconnected: 'Not connected',
-    connecting: 'Connecting...',
-    connect_error: 'Connection failed',
-    connected: 'Connected',
-    error: 'Sync failed',
-    revoked: 'Permission revoked',
+    disconnected: t('integrationsPage.status.notConnected'),
+    connecting: t('integrationsPage.status.connecting'),
+    connect_error: t('integrationsPage.status.connectionFailed'),
+    connected: t('integrationsPage.status.connected'),
+    error: t('integrationsPage.status.syncFailed'),
+    revoked: t('integrationsPage.status.revoked'),
   }[state];
 
   return (
@@ -105,7 +103,7 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
         <img src={meta.icon} alt="" style={{ width: 40, height: 40, objectFit: 'contain', flexShrink: 0 }} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 16, fontWeight: 600, color: '#32302C', fontFamily: FONT, lineHeight: '24px' }}>
-            {meta.label}
+            {label}
           </div>
           <div style={{ fontSize: 13, fontWeight: 500, color: statusColor, fontFamily: FONT, lineHeight: '20px', display: 'flex', alignItems: 'center', gap: 4 }}>
             {state === 'connected' && <span style={{ color: '#34A853', fontSize: 14 }} aria-hidden="true">&#10003;</span>}
@@ -117,7 +115,7 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
 
       {/* Description */}
       <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: FONT, lineHeight: '20px' }}>
-        {meta.description}
+        {description}
       </div>
 
       {!!error && (
@@ -153,7 +151,7 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
             onMouseEnter={e => { e.currentTarget.style.background = '#0F0F0F'; }}
             onMouseLeave={e => { e.currentTarget.style.background = '#181818'; }}
           >
-            Connect
+            {t('integrationsPage.connect')}
           </button>
         )}
 
@@ -177,7 +175,7 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
             }}
           >
             <Spinner size={14} />
-            Connecting...
+            {t('integrationsPage.connecting')}
           </button>
         )}
 
@@ -202,7 +200,7 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
                 onMouseEnter={e => { e.currentTarget.style.background = '#0F0F0F'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = '#181818'; }}
               >
-                Open
+                {t('integrationsPage.open')}
               </button>
             )}
             <button
@@ -223,7 +221,7 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
               onMouseEnter={e => { e.currentTarget.style.background = '#FEF3F2'; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'white'; }}
             >
-              Disconnect
+              {t('integrationsPage.disconnect')}
             </button>
           </>
         )}
@@ -248,7 +246,7 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
               onMouseEnter={e => { e.currentTarget.style.background = '#0F0F0F'; }}
               onMouseLeave={e => { e.currentTarget.style.background = '#181818'; }}
             >
-              Retry sync
+              {t('integrationsPage.retrySync')}
             </button>
             <button
               onClick={() => onDisconnect(provider)}
@@ -268,7 +266,7 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
               onMouseEnter={e => { e.currentTarget.style.background = '#FEF3F2'; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'white'; }}
             >
-              Disconnect
+              {t('integrationsPage.disconnect')}
             </button>
           </>
         )}
@@ -292,7 +290,7 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
             onMouseEnter={e => { e.currentTarget.style.background = '#FEF3F2'; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'white'; }}
           >
-            Retry connect
+            {t('integrationsPage.retryConnect')}
           </button>
         )}
 
@@ -315,7 +313,7 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
             onMouseEnter={e => { e.currentTarget.style.background = '#0F0F0F'; }}
             onMouseLeave={e => { e.currentTarget.style.background = '#181818'; }}
           >
-            Reconnect
+            {t('integrationsPage.reconnect')}
           </button>
         )}
       </div>
@@ -325,6 +323,7 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
 
 export default function IntegrationsPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = useIsMobile();
   const { providers, loading, connectProvider, disconnectProvider, syncNow, refetch } = useIntegrationStatus();
@@ -412,7 +411,7 @@ export default function IntegrationsPage() {
         }}>
           <button
             onClick={() => navigate(ROUTES.HOME)}
-            aria-label="Back to Home"
+            aria-label={t('integrationsPage.backToHome')}
             style={{
               width: 36,
               height: 36,
@@ -440,7 +439,7 @@ export default function IntegrationsPage() {
             fontFamily: FONT,
             lineHeight: '30px',
           }}>
-            Integrations
+            {t('integrationsPage.title')}
           </h1>
         </div>
 
@@ -459,7 +458,7 @@ export default function IntegrationsPage() {
             lineHeight: '20px',
             margin: '0 0 24px',
           }}>
-            Connect your tools to search, manage, and interact with your data from one place.
+            {t('integrationsPage.description')}
           </p>
 
           {loading ? (
@@ -481,6 +480,7 @@ export default function IntegrationsPage() {
                   onDisconnect={disconnectProvider}
                   onSync={syncNow}
                   onViewDetail={(route) => navigate(route)}
+                  t={t}
                 />
               ))}
             </div>

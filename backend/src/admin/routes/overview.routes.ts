@@ -6,6 +6,8 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { getOverview, getTimeseries } from '../../services/admin';
+import { parseRange, normalizeRange } from '../../services/admin/_shared/rangeWindow';
+import { getGoogleMetrics } from '../../services/admin/googleMetrics.service';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -17,7 +19,12 @@ const prisma = new PrismaClient();
 router.get('/', async (req: Request, res: Response) => {
   try {
     const range = (req.query.range as string) || '7d';
-    const result = await getOverview(prisma, { range });
+    const rangeKey = normalizeRange(range, '7d');
+    const window = parseRange(rangeKey);
+    const [result, google] = await Promise.all([
+      getOverview(prisma, { range: rangeKey }),
+      getGoogleMetrics(prisma, window),
+    ]);
 
     res.json({
       ok: true,
@@ -26,6 +33,7 @@ router.get('/', async (req: Request, res: Response) => {
         v: 1,
         kpis: result.kpis,
         window: result.window,
+        google,
       },
       meta: {
         cache: 'miss',

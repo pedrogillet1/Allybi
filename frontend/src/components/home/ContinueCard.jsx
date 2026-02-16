@@ -37,18 +37,18 @@ function getDocIcon(filename) {
 
 const FONT = 'Plus Jakarta Sans, sans-serif';
 
-function formatTimeAgo(dateStr) {
+function formatTimeAgo(dateStr, t) {
   if (!dateStr) return '';
   const now = new Date();
   const date = new Date(dateStr);
   const diffMs = now - date;
   const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return 'Just now';
-  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffMin < 1) return t('home.continue.timeAgo.justNow');
+  if (diffMin < 60) return t('home.continue.timeAgo.minutesAgo', { count: diffMin });
   const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
+  if (diffHr < 24) return t('home.continue.timeAgo.hoursAgo', { count: diffHr });
   const diffDay = Math.floor(diffHr / 24);
-  if (diffDay < 7) return `${diffDay}d ago`;
+  if (diffDay < 7) return t('home.continue.timeAgo.daysAgo', { count: diffDay });
   return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
@@ -57,7 +57,9 @@ function ContinueRow({ icon, iconSrc, label, subtitle, onClick }) {
     <button
       onClick={onClick}
       style={{
+        boxSizing: 'border-box',
         width: '100%',
+        maxWidth: '100%',
         height: 52,
         padding: '0 12px',
         background: 'transparent',
@@ -69,6 +71,7 @@ function ContinueRow({ icon, iconSrc, label, subtitle, onClick }) {
         cursor: 'pointer',
         transition: 'background 120ms ease',
         textAlign: 'left',
+        overflow: 'hidden',
       }}
       onMouseEnter={e => { e.currentTarget.style.background = '#F5F5F5'; }}
       onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
@@ -160,12 +163,12 @@ export default function ContinueCard({ onUpload }) {
         <div style={{
           fontSize: 16, fontWeight: 600, color: '#32302C', fontFamily: FONT,
         }}>
-          Get started
+          {t('home.continue.getStarted')}
         </div>
         <div style={{
           fontSize: 14, color: '#6C6B6E', maxWidth: 320, fontFamily: FONT, lineHeight: '20px',
         }}>
-          Upload a document to get started. Ask questions and get grounded answers.
+          {t('home.continue.getStartedMessage')}
         </div>
         <button
           onClick={onUpload}
@@ -186,7 +189,7 @@ export default function ContinueCard({ onUpload }) {
           onMouseEnter={e => { e.currentTarget.style.background = '#0F0F0F'; }}
           onMouseLeave={e => { e.currentTarget.style.background = '#181818'; }}
         >
-          Upload document
+          {t('home.continue.uploadDocument')}
         </button>
       </div>
     );
@@ -194,6 +197,9 @@ export default function ContinueCard({ onUpload }) {
 
   return (
     <div style={{
+      boxSizing: 'border-box',
+      width: '100%',
+      maxWidth: '100%',
       background: 'white',
       borderRadius: 16,
       border: '1px solid #E6E6EC',
@@ -201,6 +207,7 @@ export default function ContinueCard({ onUpload }) {
       padding: isMobile ? 16 : 24,
       display: 'flex',
       flexDirection: 'column',
+      overflow: 'hidden',
     }}>
       <h3 style={{
         margin: 0,
@@ -211,7 +218,7 @@ export default function ContinueCard({ onUpload }) {
         fontFamily: FONT,
         lineHeight: '24px',
       }}>
-        Continue
+        {t('home.continue.title')}
       </h3>
 
       {/* Recent documents */}
@@ -227,14 +234,14 @@ export default function ContinueCard({ onUpload }) {
             letterSpacing: '0.04em',
             padding: '8px 12px 4px',
           }}>
-            Documents
+            {t('home.continue.documents')}
           </div>
           {recentDocs.map(doc => (
             <ContinueRow
               key={doc.id}
               iconSrc={getDocIcon(doc.filename)}
               label={cleanDocumentName(doc.filename)}
-              subtitle={formatTimeAgo(viewHistory[doc.id] ? new Date(viewHistory[doc.id]).toISOString() : doc.updatedAt || doc.createdAt)}
+              subtitle={formatTimeAgo(viewHistory[doc.id] ? new Date(viewHistory[doc.id]).toISOString() : doc.updatedAt || doc.createdAt, t)}
               onClick={() => navigate(buildRoute.document(doc.id))}
             />
           ))}
@@ -254,14 +261,14 @@ export default function ContinueCard({ onUpload }) {
             letterSpacing: '0.04em',
             padding: '8px 12px 4px',
           }}>
-            Chats
+            {t('home.continue.chats')}
           </div>
           {recentChats.map(chat => (
             <ContinueRow
               key={chat.id}
               icon={<ChatBubbleIcon style={{ width: 18, height: 18, filter: 'brightness(0) invert(0.35)' }} />}
-              label={chat.title || 'Untitled chat'}
-              subtitle={formatTimeAgo(chat.updatedAt || chat.createdAt)}
+              label={chat.title || t('home.continue.untitledChat')}
+              subtitle={formatTimeAgo(chat.updatedAt || chat.createdAt, t)}
               onClick={() => navigate(buildRoute.document(chat.id))}
             />
           ))}

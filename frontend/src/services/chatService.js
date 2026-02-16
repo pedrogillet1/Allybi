@@ -3,6 +3,7 @@ import { io } from 'socket.io-client';
 import { encryptData, decryptData } from '../utils/security/encryption';
 import { getApiBaseUrl, getWsBaseUrl } from './runtimeConfig';
 import { emitAuthModalOpen } from '../utils/authModalBus';
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 
 const API_URL = getApiBaseUrl();
 // socket.io-client expects an http(s) origin, not ws(s).
@@ -14,6 +15,11 @@ const normalizeSocketOrigin = (raw) => {
   return v;
 };
 const WS_URL = normalizeSocketOrigin(getWsBaseUrl());
+
+const getCompatAccessToken = () => {
+  if (!AUTH_LOCALSTORAGE_COMPAT) return null;
+  return localStorage.getItem('accessToken') || localStorage.getItem('token');
+};
 
 // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Get encryption password from AuthContext
 // This will be passed to functions that need encryption
@@ -30,6 +36,7 @@ export const clearEncryptionPassword = () => {
 // Axios instance for API calls
 const api = axios.create({
   baseURL: `${API_URL}/api/chat`,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -37,7 +44,7 @@ const api = axios.create({
 
 // Add auth token to requests
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
+  const token = getCompatAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -49,8 +56,10 @@ let _chatAuthDead = false;
 api.interceptors.response.use(undefined, (error) => {
   if (error.response?.status === 401 && !_chatAuthDead) {
     _chatAuthDead = true;
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    if (AUTH_LOCALSTORAGE_COMPAT) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+    }
     localStorage.removeItem('user');
     emitAuthModalOpen({ mode: 'login', reason: 'session_expired' });
   }
@@ -125,11 +134,8 @@ function getReconnectDelay() {
  * Attempt to reconnect WebSocket
  */
 function attemptReconnect() {
-  // Get fresh token from localStorage (may have been refreshed)
-  const freshToken = localStorage.getItem('accessToken');
-
-  if (isManualDisconnect || !freshToken) {
-    console.log('⏩ [WEBSOCKET] Manual disconnect or no token, skipping reconnection');
+  if (isManualDisconnect) {
+    console.log('⏩ [WEBSOCKET] Manual disconnect, skipping reconnection');
     return;
   }
 
@@ -139,13 +145,9 @@ function attemptReconnect() {
 
   reconnectTimer = setTimeout(() => {
     console.log(`📡 [WEBSOCKET] Attempting to reconnect...`);
-    // Use fresh token from localStorage instead of potentially stale currentToken
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      initializeSocket(token);
-    } else {
-      console.log('⏩ [WEBSOCKET] No token available, stopping reconnection');
-    }
+    // Cookie-first: reconnect with no bearer token in modern mode.
+    const token = getCompatAccessToken();
+    initializeSocket(token || null);
   }, delay);
 }
 
@@ -181,7 +183,8 @@ export const initializeSocket = (token) => {
 
   // Create new socket connection
   socket = io(WS_URL, {
-    auth: { token },
+    auth: token ? { token } : {},
+    withCredentials: true,
     transports: ['websocket', 'polling'],
     reconnection: false, // We handle reconnection manually for better control
     timeout: 20000, // 20 second connection timeout
@@ -529,15 +532,17 @@ export const sendAdaptiveMessageStreaming = async (
   onAction = null,  // Callback for action events (show_file_modal, etc.)
   onIntent = null   // Callback for intent events (debug overlay)
 ) => {
-  const token = localStorage.getItem('accessToken');
+  const token = getCompatAccessToken();
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
   const response = await fetch(
     `${API_URL}/api/chat/conversations/${conversationId}/messages/adaptive/stream`,
     {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include',
+      headers,
       body: JSON.stringify({
         content,
         attachedDocumentId,
@@ -911,7 +916,7 @@ export const removeTitleListeners = () => {
  * @returns {Promise<Object>} RAG response with answer and sources
  */
 export const queryWithRAG = async (conversationId, query, researchMode = false) => {
-  const token = localStorage.getItem('accessToken');
+  const token = getCompatAccessToken();
   try {
     const response = await axios.post(
       `${API_URL}/api/rag/query`,
@@ -921,9 +926,10 @@ export const queryWithRAG = async (conversationId, query, researchMode = false) 
         researchMode,
       },
       {
+        withCredentials: true,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       }
     );
@@ -951,7 +957,7 @@ export const queryWithRAG = async (conversationId, query, researchMode = false) 
  * @returns {Promise<Object>} RAG response
  */
 export const answerFollowUp = async (conversationId, query, previousContextId) => {
-  const token = localStorage.getItem('accessToken');
+  const token = getCompatAccessToken();
   try {
     const response = await axios.post(
       `${API_URL}/api/rag/follow-up`,
@@ -961,9 +967,10 @@ export const answerFollowUp = async (conversationId, query, previousContextId) =
         previousContextId,
       },
       {
+        withCredentials: true,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       }
     );
@@ -989,13 +996,14 @@ export const answerFollowUp = async (conversationId, query, previousContextId) =
  * @returns {Promise<Object>} RAG context
  */
 export const getRAGContext = async (contextId) => {
-  const token = localStorage.getItem('accessToken');
+  const token = getCompatAccessToken();
   const response = await axios.get(
     `${API_URL}/api/rag/context/${contextId}`,
     {
       headers: {
-        Authorization: `Bearer ${token}`,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
+      withCredentials: true,
     }
   );
   return response.data;

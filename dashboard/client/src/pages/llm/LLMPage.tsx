@@ -147,6 +147,30 @@ export function LLMPage() {
         />
       </KpiCardRow>
 
+      {/* Gemini-specific KPIs */}
+      <KpiCardRow className="mt-4">
+        <KpiCard
+          title="Gemini Calls"
+          value={data ? formatNumber(data.google?.gemini?.calls ?? 0) : "-"}
+          loading={isLoading}
+        />
+        <KpiCard
+          title="Gemini Error Rate"
+          value={data ? `${(data.google?.gemini?.errorRate ?? 0).toFixed(2)}%` : "-"}
+          loading={isLoading}
+        />
+        <KpiCard
+          title="Gemini P95"
+          value={data ? formatDuration(data.google?.gemini?.p95LatencyMs ?? 0) : "-"}
+          loading={isLoading}
+        />
+        <KpiCard
+          title="Gemini Est. Cost"
+          value={data ? formatCurrency(data.google?.gemini?.estimatedCostUsd ?? 0) : "-"}
+          loading={isLoading}
+        />
+      </KpiCardRow>
+
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <ChartContainer

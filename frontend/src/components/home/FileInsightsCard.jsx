@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { buildRoute } from '../../constants/routes';
 import { useDocuments } from '../../context/DocumentsContext';
 import { useFileBreakdown } from '../../hooks/useFileBreakdown';
@@ -7,6 +8,7 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 
 export default function FileInsightsCard() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { documents } = useDocuments();
   const { breakdown, total } = useFileBreakdown(documents);
   const isMobile = useIsMobile();
@@ -47,13 +49,13 @@ export default function FileInsightsCard() {
           fontSize: 16, fontWeight: 600, color: '#32302C',
           fontFamily: 'Plus Jakarta Sans, sans-serif',
         }}>
-          File insights
+          {t('home.fileInsights.title')}
         </div>
         <div style={{
           fontSize: 13, color: '#6C6B6E',
           fontFamily: 'Plus Jakarta Sans, sans-serif',
         }}>
-          Upload files to see insights
+          {t('home.fileInsights.emptyMessage')}
         </div>
       </div>
     );
@@ -90,7 +92,7 @@ export default function FileInsightsCard() {
         fontFamily: 'Plus Jakarta Sans, sans-serif',
         lineHeight: '24px',
       }}>
-        File insights
+        {t('home.fileInsights.title')}
       </h3>
 
       {/* File type icons — scrollable carousel when > 3 types */}
@@ -295,7 +297,7 @@ export default function FileInsightsCard() {
           lineHeight: '18px',
           whiteSpace: 'nowrap',
         }}>
-          {total} {total === 1 ? 'file' : 'files'}
+          {total} {total === 1 ? t('home.fileInsights.file') : t('home.fileInsights.files')}
         </span>
       </div>
     </div>

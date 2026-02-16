@@ -6,16 +6,14 @@
  */
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 
 /**
  * Get token from localStorage (same pattern as other services)
  */
 const getAuthToken = () => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
-  return token;
+  if (!AUTH_LOCALSTORAGE_COMPAT) return null;
+  return localStorage.getItem('accessToken') || localStorage.getItem('token');
 };
 
 /**
@@ -56,9 +54,8 @@ export const downloadOriginal = async (documentId, filename = null) => {
     
     // Use fetch to get the blob with auth header
     const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include',
+      headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
     });
     
     if (!response.ok) {
@@ -127,8 +124,9 @@ export const downloadAsPdf = async (documentId, originalFilename, mimeType) => {
     // Call export endpoint to get download URL
     const exportResponse = await fetch(`${API_BASE_URL}/api/documents/${documentId}/export`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ format: 'pdf' })
@@ -147,9 +145,8 @@ export const downloadAsPdf = async (documentId, originalFilename, mimeType) => {
       : exportData.downloadUrl;
     
     const pdfResponse = await fetch(pdfUrl, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include',
+      headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
     });
     
     if (!pdfResponse.ok) {

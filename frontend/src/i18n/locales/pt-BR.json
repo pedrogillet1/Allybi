@@ -10,7 +10,8 @@
     "signIn": "Entrar",
     "signUp": "Cadastrar",
     "dashboard": "Painel",
-    "upgrade": "Atualizar"
+    "upgrade": "Atualizar",
+    "integrations": "Integrações"
   },
   "settings": {
     "cacheAndDocuments": "cache e todos os documentos",
@@ -267,6 +268,7 @@
     "failedToSend": "Falha ao enviar",
     "title": "Chat",
     "placeholder": "Pergunte ao Allybi sobre seus documentos...",
+    "inputPlaceholder": "Pergunte ao Allybi...",
     "send": "Enviar",
     "thinking": "Pensando...",
     "welcome": "Bem-vindo ao Allybi",
@@ -819,6 +821,7 @@
     "needHelpFindingSomething": "Precisa de ajuda para encontrar algo?",
     "documentDeleted": "Documento excluído com sucesso",
     "failedToDelete": "Falha ao excluir documento: {{error}}",
+    "comingSoon": "Edição para este tipo de arquivo em breve!",
     "createCategoryComingSoon": "Função de criar categoria em breve!",
     "failedToMoveDocument": "Falha ao mover documento: {{error}}",
     "failedToLoadForPrinting": "Falha ao carregar documento para impressão",
@@ -1045,7 +1048,11 @@
     "searchConversation": "Buscar conversa...",
     "chat": "Chat",
     "noConversationsYet": "Nenhuma conversa ainda. Inicie uma nova!",
-    "deleteAll": "Excluir Tudo"
+    "deleteAll": "Excluir Tudo",
+    "today": "Hoje",
+    "yesterday": "Ontem",
+    "twoDaysAgo": "2 dias atrás",
+    "older": "Mais antigos"
   },
   "bulkActions": {
     "documentsSelected": "{{count}} documento selecionado",
@@ -1594,6 +1601,183 @@
       },
       "validating": "Conferindo os detalhes antes de enviar…",
       "finalizing": "Passo final: formatação, estrutura e entrega…"
+    }
+  },
+  "chatEmptyState": {
+    "heading": "O que você quer fazer?",
+    "subtitle": "Pergunte sobre seus arquivos, edite conteúdo ou use ferramentas conectadas.",
+    "uploadFiles": "Enviar arquivos",
+    "tools": "Ferramentas",
+    "openTools": "Abrir ferramentas",
+    "usePrompt": "Usar este prompt",
+    "prompts": {
+      "summarizePdf": { "label": "Resumir este PDF", "text": "Resuma o PDF anexo em 5 pontos." },
+      "findClause": { "label": "Encontrar uma cláusula", "text": "Encontre a cláusula de rescisão e cite-a." },
+      "rewriteFormally": { "label": "Reescrever formalmente", "text": "Reescreva o parágrafo destacado de forma mais formal e concisa." },
+      "createSlide": { "label": "Criar um slide", "text": "Crie 1 slide resumindo os pontos-chave (título + 5 itens)." },
+      "searchEmail": { "label": "Pesquisar e-mail", "text": "Pesquise meu e-mail pela última conversa sobre faturas e resuma." },
+      "searchSlack": { "label": "Pesquisar Slack", "text": "Encontre mensagens do Slack sobre o projeto Orion dos últimos 30 dias." }
+    },
+    "toolBadges": {
+      "gmailConnected": "Gmail conectado",
+      "connectGmail": "Conectar Gmail",
+      "slackConnected": "Slack conectado",
+      "connectSlack": "Conectar Slack"
+    }
+  },
+  "home": {
+    "fileInsights": {
+      "title": "Análise de arquivos",
+      "emptyMessage": "Envie arquivos para ver análises",
+      "file": "arquivo",
+      "files": "arquivos",
+      "viewType": "Ver arquivos {{type}}"
+    },
+    "integrations": {
+      "title": "Integrações",
+      "manage": "Gerenciar",
+      "connect": "Conectar",
+      "retry": "Tentar novamente",
+      "retryConnect": "Tentar conectar",
+      "reconnect": "Reconectar",
+      "connectProvider": "Conectar {{provider}}",
+      "retrySyncProvider": "Tentar sincronizar {{provider}}",
+      "retryConnectProvider": "Tentar conectar {{provider}}",
+      "reconnectProvider": "Reconectar {{provider}}",
+      "status": {
+        "notConnected": "Não conectado",
+        "connecting": "Conectando...",
+        "connectFailed": "Falha na conexão. Tentar novamente.",
+        "connected": "Conectado",
+        "syncFailed": "Falha na sincronização. Tentar novamente.",
+        "revoked": "Permissão revogada"
+      }
+    },
+    "continue": {
+      "title": "Continuar",
+      "documents": "Documentos",
+      "chats": "Conversas",
+      "untitledChat": "Conversa sem título",
+      "getStarted": "Começar",
+      "getStartedMessage": "Envie um documento para começar. Faça perguntas e obtenha respostas fundamentadas.",
+      "uploadDocument": "Enviar documento",
+      "timeAgo": {
+        "justNow": "Agora mesmo",
+        "minutesAgo": "{{count}}min atrás",
+        "hoursAgo": "{{count}}h atrás",
+        "daysAgo": "{{count}}d atrás"
+      }
+    },
+    "categories": {
+      "new": "Novo",
+      "seeAll": "Ver todos",
+      "organizeTitle": "Organize seus arquivos",
+      "organizeMessage": "Crie categorias para manter seus documentos organizados e fáceis de encontrar.",
+      "createCategory": "Criar categoria",
+      "viewAll": "Ver todas as categorias",
+      "file": "Arquivo",
+      "files": "Arquivos",
+      "menu": {
+        "edit": "Editar",
+        "uploadTo": "Enviar para",
+        "moveTo": "Mover para",
+        "download": "Baixar",
+        "delete": "Excluir"
+      }
+    },
+    "recentlyAdded": {
+      "failedToLoad": "Falha ao carregar arquivos",
+      "retry": "Tentar novamente"
+    }
+  },
+  "uploadHub": {
+    "title": "Enviar",
+    "addFiles": "Adicionar arquivos",
+    "dragDropDescription": "Arraste e solte arquivos ou pastas. Máx. 500 MB por arquivo.",
+    "selectFiles": "Selecionar arquivos",
+    "selectFolder": "Selecionar pasta",
+    "scan": "Digitalizar",
+    "dropFilesHere": "Solte os arquivos aqui",
+    "orChooseFromComputer": "ou escolha do seu computador",
+    "supportedFormatsList": "Suporta PDF, DOCX, PPTX, XLSX, JPG, PNG, MP3, MP4",
+    "viewAll": "Ver todos",
+    "destination": "Destino",
+    "new": "Novo",
+    "noCategoriesYet": "Nenhuma categoria ainda",
+    "createOneToOrganize": "Crie uma para organizar seus envios.",
+    "createCategory": "Criar categoria",
+    "uploadWithoutCategory": "Você também pode enviar sem uma categoria.",
+    "searchCategories": "Buscar categorias...",
+    "noMatchingCategories": "Nenhuma categoria encontrada",
+    "seeAllCategories": "Ver todas as categorias",
+    "uploadingTo": "Enviando para: {{name}}",
+    "noCategorySelected": "Nenhuma categoria selecionada \u2014 envios vão para Adicionados Recentemente.",
+    "uploading": "Enviando\u2026",
+    "uploaded": "Enviado.",
+    "uploadingToName": "Enviando para {{name}}.",
+    "files": "Arquivos",
+    "filesCount": "Arquivos ({{count}})",
+    "clear": "Limpar",
+    "uploadCount": "Enviar ({{count}})",
+    "upload": "Enviar",
+    "selectedFilesAppear": "Os arquivos selecionados aparecem aqui antes do envio.",
+    "tableHeaders": {
+      "name": "Nome",
+      "destination": "Destino",
+      "status": "Status",
+      "size": "Tamanho"
+    },
+    "ready": "Pronto",
+    "error": "Erro",
+    "done": "Concluído",
+    "uploadFailed": "Falha no envio",
+    "retry": "Tentar novamente",
+    "supportedFormatsTitle": "Formatos suportados",
+    "maxFileSize": "Máx. 500 MB por arquivo.",
+    "dropFilesAria": "Solte os arquivos aqui ou pressione Enter para selecionar",
+    "createNewCategory": "Criar nova categoria",
+    "removeFile": "Remover arquivo",
+    "noCategoryLabel": "Sem categoria",
+    "formatGroups": {
+      "documents": "Documentos",
+      "presentations": "Apresentações",
+      "spreadsheets": "Planilhas",
+      "images": "Imagens",
+      "media": "Mídia"
+    }
+  },
+  "integrationsPage": {
+    "title": "Integrações",
+    "description": "Conecte suas ferramentas para pesquisar, gerenciar e interagir com seus dados em um só lugar.",
+    "backToHome": "Voltar ao início",
+    "connect": "Conectar",
+    "connecting": "Conectando...",
+    "open": "Abrir",
+    "disconnect": "Desconectar",
+    "retrySync": "Tentar sincronizar",
+    "retryConnect": "Tentar conectar",
+    "reconnect": "Reconectar",
+    "status": {
+      "notConnected": "Não conectado",
+      "connecting": "Conectando...",
+      "connectionFailed": "Falha na conexão",
+      "connected": "Conectado",
+      "syncFailed": "Falha na sincronização",
+      "revoked": "Permissão revogada"
+    },
+    "providers": {
+      "gmail": {
+        "label": "Gmail",
+        "description": "Conecte sua conta do Gmail para pesquisar e gerenciar e-mails diretamente do Allybi."
+      },
+      "outlook": {
+        "label": "Outlook",
+        "description": "Conecte sua conta do Outlook para acessar e-mails e eventos do calendário."
+      },
+      "slack": {
+        "label": "Slack",
+        "description": "Conecte o Slack para pesquisar mensagens e compartilhar documentos com sua equipe."
+      }
     }
   }
 }

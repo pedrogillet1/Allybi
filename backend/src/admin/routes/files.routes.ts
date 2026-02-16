@@ -6,6 +6,8 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { listFiles, getFileDetail } from '../../services/admin';
+import { parseRange, normalizeRange } from '../../services/admin/_shared/rangeWindow';
+import { getGoogleMetrics } from '../../services/admin/googleMetrics.service';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -17,10 +19,15 @@ const prisma = new PrismaClient();
 router.get('/', async (req: Request, res: Response) => {
   try {
     const range = (req.query.range as string) || '7d';
+    const rangeKey = normalizeRange(range, '7d');
     const limit = parseInt(req.query.limit as string) || 50;
     const cursor = req.query.cursor as string | undefined;
+    const window = parseRange(rangeKey);
 
-    const result = await listFiles(prisma, { range, limit, cursor });
+    const [result, google] = await Promise.all([
+      listFiles(prisma, { range: rangeKey, limit, cursor }),
+      getGoogleMetrics(prisma, window),
+    ]);
 
     res.json({
       ok: true,
@@ -30,6 +37,7 @@ router.get('/', async (req: Request, res: Response) => {
         total: result.counts.total,
         files: result.items,
         counts: result.counts,
+        google: { ocr: google.ocr },
       },
       meta: {
         cache: 'miss',

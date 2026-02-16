@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
+
+const buildAuthHeader = () => {
+  if (!AUTH_LOCALSTORAGE_COMPAT) return {};
+  const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 const NotificationCenter = () => {
   const { t } = useTranslation();
@@ -29,8 +36,9 @@ const NotificationCenter = () => {
     try {
       setIsLoading(true);
       const response = await axios.get('/api/notifications', {
+        withCredentials: true,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          ...buildAuthHeader(),
         },
       });
       setNotifications(response.data.notifications);
@@ -56,8 +64,9 @@ const NotificationCenter = () => {
         `/api/notifications/${notificationId}/read`,
         {},
         {
+          withCredentials: true,
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            ...buildAuthHeader(),
           },
         }
       );
@@ -74,8 +83,9 @@ const NotificationCenter = () => {
         '/api/notifications/mark-all-read',
         {},
         {
+          withCredentials: true,
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            ...buildAuthHeader(),
           },
         }
       );

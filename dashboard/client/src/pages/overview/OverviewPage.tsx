@@ -15,6 +15,10 @@ import {
   AlertTriangle,
   DollarSign,
   TrendingUp,
+  Database,
+  Server,
+  Cpu,
+  ScanSearch,
 } from "lucide-react";
 
 // ============================================================================
@@ -101,6 +105,13 @@ export function OverviewPage() {
   const [env, setEnv] = useState<Environment>("prod");
 
   const { data, isLoading, error, refetch } = useOverview({ range, env });
+  const google = data?.google;
+
+  const formatBytes = (bytes: number | null | undefined) => {
+    if (bytes == null || bytes <= 0) return "-";
+    const gb = bytes / (1024 * 1024 * 1024);
+    return `${gb.toFixed(2)} GB`;
+  };
 
   return (
     <AdminLayout
@@ -163,6 +174,30 @@ export function OverviewPage() {
                 From: {new Date(data.window.from).toLocaleString()} — To: {new Date(data.window.to).toLocaleString()}
               </p>
             </div>
+          )}
+
+          {/* Google Cloud Metrics */}
+          {google && (
+            <>
+              <div className="mb-3">
+                <h3 className="text-sm font-semibold text-[#111111]">Google Cloud Metrics</h3>
+                <p className="text-xs text-[#6B7280]">Cloud SQL, Cloud Run, Gemini API, OCR</p>
+              </div>
+              <div className="grid grid-cols-4 gap-4 mb-6">
+                <KpiCard label="Cloud SQL Connected" value={google.cloudSql?.connected ? "Yes" : "No"} icon={Database} />
+                <KpiCard label="Cloud SQL Latency" value={google.cloudSql?.latencyMs != null ? `${google.cloudSql.latencyMs}ms` : "-"} icon={Database} />
+                <KpiCard label="Cloud SQL Connections" value={google.cloudSql?.activeConnections ?? 0} icon={Database} />
+                <KpiCard label="Cloud SQL Size" value={formatBytes(google.cloudSql?.databaseSizeBytes)} icon={Database} />
+                <KpiCard label="Cloud Run Calls" value={google.cloudRun?.calls ?? 0} icon={Server} />
+                <KpiCard label="Cloud Run Error Rate" value={google.cloudRun?.errorRate ?? 0} icon={Server} format="percent" />
+                <KpiCard label="Gemini Calls" value={google.gemini?.calls ?? 0} icon={Cpu} />
+                <KpiCard label="Gemini Tokens" value={google.gemini?.tokens ?? 0} icon={Cpu} />
+                <KpiCard label="Gemini Cost" value={google.gemini?.estimatedCostUsd ?? 0} icon={DollarSign} format="currency" />
+                <KpiCard label="OCR Docs Processed" value={google.ocr?.docsProcessed ?? 0} icon={ScanSearch} />
+                <KpiCard label="OCR Coverage" value={google.ocr?.ocrCoverageRate ?? 0} icon={ScanSearch} format="percent" />
+                <KpiCard label="OCR Confidence" value={google.ocr?.avgConfidence ?? 0} icon={ScanSearch} format="percent" />
+              </div>
+            </>
           )}
         </>
       )}

@@ -117,11 +117,29 @@ async function request<T>(
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
+    const contentType = response.headers.get("content-type") || "";
+    let errorData: Record<string, unknown> = {};
+    if (contentType.includes("application/json")) {
+      errorData = await response.json().catch(() => ({}));
+    } else {
+      const rawText = await response.text().catch(() => "");
+      if (rawText) errorData = { error: rawText };
+    }
+
+    const isProxyStyle500 =
+      response.status === 500 &&
+      !contentType.includes("application/json") &&
+      endpoint.startsWith("/admin/");
+    const proxyHint = isProxyStyle500
+      ? " Admin API proxy/backend unavailable. Confirm dashboard proxy target and backend on port 5001."
+      : "";
+
     throw new ApiError(
-      errorData.message || errorData.error || `Request failed with status ${response.status}`,
+      ((errorData.message as string) ||
+        (errorData.error as string) ||
+        `Request failed with status ${response.status}`) + proxyHint,
       response.status,
-      errorData.code
+      errorData.code as string | undefined
     );
   }
 

@@ -24,7 +24,21 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 30_000, // 30 seconds
-      retry: 1,
+      retry: (failureCount, error) => {
+        const message =
+          error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+
+        // Proxy/backend down should fail fast to avoid retry storms across every screen.
+        if (
+          message.includes("proxy/backend unavailable") ||
+          message.includes("failed to fetch") ||
+          message.includes("networkerror")
+        ) {
+          return false;
+        }
+
+        return failureCount < 1;
+      },
       refetchOnWindowFocus: false,
     },
   },

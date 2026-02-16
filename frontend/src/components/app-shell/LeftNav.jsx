@@ -314,6 +314,9 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                         fontSize: '16px',
                                         fontWeight: typography.bodyStrong.weight,
                                         fontFamily: typography.body.family,
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
                                     }}
                                 >
                                     {t('nav.home')}
@@ -350,6 +353,9 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                         fontSize: '16px',
                                         fontWeight: typography.bodyStrong.weight,
                                         fontFamily: typography.body.family,
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
                                     }}
                                 >
                                     {t('nav.chat')}
@@ -390,6 +396,9 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                         fontSize: '16px',
                                         fontWeight: typography.bodyStrong.weight,
                                         fontFamily: typography.body.family,
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
                                     }}
                                 >
                                     {t('nav.upload')}
@@ -399,7 +408,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                     </SidebarTooltip>
 
                     {/* Integrations */}
-                    <SidebarTooltip text="Integrations" show={!isExpanded}>
+                    <SidebarTooltip text={t('nav.integrations')} show={!isExpanded}>
                         <div
                             onClick={() => navigate(ROUTES.INTEGRATIONS)}
                             style={getButtonStyle(location.pathname === ROUTES.INTEGRATIONS)}
@@ -407,7 +416,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                             onMouseLeave={(e) => handleButtonLeave(e, location.pathname === ROUTES.INTEGRATIONS)}
                             role="button"
                             tabIndex={0}
-                            aria-label="Integrations"
+                            aria-label={t('nav.integrations')}
                             aria-current={location.pathname === ROUTES.INTEGRATIONS ? 'page' : undefined}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
@@ -426,9 +435,12 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                         fontSize: '16px',
                                         fontWeight: typography.bodyStrong.weight,
                                         fontFamily: typography.body.family,
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
                                     }}
                                 >
-                                    Integrations
+                                    {t('nav.integrations')}
                                 </span>
                             )}
                         </div>
@@ -489,6 +501,9 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                     fontSize: '16px',
                                     fontWeight: typography.bodyStrong.weight,
                                     fontFamily: typography.body.family,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
                                 }}
                             >
                                 {t('nav.notifications')}
@@ -529,6 +544,9 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                     fontSize: '16px',
                                     fontWeight: typography.bodyStrong.weight,
                                     fontFamily: typography.body.family,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
                                 }}
                             >
                                 {t('nav.settings')}
@@ -565,6 +583,9 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                     fontSize: '16px',
                                     fontWeight: typography.bodyStrong.weight,
                                     fontFamily: typography.body.family,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
                                 }}
                             >
                                 {user ? t('nav.signOut') : t('nav.signIn')}

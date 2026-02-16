@@ -2,8 +2,11 @@ import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { ROUTES, DEFAULT_AUTH_REDIRECT, STORAGE_KEYS, buildRoute, AUTH_MODES } from '../../constants/routes';
+import { DEFAULT_AUTH_REDIRECT, STORAGE_KEYS, buildRoute, AUTH_MODES } from '../../constants/routes';
 import { useAuthModal } from '../../context/AuthModalContext';
+import { fetchBootstrapSession } from '../../services/authBootstrap';
+
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 
 const OAuthCallback = ({ variant = 'page' }) => {
   const { t } = useTranslation();
@@ -15,9 +18,6 @@ const OAuthCallback = ({ variant = 'page' }) => {
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
-      // Get tokens from URL
-      const accessToken = searchParams.get('accessToken');
-      const refreshToken = searchParams.get('refreshToken');
       const error = searchParams.get('error');
 
       // Handle errors
@@ -43,33 +43,24 @@ const OAuthCallback = ({ variant = 'page' }) => {
         return;
       }
 
-      // Check if tokens exist
-      if (!accessToken || !refreshToken) {
-        navigate(`${buildRoute.auth(AUTH_MODES.LOGIN)}?error=Missing authentication tokens`);
-        return;
+      // Compat-only support for legacy backend redirects.
+      const accessToken = searchParams.get('accessToken');
+      const refreshToken = searchParams.get('refreshToken');
+      if (AUTH_LOCALSTORAGE_COMPAT && accessToken && refreshToken) {
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
       }
 
-      // Store tokens in localStorage
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
-
-      // Fetch user data using the access token
+      // Cookie-first bootstrap: backend sets httpOnly cookies during OAuth callback.
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          },
-          credentials: 'include',
-        });
+        const bootstrap = await fetchBootstrapSession();
+        if (bootstrap?.ok && bootstrap?.user) {
+          const userData = { user: bootstrap.user };
 
-        if (response.ok) {
-          const userData = await response.json();
-
-          // Store user in localStorage BEFORE updating React state
-          // This ensures authService.isAuthenticated() returns true during navigation
+          // Cache non-sensitive profile locally for quick boot.
           localStorage.setItem('user', JSON.stringify(userData.user));
 
-          // Update AuthContext state (also persists to localStorage as backup)
+          // Update AuthContext state
           setAuthState(userData.user);
 
           // Small delay to ensure localStorage writes are flushed before navigation
@@ -87,12 +78,12 @@ const OAuthCallback = ({ variant = 'page' }) => {
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
-        navigate(`${buildRoute.auth(AUTH_MODES.LOGIN)}?error=Failed to fetch user data`, { replace: true });
+        navigate(`${buildRoute.auth(AUTH_MODES.LOGIN)}?error=Session bootstrap failed`, { replace: true });
       }
     };
 
     handleOAuthCallback();
-  }, [searchParams, navigate, setAuthState]);
+  }, [searchParams, navigate, setAuthState, completeAuth]);
 
   return (
     <div style={{

@@ -83,7 +83,8 @@ export const authLoginSchema = z.object({
 }).strict();
 
 export const authRefreshSchema = z.object({
-  refreshToken: z.string().min(1).max(2048),
+  // Cookie-first refresh flow can omit body and rely on httpOnly refresh cookie.
+  refreshToken: z.string().min(1).max(2048).optional(),
 }).strict();
 
 // ---------------------------------------------------------------------------

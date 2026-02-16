@@ -636,9 +636,9 @@ const UploadHub = () => {
 
   // Helper to resolve destination name from an id (searches ALL folders, not just root categories)
   const getDestinationName = (destId) => {
-    if (!destId) return 'No category';
+    if (!destId) return t('uploadHub.noCategoryLabel');
     const folder = folders.find(f => f.id === destId);
-    return folder?.name || 'No category';
+    return folder?.name || t('uploadHub.noCategoryLabel');
   };
 
   // Close dropdown when clicking outside
@@ -2844,7 +2844,7 @@ const UploadHub = () => {
             fontSize: isMobile ? 18 : 20, fontWeight: '600', color: '#32302C', margin: 0,
             fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '30px',
           }}>
-            Upload
+            {t('uploadHub.title')}
           </h2>
         </div>
 
@@ -2881,12 +2881,12 @@ const UploadHub = () => {
               <h3 style={{
                 margin: 0, fontSize: 16, fontWeight: '600', color: '#32302C',
                 fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '24px',
-              }}>Add files</h3>
+              }}>{t('uploadHub.addFiles')}</h3>
               <p style={{
                 margin: '4px 0 0', fontSize: 13, color: '#6C6B6E',
                 fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '20px',
               }}>
-                Drag &amp; drop files or folders. Max 500 MB per file.
+                {t('uploadHub.dragDropDescription')}
               </p>
 
               {isMobile ? (
@@ -2894,7 +2894,7 @@ const UploadHub = () => {
                   <div style={{ display: 'flex', gap: 8, flexDirection: 'column', width: '100%', maxWidth: 220 }}>
                     <button onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                       style={{ height: 44, background: '#181818', border: 'none', borderRadius: 9999, fontSize: 14, fontWeight: '600', color: 'white', cursor: 'pointer', fontFamily: 'Plus Jakarta Sans, sans-serif', width: '100%' }}>
-                      Select files
+                      {t('uploadHub.selectFiles')}
                     </button>
                     <button onClick={(e) => { e.stopPropagation(); setShowScanner(true); }}
                       style={{ height: 44, background: 'white', border: '1px solid #E6E6EC', borderRadius: 9999, fontSize: 14, fontWeight: '600', color: '#32302C', cursor: 'pointer', fontFamily: 'Plus Jakarta Sans, sans-serif', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
@@ -2903,7 +2903,7 @@ const UploadHub = () => {
                         <path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
                         <rect x="7" y="7" width="10" height="10" rx="1"/>
                       </svg>
-                      Scan
+                      {t('uploadHub.scan')}
                     </button>
                   </div>
                 </div>
@@ -2912,7 +2912,7 @@ const UploadHub = () => {
                 <div
                   role="button"
                   tabIndex={0}
-                  aria-label="Drop files here or press Enter to select files"
+                  aria-label={t('uploadHub.dropFilesAria')}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); fileInputRef.current?.click(); } }}
                   style={{
                     flex: 1, marginTop: 16, borderRadius: 12,
@@ -2934,13 +2934,13 @@ const UploadHub = () => {
                     margin: 0, fontSize: 15, fontWeight: '600', color: '#32302C',
                     fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '22px',
                   }}>
-                    Drop files here
+                    {t('uploadHub.dropFilesHere')}
                   </p>
                   <p style={{
                     margin: '4px 0 0', fontSize: 13, color: '#6C6B6E',
                     fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '20px',
                   }}>
-                    or choose from your computer
+                    {t('uploadHub.orChooseFromComputer')}
                   </p>
 
                   {/* Buttons */}
@@ -2955,7 +2955,7 @@ const UploadHub = () => {
                       }}
                       onMouseEnter={(e) => { e.currentTarget.style.background = '#0F0F0F'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = '#181818'; }}>
-                      Select files
+                      {t('uploadHub.selectFiles')}
                     </button>
                     <button onClick={(e) => { e.stopPropagation(); folderInputRef.current?.click(); }}
                       style={{
@@ -2967,7 +2967,7 @@ const UploadHub = () => {
                       }}
                       onMouseEnter={(e) => { e.currentTarget.style.background = '#ECECEC'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'white'; }}>
-                      Select folder
+                      {t('uploadHub.selectFolder')}
                     </button>
                   </div>
 
@@ -2977,7 +2977,7 @@ const UploadHub = () => {
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
                   }}>
                     <span style={{ fontSize: 11, color: '#A2A2A7', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', lineHeight: '16px' }}>
-                      Supports PDF, DOCX, PPTX, XLSX, JPG, PNG, MP3, MP4
+                      {t('uploadHub.supportedFormatsList')}
                     </span>
                     <span style={{ fontSize: 11, color: '#A2A2A7', lineHeight: '16px' }}>·</span>
                     <button
@@ -2991,7 +2991,7 @@ const UploadHub = () => {
                       onMouseEnter={(e) => { e.currentTarget.style.color = '#32302C'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.color = '#6C6B6E'; }}
                     >
-                      View all
+                      {t('uploadHub.viewAll')}
                     </button>
                   </div>
                 </div>
@@ -3011,11 +3011,11 @@ const UploadHub = () => {
               {/* ── Header ── */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 24px 0', flexShrink: 0 }}>
                 <h3 style={{ margin: 0, fontSize: 16, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '24px' }}>
-                  Destination
+                  {t('uploadHub.destination')}
                 </h3>
                 {categories.length > 0 && (
                   <button onClick={() => setShowNewCategoryModal(true)}
-                    aria-label="Create new category"
+                    aria-label={t('uploadHub.createNewCategory')}
                     style={{
                       height: 36, padding: '0 14px', background: '#F5F5F5', border: '1px solid #E6E6EC',
                       borderRadius: 9999, cursor: 'pointer', fontSize: 13, fontWeight: '600',
@@ -3026,7 +3026,7 @@ const UploadHub = () => {
                     onMouseEnter={(e) => { e.currentTarget.style.background = '#ECECEC'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = '#F5F5F5'; }}>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="#32302C" strokeWidth="1.8" strokeLinecap="round"/></svg>
-                    New
+                    {t('uploadHub.new')}
                   </button>
                 )}
               </div>
@@ -3035,10 +3035,10 @@ const UploadHub = () => {
                 /* ── State A: No categories — empty state ── */
                 <div style={{ padding: '32px 24px 24px', textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                   <p style={{ margin: 0, fontSize: 15, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '22px' }}>
-                    No categories yet
+                    {t('uploadHub.noCategoriesYet')}
                   </p>
                   <p style={{ margin: '6px 0 0', fontSize: 13, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '20px' }}>
-                    Create one to organize uploads.
+                    {t('uploadHub.createOneToOrganize')}
                   </p>
                   <button
                     onClick={() => setShowNewCategoryModal(true)}
@@ -3053,13 +3053,13 @@ const UploadHub = () => {
                     onMouseEnter={(e) => { e.currentTarget.style.background = '#333'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = '#181818'; }}>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="white" strokeWidth="1.8" strokeLinecap="round"/></svg>
-                    Create category
+                    {t('uploadHub.createCategory')}
                   </button>
                   <p style={{
                     marginTop: 12, fontSize: 12, color: '#A2A2A7',
                     fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px',
                   }}>
-                    You can also upload without a category.
+                    {t('uploadHub.uploadWithoutCategory')}
                   </p>
                 </div>
               ) : (
@@ -3074,7 +3074,7 @@ const UploadHub = () => {
                         }} />
                         <input
                           type="text"
-                          placeholder="Search categories..."
+                          placeholder={t('uploadHub.searchCategories')}
                           value={destinationSearchQuery}
                           onChange={(e) => setDestinationSearchQuery(e.target.value)}
                           style={{
@@ -3095,7 +3095,7 @@ const UploadHub = () => {
                   <div style={{ padding: '12px 24px 0', flex: 1, minHeight: 0, overflowY: 'auto' }}>
                     {filteredCategories.length === 0 ? (
                       <div style={{ padding: '20px 0', textAlign: 'center' }}>
-                        <p style={{ margin: 0, fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>No matching categories</p>
+                        <p style={{ margin: 0, fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{t('uploadHub.noMatchingCategories')}</p>
                       </div>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -3121,7 +3121,7 @@ const UploadHub = () => {
                         }}
                         onMouseEnter={(e) => { e.currentTarget.style.color = '#32302C'; }}
                         onMouseLeave={(e) => { e.currentTarget.style.color = '#6C6B6E'; }}>
-                        See all categories
+                        {t('uploadHub.seeAllCategories')}
                         <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5l3.5 3.5-3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                       </button>
                     </div>
@@ -3160,8 +3160,8 @@ const UploadHub = () => {
                       fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px',
                     }}>
                       {selectedDestination
-                        ? `Uploading to: ${getDestinationName(selectedDestination)}`
-                        : 'No category selected \u2014 uploads go to Recently Added.'}
+                        ? t('uploadHub.uploadingTo', { name: getDestinationName(selectedDestination) })
+                        : t('uploadHub.noCategorySelected')}
                     </p>
                   </div>
                 </>
@@ -3183,16 +3183,16 @@ const UploadHub = () => {
 
               // Subtitle copy
               let subtitle = '';
-              if (isUploading) subtitle = 'Uploading\u2026';
-              else if (isAllDone) subtitle = 'Uploaded.';
-              else if (pendingCount > 0 && selectedDestination) subtitle = `Uploading to ${getDestinationName(selectedDestination)}.`;
-              else if (pendingCount > 0) subtitle = 'No category selected \u2014 uploads go to Recently Added.';
+              if (isUploading) subtitle = t('uploadHub.uploading');
+              else if (isAllDone) subtitle = t('uploadHub.uploaded');
+              else if (pendingCount > 0 && selectedDestination) subtitle = t('uploadHub.uploadingToName', { name: getDestinationName(selectedDestination) });
+              else if (pendingCount > 0) subtitle = t('uploadHub.noCategorySelected');
 
               return (
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: hasFiles ? 16 : 0 }}>
                   <div>
                     <h3 style={{ margin: 0, fontSize: 16, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '24px' }}>
-                      Files{hasFiles ? ` (${uploadingFiles.length})` : ''}
+                      {hasFiles ? t('uploadHub.filesCount', { count: uploadingFiles.length }) : t('uploadHub.files')}
                     </h3>
                     {subtitle && (
                       <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px' }}>
@@ -3212,7 +3212,7 @@ const UploadHub = () => {
                         }}
                         onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = 'white'; }}>
-                        Clear
+                        {t('uploadHub.clear')}
                       </button>
                     )}
                     {(() => {
@@ -3233,7 +3233,7 @@ const UploadHub = () => {
                           }}
                           onMouseEnter={(e) => { if (canUpload) e.currentTarget.style.background = '#333'; }}
                           onMouseLeave={(e) => { if (canUpload) e.currentTarget.style.background = '#181818'; }}>
-                          {canUpload ? `Upload (${pendingCount})` : 'Upload'}
+                          {canUpload ? t('uploadHub.uploadCount', { count: pendingCount }) : t('uploadHub.upload')}
                         </button>
                       );
                     })()}
@@ -3249,18 +3249,18 @@ const UploadHub = () => {
                   margin: '0 0 16px', fontSize: 13, color: '#6C6B6E',
                   fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '20px',
                 }}>
-                  Selected files appear here before upload.
+                  {t('uploadHub.selectedFilesAppear')}
                 </p>
                 {/* Table header */}
                 <div style={{
                   display: 'grid', gridTemplateColumns: '1fr 200px 100px 80px 44px',
                   gap: 12, padding: '0 12px', marginBottom: 4,
                 }}>
-                  {['Name', 'Destination', 'Status', 'Size', ''].map((col, ci) => (
+                  {[t('uploadHub.tableHeaders.name'), t('uploadHub.tableHeaders.destination'), t('uploadHub.tableHeaders.status'), t('uploadHub.tableHeaders.size'), ''].map((col, ci) => (
                     <span key={ci} style={{
                       fontSize: 12, fontWeight: '600', color: '#6C6B6E',
                       fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px',
-                      textAlign: col === 'Size' ? 'right' : 'left',
+                      textAlign: ci === 3 ? 'right' : 'left',
                     }}>{col}</span>
                   ))}
                 </div>
@@ -3299,11 +3299,11 @@ const UploadHub = () => {
                   const isPending = f.status === 'pending';
                   const progressWidth = isComplete ? 100 : (f.progress || 0);
 
-                  let chipLabel = 'Ready';
+                  let chipLabel = t('uploadHub.ready');
                   let chipColor = '#6C6B6E';
                   let chipBg = '#F5F5F5';
-                  if (isError) { chipLabel = 'Error'; chipColor = '#D92D20'; chipBg = '#FEF3F2'; }
-                  else if (isComplete) { chipLabel = 'Done'; chipColor = '#34A853'; chipBg = '#F0FDF4'; }
+                  if (isError) { chipLabel = t('uploadHub.error'); chipColor = '#D92D20'; chipBg = '#FEF3F2'; }
+                  else if (isComplete) { chipLabel = t('uploadHub.done'); chipColor = '#34A853'; chipBg = '#F0FDF4'; }
                   else if (isUploading) { chipLabel = `${Math.round(progressWidth)}%`; chipColor = '#181818'; chipBg = '#F5F5F5'; }
 
                   return (
@@ -3347,7 +3347,7 @@ const UploadHub = () => {
                           fontSize: 12, color: isError ? '#D92D20' : '#6C6B6E', margin: '1px 0 0',
                           fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px',
                         }}>
-                          {isError ? 'Upload failed' : f.isFolder
+                          {isError ? t('uploadHub.uploadFailed') : f.isFolder
                             ? `${f.fileCount} file${f.fileCount !== 1 ? 's' : ''} \u00B7 ${formatFileSize(f.totalSize)}`
                             : formatFileSize(f.file?.size)}
                         </p>
@@ -3370,7 +3370,7 @@ const UploadHub = () => {
                           style={{ padding: '2px 8px', background: 'none', border: '1px solid #D92D20', borderRadius: 9999, cursor: 'pointer', fontSize: 11, fontWeight: '600', color: '#D92D20', fontFamily: 'Plus Jakarta Sans, sans-serif', transition: 'background 150ms ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.background = '#FEF3F2'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
-                            Retry
+                            {t('uploadHub.retry')}
                           </button>
                         )}
 
@@ -3386,10 +3386,10 @@ const UploadHub = () => {
                               <div data-dropdown style={{ position: 'absolute', top: '100%', right: 0, marginTop: 4, background: 'white', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', borderRadius: 12, border: '1px solid #E6E6EC', zIndex: 1001, minWidth: 160, padding: 8 }}>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                                   {[
-                                    { label: 'Download', icon: <DownloadIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />, color: '#32302C', action: async (e) => { e.stopPropagation(); try { const response = await api.get(`/api/documents/${f.documentId}/stream?download=true`, { responseType: 'blob' }); const url = window.URL.createObjectURL(new Blob([response.data])); const link = document.createElement('a'); link.href = url; link.setAttribute('download', f.file.name); document.body.appendChild(link); link.click(); link.remove(); setOpenDropdownId(null); } catch (error) { showError(t('alerts.failedToDownloadFile')); } }},
-                                    { label: 'Rename', icon: <RenameIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />, color: '#32302C', action: (e) => { e.stopPropagation(); setItemToRename({ type: 'document', id: f.documentId, name: f.file.name }); setShowRenameModal(true); setOpenDropdownId(null); }},
-                                    { label: 'Move', icon: <MoveIcon style={{ width: 16, height: 16 }} />, color: '#32302C', action: (e) => { e.stopPropagation(); setOpenDropdownId(null); setShowCategoryModal(f.documentId || (f.isFolder ? f.folderName : f.file.name)); }},
-                                    { label: 'Delete', icon: <DeleteIcon style={{ width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(7149%) hue-rotate(355deg) brightness(91%) contrast(89%)' }} />, color: '#D92D20', action: (e) => { e.stopPropagation(); setItemToDelete({ type: 'uploadedFile', documentId: f.documentId, name: f.file.name, folderName: f.isFolder ? f.folderName : null, isFolder: f.isFolder }); setShowDeleteModal(true); }},
+                                    { label: t('common.download'), icon: <DownloadIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />, color: '#32302C', action: async (e) => { e.stopPropagation(); try { const response = await api.get(`/api/documents/${f.documentId}/stream?download=true`, { responseType: 'blob' }); const url = window.URL.createObjectURL(new Blob([response.data])); const link = document.createElement('a'); link.href = url; link.setAttribute('download', f.file.name); document.body.appendChild(link); link.click(); link.remove(); setOpenDropdownId(null); } catch (error) { showError(t('alerts.failedToDownloadFile')); } }},
+                                    { label: t('common.rename'), icon: <RenameIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />, color: '#32302C', action: (e) => { e.stopPropagation(); setItemToRename({ type: 'document', id: f.documentId, name: f.file.name }); setShowRenameModal(true); setOpenDropdownId(null); }},
+                                    { label: t('common.move'), icon: <MoveIcon style={{ width: 16, height: 16 }} />, color: '#32302C', action: (e) => { e.stopPropagation(); setOpenDropdownId(null); setShowCategoryModal(f.documentId || (f.isFolder ? f.folderName : f.file.name)); }},
+                                    { label: t('common.delete'), icon: <DeleteIcon style={{ width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(7149%) hue-rotate(355deg) brightness(91%) contrast(89%)' }} />, color: '#D92D20', action: (e) => { e.stopPropagation(); setItemToDelete({ type: 'uploadedFile', documentId: f.documentId, name: f.file.name, folderName: f.isFolder ? f.folderName : null, isFolder: f.isFolder }); setShowDeleteModal(true); }},
                                   ].map(item => (
                                     <button key={item.label} onClick={item.action}
                                       style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '8px 12px', background: 'transparent', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', color: item.color, transition: 'background 150ms ease', textAlign: 'left' }}
@@ -3406,7 +3406,7 @@ const UploadHub = () => {
 
                         {isPending && (
                           <button onClick={(e) => { e.stopPropagation(); removeUploadingFile(f.isFolder ? f.folderName : f.file.name); }}
-                            aria-label="Remove file"
+                            aria-label={t('uploadHub.removeFile')}
                             style={{
                               width: 44, height: 44, border: 'none', background: 'transparent',
                               borderRadius: '50%', cursor: 'pointer', fontSize: 14, color: '#6C6B6E',
@@ -3471,13 +3471,13 @@ const UploadHub = () => {
                   margin: 0, fontSize: 18, fontWeight: '600', color: '#32302C',
                   fontFamily: 'Plus Jakarta Sans, sans-serif',
                 }}>
-                  Supported formats
+                  {t('uploadHub.supportedFormatsTitle')}
                 </h3>
                 <p style={{
                   margin: '2px 0 0', fontSize: 12, color: '#6C6B6E',
                   fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px',
                 }}>
-                  Max 500 MB per file.
+                  {t('uploadHub.maxFileSize')}
                 </p>
               </div>
               <button
@@ -3499,11 +3499,11 @@ const UploadHub = () => {
             <div style={{ padding: 24, overflowY: 'auto' }}>
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px 32px' }}>
                 {[
-                  { title: 'Documents', formats: SUPPORTED_FORMATS.filter(f => f.kind === 'doc') },
-                  { title: 'Presentations', formats: SUPPORTED_FORMATS.filter(f => f.kind === 'presentation') },
-                  { title: 'Spreadsheets', formats: SUPPORTED_FORMATS.filter(f => f.kind === 'sheet') },
-                  { title: 'Images', formats: SUPPORTED_FORMATS.filter(f => f.kind === 'image') },
-                  { title: 'Media', formats: SUPPORTED_FORMATS.filter(f => f.kind === 'media') },
+                  { title: t('uploadHub.formatGroups.documents'), formats: SUPPORTED_FORMATS.filter(f => f.kind === 'doc') },
+                  { title: t('uploadHub.formatGroups.presentations'), formats: SUPPORTED_FORMATS.filter(f => f.kind === 'presentation') },
+                  { title: t('uploadHub.formatGroups.spreadsheets'), formats: SUPPORTED_FORMATS.filter(f => f.kind === 'sheet') },
+                  { title: t('uploadHub.formatGroups.images'), formats: SUPPORTED_FORMATS.filter(f => f.kind === 'image') },
+                  { title: t('uploadHub.formatGroups.media'), formats: SUPPORTED_FORMATS.filter(f => f.kind === 'media') },
                 ].map((group) => (
                   <div key={group.title}>
                     <h4 style={{
@@ -3568,7 +3568,7 @@ const UploadHub = () => {
                 margin: 0, fontSize: 18, fontWeight: '600', color: '#32302C',
                 fontFamily: 'Plus Jakarta Sans, sans-serif',
               }}>
-                All categories
+                {t('uploadHub.seeAllCategories')}
               </h3>
               <button
                 onClick={() => setShowAllDestinationsModal(false)}
@@ -3594,7 +3594,7 @@ const UploadHub = () => {
                 }} />
                 <input
                   type="text"
-                  placeholder="Search categories..."
+                  placeholder={t('uploadHub.searchCategories')}
                   value={allDestModalSearch}
                   onChange={(e) => setAllDestModalSearch(e.target.value)}
                   autoFocus
@@ -3630,7 +3630,7 @@ const UploadHub = () => {
                   return (
                     <div style={{ padding: '20px 0', textAlign: 'center' }}>
                       <p style={{ margin: 0, fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-                        No matching categories
+                        {t('uploadHub.noMatchingCategories')}
                       </p>
                     </div>
                   );
@@ -3682,7 +3682,7 @@ const UploadHub = () => {
                 onMouseEnter={(e) => { e.currentTarget.style.background = '#ECECEC'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = '#F5F5F5'; }}>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="#32302C" strokeWidth="1.8" strokeLinecap="round"/></svg>
-                Create new category
+                {t('uploadHub.createNewCategory')}
               </button>
             </div>
           </div>

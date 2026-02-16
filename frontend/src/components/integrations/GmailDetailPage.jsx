@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../constants/routes';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useIntegrationStatus } from '../../hooks/useIntegrationStatus';
@@ -364,6 +365,7 @@ function EmailPreviewPanel({ email, showComposer, onToggleComposer, composerData
 
 // Allybi AI panel (right column)
 function AllybiPanel({ email, onInsertDraft }) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -533,7 +535,7 @@ function AllybiPanel({ email, onInsertDraft }) {
           value={query}
           onChange={e => setQuery(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAsk(); } }}
-          placeholder="Ask Allybi..."
+          placeholder={t('chat.inputPlaceholder')}
           style={{
             flex: 1,
             height: 36,
@@ -588,6 +590,7 @@ const DEMO_EMAILS = [
 
 export default function GmailDetailPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const { providers } = useIntegrationStatus();
   const gmailStatus = providers?.gmail;

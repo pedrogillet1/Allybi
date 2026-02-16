@@ -7,6 +7,7 @@ import unifiedUploadService from '../services/unifiedUploadService';
 import { UPLOAD_CONFIG } from '../config/upload.config';
 import { encryptData, decryptData } from '../utils/security/encryption';
 import { useAuth } from './AuthContext';
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 
 const DocumentsContext = createContext();
 
@@ -555,9 +556,10 @@ export const DocumentsProvider = ({ children }) => {
     // ✅ FIX: Only initialize WebSocket if authenticated and initialized
     if (!initialized || !isAuthenticated) return;
 
-    // Get auth token
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
+    // Cookie-first auth: only use localStorage token in explicit compat mode.
+    const token = AUTH_LOCALSTORAGE_COMPAT
+      ? (localStorage.getItem('accessToken') || localStorage.getItem('token'))
+      : null;
 
     // Get user ID from localStorage (set during login)
     const userStr = localStorage.getItem('user');
@@ -578,7 +580,8 @@ export const DocumentsProvider = ({ children }) => {
 
     // Initialize socket connection
     const socket = io(apiUrl, {
-      auth: { token },
+      auth: token ? { token } : {},
+      withCredentials: true,
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,

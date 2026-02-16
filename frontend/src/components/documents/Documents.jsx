@@ -1267,7 +1267,9 @@ const Documents = () => {
             gap: 24,
             alignItems: 'stretch',
           }}>
-            <ContinueCard onUpload={() => setShowUniversalUploadModal(true)} />
+            <div style={{ minWidth: 0 }}>
+              <ContinueCard onUpload={() => setShowUniversalUploadModal(true)} />
+            </div>
             {!isMobile && <FileInsightsCard />}
           </div>
 

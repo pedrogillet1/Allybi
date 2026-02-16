@@ -1,8 +1,76 @@
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 import prisma from '../config/database';
-import { encrypt, decrypt } from '../utils/encryption';
 import crypto from 'crypto';
+import { EncryptionService } from './security/encryption.service';
+import { TenantKeyService } from './security/tenantKey.service';
+import { TwoFactorCryptoService } from './security/twoFactorCrypto.service';
+import { config } from '../config/env';
+
+const encryptionService = new EncryptionService();
+const tenantKeyService = new TenantKeyService(prisma as any, encryptionService);
+const twoFactorCrypto = new TwoFactorCryptoService(encryptionService);
+
+const LEGACY_ALGORITHM = 'aes-256-gcm';
+const LEGACY_IV_LENGTH = 16;
+const LEGACY_SALT_LENGTH = 64;
+const LEGACY_TAG_LENGTH = 16;
+
+function decryptLegacyCiphertext(encryptedData: string): string {
+  const buffer = Buffer.from(encryptedData, 'base64');
+  const salt = buffer.subarray(0, LEGACY_SALT_LENGTH);
+  const iv = buffer.subarray(LEGACY_SALT_LENGTH, LEGACY_SALT_LENGTH + LEGACY_IV_LENGTH);
+  const tag = buffer.subarray(LEGACY_SALT_LENGTH + LEGACY_IV_LENGTH, LEGACY_SALT_LENGTH + LEGACY_IV_LENGTH + LEGACY_TAG_LENGTH);
+  const encrypted = buffer.subarray(LEGACY_SALT_LENGTH + LEGACY_IV_LENGTH + LEGACY_TAG_LENGTH);
+
+  const key = crypto.pbkdf2Sync(config.ENCRYPTION_KEY, salt, 100000, 32, 'sha512');
+  const decipher = crypto.createDecipheriv(LEGACY_ALGORITHM, key, iv);
+  decipher.setAuthTag(tag);
+
+  return decipher.update(encrypted) + decipher.final('utf8');
+}
+
+async function decryptSecretForUser(userId: string, twoFactorAuth: { secretEncrypted: string | null; secret: string | null }) {
+  const tenantKey = await tenantKeyService.getTenantKey(userId);
+  if (twoFactorAuth.secretEncrypted) {
+    return twoFactorCrypto.decryptSecret(userId, twoFactorAuth.secretEncrypted, tenantKey);
+  }
+  if (twoFactorAuth.secret) {
+    const legacySecret = decryptLegacyCiphertext(twoFactorAuth.secret);
+    const secretEncrypted = twoFactorCrypto.encryptSecret(userId, legacySecret, tenantKey);
+    await prisma.twoFactorAuth.update({
+      where: { userId },
+      data: {
+        secretEncrypted,
+        secret: null,
+      },
+    });
+    return legacySecret;
+  }
+  throw new Error('2FA not set up');
+}
+
+async function decryptBackupCodesForUser(userId: string, twoFactorAuth: { backupCodesEncrypted: string | null; backupCodes: string | null }) {
+  const tenantKey = await tenantKeyService.getTenantKey(userId);
+  if (twoFactorAuth.backupCodesEncrypted) {
+    const backupCodesJson = twoFactorCrypto.decryptBackupCodes(userId, twoFactorAuth.backupCodesEncrypted, tenantKey);
+    return JSON.parse(backupCodesJson) as string[];
+  }
+  if (twoFactorAuth.backupCodes) {
+    const encryptedBackupCodes: string[] = JSON.parse(twoFactorAuth.backupCodes);
+    const legacyCodes = encryptedBackupCodes.map((code) => decryptLegacyCiphertext(code));
+    const backupCodesEncrypted = twoFactorCrypto.encryptBackupCodes(userId, JSON.stringify(legacyCodes), tenantKey);
+    await prisma.twoFactorAuth.update({
+      where: { userId },
+      data: {
+        backupCodesEncrypted,
+        backupCodes: null,
+      },
+    });
+    return legacyCodes;
+  }
+  return [];
+}
 
 /**
  * Enable 2FA for a user
@@ -29,18 +97,19 @@ export const enable2FA = async (userId: string) => {
     backupCodes.push(crypto.randomBytes(4).toString('hex').toUpperCase());
   }
 
-  // Encrypt secret and backup codes
-  const encryptedSecret = encrypt(secret.base32);
-  const encryptedBackupCodes = backupCodes.map((code) => encrypt(code));
-  const backupCodesJson = JSON.stringify(encryptedBackupCodes);
+  const tenantKey = await tenantKeyService.getTenantKey(userId);
+  const secretEncrypted = twoFactorCrypto.encryptSecret(userId, secret.base32, tenantKey);
+  const backupCodesEncrypted = twoFactorCrypto.encryptBackupCodes(userId, JSON.stringify(backupCodes), tenantKey);
 
   // Store in database (not enabled yet)
   if (existing2FA) {
     await prisma.twoFactorAuth.update({
       where: { userId },
       data: {
-        secret: encryptedSecret,
-        backupCodes: backupCodesJson,
+        secretEncrypted,
+        backupCodesEncrypted,
+        secret: null,
+        backupCodes: null,
         isEnabled: false,
       },
     });
@@ -48,8 +117,8 @@ export const enable2FA = async (userId: string) => {
     await prisma.twoFactorAuth.create({
       data: {
         userId,
-        secret: encryptedSecret,
-        backupCodes: backupCodesJson,
+        secretEncrypted,
+        backupCodesEncrypted,
         isEnabled: false,
       },
     });
@@ -73,12 +142,11 @@ export const verify2FA = async (userId: string, token: string) => {
     where: { userId },
   });
 
-  if (!twoFactorAuth || !twoFactorAuth.secret) {
+  if (!twoFactorAuth) {
     throw new Error('2FA not set up');
   }
 
-  // Decrypt secret
-  const secret = decrypt(twoFactorAuth.secret);
+  const secret = await decryptSecretForUser(userId, twoFactorAuth);
 
   // Verify token
   const verified = speakeasy.totp.verify({
@@ -109,12 +177,11 @@ export const verify2FALogin = async (userId: string, token: string) => {
     where: { userId },
   });
 
-  if (!twoFactorAuth || !twoFactorAuth.isEnabled || !twoFactorAuth.secret) {
+  if (!twoFactorAuth || !twoFactorAuth.isEnabled) {
     throw new Error('2FA not enabled');
   }
 
-  // Decrypt secret
-  const secret = decrypt(twoFactorAuth.secret);
+  const secret = await decryptSecretForUser(userId, twoFactorAuth);
 
   // First, try to verify as TOTP token
   const verified = speakeasy.totp.verify({
@@ -129,22 +196,25 @@ export const verify2FALogin = async (userId: string, token: string) => {
   }
 
   // If TOTP fails, check backup codes
-  if (!twoFactorAuth.backupCodes) {
+  if (!twoFactorAuth.backupCodes && !twoFactorAuth.backupCodesEncrypted) {
     throw new Error('Invalid 2FA code or backup code');
   }
-  const encryptedBackupCodes: string[] = JSON.parse(twoFactorAuth.backupCodes);
-  const decryptedBackupCodes = encryptedBackupCodes.map((code) => decrypt(code));
+  const decryptedBackupCodes = await decryptBackupCodesForUser(userId, twoFactorAuth);
 
   const backupCodeIndex = decryptedBackupCodes.indexOf(token.toUpperCase());
 
   if (backupCodeIndex !== -1) {
-    // Remove used backup code
-    const updatedBackupCodes = [...encryptedBackupCodes];
+    const tenantKey = await tenantKeyService.getTenantKey(userId);
+    const updatedBackupCodes = [...decryptedBackupCodes];
     updatedBackupCodes.splice(backupCodeIndex, 1);
+    const backupCodesEncrypted = twoFactorCrypto.encryptBackupCodes(userId, JSON.stringify(updatedBackupCodes), tenantKey);
 
     await prisma.twoFactorAuth.update({
       where: { userId },
-      data: { backupCodes: JSON.stringify(updatedBackupCodes) },
+      data: {
+        backupCodesEncrypted,
+        backupCodes: null,
+      },
     });
 
     return { success: true, usedBackupCode: true };
@@ -189,12 +259,11 @@ export const getBackupCodes = async (userId: string) => {
     where: { userId },
   });
 
-  if (!twoFactorAuth || !twoFactorAuth.backupCodes) {
+  if (!twoFactorAuth || (!twoFactorAuth.backupCodes && !twoFactorAuth.backupCodesEncrypted)) {
     throw new Error('2FA not enabled');
   }
 
-  const encryptedBackupCodes: string[] = JSON.parse(twoFactorAuth.backupCodes);
-  const backupCodes = encryptedBackupCodes.map((code) => decrypt(code));
+  const backupCodes = await decryptBackupCodesForUser(userId, twoFactorAuth);
 
   return { backupCodes };
 };

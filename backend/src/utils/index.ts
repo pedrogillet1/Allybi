@@ -1,6 +1,6 @@
 export * from './logger';
 export * from './errors';
-export * from './encryption';
+// export * from './encryption'; // file removed — encryption utils live in frontend only
 export * from './retryUtils';
 export * from './resolveDataDir';
 export * from './dateUtils';

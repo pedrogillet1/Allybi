@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function ChatEmptyState({
   isMobile = false,
@@ -7,21 +8,23 @@ export default function ChatEmptyState({
   onOpenTools,
   connected = { gmail: false, outlook: false, slack: false },
 }) {
+  const { t } = useTranslation();
+
   const chips = useMemo(() => {
     const base = [
-      { label: "Summarize this PDF", prompt: "Summarize the attached PDF in 5 bullets." },
-      { label: "Find a clause", prompt: "Find the termination clause and quote it." },
-      { label: "Rewrite formally", prompt: "Rewrite the highlighted paragraph to sound more formal and concise." },
-      { label: "Create a slide", prompt: "Create 1 slide summarizing the key points (title + 5 bullets)." },
-      { label: "Search email", prompt: "Search my email for the latest thread about invoices and summarize it." },
-      { label: "Search Slack", prompt: "Find Slack messages about project Orion from the last 30 days." },
+      { label: t('chatEmptyState.prompts.summarizePdf.label'), prompt: t('chatEmptyState.prompts.summarizePdf.text') },
+      { label: t('chatEmptyState.prompts.findClause.label'), prompt: t('chatEmptyState.prompts.findClause.text') },
+      { label: t('chatEmptyState.prompts.rewriteFormally.label'), prompt: t('chatEmptyState.prompts.rewriteFormally.text') },
+      { label: t('chatEmptyState.prompts.createSlide.label'), prompt: t('chatEmptyState.prompts.createSlide.text') },
+      { label: t('chatEmptyState.prompts.searchEmail.label'), prompt: t('chatEmptyState.prompts.searchEmail.text') },
+      { label: t('chatEmptyState.prompts.searchSlack.label'), prompt: t('chatEmptyState.prompts.searchSlack.text') },
     ];
     return isMobile ? base.slice(0, 4) : base;
-  }, [isMobile]);
+  }, [isMobile, t]);
 
   const toolBadges = [
-    connected.gmail ? "Gmail connected" : "Connect Gmail",
-    connected.slack ? "Slack connected" : "Connect Slack",
+    connected.gmail ? t('chatEmptyState.toolBadges.gmailConnected') : t('chatEmptyState.toolBadges.connectGmail'),
+    connected.slack ? t('chatEmptyState.toolBadges.slackConnected') : t('chatEmptyState.toolBadges.connectSlack'),
   ];
 
   return (
@@ -49,10 +52,10 @@ export default function ChatEmptyState({
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 850, fontSize: 18, color: "#18181B" }}>
-              What do you want to do?
+              {t('chatEmptyState.heading')}
             </div>
             <div style={{ marginTop: 6, fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 550, fontSize: 13.5, color: "#6B7280" }}>
-              Ask about your files, edit content, or use connected tools.
+              {t('chatEmptyState.subtitle')}
             </div>
           </div>
 
@@ -74,7 +77,7 @@ export default function ChatEmptyState({
                   color: "#3F3F46",
                   cursor: "pointer",
                 }}
-                title="Open tools"
+                title={t('chatEmptyState.openTools')}
               >
                 {txt}
               </button>
@@ -100,7 +103,7 @@ export default function ChatEmptyState({
                 fontSize: 14,
                 color: "#111827",
               }}
-              title="Use this prompt"
+              title={t('chatEmptyState.usePrompt')}
             >
               {c.label}
               <div style={{ marginTop: 6, fontWeight: 550, fontSize: 12.5, color: "#6B7280", lineHeight: 1.35 }}>
@@ -127,7 +130,7 @@ export default function ChatEmptyState({
               cursor: "pointer",
             }}
           >
-            Upload files
+            {t('chatEmptyState.uploadFiles')}
           </button>
           <button
             type="button"
@@ -145,11 +148,10 @@ export default function ChatEmptyState({
               cursor: "pointer",
             }}
           >
-            Tools
+            {t('chatEmptyState.tools')}
           </button>
         </div>
       </div>
     </div>
   );
 }
-

@@ -4,6 +4,21 @@ import { getApiBaseUrl } from './runtimeConfig';
 
 // Centralized API origin selection (defaults to production unless overridden).
 const API_URL = getApiBaseUrl();
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
+const CSRF_COOKIE_NAME = 'koda_csrf';
+
+function getCookieValue(name) {
+  if (typeof document === 'undefined') return null;
+  const needle = `${name}=`;
+  const parts = document.cookie.split(';');
+  for (const raw of parts) {
+    const entry = raw.trim();
+    if (entry.startsWith(needle)) {
+      return decodeURIComponent(entry.slice(needle.length));
+    }
+  }
+  return null;
+}
 
 // Create axios instance
 const api = axios.create({
@@ -26,9 +41,11 @@ const generateUUID = () => {
 // Request interceptor - attach access token and correlation ID to every request
 api.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    if (AUTH_LOCALSTORAGE_COMPAT) {
+      const accessToken = localStorage.getItem('accessToken');
+      if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
+      }
     }
 
     // If we're sending FormData, do not force application/json.
@@ -47,6 +64,15 @@ api.interceptors.request.use(
     // Add correlation ID for request tracing
     if (!config.headers['x-request-id']) {
       config.headers['x-request-id'] = generateUUID();
+    }
+
+    // Send CSRF token for mutating requests when cookie-auth is used.
+    const method = String(config.method || 'get').toUpperCase();
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+      const csrfToken = getCookieValue(CSRF_COOKIE_NAME);
+      if (csrfToken && !config.headers['x-csrf-token']) {
+        config.headers['x-csrf-token'] = csrfToken;
+      }
     }
 
     // Log correlation ID in development
@@ -145,20 +171,19 @@ api.interceptors.response.use(
 
       // We're the first 401 — attempt refresh.
       _refreshPromise = (async () => {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (!refreshToken) {
-          markAuthDead('no_refresh_token');
-          throw new Error('No refresh token available');
-        }
-
         try {
+          const refreshPayload = AUTH_LOCALSTORAGE_COMPAT
+            ? { refreshToken: localStorage.getItem('refreshToken') || undefined }
+            : {};
           const response = await axios.post(
             `${API_URL}/api/auth/refresh`,
-            { refreshToken },
+            refreshPayload,
             { withCredentials: true }
           );
           const { accessToken: newAccessToken } = response.data;
-          localStorage.setItem('accessToken', newAccessToken);
+          if (AUTH_LOCALSTORAGE_COMPAT && newAccessToken) {
+            localStorage.setItem('accessToken', newAccessToken);
+          }
           return newAccessToken;
         } catch (refreshError) {
           markAuthDead('refresh_failed');

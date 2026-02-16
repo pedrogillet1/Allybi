@@ -30,6 +30,7 @@ export function SecurityPage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>("events");
 
   const { data, isLoading } = useSecurity({ range });
+  const google = data?.google;
 
   // Extract counters from backend
   const counters = data?.counters as {
@@ -159,7 +160,7 @@ export function SecurityPage() {
       />
 
       {/* KPIs */}
-      <KpiCardRow className="grid-cols-2 md:grid-cols-4">
+      <KpiCardRow className="grid-cols-2 md:grid-cols-5">
         <KpiCard
           title="Failed Auth"
           value={counters ? formatNumber(counters.failedAuth ?? kpis?.authFailures ?? 0) : "-"}
@@ -178,6 +179,11 @@ export function SecurityPage() {
         <KpiCard
           title="Redactions"
           value={counters ? formatNumber(counters.redactions ?? 0) : "-"}
+          loading={isLoading}
+        />
+        <KpiCard
+          title="Cloud SQL Connected"
+          value={google?.cloudSql?.connected ? "Yes" : "No"}
           loading={isLoading}
         />
       </KpiCardRow>

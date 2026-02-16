@@ -33,6 +33,38 @@ export const LabelValueUsdSchema = z.object({
   valueUsd: z.number(),
 });
 
+export const GoogleCloudSqlSchema = z.object({
+  connected: z.boolean().optional(),
+  latencyMs: z.number().nullable().optional(),
+  activeConnections: z.number().optional(),
+  databaseSizeBytes: z.number().nullable().optional(),
+  error: z.string().nullable().optional(),
+});
+
+export const GoogleCloudRunSchema = z.object({
+  calls: z.number().optional(),
+  errors: z.number().optional(),
+  errorRate: z.number().optional(),
+  p95LatencyMs: z.number().optional(),
+});
+
+export const GoogleGeminiSchema = z.object({
+  calls: z.number().optional(),
+  errors: z.number().optional(),
+  errorRate: z.number().optional(),
+  p95LatencyMs: z.number().optional(),
+  tokens: z.number().optional(),
+  estimatedCostUsd: z.number().optional(),
+});
+
+export const GoogleOcrSchema = z.object({
+  docsProcessed: z.number().optional(),
+  ocrUsed: z.number().optional(),
+  ocrCoverageRate: z.number().optional(),
+  avgConfidence: z.number().optional(),
+  failures: z.number().optional(),
+});
+
 export const DomainValueSchema = z.object({
   domain: z.string(),
   value: z.number(),
@@ -301,6 +333,7 @@ export const LLMResponseSchema = z.object({
   charts: LLMChartsSchema,
   calls: z.array(LLMCallSchema),
   summary: LLMSummarySchema.optional(),
+  google: z.object({ gemini: GoogleGeminiSchema.optional() }).optional(),
 });
 
 export type LLMResponse = z.infer<typeof LLMResponseSchema>;
@@ -340,6 +373,10 @@ export const ReliabilityResponseSchema = z.object({
   kpis: ReliabilityKpisSchema,
   charts: ReliabilityChartsSchema,
   errors: z.array(ReliabilityErrorSchema),
+  google: z.object({
+    cloudRun: GoogleCloudRunSchema.optional(),
+    cloudSql: GoogleCloudSqlSchema.optional(),
+  }).optional(),
 });
 
 export type ReliabilityResponse = z.infer<typeof ReliabilityResponseSchema>;
@@ -387,6 +424,7 @@ export const SecurityResponseSchema = z.object({
   authEvents: z.array(AuthEventSchema),
   rateLimitEvents: z.array(RateLimitEventSchema),
   adminAudit: z.array(AdminAuditSchema),
+  google: z.object({ cloudSql: GoogleCloudSqlSchema.optional() }).optional(),
 });
 
 export type SecurityResponse = z.infer<typeof SecurityResponseSchema>;

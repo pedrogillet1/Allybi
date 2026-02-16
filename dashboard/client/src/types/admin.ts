@@ -50,9 +50,68 @@ export const OverviewWindowSchema = z.object({
   to: z.string(),
 });
 
+export const GoogleCloudSqlSchema = z.object({
+  connected: z.boolean().default(false),
+  latencyMs: z.number().nullable().default(null),
+  activeConnections: z.number().default(0),
+  databaseSizeBytes: z.number().nullable().default(null),
+  error: z.string().nullable().default(null),
+});
+
+export const GoogleCloudRunServiceSchema = z.object({
+  service: z.string(),
+  calls: z.number().default(0),
+  errors: z.number().default(0),
+  errorRate: z.number().default(0),
+  p95LatencyMs: z.number().default(0),
+});
+
+export const GoogleCloudRunSchema = z.object({
+  calls: z.number().default(0),
+  errors: z.number().default(0),
+  errorRate: z.number().default(0),
+  p95LatencyMs: z.number().default(0),
+  services: z.array(GoogleCloudRunServiceSchema).default([]),
+});
+
+export const GoogleGeminiModelSchema = z.object({
+  model: z.string(),
+  calls: z.number().default(0),
+  errors: z.number().default(0),
+  errorRate: z.number().default(0),
+  p95LatencyMs: z.number().default(0),
+  tokens: z.number().default(0),
+});
+
+export const GoogleGeminiSchema = z.object({
+  calls: z.number().default(0),
+  errors: z.number().default(0),
+  errorRate: z.number().default(0),
+  p95LatencyMs: z.number().default(0),
+  tokens: z.number().default(0),
+  estimatedCostUsd: z.number().default(0),
+  models: z.array(GoogleGeminiModelSchema).default([]),
+});
+
+export const GoogleOcrSchema = z.object({
+  docsProcessed: z.number().default(0),
+  ocrUsed: z.number().default(0),
+  ocrCoverageRate: z.number().default(0),
+  avgConfidence: z.number().default(0),
+  failures: z.number().default(0),
+});
+
+export const GoogleMetricsSchema = z.object({
+  cloudSql: GoogleCloudSqlSchema.optional(),
+  cloudRun: GoogleCloudRunSchema.optional(),
+  gemini: GoogleGeminiSchema.optional(),
+  ocr: GoogleOcrSchema.optional(),
+});
+
 export const OverviewResponseSchema = z.object({
   kpis: OverviewKpisSchema,
   window: OverviewWindowSchema.optional(),
+  google: GoogleMetricsSchema.optional(),
   pagination: PaginationSchema.optional(),
 });
 
@@ -147,6 +206,7 @@ export const FilesResponseSchema = z.object({
   files: z.array(FileSchema),
   pagination: PaginationSchema,
   counts: FileCountsSchema.optional(),
+  google: z.object({ ocr: GoogleOcrSchema.optional() }).optional(),
 });
 
 export type FilesResponse = z.infer<typeof FilesResponseSchema>;
@@ -261,6 +321,7 @@ export const LLMSummarySchema = z.object({
 export const LLMCostResponseSchema = z.object({
   llmCalls: z.array(LLMCallRowSchema).optional(),
   summary: LLMSummarySchema.optional(),
+  google: z.object({ gemini: GoogleGeminiSchema.optional() }).optional(),
   pagination: PaginationSchema.optional(),
 });
 
@@ -302,6 +363,10 @@ export const ReliabilityResponseSchema = z.object({
   errors: z.array(ErrorRowSchema).optional(),
   ingestionFailures: z.array(IngestionFailureRowSchema).optional(),
   points: z.array(ReliabilityTimeseriesPointSchema).optional(),
+  google: z.object({
+    cloudRun: GoogleCloudRunSchema.optional(),
+    cloudSql: GoogleCloudSqlSchema.optional(),
+  }).optional(),
   pagination: PaginationSchema.optional(),
 });
 
@@ -333,6 +398,7 @@ export const SecurityEventRowSchema = z.object({
 export const SecurityResponseSchema = z.object({
   counters: SecurityCountersSchema.optional(),
   events: z.array(SecurityEventRowSchema).optional(),
+  google: z.object({ cloudSql: GoogleCloudSqlSchema.optional() }).optional(),
   pagination: PaginationSchema.optional(),
 });
 

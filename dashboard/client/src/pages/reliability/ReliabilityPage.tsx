@@ -33,6 +33,7 @@ export function ReliabilityPage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>("errors");
 
   const { data, isLoading } = useReliability({ range });
+  const google = data?.google;
 
   // Extract kpis
   const kpis = data?.kpis as {
@@ -188,6 +189,29 @@ export function ReliabilityPage() {
         <KpiCard
           title="Active Users"
           value={kpis ? formatNumber(kpis.activeUsers ?? 0) : "-"}
+          loading={isLoading}
+        />
+      </KpiCardRow>
+
+      <KpiCardRow className="mt-4">
+        <KpiCard
+          title="Cloud Run Calls"
+          value={data ? formatNumber(google?.cloudRun?.calls ?? 0) : "-"}
+          loading={isLoading}
+        />
+        <KpiCard
+          title="Cloud Run Error Rate"
+          value={data ? `${(google?.cloudRun?.errorRate ?? 0).toFixed(2)}%` : "-"}
+          loading={isLoading}
+        />
+        <KpiCard
+          title="Cloud Run P95"
+          value={data ? formatDuration(google?.cloudRun?.p95LatencyMs ?? 0) : "-"}
+          loading={isLoading}
+        />
+        <KpiCard
+          title="Cloud SQL Connected"
+          value={google?.cloudSql?.connected ? "Yes" : "No"}
           loading={isLoading}
         />
       </KpiCardRow>

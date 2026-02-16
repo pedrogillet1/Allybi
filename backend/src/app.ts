@@ -16,6 +16,7 @@ import { apiLimiter } from './middleware/rateLimit.middleware';
 import { auditLog } from './middleware/auditLog.middleware';
 import { errorHandler } from './middleware/error.middleware';
 import { secureLogsMiddleware } from './middleware/secureLogs.middleware';
+import { csrfProtection } from './middleware/csrf.middleware';
 
 // Routes (target 9 + health)
 import healthRoutes from './routes/health.routes';
@@ -73,12 +74,19 @@ const allowedOrigins = [
   config.FRONTEND_URL,
 ].filter(Boolean) as string[];
 
+const isLocalNetworkOrigin = (origin: string): boolean => {
+  try {
+    const { hostname } = new URL(origin);
+    return /^(10|172\.(1[6-9]|2\d|3[01])|192\.168)\./.test(hostname);
+  } catch { return false; }
+};
+
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
     // Allow same-origin / server-to-server (no Origin header)
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
+    if (allowedOrigins.includes(origin) || isLocalNetworkOrigin(origin)) {
       // Echo origin for proper ACAO behavior with credentials
       return callback(null, origin);
     }
@@ -102,6 +110,8 @@ const corsOptions: cors.CorsOptions = {
     'x-request-id',
     'X-Admin-Key',
     'x-admin-key',
+    'X-CSRF-Token',
+    'x-csrf-token',
     'Cache-Control',
     'cache-control',
     'Pragma',
@@ -119,6 +129,7 @@ app.use(cors(corsOptions));
  * Cookie parser (needed for Safari auth cookie fallback)
  * ----------------------------- */
 app.use(cookieParser());
+app.use(csrfProtection);
 
 /** -----------------------------
  * Security headers

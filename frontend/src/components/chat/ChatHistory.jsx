@@ -71,10 +71,10 @@ function groupByDate(convs) {
   twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
   const grouped = {
-    Today: [],
-    Yesterday: [],
-    '2 days ago': [],
-    Older: [],
+    today: [],
+    yesterday: [],
+    twoDaysAgo: [],
+    older: [],
   };
 
   for (const conv of convs) {
@@ -82,12 +82,12 @@ function groupByDate(convs) {
     d.setHours(0, 0, 0, 0);
     const key =
       d.getTime() === today.getTime()
-        ? 'Today'
+        ? 'today'
         : d.getTime() === yesterday.getTime()
-          ? 'Yesterday'
+          ? 'yesterday'
           : d.getTime() === twoDaysAgo.getTime()
-            ? '2 days ago'
-            : 'Older';
+            ? 'twoDaysAgo'
+            : 'older';
     grouped[key].push(conv);
   }
 
@@ -95,9 +95,9 @@ function groupByDate(convs) {
 }
 
 function normalizeTitle(conv) {
-  const t = (conv?.title ?? '').trim();
-  if (!t) return 'New chat';
-  return t.length > 60 ? t.slice(0, 60) + '…' : t;
+  const title = (conv?.title ?? '').trim();
+  if (!title) return null;
+  return title.length > 60 ? title.slice(0, 60) + '…' : title;
 }
 
 function isLoadingPlaceholderConversation(conv) {
@@ -558,6 +558,7 @@ const ChatHistory = ({
     }
     /* Hide chat input and floating buttons when drawer is open on mobile */
     body.drawer-open .chat-input-area,
+    body.drawer-open [data-mobile-composer="true"],
     body.drawer-open [data-mobile-upload-button="true"] {
       display: none !important;
     }
@@ -707,7 +708,7 @@ const ChatHistory = ({
                     }}
                   >
                     <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-                      {normalizeTitle(c)}
+                      {normalizeTitle(c) || t('chatHistory.newChat')}
                     </div>
                   </div>
                 );
@@ -832,7 +833,7 @@ const ChatHistory = ({
               <ExpandIcon style={{ width: 24, height: 24, filter: 'brightness(0) invert(0.2)' }} />
             </IconButton>
 
-            <IconButton label="New chat" onClick={handleMobileNewChat} isMobile={isMobile}>
+            <IconButton label={t('chatHistory.newChat')} onClick={handleMobileNewChat} isMobile={isMobile}>
               <PencilIcon style={{ width: 24, height: 24, filter: 'brightness(0) invert(0.2)' }} />
             </IconButton>
 
@@ -943,7 +944,7 @@ const ChatHistory = ({
                       marginBottom: 10,
                     }}
                   >
-                    {day}
+                    {t(`chatHistory.${day}`)}
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -977,7 +978,7 @@ const ChatHistory = ({
                           }}
                         >
                           <div style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {normalizeTitle(c)}
+                            {normalizeTitle(c) || t('chatHistory.newChat')}
                           </div>
 
                           {hoveredId === c.id && (

@@ -80,9 +80,8 @@ const MarkdownEditor = ({ document, zoom, onSave }) => {
 
       const response = await fetch(`${getApiBaseUrl()}/api/documents/${document.id}/export?format=markdown`, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        credentials: 'include',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
       });
 
       if (!response.ok) {

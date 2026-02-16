@@ -100,6 +100,15 @@ const UnifiedAuth = ({ variant = 'page' }) => {
     }
   }, [mode]);
 
+  // Scroll focused input into view when keyboard opens (mobile)
+  const handleInputFocus = (e) => {
+    if (!isMobile) return;
+    // Short delay to let the keyboard finish animating
+    setTimeout(() => {
+      e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+  };
+
   // Toggle between login and signup
   const toggleMode = () => {
     setMode(isSignupMode ? AUTH_MODES.LOGIN : AUTH_MODES.SIGNUP);
@@ -146,11 +155,13 @@ const UnifiedAuth = ({ variant = 'page' }) => {
         skipToast: true
       });
 
-      // Navigate to chat after successful login
+      // Login/authentication flows must land in chat, never first-upload.
+      localStorage.removeItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD);
       completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
     } catch (error) {
       console.error('Login error:', error);
-      setError(error.message || t('auth.login.loginError'));
+      const msg = error.isTranslationKey ? t(error.message) : (error.message || t('auth.login.loginError'));
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -189,8 +200,10 @@ const UnifiedAuth = ({ variant = 'page' }) => {
         navigate(ROUTES.AUTHENTICATION, { state: { email: response.email } });
       } else if (response.user && response.accessToken) {
         // Direct creation flow: user is already created and logged in
-        localStorage.setItem('accessToken', response.accessToken);
-        localStorage.setItem('refreshToken', response.refreshToken);
+        if (AUTH_LOCALSTORAGE_COMPAT) {
+          localStorage.setItem('accessToken', response.accessToken);
+          localStorage.setItem('refreshToken', response.refreshToken);
+        }
         localStorage.setItem('user', JSON.stringify(response.user));
 
         setAuthState(response.user);
@@ -207,7 +220,8 @@ const UnifiedAuth = ({ variant = 'page' }) => {
       }
     } catch (error) {
       console.error('Registration error:', error);
-      setError(error.message || t('auth.signup.registrationFailed'));
+      const msg = error.isTranslationKey ? t(error.message) : (error.message || t('auth.signup.registrationFailed'));
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -255,9 +269,11 @@ const UnifiedAuth = ({ variant = 'page' }) => {
       ref={containerRef}
       style={{
         width: '100%',
-        padding: isModal ? '16px 20px 24px' : '20px 20px 40px',
+        padding: isModal
+          ? (isMobile ? '12px 20px 24px' : '16px 20px 24px')
+          : '20px 20px 40px',
         background: '#FFFFFF',
-        overflowY: 'auto',
+        overflowY: isModal ? 'visible' : 'auto',
         position: isModal ? 'relative' : 'fixed',
         top: isModal ? 'auto' : 0,
         left: isModal ? 'auto' : 0,
@@ -276,15 +292,15 @@ const UnifiedAuth = ({ variant = 'page' }) => {
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        gap: isModal ? 20 : 32,
+        gap: isModal ? (isMobile ? 16 : 20) : 32,
         display: 'flex'
       }}>
         {/* Logo */}
         <img
           style={{
-            width: isModal ? 64 : 96,
-            height: isModal ? 64 : 96,
-            marginBottom: isModal ? 4 : 16,
+            width: isModal ? (isMobile ? 48 : 64) : 96,
+            height: isModal ? (isMobile ? 48 : 64) : 96,
+            marginBottom: isModal ? (isMobile ? 0 : 4) : 16,
             filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.10))'
           }}
           src={logo}
@@ -300,7 +316,7 @@ const UnifiedAuth = ({ variant = 'page' }) => {
         }}>
           <div style={{
             color: '#32302C',
-            fontSize: isModal ? 24 : 30,
+            fontSize: isModal ? (isMobile ? 20 : 24) : 30,
             fontFamily: 'Plus Jakarta Sans',
             fontWeight: '600'
           }}>
@@ -321,7 +337,7 @@ const UnifiedAuth = ({ variant = 'page' }) => {
           alignSelf: 'stretch',
           display: 'flex',
           flexDirection: 'column',
-          gap: isModal ? 14 : 20
+          gap: isModal ? (isMobile ? 12 : 14) : 20
         }}>
           {/* Name field (signup only) */}
           {isSignupMode && (
@@ -331,7 +347,7 @@ const UnifiedAuth = ({ variant = 'page' }) => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                onFocus={() => setNameFocused(true)}
+                onFocus={(e) => { setNameFocused(true); handleInputFocus(e); }}
                 onBlur={() => setNameFocused(false)}
                 placeholder={t('auth.signup.namePlaceholder')}
                 style={{
@@ -363,7 +379,7 @@ const UnifiedAuth = ({ variant = 'page' }) => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              onFocus={() => setEmailFocused(true)}
+              onFocus={(e) => { setEmailFocused(true); handleInputFocus(e); }}
               onBlur={() => setEmailFocused(false)}
               placeholder={isSignupMode ? t('auth.signup.emailPlaceholder') : t('auth.login.emailPlaceholder')}
               style={{
@@ -404,7 +420,7 @@ const UnifiedAuth = ({ variant = 'page' }) => {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onFocus={() => setPasswordFocused(true)}
+                onFocus={(e) => { setPasswordFocused(true); handleInputFocus(e); }}
                 onBlur={() => setPasswordFocused(false)}
                 placeholder="••••••••"
                 style={{
@@ -521,7 +537,7 @@ const UnifiedAuth = ({ variant = 'page' }) => {
               fontFamily: 'Plus Jakarta Sans',
               fontWeight: '600',
               cursor: isLoading ? 'not-allowed' : 'pointer',
-              marginTop: isModal ? 4 : 12,
+              marginTop: isModal ? (isMobile ? 2 : 4) : 12,
               opacity: isLoading ? 0.6 : 1
             }}
           >
@@ -569,10 +585,10 @@ const UnifiedAuth = ({ variant = 'page' }) => {
           alignSelf: 'stretch',
           display: 'flex',
           flexDirection: 'column',
-          gap: isModal ? 10 : 16
+          gap: isModal ? (isMobile ? 8 : 10) : 16
         }}>
           <button onClick={handleGoogleAuth} style={{
-            height: isModal ? 44 : 52,
+            height: isModal ? (isMobile ? 40 : 44) : 52,
             background: 'transparent',
             borderRadius: 26,
             border: '1px solid #E6E6EC',
@@ -590,7 +606,7 @@ const UnifiedAuth = ({ variant = 'page' }) => {
             {isSignupMode ? t('auth.signup.continueWithGoogle') : t('auth.login.continueWithGoogle')}
           </button>
           <button onClick={handleAppleAuth} style={{
-            height: isModal ? 44 : 52,
+            height: isModal ? (isMobile ? 40 : 44) : 52,
             background: 'transparent',
             borderRadius: 26,
             border: '1px solid #E6E6EC',
@@ -636,3 +652,4 @@ const UnifiedAuth = ({ variant = 'page' }) => {
 };
 
 export default UnifiedAuth;
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';

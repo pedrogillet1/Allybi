@@ -86,6 +86,11 @@ import "./streaming/SpacingUtilities.css";
  */
 
 const API_BASE = getApiBaseUrl();
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === "true";
+const getCompatAccessToken = () => {
+  if (!AUTH_LOCALSTORAGE_COMPAT) return null;
+  return localStorage.getItem("accessToken") || localStorage.getItem("token");
+};
 const ENDPOINT = process.env.REACT_APP_CHAT_STREAM_ENDPOINT || `${API_BASE}/api/chat/stream`;
 const VIEWER_ENDPOINT = process.env.REACT_APP_CHAT_VIEWER_STREAM_ENDPOINT || `${API_BASE}/api/chat/viewer/stream`;
 
@@ -2526,7 +2531,7 @@ export default function ChatInterface({
       return;
     }
 
-    const token = localStorage.getItem("accessToken");
+    const token = getCompatAccessToken();
     const controller = new AbortController();
     abortRef.current = controller;
 
@@ -3363,7 +3368,7 @@ export default function ChatInterface({
       ));
 
       // Re-send the original message with confirmation token
-      const token = localStorage.getItem("accessToken");
+      const token = getCompatAccessToken();
       try {
         const overrideProvider = snapshot?.provider === "gmail" || snapshot?.provider === "outlook" ? snapshot.provider : null;
         const response = await fetch(ENDPOINT, {
@@ -3817,51 +3822,11 @@ export default function ChatInterface({
         e.stopPropagation();
       }}
     >
-      {/* Mobile: Floating upload button (paperclip) */}
-      {isMobile && (
-        <div
-          data-mobile-upload-button="true"
-          style={{
-            position: 'fixed',
-            top: 16,
-            right: 16,
-            zIndex: 1000,
-          }}>
-          <button
-            type="button"
-            onClick={() => {
-              if (isUnauthenticated) {
-                triggerAuthGate('upload');
-                return;
-              }
-              setShowUploadModal(true);
-            }}
-            aria-label="Upload files"
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 12,
-              background: '#fff',
-              border: '1px solid #E6E6EC',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-            }}
-          >
-            <img
-              src={attachIcon}
-              alt=""
-              style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }}
-            />
-          </button>
-        </div>
-      )}
-
       {/* Mobile: Fixed bottom message bar - rendered via portal to document.body for proper z-index */}
       {isMobile && ReactDOM.createPortal(
         <div
+          className="chat-input-area"
+          data-mobile-composer="true"
           style={{
             position: 'fixed',
             left: 0,
@@ -3910,7 +3875,7 @@ export default function ChatInterface({
               ref={inputRef}
               type="text"
               value={input}
-              placeholder="Ask Allybi..."
+              placeholder={t('chat.inputPlaceholder')}
               onChange={(e) => setInput(e.target.value)}
               onPaste={onPaste}
               onFocus={() => {
@@ -3946,6 +3911,38 @@ export default function ChatInterface({
               style={{ display: "none" }}
               accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.png,.jpg,.jpeg,.gif,.webp"
             />
+
+            {/* Attachment button (inline with composer controls) */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isUnauthenticated) {
+                  triggerAuthGate('upload');
+                  return;
+                }
+                fileInputRef.current?.click();
+              }}
+              aria-label="Attach files"
+              style={{
+                width: 36,
+                height: 36,
+                padding: 0,
+                borderRadius: 10,
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <img
+                src={attachIcon}
+                alt=""
+                style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }}
+              />
+            </button>
 
             {/* Send button */}
             {isStreaming ? (
@@ -5112,7 +5109,7 @@ export default function ChatInterface({
                   data-chat-input="true"
                   className="chat-v3-textarea"
                   value={input}
-                  placeholder="Ask Allybi…"
+                  placeholder={t('chat.inputPlaceholder')}
                   onChange={(e) => setInput(e.target.value)}
                   onPaste={onPaste}
                   onFocus={() => {
@@ -5504,20 +5501,18 @@ export default function ChatInterface({
             paddingTop: isMobile ? 6 : 8,
             borderTop: 'none',
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             justifyContent: 'center',
-            gap: 6,
+            gap: 0,
             fontSize: isMobile ? 11 : 12,
             color: '#B9B9BD',
             fontFamily: 'Plus Jakarta Sans',
             textAlign: 'center',
             lineHeight: '16px',
-            whiteSpace: 'normal',
-            flexWrap: 'wrap',
             paddingBottom: 2,
           }}>
-            <ShieldIcon style={{ width: 14, height: 14, flexShrink: 0, filter: 'brightness(0) invert(0.2)' }} />
             <span>
+              <ShieldIcon style={{ width: 14, height: 14, verticalAlign: '-2px', marginRight: 4, filter: 'brightness(0) invert(0.2)' }} />
               {t('chat.footerSecure')}
               {' '}
               <a

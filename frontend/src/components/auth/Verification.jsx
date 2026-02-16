@@ -4,6 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { DEFAULT_AUTH_REDIRECT, ROUTES, STORAGE_KEYS } from '../../constants/routes';
 import { useAuthModal } from '../../context/AuthModalContext';
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
+
+const buildAuthHeader = () => {
+    if (!AUTH_LOCALSTORAGE_COMPAT) return {};
+    const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 const Verification = ({ variant = 'page' }) => {
     const { t } = useTranslation();
@@ -55,12 +62,12 @@ const Verification = ({ variant = 'page' }) => {
                     });
                 } else {
                     // Existing user - requires auth
-                    const token = localStorage.getItem('accessToken');
                     response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/verify/send-phone`, {
                         method: 'POST',
+                        credentials: 'include',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
+                            ...buildAuthHeader(),
                         },
                         body: JSON.stringify({ phoneNumber })
                     });
@@ -114,12 +121,12 @@ const Verification = ({ variant = 'page' }) => {
                 completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
             } else {
                 // Existing user adding phone - requires auth
-                const token = localStorage.getItem('accessToken');
                 const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/verify/phone`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        ...buildAuthHeader(),
                     },
                     body: JSON.stringify({ code: verificationCode })
                 });
@@ -131,6 +138,8 @@ const Verification = ({ variant = 'page' }) => {
                 }
 
                 console.log('✅ Phone verified successfully');
+                // Existing-user auth confirmation should return to chat/app.
+                localStorage.removeItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD);
                 completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
             }
         } catch (error) {

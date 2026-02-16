@@ -408,15 +408,56 @@ const DocumentScanner = ({
   const capturedFrameRef = useRef(null);
   const reviewCanvasRef = useRef(null);
   const imageContainerRef = useRef(null);
+  const initTimeoutRef = useRef(null);
+
+  const clearInitTimeout = useCallback(() => {
+    if (initTimeoutRef.current) {
+      clearTimeout(initTimeoutRef.current);
+      initTimeoutRef.current = null;
+    }
+  }, []);
+
+  const stopActiveStream = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+  }, []);
 
   // ─────────────────────────────────────────────────────────────────────────────
   // CAMERA INITIALIZATION
   // ─────────────────────────────────────────────────────────────────────────────
 
   const initializeCamera = useCallback(async () => {
+    const INIT_TIMEOUT_MS = 10000;
+    const withTimeout = (promise, message) =>
+      Promise.race([
+        promise,
+        new Promise((_, reject) => {
+          initTimeoutRef.current = setTimeout(() => reject(new Error(message)), INIT_TIMEOUT_MS);
+        })
+      ]);
+
+    const logFailure = (step, err) => {
+      console.error('[Scanner] Camera initialization error:', {
+        step,
+        name: err?.name,
+        message: err?.message,
+        isSecureContext: !!window.isSecureContext,
+        hasMediaDevices: !!navigator.mediaDevices,
+        hasGetUserMedia: !!navigator.mediaDevices?.getUserMedia,
+        userAgent: navigator.userAgent,
+      });
+    };
+
     try {
+      clearInitTimeout();
+      setError(null);
+      setTorchSupported(false);
+      setTorchOn(false);
       setState(SCANNER_STATES.INITIALIZING);
       setGuidanceText('Initializing camera...');
+      stopActiveStream();
 
       // Check for secure context
       if (!window.isSecureContext) {
@@ -433,8 +474,8 @@ const DocumentScanner = ({
         console.warn('[Scanner] OpenCV failed to load, edge detection disabled:', err);
       });
 
-      // Request camera permission
-      const constraints = {
+      setGuidanceText('Requesting camera access...');
+      const primaryConstraints = {
         video: {
           facingMode: { ideal: 'environment' },
           width: { ideal: 1920 },
@@ -442,8 +483,22 @@ const DocumentScanner = ({
         },
         audio: false
       };
+      const fallbackConstraints = { video: true, audio: false };
 
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      let stream = null;
+      try {
+        stream = await withTimeout(
+          navigator.mediaDevices.getUserMedia(primaryConstraints),
+          'Camera initialization timed out. Please try again.'
+        );
+      } catch (primaryErr) {
+        console.warn('[Scanner] Primary constraints failed, retrying with fallback constraints.', primaryErr);
+        stream = await withTimeout(
+          navigator.mediaDevices.getUserMedia(fallbackConstraints),
+          'Camera initialization timed out. Please try again.'
+        );
+      }
+      clearInitTimeout();
       streamRef.current = stream;
 
       // Check torch support
@@ -457,15 +512,38 @@ const DocumentScanner = ({
 
       // Set video source
       if (videoRef.current) {
+        setGuidanceText('Starting camera preview...');
         videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+
+        await withTimeout(new Promise((resolve) => {
+          const video = videoRef.current;
+          if (!video) return resolve();
+          if (video.readyState >= 2) return resolve();
+          const onReady = () => resolve();
+          video.addEventListener('loadedmetadata', onReady, { once: true });
+          video.addEventListener('canplay', onReady, { once: true });
+        }), 'Camera preview failed to initialize.');
+
+        try {
+          await withTimeout(videoRef.current.play(), 'Camera preview failed to start.');
+        } catch (playErr) {
+          // Some mobile browsers resolve metadata first and require another play attempt.
+          await new Promise((resolve) => setTimeout(resolve, 150));
+          await withTimeout(videoRef.current.play(), 'Camera preview failed to start.');
+          if (playErr) {
+            console.warn('[Scanner] First play attempt failed; second attempt succeeded.', playErr);
+          }
+        }
       }
+      clearInitTimeout();
 
       setState(SCANNER_STATES.CAMERA_READY);
       setGuidanceText('Searching for document...');
 
     } catch (err) {
-      console.error('[Scanner] Camera initialization error:', err);
+      clearInitTimeout();
+      stopActiveStream();
+      logFailure('initialize', err);
 
       let errorMessage = err.message;
       if (err.name === 'NotAllowedError') {
@@ -474,12 +552,14 @@ const DocumentScanner = ({
         errorMessage = 'No camera found. Please connect a camera and try again.';
       } else if (err.name === 'NotReadableError') {
         errorMessage = 'Camera is in use by another app. Please close other apps using the camera.';
+      } else if (String(err.message || '').toLowerCase().includes('timed out')) {
+        errorMessage = 'Camera initialization timed out. Please try again.';
       }
 
       setError(errorMessage);
       setState(SCANNER_STATES.ERROR);
     }
-  }, []);
+  }, [clearInitTimeout, stopActiveStream]);
 
   // ─────────────────────────────────────────────────────────────────────────────
   // TORCH CONTROL
@@ -954,10 +1034,8 @@ const DocumentScanner = ({
     }
 
     // Cleanup
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
+    clearInitTimeout();
+    stopActiveStream();
     if (detectionLoopRef.current) {
       cancelAnimationFrame(detectionLoopRef.current);
       detectionLoopRef.current = null;
@@ -975,7 +1053,7 @@ const DocumentScanner = ({
     setState(SCANNER_STATES.INITIALIZING);
 
     onClose?.();
-  }, [pages.length, state, onClose]);
+  }, [pages.length, state, onClose, clearInitTimeout, stopActiveStream]);
 
   // ─────────────────────────────────────────────────────────────────────────────
   // EFFECTS
@@ -988,14 +1066,13 @@ const DocumentScanner = ({
     }
 
     return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
+      clearInitTimeout();
+      stopActiveStream();
       if (detectionLoopRef.current) {
         cancelAnimationFrame(detectionLoopRef.current);
       }
     };
-  }, [isOpen, initializeCamera]);
+  }, [isOpen, initializeCamera, clearInitTimeout, stopActiveStream]);
 
   // Start detection loop when camera ready
   useEffect(() => {

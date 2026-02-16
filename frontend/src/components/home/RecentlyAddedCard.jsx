@@ -235,7 +235,7 @@ export default function RecentlyAddedCard({
             fontSize: 14, fontWeight: 500, color: '#D92D20',
             fontFamily: 'Plus Jakarta Sans, sans-serif',
           }}>
-            Failed to load files
+            {t('home.recentlyAdded.failedToLoad')}
           </span>
           <button
             onClick={onRetry}
@@ -246,7 +246,7 @@ export default function RecentlyAddedCard({
               fontWeight: 600, fontSize: 12, color: '#D92D20',
             }}
           >
-            Retry
+            {t('home.recentlyAdded.retry')}
           </button>
         </div>
       )}

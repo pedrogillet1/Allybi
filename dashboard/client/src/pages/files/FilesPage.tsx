@@ -242,7 +242,7 @@ export function FilesPage() {
 
       {/* Summary Stats */}
       {!isLoading && data && (
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-4 gap-4 mb-3">
           <div className="bg-white border border-[#E6E6EC] rounded-lg p-5">
             <p className="text-sm text-[#6B7280]">Total Files</p>
             <p className="text-2xl font-semibold text-[#111111] mt-1">{(data.counts?.total ?? data.pagination.total).toLocaleString()}</p>
@@ -264,6 +264,27 @@ export function FilesPage() {
             <p className="text-2xl font-semibold text-[#B91C1C] mt-1">
               {(data.counts?.failed ?? 0).toLocaleString()}
             </p>
+          </div>
+        </div>
+      )}
+
+      {!isLoading && data?.google?.ocr && (
+        <div className="grid grid-cols-4 gap-4 mb-6">
+          <div className="bg-white border border-[#E6E6EC] rounded-lg p-5">
+            <p className="text-sm text-[#6B7280]">OCR Docs Processed</p>
+            <p className="text-2xl font-semibold text-[#111111] mt-1">{data.google.ocr.docsProcessed.toLocaleString()}</p>
+          </div>
+          <div className="bg-white border border-[#E6E6EC] rounded-lg p-5">
+            <p className="text-sm text-[#6B7280]">OCR Used</p>
+            <p className="text-2xl font-semibold text-[#111111] mt-1">{data.google.ocr.ocrUsed.toLocaleString()}</p>
+          </div>
+          <div className="bg-white border border-[#E6E6EC] rounded-lg p-5">
+            <p className="text-sm text-[#6B7280]">OCR Coverage</p>
+            <p className="text-2xl font-semibold text-[#111111] mt-1">{data.google.ocr.ocrCoverageRate.toFixed(2)}%</p>
+          </div>
+          <div className="bg-white border border-[#E6E6EC] rounded-lg p-5">
+            <p className="text-sm text-[#6B7280]">OCR Avg Confidence</p>
+            <p className="text-2xl font-semibold text-[#111111] mt-1">{data.google.ocr.avgConfidence.toFixed(2)}%</p>
           </div>
         </div>
       )}

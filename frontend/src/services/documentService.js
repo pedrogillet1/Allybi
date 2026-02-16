@@ -1,5 +1,11 @@
 import api from './api';
 import { calculateFileHash } from '../utils/security/crypto';
+const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
+
+const getCompatAccessToken = () => {
+  if (!AUTH_LOCALSTORAGE_COMPAT) return null;
+  return localStorage.getItem('accessToken') || localStorage.getItem('token');
+};
 
 /**
  * Document service for handling document operations
@@ -127,11 +133,12 @@ class DocumentService {
       const isBackendUrl = url.startsWith('/api/') || url.startsWith(process.env.REACT_APP_API_BASE_URL || '');
       const fetchOptions = {
         method: 'GET',
+        credentials: 'include',
       };
       
       // Add auth header for backend URLs (not needed for presigned storage URLs)
       if (isBackendUrl) {
-        const token = localStorage.getItem('token');
+        const token = getCompatAccessToken();
         if (token) {
           fetchOptions.headers = {
             'Authorization': `Bearer ${token}`

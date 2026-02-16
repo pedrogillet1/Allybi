@@ -47,6 +47,13 @@ export async function getSecurity(
   const cursorClause = buildCursorClause(params.cursor);
 
   const { from, to } = window;
+  const safe = async <T>(query: () => Promise<T>, fallback: T): Promise<T> => {
+    try {
+      return await query();
+    } catch {
+      return fallback;
+    }
+  };
 
   // Initialize counters to zero
   let counters: SecurityCounters = {
@@ -77,30 +84,30 @@ export async function getSecurity(
 
     // Count security events
     const [privacyBlocks, redactions, failedAuth, accessDenied] = await Promise.all([
-      prisma.auditLog.count({
+      safe(() => prisma.auditLog.count({
         where: {
           createdAt: { gte: from, lt: to },
           action: { in: ['PRIVACY_BLOCK', 'privacy_block', 'BLOCKED', 'blocked'] },
         },
-      }),
-      prisma.auditLog.count({
+      }), 0),
+      safe(() => prisma.auditLog.count({
         where: {
           createdAt: { gte: from, lt: to },
           action: { in: ['REDACTION', 'redaction', 'REDACT', 'redact'] },
         },
-      }),
-      prisma.auditLog.count({
+      }), 0),
+      safe(() => prisma.auditLog.count({
         where: {
           createdAt: { gte: from, lt: to },
           action: { in: ['LOGIN_FAILED', 'login_failed', 'AUTH_FAILURE', 'auth_failure'] },
         },
-      }),
-      prisma.auditLog.count({
+      }), 0),
+      safe(() => prisma.auditLog.count({
         where: {
           createdAt: { gte: from, lt: to },
           action: { in: ['ACCESS_DENIED', 'access_denied'] },
         },
-      }),
+      }), 0),
     ]);
 
     counters = {
@@ -111,7 +118,7 @@ export async function getSecurity(
     };
 
     // Get security events with pagination
-    const events = await prisma.auditLog.findMany({
+    const events = await safe(() => prisma.auditLog.findMany({
       where: {
         createdAt: { gte: from, lt: to },
         action: { in: securityActions },
@@ -129,7 +136,7 @@ export async function getSecurity(
         ipAddress: true,
         details: true,
       },
-    });
+    }), []);
 
     const page = processPage(events, limit);
     nextCursor = page.nextCursor ?? undefined;
@@ -154,24 +161,24 @@ export async function getSecurity(
       'admin_access_denied',
     ];
 
-    const adminFailedAuth = await prisma.adminAuditLog.count({
+    const adminFailedAuth = await safe(() => prisma.adminAuditLog.count({
       where: {
         timestamp: { gte: from, lt: to },
         action: { in: adminSecurityActions },
       },
-    });
+    }), 0);
 
     counters.failedAuth += adminFailedAuth as number;
   }
 
   // Check for suspicious sessions
   if (supportsModel(prisma, 'session')) {
-    const suspiciousSessions = await prisma.session.count({
+    const suspiciousSessions = await safe(() => prisma.session.count({
       where: {
         createdAt: { gte: from, lt: to },
         isSuspicious: true,
       },
-    });
+    }), 0);
 
     counters.accessDenied += suspiciousSessions as number;
   }

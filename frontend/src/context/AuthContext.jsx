@@ -3,6 +3,7 @@ import authService from '../services/authService';
 import { setEncryptionPassword as setChatEncryptionPassword, clearEncryptionPassword as clearChatEncryptionPassword } from '../services/chatService';
 import { generateRecoveryKey, encryptMasterKeyWithRecovery, isSecureContextAvailable } from '../utils/security/encryption';
 import { getApiBaseUrl } from '../services/runtimeConfig';
+import { fetchBootstrapSession } from '../services/authBootstrap';
 
 const AuthContext = createContext(null);
 const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
@@ -24,18 +25,13 @@ export const AuthProvider = ({ children }) => {
     const initAuth = async () => {
       // Cookie-first bootstrap (primary auth mode).
       try {
-        const sessionRes = await fetch(`${API_BASE}/api/auth/session/bootstrap`, {
-          credentials: 'include',
-        });
-        if (sessionRes.ok) {
-          const sessionData = await sessionRes.json();
-          if (sessionData?.user) {
-            localStorage.setItem('user', JSON.stringify(sessionData.user));
-            setUser(sessionData.user);
-            setIsAuthenticated(true);
-            setLoading(false);
-            return;
-          }
+        const sessionData = await fetchBootstrapSession();
+        if (sessionData?.ok && sessionData?.user) {
+          localStorage.setItem('user', JSON.stringify(sessionData.user));
+          setUser(sessionData.user);
+          setIsAuthenticated(true);
+          setLoading(false);
+          return;
         }
       } catch {
         // Continue through compatibility paths.
