@@ -3778,7 +3778,7 @@ const UploadHub = () => {
           setShowNewCategoryModal(false);
         }}
         onCreateCategory={handleCreateCategory}
-        uploadedDocuments={documents}
+        uploadedDocuments={[]}
         allDocuments={contextDocuments}
       />
 
