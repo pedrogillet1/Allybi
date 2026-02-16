@@ -1,11 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { ROUTES, STORAGE_KEYS } from '../../constants/routes';
 import { useDocuments } from '../../context/DocumentsContext';
 import unifiedUploadService from '../../services/unifiedUploadService';
-import UploadProgressBar from '../upload/UploadProgressBar';
 import dropzoneIllustration from '../../assets/dropzone-files-illustration.svg';
 
 const DROPZONE_ACCEPT = {
@@ -45,11 +44,14 @@ export default function FirstDocumentUpload() {
   // files: [{ file, id, status: 'pending'|'uploading'|'uploaded'|'error', progress: 0-100 }]
   const [files, setFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
+  const folderInputRef = useRef(null);
 
   const hasUploadedFiles = files.some(f => f.status === 'uploaded');
   const hasFilesSelected = files.length > 0;
 
-  const onDrop = useCallback((acceptedFiles) => {
+  const addSelectedFiles = useCallback((acceptedFiles) => {
+    if (!Array.isArray(acceptedFiles) || acceptedFiles.length === 0) return;
     const newFiles = acceptedFiles.map(file => ({
       file,
       id: `${file.name}-${file.size}-${Date.now()}-${Math.random()}`,
@@ -58,6 +60,18 @@ export default function FirstDocumentUpload() {
     }));
     setFiles(prev => [...prev, ...newFiles]);
   }, []);
+
+  const onDrop = useCallback((acceptedFiles) => {
+    addSelectedFiles(acceptedFiles);
+  }, [addSelectedFiles]);
+
+  const handleFilePickerChange = useCallback((event) => {
+    const picked = Array.from(event.target.files || []);
+    addSelectedFiles(picked);
+    // Allow selecting the same file/folder again.
+    // eslint-disable-next-line no-param-reassign
+    event.target.value = '';
+  }, [addSelectedFiles]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -267,6 +281,71 @@ export default function FirstDocumentUpload() {
           </p>
         </div>
 
+        {/* Quick actions: same behavior as Upload flow */}
+        <div style={{
+          width: '100%',
+          display: 'flex',
+          gap: 12,
+          marginTop: 16,
+        }}>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            style={{
+              flex: 1,
+              height: 48,
+              borderRadius: 999,
+              border: '1px solid #E6E6EC',
+              background: 'white',
+              color: '#323232',
+              fontSize: 15,
+              fontFamily: 'Plus Jakarta Sans, sans-serif',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            Select Files
+          </button>
+          <button
+            type="button"
+            onClick={() => folderInputRef.current?.click()}
+            style={{
+              flex: 1,
+              height: 48,
+              borderRadius: 999,
+              border: '1px solid #E6E6EC',
+              background: 'white',
+              color: '#323232',
+              fontSize: 15,
+              fontFamily: 'Plus Jakarta Sans, sans-serif',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            Select Folder
+          </button>
+        </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept={Object.values(DROPZONE_ACCEPT).flat().join(',')}
+          onChange={handleFilePickerChange}
+          style={{ display: 'none' }}
+        />
+        <input
+          ref={folderInputRef}
+          type="file"
+          // eslint-disable-next-line react/no-unknown-property
+          webkitdirectory=""
+          // eslint-disable-next-line react/no-unknown-property
+          directory=""
+          multiple
+          onChange={handleFilePickerChange}
+          style={{ display: 'none' }}
+        />
+
         {/* File list */}
         {files.length > 0 && (
           <div style={{
@@ -276,25 +355,58 @@ export default function FirstDocumentUpload() {
             flexDirection: 'column',
             gap: 8,
           }}>
-            {files.map(f => (
-              <div
-                key={f.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '10px 12px',
-                  borderRadius: 12,
-                  background: '#F9F9F8',
-                  border: '1px solid #E6E6EC',
-                }}
-              >
+            {files.map(f => {
+              const isUploading = f.status === 'uploading';
+              const isUploaded = f.status === 'uploaded';
+              const isError = f.status === 'error';
+              const progressWidth = isUploaded ? 100 : Math.max(0, Math.min(100, Number(f.progress) || 0));
+              const chipLabel = isError
+                ? t('common.error')
+                : isUploaded
+                  ? t('upload.uploaded')
+                  : isUploading
+                    ? `${Math.round(progressWidth)}%`
+                    : t('uploadHub.ready');
+              const chipColor = isError ? '#D92D20' : isUploaded ? '#34A853' : '#181818';
+              const chipBg = isError ? '#FEF3F2' : isUploaded ? '#F0FDF4' : '#F5F5F5';
+
+              return (
+                <div
+                  key={f.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '10px 12px',
+                    borderRadius: 12,
+                    border: '1px solid #E6E6EC',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    background: '#FFFFFF',
+                  }}
+                >
+                  {isUploading && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        height: '100%',
+                        width: `${progressWidth}%`,
+                        background: 'rgba(24,24,24,0.04)',
+                        borderRadius: 12,
+                        transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1)',
+                        zIndex: 0,
+                      }}
+                    />
+                  )}
                 {/* File info */}
-                <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ flex: 1, minWidth: 0, position: 'relative', zIndex: 1 }}>
                   <div style={{
-                    fontSize: 13,
-                    fontWeight: 600,
+                    fontSize: 14,
+                    fontWeight: 500,
                     color: '#32302C',
+                    lineHeight: '20px',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -302,48 +414,34 @@ export default function FirstDocumentUpload() {
                     {f.file.name}
                   </div>
                   <div style={{
-                    fontSize: 11,
+                    fontSize: 12,
                     color: '#6C6B6E',
-                    marginTop: 2,
+                    marginTop: 1,
+                    lineHeight: '18px',
                   }}>
                     {formatFileSize(f.file.size)}
                   </div>
                 </div>
 
-                {/* Status */}
-                {f.status === 'uploading' && (
-                  <div style={{ width: 100, flexShrink: 0 }}>
-                    <UploadProgressBar
-                      progress={f.progress}
-                      status="uploading"
-                      showStatus={false}
-                      variant="compact"
-                    />
-                  </div>
-                )}
-                {f.status === 'uploaded' && (
-                  <div style={{ width: 100, flexShrink: 0 }}>
-                    <UploadProgressBar
-                      progress={100}
-                      status="completed"
-                      showStatus={false}
-                      variant="compact"
-                    />
-                  </div>
-                )}
-                {f.status === 'error' && (
-                  <div style={{ width: 100, flexShrink: 0 }}>
-                    <UploadProgressBar
-                      progress={f.progress || 0}
-                      status="error"
-                      showStatus={false}
-                      variant="compact"
-                    />
-                  </div>
-                )}
+                <span style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: chipColor,
+                  background: chipBg,
+                  padding: '2px 8px',
+                  borderRadius: 9999,
+                  fontFamily: 'Plus Jakarta Sans, sans-serif',
+                  lineHeight: '18px',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  position: 'relative',
+                  zIndex: 1,
+                }}>
+                  {chipLabel}
+                </span>
 
                 {/* Remove button (only when not uploading) */}
-                {f.status !== 'uploading' && (
+                {!isUploading && (
                   <button
                     onClick={(e) => { e.stopPropagation(); removeFile(f.id); }}
                     style={{
@@ -355,14 +453,17 @@ export default function FirstDocumentUpload() {
                       fontSize: 16,
                       lineHeight: 1,
                       flexShrink: 0,
+                      position: 'relative',
+                      zIndex: 1,
                     }}
                     aria-label={`Remove ${f.file.name}`}
                   >
                     &times;
                   </button>
                 )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         )}
 

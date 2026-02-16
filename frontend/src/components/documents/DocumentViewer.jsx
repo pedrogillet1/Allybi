@@ -2399,11 +2399,13 @@ const DocumentViewer = () => {
   }, [currentFileType, initialTargetParam]);
 
   // Fetch PPTX anchors for top-bar target editing (keeps PPTXPreview as the main viewer).
+  // Only fetches when PPTX editing is actually supported to avoid 500 errors.
   useEffect(() => {
     let cancelled = false;
     async function loadSlidesModel() {
       if (!document?.id) return;
       if (currentFileType !== 'powerpoint') return;
+      if (!supportsViewerEditing) return; // PPTX editing not yet supported
       try {
         const res = await api.get(`/api/documents/${document.id}/editing/slides-model`);
         const anchors = Array.isArray(res.data?.anchors) ? res.data.anchors : [];
@@ -2416,7 +2418,7 @@ const DocumentViewer = () => {
     }
     loadSlidesModel();
     return () => { cancelled = true; };
-  }, [currentFileType, document?.id]);
+  }, [currentFileType, document?.id, supportsViewerEditing]);
 
   useEffect(() => {
     if (currentFileType !== 'powerpoint') return;
@@ -4761,7 +4763,8 @@ const DocumentViewer = () => {
                   }
                 }}
               onClick={(e) => {
-                handleAskAllybiClick(e);
+                // onMouseDown already handles everything; prevent default only
+                e.preventDefault();
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {

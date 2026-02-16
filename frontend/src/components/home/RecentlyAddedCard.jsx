@@ -158,7 +158,7 @@ export default function RecentlyAddedCard({
           break;
         case 'date':
         default:
-          cmp = new Date(b.createdAt) - new Date(a.createdAt);
+          cmp = new Date(a.createdAt) - new Date(b.createdAt);
           break;
       }
       return sortDirection === 'asc' ? cmp : -cmp;

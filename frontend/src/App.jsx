@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { DocumentsProvider } from './context/DocumentsContext';
 import { FileProvider } from './context/FileContext';
 import { NotificationsProvider } from './context/NotificationsStore';
@@ -83,6 +83,16 @@ function AppContent() {
   // Initialize viewport CSS variables for mobile
   useVisualViewportVars({ enabled: isMobile });
 
+  // Root route: unauthenticated users see signup/login, authenticated users see chat
+  function RootRoute() {
+    const { isAuthenticated, loading } = useAuth();
+    if (loading) {
+      return <div style={{ width: '100%', height: '100vh', background: 'white' }} />;
+    }
+    if (isAuthenticated) return <ChatScreen />;
+    return <UnifiedAuth variant="page" />;
+  }
+
   function RouterLayer() {
     const location = useLocation();
 
@@ -134,8 +144,8 @@ function AppContent() {
               <Route path={ROUTES.TERMS_OF_USE} element={<LegalPage />} />
               <Route path={ROUTES.PRIVACY_POLICY} element={<LegalPage />} />
 
-              {/* Root always goes to chat (login prompt if not authenticated) */}
-              <Route path="/" element={<ChatScreen />} />
+              {/* Root: auth screen if not signed in, chat if signed in */}
+              <Route path="/" element={<RootRoute />} />
               <Route path={ROUTES.CHAT} element={<ChatScreen />} />
 
               {/* Protected app routes */}
