@@ -253,8 +253,9 @@ const ChatHistory = ({
       setConversations((prev) => {
         // Preserve any locally known currentConversation if API is behind
         let merged = normalized;
-        if (currentConversation?.id && !isLoadingPlaceholderConversation(currentConversation)) {
-          const has = merged.some((c) => c.id === currentConversation.id);
+        const cId = currentConversation?.id;
+        if (cId && cId !== 'new' && !currentConversation?.isEphemeral && !isLoadingPlaceholderConversation(currentConversation)) {
+          const has = merged.some((c) => c.id === cId);
           if (!has) merged = [currentConversation, ...merged].map((c) => ({ ...c, title: normalizeTitle(c) }));
         }
         safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(merged));
@@ -275,6 +276,7 @@ const ChatHistory = ({
   // Ensure currentConversation stays in list (ChatGPT behavior: new chats appear once real id exists)
   useEffect(() => {
     if (!currentConversation?.id) return;
+    if (currentConversation.id === 'new' || currentConversation.isEphemeral) return;
     if (isLoadingPlaceholderConversation(currentConversation)) return;
 
     setConversations((prev) => {

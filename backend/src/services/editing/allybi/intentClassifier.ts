@@ -33,6 +33,67 @@ function tokenize(value: string): string[] {
   return normalizedText(value).split(/[^a-z0-9]+/).filter(Boolean);
 }
 
+function phraseTokenCoverage(textTokens: string[], phraseTokens: string[]): number {
+  if (!textTokens.length || !phraseTokens.length) return 0;
+  let hit = 0;
+  for (const t of phraseTokens) {
+    if (textTokens.includes(t)) hit += 1;
+  }
+  return hit / phraseTokens.length;
+}
+
+function orderedTokenCoverage(textTokens: string[], phraseTokens: string[]): number {
+  if (!textTokens.length || !phraseTokens.length) return 0;
+  let cursor = 0;
+  let hit = 0;
+  for (const token of phraseTokens) {
+    let found = false;
+    for (let i = cursor; i < textTokens.length; i += 1) {
+      if (textTokens[i] === token) {
+        hit += 1;
+        cursor = i + 1;
+        found = true;
+        break;
+      }
+    }
+    if (!found) continue;
+  }
+  return hit / phraseTokens.length;
+}
+
+function wholeWordContains(text: string, token: string): boolean {
+  if (!text || !token) return false;
+  const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(^|\\s)${escaped}(\\s|$)`).test(text);
+}
+
+function triggerMatchScore(text: string, phrase: string): number {
+  const normText = normalizedText(text);
+  const normPhrase = normalizedText(phrase);
+  if (!normText || !normPhrase) return 0;
+
+  if (normText.includes(normPhrase)) return 1;
+
+  const textTokens = tokenize(normText);
+  const phraseTokens = tokenize(normPhrase);
+  if (!textTokens.length || !phraseTokens.length) return 0;
+
+  // Single-token triggers need whole-word containment to avoid noisy matches.
+  if (phraseTokens.length === 1) {
+    return wholeWordContains(normText, phraseTokens[0]) ? 0.92 : 0;
+  }
+
+  const tokenCoverage = phraseTokenCoverage(textTokens, phraseTokens);
+  const orderedCoverage = orderedTokenCoverage(textTokens, phraseTokens);
+  const overlap = overlapScore(normText, normPhrase);
+  const score = Math.max(overlap, tokenCoverage * 0.9, orderedCoverage * 0.95);
+
+  // Require strong evidence for multi-token phrase triggers.
+  if (orderedCoverage >= 0.75 && tokenCoverage >= 0.75) return score;
+  if (overlap >= 0.72 && tokenCoverage >= 0.7) return score;
+  return 0;
+}
+
 function overlapScore(a: string, b: string): number {
   const ta = new Set(tokenize(a));
   const tb = new Set(tokenize(b));
@@ -95,7 +156,8 @@ export function classifyAllybiIntent(message: string, filetype: "docx" | "xlsx" 
     const phrase = normalizedText(String(trig?.phrase || ""));
     if (!phrase) continue;
     if (String(trig?.lang || "") !== language) continue;
-    if (!text.includes(phrase)) continue;
+    const matchScore = triggerMatchScore(text, phrase);
+    if (matchScore <= 0) continue;
 
     const intentId = String(trig?.intent_id || "").trim();
     if (!intentId) continue;
@@ -107,7 +169,7 @@ export function classifyAllybiIntent(message: string, filetype: "docx" | "xlsx" 
     const filetypeMatch = scope.includes("global") || scope.includes(filetype);
     if (!filetypeMatch) continue;
 
-    const confidence = Math.min(0.99, 0.62 + phrase.length / 150);
+    const confidence = Math.min(0.99, 0.52 + phrase.length / 220 + matchScore * 0.4);
     const candidate: ClassifiedIntent = {
       intentId,
       confidence,

@@ -787,8 +787,13 @@ router.delete(
     if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
 
     try {
+      // Grace period: never delete conversations created in the last 60 seconds.
+      // This prevents a race condition where a conversation is created by the
+      // frontend just before the first message is streamed to it.
+      const graceCutoff = new Date(Date.now() - 60_000);
+
       const emptyConvos = await (await import("../config/database")).default.conversation.findMany({
-        where: { userId, isDeleted: false, messages: { none: {} } },
+        where: { userId, isDeleted: false, messages: { none: {} }, createdAt: { lt: graceCutoff } },
         select: { id: true },
       });
 

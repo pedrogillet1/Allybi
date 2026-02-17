@@ -1,0 +1,129 @@
+{
+  "_meta": {
+    "id": "editing_ux",
+    "version": "1.0.0",
+    "description": "Edit UX behavior: operator complexity classification, step labels, answer templates. Drives card visibility and descriptive post-edit answers.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-16"
+  },
+  "config": {
+    "enabled": true,
+    "fallbackLanguage": "en"
+  },
+
+  "operatorComplexity": {
+    "quick": {
+      "operators": [
+        "EDIT_CELL",
+        "EDIT_RANGE",
+        "COMPUTE_BUNDLE",
+        "CREATE_CHART",
+        "EDIT_SPAN"
+      ],
+      "taskTypes": [
+        "set_value",
+        "chart",
+        "format",
+        "generic"
+      ],
+      "description": "Show simple thinking text, no step card"
+    },
+    "extended": {
+      "operators": [
+        "EDIT_DOCX_BUNDLE",
+        "EDIT_PARAGRAPH",
+        "ADD_PARAGRAPH"
+      ],
+      "taskTypes": [
+        "translate",
+        "replace_all"
+      ],
+      "overrides": {
+        "EDIT_DOCX_BUNDLE": {
+          "quick_when": "patchCount <= 3",
+          "extended_when": "patchCount > 3 || taskType == 'translate'"
+        },
+        "EDIT_SPAN": {
+          "always": "quick"
+        }
+      },
+      "description": "Show full 5-step progress card"
+    }
+  },
+
+  "stepLabels": {
+    "en": {
+      "UNDERSTAND_REQUEST": "Understanding your request",
+      "FIND_TARGETS": "Finding what to change",
+      "FIND_TARGETS__replace_all": "Searching for \"{{query}}\"",
+      "FIND_TARGETS__chart": "Reading selected range ({{targetHint}})",
+      "DRAFT_CHANGES": "Drafting the changes",
+      "DRAFT_CHANGES__replace_all": "Preparing replacements",
+      "DRAFT_CHANGES__chart": "Building chart ({{chartType}})",
+      "VALIDATE_PREVIEW": "Checking meaning & formatting",
+      "PREVIEW_READY": "Preview ready",
+      "PREVIEW_READY__with_changes": "Preview ready ({{changes}} change{{changes_plural}})",
+      "APPLY_CHANGES": "Applying changes to the file",
+      "SAVE_VERSION": "Saving a new version",
+      "REFRESH_PREVIEW": "Updating preview & search"
+    },
+    "pt": {
+      "UNDERSTAND_REQUEST": "Entendendo seu pedido",
+      "FIND_TARGETS": "Encontrando o que mudar",
+      "FIND_TARGETS__replace_all": "Procurando por \"{{query}}\"",
+      "FIND_TARGETS__chart": "Lendo intervalo selecionado ({{targetHint}})",
+      "DRAFT_CHANGES": "Preparando as mudancas",
+      "DRAFT_CHANGES__replace_all": "Preparando substituicoes",
+      "DRAFT_CHANGES__chart": "Montando grafico ({{chartType}})",
+      "VALIDATE_PREVIEW": "Verificando sentido e formatacao",
+      "PREVIEW_READY": "Previa pronta",
+      "PREVIEW_READY__with_changes": "Previa pronta ({{changes}} mudanca{{changes_plural}})",
+      "APPLY_CHANGES": "Aplicando mudancas no arquivo",
+      "SAVE_VERSION": "Salvando uma nova versao",
+      "REFRESH_PREVIEW": "Atualizando previa e busca"
+    }
+  },
+
+  "answerTemplates": {
+    "en": {
+      "EDIT_CELL": "Updated **{{targetHint}}** to `{{value}}`.",
+      "EDIT_RANGE": "Updated range **{{targetHint}}** with new values.",
+      "COMPUTE_BUNDLE__formula": "Applied formula `={{formula}}` in **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__aggregation": "Computed {{aggFn}} of **{{sourceRange}}** → result in **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__format": "Formatted **{{targetHint}}**{{formatDetails}}.",
+      "COMPUTE_BUNDLE__table": "Created table from **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__sort": "Sorted **{{targetHint}}**{{sortDetails}}.",
+      "COMPUTE_BUNDLE__filter": "Applied filter to **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__conditional_format": "Added conditional formatting to **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__insert_rows": "Inserted {{count}} row(s) at **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__insert_columns": "Inserted {{count}} column(s) at **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__delete_rows": "Deleted row(s) at **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__delete_columns": "Deleted column(s) at **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__number_format": "Applied {{formatType}} format to **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__default": "Applied changes to **{{targetHint}}**.",
+      "CREATE_CHART": "Created {{chartType}} chart from **{{targetHint}}**.",
+      "EDIT_PARAGRAPH": "Edited paragraph: {{changeSummary}}.",
+      "EDIT_SPAN": "Replaced \"{{before}}\" with \"{{after}}\".",
+      "EDIT_DOCX_BUNDLE__translate": "Translated {{changes}} paragraph(s) to {{targetLanguage}}.",
+      "EDIT_DOCX_BUNDLE__format": "Applied formatting to {{changes}} paragraph(s){{formatDetails}}.",
+      "EDIT_DOCX_BUNDLE__replace_all": "Replaced {{changes}} occurrence(s) of \"{{query}}\" with \"{{replacement}}\".",
+      "EDIT_DOCX_BUNDLE__heading": "Set heading level on {{changes}} paragraph(s).",
+      "EDIT_DOCX_BUNDLE__default": "Made {{changes}} change(s) in the document.",
+      "ADD_PARAGRAPH": "Inserted new paragraph{{locationHint}}.",
+      "fallback": "Edit applied to **{{filename}}**."
+    },
+    "pt": {
+      "EDIT_CELL": "Atualizou **{{targetHint}}** para `{{value}}`.",
+      "EDIT_RANGE": "Atualizou intervalo **{{targetHint}}** com novos valores.",
+      "COMPUTE_BUNDLE__default": "Aplicou mudancas em **{{targetHint}}**.",
+      "CREATE_CHART": "Criou grafico {{chartType}} de **{{targetHint}}**.",
+      "EDIT_PARAGRAPH": "Editou paragrafo: {{changeSummary}}.",
+      "EDIT_SPAN": "Substituiu \"{{before}}\" por \"{{after}}\".",
+      "EDIT_DOCX_BUNDLE__translate": "Traduziu {{changes}} paragrafo(s) para {{targetLanguage}}.",
+      "EDIT_DOCX_BUNDLE__replace_all": "Substituiu {{changes}} ocorrencia(s) de \"{{query}}\" por \"{{replacement}}\".",
+      "EDIT_DOCX_BUNDLE__default": "Fez {{changes}} mudanca(s) no documento.",
+      "ADD_PARAGRAPH": "Inseriu novo paragrafo{{locationHint}}.",
+      "fallback": "Edicao aplicada em **{{filename}}**."
+    }
+  }
+}

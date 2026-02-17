@@ -33,4 +33,44 @@ describe("classifyAllybiIntent", () => {
     expect(out?.reason).toBe("font_entity_ambiguous");
     expect(out?.isFormattingIntent).toBe(true);
   });
+
+  test("classifies PT bullets-to-single-paragraph requests", () => {
+    const out = classifyAllybiIntent(
+      "Transforme todos os bullets selecionados em um único parágrafo, mantendo exatamente o mesmo conteúdo.",
+      "docx",
+      "pt",
+    );
+    expect(out?.intentId).toBe("DOCX_LIST_CONVERT");
+    expect(out?.operatorCandidates?.[0]).toBe("DOCX_LIST_REMOVE");
+  });
+
+  test("classifies EN selected-bullets-to-one-paragraph requests", () => {
+    const out = classifyAllybiIntent(
+      "Convert the selected bullets into one paragraph and keep all wording exactly the same.",
+      "docx",
+      "en",
+    );
+    expect(out?.intentId).toBe("DOCX_LIST_CONVERT");
+    expect(out?.operatorCandidates?.[0]).toBe("DOCX_LIST_REMOVE");
+  });
+
+  test("matches intent from natural PT wording even when trigger phrase is not contiguous", () => {
+    const out = classifyAllybiIntent(
+      "Por favor, coloque isso em negrito e centralize este título",
+      "docx",
+      "pt",
+    );
+    expect(out?.intentId).toBe("DOCX_FORMAT_INLINE");
+    expect(Array.isArray(out?.operatorCandidates)).toBe(true);
+  });
+
+  test("matches intent from natural EN wording with reordered trigger words", () => {
+    const out = classifyAllybiIntent(
+      "Can you sort this selected range by capex in descending order?",
+      "xlsx",
+      "en",
+    );
+    expect(out?.intentId).toBe("XLSX_SORT");
+    expect(out?.operatorCandidates?.[0]).toBe("XLSX_SORT_RANGE");
+  });
 });

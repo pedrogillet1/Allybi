@@ -93,6 +93,14 @@ function stripHtml(raw) {
   }
 }
 
+function looksLikePatchPayloadText(value) {
+  const text = String(value || '').trim();
+  if (!text) return false;
+  if (/^\{\s*"patches"\s*:/i.test(text)) return true;
+  if (/^\[\s*\{\s*"kind"\s*:\s*"docx_/i.test(text)) return true;
+  return false;
+}
+
 function collectLinearSegments(rootEl) {
   // Build a linear view over text nodes + <br> so we can map offsets to DOM positions.
   const segs = [];
@@ -243,15 +251,30 @@ function applyTextPatchToParagraphEl(paragraphEl, start, end, afterText) {
       }
     })();
 
-    r.deleteContents();
-    if (styleCarrier) {
-      styleCarrier.appendChild(window.document.createTextNode(after));
-      r.insertNode(styleCarrier);
-    } else {
-      r.insertNode(window.document.createTextNode(after));
+    const isSingleTextNode =
+      startPos?.container &&
+      endPos?.container &&
+      startPos.container === endPos.container &&
+      startPos.container.nodeType === 3;
+
+    if (isSingleTextNode) {
+      r.deleteContents();
+      if (styleCarrier) {
+        styleCarrier.appendChild(window.document.createTextNode(after));
+        r.insertNode(styleCarrier);
+      } else {
+        r.insertNode(window.document.createTextNode(after));
+      }
+      paragraphEl.normalize?.();
+      return true;
     }
-    // Normalize merges adjacent text nodes after insertion.
-    paragraphEl.normalize?.();
+
+    // Multi-node selection can delete outer spans unpredictably; patch via linear text first.
+    const linear = paragraphEl.innerText || "";
+    const safeStart = Math.max(0, Math.min(s, linear.length));
+    const safeEnd = Math.max(safeStart, Math.min(e, linear.length));
+    const patched = `${linear.slice(0, safeStart)}${after}${linear.slice(safeEnd)}`;
+    paragraphEl.innerText = patched;
     return true;
   } catch {
     return false;
@@ -442,6 +465,26 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
         // restore selection even if React rerenders replace text nodes.
         try {
           lastViewerSelectionRef.current = getDocxViewerSelectionV2FromRange(root, r);
+        } catch {
+          // ignore
+        }
+        try {
+          const live = sel.getRangeAt(0);
+          const node = live?.startContainer || null;
+          const el = node?.nodeType === 1 ? node : node?.parentElement;
+          if (el && window.getComputedStyle) {
+            const cs = window.getComputedStyle(el);
+            const family = String(cs.fontFamily || "").split(",")[0]?.replace(/['"]/g, "").trim();
+            if (family) setFontFamily(family);
+            if (cs.fontSize) setFontSizePx(String(cs.fontSize));
+            const rgb = String(cs.color || "").match(/\d+/g);
+            if (rgb && rgb.length >= 3) {
+              const hex = `#${[rgb[0], rgb[1], rgb[2]]
+                .map((x) => Number(x).toString(16).padStart(2, "0"))
+                .join("")}`;
+              setColorHex(hex);
+            }
+          }
         } catch {
           // ignore
         }
@@ -720,6 +763,106 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     return false;
   }, [controlledSelectedId, effectiveSelectedId, findParagraphEl, getActiveParagraphIdFromDom, onSelectedIdChange]);
 
+  const runToolbarCommand = useCallback((cmd) => {
+    // Keep toolbar behavior aligned with imperative `exec` so undo/redo remains reliable.
+    restoreSelection();
+    const c = String(cmd || '').toLowerCase().trim();
+
+    if (c === 'undo') {
+      const ok = applyUndoRedo('undo');
+      if (ok) return true;
+    } else if (c === 'redo') {
+      const ok = applyUndoRedo('redo');
+      if (ok) return true;
+    }
+
+    const pid = getActiveParagraphIdFromDom() || (effectiveSelectedId ? String(effectiveSelectedId) : null);
+    const beforeEl = pid ? findParagraphEl(pid) : null;
+    const beforeHtml = beforeEl ? sanitizeDocxRichHtml(beforeEl.innerHTML || '') : null;
+
+    try { window.document.execCommand(c); } catch {}
+
+    if (pid && beforeEl) {
+      const afterHtml = sanitizeDocxRichHtml(beforeEl.innerHTML || '');
+      if (beforeHtml != null && afterHtml !== beforeHtml) {
+        pushUndoSnapshot(pid, beforeHtml);
+        lastHtmlByPidRef.current.set(pid, afterHtml);
+      }
+    }
+    markDirtyFromSelection();
+    return true;
+  }, [
+    applyUndoRedo,
+    effectiveSelectedId,
+    findParagraphEl,
+    getActiveParagraphIdFromDom,
+    markDirtyFromSelection,
+    pushUndoSnapshot,
+    restoreSelection,
+  ]);
+
+  const applySelectionStyleCommand = useCallback(() => {
+    restoreSelection();
+    const pid = getActiveParagraphIdFromDom() || (effectiveSelectedId ? String(effectiveSelectedId) : null);
+    const el = pid ? findParagraphEl(pid) : null;
+    const beforeHtml = el ? sanitizeDocxRichHtml(el.innerHTML || '') : null;
+    let changed = wrapSelectionWithSpanStyle({ color: colorHex, 'font-size': fontSizePx, 'font-family': fontFamily });
+    if (!changed) changed = applyParagraphStyleFromSelection({ color: colorHex, 'font-size': fontSizePx, 'font-family': fontFamily });
+    if (pid && el) {
+      const afterHtml = sanitizeDocxRichHtml(el.innerHTML || '');
+      if (beforeHtml != null && afterHtml !== beforeHtml) {
+        pushUndoSnapshot(pid, beforeHtml);
+        lastHtmlByPidRef.current.set(pid, afterHtml);
+      }
+    }
+    markDirtyFromSelection();
+    return changed;
+  }, [
+    applyParagraphStyleFromSelection,
+    colorHex,
+    effectiveSelectedId,
+    findParagraphEl,
+    fontFamily,
+    fontSizePx,
+    getActiveParagraphIdFromDom,
+    markDirtyFromSelection,
+    pushUndoSnapshot,
+    restoreSelection,
+  ]);
+
+  const applySelectionStyleImmediate = useCallback((styleMap) => {
+    restoreSelection();
+    const pid = getActiveParagraphIdFromDom() || (effectiveSelectedId ? String(effectiveSelectedId) : null);
+    const el = pid ? findParagraphEl(pid) : null;
+    const beforeHtml = el ? sanitizeDocxRichHtml(el.innerHTML || '') : null;
+    let changed = wrapSelectionWithSpanStyle(styleMap || {});
+    if (!changed) changed = applyParagraphStyleFromSelection(styleMap || {});
+    if (pid && el) {
+      const afterHtml = sanitizeDocxRichHtml(el.innerHTML || '');
+      if (beforeHtml != null && afterHtml !== beforeHtml) {
+        pushUndoSnapshot(pid, beforeHtml);
+        lastHtmlByPidRef.current.set(pid, afterHtml);
+      }
+    }
+    markDirtyFromSelection();
+    return changed;
+  }, [
+    applyParagraphStyleFromSelection,
+    effectiveSelectedId,
+    findParagraphEl,
+    getActiveParagraphIdFromDom,
+    markDirtyFromSelection,
+    pushUndoSnapshot,
+    restoreSelection,
+  ]);
+
+  const handleFontSizeChange = useCallback((nextSize) => {
+    const next = String(nextSize || '').trim();
+    if (!next) return;
+    setFontSizePx(next);
+    applySelectionStyleImmediate({ 'font-size': next });
+  }, [applySelectionStyleImmediate]);
+
   const snapshotTarget = useCallback((paragraphId) => {
     const el = findParagraphEl(paragraphId);
     if (!el) return null;
@@ -818,6 +961,19 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     } catch {}
     try { el.style.backgroundColor = ''; } catch {}
     try { el.style.boxShadow = ''; } catch {}
+  };
+
+  const markAppliedDecoration = (el) => {
+    if (!el) return;
+    clearDraftDecoration(el);
+    try {
+      el.style.backgroundColor = "rgba(59, 130, 246, 0.06)";
+      el.style.boxShadow = "inset 0 0 0 1px rgba(59, 130, 246, 0.12)";
+      setTimeout(() => {
+        try { el.style.backgroundColor = ""; } catch {}
+        try { el.style.boxShadow = ""; } catch {}
+      }, 4000);
+    } catch {}
   };
 
   const applyDraft = useCallback(({ draftId, targetId, beforeText, afterText, afterHtml }) => {
@@ -996,6 +1152,9 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
 
       const afterHtmlRaw = String(p?.afterHtml || '').trim();
       const afterTextRaw = String(p?.afterText || '').trim();
+      if (!afterHtmlRaw && looksLikePatchPayloadText(afterTextRaw)) {
+        continue;
+      }
       const nextHtml = afterHtmlRaw ? sanitizeDocxRichHtml(afterHtmlRaw) : toHtmlFromPlain(afterTextRaw || '');
       if (!nextHtml) continue;
 
@@ -1097,7 +1256,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       const el = findParagraphEl(pid);
       if (!el) continue;
       el.innerHTML = String(paragraphs[pid]?.html || '');
-      clearDraftDecoration(el);
+      markAppliedDecoration(el);
       try { setUndoState(pid, el.innerHTML || '', { clearHistory: true }); } catch {}
     }
     setDraftListOverrides((prev) => {
@@ -1137,7 +1296,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     for (const pid of ids) {
       const el = findParagraphEl(pid);
       if (!el) continue;
-      clearDraftDecoration(el);
+      markAppliedDecoration(el);
       const currentHtml = sanitizeDocxRichHtml(el.innerHTML || '');
       baselineHtmlRef.current.set(pid, currentHtml);
       nextTextByPid.set(pid, (el.innerText || '').replace(/\u00A0/g, ' '));
@@ -1248,7 +1407,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       onApplied?.();
       try {
         const el = findParagraphEl(paragraphId);
-        clearDraftDecoration(el);
+        markAppliedDecoration(el);
       } catch {}
 
       if (!silent) {
@@ -1314,7 +1473,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       onApplied?.();
       try {
         const el = findParagraphEl(paragraphId);
-        clearDraftDecoration(el);
+        markAppliedDecoration(el);
       } catch {}
 
       setStatusMsg('Saved.');
@@ -1544,23 +1703,23 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
             fontSizePx={fontSizePx}
             colorHex={colorHex}
             onFontFamilyChange={setFontFamily}
-            onFontSizeChange={setFontSizePx}
+            onFontSizeChange={handleFontSizeChange}
             onColorChange={setColorHex}
-            onBold={() => window.document.execCommand('bold')}
-            onItalic={() => window.document.execCommand('italic')}
-            onUnderline={() => window.document.execCommand('underline')}
-            onUndo={() => window.document.execCommand('undo')}
-            onRedo={() => window.document.execCommand('redo')}
-            onAlignLeft={() => window.document.execCommand('justifyLeft')}
-            onAlignCenter={() => window.document.execCommand('justifyCenter')}
-            onAlignRight={() => window.document.execCommand('justifyRight')}
-            onAlignJustify={() => window.document.execCommand('justifyFull')}
-            onBullets={() => window.document.execCommand('insertUnorderedList')}
-            onNumbers={() => window.document.execCommand('insertOrderedList')}
-            onIndent={() => window.document.execCommand('indent')}
-            onOutdent={() => window.document.execCommand('outdent')}
-            onClearFormatting={() => window.document.execCommand('removeFormat')}
-            onApplyTextStyle={() => wrapSelectionWithSpanStyle({ color: colorHex, 'font-size': fontSizePx, 'font-family': fontFamily })}
+            onBold={() => runToolbarCommand('bold')}
+            onItalic={() => runToolbarCommand('italic')}
+            onUnderline={() => runToolbarCommand('underline')}
+            onUndo={() => runToolbarCommand('undo')}
+            onRedo={() => runToolbarCommand('redo')}
+            onAlignLeft={() => runToolbarCommand('justifyLeft')}
+            onAlignCenter={() => runToolbarCommand('justifyCenter')}
+            onAlignRight={() => runToolbarCommand('justifyRight')}
+            onAlignJustify={() => runToolbarCommand('justifyFull')}
+            onBullets={() => runToolbarCommand('insertUnorderedList')}
+            onNumbers={() => runToolbarCommand('insertOrderedList')}
+            onIndent={() => runToolbarCommand('indent')}
+            onOutdent={() => runToolbarCommand('outdent')}
+            onClearFormatting={() => runToolbarCommand('removeFormat')}
+            onApplyTextStyle={applySelectionStyleCommand}
             onRevert={revertSelected}
             onApply={applySelected}
             applyLabel="Apply paragraph"
@@ -1710,7 +1869,10 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
                 style={{
                   outline: 'none',
                   borderRadius: 0,
-                  padding: 0,
+                  paddingTop: 0,
+                  paddingRight: 0,
+                  paddingBottom: 0,
+                  paddingLeft: isList ? 18 + listLevel * 18 : 0,
                   margin: '0 0 10px 0',
                   background: 'transparent',
                   boxShadow: 'none',
@@ -1722,7 +1884,6 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
                   fontWeight: isHeading ? 800 : 400,
                   fontSize: headingSize,
                   textAlign,
-                  paddingLeft: isList ? 18 + listLevel * 18 : undefined,
                 }}
                 ref={(el) => {
                   if (!el) return;

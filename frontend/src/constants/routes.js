@@ -32,6 +32,7 @@ export const ROUTES = {
 
   // Protected routes
   CHAT: '/c/k4r8f5',
+  CHAT_CONVERSATION: '/c/k4r8f5/:conversationId?',
   HOME: '/h/m7t3j9',
   DOCUMENTS: '/d/b9v2n6',
   DASHBOARD: '/d/g5x8k1',
@@ -83,6 +84,8 @@ export const AUTH_MODES = {
 // Helper functions for building routes with parameters
 export const buildRoute = {
   auth: (mode) => `${ROUTES.AUTH}?mode=${mode}`,
+  chat: (conversationId) => conversationId && conversationId !== 'new'
+    ? `/c/k4r8f5/${conversationId}` : '/c/k4r8f5',
   category: (categoryName) => `/c/t5k9n3/${categoryName}`,
   folder: (folderId) => `/f/h2r6p8/${folderId}`,
   document: (documentId) => `/d/m4w8j2/${documentId}`,

@@ -4248,6 +4248,20 @@
       "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
       "checksumSha256": "",
       "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "editing_ux",
+      "category": "microcopy",
+      "path": "microcopy/editing_ux.any.json",
+      "filename": "editing_ux.any.json",
+      "version": "1.0.0",
+      "contentType": "microcopy",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
+      "requiredByEnv": { "production": true, "staging": true, "dev": true, "local": true },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-16"
     }
   ],
   "tests": [

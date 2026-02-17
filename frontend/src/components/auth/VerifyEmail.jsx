@@ -26,22 +26,6 @@ const VerifyEmail = ({ variant = 'page' }) => {
     // Get email from navigation state or localStorage
     const email = location.state?.email || localStorage.getItem('pendingEmail') || '';
 
-    // Send initial verification code when component mounts
-    React.useEffect(() => {
-        const sendInitialCode = async () => {
-            if (email) {
-                try {
-                    await resendPendingEmail({ email });
-                    console.log('✅ Initial verification code sent');
-                } catch (error) {
-                    console.error('Error sending initial code:', error);
-                    setError(t('auth.verifyEmail.sendFailed'));
-                }
-            }
-        };
-        sendInitialCode();
-    }, []); // Empty dependency array - only run once on mount
-
     // Countdown timer effect
     React.useEffect(() => {
         if (resendCountdown > 0) {

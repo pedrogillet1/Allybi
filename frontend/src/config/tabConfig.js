@@ -93,6 +93,9 @@ export function getTabPath(index) {
 export function isTabRoot(pathname) {
   if (pathname === '/') return true;
 
+  // Chat conversation URLs (/c/k4r8f5/{id}) are tab roots for swipe nav
+  if (pathname.startsWith(ROUTES.CHAT + '/')) return true;
+
   for (const tab of TAB_CONFIG) {
     // Check for exact match with any of the tab's paths
     if (tab.matchPaths.includes(pathname)) {

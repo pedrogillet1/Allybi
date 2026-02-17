@@ -51,12 +51,12 @@ function readRunText(run: XmlNode): string {
 }
 
 type RichStyleState = {
-  bold: boolean;
-  italic: boolean;
-  underline: boolean;
-  fontSizeHalfPoints: number | null;
-  colorHex: string | null; // #RRGGBB
-  fontFamily: string | null; // CSS family name
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  fontSizeHalfPoints?: number | null;
+  colorHex?: string | null; // #RRGGBB
+  fontFamily?: string | null; // CSS family name
 };
 
 type RichToken =
@@ -115,12 +115,12 @@ function parseFontFamilyFromStyle(styleAttr: string): string | null {
 function tokenizeRichHtml(html: string): RichToken[] {
   const tokens: RichToken[] = [];
   const base: RichStyleState = {
-    bold: false,
-    italic: false,
-    underline: false,
-    fontSizeHalfPoints: null,
-    colorHex: null,
-    fontFamily: null,
+    bold: undefined,
+    italic: undefined,
+    underline: undefined,
+    fontSizeHalfPoints: undefined,
+    colorHex: undefined,
+    fontFamily: undefined,
   };
   const stack: Array<{ tag: string; style: RichStyleState }> = [{ tag: "root", style: base }];
 
@@ -284,25 +284,27 @@ function buildReplacementRun(text: string, preservedRunProps: XmlNode | undefine
 
 function buildRunProps(base: XmlNode | undefined, style: RichStyleState): XmlNode | undefined {
   const hasStyle =
-    style.bold ||
-    style.italic ||
-    style.underline ||
-    Boolean(style.fontSizeHalfPoints) ||
-    Boolean(style.colorHex) ||
-    Boolean(style.fontFamily);
+    style.bold !== undefined ||
+    style.italic !== undefined ||
+    style.underline !== undefined ||
+    style.fontSizeHalfPoints !== undefined ||
+    style.colorHex !== undefined ||
+    style.fontFamily !== undefined;
   if (!base && !hasStyle) return undefined;
 
   const rPr: XmlNode = base ? deepClone(base) : {};
 
   // Ensure the rich-text payload controls these core style flags, even if the
   // original paragraph's first run was styled.
-  delete rPr["w:b"];
-  delete rPr["w:i"];
-  delete rPr["w:u"];
-  delete rPr["w:sz"];
-  delete rPr["w:szCs"];
-  delete rPr["w:color"];
-  delete rPr["w:rFonts"];
+  if (style.bold !== undefined) delete rPr["w:b"];
+  if (style.italic !== undefined) delete rPr["w:i"];
+  if (style.underline !== undefined) delete rPr["w:u"];
+  if (style.fontSizeHalfPoints !== undefined) {
+    delete rPr["w:sz"];
+    delete rPr["w:szCs"];
+  }
+  if (style.colorHex !== undefined) delete rPr["w:color"];
+  if (style.fontFamily !== undefined) delete rPr["w:rFonts"];
 
   if (style.bold) rPr["w:b"] = [{}];
   if (style.italic) rPr["w:i"] = [{}];
@@ -392,12 +394,12 @@ function buildRunsFromRichHtml(html: string, preservedRunProps: XmlNode | undefi
       if (!runs.length) continue;
       if (lastWasBreak) continue;
       runs.push(buildBreakRun(preservedRunProps, {
-        bold: false,
-        italic: false,
-        underline: false,
-        fontSizeHalfPoints: null,
-        colorHex: null,
-        fontFamily: null,
+        bold: undefined,
+        italic: undefined,
+        underline: undefined,
+        fontSizeHalfPoints: undefined,
+        colorHex: undefined,
+        fontFamily: undefined,
       }));
       lastWasBreak = true;
       continue;
@@ -691,6 +693,70 @@ function validateInput(paragraphId: string, content: string, opts?: DocxContentO
   }
 }
 
+function setRunPlainText(run: XmlNode, text: string): void {
+  delete run["w:tab"];
+  delete run["w:br"];
+  run["w:t"] = [
+    {
+      _: text,
+      $: { "xml:space": "preserve" },
+    },
+  ];
+}
+
+function patchRunInPlace(runs: XmlNode[], beforeFullText: string, afterFullText: string): boolean {
+  const before = String(beforeFullText || "");
+  const after = String(afterFullText || "");
+  if (before === after) return true;
+  if (!runs.length) return false;
+
+  let prefix = 0;
+  const minLen = Math.min(before.length, after.length);
+  while (prefix < minLen && before[prefix] === after[prefix]) prefix += 1;
+
+  let suffix = 0;
+  while (
+    suffix < (before.length - prefix) &&
+    suffix < (after.length - prefix) &&
+    before[before.length - 1 - suffix] === after[after.length - 1 - suffix]
+  ) {
+    suffix += 1;
+  }
+
+  const changeStart = prefix;
+  const changeEnd = before.length - suffix;
+  const replacement = after.slice(prefix, after.length - suffix);
+
+  let cursor = 0;
+  let targetRunIndex = -1;
+  let runStart = 0;
+  let runEnd = 0;
+  let runText = "";
+
+  for (let i = 0; i < runs.length; i += 1) {
+    const r = runs[i]!;
+    const t = readRunText(r);
+    const next = cursor + t.length;
+    if (changeStart >= cursor && changeEnd <= next) {
+      targetRunIndex = i;
+      runStart = cursor;
+      runEnd = next;
+      runText = t;
+      break;
+    }
+    cursor = next;
+  }
+
+  if (targetRunIndex < 0) return false;
+  if (runText.includes("\n") || runText.includes("\t")) return false;
+
+  const localStart = Math.max(0, changeStart - runStart);
+  const localEnd = Math.min(runText.length, Math.max(localStart, changeEnd - runStart));
+  const nextText = `${runText.slice(0, localStart)}${replacement}${runText.slice(localEnd)}`;
+  setRunPlainText(runs[targetRunIndex]!, nextText);
+  return true;
+}
+
 export class DocxEditorService {
   private readonly anchorsService = new DocxAnchorsService();
 
@@ -743,7 +809,13 @@ export class DocxEditorService {
             const runs = asArray(paragraph["w:r"] as XmlNode | XmlNode[] | undefined);
             const firstRun = runs[0];
             const firstRunProps = firstRun ? asArray(firstRun["w:rPr"] as XmlNode | XmlNode[] | undefined)[0] : undefined;
-            paragraph["w:r"] = buildRunsFromRichHtml(newText, firstRunProps);
+            const patchedInPlace =
+              !hasInlineMarkupPatch &&
+              runs.length > 1 &&
+              patchRunInPlace(runs, beforeText, afterPlainText);
+            if (!patchedInPlace) {
+              paragraph["w:r"] = buildRunsFromRichHtml(newText, firstRunProps);
+            }
             if (nextParagraphStyle.alignment || nextParagraphStyle.lineSpacingTwips) {
               applyParagraphStyleToParagraph(paragraph, nextParagraphStyle);
             }

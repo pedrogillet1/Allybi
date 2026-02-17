@@ -343,6 +343,8 @@ export const createConversation = async (title = 'New Chat') => {
   }
 
   const response = await api.post('/conversations', requestData);
+  // Invalidate conversations list cache so next fetch includes the new conversation
+  _conversationsCache = { data: null, ts: 0 };
   return response.data;
 };
 

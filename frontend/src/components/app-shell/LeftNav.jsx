@@ -329,13 +329,13 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                     <SidebarTooltip text={t('nav.chat')} show={!isExpanded}>
                         <div
                             onClick={() => navigate(ROUTES.CHAT)}
-                            style={getButtonStyle(location.pathname === ROUTES.CHAT)}
-                            onMouseEnter={(e) => handleButtonHover(e, location.pathname === ROUTES.CHAT)}
-                            onMouseLeave={(e) => handleButtonLeave(e, location.pathname === ROUTES.CHAT)}
+                            style={getButtonStyle(location.pathname.startsWith(ROUTES.CHAT))}
+                            onMouseEnter={(e) => handleButtonHover(e, location.pathname.startsWith(ROUTES.CHAT))}
+                            onMouseLeave={(e) => handleButtonLeave(e, location.pathname.startsWith(ROUTES.CHAT))}
                             role="button"
                             tabIndex={0}
                             aria-label={t('nav.chat')}
-                            aria-current={location.pathname === ROUTES.CHAT ? 'page' : undefined}
+                            aria-current={location.pathname.startsWith(ROUTES.CHAT) ? 'page' : undefined}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
                                     e.preventDefault();

@@ -168,7 +168,7 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
-    port: 3000,
+    port: 3002,
     strictPort: false, // Will find next available port if 3000 is busy
     host: true,
     allowedHosts: [
@@ -186,7 +186,7 @@ export default defineConfig({
     },
     proxy: {
       "/api": {
-        target: process.env.VITE_API_PROXY_TARGET || "https://localhost:5001",
+        target: "https://allybi.co",
         changeOrigin: true,
         secure: false,
       },

@@ -82,6 +82,32 @@ function enforceNonZeroBytes(bytesFromService, localFileSize) {
   return 0;
 }
 
+function resolveUploadMimeType(file) {
+  const browserMime = String(file?.type || '').trim();
+  if (browserMime && browserMime !== 'application/octet-stream') return browserMime;
+  const ext = String(file?.name || '').split('.').pop()?.toLowerCase() || '';
+  const map = {
+    pdf: 'application/pdf',
+    doc: 'application/msword',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    xls: 'application/vnd.ms-excel',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ppt: 'application/vnd.ms-powerpoint',
+    pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    txt: 'text/plain',
+    csv: 'text/csv',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    gif: 'image/gif',
+    webp: 'image/webp',
+    bmp: 'image/bmp',
+    tif: 'image/tiff',
+    tiff: 'image/tiff',
+  };
+  return map[ext] || 'application/octet-stream';
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // CONCURRENCY LIMITER - p-limit style semaphore for controlled parallelism
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -1019,7 +1045,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
         const { data } = await api.post('/api/presigned-urls/bulk', {
           files: smallFileEntries.map(entry => ({
             fileName: (entry.file?.name || entry.name || 'unknown').normalize('NFC'),
-            fileType: entry.file?.type || 'application/octet-stream',
+            fileType: resolveUploadMimeType(entry.file),
             fileSize: entry.file?.size || 0,
             folderId: categoryId
           })),

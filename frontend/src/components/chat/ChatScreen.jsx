@@ -1,6 +1,7 @@
 // src/components/chat/ChatScreen.jsx
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
+import { ROUTES, buildRoute } from "../../constants/routes";
 
 import LeftNav from "../app-shell/LeftNav";
 import ChatHistory from "./ChatHistory";
@@ -24,6 +25,7 @@ import chatService from "../../services/chatService";
  *      - Desktop: left nav + chat history + chat thread
  *      - Mobile: left nav + chat thread (history hidden by default; controlled inside ChatHistory if needed)
  *  - No noisy console logging in production
+ *  - URL contains conversation ID for refresh persistence (uses replaceState to avoid re-renders)
  */
 
 const STORAGE_KEY = "currentConversationId";
@@ -43,8 +45,20 @@ function isEphemeral(convo) {
   return !convo || convo.id === "new" || convo.isEphemeral;
 }
 
+/**
+ * Silently update the browser URL bar without triggering React Router
+ * re-renders or route matching. This is critical — using navigate() would
+ * cause ChatHistory to re-fetch conversations and lose locally-added items.
+ */
+function silentReplaceUrl(path) {
+  if (window.location.pathname !== path) {
+    window.history.replaceState(null, "", path);
+  }
+}
+
 export default function ChatScreen() {
   const location = useLocation();
+  const { conversationId: urlConversationId } = useParams();
   const isMobile = useIsMobile();
 
   const { isAuthenticated } = useAuth();
@@ -58,17 +72,23 @@ export default function ChatScreen() {
   // Track onboarding open once per session
   const onboardingTriggeredRef = useRef(false);
 
-  // Track whether we mounted with an existing conversation (so we don’t re-add it to history)
+  // Track whether we mounted with an existing conversation (so we don't re-add it to history)
   const hadInitialConversationRef = useRef(false);
 
   // Avoid spamming /conversations during dev remounts or when backend is rate limiting.
   const hydrateMetaRef = useRef({ lastAttemptTs: 0 });
 
   // Initial conversation resolution:
-  //  1) navigation state (if provided)
-  //  2) sessionStorage active id (load minimal placeholder, fetch full in effect)
-  //  3) ephemeral "new chat"
+  //  1) URL param (e.g. /c/k4r8f5/{id})
+  //  2) navigation state (if provided)
+  //  3) localStorage active id (load minimal placeholder, fetch full in effect)
+  //  4) ephemeral "new chat"
   const [currentConversation, setCurrentConversation] = useState(() => {
+    if (urlConversationId && urlConversationId !== "new") {
+      hadInitialConversationRef.current = true;
+      return { id: urlConversationId, title: "Loading…" };
+    }
+
     const navConvo = location.state?.newConversation;
     if (navConvo) {
       hadInitialConversationRef.current = true;
@@ -94,15 +114,17 @@ export default function ChatScreen() {
   }, [location.state]);
 
   // ---------------------------------------------------------------------------
-  // Persist current conversation id during the session (but never persist ephemeral)
+  // Persist current conversation id + sync URL bar
   // ---------------------------------------------------------------------------
   useEffect(() => {
     if (!currentConversation) return;
 
     if (!isEphemeral(currentConversation) && currentConversation.id) {
       localStorage.setItem(STORAGE_KEY, currentConversation.id);
+      silentReplaceUrl(buildRoute.chat(currentConversation.id));
     } else {
       localStorage.removeItem(STORAGE_KEY);
+      silentReplaceUrl(ROUTES.CHAT);
     }
   }, [currentConversation]);
 
@@ -154,9 +176,9 @@ export default function ChatScreen() {
           // Conversation was deleted — reset to new chat
           setCurrentConversation(makeEphemeralConversation());
         }
-      } catch (err) {
-        if (cancelled) return;
-        setCurrentConversation(makeEphemeralConversation());
+      } catch {
+        // Keep current state on transient errors (500, network, rate-limit)
+        // so we don't permanently lose the conversation reference.
       }
     }
 
@@ -215,8 +237,14 @@ export default function ChatScreen() {
       return;
     }
 
-    // Update local state
-    setCurrentConversation((prev) => (prev ? { ...prev, ...updatedConversation } : updatedConversation));
+    // Update local state (clear isEphemeral when merging a real conversation)
+    setCurrentConversation((prev) => {
+      const merged = prev ? { ...prev, ...updatedConversation } : updatedConversation;
+      if (merged.id && merged.id !== "new") {
+        merged.isEphemeral = false;
+      }
+      return merged;
+    });
 
     // Update list if available
     if (typeof updateConversationInListRef.current === "function") {
@@ -228,7 +256,7 @@ export default function ChatScreen() {
    * Called by ChatInterface when the first user message creates a real conversation.
    */
   const handleConversationCreated = useCallback((newConversation) => {
-    setCurrentConversation(newConversation);
+    setCurrentConversation({ ...newConversation, isEphemeral: false });
 
     if (typeof updateConversationInListRef.current === "function") {
       updateConversationInListRef.current(newConversation);

@@ -1623,15 +1623,7 @@ const Documents = () => {
           {/* Thinking bubble - Large circle */}
           <div style={{ width: 14, height: 14, right: 44, top: 9, position: 'absolute', background: '#222222', borderRadius: 9999 }} aria-hidden="true" />
           <button
-            onClick={async () => {
-              try {
-                const newConversation = await chatService.createConversation();
-                navigate(ROUTES.CHAT, { state: { newConversation } });
-              } catch (error) {
-                console.error('Error creating new chat:', error);
-                navigate(ROUTES.CHAT);
-              }
-            }}
+            onClick={() => navigate(ROUTES.CHAT)}
             aria-label={t('documentViewer.needHelpFindingSomething')}
             style={{
               height: 60,

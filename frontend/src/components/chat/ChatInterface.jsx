@@ -381,6 +381,11 @@ function editDocumentKindLabel(kind) {
 }
 
 function editStepLabel(stepKey, vars = {}, lang = "en") {
+  // If backend provided a resolved label via the bank, prefer it
+  const bankLabel = String(vars?.[`stepLabel_${String(stepKey || "").trim().toUpperCase()}`] || "").trim();
+  if (bankLabel) return bankLabel;
+
+  // Fallback to existing hardcoded logic (backwards compat)
   const loc = normalizeEditLang(lang);
   const step = String(stepKey || "").trim().toUpperCase();
   const taskType = String(vars?.taskType || "").trim().toLowerCase();
@@ -547,19 +552,29 @@ function stripHtmlTags(raw) {
     .trim();
 }
 
+function sanitizeHumanText(raw) {
+  let t = String(raw || "").trim();
+  if (!t) return "";
+  // Drop placeholder prefixes that leak from backend glue text.
+  t = t.replace(/^(?:\(empty\)|undefined|null)\s*/i, "").trim();
+  if (!t) return "";
+  if (/^(?:\(empty\)|undefined|null)$/i.test(t)) return "";
+  return t;
+}
+
 function extractPatchText(obj, direction = "after") {
   const patches = Array.isArray(obj?.patches) ? obj.patches : [];
   if (!patches.length) return "";
   const keyText = direction === "before" ? "beforeText" : "afterText";
   const keyHtml = direction === "before" ? "beforeHtml" : "afterHtml";
   const parts = patches
-    .map((p) => String(p?.[keyText] || "").trim() || stripHtmlTags(p?.[keyHtml] || ""))
+    .map((p) => sanitizeHumanText(String(p?.[keyText] || "").trim()) || stripHtmlTags(p?.[keyHtml] || "") || sanitizeHumanText(String(p?.text || "").trim()))
     .filter(Boolean);
   return parts.join("\n").trim();
 }
 
 function extractHumanEditText(raw, direction = "after") {
-  const input = String(raw || "").trim();
+  const input = sanitizeHumanText(raw);
   if (!input) return "";
 
   const tryParse = (txt) => {
@@ -573,7 +588,7 @@ function extractHumanEditText(raw, direction = "after") {
 
   const fromObject = (obj) => {
     if (!obj || typeof obj !== "object") return "";
-    const fromDiff = String(direction === "before" ? obj?.diff?.before : obj?.diff?.after || "").trim();
+    const fromDiff = sanitizeHumanText(direction === "before" ? obj?.diff?.before : obj?.diff?.after || "");
     if (fromDiff) return fromDiff;
     const fromPatches = extractPatchText(obj, direction);
     if (fromPatches) return fromPatches;
@@ -587,10 +602,10 @@ function extractHumanEditText(raw, direction = "after") {
   // Handle payloads that append JSON patch bodies after natural text.
   const patchStart = input.search(/\{\s*"patches"\s*:/);
   if (patchStart >= 0) {
-    const prefix = input.slice(0, patchStart).trim();
+    const prefix = sanitizeHumanText(input.slice(0, patchStart).trim());
     const parsedSuffix = tryParse(input.slice(patchStart));
     const fromSuffix = fromObject(parsedSuffix);
-    return prefix || fromSuffix || input;
+    return fromSuffix || prefix || input;
   }
 
   return input;
@@ -622,9 +637,14 @@ function InlineEditActions({ editSession, lang, onFileClick }) {
         documentId: editSession.documentId,
         targetHint: editSession.targetHint || undefined,
         target: editSession.target || undefined,
-        beforeText: s(editSession.beforeText || editSession.diff?.before),
+        beforeText: s(editSession.beforeText || editSession.diff?.before || "(bulk edit)"),
         // Use canonical proposedText first. diff.after may be a shortened preview snippet.
-        proposedText: s(editSession.proposedText || editSession.diff?.after),
+        proposedText: s(
+          editSession.proposedText ||
+            (Array.isArray(editSession.bundlePatches)
+              ? JSON.stringify({ patches: editSession.bundlePatches })
+              : editSession.diff?.after),
+        ),
         userConfirmed: true,
       });
       if (res?.result?.revisionId || res?.result?.restoredRevisionId) {
@@ -649,7 +669,7 @@ function InlineEditActions({ editSession, lang, onFileClick }) {
   if (status === "rejected") {
     return (
       <div style={{ marginTop: 8, fontSize: 12, color: "#6B7280", fontFamily: "Plus Jakarta Sans, sans-serif" }}>
-        {lang === "pt" ? "Mudanca rejeitada" : "Change rejected"}
+        {lang === "pt" ? "Edicao cancelada" : "Edit cancelled"}
       </div>
     );
   }
@@ -669,11 +689,17 @@ function InlineEditActions({ editSession, lang, onFileClick }) {
     <div style={{ marginTop: 8, display: "flex", gap: 8, alignItems: "center" }}>
       <button
         type="button"
-        onClick={() => setStatus("rejected")}
+        onClick={() => {
+          setStatus("rejected");
+          // Tell the document viewer to discard the draft preview
+          try {
+            window.dispatchEvent(new CustomEvent("koda:edit-discard", { detail: { editSession } }));
+          } catch {}
+        }}
         disabled={status === "applying"}
         style={{ ...btnBase, color: "#6B7280" }}
       >
-        {lang === "pt" ? "Rejeitar" : "Reject"}
+        {lang === "pt" ? "Cancelar" : "Cancel"}
       </button>
       <button
         type="button"
@@ -4259,11 +4285,15 @@ export default function ChatInterface({
                             const isEditWorklog = String(wl.mode || "") === "editing";
                             const editLang = normalizeEditLang(i18n.language);
                             const editVars = (wl.editVars && typeof wl.editVars === "object") ? wl.editVars : {};
+                            const editComplexity = String(editVars?.complexity || "quick");
+                            const isQuickEdit = isEditWorklog && editComplexity === "quick";
                             const doneCount = steps.filter((s) => s?.status === "done").length;
                             const runningCount = steps.filter((s) => s?.status === "running").length;
                             const totalCount = steps.length;
                             const showCard = Boolean(isStreamingMsg || totalCount || narration.length || wl.summary);
                             if (!showCard) return null;
+                            // Quick edits: hide the entire card once done; only show a compact indicator while running
+                            if (isQuickEdit && wl.status === "done") return null;
                             const isCollapsed = Boolean(wl.collapsed) && wl.status === "done" && !isStreamingMsg;
                             const toggleCollapse = () => {
                               setMessages((prev) =>
@@ -4459,7 +4489,7 @@ export default function ChatInterface({
                                   </div>
                                 </div>
 
-                                {isEditWorklog ? (
+                                {isEditWorklog && !isQuickEdit ? (
                                   <div style={{ marginTop: 6, display: "flex", gap: 6, flexWrap: "wrap" }}>
                                     <span style={{ fontSize: 10, fontWeight: 700, color: "#374151", border: "1px solid #E5E7EB", borderRadius: 999, padding: "2px 8px", background: "#fff" }}>
                                       {scopeChip}
@@ -4483,7 +4513,7 @@ export default function ChatInterface({
                                   </div>
                                 ) : null}
 
-                                {totalCount > 0 ? (
+                                {totalCount > 0 && !isQuickEdit ? (
                                   <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
                                     <div style={{ fontSize: 11, color: "#6B7280", fontWeight: 700, fontFamily: "Plus Jakarta Sans, sans-serif" }}>
                                       {progressText}
@@ -4512,7 +4542,7 @@ export default function ChatInterface({
                                   </div>
                                 ) : null}
 
-                                {updates.length > 0 ? (
+                                {updates.length > 0 && !isQuickEdit ? (
                                   <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
                                     <div style={{ fontSize: 11, color: "#6B7280", fontWeight: 700, fontFamily: "Plus Jakarta Sans, sans-serif" }}>
                                       {editLang === "pt" ? "Atualizacoes" : "Updates"}
@@ -4536,10 +4566,20 @@ export default function ChatInterface({
                                   const editSession = getEditSessionFromAttachments(m.attachments);
                                   if (!editSession) return null;
                                   const diff = editSession.diff || null;
+                                  const isBundle = Boolean(editSession?.bundle) && Array.isArray(editSession?.bundlePatches);
+                                  const bundleSummary = isBundle
+                                    ? editSession.bundlePatches
+                                        .map((p) => sanitizeHumanText(String(p?.afterText || "").trim()) || stripHtmlTags(p?.afterHtml || "") || sanitizeHumanText(String(p?.text || "").trim()))
+                                        .filter(Boolean)
+                                        .slice(0, 5)
+                                        .join(" | ")
+                                    : "";
                                   const beforeText = extractHumanEditText(String(diff?.before || editSession.beforeText || ""), "before");
-                                  const afterText = extractHumanEditText(String(diff?.after || editSession.proposedText || ""), "after");
+                                  const afterText = isBundle
+                                    ? bundleSummary
+                                    : extractHumanEditText(String(diff?.after || editSession.proposedText || ""), "after");
                                   if (!beforeText && !afterText) return null;
-                                  const diffParts = buildInlineDiffParts(diff);
+                                  const diffParts = isBundle ? [] : buildInlineDiffParts(diff);
                                   const locationLabel = String(editSession.locationLabel || editSession.target?.label || editSession.filename || "").trim();
                                   return (
                                     <div style={{ marginTop: 10, borderTop: "1px solid #E5E7EB", paddingTop: 10 }}>
@@ -4577,11 +4617,6 @@ export default function ChatInterface({
                                           <span>{afterText}</span>
                                         )}
                                       </div>
-                                      <InlineEditActions
-                                        editSession={editSession}
-                                        lang={editLang}
-                                        onFileClick={(att) => openPreviewFromSource(att)}
-                                      />
                                     </div>
                                   );
                                 })()}
@@ -4706,6 +4741,19 @@ export default function ChatInterface({
                                           onUpload={() => setShowUploadModal(true)}
                                         />
                                       </div>
+                                    );
+                                  })()}
+                                  {/* Inline Apply/Cancel for edit answers */}
+                                  {(() => {
+                                    if (isStreamingMsg) return null;
+                                    const es = getEditSessionFromAttachments(m.attachments);
+                                    if (!es) return null;
+                                    return (
+                                      <InlineEditActions
+                                        editSession={es}
+                                        lang={normalizeEditLang(i18n.language)}
+                                        onFileClick={(att) => openPreviewFromSource(att)}
+                                      />
                                     );
                                   })()}
                                   {renderAssistantAttachments(m)}

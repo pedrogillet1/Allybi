@@ -143,7 +143,7 @@ async function sendSMS(to: string, text: string): Promise<boolean> {
  * Send verification SMS with a 6-digit code
  */
 export async function sendVerificationSMS(phoneNumber: string, code: string): Promise<void> {
-  const text = `Your Koda verification code is: ${code}. This code expires in 10 minutes.`;
+  const text = `Your Allybi verification code is: ${code}. This code expires in 10 minutes.`;
 
   const sent = await sendSMS(phoneNumber, text);
 
@@ -156,7 +156,7 @@ export async function sendVerificationSMS(phoneNumber: string, code: string): Pr
  * Send password reset SMS with a 6-digit code
  */
 export async function sendPasswordResetSMS(phoneNumber: string, code: string): Promise<void> {
-  const text = `Your Koda password reset code is: ${code}. This code expires in 15 minutes.`;
+  const text = `Your Allybi password reset code is: ${code}. This code expires in 15 minutes.`;
 
   const sent = await sendSMS(phoneNumber, text);
 
@@ -169,7 +169,7 @@ export async function sendPasswordResetSMS(phoneNumber: string, code: string): P
  * Send 2FA verification SMS
  */
 export async function send2FASMS(phoneNumber: string, code: string): Promise<void> {
-  const text = `Your Koda login code is: ${code}. This code expires in 5 minutes.`;
+  const text = `Your Allybi login code is: ${code}. This code expires in 5 minutes.`;
 
   const sent = await sendSMS(phoneNumber, text);
 

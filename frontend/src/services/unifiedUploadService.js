@@ -697,7 +697,7 @@ function calculateFileHash(file) {
 async function requestPresignedUrls(files, folderId, sessionId = null) {
   const urlRequests = files.map(fileInfo => ({
     fileName: (fileInfo.fileName || fileInfo.file.name).normalize('NFC'),
-    fileType: fileInfo.file.type || 'application/octet-stream',
+    fileType: resolveUploadMimeType(fileInfo.file),
     fileSize: fileInfo.file.size,
     relativePath: fileInfo.relativePath ? fileInfo.relativePath.normalize('NFC') : null,
     folderId: fileInfo.folderId || folderId
@@ -886,7 +886,7 @@ async function uploadFileToSignedUrl(file, presignedUrl, documentId, onProgress,
         // CLOUD STORAGE: PUT directly to signed URL (GCS)
         response = await axios.put(presignedUrl, file, {
           headers: {
-            'Content-Type': file.type || 'application/octet-stream',
+            'Content-Type': resolveUploadMimeType(file),
           },
           onUploadProgress: (progressEvent) => {
             if (onProgress && progressEvent.total) {
@@ -1373,6 +1373,39 @@ function formatFileSize(bytes) {
   if (bytes < 1024) return bytes + ' B';
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
   return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
+function inferMimeTypeFromFilename(filename = '') {
+  const ext = String(filename).split('.').pop()?.toLowerCase() || '';
+  const map = {
+    pdf: 'application/pdf',
+    doc: 'application/msword',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    xls: 'application/vnd.ms-excel',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ppt: 'application/vnd.ms-powerpoint',
+    pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    txt: 'text/plain',
+    csv: 'text/csv',
+    html: 'text/html',
+    htm: 'text/html',
+    rtf: 'application/rtf',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    gif: 'image/gif',
+    webp: 'image/webp',
+    bmp: 'image/bmp',
+    tif: 'image/tiff',
+    tiff: 'image/tiff',
+  };
+  return map[ext] || 'application/octet-stream';
+}
+
+function resolveUploadMimeType(file) {
+  const browserMime = String(file?.type || '').trim();
+  if (browserMime && browserMime !== 'application/octet-stream') return browserMime;
+  return inferMimeTypeFromFilename(file?.name || '');
 }
 
 function getErrorMessage(error) {
@@ -2063,7 +2096,7 @@ async function uploadSingleFile(file, folderId, onProgress) {
     const { data } = await api.post('/api/presigned-urls/bulk', {
       files: [{
         fileName: file.name.normalize('NFC'),
-        fileType: file.type || 'application/octet-stream',
+        fileType: resolveUploadMimeType(file),
         fileSize: file.size,
         folderId
       }],

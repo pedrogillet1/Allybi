@@ -53,40 +53,13 @@ function normalizeToken(value: unknown): string {
   return String(value || "").trim();
 }
 
-function looksLikeChartRequest(message: string): boolean {
-  const low = message.toLowerCase();
-  const explicitChartNoun =
-    /\b(chart|graph|plot|gr[aá]fico|gr[aá]fica)\b/.test(low);
-  const explicitChartTypePhrase =
-    /\b(pie|bar|line|area|scatter|combo|bubble|radar|histogram|stacked)\s+(chart|graph|plot)\b/.test(low) ||
-    /\b(column|coluna|barra|pizza|linha|dispers[aã]o|combinad[oa]|bolha|histograma|empilhad[oa])\s+(chart|graph|gr[aá]fico)\b/.test(low);
-  const chartVerbWithType =
-    /\b(create|build|generate|make|criar|gerar|fazer)\b.{0,24}\b(pie|bar|column|line|area|scatter|combo|bubble|radar|histogram|stacked)\b/.test(low);
-  return (
-    explicitChartNoun ||
-    explicitChartTypePhrase ||
-    chartVerbWithType
-  );
-}
-
-function looksLikeTableOrComputeRequest(message: string): boolean {
-  const low = message.toLowerCase();
-  return (
-    /\b(table|column|calculate|compute|sum|total|average|avg|min|max|count|sort|filter|freeze|format|validation|dropdown|conditional|print)\b/.test(low) ||
-    /\b(tabela|coluna|calcular|somar|m[eé]dia|media|total|m[ií]nimo|m[aá]ximo|contar|ordenar|filtrar|congelar|formatar|valida[cç][aã]o|lista suspensa|condicional|impress[aã]o)\b/.test(low)
-  );
-}
-
-function defaultOperatorForDomain(domain: EditDomain, instruction: string): EditOperator {
+function defaultOperatorForDomain(domain: EditDomain): EditOperator {
   if (domain === "sheets") {
-    if (looksLikeChartRequest(instruction)) return "CREATE_CHART";
-    return looksLikeTableOrComputeRequest(instruction) ? "COMPUTE_BUNDLE" : "EDIT_RANGE";
+    return "COMPUTE_BUNDLE";
   }
   if (domain === "slides") {
-    return /\b(add|insert|new)\b.{0,20}\bslide\b/i.test(instruction) ? "ADD_SLIDE" : "REWRITE_SLIDE_TEXT";
+    return "REWRITE_SLIDE_TEXT";
   }
-  if (/\b(add|insert|append)\b.{0,30}\bparagraph\b/i.test(instruction)) return "ADD_PARAGRAPH";
-  if (/\b(word|sentence|span|selection)\b/i.test(instruction)) return "EDIT_SPAN";
   return "EDIT_PARAGRAPH";
 }
 
@@ -137,21 +110,21 @@ export function normalizeEditOperator(
   const low = raw.toLowerCase();
   if (PLAN_ALIASES.has(low)) {
     return {
-      operator: defaultOperatorForDomain(options.domain, options.instruction),
+      operator: defaultOperatorForDomain(options.domain),
       canonicalOperator: null,
       strictActionAlias: "plan",
     };
   }
   if (APPLY_ALIASES.has(low)) {
     return {
-      operator: defaultOperatorForDomain(options.domain, options.instruction),
+      operator: defaultOperatorForDomain(options.domain),
       canonicalOperator: null,
       strictActionAlias: "apply",
     };
   }
   if (UNDO_ALIASES.has(low)) {
     return {
-      operator: defaultOperatorForDomain(options.domain, options.instruction),
+      operator: defaultOperatorForDomain(options.domain),
       canonicalOperator: null,
       strictActionAlias: "undo",
     };
@@ -187,8 +160,8 @@ export function normalizeEditOperator(
   if (token.startsWith("sheets_")) {
     // Most sheets.* operator IDs in databanks map to compute bundles.
     return {
-      operator: looksLikeChartRequest(options.instruction) ? "CREATE_CHART" : "COMPUTE_BUNDLE",
-      canonicalOperator: looksLikeChartRequest(options.instruction) ? "XLSX_CHART_CREATE" : "XLSX_FORMAT_RANGE",
+      operator: "COMPUTE_BUNDLE",
+      canonicalOperator: "XLSX_FORMAT_RANGE",
       strictActionAlias: null,
     };
   }

@@ -26,19 +26,29 @@ function stripHtmlTags(raw) {
     .trim();
 }
 
+function sanitizeHumanText(raw) {
+  let t = String(raw || "").trim();
+  if (!t) return "";
+  // Drop placeholder prefixes that leak from backend glue text.
+  t = t.replace(/^(?:\(empty\)|undefined|null)\s*/i, "").trim();
+  if (!t) return "";
+  if (/^(?:\(empty\)|undefined|null)$/i.test(t)) return "";
+  return t;
+}
+
 function extractPatchText(obj, direction = "after") {
   const patches = Array.isArray(obj?.patches) ? obj.patches : [];
   if (!patches.length) return "";
   const keyText = direction === "before" ? "beforeText" : "afterText";
   const keyHtml = direction === "before" ? "beforeHtml" : "afterHtml";
   const parts = patches
-    .map((p) => String(p?.[keyText] || "").trim() || stripHtmlTags(p?.[keyHtml] || ""))
+    .map((p) => sanitizeHumanText(String(p?.[keyText] || "").trim()) || stripHtmlTags(p?.[keyHtml] || "") || sanitizeHumanText(String(p?.text || "").trim()))
     .filter(Boolean);
   return parts.join("\n").trim();
 }
 
 function extractHumanEditText(raw, direction = "after") {
-  const input = String(raw || "").trim();
+  const input = sanitizeHumanText(raw);
   if (!input) return "";
 
   const tryParse = (txt) => {
@@ -52,7 +62,7 @@ function extractHumanEditText(raw, direction = "after") {
 
   const fromObject = (obj) => {
     if (!obj || typeof obj !== "object") return "";
-    const fromDiff = String(direction === "before" ? obj?.diff?.before : obj?.diff?.after || "").trim();
+    const fromDiff = sanitizeHumanText(direction === "before" ? obj?.diff?.before : obj?.diff?.after || "");
     if (fromDiff) return fromDiff;
     const fromPatches = extractPatchText(obj, direction);
     if (fromPatches) return fromPatches;
@@ -66,10 +76,10 @@ function extractHumanEditText(raw, direction = "after") {
   // Handle payloads that append JSON patch bodies after natural text.
   const patchStart = input.search(/\{\s*"patches"\s*:/);
   if (patchStart >= 0) {
-    const prefix = input.slice(0, patchStart).trim();
+    const prefix = sanitizeHumanText(input.slice(0, patchStart).trim());
     const parsedSuffix = tryParse(input.slice(patchStart));
     const fromSuffix = fromObject(parsedSuffix);
-    return prefix || fromSuffix || input;
+    return fromSuffix || prefix || input;
   }
 
   return input;
@@ -165,6 +175,14 @@ export default function EditSessionCard({ session, onOpenDoc }) {
   const afterText = extractHumanEditText(safeString(diff?.after || rawProposedText), "after");
   const beforeText = extractHumanEditText(rawBeforeText, "before");
   const hasStructuredRawProposed = isStructuredPatchPayload(rawProposedText);
+  const bundleSummary = useMemo(() => {
+    if (!isBundle || !Array.isArray(session?.bundlePatches)) return "";
+    return session.bundlePatches
+      .map((p) => stripHtmlTags(p?.afterText || p?.afterHtml || p?.text || ""))
+      .filter(Boolean)
+      .slice(0, 5)
+      .join(" | ");
+  }, [isBundle, session?.bundlePatches]);
   const inlineDiffParts = useMemo(() => buildInlineDiff(diff), [diff]);
 
   useEffect(() => {
@@ -241,7 +259,7 @@ export default function EditSessionCard({ session, onOpenDoc }) {
         target: selectedTarget || undefined,
         beforeText: safeString(session.beforeText || beforeText || "(bulk edit)"),
         proposedText: isBundle
-          ? rawProposedText
+          ? safeString(rawProposedText || JSON.stringify({ patches: Array.isArray(session?.bundlePatches) ? session.bundlePatches : [] }))
           // Prefer canonical proposedText; draftAfter may be a shortened diff rendering.
           : safeString(rawProposedText || (hasStructuredRawProposed && !manualEdit ? rawProposedText : draftAfter)),
         userConfirmed: requiresConfirmation ? confirmed : true,
@@ -320,7 +338,7 @@ export default function EditSessionCard({ session, onOpenDoc }) {
 
   if (isBundle) {
     const bp = Array.isArray(session?.bundlePatches) ? session.bundlePatches : [];
-    const summary = safeString(session?.bundle?.summary) || `Bulk edit with ${bp.length} change(s).`;
+    const summary = safeString(session?.bundle?.summary) || bundleSummary || `Bulk edit with ${bp.length} change(s).`;
     const domainLabel = String(session?.domain || "").toUpperCase();
     return (
       <div className="koda-editSessionCard">

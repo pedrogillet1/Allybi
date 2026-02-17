@@ -1072,9 +1072,9 @@ const UploadHub = () => {
       } else {
         // Handle individual file upload - DIRECT TO GCS!
         const file = item.file;
+        let targetFolderId = item.folderId;
       try {
         // Create folder structure if file has a folder path
-        let targetFolderId = item.folderId;
         if (item.folderPath) {
           // Helper function to create folder hierarchy
           const getOrCreateFolder = async (folderPath) => {
@@ -1346,6 +1346,36 @@ const UploadHub = () => {
         // 3. We remove the item from uploadingFiles
         // 4. We show the success notification
         } catch (error) {
+          const ext = String(file?.name || '').split('.').pop()?.toLowerCase() || '';
+          const isImage = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'tif', 'tiff'].includes(ext);
+
+          // Fallback for image single-file uploads:
+          // retry via unified upload pipeline to avoid legacy endpoint edge cases.
+          if (isImage) {
+            try {
+              await unifiedUploadService.uploadSingleFile(file, targetFolderId, (progress) => {
+                setUploadingFiles(prev => prev.map((f, idx) =>
+                  idx === i ? {
+                    ...f,
+                    progress: Math.max(f.progress || 0, Math.round(progress.percentage || 0)),
+                    processingStage: progress.message || 'Uploading...'
+                  } : f
+                ));
+              });
+
+              setUploadingFiles(prev => prev.map((f, idx) =>
+                idx === i ? { ...f, status: 'completed', progress: 100, processingStage: null, error: null } : f
+              ));
+              setTimeout(() => {
+                setUploadingFiles(prev => prev.filter((f, idx) => idx !== i));
+              }, 1500);
+              await fetchDocuments();
+              return;
+            } catch (fallbackError) {
+              console.error('[UploadHub] Image fallback upload failed:', fallbackError);
+            }
+          }
+
           const status = error?.response?.status;
           const data = error?.response?.data;
           const backendMsg =

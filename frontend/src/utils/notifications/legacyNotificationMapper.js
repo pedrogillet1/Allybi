@@ -72,6 +72,11 @@ const KEY_MAPPINGS = {
   'upload.complete': 'notifications.uploadComplete',
   'upload.error': 'notifications.uploadFailed',
 
+  // Keep upload namespace keys quiet in migration logs (still valid translation keys)
+  'upload.limitedSupport.title': 'upload.limitedSupport.title',
+  'upload.limitedSupport.title_plural': 'upload.limitedSupport.title_plural',
+  'upload.limitedSupport.message': 'upload.limitedSupport.message',
+
   // Settings/Profile notifications
   'settings.saved': 'notifications.allMarkedRead', // Generic success
   'profile.updated': 'notifications.allMarkedRead', // Generic success

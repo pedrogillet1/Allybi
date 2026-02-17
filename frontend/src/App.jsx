@@ -75,6 +75,17 @@ import {
 } from './components/admin';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 
+// Root route: unauthenticated users see signup/login, authenticated users see chat
+// Defined at module level so React keeps a stable component reference across renders.
+function RootRoute() {
+  const { isAuthenticated, loading } = useAuth();
+  if (loading) {
+    return <div style={{ width: '100%', height: '100vh', background: 'white' }} />;
+  }
+  if (isAuthenticated) return <ChatScreen />;
+  return <UnifiedAuth variant="page" />;
+}
+
 // Inner component that uses NotificationsStore hook
 function AppContent() {
   const isMobile = useIsMobile();
@@ -82,16 +93,6 @@ function AppContent() {
 
   // Initialize viewport CSS variables for mobile
   useVisualViewportVars({ enabled: isMobile });
-
-  // Root route: unauthenticated users see signup/login, authenticated users see chat
-  function RootRoute() {
-    const { isAuthenticated, loading } = useAuth();
-    if (loading) {
-      return <div style={{ width: '100%', height: '100vh', background: 'white' }} />;
-    }
-    if (isAuthenticated) return <ChatScreen />;
-    return <UnifiedAuth variant="page" />;
-  }
 
   function RouterLayer() {
     const location = useLocation();
@@ -146,7 +147,7 @@ function AppContent() {
 
               {/* Root: auth screen if not signed in, chat if signed in */}
               <Route path="/" element={<RootRoute />} />
-              <Route path={ROUTES.CHAT} element={<ChatScreen />} />
+              <Route path={ROUTES.CHAT_CONVERSATION} element={<ChatScreen />} />
 
               {/* Protected app routes */}
               <Route path={ROUTES.UPLOAD} element={<ProtectedRoute><Upload /></ProtectedRoute>} />

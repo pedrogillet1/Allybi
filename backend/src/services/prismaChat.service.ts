@@ -40,6 +40,9 @@ import type { EncryptedChatContextService } from './chat/encryptedChatContext.se
 // Semantic bolding (ChatGPT-style emphasis)
 import { getBoldingNormalizer } from './core/inputs/boldingNormalizer.service';
 
+// Bank loader for data-bank-driven UX
+import { getOptionalBank } from './core/banks/bankLoader.service';
+
 // Folder tree rendering for document inventory context
 import { buildFolderTreeFromRecords, renderFolderTreeWithDocs } from './files/utils/buildFolderTree';
 import { getFileActionExecutor } from './core/execution/fileActionExecutor.service';
@@ -746,14 +749,6 @@ export class PrismaChatService {
     return null;
   }
 
-  private parseConnectorProviderHint(message: string): 'gmail' | 'outlook' | 'slack' | null {
-    const q = (message || '').toLowerCase();
-    if (/\bgmail\b/.test(q)) return 'gmail';
-    if (/\b(outlook|office ?365|microsoft)\b/.test(q)) return 'outlook';
-    if (/\bslack\b/.test(q)) return 'slack';
-    return null;
-  }
-
   private isComposeRequest(message: string): boolean {
     const q = (message || '').toLowerCase();
     return /\b(write|draft|compose|send|reply to|forward|follow up)\b/.test(q)
@@ -771,31 +766,6 @@ export class PrismaChatService {
       || /\b(tell me|what(?:'s| is)\s+in|what\s+do\s+i\s+have)\b/.test(q);
     const hasConnectorNoun = /\b(email|emails|inbox|mail|message|messages|slack|chat|chats|dm|dms|conversation|conversations|thread|threads|channel|channels)\b/.test(q);
     return hasConnectorNoun && (hasRecencyWord || hasReadIntent);
-  }
-
-  private isConnectorActionRequest(message: string): boolean {
-    const q = (message || '').toLowerCase();
-    const hasConnectorNoun = /\b(connector|connectors|integration|integrations|email|emails|inbox|mail|messages|slack|chat|chats|dm|dms|conversation|conversations|thread|threads|channel|channels)\b/.test(q);
-    const hasProvider = /\b(gmail|outlook|office ?365|microsoft|slack)\b/.test(q);
-    const hasVerb = /\b(connect|disconnect|unlink|revoke|disable|enable|activate|link|authorize|sync|synchroni[sz]e|refresh|resync|reindex|status|state|connected|connections|search|find|look for|show me|pull|fetch|import|check|show|list|which|read|get|open|display|view|summarize|what|browse|look at|look up|give me|tell me)\b/.test(q);
-    return (hasConnectorNoun || hasProvider) && hasVerb;
-  }
-
-  private extractConnectorSearchQuery(message: string): string {
-    const m = message || '';
-    const quoted = m.match(/["“”']([^"“”']{2,200})["“”']/);
-    if (quoted?.[1]) return quoted[1].trim();
-
-    const lower = m.toLowerCase();
-    for (const needle of [' for ', ' about ', ' regarding ']) {
-      const idx = lower.indexOf(needle);
-      if (idx >= 0) return m.slice(idx + needle.length).trim();
-    }
-
-    return m
-      .replace(/^\s*(search|find|look for|show me|look up|browse|look at|give me|tell me about)\s+/i, '')
-      .replace(/\b(inbox|email|emails|mail|messages|slack|chat|chats|dm|dms|conversation|conversations|thread|threads|channel|channels|gmail|outlook|office ?365)\b/ig, '')
-      .trim();
   }
 
   private async getConnectedConnectorProviders(
@@ -956,39 +926,6 @@ export class PrismaChatService {
       : "";
   }
 
-  private async detectLatestConnectorQuery(
-    userId: string,
-    message: string,
-    connectorContext?: ChatRequest["connectorContext"],
-  ): Promise<null | { provider: 'gmail' | 'outlook' | 'slack' | 'email'; count: number; mode: 'raw' | 'explain' }> {
-    if (!this.isLatestConnectorRequest(message)) return null;
-    const hint = this.parseConnectorProviderHint(message);
-    const q = (message || '').toLowerCase();
-    const active = this.resolveActiveConnectorProvider(connectorContext);
-    const activeProviders = this.resolveActiveConnectorProviders(connectorContext);
-
-    const wantsExplain =
-      /\b(explain|summari[sz]e|analy[sz]e|break\s+down|what(?:'s| is)\s+(?:this|that|it)\s+(?:email|message)\s+about|what\s+does\s+(?:this|that|it)\s+(?:email|message)\s+say)\b/.test(q);
-    const mode: 'raw' | 'explain' = wantsExplain ? 'explain' : 'raw';
-
-    // Parse "last 3 emails", "3 most recent emails", "show me 5 newest messages", etc.
-    // Clamp to keep latency reasonable (we fetch full message bodies).
-    const countMatch =
-      q.match(/\b(?:last|latest|newest|recent|most\s+recent)\s+(\d{1,2})\b/) ||
-      q.match(/\b(\d{1,2})\s+(?:most\s+recent|latest|newest|recent|last)\b/);
-    const count = Math.max(1, Math.min(10, Number(countMatch?.[1] || 1)));
-
-    if (hint) return { provider: hint, count, mode };
-
-    if (/\bslack\b/.test(q)) return { provider: 'slack', count, mode };
-    // If the Slack connector pill is active, interpret "latest chats/messages" as Slack by default.
-    if ((active === "slack" || activeProviders.includes("slack")) && /\b(chat|chats|dm|dms|message|messages|conversation|conversations|thread|threads|channel|channels)\b/.test(q)) {
-      return { provider: "slack", count, mode };
-    }
-    // Default to email when they say "email/inbox/mail" without specifying provider.
-    return { provider: 'email', count, mode };
-  }
-
   private isExplainPreviousEmailRequest(message: string): boolean {
     const q = (message || '').toLowerCase();
 
@@ -1139,20 +1076,6 @@ export class PrismaChatService {
     }
 
     return { provider: best.provider, messageId: best.messageId };
-  }
-
-  private isEmailDocFusionRequest(message: string): boolean {
-    const q = (message || '').toLowerCase();
-    const mentionsEmail =
-      /\b(email|emails|inbox|gmail|outlook)\b/.test(q) ||
-      /\b(this|that|the)\s+email\b/.test(q) ||
-      /\bfrom\s+(?:the|that)\s+email\b/.test(q);
-    if (!mentionsEmail) return false;
-
-    const mentionsDoc =
-      /\b(document|file|pdf|docx|xlsx|pptx|contract|agreement|proposal|sow|msa|nda|clause|section|exhibit|appendix)\b/.test(q) ||
-      /[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/i.test(message);
-    return mentionsDoc;
   }
 
   private extractEmailKeywordHints(email: {
@@ -1688,126 +1611,6 @@ export class PrismaChatService {
       answerClass: 'GENERAL' as AnswerClass,
       navType: null,
     };
-  }
-
-  private async detectConnectorActionQuery(
-    userId: string,
-    message: string,
-  ): Promise<null | { action: 'connect' | 'sync' | 'status' | 'search' | 'disconnect'; provider: 'gmail' | 'outlook' | 'slack' | 'email' | 'all'; query?: string }> {
-    if (!this.isConnectorActionRequest(message)) return null;
-
-    const q = (message || '').toLowerCase();
-    const hint = this.parseConnectorProviderHint(message);
-
-    const wantsStatus = /\b(status|state|connected|connections|integrations|connectors|check connectors|show connectors|show integrations|which connectors)\b/.test(q);
-    const wantsConnect = /\b(connect|enable|activate|link|authorize|sign in|log in|add)\b/.test(q);
-    const wantsSync = /\b(sync|synchroni[sz]e|refresh|resync|reindex|pull|fetch|import)\b/.test(q);
-    const wantsSearch = /\b(search|find|look for|show me|look up|browse|look at|give me|tell me about)\b/.test(q) && /\b(email|emails|inbox|mail|message|messages|slack)\b/.test(q);
-    const wantsDisconnect = /\b(disconnect|unlink|revoke|deauthorize|de-authorize|remove integration|remove connector|disable integration|disable connector|turn off)\b/.test(q);
-
-    if (wantsStatus && !hint) return { action: 'status', provider: 'all' };
-    if (wantsStatus && hint) return { action: 'status', provider: hint };
-
-    if (wantsDisconnect) {
-      if (!hint) return { action: 'disconnect', provider: 'all' };
-      return { action: 'disconnect', provider: hint };
-    }
-
-    if (wantsConnect) {
-      if (!hint && /\b(email|inbox|mail)\b/.test(q)) return { action: 'connect', provider: 'email' };
-      if (!hint) return { action: 'connect', provider: 'all' };
-      return { action: 'connect', provider: hint };
-    }
-
-    if (wantsSync) {
-      if (!hint && /\b(email|inbox|mail|emails)\b/.test(q)) return { action: 'sync', provider: 'email' };
-      if (!hint) return { action: 'sync', provider: 'all' };
-      return { action: 'sync', provider: hint };
-    }
-
-    if (wantsSearch) {
-      const query = this.extractConnectorSearchQuery(message).trim();
-      if (!hint && /\b(email|inbox|mail|emails)\b/.test(q)) return { action: 'search', provider: 'email', query };
-      return { action: 'search', provider: hint ?? 'all', query };
-    }
-
-    return null;
-  }
-
-  private async detectComposeQuery(
-    userId: string,
-    message: string,
-  ): Promise<null | { to: string | null; subject: string | null; bodyHint: string | null; provider: 'gmail' | 'outlook' | 'email' }> {
-    if (!this.isComposeRequest(message)) return null;
-
-    const q = (message || '').toLowerCase();
-    const hint = this.parseConnectorProviderHint(message);
-    const provider: 'gmail' | 'outlook' | 'email' =
-      hint === 'gmail' ? 'gmail'
-      : hint === 'outlook' ? 'outlook'
-      : 'email';
-
-    const normalized = String(message || '').replace(/\r\n/g, '\n');
-
-    // Extract "to" — look for email address or "to <name>"
-    const emailMatch = message.match(/[\w.+-]+@[\w.-]+\.\w{2,}/);
-    const toNameMatch = message.match(/\b(?:to|for)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/);
-    const to = emailMatch?.[0] ?? toNameMatch?.[1] ?? null;
-
-    const extractField = (keys: string[], text: string, stopKeys?: string[]): string | null => {
-      // subject: "Hello" / subject: Hello / subject "Hello" / with subject Hello
-      const keyGroup = keys.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-      const reQuoted = new RegExp(`\\b(?:${keyGroup})\\b\\s*[:=]\\s*[\"""']([^\"""']{1,200})[\"""']`, 'i');
-      const reBare = new RegExp(`\\b(?:${keyGroup})\\b\\s*[:=]\\s*([^\\n]{1,200})`, 'i');
-      const reAltQuoted = new RegExp(`\\b(?:${keyGroup})\\b\\s+[\"""']([^\"""']{1,200})[\"""']`, 'i');
-      // "with subject Foo" / "and body Foo" — bare without colon
-      const reWithBare = new RegExp(`\\b(?:with|and)\\s+(?:${keyGroup})\\b\\s+([^\\n]{1,200})`, 'i');
-      const m = text.match(reQuoted) || text.match(reAltQuoted) || text.match(reBare) || text.match(reWithBare);
-      const v = m?.[1]?.trim();
-      if (!v) return null;
-      // Stop at next field marker — require "and/with" prefix OR colon/equals suffix
-      // to avoid false-positives on words like "Body" inside actual content.
-      const stops = ['body', 'message', 'text', ...(stopKeys ?? [])];
-      const stopGroup = stops.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-      return v
-        .replace(new RegExp(`\\s+(?:and|with)\\s+(?:${stopGroup})\\b\\s*[:=]?.*$`, 'i'), '')
-        .replace(new RegExp(`\\s+(?:${stopGroup})\\s*[:=].*$`, 'i'), '')
-        .trim() || null;
-    };
-
-    // Prefer explicit Subject:/Body: fields.
-    const subjectExplicit = extractField(['subject', 'subj'], normalized, ['body', 'message', 'text']);
-    const bodyExplicit = extractField(['body', 'message', 'text'], normalized, ['subject', 'subj']);
-
-    // Fallback subject — "about <topic>" or "regarding <topic>" (stop before body markers)
-    const aboutMatch = normalized.match(/\b(?:about|regarding|re:?)\s+(.{3,120}?)(?:\s+\b(?:saying|with body|with text|with message|body|message|text)\b\s*[:=]|$)/i);
-    const subject = subjectExplicit ?? (aboutMatch?.[1]?.replace(/\.$/, '').trim() ?? null);
-
-    // Body hint:
-    // 1) explicit "body:"/"message:"/"text:"
-    // 2) "saying ..." / "that ..." / "tell them ..."
-    // 3) trailing remainder after stripping "send/compose email to X" boilerplate
-    const bodyMatch = normalized.match(/\b(?:saying|that says|tell (?:him|her|them)|tell them|(?:with|and)\s+body|(?:with|and)\s+text|(?:with|and)\s+message)\b\s+([\s\S]+)$/i);
-    let bodyHint = bodyExplicit ?? (bodyMatch?.[1]?.trim() ?? null);
-    if (!bodyHint) {
-      let remainder = normalized;
-      remainder = remainder.replace(/^[\s\S]*?\b(?:to)\b\s+[\w.+-]+@[\w.-]+\.\w{2,}\b/i, ''); // drop up-to recipient email
-      remainder = remainder.replace(/\b(?:subject|subj)\b\s*[:=][^\n]*/ig, '');
-      remainder = remainder.replace(/\b(?:body|message|text)\b\s*[:=]\s*/ig, '');
-      remainder = remainder.replace(/^\s*[,\-:]\s*/, '').trim();
-      if (remainder.length >= 3) bodyHint = remainder;
-    }
-
-    // Common phrasing: "send an email saying hello to alice@..." should treat the body as "hello".
-    // If we detect the recipient email anywhere in the extracted body, strip a trailing "to <email>" suffix.
-    if (bodyHint && emailMatch?.[0]) {
-      const escaped = emailMatch[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      bodyHint = bodyHint
-        .replace(new RegExp(`\\s+(?:to\\s*[:\\-,]?\\s*)?${escaped}\\s*[.!?]?\\s*$`, 'i'), '')
-        .trim() || null;
-    }
-
-    return { to, subject, bodyHint, provider };
   }
 
   private stripComposeScaffolding(raw: string): string {
@@ -3246,6 +3049,113 @@ export class PrismaChatService {
     } as any);
   }
 
+  /* ── Edit UX: data-bank-driven complexity, answer templates, step labels ── */
+
+  private resolveEditComplexity(input: {
+    operator: string;
+    taskType: string;
+    domain: string;
+    patchCount: number;
+    scopeKind?: string;
+  }): "quick" | "extended" {
+    const op = String(input.operator || "").trim().toUpperCase();
+    const task = String(input.taskType || "").trim().toLowerCase();
+
+    // Always-extended task types
+    if (task === "translate" || task === "replace_all") return "extended";
+
+    // Override: EDIT_SPAN is always quick
+    if (op === "EDIT_SPAN") return "quick";
+
+    // EDIT_DOCX_BUNDLE heuristic
+    if (op === "EDIT_DOCX_BUNDLE") {
+      if (task === "translate") return "extended";
+      if (input.patchCount > 3) return "extended";
+      return "quick";
+    }
+
+    // EDIT_PARAGRAPH with broad scope
+    if (op === "EDIT_PARAGRAPH") {
+      if (input.scopeKind === "section" || input.scopeKind === "document") return "extended";
+      return "quick";
+    }
+
+    // ADD_PARAGRAPH is quick unless many patches
+    if (op === "ADD_PARAGRAPH") {
+      return input.patchCount > 3 ? "extended" : "quick";
+    }
+
+    // Everything else (EDIT_CELL, EDIT_RANGE, COMPUTE_BUNDLE, CREATE_CHART) is quick
+    return "quick";
+  }
+
+  private resolveAnswerTemplate(input: {
+    operator: string;
+    taskType: string;
+    domain: string;
+    lang: string;
+  }): string {
+    const bank = getOptionalBank<any>("editing_ux");
+    const templates = bank?.answerTemplates;
+    if (!templates) return "Edit applied to **{{filename}}**.";
+
+    const loc = String(input.lang || "en").toLowerCase().startsWith("pt") ? "pt" : "en";
+    const langTemplates = templates[loc] || templates["en"] || {};
+    const op = String(input.operator || "").trim().toUpperCase();
+    const task = String(input.taskType || "").trim().toLowerCase();
+
+    // Try operator__taskType first, then operator__default, then operator, then fallback
+    const key1 = `${op}__${task}`;
+    if (langTemplates[key1]) return langTemplates[key1];
+
+    const key2 = `${op}__default`;
+    if (langTemplates[key2]) return langTemplates[key2];
+
+    if (langTemplates[op]) return langTemplates[op];
+
+    return langTemplates["fallback"] || "Edit applied to **{{filename}}**.";
+  }
+
+  private interpolateTemplate(template: string, vars: Record<string, unknown>): string {
+    return template.replace(/\{\{(\w+)\}\}/g, (_match, key) => {
+      if (key === "changes_plural") {
+        const n = Number(vars["changes"] || 0);
+        return n === 1 ? "" : "s";
+      }
+      const val = vars[key];
+      if (val === undefined || val === null || val === "") return "";
+      return String(val);
+    });
+  }
+
+  private resolveStepLabel(input: {
+    stepKey: string;
+    taskType: string;
+    lang: string;
+    vars: Record<string, unknown>;
+  }): string | null {
+    const bank = getOptionalBank<any>("editing_ux");
+    const labels = bank?.stepLabels;
+    if (!labels) return null;
+
+    const loc = String(input.lang || "en").toLowerCase().startsWith("pt") ? "pt" : "en";
+    const langLabels = labels[loc] || labels["en"] || {};
+    const step = String(input.stepKey || "").trim().toUpperCase();
+    const task = String(input.taskType || "").trim().toLowerCase();
+
+    // Try step__taskType variant first
+    const variant = `${step}__${task}`;
+    let raw = langLabels[variant] || langLabels[step] || null;
+
+    // For PREVIEW_READY, use __with_changes variant when changes > 0
+    if (step === "PREVIEW_READY" && Number(input.vars?.changes || 0) > 0) {
+      raw = langLabels["PREVIEW_READY__with_changes"] || raw;
+    }
+
+    if (!raw) return null;
+    return this.interpolateTemplate(raw, input.vars);
+  }
+
   private async handleSlidesDeckRequest(params: {
     traceId: string;
     userId: string;
@@ -4157,9 +4067,32 @@ export class PrismaChatService {
     };
   }
 
-  private isAllybiDocumentScopeDirective(message: string, domain: "docx" | "xlsx"): boolean {
-    const scope = this.resolveAllybiRequestedScope({ message, domain, hasSelection: false });
+  private isAllybiDocumentScopeDirective(
+    message: string,
+    domain: "docx" | "xlsx",
+    opts?: { hasSelection?: boolean },
+  ): boolean {
+    const scope = this.resolveAllybiRequestedScope({
+      message,
+      domain,
+      hasSelection: Boolean(opts?.hasSelection),
+    });
     return scope.scopeKind === "document" || String(scope.targetHint || "").trim().toLowerCase() === "document";
+  }
+
+  private isUndoEditCommand(message: string): boolean {
+    const q = String(message || "").toLowerCase().trim();
+    if (!q) return false;
+    return (
+      /\bundo\b/.test(q) ||
+      /\bredo\b/.test(q) ||
+      /\brevert\b/.test(q) ||
+      /\bdesfazer\b/.test(q) ||
+      /\brefazer\b/.test(q) ||
+      /\breverter\b/.test(q) ||
+      /\bdeshacer\b/.test(q) ||
+      /\brehacer\b/.test(q)
+    );
   }
 
   private extractInsertAfterHint(message: string): string | null {
@@ -4192,6 +4125,19 @@ export class PrismaChatService {
     if (/\b(bullet|bullets|bullet points?|list|lista|itens?)\b/.test(q)) return "bullets";
     if (/\b(heading|header|title|t[ií]tulo|cabe[cç]alho|subheading|subt[ií]tulo)\b/.test(q)) return "heading";
     return "unknown";
+  }
+
+  private wantsSingleParagraphResult(message: string): boolean {
+    const q = String(message || "").toLowerCase();
+    if (!q) return false;
+    const en =
+      /\b(one|single)\s+paragraph\b/.test(q) ||
+      /\binto\s+(?:a|one)\s+paragraph\b/.test(q);
+    const pt =
+      /\bum\s+[uú]nico\s+par[aá]grafo\b/.test(q) ||
+      /\bem\s+um\s+[uú]nico\s+par[aá]grafo\b/.test(q) ||
+      /\bpara\s+um\s+[uú]nico\s+par[aá]grafo\b/.test(q);
+    return en || pt;
   }
 
   private extractQuotedText(message: string): string | null {
@@ -4320,9 +4266,16 @@ export class PrismaChatService {
     }
     if (disable && /\b(color|colour|cor)\b/.test(low)) styles.color = "#000000";
 
-    const sizeMatch = low.match(/\b(\d{1,2})(?:\s*(?:pt|px))\b/i) || low.match(/\bfont\s*size\s*(?:to|=)?\s*(\d{1,2})\b/i);
-    if (sizeMatch?.[1]) {
-      const n = Number(sizeMatch[1]);
+    const explicitUnitMatch = low.match(/\b(\d{1,2})(?:\s*(pt|px))\b/i);
+    const implicitSizeMatch = low.match(/\bfont\s*size\s*(?:to|=)?\s*(\d{1,2})\b/i);
+    if (explicitUnitMatch?.[1]) {
+      const raw = Number(explicitUnitMatch[1]);
+      const unit = String(explicitUnitMatch[2] || "").toLowerCase();
+      // DOCX internal style payload uses points. Convert px -> pt.
+      const asPt = unit === "px" ? Number((raw * 0.75).toFixed(2)) : raw;
+      if (Number.isFinite(asPt) && asPt >= 6 && asPt <= 72) styles.fontSizePt = asPt;
+    } else if (implicitSizeMatch?.[1]) {
+      const n = Number(implicitSizeMatch[1]);
       if (Number.isFinite(n) && n >= 6 && n <= 72) styles.fontSizePt = n;
     }
 
@@ -4388,13 +4341,18 @@ export class PrismaChatService {
     const entities = params.routingEntities && typeof params.routingEntities === "object"
       ? params.routingEntities
       : {};
-    const transform = String((entities as any)?.transform || "").trim().toLowerCase();
-    if (transform && !["", "style_change", "paragraph_style_change", "inline_style_change"].includes(transform)) {
-      return null;
-    }
 
     const inlineIntent = this.parseInlineFormattingIntent(params.message);
     const paragraphIntent = this.parseParagraphFormattingIntent(params.message);
+    const transform = String((entities as any)?.transform || "").trim().toLowerCase();
+    const hasParsedFormatting = Boolean(inlineIntent || paragraphIntent);
+    if (
+      transform &&
+      !["", "style_change", "paragraph_style_change", "inline_style_change"].includes(transform) &&
+      !hasParsedFormatting
+    ) {
+      return null;
+    }
     const inlineStyles = inlineIntent?.styles ? { ...inlineIntent.styles } : {};
     const paragraphStyles = paragraphIntent ? { ...paragraphIntent } : {};
     const enableInline = inlineIntent?.enable !== false;
@@ -5878,10 +5836,79 @@ export class PrismaChatService {
       if (sheetName && a1 && !stop.has(sheetName.toLowerCase()) && !stop.has(firstWord)) return { sheetName, a1 };
     }
 
+    // Prefer explicit target indicators such as:
+    // "set formula =SUM(D5:D8) in D9" / "put value at B2" / "into cell C5"
+    // while avoiding formula-body matches.
+    const targetCellMatch = q.match(
+      /\b(?:in|at|into)\s+(?:cell\s+)?([A-Z]{1,3}\d{1,7}(?::[A-Z]{1,3}\d{1,7})?)\s*(?:[,.\s;]|for\b|$)/i,
+    );
+    if (targetCellMatch) {
+      const idx = targetCellMatch.index || 0;
+      const before = q.slice(0, idx);
+      if (!/=\s*[A-Z]+\s*\([^)]*$/i.test(before)) {
+        return { a1: String(targetCellMatch[1] || "").toUpperCase() };
+      }
+    }
+
     // Fallback: "set B12 to 42" or "update range A1:B10"
-    const a1 = q.match(/\b([A-Z]{1,3}\d{1,7}(?::[A-Z]{1,3}\d{1,7})?)\b/);
+    const stripped = q.replace(/=\s*[A-Z]+\s*\([^)]*\)/gi, "");
+    const a1 = stripped.match(/\b([A-Z]{1,3}\d{1,7}(?::[A-Z]{1,3}\d{1,7})?)\b/);
     if (!a1) return null;
-    return { a1: a1[1] };
+    return { a1: String(a1[1] || "").toUpperCase() };
+  }
+
+  private resolveCellFactTarget(
+    message: string,
+    facts: any[],
+  ): { a1: string; sheetName?: string } | null {
+    if (!Array.isArray(facts) || !facts.length) return null;
+    const msgLow = String(message || "").toLowerCase().trim();
+    if (!msgLow) return null;
+
+    const tokenize = (value: string): string[] =>
+      String(value || "")
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N}\s]/gu, " ")
+        .split(/\s+/)
+        .map((w) => w.trim())
+        .filter((w) => w.length >= 3);
+
+    let best: { a1: string; sheetName?: string; score: number } | null = null;
+    for (const fact of facts) {
+      const rowLabel = String(fact?.rowLabel || "").trim();
+      const colHeader = String(fact?.colHeader || "").trim();
+      const cell = String(fact?.cell || "").trim();
+      if (!rowLabel || !colHeader || !cell) continue;
+
+      const rowLow = rowLabel.toLowerCase();
+      const colLow = colHeader.toLowerCase();
+      const rowWords = tokenize(rowLabel);
+      const colWords = tokenize(colHeader);
+
+      const rowMatch =
+        msgLow.includes(rowLow) ||
+        (rowWords.length > 0 && rowWords.every((w) => msgLow.includes(w)));
+      const colMatch =
+        msgLow.includes(colLow) ||
+        (colWords.length > 0 && colWords.every((w) => msgLow.includes(w)));
+      if (!rowMatch || !colMatch) continue;
+
+      const score =
+        (msgLow.includes(rowLow) ? 8 : rowWords.length) +
+        (msgLow.includes(colLow) ? 8 : colWords.length) +
+        rowLabel.length +
+        colHeader.length;
+
+      if (!best || score > best.score) {
+        best = {
+          a1: cell,
+          sheetName: String(fact?.sheet || fact?.sheetName || "").trim() || undefined,
+          score,
+        };
+      }
+    }
+
+    return best ? { a1: best.a1, sheetName: best.sheetName } : null;
   }
 
   private defaultCanonicalOperatorForRuntime(domain: EditDomain, runtimeOperator: string): string {
@@ -6257,7 +6284,13 @@ export class PrismaChatService {
             ? String(viewerSelRaw.rangeA1 || "").trim()
             : "";
       const viewerMode = Boolean((params.req.meta as any)?.viewerMode);
-      const wholeDocumentDirective = this.isAllybiDocumentScopeDirective(params.req.message, "docx");
+      const hasSelectionInput =
+        (typeof viewerSelText === "string" && viewerSelText.trim().length > 0) ||
+        (typeof viewerRangeA1 === "string" && viewerRangeA1.length > 0) ||
+        (Array.isArray(viewerRanges) && viewerRanges.length > 0);
+      const wholeDocumentDirective = this.isAllybiDocumentScopeDirective(params.req.message, "docx", {
+        hasSelection: hasSelectionInput,
+      });
       // Safety net: whole-document operations must never inherit stale locked selection.
       if (wholeDocumentDirective) {
         viewerRanges = [];
@@ -6281,68 +6314,16 @@ export class PrismaChatService {
         viewerDomainHint === "sheets" ||
         ["excel", "xlsx", "sheet", "sheets", "spreadsheet"].includes(viewerFileType);
 
-      // Structural insertion detector: "add a paragraph below/after the last bullet point in <section> ..."
-      // This must run BEFORE bulk intent detection to avoid misrouting.
-      const detectInsertBelowLastBullet = (message: string): { sectionHint: string | null } | null => {
-        const q = String(message || "").trim();
-        const low = q.toLowerCase();
-        const wantsAdd = /\b(add|insert|append)\b/.test(low) && /\bparagraph\b/.test(low);
-        const wantsBelowLastBullet =
-          (/\bbelow\b/.test(low) || /\bafter\b/.test(low)) &&
-          /\blast\b/.test(low) &&
-          /\b(bullet|bullets|bullet points|list)\b/.test(low);
-        if (!wantsAdd || !wantsBelowLastBullet) return null;
-
-        const inSection = q.match(/\b(?:in|within)\b\s+(?:the\s+)?(.+?)\s+\bsection\b/i);
-        if (inSection?.[1]) return { sectionHint: String(inSection[1]).trim() };
-
-        const underSection = q.match(/\b(?:under|below)\b\s+(.+?)\s+\bsection\b/i);
-        if (underSection?.[1]) return { sectionHint: String(underSection[1]).trim() };
-
-        const quoted = this.extractQuotedSegments(q);
-        if (quoted.length >= 1) return { sectionHint: String(quoted[0] || "").trim() || null };
-        return { sectionHint: null };
-      };
-
-      const insertBelow = detectInsertBelowLastBullet(params.req.message);
-      const bulk = insertBelow ? null : this.detectBulkEditIntent(params.req.message);
-
-      const viewerWantsChart = (() => {
-        if (!viewerMode) return false;
-        const low = String(params.req.message || "").toLowerCase();
-        const explicitChartNoun =
-          /\b(chart|graph|plot|gr[aá]fico|gr[aá]fica)\b/.test(low);
-        const explicitChartTypePhrase =
-          /\b(pie|bar|line|area|scatter|combo|bubble|radar|histogram|stacked)\s+(chart|graph|plot)\b/.test(low) ||
-          /\b(column|coluna|barra|pizza|linha|dispers[aã]o|combinad[oa]|bolha|histograma|empilhad[oa])\s+(chart|graph|gr[aá]fico)\b/.test(low);
-        const chartVerbWithType =
-          /\b(create|build|generate|make|criar|gerar|fazer)\b.{0,24}\b(pie|bar|column|line|area|scatter|combo|bubble|radar|histogram|stacked)\b/.test(low);
-        const wantsChart =
-          explicitChartNoun ||
-          explicitChartTypePhrase ||
-          chartVerbWithType;
-        if (!wantsChart) return false;
-        // Only treat chart requests as sheet edits when selection/context indicates sheets.
-        return viewerLooksLikeSheetsContext;
-      })();
-
-      const isViewerLikelyEditInstruction = (message: string): boolean => {
-        const q = String(message || "").toLowerCase();
-        // Don't force editing for obvious questions unless user also uses an edit verb.
-        const looksLikeQuestion =
-          /\?\s*$/.test(q) ||
-          /^\s*(what|why|how|when|where|who)\b/.test(q) ||
-          /\b(summarize|summarise|summary|explain)\b/.test(q);
-
-        const editVerb =
-          /\b(change|edit|rewrite|rephrase|fix|update|replace|remove|delete|add|insert|append|make|tighten|translate|traduzir|traduza|traducao|tradução|localize|localise)\b/.test(q) ||
-          /\b(create|build|generate)\b/.test(q) ||
-          /\b(chart|graph|plot)\b/.test(q) ||
-          /\b(bullet|bullets|bullet points|points)\b/.test(q);
-
-        // In the viewer, treat natural language "do X to this doc" as an edit intent.
-        return editVerb && (!looksLikeQuestion || editVerb);
-      };
+      let insertBelow: { sectionHint: string | null } | null =
+        (params.req.meta as any)?.insertBelow && typeof (params.req.meta as any)?.insertBelow === "object"
+          ? {
+              sectionHint:
+                typeof (params.req.meta as any)?.insertBelow?.sectionHint === "string"
+                  ? String((params.req.meta as any).insertBelow.sectionHint)
+                  : null,
+            }
+          : null;
+      const bulk = this.detectBulkEditIntent(params.req.message);
 
       const decision = await this.intentEngineV3.resolve({
         text: params.req.message,
@@ -6350,25 +6331,36 @@ export class PrismaChatService {
       } as any);
 
       const isEditingFamily = decision?.intentFamily === "editing";
+      const decisionDomainRaw = String((decision as any)?.signals?.editing?.domain || "").trim();
+      const decisionDomainNormalized: EditDomain | undefined =
+        decisionDomainRaw === "docx" || decisionDomainRaw === "sheets" || decisionDomainRaw === "slides"
+          ? (decisionDomainRaw as EditDomain)
+          : undefined;
+      const normalizeDomain: EditDomain = decisionDomainNormalized || (viewerLooksLikeSheetsContext ? "sheets" : "docx");
+      const normalizedDecisionOperator = normalizeEditOperator(
+        String(decision?.operator || "").trim(),
+        {
+          domain: normalizeDomain,
+          instruction: params.req.message,
+        },
+      ).operator;
+      const decisionWantsChart = normalizedDecisionOperator === "CREATE_CHART";
       const editingEntities =
         isEditingFamily && typeof (decision as any)?.signals?.editing?.entities === "object"
           ? ((decision as any).signals.editing.entities as Record<string, any>)
           : {};
-      const viewerHeuristicEdit = viewerMode && isViewerLikelyEditInstruction(params.req.message);
-      // Viewer mode should not hijack normal doc questions into "editing" just because
-      // some text is selected. Only force editing when the message itself looks like
-      // an edit instruction.
-      const shouldForceViewerEditing = viewerMode && !isEditingFamily && viewerHeuristicEdit;
+      const viewerHeuristicEdit = viewerMode && hasViewerSelection;
+      const shouldForceViewerEditing = viewerMode && !isEditingFamily && hasViewerSelection;
       const operatorRaw = isEditingFamily
         ? String(decision.operator || "").trim()
-        : (viewerWantsChart
+        : (decisionWantsChart
           ? "CREATE_CHART"
           : (shouldForceViewerEditing
           ? (viewerLooksLikeSheetsContext ? "COMPUTE_BUNDLE" : "EDIT_PARAGRAPH")
           : ""));
       const domainRaw = isEditingFamily
         ? String((decision as any)?.signals?.editing?.domain || "").trim()
-        : (viewerWantsChart ? "sheets" : (shouldForceViewerEditing ? (viewerLooksLikeSheetsContext ? "sheets" : "docx") : ""));
+        : (decisionWantsChart ? "sheets" : (shouldForceViewerEditing ? (viewerLooksLikeSheetsContext ? "sheets" : "docx") : ""));
 
       // Viewer structural insertion forces DOCX ADD_PARAGRAPH.
       const normalizedInitialOperator =
@@ -6378,32 +6370,18 @@ export class PrismaChatService {
 
       const operatorForced = (viewerMode && insertBelow) ? "ADD_PARAGRAPH" : (normalizedInitialOperator || operatorRaw);
       const domainForced = (viewerMode && insertBelow) ? "docx" : domainRaw;
-      const viewerSheetsLow = String(params.req.message || "").toLowerCase();
-      const viewerWantsTable = /\btable\b/.test(viewerSheetsLow) || /\btabela\b/.test(viewerSheetsLow);
-      const viewerWantsColumn =
-        /\b(column|coluna)\b/.test(viewerSheetsLow) &&
-        /\b(add|create|new|insert|adicionar|criar|nova|novo)\b/.test(viewerSheetsLow);
-      const viewerWantsCompute =
-        /\b(calculate|compute|sum|total|average|avg|min|max|count|calcular|somar|media|m[eé]dia|sort|filter|freeze|format|validation|dropdown|conditional|print)\b/.test(viewerSheetsLow) ||
-        /\b(ordenar|filtrar|congelar|formatar|valida[cç][aã]o|lista suspensa|condicional|impress[aã]o)\b/.test(viewerSheetsLow) ||
-        (/\b(insert|delete|remove|add)\b/.test(viewerSheetsLow) && /\b(rows?|columns?|linhas?|colunas?)\b/.test(viewerSheetsLow));
-      const viewerWantsDirectValueEdit = (
-        /\b(set|change|replace|update|write|put|make|edit)\b/.test(viewerSheetsLow) ||
-        /\b(definir|mudar|alterar|substituir|trocar|atualizar|colocar|editar)\b/.test(viewerSheetsLow)
-      ) && Boolean(
-        this.parseAfterToValue(params.req.message) ||
-        this.extractQuotedText(params.req.message),
-      );
+      const viewerHasValuePayload = Boolean(this.parseAfterToValue(params.req.message) || this.extractQuotedText(params.req.message));
+      const parsedTarget = this.parseSheetTarget(params.req.message);
+      const viewerWantsDirectValueEdit = viewerHasValuePayload && (hasViewerSelection || Boolean(parsedTarget?.a1));
 
       let operatorFinal = operatorForced;
       let domainFinal = domainForced;
       if (viewerMode && (domainForced === "sheets" || viewerLooksLikeSheetsContext)) {
         domainFinal = "sheets";
-        if (viewerWantsChart) operatorFinal = "CREATE_CHART";
-        else if (viewerWantsDirectValueEdit && hasViewerSelection) {
+        if (decisionWantsChart || operatorFinal === "CREATE_CHART") operatorFinal = "CREATE_CHART";
+        else if (viewerWantsDirectValueEdit) {
           operatorFinal = String(viewerRangeA1 || "").includes(":") ? "EDIT_RANGE" : "EDIT_CELL";
         }
-        else if (viewerWantsTable || viewerWantsColumn || viewerWantsCompute) operatorFinal = "COMPUTE_BUNDLE";
         else if (!["EDIT_CELL", "EDIT_RANGE", "ADD_SHEET", "RENAME_SHEET", "CREATE_CHART", "COMPUTE", "COMPUTE_BUNDLE"].includes(operatorFinal)) {
           operatorFinal = "COMPUTE_BUNDLE";
         }
@@ -6437,7 +6415,7 @@ export class PrismaChatService {
       ) {
         domainFinal = viewerLooksLikeSheetsContext ? "sheets" : "docx";
         operatorFinal = viewerLooksLikeSheetsContext
-          ? (viewerWantsChart ? "CREATE_CHART" : "COMPUTE_BUNDLE")
+          ? (decisionWantsChart ? "CREATE_CHART" : "COMPUTE_BUNDLE")
           : "EDIT_PARAGRAPH";
       }
 
@@ -6452,7 +6430,7 @@ export class PrismaChatService {
       if (viewerMode && domainFinal === "docx" && !supportedOperators.has(operatorFinal)) {
         // Keep viewer edit mode resilient when the intent engine returns a non-canonical
         // docx operator id (e.g. translate/rewrite aliases). Fall back to paragraph edit.
-        if (isViewerLikelyEditInstruction(params.req.message) || hasViewerSelection) {
+        if (hasViewerSelection || isEditingFamily) {
           operatorFinal = "EDIT_PARAGRAPH";
         }
       }
@@ -6599,13 +6577,12 @@ export class PrismaChatService {
         routingEntities: editingEntities,
       });
 
-      const hasExplicitSheetsSignalsInMessage = (() => {
-        const msg = String(params.req.message || "").toLowerCase();
-        if (/\b([a-z_ ]+!)?[a-z]{1,3}\d{1,7}(?::[a-z]{1,3}\d{1,7})?\b/i.test(msg)) return true;
-        if (/\b(sheet|sheets|spreadsheet|excel|cell|cells|column|row|table|chart|formula|range)\b/i.test(msg)) return true;
-        if (/\b(planilha|c[eé]lula|coluna|linha|tabela|gr[aá]fico|f[oó]rmula|intervalo)\b/i.test(msg)) return true;
-        return false;
-      })();
+      const hasExplicitSheetsSignalsInMessage =
+        domainFinal === "sheets" ||
+        normalizedDecisionOperator === "CREATE_CHART" ||
+        normalizedDecisionOperator === "COMPUTE_BUNDLE" ||
+        normalizedDecisionOperator === "EDIT_CELL" ||
+        normalizedDecisionOperator === "EDIT_RANGE";
 
       if (
         viewerMode &&
@@ -6638,13 +6615,7 @@ export class PrismaChatService {
         viewerMode &&
         isXlsxMime(docMime)
       ) {
-        const low = String(params.req.message || "").toLowerCase();
-        const wantsChart =
-          /\b(chart|graph|plot)\b/.test(low) ||
-          /\b(gr[aá]fico|gr[aá]fica)\b/.test(low) ||
-          /\b(pie|bar|column|line|area)\b/.test(low) ||
-          /\b(pizza|barra|coluna|linha|area)\b/.test(low);
-        if (wantsChart) {
+        if (decisionWantsChart || operator === "CREATE_CHART") {
           domain = "sheets";
           operator = "CREATE_CHART";
         }
@@ -6686,6 +6657,16 @@ export class PrismaChatService {
       ) {
         operator = "EDIT_DOCX_BUNDLE";
       }
+      if (
+        viewerMode &&
+        domain === "docx" &&
+        docxFormattingHint &&
+        !wholeDocumentDirective &&
+        (operator === "EDIT_PARAGRAPH" || operator === "EDIT_SPAN")
+      ) {
+        // Formatting intents must route through bundle formatting operators, not text rewrite.
+        operator = "EDIT_DOCX_BUNDLE";
+      }
 
     // Safety: ensure operator aligns with explicit A1 range mentions for direct cell/range edits.
     if (domain === "sheets") {
@@ -6697,6 +6678,73 @@ export class PrismaChatService {
     const userMsg = params.existingUserMsgId
       ? { id: params.existingUserMsgId }
       : await this.createMessage({ conversationId: params.conversationId, role: "user", content: params.req.message, userId: params.req.userId });
+
+    // Viewer quick action: undo the latest applied revision for the open document.
+    if (viewerMode && this.isUndoEditCommand(params.req.message)) {
+      const undone = await this.editHandler.execute({
+        mode: "undo",
+        context: {
+          userId: params.req.userId,
+          conversationId: params.conversationId,
+          correlationId: params.traceId,
+          clientMessageId: userMsg.id,
+          language: params.req.preferredLanguage,
+        } as any,
+        undo: {
+          documentId: doc.id,
+        },
+      });
+
+      if (!undone.ok) {
+        const text = undone.error || "Undo failed.";
+        if (params.sink?.isOpen()) {
+          params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+          params.sink.write({ event: "delta", data: { text } } as any);
+        }
+        const assistantMsg = await this.createMessage({
+          conversationId: params.conversationId,
+          role: "assistant",
+          content: text,
+          userId: params.req.userId,
+          metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+        });
+        return {
+          conversationId: params.conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: text,
+          sources: [],
+          answerMode: "action_receipt",
+          answerClass: "NAVIGATION",
+          navType: null,
+        };
+      }
+
+      const undoText = String(params.req.preferredLanguage || "").toLowerCase().startsWith("pt")
+        ? "Desfiz a última alteração neste documento."
+        : "Undid the last edit in this document.";
+      if (params.sink?.isOpen()) {
+        params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+        params.sink.write({ event: "delta", data: { text: undoText } } as any);
+      }
+      const assistantMsg = await this.createMessage({
+        conversationId: params.conversationId,
+        role: "assistant",
+        content: undoText,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+      });
+      return {
+        conversationId: params.conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: undoText,
+        sources: [],
+        answerMode: "action_receipt",
+        answerClass: "NAVIGATION",
+        navType: null,
+      };
+    }
 
     // Validate MIME early.
     if (domain === "docx" && !isDocxMime(docMime)) {
@@ -6766,10 +6814,19 @@ export class PrismaChatService {
       domain === "docx"
         ? (hasViewerSelection ? "selection" : "document")
         : (hasViewerSelection ? "selection" : "range");
+    const editLang = String(params.req.preferredLanguage || "en").toLowerCase().startsWith("pt") ? "pt" : "en";
+    const editComplexity = this.resolveEditComplexity({
+      operator,
+      taskType: editTaskType,
+      domain,
+      patchCount: 0,
+      scopeKind: initialScope,
+    });
     const baseEditVars: Record<string, unknown> = {
       taskType: editTaskType,
       operator,
       domain,
+      complexity: editComplexity,
       ...(replacePair ? { query: replacePair.from, replacement: replacePair.to } : {}),
       ...(hasViewerSelection ? { selection: true } : {}),
     };
@@ -6827,7 +6884,13 @@ export class PrismaChatService {
       }));
 
       const viewerSel = (params.req.meta as any)?.viewerSelection as any;
-      const suppressViewerSelection = this.isAllybiDocumentScopeDirective(params.req.message, "docx");
+      const hasSelectionInput =
+        (Array.isArray(viewerSel?.ranges) && viewerSel.ranges.length > 0) ||
+        (typeof viewerSel?.text === "string" && String(viewerSel.text || "").trim().length > 0) ||
+        (typeof viewerSel?.paragraphId === "string" && String(viewerSel.paragraphId || "").trim().length > 0);
+      const suppressViewerSelection = this.isAllybiDocumentScopeDirective(params.req.message, "docx", {
+        hasSelection: hasSelectionInput,
+      });
       const viewerRanges = suppressViewerSelection
         ? []
         : (Array.isArray(viewerSel?.ranges) ? viewerSel.ranges : []);
@@ -7211,30 +7274,47 @@ export class PrismaChatService {
         const lines = chunks.length >= 2 ? chunks : [compact];
         return lines.map((line) => `• ${line}`).join("\n");
       };
-      const wantsOneParagraph =
-        /\b(one|single)\s+paragraph\b/.test(low) ||
-        /\binto\s+(?:a|one)\s+paragraph\b/.test(low) ||
-        /\bmake\b.*\bparagraph\b/.test(low) ||
-        /\breplace\b.*\bparagraph\b/.test(low) ||
-        /\bsummariz(e|ing)\b.*\bparagraph\b/.test(low);
-      const wantsBulletsAsParagraphs =
-        /\b(bullets?|bullet points?|list)\b/.test(low) &&
-        !wantsOneParagraph &&
-        (
-          /\b(?:to|into|as)\s+paragraphs?\b/.test(low) ||
-          /\bremove\b.{0,24}\b(bullets?|bullet points?)\b/.test(low) ||
-          /\b(unbullet|plain paragraphs?)\b/.test(low)
-        );
+      const hintedLang = String(params.req.preferredLanguage || "").toLowerCase().startsWith("pt")
+        ? "pt"
+        : "en";
+      const allybiDocxIntentHinted = classifyAllybiIntent(
+        params.req.message,
+        "docx",
+        hintedLang,
+      );
+      const allybiDocxIntentAuto = classifyAllybiIntent(
+        params.req.message,
+        "docx",
+      );
+      const allybiDocxIntent = (() => {
+        if (!allybiDocxIntentHinted) return allybiDocxIntentAuto;
+        if (!allybiDocxIntentAuto) return allybiDocxIntentHinted;
+        // Prefer the auto-detected language classification only when it is materially
+        // more confident than the UI-hinted pass.
+        return allybiDocxIntentAuto.confidence > allybiDocxIntentHinted.confidence + 0.08
+          ? allybiDocxIntentAuto
+          : allybiDocxIntentHinted;
+      })();
+      const allybiDocxCandidate = String(allybiDocxIntent?.operatorCandidates?.[0] || "").trim();
+      const allybiDocxNormalized = allybiDocxCandidate
+        ? normalizeEditOperator(allybiDocxCandidate, { domain: "docx", instruction: params.req.message })
+        : { operator: null, canonicalOperator: null, strictActionAlias: null as any };
+      const allybiDocxCanonical = String(
+        allybiDocxNormalized?.canonicalOperator || allybiDocxCandidate || "",
+      ).toUpperCase();
+
+      const wantsBulletsAsParagraphs = allybiDocxCanonical === "DOCX_LIST_REMOVE";
       const wantsParagraphsAsBullets =
-        /\b(bullets?|bullet points?|list)\b/.test(low) &&
-        /\b(convert|turn|make|change|format|transform|divide|split|break|separate)\b/.test(low) &&
+        allybiDocxCanonical === "DOCX_LIST_APPLY_BULLETS" ||
+        allybiDocxCanonical === "DOCX_LIST_APPLY_NUMBERING";
+      const explicitSingleParagraphRequest = this.wantsSingleParagraphResult(params.req.message);
+      const wantsOneParagraph =
+        explicitSingleParagraphRequest ||
         (
-          /\bparagraphs?\b/.test(low) ||
-          /\bselected\b/.test(low) ||
-          /\bthese\b/.test(low) ||
-          /\bthis\b/.test(low) ||
-          /\bthem\b/.test(low) ||
-          /\bit\b/.test(low)
+          Boolean(viewerIsMulti) &&
+          allybiDocxIntent?.intentId === "DOCX_REWRITE" &&
+          !wantsBulletsAsParagraphs &&
+          !wantsParagraphsAsBullets
         );
 
       const collectSelectedParagraphs = () => {
@@ -7255,7 +7335,7 @@ export class PrismaChatService {
         for (const r of viewerRanges.slice(0, 60)) addByPid(String((r as any)?.paragraphId || ""));
         if (!byPid.size && viewerParagraphId) addByPid(String(viewerParagraphId));
 
-        if (!byPid.size) {
+        if (byPid.size < 2) {
           const normalize = (s: string): string =>
             this.normalizeForMatch(String(s || "").replace(/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25AA\u25CF]|[\-\*]|□)\s+/, "").trim());
           const lines = Array.from(new Set(
@@ -7284,6 +7364,20 @@ export class PrismaChatService {
               addByPid(pid);
               if (byPid.size >= Math.min(lines.length, 40)) break;
             }
+            // Fallback for long documents: when the viewer does not provide a stable paragraphId,
+            // search globally so selected bullets in later sections can still be mapped.
+            if (!byPid.size) {
+              for (const c of docxCandidates.slice(0, 3000)) {
+                const pid = String(c.paragraphId || "").trim();
+                if (!pid) continue;
+                const txt = normalize(String(c.text || ""));
+                if (!txt) continue;
+                const hit = lines.some((line) => txt === line || txt.includes(line) || line.includes(txt));
+                if (!hit) continue;
+                addByPid(pid);
+                if (byPid.size >= Math.min(lines.length, 40)) break;
+              }
+            }
           }
         }
         return Array.from(byPid.values()).slice(0, 40);
@@ -7295,7 +7389,34 @@ export class PrismaChatService {
           const shouldUseManualBullets =
             wantsParagraphsAsBullets &&
             selectedParagraphs.length === 1;
-          const patches = wantsParagraphsAsBullets
+          const mergeToSingleParagraph =
+            wantsBulletsAsParagraphs &&
+            wantsOneParagraph &&
+            selectedParagraphs.length >= 2;
+          const patches = mergeToSingleParagraph
+            ? (() => {
+                const merged = selectedParagraphs
+                  .map((p) => String(p.text || "").trim())
+                  .filter(Boolean)
+                  .join(" ")
+                  .replace(/\s+/g, " ")
+                  .trim();
+                const first = selectedParagraphs[0];
+                const out: any[] = [{
+                  kind: "docx_paragraph",
+                  paragraphId: first.paragraphId,
+                  beforeText: first.text,
+                  afterText: merged,
+                  afterHtml: this.toHtmlFromPlain(merged),
+                  sectionPath: first.sectionPath,
+                  removeNumbering: true,
+                }];
+                for (const p of selectedParagraphs.slice(1)) {
+                  out.push({ kind: "docx_delete_paragraph", paragraphId: p.paragraphId });
+                }
+                return out;
+              })()
+            : wantsParagraphsAsBullets
             ? selectedParagraphs.map((p) => {
                 const manualBullets = shouldUseManualBullets ? toManualBulletLines(p.text) : "";
                 const nextText = manualBullets || p.text;
@@ -7335,7 +7456,11 @@ export class PrismaChatService {
             }],
             decisionMargin: 1,
             isAmbiguous: false,
-            resolutionReason: wantsParagraphsAsBullets ? "paragraphs_to_bullets_selection" : "bullets_to_paragraphs_selection",
+            resolutionReason: wantsParagraphsAsBullets
+              ? "paragraphs_to_bullets_selection"
+              : mergeToSingleParagraph
+                ? "bullets_to_single_paragraph_selection"
+                : "bullets_to_paragraphs_selection",
           };
         }
       }
@@ -7389,6 +7514,18 @@ export class PrismaChatService {
               addByPid(pid);
               if (byPid.size >= Math.min(lines.length, 40)) break;
             }
+            if (byPid.size < 2) {
+              for (const c of docxCandidates.slice(0, 3000)) {
+                const pid = String(c.paragraphId || "").trim();
+                if (!pid) continue;
+                const txt = normalize(String(c.text || ""));
+                if (!txt) continue;
+                const hit = lines.some((line) => txt === line || txt.includes(line) || line.includes(txt));
+                if (!hit) continue;
+                addByPid(pid);
+                if (byPid.size >= Math.min(lines.length, 40)) break;
+              }
+            }
           }
         }
 
@@ -7425,6 +7562,7 @@ export class PrismaChatService {
           operator = "EDIT_DOCX_BUNDLE";
           beforeText = "(bundle)";
           proposedText = JSON.stringify({ patches });
+          bundlePatchesForUi = patches;
           resolvedTarget = {
             id: selectedBullets[0]!.paragraphId,
             label: "Selected bullets",
@@ -7450,26 +7588,16 @@ export class PrismaChatService {
         })();
 
       const wantsBulletsToParagraph =
-        /\b(bullets?|bullet points?)\b/i.test(params.req.message) &&
-        (/\b(one|single)\s+paragraph\b/i.test(params.req.message) || /\binto\s+(?:a|one)\s+paragraph\b/i.test(params.req.message) || /\bone\s+paragraph\b/i.test(params.req.message)) &&
-        (/\b(under|below|in\s+the\s+section|in\s+section)\b/i.test(params.req.message) || hasHeadingReference || viewerIsMulti);
+        (wantsOneParagraph || wantsBulletsAsParagraphs) &&
+        (hasHeadingReference || viewerIsMulti);
 
-      // Also support natural section phrasing without explicitly saying "bullet points":
-      // "change the organization section into a paragraph"
+      // Section rewrite-to-paragraph driven by bank intent, scoped by heading context.
       const wantsSectionToParagraph =
-        /\bsection\b/i.test(params.req.message) &&
-        /\bparagraph\b/i.test(params.req.message) &&
-        /\b(change|turn|convert|rewrite|make|transform)\b/i.test(params.req.message) &&
-        hasHeadingReference;
+        allybiDocxIntent?.intentId === "DOCX_REWRITE" &&
+        hasHeadingReference &&
+        wantsOneParagraph;
 
-      // Avoid hijacking structural insert requests like:
-      // "add a paragraph below the last bullet point in <section> ..."
-      const isInsertBelowLastBullet =
-        /\b(add|insert|append)\b/i.test(params.req.message) &&
-        /\bparagraph\b/i.test(params.req.message) &&
-        (/\bbelow\b/i.test(params.req.message) || /\bafter\b/i.test(params.req.message)) &&
-        /\blast\b/i.test(params.req.message) &&
-        /\b(bullets?|bullet points?|list)\b/i.test(params.req.message);
+      const isInsertBelowLastBullet = Boolean(insertBelow);
 
 	      if ((wantsBulletsToParagraph || wantsSectionToParagraph) && !isInsertBelowLastBullet && !preferSelectionFirst) {
           const extractHeadingHintFromQuery = (): string => {
@@ -7853,8 +7981,7 @@ export class PrismaChatService {
 
       if (!resolvedTarget) {
         const needsExplicitAnchor =
-          operator === "ADD_PARAGRAPH" &&
-          /\b(after|below|under|depois de|abaixo de)\b/i.test(params.req.message);
+          operator === "ADD_PARAGRAPH" && !viewerHasExplicitSelection && !quotedSegs.length;
         if (needsExplicitAnchor) {
           const text = "I couldn't resolve the anchor for insertion. Quote the exact heading/paragraph after which I should insert the new paragraph.";
           if (params.sink?.isOpen()) {
@@ -7882,12 +8009,13 @@ export class PrismaChatService {
 
         const wholeDocumentDirective = suppressViewerSelection;
         const rewriteLikeIntent =
-          /\b(rewrite|rephrase|reword|improve|tighten|clarify|polish|edit|refine|clean up)\b/i.test(params.req.message) ||
-          /\b(reescrev|reformular|melhorar|ajustar|clarear|refinar|editar|limpar)\b/i.test(params.req.message);
+          operator === "EDIT_PARAGRAPH" ||
+          operator === "EDIT_SPAN" ||
+          operator === "EDIT_DOCX_BUNDLE";
         const hasExplicitLocator =
           quotedSegs.length > 0 ||
-          /\b(section|heading|title|paragraph|under|below|above|after|before)\b/i.test(params.req.message) ||
-          /\b(se[cç][aã]o|t[ií]tulo|par[aá]grafo|abaixo|acima|depois|antes)\b/i.test(params.req.message);
+          Boolean(String(targetHint || "").trim()) ||
+          Boolean(viewerParagraphId);
 
         // Viewer rule: without an explicit selection/locator, never auto-pick a random
         // paragraph for rewrite-like commands. This prevents stale/implicit line locking.
@@ -7961,32 +8089,9 @@ export class PrismaChatService {
 	      if (!beforeText) beforeText = "(empty)";
 
       if (!bundlePatchesForUi) {
-        const lowSingle = String(params.req.message || "").toLowerCase();
-        const singleWantsOneParagraph =
-          /\b(one|single)\s+paragraph\b/.test(lowSingle) ||
-          /\binto\s+(?:a|one)\s+paragraph\b/.test(lowSingle) ||
-          /\bmake\b.*\bparagraph\b/.test(lowSingle) ||
-          /\breplace\b.*\bparagraph\b/.test(lowSingle) ||
-          /\bsummariz(e|ing)\b.*\bparagraph\b/.test(lowSingle);
-        const singleBulletsAsParagraphs =
-          /\b(bullets?|bullet points?|list)\b/.test(lowSingle) &&
-          !singleWantsOneParagraph &&
-          (
-            /\b(?:to|into|as)\s+paragraphs?\b/.test(lowSingle) ||
-            /\bremove\b.{0,24}\b(bullets?|bullet points?)\b/.test(lowSingle) ||
-            /\b(unbullet|plain paragraphs?)\b/.test(lowSingle)
-          );
-        const singleParagraphsAsBullets =
-          /\b(bullets?|bullet points?|list)\b/.test(lowSingle) &&
-          /\b(convert|turn|make|change|format|transform|divide|split|break|separate)\b/.test(lowSingle) &&
-          (
-            /\bparagraphs?\b/.test(lowSingle) ||
-            /\bselected\b/.test(lowSingle) ||
-            /\bthese\b/.test(lowSingle) ||
-            /\bthis\b/.test(lowSingle) ||
-            /\bthem\b/.test(lowSingle) ||
-            /\bit\b/.test(lowSingle)
-          );
+        const singleWantsOneParagraph = wantsOneParagraph;
+        const singleBulletsAsParagraphs = wantsBulletsAsParagraphs && !singleWantsOneParagraph;
+        const singleParagraphsAsBullets = wantsParagraphsAsBullets;
 
         if ((singleBulletsAsParagraphs || singleParagraphsAsBullets) && targetNode) {
           const paragraphId = String(targetNode.paragraphId || "").trim();
@@ -8039,6 +8144,55 @@ export class PrismaChatService {
           if (fromViewer) return [fromViewer];
           const fromResolved = String(resolvedTarget?.id || "").trim();
           if (fromResolved && fromResolved !== "document") return [fromResolved];
+          const headingNodes = docxCandidates.filter((c: any) => Number.isFinite(Number(c?.headingLevel)) && Number(c.headingLevel) >= 1);
+          if (!headingNodes.length) return [] as string[];
+
+          const msg = String(params.req.message || "");
+          const msgLow = this.normalizeForMatch(msg);
+          const quoted = this.extractQuotedSegments(msg).map((x) => this.normalizeForMatch(String(x || ""))).filter(Boolean);
+
+          const allHeadersRequested =
+            /\b(all|every)\s+(headers?|headings?|titles?)\b/i.test(msgLow) ||
+            /\b(todos|todas)\s+os?\s+(cabecalhos|cabecalho|titulos|titulo)\b/i.test(msgLow);
+          if (allHeadersRequested) {
+            return headingNodes
+              .map((c: any) => String(c?.paragraphId || "").trim())
+              .filter(Boolean)
+              .slice(0, 120);
+          }
+
+          const headingHint = (() => {
+            if (quoted.length) return quoted[0] || "";
+            const afterHeading =
+              msg.match(/\b(?:header|heading|title|t[ií]tulo|cabecalho|cabe[cç]alho)\s+(.+?)(?:\s+(?:to|para|as|em|in)\b|[,.!?]|$)/i)?.[1] ||
+              "";
+            if (afterHeading.trim()) return this.normalizeForMatch(afterHeading);
+            const beforeHeading =
+              msg.match(/\b(.+?)\s+(?:header|heading|title|t[ií]tulo|cabecalho|cabe[cç]alho)\b/i)?.[1] ||
+              "";
+            return this.normalizeForMatch(beforeHeading);
+          })();
+
+          if (headingHint) {
+            const scored = headingNodes
+              .map((c: any) => ({
+                id: String(c?.paragraphId || "").trim(),
+                text: this.normalizeForMatch(String(c?.text || "")),
+              }))
+              .filter((x: any) => x.id && x.text)
+              .map((x: any) => ({
+                ...x,
+                hit: x.text.includes(headingHint) || headingHint.includes(x.text),
+                score: x.text.includes(headingHint)
+                  ? headingHint.length
+                  : headingHint.includes(x.text)
+                    ? x.text.length
+                    : 0,
+              }))
+              .filter((x: any) => x.hit)
+              .sort((a: any, b: any) => b.score - a.score);
+            if (scored.length) return [scored[0].id];
+          }
           return [] as string[];
         })();
 
@@ -8530,7 +8684,22 @@ export class PrismaChatService {
         // Bundle operations (translate-all, section transforms, multi-range format)
         // must not fall through into single-paragraph rewrite generation.
         if (!String(proposedText || "").trim()) {
-          const text = "I couldn't prepare a safe document-wide draft. No paragraph was auto-targeted.";
+          const inferredIntentLang = classifyAllybiIntent(params.req.message, "docx")?.language;
+          const isPt =
+            String(params.req.preferredLanguage || "").toLowerCase().startsWith("pt") ||
+            inferredIntentLang === "pt";
+          const msgLow = this.normalizeForMatch(String(params.req.message || ""));
+          const headingCommand = /\b(header|heading|title|t[ií]tulo|cabecalho|cabe[cç]alho)\b/i.test(msgLow);
+          const formatCommand =
+            Boolean(docxFormattingHint) ||
+            /\b(format|style|styled|bold|italic|underline|font|size|color|colour|green|red|blue|negrito|it[aá]lico|sublinhad[oa]|fonte|cor|verde|vermelho|azul)\b/i.test(msgLow);
+          const text = isPt
+            ? (headingCommand && formatCommand
+              ? "Não consegui localizar o cabeçalho/título alvo para aplicar a formatação. Selecione o cabeçalho exato ou coloque o texto do cabeçalho entre aspas e tente de novo."
+              : "Não consegui preparar uma prévia segura para o documento. Nenhum parágrafo da seleção foi identificado automaticamente. Selecione novamente os bullets e tente de novo.")
+            : (headingCommand && formatCommand
+              ? "I couldn't locate the target heading/title to apply formatting. Select the exact heading or quote the heading text and try again."
+              : "I couldn't prepare a safe document-wide draft. No paragraph from your selection was auto-targeted. Reselect the bullets and try again.");
           if (params.sink?.isOpen()) {
             params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
             params.sink.write({ event: "delta", data: { text } } as any);
@@ -8864,21 +9033,31 @@ export class PrismaChatService {
         requiresConfirmation: Boolean(previewResult?.requiresConfirmation) || routingMeta.requiresConfirmation,
       };
 
+      const docxPatchCount = Array.isArray(bundlePatchesForUi) ? bundlePatchesForUi.length : (spanPatches.length || 0);
+      const docxAnswerTemplate = this.resolveAnswerTemplate({ operator, taskType: editTaskType, domain, lang: editLang });
+      const docxAnswerVars: Record<string, unknown> = {
+        filename,
+        targetHint: targetHint || locationLabel || "",
+        changes: docxPatchCount,
+        value: proposedText || "",
+        before: beforeText || "",
+        after: proposedText || "",
+        query: replacePair?.from || "",
+        replacement: replacePair?.to || "",
+        changeSummary: String(previewResult?.rationale || "").slice(0, 120) || "content updated",
+        targetLanguage: this.parseRequestedTranslationLanguage(params.req.message) || "",
+        locationHint: locationLabel ? ` after "${locationLabel}"` : "",
+        formatDetails: "",
+      };
+      const descriptiveAnswer = this.interpolateTemplate(docxAnswerTemplate, docxAnswerVars);
+
       const note = (() => {
         const n = String(previewResult?.receipt?.note || "").trim();
         if (n) return n;
-        if (operator === "EDIT_DOCX_BUNDLE" && Array.isArray(bundlePatchesForUi) && bundlePatchesForUi.length) {
-          const changeCount = bundlePatchesForUi.length;
-          const loc = String(locationLabel || resolvedForUi?.label || "").trim();
-          return `Draft prepared: ${changeCount} change${changeCount === 1 ? "" : "s"}${loc ? ` in "${loc}"` : ""}.`;
-        }
-        if (operator === "COMPUTE_BUNDLE") {
-          return "Draft prepared: review the changes, then click Apply to commit a new revision.";
-        }
-        return "Review the diff, then click Apply to create a new revision.";
+        return descriptiveAnswer;
       })();
 
-      const text = `Edit preview ready for **${filename}**.\n\n${note}`;
+      const text = `${note}\n\nReview the diff, then click **Apply** to create a new revision.`;
 
       if (params.sink?.isOpen()) {
         params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
@@ -9282,6 +9461,15 @@ export class PrismaChatService {
 	          viewerSheetNameRaw ||
 	          null;
 	        let a1 = rangeTarget.a1;
+          if (!a1) {
+            const extraction = await extractXlsxWithAnchors(bytes).catch(() => null);
+            const facts = Array.isArray((extraction as any)?.cellFacts) ? (extraction as any).cellFacts : [];
+            const match = this.resolveCellFactTarget(params.req.message, facts);
+            if (match?.a1) {
+              a1 = match.a1;
+              sheetName = sheetName || match.sheetName || null;
+            }
+          }
 
 	        const ops: any[] = [];
 
@@ -9892,7 +10080,7 @@ export class PrismaChatService {
 	        }
 
 	        // Natural command fallback: "calculate this" with selected range.
-	        if (!ops.length && viewerMode && viewerWantsCompute && sheetName && a1) {
+	        if (!ops.length && viewerMode && sheetName && a1) {
 	          const fn = "SUM";
 	          const value = await evaluateAggFromWorkbook({ sheetName, a1, fn });
 	          if (value != null) {
@@ -9924,9 +10112,6 @@ export class PrismaChatService {
 	        // Direct assignment fallback for editor-mode language:
 	        // "change/set ... to X" should write into the selected cell/range.
 	        if (!ops.length && sheetName && a1) {
-	          const wantsDirectSet =
-	            /\b(set|change|replace|update|write|put|make|edit)\b/i.test(low) ||
-	            /\b(definir|mudar|alterar|substituir|trocar|atualizar|colocar|editar)\b/i.test(low);
 	          const rawValue =
 	            this.parseAfterToValue(params.req.message) ||
 	            this.extractQuotedText(params.req.message) ||
@@ -9939,7 +10124,7 @@ export class PrismaChatService {
 	            /\bformula|f[óo]rmula\b/i.test(low) ||
 	            rawValueTrimmed.startsWith("=");
 
-	          if (wantsDirectSet && rawValueTrimmed) {
+	          if (rawValueTrimmed) {
 	            if (wantsFormula && formulaCandidate) {
 	              if (String(a1).includes(":")) {
 	                const [startRef, endRef] = String(a1).split(":");
@@ -10134,6 +10319,14 @@ export class PrismaChatService {
                 }
               }
             }
+          }
+        }
+
+        if (!a1 && facts.length) {
+          const match = this.resolveCellFactTarget(params.req.message, facts);
+          if (match?.a1) {
+            a1 = match.a1;
+            sheetName = sheetName || match.sheetName || null;
           }
         }
 
@@ -10504,9 +10697,33 @@ export class PrismaChatService {
         ? [chartPreviewAttachment, editAttachment]
         : [editAttachment];
 
+      const xlsxAnswerTemplate = this.resolveAnswerTemplate({ operator, taskType: editTaskType, domain, lang: editLang });
+      const xlsxAnswerVars: Record<string, unknown> = {
+        filename,
+        targetHint: String(targetHint || "").trim(),
+        changes: sheetDraftCount,
+        value: proposedText || "",
+        chartType: String(editTaskType === "chart" ? "chart" : "").trim(),
+        formula: "",
+        aggFn: "",
+        sourceRange: "",
+        formatType: "",
+        formatDetails: "",
+        sortDetails: "",
+        count: sheetDraftCount,
+      };
+      // Detect COMPUTE_BUNDLE sub-types from ops
+      if (operator === "COMPUTE_BUNDLE" && sheetOpsForAttachment.length) {
+        const firstOp = sheetOpsForAttachment[0] as any;
+        const kind = String(firstOp?.kind || "").toLowerCase();
+        if (kind === "formula" && firstOp?.formula) xlsxAnswerVars.formula = firstOp.formula;
+        if (kind === "format" || kind === "number_format") xlsxAnswerVars.formatType = String(firstOp?.format || firstOp?.numberFormat || "");
+      }
+      const xlsxDescriptiveAnswer = this.interpolateTemplate(xlsxAnswerTemplate, xlsxAnswerVars);
+
       const baseText = (preview.result as any)?.receipt?.note
-        ? `Edit preview ready for **${filename}**.\n\n${(preview.result as any).receipt.note}`
-        : `Edit preview ready for **${filename}**. Review the diff, then click Apply to create a new revision.`;
+        ? `${(preview.result as any).receipt.note}`
+        : `${xlsxDescriptiveAnswer}\n\nReview the diff, then click **Apply** to create a new revision.`;
       const text = chartPreviewWarning
         ? `${baseText}\n\nChart check: ${chartPreviewWarning}`
         : baseText;
@@ -10907,43 +11124,6 @@ export class PrismaChatService {
       };
     }
 
-    // --- Connector: compose/draft email ---
-    const composeQuery = await this.detectComposeQuery(req.userId, req.message);
-    if (composeQuery) {
-      const userMsg = await this.createMessage({
-        conversationId, role: 'user', content: req.message, userId: req.userId,
-      });
-
-      const out = await this.handleComposeQuery({
-        userId: req.userId,
-        conversationId,
-        correlationId: traceId,
-        clientMessageId: userMsg.id,
-        message: req.message,
-        compose: composeQuery,
-        connectorContext: req.connectorContext,
-        confirmationToken: req.confirmationToken,
-        attachedDocumentIds: req.attachedDocumentIds ?? [],
-      });
-
-      const assistantMsg = await this.createMessage({
-        conversationId, role: 'assistant', content: out.text, userId: req.userId,
-        metadata: { sources: out.sources, attachments: out.attachments, answerMode: out.answerMode as AnswerMode, answerClass: out.answerClass as AnswerClass, navType: null },
-      });
-
-      return {
-        conversationId,
-        userMessageId: userMsg.id,
-        assistantMessageId: assistantMsg.id,
-        assistantText: out.text,
-        attachmentsPayload: out.attachments,
-        sources: out.sources,
-        answerMode: out.answerMode,
-        answerClass: out.answerClass,
-        navType: null,
-      };
-    }
-
     // --- Email: bank-driven read/explain/draft/send + email+doc fusion flag ---
     let forceEmailFusion = false;
     try {
@@ -11067,13 +11247,7 @@ export class PrismaChatService {
         }
       }
     } catch {
-      // non-fatal; proceed with legacy logic and RAG
-    }
-
-    // Fallback: if the user explicitly references an email and a document, enable fusion even if
-    // the bank-driven router missed it (e.g., in dev while patterns iterate).
-    if (!forceEmailFusion && this.isEmailDocFusionRequest(req.message)) {
-      forceEmailFusion = true;
+      // non-fatal; proceed with RAG and non-email flows
     }
 
     // --- Connector: explain/summarize previous email ("summarize this email") ---
@@ -11094,43 +11268,7 @@ export class PrismaChatService {
     });
     if (emailQa) return emailQa;
 
-    // --- Connector: "latest email/message" (Outlook/Gmail/Slack) ---
-    const latestConnector = await this.detectLatestConnectorQuery(req.userId, req.message, req.connectorContext);
-    if (latestConnector) {
-      const userMsg = await this.createMessage({
-        conversationId, role: 'user', content: req.message, userId: req.userId,
-      });
-
-      const out = await this.handleLatestConnectorQuery({
-        userId: req.userId,
-        conversationId,
-        correlationId: traceId,
-        clientMessageId: userMsg.id,
-        message: req.message,
-        latest: latestConnector,
-        connectorContext: req.connectorContext,
-      });
-
-      const storedAttachments = this.toConnectorEmailRefs(out.attachments || []);
-      const assistantMsg = await this.createMessage({
-        conversationId, role: 'assistant', content: out.text, userId: req.userId,
-        metadata: { sources: out.sources, attachments: storedAttachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
-      });
-
-      return {
-        conversationId,
-        userMessageId: userMsg.id,
-        assistantMessageId: assistantMsg.id,
-        assistantText: out.text,
-        attachmentsPayload: out.attachments,
-        sources: out.sources,
-        answerMode: 'general_answer' as AnswerMode,
-        answerClass: 'GENERAL' as AnswerClass,
-        navType: null,
-      };
-    }
-
-    // --- Connector: connect/sync/status/search/disconnect (bank-driven first; fallback to legacy heuristics) ---
+    // --- Connector: connect/sync/status/search/disconnect (bank-driven) ---
     let connectorAction: null | { action: 'connect' | 'sync' | 'status' | 'search' | 'disconnect'; provider: 'gmail' | 'outlook' | 'slack' | 'email' | 'all'; query?: string } = null;
 
     try {
@@ -11156,11 +11294,7 @@ export class PrismaChatService {
         else if (op === 'CONNECTOR_DISCONNECT') connectorAction = { action: 'disconnect', provider: mappedProvider };
       }
     } catch {
-      // non-fatal; fall back to heuristics
-    }
-
-    if (!connectorAction) {
-      connectorAction = await this.detectConnectorActionQuery(req.userId, req.message);
+      // non-fatal; continue to non-connector flows
     }
 
     if (connectorAction) {
@@ -14814,48 +14948,6 @@ export class PrismaChatService {
       // non-fatal; proceed with legacy logic and RAG
     }
 
-    // --- Connector: compose/draft email (legacy fallback) ---
-    const composeQuery = await this.detectComposeQuery(params.req.userId, params.req.message);
-    if (composeQuery) {
-      const userMsg = existingUserMsgId
-        ? { id: existingUserMsgId }
-        : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
-
-      const out = await this.handleComposeQuery({
-        userId: params.req.userId,
-        conversationId,
-        correlationId: traceId,
-        clientMessageId: userMsg.id,
-        message: params.req.message,
-        compose: composeQuery,
-        connectorContext: params.req.connectorContext,
-        confirmationToken: params.req.confirmationToken,
-        attachedDocumentIds: params.req.attachedDocumentIds ?? [],
-      });
-
-      if (params.sink.isOpen()) {
-        params.sink.write({ event: 'meta', data: { answerMode: out.answerMode, answerClass: out.answerClass, navType: null } } as any);
-        params.sink.write({ event: 'delta', data: { text: out.text } } as any);
-      }
-
-      const assistantMsg = await this.createMessage({
-        conversationId, role: 'assistant', content: out.text, userId: params.req.userId,
-        metadata: { sources: out.sources, attachments: out.attachments, answerMode: out.answerMode as AnswerMode, answerClass: out.answerClass as AnswerClass, navType: null },
-      });
-
-      return {
-        conversationId,
-        userMessageId: userMsg.id,
-        assistantMessageId: assistantMsg.id,
-        assistantText: out.text,
-        attachmentsPayload: out.attachments,
-        sources: out.sources,
-        answerMode: out.answerMode,
-        answerClass: out.answerClass,
-        navType: null,
-      };
-    }
-
     // --- Connector: explain/summarize previous email ("summarize this email") ---
     const explainedPrev = await this.tryHandleExplainPreviousEmailTurn({
       traceId,
@@ -14878,62 +14970,7 @@ export class PrismaChatService {
     });
     if (emailQa) return emailQa;
 
-    // --- Connector: "latest email/message" (Outlook/Gmail/Slack) ---
-    const latestConnector = await this.detectLatestConnectorQuery(params.req.userId, params.req.message, params.req.connectorContext);
-    if (latestConnector) {
-      const userMsg = existingUserMsgId
-        ? { id: existingUserMsgId }
-        : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
-
-      // Progress UX: show connector-specific work instead of generic "Thinking…".
-      if (latestConnector.provider === "slack") {
-        this.emitStage(params.sink, { stage: 'connecting', key: 'allybi.stage.slack.checking_access' });
-        this.emitStage(params.sink, { stage: 'retrieving', key: 'allybi.stage.slack.fetching_messages' });
-      } else {
-        this.emitStage(params.sink, { stage: 'connecting', key: 'allybi.stage.email.checking_access' });
-        this.emitStage(params.sink, { stage: 'retrieving', key: 'allybi.stage.email.fetching_thread' });
-      }
-
-      const out = await this.handleLatestConnectorQuery({
-        userId: params.req.userId,
-        conversationId,
-        correlationId: traceId,
-        clientMessageId: userMsg.id,
-        message: params.req.message,
-        latest: latestConnector,
-        connectorContext: params.req.connectorContext,
-      });
-
-      if (params.sink.isOpen()) {
-        params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
-      }
-      if (out.sources.length && params.sink.isOpen()) {
-        params.sink.write({ event: 'sources', data: { sources: out.sources } } as any);
-      }
-      if (params.sink.isOpen()) {
-        params.sink.write({ event: 'delta', data: { text: out.text } } as any);
-      }
-
-      const storedAttachments = this.toConnectorEmailRefs(out.attachments || []);
-      const assistantMsg = await this.createMessage({
-        conversationId, role: 'assistant', content: out.text, userId: params.req.userId,
-        metadata: { sources: out.sources, attachments: storedAttachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
-      });
-
-      return {
-        conversationId,
-        userMessageId: userMsg.id,
-        assistantMessageId: assistantMsg.id,
-        assistantText: out.text,
-        attachmentsPayload: out.attachments,
-        sources: out.sources,
-        answerMode: 'general_answer' as AnswerMode,
-        answerClass: 'GENERAL' as AnswerClass,
-        navType: null,
-      };
-    }
-
-    // --- Connector: connect/sync/status/search/disconnect (bank-driven first; fallback to legacy heuristics) ---
+    // --- Connector: connect/sync/status/search/disconnect (bank-driven) ---
     let connectorAction: null | { action: 'connect' | 'sync' | 'status' | 'search' | 'disconnect'; provider: 'gmail' | 'outlook' | 'slack' | 'email' | 'all'; query?: string } = null;
 
     try {
@@ -14959,11 +14996,7 @@ export class PrismaChatService {
         else if (op === 'CONNECTOR_DISCONNECT') connectorAction = { action: 'disconnect', provider: mappedProvider };
       }
     } catch {
-      // non-fatal; fall back to heuristics
-    }
-
-    if (!connectorAction) {
-      connectorAction = await this.detectConnectorActionQuery(params.req.userId, params.req.message);
+      // non-fatal; continue to non-connector flows
     }
 
     if (connectorAction) {

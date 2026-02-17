@@ -11,12 +11,12 @@ describe("normalizeEditOperator", () => {
     expect(out.strictActionAlias).toBeNull();
   });
 
-  test("maps strict plan alias to sheets chart/table-aware default operator", () => {
+  test("maps strict plan alias to deterministic domain default operator", () => {
     const outChart = normalizeEditOperator("edit.plan", {
       domain: "sheets",
       instruction: "create a chart with the selected range",
     });
-    expect(outChart.operator).toBe("CREATE_CHART");
+    expect(outChart.operator).toBe("COMPUTE_BUNDLE");
     expect(outChart.strictActionAlias).toBe("plan");
 
     const outTable = normalizeEditOperator("edit.plan", {

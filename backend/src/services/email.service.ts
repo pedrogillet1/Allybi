@@ -74,16 +74,16 @@ export const sendEmail = async (to: string, subject: string, html: string): Prom
  * Sends a verification email to a new user.
  */
 export const sendVerificationEmail = async (to: string, name: string, verificationLink: string): Promise<void> => {
-  const subject = 'Verify Your Email Address for Koda';
+  const subject = 'Verify Your Email Address for Allybi';
   const html = `
     <div style="font-family: sans-serif; padding: 20px; color: #333;">
-      <h2>Welcome to Koda, ${name}!</h2>
+      <h2>Welcome to Allybi, ${name}!</h2>
       <p>Please click the button below to verify your email address and complete your registration.</p>
       <a href="${verificationLink}" style="background-color: #000; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
         Verify Email
       </a>
       <p>This link will expire in 24 hours.</p>
-      <p>If you did not sign up for Koda, please ignore this email.</p>
+      <p>If you did not sign up for Allybi, please ignore this email.</p>
     </div>
   `;
   await sendEmail(to, subject, html);
@@ -97,7 +97,7 @@ export async function sendPasswordResetEmail(
   resetLink: string,
   firstName: string = 'User'
 ): Promise<void> {
-  const subject = 'Reset Your Password - Koda';
+  const subject = 'Reset Your Password - Allybi';
   const html = `
     <!DOCTYPE html>
     <html>
@@ -127,7 +127,7 @@ export async function sendPasswordResetEmail(
           </div>
           <div class="content">
             <p>Hi ${firstName},</p>
-            <p>We received a request to reset your password for your Koda account.</p>
+            <p>We received a request to reset your password for your Allybi account.</p>
             <p>Click the button below to reset your password:</p>
             <p style="text-align: center;">
               <a href="${resetLink}" class="button">Reset Password</a>
@@ -138,7 +138,7 @@ export async function sendPasswordResetEmail(
             <p style="margin-top: 20px;">If you didn't request a password reset, you can safely ignore this email.</p>
           </div>
           <div class="footer">
-            <p>© ${new Date().getFullYear()} Koda. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Allybi. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -159,10 +159,10 @@ export async function sendPasswordResetEmail(
  * Sends a welcome email to a newly verified user.
  */
 export const sendWelcomeEmail = async (to: string, name: string): Promise<void> => {
-  const subject = 'Welcome to Koda!';
+  const subject = 'Welcome to Allybi!';
   const html = `
     <div style="font-family: sans-serif; padding: 20px; color: #333;">
-      <h2>Welcome to Koda, ${name}!</h2>
+      <h2>Welcome to Allybi, ${name}!</h2>
       <p>Your account has been successfully created.</p>
       <p>You can now start uploading and managing your documents.</p>
       <a href="${process.env.FRONTEND_URL || 'http://localhost:3001'}" style="background-color: #000; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
@@ -190,7 +190,7 @@ export const sendDocumentShareEmail = async (to: string, documentName: string, s
   const html = `
     <div style="font-family: sans-serif; padding: 20px; color: #333;">
       <h2>New Document Shared</h2>
-      <p>${sharedBy} has shared "${documentName}" with you on Koda.</p>
+      <p>${sharedBy} has shared "${documentName}" with you on Allybi.</p>
       <a href="${process.env.FRONTEND_URL}/documents" style="background-color: #000; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
         View Document
       </a>
@@ -207,10 +207,10 @@ export const generateVerificationCode = () => {
  * Sends a verification CODE email (for pending user registration).
  */
 export const sendVerificationCodeEmail = async (to: string, code: string): Promise<void> => {
-  const subject = 'Your Koda verification code';
+  const subject = 'Your Allybi code';
   const html = `
     <div style="font-family: sans-serif; padding: 20px; color: #333;">
-      <p>Your Koda verification code is: <strong>${code}</strong></p>
+      <p>Your Allybi verification code is: <strong>${code}</strong></p>
       <p>This code expires in 10 minutes.</p>
       <p>If you didn't request this code, you can safely ignore this email.</p>
     </div>

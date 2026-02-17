@@ -259,12 +259,12 @@ const FileTypeDetail = () => {
 
     try {
       if (isSelectMode && docsToMove && docsToMove.length > 0) {
-        Promise.all(docsToMove.map(docId => moveToFolder(docId, categoryId)));
+        await Promise.all(docsToMove.map(docId => moveToFolder(docId, categoryId)));
+        showSuccess(t('toasts.filesMovedSuccessfully', { count: docCount }));
         clearSelection();
         toggleSelectMode();
-        showSuccess(t('toasts.filesMovedSuccessfully', { count: docCount }));
       } else if (docToMove) {
-        moveToFolder(docToMove.id, categoryId);
+        await moveToFolder(docToMove.id, categoryId);
         showSuccess(t('toasts.fileMovedSuccessfully'));
       }
     } catch (error) {
@@ -275,6 +275,8 @@ const FileTypeDetail = () => {
 
   const handleCreateCategory = async (categoryData) => {
     // Capture state before closing modals
+    const docsToMove = isSelectMode ? Array.from(selectedDocuments) : null;
+    const docCount = selectedDocuments.size;
     const docToMove = documentToMove;
 
     // Close modals IMMEDIATELY for snappy UX
@@ -285,8 +287,15 @@ const FileTypeDetail = () => {
 
     try {
       const newFolder = await createFolder(categoryData.name, categoryData.emoji);
-      if (newFolder && docToMove) {
-        moveToFolder(docToMove.id, newFolder.id);
+
+      // Handle bulk move when in select mode
+      if (isSelectMode && docsToMove && docsToMove.length > 0) {
+        await Promise.all(docsToMove.map(docId => moveToFolder(docId, newFolder.id)));
+        showSuccess(t('toasts.filesMovedSuccessfully', { count: docCount }));
+        clearSelection();
+        toggleSelectMode();
+      } else if (newFolder && docToMove) {
+        await moveToFolder(docToMove.id, newFolder.id);
         showSuccess(t('toasts.fileMovedSuccessfully'));
       }
     } catch (error) {
@@ -819,8 +828,12 @@ const FileTypeDetail = () => {
       <MoveToCategoryModal
         isOpen={showMoveModal}
         onClose={() => { setShowMoveModal(false); setDocumentToMove(null); setSelectedCategoryId(null); }}
-        uploadedDocuments={documentToMove ? [documentToMove] : []}
-        showFilesSection={!!documentToMove}
+        uploadedDocuments={
+          isSelectMode && selectedDocuments.size > 0
+            ? filteredDocuments.filter(doc => selectedDocuments.has(doc.id))
+            : (documentToMove ? [documentToMove] : [])
+        }
+        showFilesSection={!!documentToMove || (isSelectMode && selectedDocuments.size > 0)}
         categories={getRootFolders()}
         selectedCategoryId={selectedCategoryId}
         onCategorySelect={setSelectedCategoryId}

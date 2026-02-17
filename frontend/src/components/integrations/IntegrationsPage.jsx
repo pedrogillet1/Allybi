@@ -15,15 +15,12 @@ const FONT = 'Plus Jakarta Sans, sans-serif';
 const PROVIDER_META = {
   gmail: {
     icon: gmailSvg,
-    detailRoute: ROUTES.INTEGRATIONS_GMAIL,
   },
   outlook: {
     icon: outlookSvg,
-    detailRoute: null,
   },
   slack: {
     icon: slackSvg,
-    detailRoute: null,
   },
 };
 
@@ -44,7 +41,7 @@ function Spinner({ size = 16 }) {
   );
 }
 
-function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onViewDetail, t }) {
+function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, t }) {
   const [hovered, setHovered] = useState(false);
   const meta = PROVIDER_META[provider];
   if (!meta) return null;
@@ -180,30 +177,7 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
         )}
 
         {state === 'connected' && (
-          <>
-            {meta.detailRoute && (
-              <button
-                onClick={() => onViewDetail(meta.detailRoute)}
-                style={{
-                  height: 40,
-                  padding: '0 20px',
-                  borderRadius: 9999,
-                  background: '#181818',
-                  border: 'none',
-                  color: 'white',
-                  cursor: 'pointer',
-                  fontFamily: FONT,
-                  fontWeight: 600,
-                  fontSize: 14,
-                  transition: 'background 120ms ease',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#0F0F0F'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#181818'; }}
-              >
-                {t('integrationsPage.open')}
-              </button>
-            )}
-            <button
+          <button
               onClick={() => onDisconnect(provider)}
               style={{
                 height: 40,
@@ -223,7 +197,6 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, onVie
             >
               {t('integrationsPage.disconnect')}
             </button>
-          </>
         )}
 
         {state === 'error' && (
@@ -480,7 +453,6 @@ export default function IntegrationsPage() {
                   onConnect={connectProvider}
                   onDisconnect={disconnectProvider}
                   onSync={syncNow}
-                  onViewDetail={(route) => navigate(route)}
                   t={t}
                 />
               ))}

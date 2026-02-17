@@ -639,6 +639,40 @@ const DocumentViewer = () => {
     setDocxAlignment('');
   }, [documentId]);
 
+  // Listen for edit discard events from the chat (Cancel button)
+  useEffect(() => {
+    const onEditDiscard = (e) => {
+      const es = e?.detail?.editSession;
+      if (!es) return;
+      // Match by documentId — only discard drafts for this viewer's document
+      if (es.documentId && es.documentId !== documentId) return;
+      // Discard all pending drafts in the canvas and update state
+      setDraftEdits((prev) => {
+        if (!Array.isArray(prev)) return prev;
+        return prev.map((d) => {
+          if (d?.status !== 'drafted') return d;
+          const domain = String(d?.session?.domain || '').trim().toLowerCase();
+          try {
+            if (domain === 'docx') docxCanvasRef.current?.discardDraft?.({ draftId: d.id });
+            if (domain === 'sheets') excelCanvasRef.current?.discardDraftOps?.({ draftId: d.id });
+          } catch {}
+          return { ...d, status: 'discarded' };
+        });
+      });
+      // Also mark entries in the sessions queue as discarded
+      setEditSessionsQueue((prev) => {
+        if (!Array.isArray(prev)) return prev;
+        return prev.map((entry) => {
+          if (entry?.status === 'drafted') return { ...entry, status: 'discarded' };
+          return entry;
+        });
+      });
+      setActiveDraftId('');
+    };
+    window.addEventListener('koda:edit-discard', onEditDiscard);
+    return () => window.removeEventListener('koda:edit-discard', onEditDiscard);
+  }, [documentId]);
+
   // (intentionally removed) zoom presets dropdown UI
 
   // Refs to track PDF pages for scroll position
@@ -719,8 +753,9 @@ const DocumentViewer = () => {
           resolutionReason === 'normalize_headings_docx' ||
           resolutionReason === 'heading_style_normalization';
         if (isDocumentWide) return '';
-        if (sess?.bundle && Array.isArray(sess?.bundlePatches)) {
-          const first = sess.bundlePatches.find((p) => p?.paragraphId) || null;
+        const bundlePatches = extractDocxBundlePatches(sess);
+        if (bundlePatches.length) {
+          const first = bundlePatches.find((p) => p?.paragraphId) || null;
           if (first?.paragraphId) return String(first.paragraphId);
         }
         return (
@@ -748,8 +783,9 @@ const DocumentViewer = () => {
 
         try {
           // Draft preview: apply into the live editable canvas (no revision committed yet).
-          if (s?.bundle && Array.isArray(s?.bundlePatches) && s.bundlePatches.length) {
-            await docxCanvasRef.current?.applyParagraphPatches?.({ draftId: entryId, patches: s.bundlePatches });
+          const bundlePatches = extractDocxBundlePatches(s);
+          if (bundlePatches.length) {
+            await docxCanvasRef.current?.applyParagraphPatches?.({ draftId: entryId, patches: bundlePatches });
           } else {
             const patches = Array.isArray(s?.patches) ? s.patches : [];
             const afterText = String(s?.diff?.after || s?.proposedText || '').trim();
@@ -2507,9 +2543,10 @@ const DocumentViewer = () => {
     if (lockedDocxSelection && prefersLockedSelection) return lockedDocxSelection;
 
     // Bundle sessions: jump to the first changed paragraph.
-    if (session?.bundle && Array.isArray(session?.bundlePatches)) {
-      if (session.bundlePatches.length !== 1) return '';
-      const first = session.bundlePatches.find((p) => p?.paragraphId) || null;
+    const bundlePatches = extractDocxBundlePatches(session);
+    if (bundlePatches.length) {
+      if (bundlePatches.length !== 1) return '';
+      const first = bundlePatches.find((p) => p?.paragraphId) || null;
       if (first?.paragraphId) return String(first.paragraphId);
     }
     const direct =
@@ -2538,7 +2575,7 @@ const DocumentViewer = () => {
 
   const getDraftAfterText = (session) => {
     // Bundle sessions draft via explicit paragraph patches (no single "afterText").
-    if (session?.bundle && Array.isArray(session?.bundlePatches)) return '';
+    if (extractDocxBundlePatches(session).length) return '';
     return String(session?.diff?.after || session?.proposedText || '').trim();
   };
 
@@ -2558,6 +2595,16 @@ const DocumentViewer = () => {
       try { return JSON.parse(text.slice(first, last + 1)); } catch {}
     }
     return null;
+  };
+
+  const extractDocxBundlePatches = (session) => {
+    const explicit = Array.isArray(session?.bundlePatches) ? session.bundlePatches : [];
+    if (explicit.length) return explicit;
+    const op = String(session?.operator || '').trim().toUpperCase();
+    if (op !== 'EDIT_DOCX_BUNDLE') return [];
+    const parsed = parseJsonPayload(session?.proposedText) || parseJsonPayload(session?.diff?.after) || null;
+    const parsedPatches = Array.isArray(parsed?.patches) ? parsed.patches : [];
+    return parsedPatches.filter((p) => p && typeof p === 'object');
   };
 
   const normalizeOpsList = (value) => {
@@ -2802,12 +2849,12 @@ const DocumentViewer = () => {
     const domain = String(session?.domain || '').trim().toLowerCase();
     const targetId = getEditTargetId(session);
     const afterText = getDraftAfterText(session);
-    if (domain === 'docx' && session?.bundle && Array.isArray(session?.bundlePatches)) {
+    const docxBundlePatches = extractDocxBundlePatches(session);
+    if (domain === 'docx' && docxBundlePatches.length) {
       try {
-        const bp = session.bundlePatches;
-        const first = bp.find((p) => p?.paragraphId) || null;
+        const first = docxBundlePatches.find((p) => p?.paragraphId) || null;
         const snap = first?.paragraphId ? await docxCanvasRef.current?.snapshotTarget?.(String(first.paragraphId)) : null;
-        await docxCanvasRef.current?.applyParagraphPatches?.({ draftId, patches: bp });
+        await docxCanvasRef.current?.applyParagraphPatches?.({ draftId, patches: docxBundlePatches });
         return { ok: true, snapshot: snap };
       } catch (e) {
         return { ok: false, error: e?.message || 'Failed to apply bulk draft preview.' };
@@ -2983,7 +3030,8 @@ const DocumentViewer = () => {
       setSelectionOverlay({ rects: [], frozen: false });
       return false;
     }
-    if (Array.isArray(session?.bundlePatches) && session.bundlePatches.length !== 1) {
+    const bundlePatches = extractDocxBundlePatches(session);
+    if (bundlePatches.length !== 0 && bundlePatches.length !== 1) {
       setFrozenSelection(null);
       setSelectionOverlay({ rects: [], frozen: false });
       return false;
@@ -3067,18 +3115,19 @@ const DocumentViewer = () => {
 
       // DOCX bundle edits: draft paragraph patches into the canvas for a preview,
       // then apply once to create a single new revision.
-      if (sessionDomain === 'docx' && String(session?.operator) === 'EDIT_DOCX_BUNDLE' && session?.bundle && Array.isArray(session?.bundlePatches)) {
-        await docxCanvasRef.current?.applyParagraphPatches?.({ draftId: entryId, patches: session.bundlePatches });
+      const docxBundlePatches = extractDocxBundlePatches(session);
+      if (sessionDomain === 'docx' && String(session?.operator) === 'EDIT_DOCX_BUNDLE' && docxBundlePatches.length) {
+        await docxCanvasRef.current?.applyParagraphPatches?.({ draftId: entryId, patches: docxBundlePatches });
         let bundlePayloadText = String(session.proposedText || '').trim();
         if (!bundlePayloadText) {
-          bundlePayloadText = JSON.stringify({ patches: session.bundlePatches });
+          bundlePayloadText = JSON.stringify({ patches: docxBundlePatches });
         } else {
           try {
             const parsed = JSON.parse(bundlePayloadText);
             const hasPatches = Array.isArray(parsed?.patches) && parsed.patches.length > 0;
-            if (!hasPatches) bundlePayloadText = JSON.stringify({ patches: session.bundlePatches });
+            if (!hasPatches) bundlePayloadText = JSON.stringify({ patches: docxBundlePatches });
           } catch {
-            bundlePayloadText = JSON.stringify({ patches: session.bundlePatches });
+            bundlePayloadText = JSON.stringify({ patches: docxBundlePatches });
           }
         }
         const res = await applyEdit({
@@ -3088,7 +3137,7 @@ const DocumentViewer = () => {
           documentId: session.documentId,
           beforeText: String(session.beforeText || '(bulk edit)'),
           proposedText: bundlePayloadText,
-          bundlePatches: Array.isArray(session.bundlePatches) ? session.bundlePatches : undefined,
+          bundlePatches: docxBundlePatches,
           idempotencyKey: `viewer:${entryId}:bundle`,
           expectedDocumentUpdatedAtIso: session?.baseDocumentUpdatedAtIso || undefined,
           expectedDocumentFileHash: session?.baseDocumentFileHash || undefined,
@@ -3104,14 +3153,14 @@ const DocumentViewer = () => {
         patchEditEntry(entryId, { status: 'applied', revisionId, appliedAt: new Date().toISOString() });
         if (revisionId && document?.id && revisionId !== document.id) {
           clearFrozenSelection();
-          try { sessionStorage.setItem('koda_toolbar_sync_paragraph', session?.bundlePatches?.[0]?.paragraphId || session?.target?.id || session?.targetHint || ''); } catch {}
+          try { sessionStorage.setItem('koda_toolbar_sync_paragraph', docxBundlePatches?.[0]?.paragraphId || session?.target?.id || session?.targetHint || ''); } catch {}
           navigate(buildRoute.document(revisionId));
           return true;
         }
         const accepted = await docxCanvasRef.current?.acceptDraft?.({ draftId: entryId });
         if (!accepted) await docxCanvasRef.current?.reload?.();
         clearFrozenSelection();
-        syncToolbarAfterDocxReload(session?.bundlePatches?.[0]?.paragraphId || session?.target?.id || session?.targetHint);
+        syncToolbarAfterDocxReload(docxBundlePatches?.[0]?.paragraphId || session?.target?.id || session?.targetHint);
         setEditorStatusMsg('Applied.');
         setTimeout(() => setEditorStatusMsg(''), 900);
         return true;
@@ -3385,16 +3434,21 @@ const DocumentViewer = () => {
         conversationCreateTitle={viewerConversationTitle}
         variant="viewer"
         viewerSelection={(() => {
+          const expectedDomain = String(currentFileType || "").toLowerCase() === "excel" ? "sheets" : "docx";
           const hasSel = (s) => Boolean(
             s &&
             (
+              (typeof s?.domain === "string" && String(s.domain || "").trim().toLowerCase() === expectedDomain) &&
+              (
               (typeof s?.text === 'string' && s.text.trim()) ||
               (typeof s?.rangeA1 === 'string' && s.rangeA1.trim()) ||
               (Array.isArray(s?.ranges) && s.ranges.length > 0)
+              )
             )
           );
-          if (hasSel(liveViewerSelection)) return liveViewerSelection;
+          // Prefer frozen selection in viewer mode because focus changes can clear live selection.
           if (hasSel(frozenSelection)) return frozenSelection;
+          if (hasSel(liveViewerSelection)) return liveViewerSelection;
           return null;
         })()}
         viewerContext={{
