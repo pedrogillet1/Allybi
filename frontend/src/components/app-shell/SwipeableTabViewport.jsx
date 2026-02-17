@@ -190,7 +190,11 @@ function SwipeableTabViewport({ children }) {
   const previewOpacity = Math.min(dragProgress * 2, 1);
 
   // Calculate transform
-  const transform = isActive ? `translate3d(${offset}px, 0, 0)` : 'translate3d(0, 0, 0)';
+  // IMPORTANT: Only apply transform when actively swiping or settling.
+  // A persistent transform (even identity translate3d(0,0,0)) creates a containing
+  // block for position:fixed descendants, breaking their viewport-relative positioning
+  // and causing overflow:hidden on the parent to clip them.
+  const transform = isActive || isSettling ? `translate3d(${offset}px, 0, 0)` : 'none';
 
   // Calculate transition
   const transition = isSettling

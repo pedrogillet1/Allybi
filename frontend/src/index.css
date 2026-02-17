@@ -20,7 +20,7 @@ html {
   top: 0;
   left: 0;
   color-scheme: light;
-  background-color: #FFFFFF;
+  background-color: #F1F0EF;
 }
 
 body {
@@ -32,7 +32,7 @@ body {
   width: 100%;
   top: 0;
   left: 0;
-  background-color: #FFFFFF;
+  background: #F1F0EF;
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -52,7 +52,7 @@ code {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background-color: #FFFFFF;
+  background-color: #F1F0EF;
 }
 
 /* ========================================
@@ -1322,8 +1322,8 @@ button.btn-ghost:active:not(:disabled), .btn-ghost:active:not(:disabled) {
   /* Chat interface layout with dvh */
   .chat-interface,
   [data-chat-container="true"] {
-    height: 100dvh !important;
-    height: 100vh !important; /* Fallback */
+    height: 100vh !important; /* Fallback for older browsers */
+    height: 100dvh !important; /* Preferred: dynamic viewport height on iOS */
     display: flex !important;
     flex-direction: column !important;
   }

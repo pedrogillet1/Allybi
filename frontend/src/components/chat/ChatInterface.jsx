@@ -3843,7 +3843,7 @@ export default function ChatInterface({
             bottom: isKeyboardVisible ? 8 : 70,
             padding: '8px 16px',
             background: '#F5F5F5',
-            zIndex: isKeyboardVisible ? 9999 : 19, // Above everything when keyboard open
+            zIndex: isKeyboardVisible ? 9999 : 21, // Above bottom nav (z-index: 20)
             transition: 'bottom 0.15s ease-out',
           }}
         >
