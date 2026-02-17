@@ -808,19 +808,62 @@ const DocumentsPage = () => {
         <div className="documents-content scrollable-content" style={{flex: 1, padding: isMobile ? spacing.xl : 48, paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 48, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: spacing.xl, WebkitOverflowScrolling: 'touch'}}>
           {/* Smart Categories */}
           <div style={{display: 'flex', flexDirection: 'column', gap: spacing.md}}>
+            {/* Mobile: section header with + New */}
+            {isMobile && (
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+                <div style={{
+                  color: '#32302C',
+                  fontSize: 16,
+                  fontFamily: 'Plus Jakarta Sans, sans-serif',
+                  fontWeight: 600,
+                  lineHeight: '26px',
+                }}>
+                  {t('documents.smartCategories')}
+                </div>
+                <div
+                  onClick={() => setIsModalOpen(true)}
+                  style={{
+                    height: 34,
+                    padding: '0 14px',
+                    borderRadius: 9999,
+                    border: '1px solid #E6E6EC',
+                    background: 'white',
+                    cursor: 'pointer',
+                    fontFamily: 'Plus Jakarta Sans, sans-serif',
+                    fontWeight: 600,
+                    fontSize: 13,
+                    color: '#32302C',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M7 1v12M1 7h12" stroke="#32302C" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                  {t('home.categories.new')}
+                </div>
+              </div>
+            )}
             <div style={{display: isMobile ? 'flex' : 'grid', flexDirection: isMobile ? 'column' : undefined, gridTemplateColumns: isMobile ? undefined : 'repeat(4, 1fr)', gap: spacing.md}}>
+              {/* Desktop only: New Folder card */}
+              {!isMobile && (
               <div onClick={() => setIsModalOpen(true)} style={{
-                padding: isMobile ? '10px' : `${spacing.lg}px`,
+                padding: `${spacing.lg}px`,
                 background: colors.white,
-                borderRadius: isMobile ? 14 : radius.xl,
-                border: isMobile ? '1px solid #E6E6EC' : `2px solid ${colors.gray[300]}`,
-                boxShadow: isMobile ? 'none' : '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
+                borderRadius: radius.xl,
+                border: `2px solid ${colors.gray[300]}`,
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: spacing.sm,
                 cursor: 'pointer',
                 minHeight: 72,
-                height: isMobile ? 'auto' : 72,
+                height: 72,
                 boxSizing: 'border-box',
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease'
               }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
@@ -829,6 +872,7 @@ const DocumentsPage = () => {
                 </div>
                 <span style={{color: colors.gray[900], fontSize: typography.sizes.sm, fontFamily: typography.fontFamily, fontWeight: typography.weights.semibold, lineHeight: '19.60px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, minWidth: 0}}>{t('documents.newFolder')}</span>
               </div>
+              )}
               {categories.map((category, index) => {
                 const folderSelected = isSelectMode && isFolderSelected(category.id);
                 return (

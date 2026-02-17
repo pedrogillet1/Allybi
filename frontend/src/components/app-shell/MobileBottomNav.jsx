@@ -72,13 +72,19 @@ const MobileBottomNav = () => {
     };
   }, [isMobile]);
 
-  // Auth routes where bottom nav should be hidden
-  const isAuthRoute = effectivePathname.startsWith('/a/') ||
-                      effectivePathname.startsWith('/v/') ||
-                      effectivePathname.startsWith('/r/');
+  // Auth routes where bottom nav should be hidden — check actual URL, not
+  // effectivePathname (which resolves to the background location on auth routes).
+  const actualPath = location.pathname;
+  const isAuthRoute = actualPath.startsWith('/a/') ||
+                      actualPath.startsWith('/v/') ||
+                      actualPath.startsWith('/r/') ||
+                      actualPath.startsWith('/legal/');
+
+  // Also hide when unauthenticated at root (renders UnifiedAuth inline)
+  const isRootAuth = actualPath === '/' && isUnauthenticated;
 
   // Don't render on desktop, auth pages, or when auth modal is open
-  if (!isMobile || isAuthRoute || authModalOpen) return null;
+  if (!isMobile || isAuthRoute || isRootAuth || authModalOpen) return null;
 
   // Check if current path matches any of the item's paths
   const isActive = (tabConfig) => {

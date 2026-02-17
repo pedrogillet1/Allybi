@@ -238,8 +238,8 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
         justifyContent: 'center',
         alignItems: isMobile ? 'flex-end' : 'center',
         zIndex: 1000,
-        padding: isMobile ? 0 : 16,
-        paddingBottom: isMobile ? 'env(safe-area-inset-bottom, 0px)' : 16
+        padding: isMobile ? '0 16px' : 16,
+        paddingBottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 16px)' : 16,
       }}
     >
       <div
@@ -247,9 +247,9 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
         style={{
           width: '100%',
           maxWidth: isMobile ? '100%' : 500,
-          maxHeight: isMobile ? '90vh' : '85vh',
+          maxHeight: isMobile ? 'calc(90vh - 70px)' : '85vh',
           background: 'white',
-          borderRadius: isMobile ? '14px 14px 0 0' : 14,
+          borderRadius: 14,
           outline: '1px #E6E6EC solid',
           outlineOffset: '-1px',
           display: 'flex',
@@ -259,10 +259,10 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
       >
         {/* Header */}
         <div style={{
-          paddingLeft: 18,
-          paddingRight: 18,
-          paddingTop: 18,
-          paddingBottom: 18,
+          paddingLeft: isMobile ? 14 : 18,
+          paddingRight: isMobile ? 14 : 18,
+          paddingTop: isMobile ? 14 : 18,
+          paddingBottom: isMobile ? 14 : 18,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -270,10 +270,10 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
         }}>
           <div style={{ width: 30, height: 30, opacity: 0 }} />
           <div style={{
-            width: 304,
+            flex: 1,
             textAlign: 'center',
             color: '#32302C',
-            fontSize: 18,
+            fontSize: isMobile ? 16 : 18,
             fontFamily: 'Plus Jakarta Sans',
             fontWeight: '700',
             lineHeight: '26px'
@@ -309,22 +309,22 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
           overflowX: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          gap: 18,
-          paddingTop: 18,
-          paddingBottom: 18,
+          gap: isMobile ? 14 : 18,
+          paddingTop: isMobile ? 14 : 18,
+          paddingBottom: isMobile ? 14 : 18,
           WebkitOverflowScrolling: 'touch'
         }}>
           {/* Category Name Input */}
           <div style={{
-            paddingLeft: 18,
-            paddingRight: 18,
+            paddingLeft: isMobile ? 14 : 18,
+            paddingRight: isMobile ? 14 : 18,
             display: 'flex',
             flexDirection: 'column',
             gap: 6
           }}>
           <div style={{
             color: '#32302C',
-            fontSize: 14,
+            fontSize: isMobile ? 13 : 14,
             fontFamily: 'Plus Jakarta Sans',
             fontWeight: '600',
             lineHeight: '20px'
@@ -342,16 +342,16 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
             }}
             placeholder={t('modals.createCategory.namePlaceholder')}
             style={{
-              height: 52,
-              paddingLeft: 24,
-              paddingRight: 24,
+              height: isMobile ? 44 : 52,
+              paddingLeft: isMobile ? 16 : 24,
+              paddingRight: isMobile ? 16 : 24,
               background: '#F5F5F5',
               borderRadius: 100,
               outline: nameError ? '2px #DC2626 solid' : '1px #E6E6EC solid',
               outlineOffset: '-1px',
               border: 'none',
               color: '#32302C',
-              fontSize: 16,
+              fontSize: isMobile ? 14 : 16,
               fontFamily: 'Plus Jakarta Sans',
               fontWeight: '400',
               lineHeight: '24px'
@@ -361,11 +361,11 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
 
         {/* Category Emoji Selector */}
         <div style={{
-          paddingLeft: 18,
-          paddingRight: 18,
+          paddingLeft: isMobile ? 14 : 18,
+          paddingRight: isMobile ? 14 : 18,
           display: 'flex',
           flexDirection: 'column',
-          gap: 12
+          gap: isMobile ? 8 : 12
         }}>
           <div style={{
             display: 'flex',
@@ -401,22 +401,27 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
               {showAllEmojis ? t('modals.createCategory.showLess') : t('modals.createCategory.seeAll')}
             </button>
           </div>
-          <div style={{
+          <div
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            style={{
             alignSelf: 'stretch',
             display: 'flex',
             flexWrap: showAllEmojis ? 'wrap' : 'nowrap',
-            gap: 12,
+            gap: isMobile ? 8 : 12,
             maxHeight: showAllEmojis ? 200 : 'auto',
             overflowY: showAllEmojis ? 'auto' : 'visible',
-            overflowX: showAllEmojis ? 'visible' : 'hidden'
+            overflowX: showAllEmojis ? 'visible' : 'auto',
+            WebkitOverflowScrolling: 'touch',
+            touchAction: 'pan-x',
           }}>
             {(showAllEmojis ? emojis : emojis.slice(0, 7)).map((emoji) => (
               <button
                 key={emoji}
                 onClick={() => setSelectedEmoji(emoji)}
                 style={{
-                  width: 52,
-                  height: 52,
+                  width: isMobile ? 42 : 52,
+                  height: isMobile ? 42 : 52,
                   background: selectedEmoji === emoji ? '#E6E6EC' : 'transparent',
                   borderRadius: 100,
                   border: 'none',
@@ -424,14 +429,14 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
                   alignItems: 'center',
                   display: 'flex',
                   cursor: 'pointer',
-                  fontSize: 32,
+                  fontSize: isMobile ? 24 : 32,
                   flexShrink: 0,
                   transition: 'transform 0.2s ease, background 0.2s ease'
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
               >
-                <CategoryIcon emoji={emoji} size={32} />
+                <CategoryIcon emoji={emoji} size={isMobile ? 24 : 32} />
               </button>
             ))}
           </div>
@@ -442,11 +447,11 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
 
         {/* Select Documents */}
         <div style={{
-          paddingLeft: 18,
-          paddingRight: 18,
+          paddingLeft: isMobile ? 14 : 18,
+          paddingRight: isMobile ? 14 : 18,
           display: 'flex',
           flexDirection: 'column',
-          gap: 12
+          gap: isMobile ? 8 : 12
         }}>
           <div style={{
             color: '#32302C',
@@ -479,7 +484,7 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
               placeholder={t('modals.createCategory.searchPlaceholder')}
               style={{
                 width: '100%',
-                height: 48,
+                height: isMobile ? 40 : 48,
                 paddingLeft: 44,
                 paddingRight: 20,
                 background: '#F5F5F5',
@@ -488,7 +493,7 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
                 outlineOffset: '-1px',
                 border: 'none',
                 color: '#32302C',
-                fontSize: 16,
+                fontSize: isMobile ? 14 : 16,
                 fontFamily: 'Plus Jakarta Sans',
                 fontWeight: '400',
                 lineHeight: '20px'
@@ -531,14 +536,14 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
                   onClick={() => toggleDocumentSelection(doc.id)}
                   style={{
                     alignSelf: 'stretch',
-                    padding: 14,
+                    padding: isMobile ? 10 : 14,
                     background: selectedDocuments.includes(doc.id) ? '#F0F0F0' : '#F5F5F5',
-                    borderRadius: 18,
+                    borderRadius: isMobile ? 12 : 18,
                     outline: '1px #E6E6EC solid',
                     outlineOffset: '-1px',
                     justifyContent: 'flex-start',
                     alignItems: 'center',
-                    gap: 12,
+                    gap: isMobile ? 10 : 12,
                     display: 'flex',
                     border: 'none',
                     cursor: 'pointer',
@@ -560,8 +565,8 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
                     src={getFileIcon(doc.filename)}
                     alt="File icon"
                     style={{
-                      width: 40,
-                      height: 40,
+                      width: isMobile ? 30 : 40,
+                      height: isMobile ? 30 : 40,
                       imageRendering: 'auto',
                       objectFit: 'contain',
                       shapeRendering: 'geometricPrecision',
@@ -574,17 +579,16 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: 'flex-start',
-                    gap: 6,
                     display: 'flex',
                     minWidth: 0
                   }}>
                     <div style={{
                       width: '100%',
                       color: '#32302C',
-                      fontSize: 16,
+                      fontSize: isMobile ? 13 : 16,
                       fontFamily: 'Plus Jakarta Sans',
                       fontWeight: '600',
-                      lineHeight: '22.40px',
+                      lineHeight: isMobile ? '18px' : '22.40px',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -592,7 +596,7 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
                     }}>
                       {cleanDocumentName(doc.filename)}
                     </div>
-                    <div style={{
+                    {!isMobile && <div style={{
                       width: '100%',
                       color: '#6C6B6E',
                       fontSize: 14,
@@ -602,12 +606,12 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
                       textAlign: 'left'
                     }}>
                       {formatFileSize(doc.fileSize)}
-                    </div>
+                    </div>}
                   </div>
                   <div
                     style={{
-                      width: 44,
-                      height: 44,
+                      width: isMobile ? 34 : 44,
+                      height: isMobile ? 34 : 44,
                       background: selectedDocuments.includes(doc.id) ? '#171717' : 'white',
                       borderRadius: 100,
                       outline: '1px rgba(55, 53, 47, 0.09) solid',
@@ -637,10 +641,10 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
 
         {/* Action Buttons */}
         <div style={{
-          paddingLeft: 18,
-          paddingRight: 18,
-          paddingTop: 18,
-          paddingBottom: 18,
+          paddingLeft: isMobile ? 14 : 18,
+          paddingRight: isMobile ? 14 : 18,
+          paddingTop: isMobile ? 12 : 18,
+          paddingBottom: isMobile ? 12 : 18,
           display: 'flex',
           gap: 8,
           flexShrink: 0
@@ -649,7 +653,7 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
             onClick={onClose}
             style={{
               flex: 1,
-              height: 52,
+              height: isMobile ? 44 : 52,
               background: '#F5F5F5',
               borderRadius: 100,
               outline: '1px #E6E6EC solid',
@@ -675,7 +679,7 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
             onClick={handleCreate}
             style={{
               flex: 1,
-              height: 52,
+              height: isMobile ? 44 : 52,
               background: 'rgba(24, 24, 24, 0.90)',
               borderRadius: 100,
               display: 'flex',

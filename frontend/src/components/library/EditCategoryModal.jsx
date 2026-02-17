@@ -6,6 +6,7 @@ import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import api from '../../services/api';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';
@@ -18,6 +19,7 @@ import folderIcon from '../../assets/folder_icon.svg';
 
 const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const { showError } = useNotifications();
   const [categoryName, setCategoryName] = useState('');
   const [selectedEmoji, setSelectedEmoji] = useState('__FOLDER_SVG__');
@@ -147,17 +149,19 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
         bottom: 0,
         background: 'rgba(0, 0, 0, 0.5)',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: isMobile ? 'flex-end' : 'center',
         justifyContent: 'center',
-        zIndex: 1000
+        zIndex: 1000,
+        padding: isMobile ? '0 16px' : 16,
+        paddingBottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 16px)' : 16,
       }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
           width: '100%',
-          maxWidth: 450,
-          maxHeight: '90vh',
+          maxWidth: isMobile ? '100%' : 450,
+          maxHeight: isMobile ? 'calc(90vh - 70px)' : '85vh',
           background: 'white',
           borderRadius: 14,
           outline: '1px #E6E6EC solid',
@@ -169,10 +173,10 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
         {/* Header */}
         <div style={{
           alignSelf: 'stretch',
-          paddingLeft: 18,
-          paddingRight: 18,
-          paddingTop: 18,
-          paddingBottom: 18,
+          paddingLeft: isMobile ? 14 : 18,
+          paddingRight: isMobile ? 14 : 18,
+          paddingTop: isMobile ? 14 : 18,
+          paddingBottom: isMobile ? 14 : 18,
           justifyContent: 'space-between',
           alignItems: 'center',
           display: 'flex',
@@ -187,10 +191,10 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
             display: 'flex'
           }}>
             <div style={{
-              width: 304,
+              flex: 1,
               textAlign: 'center',
               color: '#32302C',
-              fontSize: 18,
+              fontSize: isMobile ? 16 : 18,
               fontFamily: 'Plus Jakarta Sans',
               fontWeight: '700',
               lineHeight: '26px'
@@ -229,11 +233,11 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
           alignSelf: 'stretch',
           flex: 1,
           overflowY: 'auto',
-          paddingLeft: 18,
-          paddingRight: 18,
+          paddingLeft: isMobile ? 14 : 18,
+          paddingRight: isMobile ? 14 : 18,
           display: 'flex',
           flexDirection: 'column',
-          gap: 18
+          gap: isMobile ? 14 : 18
         }}>
           {/* Category Name */}
           <div style={{
@@ -246,7 +250,7 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
           }}>
             <div style={{
               color: '#32302C',
-              fontSize: 14,
+              fontSize: isMobile ? 13 : 14,
               fontFamily: 'Plus Jakarta Sans',
               fontWeight: '600',
               lineHeight: '20px'
@@ -259,9 +263,9 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
               onChange={(e) => setCategoryName(e.target.value)}
               style={{
                 alignSelf: 'stretch',
-                height: 52,
-                paddingLeft: 24,
-                paddingRight: 24,
+                height: isMobile ? 44 : 52,
+                paddingLeft: isMobile ? 16 : 24,
+                paddingRight: isMobile ? 16 : 24,
                 paddingTop: 10,
                 paddingBottom: 10,
                 background: '#F5F5F5',
@@ -271,7 +275,7 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
                 outlineOffset: '-1px',
                 border: 'none',
                 color: '#32302C',
-                fontSize: 16,
+                fontSize: isMobile ? 14 : 16,
                 fontFamily: 'Plus Jakarta Sans',
                 fontWeight: '400',
                 lineHeight: '24px'
@@ -285,7 +289,7 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
             flexDirection: 'column',
             justifyContent: 'flex-start',
             alignItems: 'flex-start',
-            gap: 12,
+            gap: isMobile ? 8 : 12,
             display: 'flex'
           }}>
             <div style={{
@@ -323,22 +327,27 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
                 {showAllEmojis ? t('modals.editCategory.showLess') : t('modals.editCategory.seeAll')}
               </button>
             </div>
-            <div style={{
+            <div
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+              style={{
               alignSelf: 'stretch',
               display: 'flex',
               flexWrap: showAllEmojis ? 'wrap' : 'nowrap',
-              gap: 12,
+              gap: isMobile ? 8 : 12,
               maxHeight: showAllEmojis ? 200 : 'auto',
               overflowY: showAllEmojis ? 'auto' : 'visible',
-              overflowX: showAllEmojis ? 'visible' : 'hidden'
+              overflowX: showAllEmojis ? 'visible' : 'auto',
+              WebkitOverflowScrolling: 'touch',
+              touchAction: 'pan-x',
             }}>
               {emojiOptions.map((emoji) => (
                 <button
                   key={emoji}
                   onClick={() => setSelectedEmoji(emoji)}
                   style={{
-                    width: 52,
-                    height: 52,
+                    width: isMobile ? 42 : 52,
+                    height: isMobile ? 42 : 52,
                     background: selectedEmoji === emoji ? '#E6E6EC' : 'transparent',
                     borderRadius: 100,
                     border: 'none',
@@ -346,7 +355,7 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
                     alignItems: 'center',
                     display: 'flex',
                     cursor: 'pointer',
-                    fontSize: 32,
+                    fontSize: isMobile ? 24 : 32,
                     flexShrink: 0,
                     transition: 'transform 0.2s ease, background 0.2s ease'
                   }}
@@ -358,8 +367,8 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
                       src={folderIcon}
                       alt="Folder"
                       style={{
-                        width: 32,
-                        height: 32
+                        width: isMobile ? 24 : 32,
+                        height: isMobile ? 24 : 32
                       }}
                     />
                   ) : (
@@ -376,7 +385,7 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
             flexDirection: 'column',
             justifyContent: 'flex-start',
             alignItems: 'flex-start',
-            gap: 16,
+            gap: isMobile ? 10 : 16,
             display: 'flex'
           }}>
             <div style={{
@@ -389,7 +398,7 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
               <div style={{
                 flex: '1 1 0',
                 color: '#32302C',
-                fontSize: 16,
+                fontSize: isMobile ? 14 : 16,
                 fontFamily: 'Plus Jakarta Sans',
                 fontWeight: '700',
                 textTransform: 'capitalize',
@@ -402,11 +411,11 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
             {/* Search */}
             <div style={{
               alignSelf: 'stretch',
-              height: 48,
+              height: isMobile ? 40 : 48,
               paddingLeft: 12,
               paddingRight: 12,
-              paddingTop: 10,
-              paddingBottom: 10,
+              paddingTop: isMobile ? 8 : 10,
+              paddingBottom: isMobile ? 8 : 10,
               background: '#F5F5F5',
               boxShadow: '0px 0px 8px 1px rgba(0, 0, 0, 0.02)',
               overflow: 'hidden',
@@ -418,7 +427,7 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
               gap: 8,
               display: 'flex'
             }}>
-              <SearchIcon style={{width: 24, height: 24, filter: 'brightness(0) invert(0.2)'}} />
+              <SearchIcon style={{width: isMobile ? 20 : 24, height: isMobile ? 20 : 24, filter: 'brightness(0) invert(0.2)'}} />
               <input
                 type="text"
                 placeholder={t('modals.editCategory.searchPlaceholder')}
@@ -430,7 +439,7 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
                   border: 'none',
                   outline: 'none',
                   color: '#32302C',
-                  fontSize: 16,
+                  fontSize: isMobile ? 14 : 16,
                   fontFamily: 'Plus Jakarta Sans',
                   fontWeight: '500',
                   lineHeight: '24px'
@@ -455,14 +464,14 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
                   onClick={() => toggleDocumentSelection(doc.id)}
                   style={{
                     alignSelf: 'stretch',
-                    padding: 14,
+                    padding: isMobile ? 10 : 14,
                     background: selectedDocuments.includes(doc.id) ? '#F0F0F0' : '#F5F5F5',
-                    borderRadius: 18,
+                    borderRadius: isMobile ? 12 : 18,
                     outline: '1px #E6E6EC solid',
                     outlineOffset: '-1px',
                     justifyContent: 'flex-start',
                     alignItems: 'center',
-                    gap: 12,
+                    gap: isMobile ? 10 : 12,
                     display: 'flex',
                     border: 'none',
                     cursor: 'pointer',
@@ -480,23 +489,23 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
                     }
                   }}
                 >
-                  <img src={getFileIcon(doc.filename)} alt="File" style={{width: 40, height: 40, flexShrink: 0, filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'}} />
+                  <img src={getFileIcon(doc.filename)} alt="File" style={{width: isMobile ? 30 : 40, height: isMobile ? 30 : 40, flexShrink: 0, filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'}} />
                   <div style={{
                     flex: '1 1 0',
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: 'flex-start',
-                    gap: 6,
+                    gap: isMobile ? 2 : 6,
                     display: 'flex',
                     minWidth: 0
                   }}>
                     <div style={{
                       width: '100%',
                       color: '#32302C',
-                      fontSize: 16,
+                      fontSize: isMobile ? 13 : 16,
                       fontFamily: 'Plus Jakarta Sans',
                       fontWeight: '600',
-                      lineHeight: '22.40px',
+                      lineHeight: isMobile ? '18px' : '22.40px',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -504,22 +513,24 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
                     }}>
                       {cleanDocumentName(doc.filename)}
                     </div>
-                    <div style={{
-                      width: '100%',
-                      color: '#6C6B6E',
-                      fontSize: 14,
-                      fontFamily: 'Plus Jakarta Sans',
-                      fontWeight: '500',
-                      lineHeight: '15.40px',
-                      textAlign: 'left'
-                    }}>
-                      {formatFileSize(doc.fileSize)}
-                    </div>
+                    {!isMobile && (
+                      <div style={{
+                        width: '100%',
+                        color: '#6C6B6E',
+                        fontSize: 14,
+                        fontFamily: 'Plus Jakarta Sans',
+                        fontWeight: '500',
+                        lineHeight: '15.40px',
+                        textAlign: 'left'
+                      }}>
+                        {formatFileSize(doc.fileSize)}
+                      </div>
+                    )}
                   </div>
                   <div
                     style={{
-                      width: 44,
-                      height: 44,
+                      width: isMobile ? 34 : 44,
+                      height: isMobile ? 34 : 44,
                       background: selectedDocuments.includes(doc.id) ? '#E4E4E8' : 'white',
                       borderRadius: 100,
                       outline: '1px rgba(55, 53, 47, 0.09) solid',
@@ -531,9 +542,9 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
                     }}
                   >
                     {selectedDocuments.includes(doc.id) ? (
-                      <CheckIcon style={{width: 16, height: 16, color: '#000000'}} />
+                      <CheckIcon style={{width: isMobile ? 14 : 16, height: isMobile ? 14 : 16, color: '#000000'}} />
                     ) : (
-                      <AddIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
+                      <AddIcon style={{width: isMobile ? 14 : 16, height: isMobile ? 14 : 16, filter: 'brightness(0) invert(0.2)'}} />
                     )}
                   </div>
                 </button>
@@ -547,10 +558,10 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
         {/* Footer Buttons */}
         <div style={{
           alignSelf: 'stretch',
-          paddingLeft: 18,
-          paddingRight: 18,
-          paddingTop: 18,
-          paddingBottom: 18,
+          paddingLeft: isMobile ? 14 : 18,
+          paddingRight: isMobile ? 14 : 18,
+          paddingTop: isMobile ? 12 : 18,
+          paddingBottom: isMobile ? 12 : 18,
           justifyContent: 'flex-start',
           alignItems: 'flex-start',
           gap: 8,
@@ -561,9 +572,9 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
             onClick={onClose}
             style={{
               flex: '1 1 0',
-              height: 52,
-              paddingLeft: 18,
-              paddingRight: 18,
+              height: isMobile ? 44 : 52,
+              paddingLeft: isMobile ? 14 : 18,
+              paddingRight: isMobile ? 14 : 18,
               paddingTop: 10,
               paddingBottom: 10,
               background: '#F5F5F5',
@@ -576,7 +587,7 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
               border: 'none',
               cursor: 'pointer',
               color: '#323232',
-              fontSize: 16,
+              fontSize: isMobile ? 14 : 16,
               fontFamily: 'Plus Jakarta Sans',
               fontWeight: '700',
               textTransform: 'capitalize',
@@ -589,7 +600,7 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
             onClick={handleConfirm}
             style={{
               flex: '1 1 0',
-              height: 52,
+              height: isMobile ? 44 : 52,
               background: 'rgba(24, 24, 24, 0.90)',
               overflow: 'hidden',
               borderRadius: 100,
@@ -599,7 +610,7 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
               border: 'none',
               cursor: 'pointer',
               color: 'white',
-              fontSize: 16,
+              fontSize: isMobile ? 14 : 16,
               fontFamily: 'Plus Jakarta Sans',
               fontWeight: '600',
               textTransform: 'capitalize',

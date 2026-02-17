@@ -5502,16 +5502,16 @@ export default function ChatInterface({
             </motion.div>
           )}
 
-          {/* Trust & Security Footer */}
-          <div style={{
-            marginTop: isMobile ? 8 : 10,
-            paddingTop: isMobile ? 6 : 8,
+          {/* Trust & Security Footer — desktop only (mobile has no room above tab bar) */}
+          {!isMobile && <div style={{
+            marginTop: 10,
+            paddingTop: 8,
             borderTop: 'none',
             display: 'flex',
             alignItems: 'flex-start',
             justifyContent: 'center',
             gap: 0,
-            fontSize: isMobile ? 11 : 12,
+            fontSize: 12,
             color: '#B9B9BD',
             fontFamily: 'Plus Jakarta Sans',
             textAlign: 'center',
@@ -5565,7 +5565,7 @@ export default function ChatInterface({
                 {t('chat.footerCookiePreferences')}
               </a>
             </span>
-          </div>
+          </div>}
         </div>
       </div>
 

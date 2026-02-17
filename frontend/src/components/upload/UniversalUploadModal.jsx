@@ -5,6 +5,7 @@ import { ROUTES } from '../../constants/routes';
 import { useAuthModal } from '../../context/AuthModalContext';
 import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
 import dropzoneIllustration from '../../assets/dropzone-files-illustration.svg';
+import dropzoneIllustrationMobile from '../../assets/dropzone-files-illustration-mobile.png';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 // ✅ REFACTORED: Use unified upload service (replaces folderUploadService + presignedUploadService)
@@ -1524,7 +1525,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
 
             {/* File Types Illustration */}
             <img
-              src={dropzoneIllustration}
+              src={isMobile ? dropzoneIllustrationMobile : dropzoneIllustration}
               alt=""
               style={{
                 width: isMobile ? 140 : 180,

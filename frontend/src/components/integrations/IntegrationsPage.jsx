@@ -446,6 +446,7 @@ export default function IntegrationsPage() {
         {/* Content */}
         <div style={{
           padding: isMobile ? 16 : 48,
+          paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 80px)' : 48,
           maxWidth: 1200,
           margin: '0 auto',
           width: '100%',

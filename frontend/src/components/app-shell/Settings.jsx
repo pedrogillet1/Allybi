@@ -367,12 +367,14 @@ const Settings = () => {
             <LanguageDropdown type="interface" variant="pill" />
           </div>
         </div>
-        <Row
-          icon={Icons.playCircle}
-          title={t('settings.introToAllybi')}
-          desc={t('settings.introToAllybiDesc')}
-          onClick={() => openOnboarding(0, 'settings')}
-        />
+        {!isMobile && (
+          <Row
+            icon={Icons.playCircle}
+            title={t('settings.introToAllybi')}
+            desc={t('settings.introToAllybiDesc')}
+            onClick={() => openOnboarding(0, 'settings')}
+          />
+        )}
         <Row
           icon={Icons.logOut}
           title={t('settings.signOut')}
@@ -548,7 +550,7 @@ const Settings = () => {
         `}</style>
 
         {/* ── Content ── */}
-        <div style={{ flex: 1, minHeight: 0, padding: isMobile ? '16px 16px 80px' : '24px 48px', overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch', maxWidth: 1200, width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
+        <div className="scrollable-content" style={{ flex: 1, minHeight: 0, padding: isMobile ? '16px 16px calc(60vh)' : '24px 48px', overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch', maxWidth: 1200, width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '220px 1fr', gap: 20, alignItems: 'start' }}>
 
             {/* ── Left: Section nav ── */}

@@ -510,30 +510,34 @@ const DocumentScanner = ({
         }
       }
 
-      // Set video source
-      if (videoRef.current) {
-        setGuidanceText('Starting camera preview...');
-        videoRef.current.srcObject = stream;
+      // Set video source — video element is always in DOM now
+      const video = videoRef.current;
+      if (!video) {
+        throw new Error('Video element not available. Please try again.');
+      }
 
-        await withTimeout(new Promise((resolve) => {
-          const video = videoRef.current;
-          if (!video) return resolve();
-          if (video.readyState >= 2) return resolve();
-          const onReady = () => resolve();
-          video.addEventListener('loadedmetadata', onReady, { once: true });
-          video.addEventListener('canplay', onReady, { once: true });
-        }), 'Camera preview failed to initialize.');
+      setGuidanceText('Starting camera preview...');
+      video.srcObject = stream;
 
-        try {
-          await withTimeout(videoRef.current.play(), 'Camera preview failed to start.');
-        } catch (playErr) {
-          // Some mobile browsers resolve metadata first and require another play attempt.
-          await new Promise((resolve) => setTimeout(resolve, 150));
-          await withTimeout(videoRef.current.play(), 'Camera preview failed to start.');
-          if (playErr) {
-            console.warn('[Scanner] First play attempt failed; second attempt succeeded.', playErr);
-          }
-        }
+      // Wait for video metadata to load
+      await withTimeout(new Promise((resolve) => {
+        if (video.readyState >= 2) return resolve();
+        const onReady = () => {
+          video.removeEventListener('loadedmetadata', onReady);
+          video.removeEventListener('canplay', onReady);
+          resolve();
+        };
+        video.addEventListener('loadedmetadata', onReady, { once: true });
+        video.addEventListener('canplay', onReady, { once: true });
+      }), 'Camera preview failed to load. Please try again.');
+
+      // Play with retry — iOS Safari sometimes needs a second attempt
+      try {
+        await withTimeout(video.play(), 'Camera preview failed to start.');
+      } catch (playErr) {
+        console.warn('[Scanner] First play() failed, retrying after delay:', playErr?.name);
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        await withTimeout(video.play(), 'Camera preview failed to start after retry.');
       }
       clearInitTimeout();
 
@@ -1155,6 +1159,27 @@ const DocumentScanner = ({
         </>
       )}
 
+      {/*
+        Video element is ALWAYS in the DOM so videoRef is available during
+        initializeCamera(). iOS Safari deactivates streams not immediately
+        attached to a visible <video>, so it must exist before getUserMedia resolves.
+      */}
+      <div style={{
+        ...styles.cameraContainer,
+        // Behind the loading overlay during init; visible once camera is ready
+        opacity: (state === SCANNER_STATES.CAMERA_READY || state === SCANNER_STATES.CAPTURING) ? 1 : 0,
+        pointerEvents: (state === SCANNER_STATES.CAMERA_READY || state === SCANNER_STATES.CAPTURING) ? 'auto' : 'none',
+      }}>
+        <video
+          ref={videoRef}
+          style={styles.video}
+          autoPlay
+          playsInline
+          muted
+        />
+        <canvas ref={overlayCanvasRef} style={styles.overlayCanvas} />
+      </div>
+
       {/* LOADING STATE */}
       {state === SCANNER_STATES.INITIALIZING && (
         <div style={styles.loadingContainer}>
@@ -1197,18 +1222,6 @@ const DocumentScanner = ({
 
           {/* Guidance text */}
           <div style={styles.guidanceText}>{guidanceText}</div>
-
-          {/* Camera */}
-          <div style={styles.cameraContainer}>
-            <video
-              ref={videoRef}
-              style={styles.video}
-              autoPlay
-              playsInline
-              muted
-            />
-            <canvas ref={overlayCanvasRef} style={styles.overlayCanvas} />
-          </div>
 
           {/* Footer */}
           <div style={styles.footer}>

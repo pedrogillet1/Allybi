@@ -1207,7 +1207,7 @@ const Documents = () => {
             gap: 24,
             alignItems: 'stretch',
           }}>
-            <div key={categoriesRefreshKey}>
+            <div key={categoriesRefreshKey} style={{ minWidth: 0 }}>
               <SmartCategoriesCard
                 categories={categories}
                 onCreateCategory={() => setIsModalOpen(true)}

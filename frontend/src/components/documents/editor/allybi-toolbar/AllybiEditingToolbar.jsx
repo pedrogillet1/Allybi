@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useIsMobile } from '../../../../hooks/useIsMobile';
 import './AllybiEditingToolbar.css';
 
 import UndoIcon from './icons/undo.svg';
@@ -135,6 +136,7 @@ export default function AllybiEditingToolbar({
   // Called when user clicks on a non-interactive (empty) area of the toolbar.
   onBackgroundClick,
 }) {
+  const isMobile = useIsMobile();
   const showWordControls = fileType === 'word' || (fileType === 'pdf' && pdfIsEditingText);
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
   const [fontMenuOpen, setFontMenuOpen] = useState(false);
@@ -858,6 +860,7 @@ export default function AllybiEditingToolbar({
               : null}
           </div>
         ) : null}
+        {!isMobile && (<>
         <button
           type="button"
           className="toolbar-btn icon-btn"
@@ -881,6 +884,7 @@ export default function AllybiEditingToolbar({
             <path d="M8 4V12M4 8H12" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
+        </>)}
       </div>
     </div>
   );

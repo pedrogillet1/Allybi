@@ -1875,7 +1875,7 @@ const CategoryDetail = () => {
           )}
         </div>
 
-        {/* Mobile Tab Bar - Search + Select + New */}
+        {/* Mobile Tab Bar - Search + Select */}
         {isMobile && !isSelectMode && (
           <div className="mobile-tab-bar" style={{
             padding: '12px 16px',
@@ -1943,96 +1943,6 @@ const CategoryDetail = () => {
             >
               {t('common.select')}
             </button>
-            {/* New Button */}
-            <div style={{ position: 'relative', flexShrink: 0 }} data-new-dropdown-mobile>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowNewDropdown(!showNewDropdown);
-                }}
-                style={{
-                  height: 40,
-                  paddingLeft: 10,
-                  paddingRight: 10,
-                  background: 'white',
-                  borderRadius: 100,
-                  border: '1px solid #E6E6EC',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  flexShrink: 0
-                }}
-              >
-                <VectorIcon style={{ width: 14, height: 13 }} />
-                <span style={{
-                  color: '#32302C',
-                  fontSize: 14,
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: '500'
-                }}>{t('common.new')}</span>
-              </button>
-              {showNewDropdown && (
-                <div style={{
-                  position: 'absolute',
-                  top: 'calc(100% + 8px)',
-                  right: 0,
-                  background: 'white',
-                  boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.12)',
-                  borderRadius: 12,
-                  border: '1px #E6E6EC solid',
-                  zIndex: 100,
-                  minWidth: 200
-                }}>
-                  <div style={{ padding: 4 }}>
-                    {/* Upload a Document */}
-                    <div
-                      onClick={() => {
-                        setShowUploadModal(true);
-                        setShowNewDropdown(false);
-                      }}
-                      style={{
-                        padding: '12px 16px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 12,
-                        borderRadius: 8
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = '#F9FAFB'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <UploadIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
-                      <span style={{ fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', color: '#32302C' }}>
-                        {t('common.uploadDocument')}
-                      </span>
-                    </div>
-                    {/* Create Folder */}
-                    <div
-                      onClick={() => {
-                        setShowCreateFolderModal(true);
-                        setShowNewDropdown(false);
-                      }}
-                      style={{
-                        padding: '12px 16px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 12,
-                        borderRadius: 8
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = '#F9FAFB'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <FolderSvgIcon style={{ width: 20, height: 20 }} />
-                      <span style={{ fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', color: '#32302C' }}>
-                        {t('common.createFolder')}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         )}
 

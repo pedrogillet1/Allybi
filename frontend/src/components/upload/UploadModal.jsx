@@ -28,9 +28,12 @@ import mp4Icon from '../../assets/mp4.png';
 import mp3Icon from '../../assets/mp3.svg';
 import folderIcon from '../../assets/folder_icon.svg';
 import dropzoneIllustration from '../../assets/dropzone-files-illustration.svg';
+import dropzoneIllustrationMobile from '../../assets/dropzone-files-illustration-mobile.png';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const { showError } = useNotifications();
   // Get context functions for optimistic uploads
   const { addDocument, moveToFolder, createFolder, getRootFolders, getDocumentCountByFolder, pauseAutoRefresh, resumeAutoRefresh, invalidateCache, fetchAllData } = useDocuments();
@@ -348,7 +351,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
               }}
             >
               {/* File Types Illustration */}
-              <img src={dropzoneIllustration} alt="" style={{ width: 180, height: 'auto', objectFit: 'contain' }} />
+              <img src={isMobile ? dropzoneIllustrationMobile : dropzoneIllustration} alt="" style={{ width: 180, height: 'auto', objectFit: 'contain' }} />
 
               {/* Text */}
               <div style={{
@@ -510,7 +513,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                 }}
               >
                 {/* File Types Illustration */}
-                <img src={dropzoneIllustration} alt="" style={{ width: 180, height: 'auto', objectFit: 'contain' }} />
+                <img src={isMobile ? dropzoneIllustrationMobile : dropzoneIllustration} alt="" style={{ width: 180, height: 'auto', objectFit: 'contain' }} />
 
                 {/* Text */}
                 <div style={{

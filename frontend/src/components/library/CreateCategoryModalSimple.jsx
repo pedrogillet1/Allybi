@@ -106,17 +106,18 @@ export default function CreateCategoryModalSimple({ isOpen, onClose, onCreate })
         justifyContent: 'center',
         alignItems: isMobile ? 'flex-end' : 'center',
         zIndex: 1001,
-        padding: isMobile ? 0 : 16
+        padding: isMobile ? '0 16px' : 16,
+        paddingBottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 16px)' : 16,
       }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: isMobile ? '100%' : '100%',
-          maxWidth: 520,
-          maxHeight: isMobile ? '90vh' : '80vh',
+          width: '100%',
+          maxWidth: isMobile ? '100%' : 520,
+          maxHeight: isMobile ? 'calc(90vh - 70px)' : '80vh',
           background: 'white',
-          borderRadius: isMobile ? '16px 16px 0 0' : 14,
+          borderRadius: 14,
           padding: 24,
           display: 'flex',
           flexDirection: 'column',

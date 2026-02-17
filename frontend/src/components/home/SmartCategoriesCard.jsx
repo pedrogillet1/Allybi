@@ -62,6 +62,7 @@ export default function SmartCategoriesCard({
       display: 'flex',
       flexDirection: 'column',
       gap: isMobile ? 8 : 12,
+      minWidth: 0,
     }}>
       {/* Section header */}
       <div style={{
@@ -69,19 +70,18 @@ export default function SmartCategoriesCard({
         justifyContent: 'space-between',
         alignItems: 'center',
       }}>
-        <h2 style={{
+        <div style={{
           color: '#32302C',
           fontSize: isMobile ? 16 : 18,
           fontFamily: 'Plus Jakarta Sans, sans-serif',
           fontWeight: 600,
           lineHeight: '26px',
-          margin: 0,
         }}>
           {t('documents.smartCategories')}
-        </h2>
+        </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div
             onClick={onCreateCategory}
             style={{
               height: 34,
@@ -94,49 +94,39 @@ export default function SmartCategoriesCard({
               fontWeight: 600,
               fontSize: 13,
               color: '#32302C',
-              transition: 'background 120ms ease',
               display: 'flex',
               alignItems: 'center',
               gap: 6,
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#F5F5F5'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'white'; }}
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <path d="M7 1v12M1 7h12" stroke="#32302C" strokeWidth="2" strokeLinecap="round"/>
             </svg>
             {t('home.categories.new')}
-          </button>
+          </div>
 
           {categories.length > 3 && (
-            <button
+            <div
               onClick={() => navigate(ROUTES.DOCUMENTS)}
-              aria-label={t('documents.seeAllCategories')}
               style={{
                 color: '#55534E',
                 fontSize: 13,
                 fontFamily: 'Plus Jakarta Sans, sans-serif',
                 fontWeight: 600,
                 cursor: 'pointer',
-                background: 'none',
-                border: 'none',
-                padding: '4px 0',
-                transition: 'color 120ms ease',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
               }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#181818'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = '#55534E'; }}
             >
               {t('home.categories.seeAll')}
               <ArrowIcon style={{ width: 14, height: 14, filter: 'brightness(0) invert(0.3)' }} aria-hidden="true" />
-            </button>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Grid */}
+      {/* Grid / Horizontal scroll */}
       {categories.length === 0 ? (
         /* Empty state */
         <div style={{
@@ -190,14 +180,213 @@ export default function SmartCategoriesCard({
             {t('home.categories.createCategory')}
           </button>
         </div>
+      ) : isMobile ? (
+        /* Mobile: horizontal scrollable cards */
+        <>
+        <style>{`.smart-cat-scroll::-webkit-scrollbar { display: none; }`}</style>
+        <div
+          role="list"
+          aria-label={t('documents.smartCategories')}
+          className="smart-cat-scroll horizontal-scroll"
+          data-horizontal-scroll
+          data-swipe-ignore
+          style={{
+            display: 'flex',
+            gap: 12,
+            overflowX: 'auto',
+            overflowY: 'hidden',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            touchAction: 'pan-x',
+            padding: '0 0 4px 0',
+          }}
+        >
+          {visible.map(category => {
+            const folderSelected = isSelectMode && isFolderSelected?.(category.id);
+            return (
+              <div
+                key={`${category.id}-${category.emoji}`}
+                role="listitem"
+                onClick={() => {
+                  if (isSelectMode) {
+                    onToggleFolder?.(category.id);
+                  } else {
+                    navigate(buildRoute.category(category.name.toLowerCase().replace(/\s+/g, '-')));
+                  }
+                }}
+                style={{
+                  width: 156,
+                  minWidth: 156,
+                  background: folderSelected ? '#F0F0F0' : 'white',
+                  borderRadius: 16,
+                  border: folderSelected ? '2px solid #32302C' : '1px solid #E6E6EC',
+                  boxShadow: '0 1px 2px rgba(24,24,24,0.06), 0 4px 12px rgba(24,24,24,0.06)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  boxSizing: 'border-box',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  overflow: 'hidden',
+                }}
+              >
+                {/* Top area with emoji/icon */}
+                <div style={{
+                  width: '100%',
+                  height: 110,
+                  background: '#F5F5F5',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                }}>
+                  <CategoryIcon emoji={category.emoji} size={80} />
+
+                  {/* Selection checkmark */}
+                  {isSelectMode && (
+                    <div style={{
+                      position: 'absolute',
+                      top: 8,
+                      left: 8,
+                      width: 22,
+                      height: 22,
+                      borderRadius: '50%',
+                      border: folderSelected ? 'none' : '2px solid #D0D0D0',
+                      background: folderSelected ? '#181818' : 'rgba(255,255,255,0.8)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 160ms ease',
+                    }}>
+                      {folderSelected && (
+                        <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M3 7L6 10L11 4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Kebab menu */}
+                  {!isSelectMode && (
+                    <button
+                      data-category-id={category.id}
+                      aria-label={`Options for ${category.name}`}
+                      onClick={e => {
+                        e.stopPropagation();
+                        const clickedId = e.currentTarget.getAttribute('data-category-id');
+                        if (categoryMenuOpen === clickedId) {
+                          setCategoryMenuOpen(null);
+                        } else {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          const dropdownHeight = 220;
+                          const dropdownWidth = 180;
+                          const spaceBelow = window.innerHeight - rect.bottom;
+                          const openUpward = spaceBelow < dropdownHeight && rect.top > dropdownHeight;
+                          let leftPos = rect.right - dropdownWidth;
+                          leftPos = Math.max(8, Math.min(leftPos, window.innerWidth - dropdownWidth - 8));
+                          setCategoryMenuPosition?.({
+                            top: openUpward ? rect.top - dropdownHeight - 4 : rect.bottom + 4,
+                            left: leftPos,
+                          });
+                          setCategoryMenuOpen(clickedId);
+                        }
+                      }}
+                      style={{
+                        position: 'absolute',
+                        top: 6,
+                        right: 6,
+                        width: 30,
+                        height: 30,
+                        background: 'transparent',
+                        borderRadius: '50%',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        padding: 0,
+                      }}
+                    >
+                      <DotsIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.3)' }} />
+                    </button>
+                  )}
+                </div>
+
+                {/* Bottom: name + file count */}
+                <div style={{
+                  padding: '10px 12px 12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                }}>
+                  <div style={{
+                    color: '#32302C',
+                    fontSize: 13,
+                    fontFamily: 'Plus Jakarta Sans, sans-serif',
+                    fontWeight: 600,
+                    lineHeight: '18px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    {category.name}
+                  </div>
+                  <div style={{
+                    color: category.fileCount ? '#6C6B6E' : '#A2A2A7',
+                    fontSize: 12,
+                    fontFamily: 'Plus Jakarta Sans, sans-serif',
+                    fontWeight: 500,
+                    lineHeight: '16px',
+                  }}>
+                    {category.fileCount || 0} {category.fileCount === 1 ? t('home.categories.file') : t('home.categories.files')}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+
+          {/* "View all categories" tile */}
+          {hasMore && (
+            <button
+              role="listitem"
+              onClick={() => navigate(ROUTES.DOCUMENTS)}
+              style={{
+                width: 156,
+                minWidth: 156,
+                background: '#F5F5F5',
+                borderRadius: 16,
+                border: '1px solid #E6E6EC',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                cursor: 'pointer',
+                fontFamily: 'Plus Jakarta Sans, sans-serif',
+                fontWeight: 600,
+                fontSize: 13,
+                color: '#55534E',
+                boxSizing: 'border-box',
+                flexShrink: 0,
+                padding: 0,
+              }}
+            >
+              {t('home.categories.viewAll')}
+              <ArrowIcon style={{ width: 14, height: 14, filter: 'brightness(0) invert(0.3)' }} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+        </>
       ) : (
+        /* Desktop: grid layout */
         <div
           role="list"
           aria-label={t('documents.smartCategories')}
           style={{
             display: 'grid',
             gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
-            gap: isMobile ? 10 : 16,
+            gap: 16,
             overflow: 'visible',
           }}
         >
@@ -252,16 +441,12 @@ export default function SmartCategoriesCard({
                 cursor: 'pointer',
               }}
               onMouseEnter={e => {
-                if (!isMobile) {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(24,24,24,0.08), 0 16px 28px rgba(24,24,24,0.10)';
-                }
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 2px 4px rgba(24,24,24,0.08), 0 16px 28px rgba(24,24,24,0.10)';
               }}
               onMouseLeave={e => {
-                if (!isMobile) {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)';
-                }
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)';
               }}
             >
               {/* Selection checkmark */}

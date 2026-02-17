@@ -128,7 +128,6 @@ code {
     flex: 1 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    height: auto !important;
     min-height: 0 !important;
     -webkit-overflow-scrolling: touch !important;
   }
@@ -142,8 +141,9 @@ code {
   }
 
   /* Ensure input areas are always visible above keyboard */
+  /* Exclude the mobile portal composer — it needs position:fixed */
   [data-input-area="true"],
-  .chat-input-area,
+  .chat-input-area:not([data-mobile-composer="true"]),
   .chat-input-wrapper,
   input[type="text"],
   input[type="email"],
@@ -948,7 +948,8 @@ button.btn-ghost:active:not(:disabled), .btn-ghost:active:not(:disabled) {
   }
 
   /* Chat input area position - NO padding here, padding is set in line 1314 */
-  .chat-input-area,
+  /* Exclude the mobile portal composer — it needs position:fixed to float above the tab bar */
+  .chat-input-area:not([data-mobile-composer="true"]),
   [data-input-area="true"] {
     position: relative !important;
     z-index: 10 !important;
@@ -1293,7 +1294,7 @@ button.btn-ghost:active:not(:disabled), .btn-ghost:active:not(:disabled) {
 .chat-interface,
 .messages-container,
 .message-item,
-.chat-input-area {
+.chat-input-area:not([data-mobile-composer="true"]) {
   will-change: transform;
 }
 
@@ -1338,14 +1339,15 @@ button.btn-ghost:active:not(:disabled), .btn-ghost:active:not(:disabled) {
   }
 
   /* Input area - padding-bottom to sit above MobileBottomNav (~72px + safe area) */
-  .chat-input-area {
+  /* Exclude the mobile portal composer (it handles its own padding) */
+  .chat-input-area:not([data-mobile-composer="true"]) {
     padding-bottom: calc(72px + max(env(safe-area-inset-bottom), 12px)) !important;
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
 
   /* Smooth transitions */
-  .chat-input-area {
+  .chat-input-area:not([data-mobile-composer="true"]) {
     transition: padding 0.2s ease !important;
   }
 
@@ -1504,43 +1506,8 @@ button.btn-ghost:active:not(:disabled), .btn-ghost:active:not(:disabled) {
   }
 }
 
-/* ========================================
-   MOBILE SETTINGS SCROLLING - DESKTOP PROTECTED
-   ======================================== */
-@media (max-width: 768px) {
-  /* Enable smooth scrolling on mobile */
-  html {
-    scroll-behavior: smooth;
-  }
-
-  /* Ensure Settings page scrolls properly */
-  .settings-page,
-  [data-page="settings"] {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch;
-    height: auto !important;
-    min-height: 100dvh !important;
-  }
-
-  /* Settings content area scrolling */
-  .settings-content {
-    overflow-y: visible !important;
-    height: auto !important;
-  }
-
-  /* Ensure sticky headers work */
-  .settings-content > div:first-child {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 10 !important;
-    background: white !important;
-  }
-}
-
-/* Desktop - NO CHANGES */
+/* Settings desktop layout */
 @media (min-width: 769px) {
-  /* Desktop layout unchanged */
   .settings-page,
   [data-page="settings"] {
     overflow: hidden;

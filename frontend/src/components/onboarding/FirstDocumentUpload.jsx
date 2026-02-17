@@ -6,6 +6,8 @@ import { ROUTES, STORAGE_KEYS } from '../../constants/routes';
 import { useDocuments } from '../../context/DocumentsContext';
 import unifiedUploadService from '../../services/unifiedUploadService';
 import dropzoneIllustration from '../../assets/dropzone-files-illustration.svg';
+import dropzoneIllustrationMobile from '../../assets/dropzone-files-illustration-mobile.png';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const DROPZONE_ACCEPT = {
   'application/pdf': ['.pdf'],
@@ -32,6 +34,7 @@ function formatFileSize(bytes) {
 export default function FirstDocumentUpload() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const { refreshDocuments } = useDocuments();
 
   // Guard: if user already completed first upload, redirect to Home
@@ -201,15 +204,15 @@ export default function FirstDocumentUpload() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
-        padding: '0 24px calc(env(safe-area-inset-bottom) + 48px)',
+        justifyContent: isMobile ? 'flex-start' : 'center',
+        padding: isMobile ? '24px 24px calc(env(safe-area-inset-bottom) + 48px)' : '0 24px calc(env(safe-area-inset-bottom) + 48px)',
         maxWidth: 560,
         width: '100%',
         margin: '0 auto',
       }}>
         {/* Illustration */}
         <img
-          src={dropzoneIllustration}
+          src={isMobile ? dropzoneIllustrationMobile : dropzoneIllustration}
           alt=""
           aria-hidden="true"
           style={{
@@ -242,44 +245,46 @@ export default function FirstDocumentUpload() {
           {t('firstUpload.subtitle')}
         </p>
 
-        {/* Dropzone */}
-        <div
-          {...getRootProps()}
-          style={{
-            width: '100%',
-            border: isDragActive ? '2px dashed #32302C' : '2px dashed #D0D0D6',
-            borderRadius: 16,
-            padding: 32,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            background: isDragActive ? '#F9F9F8' : 'transparent',
-            transition: 'border-color 160ms ease, background 160ms ease',
-            minHeight: 120,
-          }}
-        >
-          <input {...getInputProps()} />
-          <p style={{
-            fontSize: 14,
-            fontWeight: 500,
-            color: '#32302C',
-            margin: '0 0 4px',
-            textAlign: 'center',
-          }}>
-            {t('firstUpload.dropzoneText')}
-          </p>
-          <p style={{
-            fontSize: 12,
-            fontWeight: 400,
-            color: '#9B9B9E',
-            margin: 0,
-            textAlign: 'center',
-          }}>
-            {t('firstUpload.supportedFormats')}
-          </p>
-        </div>
+        {/* Dropzone — hidden on mobile (tap Select Files / Select Folder instead) */}
+        {!isMobile && (
+          <div
+            {...getRootProps()}
+            style={{
+              width: '100%',
+              border: isDragActive ? '2px dashed #32302C' : '2px dashed #D0D0D6',
+              borderRadius: 16,
+              padding: 32,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              background: isDragActive ? '#F9F9F8' : 'transparent',
+              transition: 'border-color 160ms ease, background 160ms ease',
+              minHeight: 120,
+            }}
+          >
+            <input {...getInputProps()} />
+            <p style={{
+              fontSize: 14,
+              fontWeight: 500,
+              color: '#32302C',
+              margin: '0 0 4px',
+              textAlign: 'center',
+            }}>
+              {t('firstUpload.dropzoneText')}
+            </p>
+            <p style={{
+              fontSize: 12,
+              fontWeight: 400,
+              color: '#9B9B9E',
+              margin: 0,
+              textAlign: 'center',
+            }}>
+              {t('firstUpload.supportedFormats')}
+            </p>
+          </div>
+        )}
 
         {/* Quick actions: same behavior as Upload flow */}
         <div style={{

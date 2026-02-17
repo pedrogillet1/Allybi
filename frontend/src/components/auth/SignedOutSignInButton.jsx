@@ -1,6 +1,7 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useAuthModal } from '../../context/AuthModalContext';
+import { useAuthModal, isAuthPathname } from '../../context/AuthModalContext';
 import { AUTH_MODES, STORAGE_KEYS } from '../../constants/routes';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
@@ -13,12 +14,19 @@ export default function SignedOutSignInButton() {
   const { isAuthenticated, loading } = useAuth();
   const { dismissed, isOpen, open, clearDismissed } = useAuthModal();
   const isMobile = useIsMobile();
+  const location = useLocation();
 
   if (loading) return null;
   if (isAuthenticated) return null;
   if (isOpen) return null;
   // Desktop already has a sidebar sign-in/out affordance. Avoid overlapping UI.
   if (!isMobile) return null;
+
+  // Hide on auth pages — the user is already on a sign-in/sign-up form.
+  const path = location.pathname;
+  if (isAuthPathname(path) || path.startsWith('/legal/')) return null;
+  // Root renders UnifiedAuth inline for unauthenticated users.
+  if (path === '/') return null;
 
   return (
     <button

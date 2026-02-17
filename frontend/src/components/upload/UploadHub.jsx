@@ -43,6 +43,7 @@ import mp3Icon from '../../assets/mp3.svg';
 import folderIcon from '../../assets/folder_icon.svg';
 import filesIcon from '../../assets/files-icon.svg';
 import dropzoneIllustration from '../../assets/dropzone-files-illustration.svg';
+import dropzoneIllustrationMobile from '../../assets/dropzone-files-illustration-mobile.png';
 import { generateThumbnail, supportsThumbnail } from '../../utils/files/thumbnailGenerator';
 import { encryptFile, encryptData } from '../../utils/security/encryption';
 import { extractText } from '../../utils/files/textExtraction';
@@ -2856,7 +2857,7 @@ const UploadHub = () => {
                   onBlur={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
                 >
                   {/* File type illustration */}
-                  <img src={dropzoneIllustration} alt="" style={{ width: 180, height: 86, objectFit: 'contain', marginBottom: 16 }} />
+                  <img src={isMobile ? dropzoneIllustrationMobile : dropzoneIllustration} alt="" style={{ width: 180, height: 86, objectFit: 'contain', marginBottom: 16 }} />
 
                   {/* Headline */}
                   <p style={{
@@ -2931,8 +2932,8 @@ const UploadHub = () => {
               <input ref={folderInputRef} type="file" webkitdirectory="" directory="" multiple onChange={handleFolderSelect} style={{ display: 'none' }} />
             </div>
 
-            {/* ═══ RIGHT: Destination Card (span 4) ═══ */}
-            <div style={{
+            {/* ═══ RIGHT: Destination Card (span 4) — desktop only ═══ */}
+            {!isMobile && <div style={{
               background: 'white', borderRadius: 16, border: '1px solid #E6E6EC',
               boxShadow: '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)',
               display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0,
@@ -3095,7 +3096,7 @@ const UploadHub = () => {
                   </div>
                 </>
               )}
-            </div>
+            </div>}
 
           </div>
 
@@ -3103,7 +3104,7 @@ const UploadHub = () => {
           <div style={{
             background: 'white', borderRadius: 16, border: '1px solid #E6E6EC',
             boxShadow: '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)',
-            padding: 24, marginTop: 24,
+            padding: 24, marginTop: isMobile ? -8 : 24,
           }}>
             {/* Files header */}
             {(() => {
