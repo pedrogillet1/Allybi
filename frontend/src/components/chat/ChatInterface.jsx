@@ -5108,27 +5108,25 @@ export default function ChatInterface({
                             </div>
                           ) : null}
 
-                          {/* Source pill + action icons (Copy/Regenerate) */}
+                          {/* Action icons (Copy/Regenerate) + Source pill */}
                           {!isStreamingMsg && !isError && m.answerMode !== 'nav_pills' ? (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: suppressPlainFileMatch ? -2 : (String(assistantCleanText || "").trim() ? 10 : 0), width: '100%' }}>
-                              {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded')) || m.answerMode === 'action_receipt') ? (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                                  {renderSources(m)}
-                                </div>
-                              ) : null}
-                              <MessageActions
-                                message={m}
-                                onRegenerate={m.id === lastAssistant?.id ? regenerateLastAnswer : () => {
-                                  const idx = messages.indexOf(m);
-                                  let userMsg = null;
-                                  for (let i = idx - 1; i >= 0; i--) {
-                                    if (messages[i].role === "user") { userMsg = messages[i]; break; }
-                                  }
-                                  if (userMsg?.content) setInput(userMsg.content);
-                                  setTimeout(() => inputRef.current?.focus(), 10);
-                                }}
-                                isRegenerating={isStreaming && m.id === lastAssistant?.id}
-                              />
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                                <MessageActions
+                                  message={m}
+                                  onRegenerate={m.id === lastAssistant?.id ? regenerateLastAnswer : () => {
+                                    const idx = messages.indexOf(m);
+                                    let userMsg = null;
+                                    for (let i = idx - 1; i >= 0; i--) {
+                                      if (messages[i].role === "user") { userMsg = messages[i]; break; }
+                                    }
+                                    if (userMsg?.content) setInput(userMsg.content);
+                                    setTimeout(() => inputRef.current?.focus(), 10);
+                                  }}
+                                  isRegenerating={isStreaming && m.id === lastAssistant?.id}
+                                />
+                                {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded')) || m.answerMode === 'action_receipt') ? renderSources(m) : null}
+                              </div>
                               {Array.isArray(m.followups) && m.followups.length > 0 && (
                                 <div className="koda-followup-chips" style={{ marginTop: 4 }}>
                                   <FollowUpChips

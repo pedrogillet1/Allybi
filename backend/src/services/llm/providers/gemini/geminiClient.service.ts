@@ -294,7 +294,8 @@ export class GeminiClientService implements LLMClient {
         const { value, done } = await reader.read();
         if (done) break;
 
-        buffer += decoder.decode(value, { stream: true });
+        // Normalize \r\n → \n (Gemini API sometimes returns \r\n line endings)
+        buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, '\n');
 
         // Process complete SSE events as they arrive
         let boundary: number;
