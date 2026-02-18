@@ -341,12 +341,12 @@
 
 .formatting-toolbar.allybi-one-line .toolbar-section {
   flex-wrap: nowrap;
-  gap: 12px; /* slightly more breathing room */
+  gap: 8px;
 }
 
 .formatting-toolbar.allybi-one-line .toolbar-section.allybi-fontsize-section {
-  margin-left: 10px;
-  gap: 14px; /* more space between font name and size */
+  margin-left: 6px;
+  gap: 8px;
 }
 
 .formatting-toolbar.allybi-one-line .toolbar-btn.allybi-font-readout{
@@ -366,23 +366,38 @@
 }
 
 .formatting-toolbar.allybi-one-line .toolbar-section.allybi-format-section {
-  margin-left: 26px; /* more space between font-size and formatting icons */
-}
-
-.formatting-toolbar.allybi-one-line .toolbar-section.allybi-color-section {
   margin-left: 10px;
 }
 
+.formatting-toolbar.allybi-one-line .toolbar-section.allybi-color-section {
+  margin-left: 6px;
+}
+
 .formatting-toolbar.allybi-one-line .toolbar-section.allybi-list-section {
-  margin-left: 18px;
+  margin-left: 8px;
 }
 
 .formatting-toolbar.allybi-one-line .toolbar-section.allybi-align-section {
-  margin-left: 14px;
+  margin-left: 8px;
 }
 
 .formatting-toolbar.allybi-one-line .toolbar-btn.icon-btn {
   line-height: 0;
+}
+
+/* Keep control sizing stable when the assistant panel opens. */
+.formatting-toolbar.allybi-one-line .toolbar-btn,
+.formatting-toolbar.allybi-one-line .toolbar-select,
+.formatting-toolbar.allybi-one-line .toolbar-input,
+.formatting-toolbar.allybi-one-line .zoom-display,
+.formatting-toolbar.allybi-one-line .toolbar-divider {
+  flex: 0 0 auto;
+}
+
+.formatting-toolbar.allybi-one-line .toolbar-btn.icon-btn {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
 }
 
 .allybi-toolbar-center {
@@ -400,6 +415,14 @@
 
 .allybi-toolbar-side-spacer {
   display: none;
+}
+
+.allybi-toolbar-left {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  padding-left: 8px;
 }
 
 /* Excel needs the full width — sheet nav far-left, formatting, then value bar. */
@@ -421,12 +444,39 @@
 }
 
 .formatting-toolbar.allybi-one-line.allybi-balanced {
-  --allybi-toolbar-side-slot: clamp(92px, 8vw, 124px);
+  --allybi-toolbar-side-slot: clamp(128px, 12vw, 160px);
 }
 
+.formatting-toolbar.allybi-one-line.allybi-balanced .allybi-toolbar-left,
 .formatting-toolbar.allybi-one-line.allybi-balanced .allybi-toolbar-side-spacer {
   display: block;
   flex: 0 0 var(--allybi-toolbar-side-slot);
+}
+
+.formatting-toolbar.allybi-one-line.allybi-balanced .allybi-toolbar-left {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  min-width: 0;
+}
+
+.allybi-word-actions-left {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  margin-right: 14px;
+}
+
+.allybi-word-actions-left .toolbar-btn {
+  flex: 0 0 auto;
+  height: 30px;
+}
+
+.allybi-word-actions-left .toolbar-btn.text-btn {
+  min-width: 60px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .formatting-toolbar.allybi-one-line.allybi-balanced .allybi-toolbar-zoom {
@@ -436,13 +486,14 @@
 }
 
 .formatting-toolbar.allybi-one-line.allybi-balanced .allybi-toolbar-center {
+  max-width: none;
   overflow-x: hidden;
   overflow-y: visible;
   justify-content: center;
 }
 
 .formatting-toolbar.allybi-one-line.allybi-balanced .allybi-toolbar-center > * {
-  min-width: 0;
+  min-width: max-content;
 }
 
 .toolbar-btn:disabled {
@@ -765,6 +816,10 @@
   }
 
   .allybi-toolbar-side-spacer {
+    display: none !important;
+  }
+
+  .allybi-toolbar-left {
     display: none !important;
   }
 

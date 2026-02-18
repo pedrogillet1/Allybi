@@ -5486,63 +5486,10 @@ export class PrismaChatService {
     })();
 
     const fallbackParagraphFromBullets = (): string => {
-      // Deterministic rewrite: produce a cohesive paragraph (not a list) that preserves meaning.
-      // For question-heavy lists, prefer a thematic summary so the output doesn't become a
-      // run-on restatement of every bullet.
-      const raw = list
-        .map((b) => String(b.text || "").trim())
-        .filter(Boolean)
-        .map((s) => s.replace(/\s+/g, " ").trim())
-        .map((s) => s.replace(/[.]\s*$/, "").trim());
-
-      if (!raw.length) return "";
-
-      const thematicSummary = (): string => {
-        // Map common "test suite / task list" bullets into 3-6 higher-level themes.
-        const themes: Array<{ id: string; phrase: string }> = [];
-        const seen = new Set<string>();
-
-        const addTheme = (id: string, phrase: string) => {
-          if (seen.has(id)) return;
-          seen.add(id);
-          themes.push({ id, phrase });
-        };
-
-        for (const s0 of raw) {
-          const s = s0.toLowerCase();
-          if (/\bsummariz(e|ing)|summary|insights?\b/.test(s)) addTheme("summarize", "summarizing documents and surfacing key insights");
-          else if (/\bwhich file\b|\bcontains the sentence\b|\blocate\b.*\bsentence\b/.test(s)) addTheme("exact_lookup", "locating exact clauses and passages across files");
-          else if (/\bfind all documents\b|\bmentions?\b.*\bgroup\b|\bgroup\b.*\byear\b/.test(s)) addTheme("cross_doc_group", "finding cross-document mentions and grouping results over time");
-          else if (/\bkey differences\b|\bcompare\b|\bcontracts?\b/.test(s)) addTheme("compare", "comparing documents and explaining key differences");
-          else if (/\bauthor\b|\btopic\b|\bmetadata\b|\bmerger\b/.test(s)) addTheme("metadata", "filtering by metadata (for example, author and topic) to retrieve relevant documents");
-          else if (/\bproject\b|\bq[1-4]\b|\bdate range\b|\bfrom\b.*\b20\\d{2}\b/.test(s)) addTheme("project_time", "retrieving project-related documents by date range");
-          else if (/\bduplicate\b|\bnear-duplicate\b/.test(s)) addTheme("dedupe", "identifying duplicates and near-duplicates");
-          else if (/\bexpired licenses?\b|\bcompliance\b|\blicense\b/.test(s)) addTheme("compliance", "flagging compliance and lifecycle issues (such as expired licenses)");
-          else if (/\bextract\b.*\btables?\b/.test(s)) addTheme("tables", "extracting tables and presenting them clearly");
-          else if (/\bfirst time\b|\bfirst referenced\b|\bfirst mention\b|\bin which document\b/.test(s)) addTheme("first_mention", "tracking where entities are first referenced across the library");
-          else addTheme("general", "understanding document content and answering targeted retrieval questions");
-          if (themes.length >= 7) break;
-        }
-
-        const picked = wantsSummary ? themes.slice(0, 6) : themes.slice(0, 7);
-        const lead =
-          params.toneProfile.tone === "formal"
-            ? "This section evaluates AI understanding and retrieval capabilities by"
-            : params.toneProfile.tone === "casual"
-              ? "This section focuses on AI understanding and retrieval by"
-              : "This section focuses on AI understanding and retrieval by";
-
-        const parts =
-          picked.length === 1
-            ? [picked[0]!.phrase]
-            : picked.length === 2
-              ? [picked[0]!.phrase, picked[1]!.phrase]
-              : picked.map((x, idx) => (idx === picked.length - 1 ? `and ${x.phrase}` : x.phrase));
-
-        return `${lead} ${parts.join(", ")}.`;
-      };
-
-      return thematicSummary();
+      return this.buildSingleParagraphFromList(
+        list.map((b) => String(b.text || "").trim()),
+        wantsSummary ? { maxSentences: 6 } : undefined,
+      );
     };
 
     const system =
@@ -5609,6 +5556,7 @@ export class PrismaChatService {
 
     const isBad = (text: string): boolean => {
       const low = String(text || "").toLowerCase();
+      const raw = String(text || "");
       // Reject assistant/meta commentary. This must never be written into the document.
       if (!low) return true;
       if (low.includes("as an ai")) return true;
@@ -5620,6 +5568,8 @@ export class PrismaChatService {
       if (low.includes("heading:")) return true;
       if (low.includes("bullets:")) return true;
       if (low.includes("bullet points:")) return true;
+      if (/^[\s]*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25AB\u25CF\u25CB\u25C9]|[\-\*\+]|□|\d{1,3}[.)])\s+/m.test(raw)) return true;
+      if ((raw.match(/\n/g) || []).length >= 2) return true;
       if (looksLikeConcatenatedBullets(text)) return true;
       return false;
     };
@@ -6839,16 +6789,42 @@ export class PrismaChatService {
    * "• Point 1\n• Point 2\n• Point 3" → ["Point 1", "Point 2", "Point 3"]
    * "1. First\n2. Second" → ["First", "Second"]
    */
+  private normalizeListLikeLine(text: string): string {
+    return String(text || "")
+      .replace(/^[\s"'`“”‘’\u200B-\u200D\uFEFF]+/, "")
+      .replace(/^(?:&bull;|&#8226;|&#x2022;)\s*/i, "")
+      .replace(/^[\s]*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25AB\u25CF\u25CB\u25C9\u2765\u2767]|[\-\*\+]|□)\s*/, "")
+      .replace(/^\(?\d{1,3}\)?[.)\-:]\s*/, "")
+      .replace(/^[a-zA-Z][.)\-:]\s+/, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  private buildSingleParagraphFromList(lines: string[], opts?: { maxSentences?: number }): string {
+    const maxSentences = Math.max(1, Number(opts?.maxSentences || 0)) || null;
+    const deduped = Array.from(new Set(
+      (lines || [])
+        .map((line) => this.normalizeListLikeLine(line))
+        .filter(Boolean),
+    ));
+    if (!deduped.length) return "";
+
+    const sentenceSafe = deduped.map((line) => {
+      const text = String(line || "").replace(/[;:]\s*$/, "").trim();
+      if (!text) return "";
+      return /[.!?]$/.test(text) ? text : `${text}.`;
+    }).filter(Boolean);
+    if (!sentenceSafe.length) return "";
+
+    const bounded = maxSentences ? sentenceSafe.slice(0, maxSentences) : sentenceSafe;
+    return bounded.join(" ").replace(/\s+/g, " ").trim();
+  }
+
   private parseBulletItems(text: string): string[] {
     if (!text || typeof text !== "string") return [];
     return text
       .split(/\n+/)
-      .map((line) =>
-        line
-          .replace(/^[\s]*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*]|□)\s*/, "")
-          .replace(/^\d{1,3}[.)]\s*/, "")
-          .trim()
-      )
+      .map((line) => this.normalizeListLikeLine(line))
       .filter((item) => item.length > 0);
   }
 
@@ -8386,17 +8362,57 @@ export class PrismaChatService {
             selectedParagraphs.length >= 2 &&
             (explicitlyRequestsSingleParagraph || !explicitlyPluralParagraphTarget);
           const patches = mergeToSingleParagraph
-            ? (() => {
+            ? await (async () => {
                 if (selectedParagraphs.length > 12) return [];
-                const orderedPids = selectedParagraphs
-                  .map((p) => String(p.paragraphId || "").trim())
-                  .filter(Boolean);
-                if (orderedPids.length < 2) return [];
-                return [{
-                  kind: "docx_merge_paragraphs",
-                  paragraphIds: orderedPids,
-                  joinSeparator: " ",
-                }];
+                const bullets = selectedParagraphs
+                  .map((p) => ({
+                    paragraphId: String(p.paragraphId || "").trim(),
+                    text: String(p.text || "").trim(),
+                    sectionPath: Array.isArray(p.sectionPath) ? p.sectionPath : undefined,
+                  }))
+                  .filter((p) => p.paragraphId && p.text);
+                if (bullets.length < 2) return [];
+
+                let mergedPatches: any[] = await this.bulletsToParagraph({
+                  traceId: params.traceId,
+                  userId: params.req.userId,
+                  conversationId: params.conversationId,
+                  instruction: params.req.message,
+                  headingText: "Selected bullets",
+                  bullets,
+                  toneProfile,
+                });
+
+                if (!Array.isArray(mergedPatches) || !mergedPatches.length) {
+                  const orderedBullets = bullets
+                    .map((p) => ({
+                      paragraphId: String(p.paragraphId || "").trim(),
+                      text: String(p.text || "").trim(),
+                      sectionPath: Array.isArray(p.sectionPath) ? p.sectionPath : undefined,
+                    }))
+                    .filter((p) => p.paragraphId && p.text);
+                  if (orderedBullets.length < 2) return [];
+                  const merged = this.buildSingleParagraphFromList(orderedBullets.map((b) => b.text));
+                  if (!merged) return [];
+                  const first = orderedBullets[0]!;
+                  mergedPatches = [
+                    {
+                      kind: "docx_paragraph",
+                      paragraphId: first.paragraphId,
+                      beforeText: first.text,
+                      afterText: merged,
+                      afterHtml: this.toHtmlFromPlain(merged),
+                      sectionPath: first.sectionPath,
+                      removeNumbering: true,
+                    },
+                    ...orderedBullets.slice(1).map((b) => ({
+                      kind: "docx_delete_paragraph",
+                      paragraphId: b.paragraphId,
+                    })),
+                  ];
+                }
+
+                return mergedPatches;
               })()
             : wantsParagraphsAsBullets
             ? await (async () => {
@@ -8586,25 +8602,37 @@ export class PrismaChatService {
           });
 
           if (!Array.isArray(patches) || !patches.length) {
-            const sentenceLike = (s: string) => /[.!?]$/.test(String(s || "").trim());
             const merged = selectedBullets
-              .map((b: any) => String(b?.text || "").trim())
-              .filter(Boolean)
-              .map((t: string) => (sentenceLike(t) ? t : `${t}.`))
-              .join(" ")
-              .replace(/\s+/g, " ")
-              .trim();
-            const orderedPids = selectedBullets
-              .map((b: any) => String(b?.paragraphId || "").trim())
+              .map((b: any) => String(b?.text || ""))
               .filter(Boolean);
-            patches = orderedPids.length >= 2
-              ? [{ kind: "docx_merge_paragraphs", paragraphIds: orderedPids, joinSeparator: " " }]
-              : [{
+            const paragraphText = this.buildSingleParagraphFromList(merged);
+            const orderedBullets = selectedBullets
+              .map((b: any) => ({
+                paragraphId: String(b?.paragraphId || "").trim(),
+                text: String(b?.text || "").trim(),
+                sectionPath: Array.isArray(b?.sectionPath) ? b.sectionPath : undefined,
+              }))
+              .filter((b: any) => b.paragraphId && b.text);
+            if (paragraphText && orderedBullets.length >= 2) {
+              const first = orderedBullets[0]!;
+              patches = [
+                {
                   kind: "docx_paragraph",
-                  paragraphId: selectedBullets[0]!.paragraphId,
-                  afterHtml: this.toHtmlFromPlain(merged),
+                  paragraphId: first.paragraphId,
+                  beforeText: first.text,
+                  afterText: paragraphText,
+                  afterHtml: this.toHtmlFromPlain(paragraphText),
+                  sectionPath: first.sectionPath,
                   removeNumbering: true,
-                }];
+                },
+                ...orderedBullets.slice(1).map((b: any) => ({
+                  kind: "docx_delete_paragraph",
+                  paragraphId: b.paragraphId,
+                })),
+              ];
+            } else {
+              patches = [];
+            }
           }
 
           operator = "EDIT_DOCX_BUNDLE";

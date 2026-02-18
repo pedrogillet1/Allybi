@@ -12,7 +12,6 @@ import AlignJustifyIcon from './icons/align-justify.svg';
 import ListBulletIcon from './icons/list-bullet.svg';
 import ListNumberedIcon from './icons/list-numbered.svg';
 import UnderlineIcon from './icons/underline.svg';
-import MinusIcon from './icons/minus.svg';
 import chevronLeftIcon from '../../../../assets/chevron-left.svg';
 import DropdownIcon from './icons/dropdown.svg';
 
@@ -347,6 +346,7 @@ export default function AllybiEditingToolbar({
     if (/^reverted\b/i.test(msg)) return '';
     return msg;
   }, [excelStatusMsg]);
+  const showWordActions = Boolean(showWordControls && (wordSecondaryActionLabel || wordPrimaryActionLabel));
 
   return (
     <div
@@ -360,33 +360,31 @@ export default function AllybiEditingToolbar({
         onBackgroundClick?.();
       }}
     >
-      <div className="allybi-toolbar-side-spacer" aria-hidden="true" />
+      <div className="allybi-toolbar-left">
+        {showWordActions ? (
+          <div className="toolbar-section allybi-word-actions-left" style={{ gap: 6 }}>
+            {wordPrimaryActionLabel ? (
+              <button
+                type="button"
+                className="toolbar-btn text-btn word-save-btn"
+                title={wordPrimaryActionLabel}
+                onClick={() => onWordPrimaryAction?.()}
+              >
+                {wordPrimaryActionLabel}
+              </button>
+            ) : null}
+            {wordSecondaryActionLabel
+              ? textBtn(wordSecondaryActionLabel, wordSecondaryActionLabel, () => onWordSecondaryAction?.())
+              : null}
+          </div>
+        ) : (
+          <div className="allybi-toolbar-side-spacer" aria-hidden="true" />
+        )}
+      </div>
       {/* Content: centered, file-type specific */}
       <div className="allybi-toolbar-center">
         {showWordControls ? (
           <>
-            {(wordSecondaryActionLabel || wordPrimaryActionLabel) ? (
-              <>
-                <div className="toolbar-section" style={{ gap: 6, marginRight: 4 }}>
-                  {wordPrimaryActionLabel ? (
-                    <button
-                      type="button"
-                      className="toolbar-btn text-btn word-save-btn"
-                      title={wordPrimaryActionLabel}
-                      style={{ padding: '6px 14px', fontWeight: 600 }}
-                      onClick={() => onWordPrimaryAction?.()}
-                    >
-                      {wordPrimaryActionLabel}
-                    </button>
-                  ) : null}
-                  {wordSecondaryActionLabel
-                    ? textBtn(wordSecondaryActionLabel, wordSecondaryActionLabel, () => onWordSecondaryAction?.())
-                    : null}
-                </div>
-                {divider()}
-              </>
-            ) : null}
-
             <div className="toolbar-section">
               {iconBtn('Undo', UndoIcon, () => onCommand?.('undo'))}
               {iconBtn('Redo', RedoIcon, () => onCommand?.('redo'))}

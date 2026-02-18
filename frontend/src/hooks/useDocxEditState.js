@@ -85,6 +85,10 @@ export default function useDocxEditState() {
     return Array.from(dirtyParagraphsRef.current);
   }, []);
 
+  const resetDirty = useCallback(() => {
+    dirtyParagraphsRef.current = new Set();
+  }, []);
+
   // ── Inflight tracking ──
 
   const startInflight = useCallback((pid) => {
@@ -268,6 +272,7 @@ export default function useDocxEditState() {
       clearDirty,
       isDirty,
       getDirtyPids,
+      resetDirty,
       // Inflight
       startInflight,
       endInflight,

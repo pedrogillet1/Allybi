@@ -739,22 +739,50 @@ router.get("/:id/editing/docx-html", rateLimitMiddleware, async (req: any, res: 
         .replaceAll("'", "&#39;");
 
     const bytes = await downloadFile(doc.encryptedFilename);
+    {
+      const crypto = await import("crypto");
+      const loadedHash = crypto.createHash("sha256").update(bytes).digest("hex").slice(0, 12);
+      console.log(`[docx-html] Loaded file for ${doc.id}, hash=${loadedHash}, size=${bytes.length}`);
+    }
     const anchors = new DocxAnchorsService();
-    const paragraphs = await anchors.extractParagraphNodes(bytes);
+    const paragraphs = await anchors.extractRichParagraphNodes(bytes);
 
-    const blocks = paragraphs.map((p: any) => ({
-      paragraphId: p.paragraphId,
-      text: p.text,
-      sectionPath: p.sectionPath,
-      indexInSection: p.indexInSection,
-      docIndex: p.docIndex,
-      styleFingerprint: p.styleFingerprint,
-      styleName: p.styleName || null,
-      headingLevel: typeof p.headingLevel === "number" ? p.headingLevel : null,
-      numberingSignature: p.numberingSignature || null,
-      alignment: p.alignment || null,
-      html: escapeHtml(p.text).replace(/\n/g, "<br/>"),
-    }));
+    /** Build rich HTML from DOCX runs, preserving bold/italic/underline/strikethrough and inline styles. */
+    const runsToHtml = (runs: any[]): string => {
+      if (!Array.isArray(runs) || runs.length === 0) return "";
+      return runs.map((r: any) => {
+        let html = escapeHtml(String(r.text || "")).replace(/\n/g, "<br/>");
+        // Inline style spans (font-size, color, font-family)
+        const styles: string[] = [];
+        if (r.fontSize) styles.push(`font-size:${r.fontSize}`);
+        if (r.color) styles.push(`color:#${String(r.color).replace(/^#/, "")}`);
+        if (r.fontFamily) styles.push(`font-family:${escapeHtml(r.fontFamily)}`);
+        if (styles.length) html = `<span style="${styles.join(";")}">${html}</span>`;
+        // Formatting tags
+        if (r.strikethrough) html = `<s>${html}</s>`;
+        if (r.underline) html = `<u>${html}</u>`;
+        if (r.italic) html = `<em>${html}</em>`;
+        if (r.bold) html = `<strong>${html}</strong>`;
+        return html;
+      }).join("");
+    };
+
+    const blocks = paragraphs.map((p: any) => {
+      const richHtml = runsToHtml(p.runs);
+      return {
+        paragraphId: p.paragraphId,
+        text: p.text,
+        sectionPath: p.sectionPath,
+        indexInSection: p.indexInSection,
+        docIndex: p.docIndex,
+        styleFingerprint: p.styleFingerprint,
+        styleName: p.styleName || null,
+        headingLevel: typeof p.headingLevel === "number" ? p.headingLevel : null,
+        numberingSignature: p.numberingSignature || null,
+        alignment: p.alignment || null,
+        html: richHtml || escapeHtml(p.text).replace(/\n/g, "<br/>"),
+      };
+    });
 
     const classFor = (b: any): string => {
       const cls = ["koda-docx-p"];
@@ -1167,6 +1195,7 @@ router.get("/:id/preview", rateLimitMiddleware, async (req: any, res: Response):
 
       if (!isHtml && doc.encryptedFilename) {
         // Generate fresh HTML preview from the Excel file
+        console.log(`[Preview:Excel] Regenerating HTML from file for ${doc.id}`);
         try {
           const buffer = await downloadFile(doc.encryptedFilename);
           const preview = await generateExcelHtmlPreview(buffer);
@@ -1198,6 +1227,7 @@ router.get("/:id/preview", rateLimitMiddleware, async (req: any, res: Response):
         }
       } else {
         // Parse sheet names from existing HTML
+        console.log(`[Preview:Excel] Serving cached HTML for ${doc.id}, length=${(htmlContent || "").length}`);
         const sheetRegex = /<!--\s*Sheet:\s*(.+?)\s*-->|data-sheet-name="([^"]+)"|<h2[^>]*>(.+?)<\/h2>/gi;
         let m: RegExpExecArray | null;
         while ((m = sheetRegex.exec(htmlContent!)) !== null) {

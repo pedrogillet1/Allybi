@@ -589,7 +589,19 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
           }
           case "docx_split_to_list": {
             if (!pid) continue;
-            const items = Array.isArray((p as any).items) ? (p as any).items.map((i: any) => String(i || "")) : [];
+            const items = Array.isArray((p as any).items)
+              ? (p as any).items
+                .map((i: any) => String(i || ""))
+                .map((line: string) => line
+                  .replace(/^[\s"'`“”‘’\u200B-\u200D\uFEFF]+/, "")
+                  .replace(/^(?:&bull;|&#8226;|&#x2022;)\s*/i, "")
+                  .replace(/^[\s]*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25AB\u25CF\u25CB\u25C9\u2765\u2767]|[\-\*\+]|□)\s*/, "")
+                  .replace(/^\(?\d{1,3}\)?[.)\-:]\s*/, "")
+                  .replace(/^[a-zA-Z][.)\-:]\s+/, "")
+                  .replace(/\s+/g, " ")
+                  .trim())
+                .filter(Boolean)
+              : [];
             if (!items.length) continue;
             const listType = String((p as any).listType || "bulleted").trim().toLowerCase() === "numbered" ? "numbered" : "bulleted";
             buf = await this.docxEditor.splitParagraphToList(buf, pid, items, listType as any);
@@ -625,7 +637,19 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
           }
           case "docx_split_paragraph": {
             if (!pid) continue;
-            const splitItems = Array.isArray((p as any).items) ? (p as any).items.map((i: any) => String(i || "")) : [];
+            const splitItems = Array.isArray((p as any).items)
+              ? (p as any).items
+                .map((i: any) => String(i || ""))
+                .map((line: string) => line
+                  .replace(/^[\s"'`“”‘’\u200B-\u200D\uFEFF]+/, "")
+                  .replace(/^(?:&bull;|&#8226;|&#x2022;)\s*/i, "")
+                  .replace(/^[\s]*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25AB\u25CF\u25CB\u25C9\u2765\u2767]|[\-\*\+]|□)\s*/, "")
+                  .replace(/^\(?\d{1,3}\)?[.)\-:]\s*/, "")
+                  .replace(/^[a-zA-Z][.)\-:]\s+/, "")
+                  .replace(/\s+/g, " ")
+                  .trim())
+                .filter(Boolean)
+              : [];
             const splitListType = String((p as any).listType || "bulleted").trim().toLowerCase() === "numbered" ? "numbered" : "bulleted";
             if (!splitItems.length) continue;
             buf = await this.docxEditor.splitParagraphToList(buf, pid, splitItems, splitListType as any);
@@ -1029,6 +1053,16 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
       // Overwrite content at the same storage key.
       await uploadFile(doc.encryptedFilename, edited, doc.mimeType || "application/octet-stream");
+
+      const editedHash = sha256(edited);
+      logger.info("[Editing] File saved to storage", {
+        documentId: docId,
+        operator: op,
+        storageKey: doc.encryptedFilename,
+        fileHashBefore,
+        fileHashAfter: editedHash,
+        fileSizeBytes: edited.length,
+      });
 
       // Invalidate any cached document buffer so subsequent reads fetch the fresh file.
       try { await cacheService.del(`document_buffer:${docId}`); } catch {}

@@ -1349,7 +1349,18 @@ export class DocxEditorService {
     items: string[],
     listType: 'bulleted' | 'numbered',
   ): Promise<Buffer> {
-    if (!items.length) return buffer;
+    const normalizedItems = (items || [])
+      .map((text) => String(text || ""))
+      .map((line) => line
+        .replace(/^[\s"'`“”‘’\u200B-\u200D\uFEFF]+/, "")
+        .replace(/^(?:&bull;|&#8226;|&#x2022;)\s*/i, "")
+        .replace(/^[\s]*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25AB\u25CF\u25CB\u25C9\u2765\u2767]|[\-\*\+]|□)\s*/, "")
+        .replace(/^\(?\d{1,3}\)?[.)\-:]\s*/, "")
+        .replace(/^[a-zA-Z][.)\-:]\s+/, "")
+        .replace(/\s+/g, " ")
+        .trim())
+      .filter(Boolean);
+    if (!normalizedItems.length) return buffer;
 
     const anchors = await this.anchorsService.extractParagraphNodes(buffer);
     const targetAnchor = anchors.find(a => a.paragraphId === paragraphId);
@@ -1389,7 +1400,7 @@ export class DocxEditorService {
     }
 
     // Build new paragraph nodes
-    const newParagraphs: XmlNode[] = items.map(text => {
+    const newParagraphs: XmlNode[] = normalizedItems.map(text => {
       const newP: XmlNode = {
         'w:pPr': [{}],
         'w:r': [buildReplacementRun(text.trim(), sourceRunProps ? deepClone(sourceRunProps) : undefined)],

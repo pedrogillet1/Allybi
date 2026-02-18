@@ -179,6 +179,24 @@ function applyRunStyleToParagraphInlineHtml(paragraphEl, patch = {}) {
   return true;
 }
 
+const EMPTY_EDIT_SENTINEL = '(empty)';
+
+function toRequiredEditText(value) {
+  const text = String(value || '').trim();
+  return text || EMPTY_EDIT_SENTINEL;
+}
+
+function stripLeadingListMarker(value) {
+  return String(value || '')
+    .replace(/^[\s"'`“”‘’\u200B-\u200D\uFEFF]+/, '')
+    .replace(/^(?:&bull;|&#8226;|&#x2022;)\s*/i, '')
+    .replace(/^[\s]*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25AB\u25CF\u25CB\u25C9\u2765\u2767]|[\-\*\+]|□)\s*/, '')
+    .replace(/^\(?\d{1,3}\)?[.)\-:]\s*/, '')
+    .replace(/^[a-zA-Z][.)\-:]\s+/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   {
     document,
@@ -212,6 +230,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   const autoSaveTimerRef = useRef(null);
   const isFlushingRef = useRef(false);
   const scheduleAutoSaveRef = useRef(null);
+  const flushDirtyParagraphsRef = useRef(null);
 
   // Centralized editing state (blocks, baselines, drafts, undo/redo, etc.)
   const { state: editState, actions } = useDocxEditState();
@@ -282,15 +301,27 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
         res = { data: { blocks: normalizeBlocks(anchorsRes?.data?.paragraphs) } };
       }
 
-      const nextBlocks = normalizeBlocks(res?.data?.blocks);
+      // Build a map of server-provided rich HTML (with bold/italic/underline from DOCX runs).
+      // This is used for baselines so formatting survives reload after apply.
+      // We pass through sanitizeDocxRichHtml so entity encoding matches what getLiveHtmlFor returns
+      // (e.g. &#39; → ' after browser parse), preventing false dirty detection.
+      const rawBlocks = Array.isArray(res?.data?.blocks) ? res.data.blocks : [];
+      const serverHtmlMap = new Map();
+      for (const b of rawBlocks) {
+        if (b?.paragraphId && b?.html) {
+          serverHtmlMap.set(b.paragraphId, sanitizeDocxRichHtml(String(b.html)).trim());
+        }
+      }
+      const nextBlocks = normalizeBlocks(rawBlocks);
       actions.loadBlocks(nextBlocks);
       onBlocksLoadedRef.current?.(nextBlocks);
-      // Initialize local baseline HTML so we can detect formatting-only changes without reloading.
+      // Initialize local baseline HTML: prefer server-provided rich HTML, fallback to plain text.
       const nextBaseline = new Map();
       for (const b of nextBlocks) {
-        if (b?.paragraphId) nextBaseline.set(b.paragraphId, toHtmlFromPlain(b.text || '').trim());
+        if (b?.paragraphId) nextBaseline.set(b.paragraphId, serverHtmlMap.get(b.paragraphId) || toHtmlFromPlain(b.text || '').trim());
       }
       actions.resetBaselines(nextBaseline);
+      actions.resetDirty();
       actions.resetListOverrides();
       // Force a reseed of paragraph HTML on the next render after a load/reload.
       actions.bumpSeedVersion();
@@ -1166,11 +1197,11 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
           const items = Array.isArray(p?.items) ? p.items : [];
           if (!items.length) continue;
           // Preview: replace paragraph text with bullet-formatted items
-          const listType = String(p?.listType || 'bulleted').toLowerCase();
-          const html = items.map((item, idx) => {
-            const prefix = listType === 'numbered' ? `${idx + 1}. ` : '\u2022 ';
-            return escapeHtml(prefix + String(item || ''));
-          }).join('<br/>');
+          const html = items
+            .map((item) => escapeHtml(stripLeadingListMarker(item)))
+            .filter(Boolean)
+            .join('<br/>');
+          if (!html) continue;
           el.innerHTML = html;
           nextListOverrides[pid] = { isList: true, level: 0 };
           decorateAsDraft(el, draftId);
@@ -1424,6 +1455,10 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     // Batch-update block text
     if (nextTextByPid.size) {
       actions.updateBlocksText(nextTextByPid);
+      for (const pid of Array.from(nextTextByPid.keys())) {
+        actions.markDirty(pid);
+      }
+      onDirtyChangeRef.current?.(true);
     }
 
     actions.deleteDraft(draftId);
@@ -1502,16 +1537,16 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     const nextHtml = getLiveHtmlFor(paragraphId);
     if (nextText == null || nextHtml == null) return { ok: false, error: 'Unable to read paragraph.' };
 
-    const beforeText = String(block.text || '');
+    const beforeTextRaw = String(block.text || '');
+    const beforeText = toRequiredEditText(beforeTextRaw);
     const proposedText = String(nextText || '').trim();
-    // When the user clears all text, treat it as a whitespace-only paragraph
-    // so the backend still accepts and persists the edit.
-    const effectiveProposedText = proposedText || ' ';
+    // Backend requires non-empty text after trim.
+    const effectiveProposedText = toRequiredEditText(proposedText);
 
     // Skip no-ops (only for autosave, not explicit commits)
     if (silent) {
-      const baselineHtml = actions.getBaseline(paragraphId) || toHtmlFromPlain(beforeText.trim());
-      if (proposedText === beforeText.trim() && String(nextHtml || '').replace(/\s+/g, '') === baselineHtml.replace(/\s+/g, '')) {
+      const baselineHtml = actions.getBaseline(paragraphId) || toHtmlFromPlain(beforeTextRaw.trim());
+      if (proposedText === beforeTextRaw.trim() && String(nextHtml || '').replace(/\s+/g, '') === baselineHtml.replace(/\s+/g, '')) {
         return { ok: true, noop: true };
       }
     }
@@ -1572,7 +1607,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
 
       // Atomic state update
       actions.updateBaseline(paragraphId, String(nextHtml || '').trim());
-      actions.updateBlockText(paragraphId, effectiveProposedText);
+      actions.updateBlockText(paragraphId, proposedText);
       actions.clearDirty(paragraphId);
       onDirtyChangeRef.current?.(actions.getDirtyPids().length > 0);
       onApplied?.({ revisionId });
@@ -1621,12 +1656,23 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       isFlushingRef.current = false;
     }
   }, [actions, submitSingleEdit]);
+  flushDirtyParagraphsRef.current = flushDirtyParagraphs;
 
   // Dedicated save function that bypasses dirty-tracking and submitSingleEdit early-returns.
   // Compares every block's original text against the live DOM and calls applyEdit() directly.
   const saveAllManualEdits = useCallback(async () => {
     const results = [];
-    for (const block of blocks) {
+    const dirtySet = new Set(
+      (actions.getDirtyPids?.() || [])
+        .map((pid) => String(pid || '').trim())
+        .filter(Boolean)
+    );
+    const candidateBlocks = dirtySet.size > 0
+      ? blocks.filter((b) => dirtySet.has(String(b?.paragraphId || '').trim()))
+      : blocks;
+    let stopDueToRateLimit = false;
+    for (const block of candidateBlocks) {
+      if (stopDueToRateLimit) break;
       const pid = block.paragraphId;
       if (!pid || !docId) continue;
       if (actions.isInflight(pid)) continue;
@@ -1648,9 +1694,16 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       // Save only when we have an explicit dirty signal or an actual text/html diff.
       if (!dirty && !textChanged && !htmlChanged) continue;
 
-      // Backend requires non-empty before/proposed text payloads.
-      const beforeText = originalText || ' ';
-      const effectiveProposedText = proposedText || ' ';
+      // Skip paragraphs with empty or whitespace-only proposed text — backend's
+      // normalizeWhitespace would reduce these to empty and reject the save.
+      if (!proposedText || !proposedText.replace(/\s+/g, '').length) {
+        if (dirty) actions.clearDirty(pid);
+        continue;
+      }
+
+      // Backend requires non-empty before/proposed text payloads after trim().
+      const beforeText = toRequiredEditText(originalText);
+      const effectiveProposedText = toRequiredEditText(proposedText);
 
       actions.startInflight(pid);
       try {
@@ -1676,6 +1729,9 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
           actions.clearDirty(pid);
           results.push({ pid, ok: true, revisionId });
         } else if (isNoopResult(res)) {
+          if (textChanged || htmlChanged) {
+            console.warn('[DocxEditCanvas] Save returned noop but content appeared changed', { pid, textChanged, htmlChanged });
+          }
           actions.clearDirty(pid);
           results.push({ pid, ok: true, noop: true });
         } else {
@@ -1683,7 +1739,11 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
         }
       } catch (e) {
         console.error('[DocxEditCanvas] saveAllManualEdits failed for', pid, e);
-        results.push({ pid, ok: false, error: e?.message || 'Save failed' });
+        const msg = e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || 'Save failed';
+        results.push({ pid, ok: false, error: msg });
+        if (Number(e?.response?.status || 0) === 429) {
+          stopDueToRateLimit = true;
+        }
       } finally {
         actions.endInflight(pid);
       }
@@ -1691,10 +1751,18 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     // Notify parent once after all saves (not per-paragraph) to avoid
     // multiple re-renders and replaceState calls mid-loop.
     const lastRevisionId = results.findLast(r => r.ok && r.revisionId)?.revisionId;
-    if (lastRevisionId) onApplied?.({ revisionId: lastRevisionId });
+    if (lastRevisionId) {
+      onApplied?.({ revisionId: lastRevisionId });
+      // Reload from server so paragraph IDs and baselines are fresh.
+      // Paragraph IDs are content-addressed (SHA-256), so after saving new text
+      // the old IDs become stale. Without reload, subsequent saves fail with
+      // "Paragraph target not found".
+      await new Promise(r => setTimeout(r, 300));
+      await load();
+    }
     onDirtyChangeRef.current?.(actions.getDirtyPids().length > 0);
     return results;
-  }, [blocks, docId, document?.filename, actions, getLiveTextFor, getLiveHtmlFor, onApplied]);
+  }, [blocks, docId, document?.filename, actions, getLiveTextFor, getLiveHtmlFor, onApplied, load]);
 
   const scheduleAutoSave = useCallback(() => {
     if (readOnly) return;
@@ -1716,10 +1784,12 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
         clearTimeout(autoSaveTimerRef.current);
         autoSaveTimerRef.current = null;
       }
-      // Fire-and-forget flush so edits aren't lost when navigating away
-      flushDirtyParagraphs();
+      // Explicit Save/Discard mode owns persistence; do not auto-flush on unmount.
+      if (onDirtyChangeRef.current) return;
+      // Fire-and-forget flush so edits aren't lost when navigating away.
+      try { flushDirtyParagraphsRef.current?.(); } catch {}
     };
-  }, [flushDirtyParagraphs]);
+  }, []);
 
   const commitParagraph = useCallback(
     ({ paragraphId, instruction, operator = 'EDIT_PARAGRAPH' } = {}) =>
@@ -1986,8 +2056,22 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
           }}
           onInput={(e) => {
             if (readOnly) return;
-            const el = e.target?.closest?.('[data-paragraph-id]');
-            const pid = el?.getAttribute?.('data-paragraph-id') || '';
+            const fromTarget = e.target?.closest?.('[data-paragraph-id]') || null;
+            const fromSelection = (() => {
+              try {
+                const sel = window.getSelection?.();
+                const node = sel?.anchorNode || null;
+                const parentEl = node?.nodeType === 1 ? node : node?.parentElement;
+                return parentEl?.closest?.('[data-paragraph-id]') || null;
+              } catch {
+                return null;
+              }
+            })();
+            const el =
+              fromTarget ||
+              fromSelection ||
+              (effectiveSelectedId ? findParagraphEl(effectiveSelectedId) : null);
+            const pid = String(el?.getAttribute?.('data-paragraph-id') || effectiveSelectedId || '').trim();
             if (!pid) return;
             // Record per-paragraph undo snapshots for typing/paste. `onInput` fires after mutation,
             // so we use our last seen HTML as the "before" state.

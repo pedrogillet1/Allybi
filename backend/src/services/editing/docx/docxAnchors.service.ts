@@ -22,6 +22,9 @@ export interface RichRun {
   underline?: boolean;
   strikethrough?: boolean;
   hyperlink?: string;
+  fontSize?: string;
+  color?: string;
+  fontFamily?: string;
 }
 
 export interface RichParagraphNode extends ParagraphNode {
@@ -222,14 +225,39 @@ function paragraphId(snapshot: ParagraphSnapshot, sectionPath: string[], indexIn
   return `docx:p:${digest}`;
 }
 
-function extractRunFormatting(run: XmlNode): { bold?: boolean; italic?: boolean; underline?: boolean; strikethrough?: boolean } {
+function extractRunFormatting(run: XmlNode): { bold?: boolean; italic?: boolean; underline?: boolean; strikethrough?: boolean; fontSize?: string; color?: string; fontFamily?: string } {
   const rPr = asArray(run['w:rPr'] as XmlNode | XmlNode[] | undefined)[0];
   if (!rPr) return {};
-  const result: { bold?: boolean; italic?: boolean; underline?: boolean; strikethrough?: boolean } = {};
+  const result: { bold?: boolean; italic?: boolean; underline?: boolean; strikethrough?: boolean; fontSize?: string; color?: string; fontFamily?: string } = {};
   if (rPr['w:b']) result.bold = true;
   if (rPr['w:i']) result.italic = true;
   if (rPr['w:u']) result.underline = true;
   if (rPr['w:strike']) result.strikethrough = true;
+
+  // Font size: w:sz value is in half-points (e.g. 24 = 12pt)
+  const szNode = asArray(rPr['w:sz'] as XmlNode | XmlNode[] | undefined)[0];
+  if (szNode) {
+    const szAttrs = (szNode.$ as Record<string, unknown> | undefined) ?? {};
+    const halfPts = Number(szAttrs['w:val'] ?? '');
+    if (Number.isFinite(halfPts) && halfPts > 0) result.fontSize = `${halfPts / 2}pt`;
+  }
+
+  // Text color: w:color
+  const colorNode = asArray(rPr['w:color'] as XmlNode | XmlNode[] | undefined)[0];
+  if (colorNode) {
+    const colorAttrs = (colorNode.$ as Record<string, unknown> | undefined) ?? {};
+    const val = String(colorAttrs['w:val'] ?? '').trim();
+    if (val && val !== 'auto' && /^[0-9a-fA-F]{6}$/.test(val)) result.color = val;
+  }
+
+  // Font family: w:rFonts
+  const fontsNode = asArray(rPr['w:rFonts'] as XmlNode | XmlNode[] | undefined)[0];
+  if (fontsNode) {
+    const fontAttrs = (fontsNode.$ as Record<string, unknown> | undefined) ?? {};
+    const ascii = String(fontAttrs['w:ascii'] ?? fontAttrs['w:hAnsi'] ?? '').trim();
+    if (ascii) result.fontFamily = ascii;
+  }
+
   return result;
 }
 
