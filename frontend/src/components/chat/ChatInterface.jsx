@@ -1548,9 +1548,12 @@ export default function ChatInterface({
 
   // Detect language from user message text (for 'match' mode)
   const detectMessageLang = useCallback((text) => {
-    const q = (text || '').toLowerCase();
-    if (/\b(quais?|meus?|minhas?|documentos?|arquivos?|pastas?|tenho|está|como|onde|qual|por que|porque|obrigad|olá|oi|tudo|pode|fazer|quero|preciso|ajuda|sobre)\b/.test(q)) return 'pt';
-    if (/\b(cuáles?|mis|archivos?|carpetas?|tengo|está|cómo|dónde|cuál|por qué|gracias|hola|todo|puede|hacer|quiero|necesito|ayuda|sobre)\b/.test(q)) return 'es';
+    const q = String(text || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+    if (/\b(quais?|meus?|minhas?|documentos?|arquivos?|pastas?|tenho|esta|como|onde|qual|por que|porque|obrigad|ola|oi|tudo|pode|fazer|quero|preciso|ajuda|sobre|exame|resultado)\b/.test(q)) return 'pt';
+    if (/\b(cuales?|mis|archivos?|carpetas?|tengo|esta|como|donde|cual|porque|gracias|hola|todo|puede|hacer|quiero|necesito|ayuda|sobre|prueba|analisis|resultado)\b/.test(q)) return 'es';
     return 'en';
   }, []);
 

@@ -64,7 +64,7 @@ export type TurnContext = {
   orgId?: string;
   conversationId?: string;
   messageText: string;
-  locale: "en" | "pt";
+  locale: "en" | "pt" | "es";
   now: Date;
   activeDocument?: { id: string; mime: string; title?: string };
   attachedDocuments: Array<{ id: string; mime: string; title?: string }>;

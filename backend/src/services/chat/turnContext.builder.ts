@@ -1,7 +1,8 @@
 import type { ChatRequest, EditorSelectionRange, TurnContext } from "./chat.types";
 
-function detectLocale(req: ChatRequest): "en" | "pt" {
+function detectLocale(req: ChatRequest): "en" | "pt" | "es" {
   const lang = String(req.preferredLanguage || "en").toLowerCase();
+  if (lang.startsWith("es")) return "es";
   return lang.startsWith("pt") ? "pt" : "en";
 }
 
