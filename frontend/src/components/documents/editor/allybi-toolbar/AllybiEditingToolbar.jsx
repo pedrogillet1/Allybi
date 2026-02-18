@@ -109,6 +109,12 @@ export default function AllybiEditingToolbar({
   excelCanUndo = false,
   excelCanRedo = false,
   excelStatusMsg,
+  excelPrimaryActionLabel,
+  onExcelPrimaryAction,
+  excelPrimaryActionDisabled,
+  excelSecondaryActionLabel,
+  onExcelSecondaryAction,
+  excelSecondaryActionDisabled,
   excelLogoSrc,
   onExcelLogoClick,
 
@@ -347,6 +353,7 @@ export default function AllybiEditingToolbar({
     return msg;
   }, [excelStatusMsg]);
   const showWordActions = Boolean(showWordControls && (wordSecondaryActionLabel || wordPrimaryActionLabel));
+  const showExcelActions = Boolean(fileType === 'excel' && (excelSecondaryActionLabel || excelPrimaryActionLabel));
 
   return (
     <div
@@ -375,6 +382,28 @@ export default function AllybiEditingToolbar({
             ) : null}
             {wordSecondaryActionLabel
               ? textBtn(wordSecondaryActionLabel, wordSecondaryActionLabel, () => onWordSecondaryAction?.())
+              : null}
+          </div>
+        ) : showExcelActions ? (
+          <div className="toolbar-section allybi-word-actions-left" style={{ gap: 6 }}>
+            {excelPrimaryActionLabel ? (
+              <button
+                type="button"
+                className="toolbar-btn text-btn word-save-btn"
+                title={excelPrimaryActionLabel}
+                onClick={() => onExcelPrimaryAction?.()}
+                disabled={Boolean(excelPrimaryActionDisabled)}
+              >
+                {excelPrimaryActionLabel}
+              </button>
+            ) : null}
+            {excelSecondaryActionLabel
+              ? textBtn(
+                excelSecondaryActionLabel,
+                excelSecondaryActionLabel,
+                () => onExcelSecondaryAction?.(),
+                { disabled: Boolean(excelSecondaryActionDisabled) },
+              )
               : null}
           </div>
         ) : (

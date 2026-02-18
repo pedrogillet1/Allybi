@@ -1691,7 +1691,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   }, [selectedInfo?.targetId, controlledDraftValue, onDraftValueChange, selectedInfo?.beforeText]);
 
   const apply = useCallback(async (overrideDraftRaw = null) => {
-    if (!docId || !selectedInfo) return;
+    if (!docId || !selectedInfo) return { ok: false, error: 'No target selected.' };
     const proposedTextRaw = overrideDraftRaw != null
       ? String(overrideDraftRaw)
       : String(effectiveDraftValue ?? '');
@@ -1699,7 +1699,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     if (!proposedText && proposedText !== '') {
       setStatusMsg('Nothing to apply.');
       onStatusMsg?.('Nothing to apply.');
-      return;
+      return { ok: false, error: 'Nothing to apply.' };
     }
 
     const beforeText = String(selectedInfo.beforeText ?? '');
@@ -1719,6 +1719,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     setStatusMsg('');
     onStatusMsg?.('');
     try {
+      let latestRevisionId = null;
       if (isGridPayload(proposedText)) {
         // Range paste: treat the selected cell as the top-left corner.
         const { r, c } = gridSizeFromPayload(proposedText);
@@ -1756,7 +1757,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
           setStatusMsg('No changes detected.');
           onStatusMsg?.('No changes detected.');
           setTimeout(() => { setStatusMsg(''); onStatusMsg?.(''); }, 1800);
-          return;
+          return { ok: true, noop: true };
         }
         const outcomeType = String(res?.outcomeType || res?.result?.outcomeType || '').toLowerCase();
         if (outcomeType && outcomeType !== 'applied') {
@@ -1773,6 +1774,9 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
           throw new Error('Apply proof verification failed.');
         }
         pushEditHistory({ kind: 'applyEdit', revisionId, payload });
+        // Keep return shape consistent for explicit Save callers.
+        // (The visual refresh is handled below.)
+        latestRevisionId = revisionId;
       } else {
         const payload = {
           instruction: `Manual edit in viewer: ${cleanDocumentName(document?.filename)}`,
@@ -1798,7 +1802,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
           setStatusMsg('No changes detected.');
           onStatusMsg?.('No changes detected.');
           setTimeout(() => { setStatusMsg(''); onStatusMsg?.(''); }, 1800);
-          return;
+          return { ok: true, noop: true };
         }
         const outcomeType = String(res?.outcomeType || res?.result?.outcomeType || '').toLowerCase();
         if (outcomeType && outcomeType !== 'applied') {
@@ -1815,6 +1819,9 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
           throw new Error('Apply proof verification failed.');
         }
         pushEditHistory({ kind: 'applyEdit', revisionId, payload });
+        // Keep return shape consistent for explicit Save callers.
+        // (The visual refresh is handled below.)
+        latestRevisionId = revisionId;
       }
 
       setStatusMsg('Applied. Refreshing…');
@@ -1829,10 +1836,12 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       setStatusMsg('Applied.');
       onStatusMsg?.('Applied.');
       setTimeout(() => setStatusMsg(''), 1500);
+      return { ok: true, revisionId: latestRevisionId || null };
     } catch (e) {
       const msg = e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || 'Apply failed.';
       setStatusMsg(msg);
       onStatusMsg?.(msg);
+      return { ok: false, error: msg };
     } finally {
       setIsApplying(false);
     }
@@ -1981,6 +1990,32 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     onStatusMsg?.(msg);
     setTimeout(() => { setStatusMsg(''); onStatusMsg?.(''); }, 1000);
   }, [controlledDraftValue, onDraftValueChange, onStatusMsg, selectedInfo]);
+
+  const hasPendingEdits = useCallback(() => {
+    if (!selectedInfo?.a1) return false;
+    const draft = String(effectiveDraftValue ?? '');
+    const before = String(selectedInfo?.beforeText ?? '');
+    const isGrid = draft.includes('\n') || draft.includes('\t');
+    if (isGrid) return Boolean(draft.trim());
+    return draft.trim() !== before.trim();
+  }, [effectiveDraftValue, selectedInfo?.a1, selectedInfo?.beforeText]);
+
+  const saveAllManualEdits = useCallback(async () => {
+    if (!hasPendingEdits()) return [];
+    const result = await apply();
+    if (result?.ok && result?.revisionId) {
+      return [{ ok: true, revisionId: result.revisionId }];
+    }
+    if (result?.ok && result?.noop) {
+      return [{ ok: true, noop: true }];
+    }
+    return [{ ok: false, error: result?.error || 'Save failed.' }];
+  }, [apply, hasPendingEdits]);
+
+  const discardAllManualEdits = useCallback(() => {
+    revert();
+    return true;
+  }, [revert]);
 
   useEffect(() => {
     const isEditableTarget = (node) => {
@@ -2215,6 +2250,9 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   useImperativeHandle(ref, () => ({
     apply,
     revert,
+    saveAllManualEdits,
+    discardAllManualEdits,
+    hasPendingEdits,
     compute,
     applyFormat,
     reload: () => load(),
@@ -2306,7 +2344,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       return null;
     },
     clearSelection,
-  }), [apply, revert, compute, selectedInfo, effectiveDraftValue, controlledDraftValue, onDraftValueChange, isApplying, load, sheetMeta, lockedCells, current, cellA1At, currentSheetName, activeAskBubble, selectedRange, selected, viewerSelectionForRange, clearSelection, undoSelection, redoSelection, undoAction, redoAction, canUndoEdit, canRedoEdit, canUndoSelection, canRedoSelection, editHistoryVersion, selectionHistoryVersion]);
+  }), [apply, revert, saveAllManualEdits, discardAllManualEdits, hasPendingEdits, compute, selectedInfo, effectiveDraftValue, controlledDraftValue, onDraftValueChange, isApplying, load, sheetMeta, lockedCells, current, cellA1At, currentSheetName, activeAskBubble, selectedRange, selected, viewerSelectionForRange, clearSelection, undoSelection, redoSelection, undoAction, redoAction, canUndoEdit, canRedoEdit, canUndoSelection, canRedoSelection, editHistoryVersion, selectionHistoryVersion]);
 
   if (loading) {
     return (

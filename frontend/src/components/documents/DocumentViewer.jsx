@@ -638,6 +638,8 @@ const DocumentViewer = () => {
   const [docxAlignment, setDocxAlignment] = useState('');
   const [docxHasPendingEdits, setDocxHasPendingEdits] = useState(false);
   const [docxSaveNotice, setDocxSaveNotice] = useState(''); // 'Saved!' / 'Discarded' / ''
+  const docxSaveInFlightRef = useRef(false);
+  const excelSaveInFlightRef = useRef(false);
 
   // XLSX toolbar state
   const [excelSelectedInfo, setExcelSelectedInfo] = useState(null);
@@ -4194,6 +4196,35 @@ const DocumentViewer = () => {
         onExcelDraftValueChange={setExcelDraftValue}
         onExcelApply={() => excelCanvasRef.current?.apply?.()}
         onExcelRevert={() => excelCanvasRef.current?.revert?.()}
+        excelPrimaryActionLabel="Save"
+        onExcelPrimaryAction={async () => {
+          if (excelSaveInFlightRef.current) return;
+          excelSaveInFlightRef.current = true;
+          try {
+            const results = await excelCanvasRef.current?.saveAllManualEdits?.();
+            const saved = (results || []).filter((r) => r.ok && r.revisionId);
+            const failed = (results || []).filter((r) => !r.ok);
+            const stillPending = Boolean(excelCanvasRef.current?.hasPendingEdits?.());
+            if (saved.length > 0) {
+              setEditorStatusMsg('Saved.');
+              setTimeout(() => setEditorStatusMsg(''), 1800);
+            } else if (failed.length > 0 || stillPending) {
+              setEditorStatusMsg('Save failed');
+              setTimeout(() => setEditorStatusMsg(''), 2600);
+            } else {
+              setEditorStatusMsg('All changes already saved');
+              setTimeout(() => setEditorStatusMsg(''), 1800);
+            }
+          } catch (e) {
+            console.error('[ExcelSave] save failed', e);
+            setEditorStatusMsg('Save failed');
+            setTimeout(() => setEditorStatusMsg(''), 2600);
+          } finally {
+            excelSaveInFlightRef.current = false;
+          }
+        }}
+        excelSecondaryActionLabel="Discard"
+        onExcelSecondaryAction={() => excelCanvasRef.current?.discardAllManualEdits?.()}
         excelCanApply={excelCanApply}
         excelSelectedInfo={excelSelectedInfo}
         excelSheetMeta={excelSheetMeta}
@@ -4285,6 +4316,8 @@ const DocumentViewer = () => {
 
         wordPrimaryActionLabel="Save"
         onWordPrimaryAction={async () => {
+          if (docxSaveInFlightRef.current) return;
+          docxSaveInFlightRef.current = true;
           const hadPendingBeforeSave = Boolean(docxCanvasRef.current?.hasPendingEdits?.() ?? docxHasPendingEdits);
           try {
             const results = await docxCanvasRef.current?.saveAllManualEdits?.();
@@ -4309,6 +4342,8 @@ const DocumentViewer = () => {
             setDocxHasPendingEdits(true);
             setDocxSaveNotice('Save failed');
             setTimeout(() => setDocxSaveNotice(''), 3000);
+          } finally {
+            docxSaveInFlightRef.current = false;
           }
         }}
         wordSecondaryActionLabel="Discard"

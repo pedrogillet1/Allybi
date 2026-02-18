@@ -197,6 +197,23 @@ function stripLeadingListMarker(value) {
     .trim();
 }
 
+function normalizeHtmlForCompare(value) {
+  return String(value || '')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function ensureNonEmptyDocxHtml(value, fallbackText = '') {
+  const html = String(value || '').trim();
+  const plain = stripHtml(html).replace(/\u00A0/g, ' ').trim();
+  if (plain) return html;
+  const fallback = String(fallbackText || '').replace(/\u00A0/g, ' ').trim();
+  if (fallback) return escapeHtml(fallback);
+  // Backend rejects fully-empty paragraph text; use an invisible placeholder run.
+  return '<span>\u200B</span>';
+}
+
 const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   {
     document,
@@ -229,6 +246,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   const reviewModeRef = useRef(Boolean(reviewMode));
   const autoSaveTimerRef = useRef(null);
   const isFlushingRef = useRef(false);
+  const isManualSaveRef = useRef(false);
   const scheduleAutoSaveRef = useRef(null);
   const flushDirtyParagraphsRef = useRef(null);
 
@@ -1521,6 +1539,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     instruction,
     silent = false,
     userConfirmed = true,
+    forceBundle = false,
   }) => {
     if (!docId || !paragraphId) return { ok: false, error: 'Missing doc/paragraph.' };
     if (actions.isInflight(paragraphId)) return { ok: false, error: 'Save in progress.' };
@@ -1542,36 +1561,82 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     const proposedText = String(nextText || '').trim();
     // Backend requires non-empty text after trim.
     const effectiveProposedText = toRequiredEditText(proposedText);
+    const baselineHtml = actions.getBaseline(paragraphId) || toHtmlFromPlain(beforeTextRaw).trim();
+    const textChanged = proposedText !== beforeTextRaw.trim();
+    const htmlChanged = normalizeHtmlForCompare(nextHtml) !== normalizeHtmlForCompare(baselineHtml);
 
-    // Skip no-ops (only for autosave, not explicit commits)
-    if (silent) {
-      const baselineHtml = actions.getBaseline(paragraphId) || toHtmlFromPlain(beforeTextRaw.trim());
-      if (proposedText === beforeTextRaw.trim() && String(nextHtml || '').replace(/\s+/g, '') === baselineHtml.replace(/\s+/g, '')) {
-        return { ok: true, noop: true };
+    if (!textChanged && !htmlChanged) {
+      if (!silent) {
+        setStatusMsg('No changes detected.');
+        onStatusMsg?.('No changes detected.');
+        setTimeout(() => { setStatusMsg(''); onStatusMsg?.(''); }, 1800);
       }
+      return { ok: true, noop: true };
     }
+
+    const useDocxBundle = forceBundle || operator === 'EDIT_DOCX_BUNDLE' || htmlChanged;
+    const payloadOperator = useDocxBundle ? 'EDIT_DOCX_BUNDLE' : operator;
+    const safeBundleAfterHtml = useDocxBundle ? ensureNonEmptyDocxHtml(nextHtml, proposedText) : null;
+    const bundlePatches = useDocxBundle
+      ? [{
+          kind: 'docx_paragraph',
+          paragraphId,
+          beforeText: beforeTextRaw,
+          afterText: proposedText,
+          afterHtml: safeBundleAfterHtml,
+        }]
+      : null;
+    const payloadProposedText = useDocxBundle
+      ? JSON.stringify({ patches: bundlePatches })
+      : effectiveProposedText;
 
     actions.startInflight(paragraphId);
     if (!silent) { setStatusMsg('Saving…'); onStatusMsg?.('Saving…'); }
     setIsApplying(true);
 
     try {
+      console.log('[DocxEditCanvas] applyEdit payload', {
+        instruction: instruction || `Manual edit in viewer: ${cleanDocumentName(document?.filename)}`,
+        operator: payloadOperator,
+        domain: 'docx',
+        documentId: docId,
+        beforeText: String(beforeText || '').slice(0, 60),
+        proposedText: String(payloadProposedText || '').slice(0, 60),
+        pid: paragraphId,
+        textChanged,
+        htmlChanged,
+      });
       const res = await applyEdit({
         instruction: instruction || `Manual edit in viewer: ${cleanDocumentName(document?.filename)}`,
-        operator,
+        operator: payloadOperator,
         domain: 'docx',
         documentId: docId,
         targetHint: paragraphId,
         target: { id: paragraphId, label: 'Paragraph', confidence: 1, candidates: [], decisionMargin: 1, isAmbiguous: false, resolutionReason: 'viewer_submit' },
         beforeText,
-        proposedText: effectiveProposedText,
-        proposedHtml: nextHtml,
+        proposedText: payloadProposedText,
+        ...(useDocxBundle ? { bundlePatches } : { proposedHtml: nextHtml }),
         userConfirmed,
       });
 
       // Noop detection: backend says "nothing changed"
       if (isNoopResult(res)) {
         console.warn('[DocxEditCanvas] Manual save: backend says noop', { res, paragraphId, beforeText, effectiveProposedText });
+        const stillDirty =
+          proposedText !== beforeTextRaw.trim() ||
+          normalizeHtmlForCompare(nextHtml) !== normalizeHtmlForCompare(baselineHtml);
+        if (stillDirty) {
+          if (!silent) {
+            const msg = 'Save was rejected as no-op while local changes are still pending.';
+            setStatusMsg(msg);
+            onStatusMsg?.(msg);
+          }
+          return { ok: false, error: 'Save was rejected as no-op while local changes are still pending.' };
+        }
+        // Sync local baseline to prevent repeated noop save attempts caused by minor
+        // local HTML normalization differences.
+        actions.updateBaseline(paragraphId, String(nextHtml || '').trim());
+        actions.updateBlockText(paragraphId, proposedText);
         actions.clearDirty(paragraphId);
         onDirtyChangeRef.current?.(actions.getDirtyPids().length > 0);
         if (!silent) {
@@ -1620,7 +1685,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       }
       return { ok: true, revisionId };
     } catch (e) {
-      console.error('[DocxEditCanvas] Manual save failed:', e?.response?.data || e?.message || e);
+      console.error('[DocxEditCanvas] Manual save failed:', e?.response?.data?.error || e?.message || e);
       const msg = e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || 'Save failed.';
       if (!silent) { setStatusMsg(msg); onStatusMsg?.(msg); }
       return { ok: false, error: msg };
@@ -1658,111 +1723,97 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   }, [actions, submitSingleEdit]);
   flushDirtyParagraphsRef.current = flushDirtyParagraphs;
 
-  // Dedicated save function that bypasses dirty-tracking and submitSingleEdit early-returns.
-  // Compares every block's original text against the live DOM and calls applyEdit() directly.
+  // Dedicated save function for explicit Save button.
+  // Uses the same backend apply route as chat (bundle patches for DOCX paragraph updates).
   const saveAllManualEdits = useCallback(async () => {
+    if (isManualSaveRef.current) return [];
+    isManualSaveRef.current = true;
     const results = [];
-    const dirtySet = new Set(
-      (actions.getDirtyPids?.() || [])
-        .map((pid) => String(pid || '').trim())
-        .filter(Boolean)
-    );
-    const candidateBlocks = dirtySet.size > 0
-      ? blocks.filter((b) => dirtySet.has(String(b?.paragraphId || '').trim()))
-      : blocks;
-    let stopDueToRateLimit = false;
-    for (const block of candidateBlocks) {
-      if (stopDueToRateLimit) break;
-      const pid = block.paragraphId;
-      if (!pid || !docId) continue;
-      if (actions.isInflight(pid)) continue;
 
+    // Collect candidates by real text/html diffs against the server baseline.
+    // Dirty tracking is treated as a hint only (it can become stale when focus moves).
+    const candidatePidSet = new Set();
+    const staleDirtyPids = [];
+    const dirtySet = new Set(
+      (actions.getDirtyPids?.() || []).map((p) => String(p || '').trim()).filter(Boolean),
+    );
+    for (const block of blocks) {
+      const pid = String(block?.paragraphId || '').trim();
+      if (!pid) continue;
       const liveText = getLiveTextFor(pid);
       const liveHtml = getLiveHtmlFor(pid);
-      if (liveText == null || liveHtml == null) continue;
-
-      // Normalize NBSP→space in originalText to match getLiveTextFor's normalization
-      const originalText = String(block.text || '').replace(/\u00A0/g, ' ').trim();
-      const proposedText = String(liveText || '').trim();
-      const baselineHtml = String(actions.getBaseline(pid) || toHtmlFromPlain(block.text || '') || '').trim();
-      const baselineHtmlCompact = baselineHtml.replace(/\s+/g, ' ').trim();
-      const liveHtmlCompact = String(liveHtml || '').replace(/\s+/g, ' ').trim();
-      const textChanged = proposedText !== originalText;
-      const htmlChanged = liveHtmlCompact !== baselineHtmlCompact;
-      const dirty = actions.isDirty(pid);
-
-      // Save only when we have an explicit dirty signal or an actual text/html diff.
-      if (!dirty && !textChanged && !htmlChanged) continue;
-
-      // Skip paragraphs with empty or whitespace-only proposed text — backend's
-      // normalizeWhitespace would reduce these to empty and reject the save.
-      if (!proposedText || !proposedText.replace(/\s+/g, '').length) {
-        if (dirty) actions.clearDirty(pid);
+      if (liveText == null || liveHtml == null) {
+        if (dirtySet.has(pid)) staleDirtyPids.push(pid);
         continue;
       }
-
-      // Backend requires non-empty before/proposed text payloads after trim().
-      const beforeText = toRequiredEditText(originalText);
-      const effectiveProposedText = toRequiredEditText(proposedText);
-
-      actions.startInflight(pid);
-      try {
-        const res = await applyEdit({
-          instruction: `Manual edit in viewer: ${cleanDocumentName(document?.filename)}`,
-          operator: 'EDIT_PARAGRAPH',
-          domain: 'docx',
-          documentId: docId,
-          targetHint: pid,
-          target: { id: pid, label: 'Paragraph', confidence: 1, candidates: [], decisionMargin: 1, isAmbiguous: false, resolutionReason: 'viewer_submit' },
-          beforeText,
-          proposedText: effectiveProposedText,
-          proposedHtml: liveHtml,
-          userConfirmed: true,
-        });
-
-        const verified = extractVerifiedApply(res);
-        const revisionId = verified?.newRevisionId || null;
-
-        if (revisionId) {
-          actions.updateBaseline(pid, String(liveHtml || '').trim());
-          actions.updateBlockText(pid, proposedText);
-          actions.clearDirty(pid);
-          results.push({ pid, ok: true, revisionId });
-        } else if (isNoopResult(res)) {
-          if (textChanged || htmlChanged) {
-            console.warn('[DocxEditCanvas] Save returned noop but content appeared changed', { pid, textChanged, htmlChanged });
-          }
-          actions.clearDirty(pid);
-          results.push({ pid, ok: true, noop: true });
-        } else {
-          results.push({ pid, ok: false, error: 'No revision ID returned' });
-        }
-      } catch (e) {
-        console.error('[DocxEditCanvas] saveAllManualEdits failed for', pid, e);
-        const msg = e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || 'Save failed';
-        results.push({ pid, ok: false, error: msg });
-        if (Number(e?.response?.status || 0) === 429) {
-          stopDueToRateLimit = true;
-        }
-      } finally {
-        actions.endInflight(pid);
+      const originalText = String(block.text || '').replace(/\u00A0/g, ' ').trim();
+      const proposedText = String(liveText || '').trim();
+      const baselineHtml = actions.getBaseline(pid) || toHtmlFromPlain(originalText).trim();
+      const textChanged = proposedText !== originalText;
+      const htmlChanged = normalizeHtmlForCompare(liveHtml) !== normalizeHtmlForCompare(baselineHtml);
+      // Only treat HTML-only deltas as save candidates when the paragraph is
+      // explicitly dirty. This avoids repeated noop saves from harmless DOM drift.
+      if (textChanged || (dirtySet.has(pid) && htmlChanged)) {
+        candidatePidSet.add(pid);
+      } else if (dirtySet.has(pid)) {
+        // Drop stale dirty flags so Save button status matches reality.
+        actions.clearDirty(pid);
       }
     }
-    // Notify parent once after all saves (not per-paragraph) to avoid
-    // multiple re-renders and replaceState calls mid-loop.
+    const candidatePids = Array.from(candidatePidSet);
+    for (const pid of staleDirtyPids) {
+      actions.clearDirty(pid);
+    }
+
+    console.log('[DocxEditCanvas] saveAllManualEdits', {
+      dirtyPids: Array.from(dirtySet),
+      staleDirtyPids,
+      candidatePids,
+      totalBlocks: blocks.length,
+    });
+
+    let stopDueToRateLimit = false;
+    try {
+      for (const pid of candidatePids) {
+        if (stopDueToRateLimit) break;
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          const res = await submitSingleEdit({
+            paragraphId: pid,
+            operator: 'EDIT_DOCX_BUNDLE',
+            silent: false,
+            userConfirmed: true,
+            forceBundle: true,
+          });
+          if (res?.revisionId) {
+            results.push({ pid, ok: true, revisionId: res.revisionId });
+          } else if (res?.noop) {
+            results.push({ pid, ok: true, noop: true });
+          } else {
+            results.push({ pid, ok: false, error: res?.error || 'Save failed' });
+            if (String(res?.error || '').includes('429')) stopDueToRateLimit = true;
+          }
+        } catch (e) {
+          console.error('[DocxEditCanvas] saveAllManualEdits error for', pid, e);
+          results.push({ pid, ok: false, error: e?.message || 'Save failed' });
+        }
+      }
+    } finally {
+      isManualSaveRef.current = false;
+    }
+
+    // Notify parent once after all saves.
     const lastRevisionId = results.findLast(r => r.ok && r.revisionId)?.revisionId;
     if (lastRevisionId) {
       onApplied?.({ revisionId: lastRevisionId });
-      // Reload from server so paragraph IDs and baselines are fresh.
-      // Paragraph IDs are content-addressed (SHA-256), so after saving new text
-      // the old IDs become stale. Without reload, subsequent saves fail with
-      // "Paragraph target not found".
-      await new Promise(r => setTimeout(r, 300));
-      await load();
     }
-    onDirtyChangeRef.current?.(actions.getDirtyPids().length > 0);
+    const pendingAfter = (actions.getDirtyPids?.() || [])
+      .map((pid) => String(pid || '').trim())
+      .filter(Boolean)
+      .some((pid) => getLiveTextFor(pid) != null && getLiveHtmlFor(pid) != null);
+    onDirtyChangeRef.current?.(pendingAfter);
     return results;
-  }, [blocks, docId, document?.filename, actions, getLiveTextFor, getLiveHtmlFor, onApplied, load]);
+  }, [blocks, actions, getLiveTextFor, getLiveHtmlFor, submitSingleEdit, onApplied]);
 
   const scheduleAutoSave = useCallback(() => {
     if (readOnly) return;
@@ -1809,6 +1860,29 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     const revisionId = results.find((r) => r.revisionId)?.revisionId || null;
     return { ok, revisionId, results };
   }, [commitParagraph]);
+
+  const hasPendingEdits = useCallback(() => {
+    const dirtySet = new Set(
+      (actions.getDirtyPids?.() || []).map((pid) => String(pid || '').trim()).filter(Boolean),
+    );
+    for (const block of blocks) {
+      const pid = String(block?.paragraphId || '').trim();
+      if (!pid) continue;
+      const liveText = getLiveTextFor(pid);
+      const liveHtml = getLiveHtmlFor(pid);
+      if (liveText == null || liveHtml == null) {
+        // Ignore stale dirty ids that no longer resolve to a live paragraph node.
+        continue;
+      }
+      const originalText = String(block.text || '').replace(/\u00A0/g, ' ').trim();
+      const proposedText = String(liveText || '').trim();
+      const baselineHtml = actions.getBaseline(pid) || toHtmlFromPlain(originalText).trim();
+      const textChanged = proposedText !== originalText;
+      const htmlChanged = normalizeHtmlForCompare(liveHtml) !== normalizeHtmlForCompare(baselineHtml);
+      if (textChanged || htmlChanged || dirtySet.has(pid)) return true;
+    }
+    return false;
+  }, [actions, blocks, getLiveHtmlFor, getLiveTextFor]);
 
   const applySelected = useCallback(async () => {
     if (!docId || !selectedBlock?.paragraphId) return;
@@ -1879,7 +1953,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     commitParagraphs,
     flushDirtyParagraphs,
     saveAllManualEdits,
-    hasPendingEdits: () => actions.getDirtyPids().length > 0,
+    hasPendingEdits,
     focus: () => {
       try { pageHostRef.current?.focus?.(); } catch {}
     },
@@ -1914,6 +1988,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     commitParagraphs,
     flushDirtyParagraphs,
     saveAllManualEdits,
+    hasPendingEdits,
   ]);
 
   if (loading) {
@@ -2082,12 +2157,6 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
                 pushUndoSnapshot(pid, prevHtml);
                 actions.setLastHtml(pid, nextHtml);
               }
-            } catch {}
-            // Update baseline immediately so the DOM state survives any React
-            // re-render that triggers a re-seed (e.g. toolbar interactions).
-            try {
-              const liveHtml = sanitizeDocxRichHtml(el.innerHTML || '');
-              actions.updateBaseline(pid, liveHtml);
             } catch {}
             actions.markDirty(pid);
             onDirtyChangeRef.current?.(true);
