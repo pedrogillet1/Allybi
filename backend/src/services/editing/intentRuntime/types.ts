@@ -217,10 +217,22 @@ export interface AnalyzeInput {
 export interface OperatorCatalogEntry {
   domain: "excel" | "docx";
   runtimeOperator: string;
+  engine?: string;
   requiresSelection: "required" | "optional" | "forbidden";
   supportsMultiTarget: boolean;
   requiredSlots: string[];
   optionalSlots: string[];
+  slotSchema?: Record<string, unknown>;
+  allowedScopes?: string[];
+  scopeDefaults?: Record<string, unknown>;
+  previewType?: string;
+  diffType?: string;
+  validationRules?: Array<Record<string, unknown>>;
+  confirmationPolicy?: {
+    requiresExplicitConfirm?: boolean;
+  };
+  microcopyKeys?: Record<string, string>;
+  capabilityKey?: string;
   conflictsWith: string[];
   previewable: boolean;
   undoable: boolean;

@@ -1526,7 +1526,7 @@
       "priority": 82,
       "triggers": {
         "regex_any": [
-          "\\bconvert\\b.*\\bbullets?\\b.*\\bparagraph\\b",
+          "\\bconvert\\b.*\\bbullets?\\b.*\\bparagraphs?\\b",
           "\\bbullets?\\b.*\\b(?:to|into)\\b.*\\bparagraphs?\\b",
           "\\b(?:turn|change|transform)\\b.*\\b(?:bullets?|list)\\b.*\\b(?:into|to)\\b.*\\bparagraphs?\\b"
         ]
@@ -1545,9 +1545,11 @@
       "planTemplate": [
         {
           "op": "DOCX_LIST_REMOVE",
-          "targets": [
-            "$target"
-          ]
+          "targets": "$target"
+        },
+        {
+          "op": "DOCX_MERGE_PARAGRAPHS",
+          "targetIds": "$target"
         }
       ],
       "examples": {
@@ -1838,9 +1840,7 @@
       "planTemplate": [
         {
           "op": "DOCX_MERGE_PARAGRAPHS",
-          "targetIds": [
-            "$targets"
-          ]
+          "targetIds": "$targets"
         }
       ],
       "examples": {

@@ -97,6 +97,8 @@ export class EditPlanService {
 
     const plan: EditPlan = {
       operator: request.operator,
+      canonicalOperator: request.canonicalOperator,
+      intentSource: request.intentSource,
       domain: request.domain,
       documentId: request.documentId,
       targetHint: request.targetHint,

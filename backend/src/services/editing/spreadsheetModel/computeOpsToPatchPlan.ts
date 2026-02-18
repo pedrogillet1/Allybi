@@ -78,17 +78,7 @@ function detectHeaderRangeFromSemantic(semantic: Record<string, SemanticIndex> |
   if (!cols.length) return null;
   const min = Math.min(...cols);
   const max = Math.max(...cols);
-  const toCol = (n: number): string => {
-    let x = n;
-    let out = "";
-    while (x > 0) {
-      const r = (x - 1) % 26;
-      out = String.fromCharCode(65 + r) + out;
-      x = Math.floor((x - 1) / 26);
-    }
-    return out;
-  };
-  return `${sheetName}!${toCol(min)}${index.headerRow}:${toCol(max)}${index.headerRow}`;
+  return `${sheetName}!${numberToCol(min)}${index.headerRow}:${numberToCol(max)}${index.headerRow}`;
 }
 
 export function computeOpsToPatchPlan(input: {

@@ -1556,7 +1556,7 @@
         {
           "op": "DOCX_SET_PARAGRAPH_STYLE",
           "targets": "$targets",
-          "styleName": "Heading$level"
+          "styleName": "Heading $level"
         }
       ],
       "examples": {

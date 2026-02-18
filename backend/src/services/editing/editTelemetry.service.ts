@@ -6,7 +6,7 @@ import { TelemetryService } from "../telemetry/telemetry.service";
 import { redactText, stableObjectHash } from "../telemetry/telemetry.redaction";
 import type { EditTelemetry } from "./editing.types";
 
-type EditTelemetryEvent = "edit_planned" | "edit_previewed" | "edit_applied" | "edit_failed";
+type EditTelemetryEvent = "edit_planned" | "edit_previewed" | "edit_applied" | "edit_failed" | "edit_noop";
 
 function safeNumber(x: unknown): number | null {
   if (typeof x !== "number") return null;
@@ -141,4 +141,3 @@ export class EditTelemetryService implements EditTelemetry {
     }
   }
 }
-

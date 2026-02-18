@@ -78,6 +78,7 @@ interface GeminiToolSchema {
 
 interface GeminiGenerateRequest {
   contents: GeminiContent[];
+  systemInstruction?: { parts: Array<{ text: string }> };
   tools?: GeminiToolSchema[];
   generationConfig?: {
     temperature?: number;
@@ -281,31 +282,38 @@ export class GeminiClientService implements LLMClient {
 
       state.phase = 'preamble';
 
-      // Stream parse
+      // Stream parse — SSE (alt=sse) returns "data: {json}\n\n" events incrementally
       const reader = res.body.getReader();
       const decoder = new TextDecoder('utf-8');
 
       let buffer = '';
       let firstTokenEmitted = false;
+      let usageMetadata: GeminiUsageMetadata | undefined;
 
       while (sink.isOpen()) {
         const { value, done } = await reader.read();
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-      }
 
-      // Gemini streaming returns JSON array with chunks
-      // Parse the entire response once we have it all
-      const fullResponse = safeJsonParse(buffer);
-      let usageMetadata: GeminiUsageMetadata | undefined;
+        // Process complete SSE events as they arrive
+        let boundary: number;
+        while ((boundary = buffer.indexOf('\n\n')) >= 0) {
+          const eventBlock = buffer.slice(0, boundary).trim();
+          buffer = buffer.slice(boundary + 2);
 
-      if (fullResponse) {
-        // Handle array format (SSE returns array of chunks)
-        const chunks = Array.isArray(fullResponse) ? fullResponse : [fullResponse];
+          if (!eventBlock) continue;
 
-        for (const chunk of chunks) {
-          const chunkResp = chunk as GeminiGenerateResponse;
+          // Extract JSON from "data: {...}" line(s)
+          const dataLines = eventBlock.split('\n')
+            .filter((line) => line.startsWith('data: '))
+            .map((line) => line.slice(6));
+          const jsonStr = dataLines.join('');
+          if (!jsonStr) continue;
+
+          const chunkResp = safeJsonParse(jsonStr) as GeminiGenerateResponse | null;
+          if (!chunkResp) continue;
+
           const parsed = this.parseGeminiResponse(chunkResp);
 
           // Capture usage from the last chunk that has it
@@ -448,9 +456,10 @@ export class GeminiClientService implements LLMClient {
   }
 
   private buildStreamUrl(model: string): string {
-    // v1beta/models/{model}:streamGenerateContent
+    // v1beta/models/{model}:streamGenerateContent?alt=sse
+    // alt=sse enables Server-Sent Events for true incremental streaming
     const base = this.cfg.baseUrl.replace(/\/$/, '');
-    return `${base}/models/${encodeURIComponent(model)}:streamGenerateContent`;
+    return `${base}/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`;
   }
 
   private inferKind(req: LLMRequest): 'answer' | 'nav_pills' | 'system' {
@@ -462,19 +471,16 @@ export class GeminiClientService implements LLMClient {
 
   private buildGeminiRequest(req: LLMRequest): GeminiGenerateRequest {
     const contents: GeminiContent[] = [];
+    const systemParts: string[] = [];
 
     for (const m of req.messages) {
       // Map roles -> Gemini roles.
-      // - system/developer are folded into user role as preface content
+      // - system/developer -> top-level systemInstruction
       // - assistant -> model
       // - tool -> user (functionResponse part)
       if (m.role === 'system' || m.role === 'developer') {
-        if (m.content) {
-          contents.push({
-            role: 'user',
-            parts: [{ text: m.content }],
-          });
-        }
+        const text = (m.content ?? '').trim();
+        if (text) systemParts.push(text);
         continue;
       }
 
@@ -538,6 +544,13 @@ export class GeminiClientService implements LLMClient {
         maxOutputTokens: req.sampling?.maxOutputTokens,
       },
     };
+
+    // Use top-level systemInstruction for system/developer messages
+    if (systemParts.length > 0) {
+      out.systemInstruction = {
+        parts: systemParts.map((text) => ({ text })),
+      };
+    }
 
     // Tools: Gemini uses functionDeclarations
     if (req.tools?.enabled && req.tools.registry?.tools?.length) {

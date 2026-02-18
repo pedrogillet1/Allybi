@@ -12,32 +12,23 @@ const controller = createEditingController();
 // confirmation rules as the backend (single source of truth).
 router.get('/policy', authMiddleware, rateLimitMiddleware, (_req, res) => {
   const capabilities: any = getOptionalBank('allybi_capabilities');
-  const bank: any = getOptionalBank('editing_routing');
   const alwaysConfirmOperators = Array.isArray(capabilities?.alwaysConfirmOperators)
     ? capabilities.alwaysConfirmOperators.map((x: any) => String(x))
-    : (Array.isArray(bank?.operators?.alwaysConfirm)
-      ? bank.operators.alwaysConfirm.map((x: any) => String(x))
-      : []);
+    : [];
   const silentExecuteConfidence =
     typeof capabilities?.config?.silentExecuteConfidence === 'number'
       ? capabilities.config.silentExecuteConfidence
-      : typeof bank?.config?.thresholds?.silentExecuteConfidence === 'number'
-        ? bank.config.thresholds.silentExecuteConfidence
       : 0.9;
 
   const autoApplyInViewer =
     typeof capabilities?.config?.autoApplyInViewer === 'boolean'
       ? capabilities.config.autoApplyInViewer
-      : typeof bank?.config?.autoApplyInViewer === 'boolean'
-        ? bank.config.autoApplyInViewer
-        : true;
+      : true;
 
   const autoApplyComputeBundles =
     typeof capabilities?.config?.autoApplyComputeBundles === 'boolean'
       ? capabilities.config.autoApplyComputeBundles
-      : typeof bank?.config?.autoApplyComputeBundles === 'boolean'
-        ? bank.config.autoApplyComputeBundles
-        : true;
+      : true;
 
   res.json({
     ok: true,
@@ -48,7 +39,6 @@ router.get('/policy', authMiddleware, rateLimitMiddleware, (_req, res) => {
       autoApplyComputeBundles,
       databanksUsed: [
         ...(capabilities?._meta?.id ? [String(capabilities._meta.id)] : []),
-        ...(bank?.bankId ? [String(bank.bankId)] : []),
       ],
     },
   });

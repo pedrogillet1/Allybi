@@ -3162,6 +3162,8 @@ export class PrismaChatService {
     const byOperator = String(
       copy?.byOperator?.[stage]?.[op]?.[loc]?.body ||
       copy?.byOperator?.[stage]?.[op]?.[fallbackLang]?.body ||
+      copy?.byOperator?.[stage]?.["*"]?.[loc]?.body ||
+      copy?.byOperator?.[stage]?.["*"]?.[fallbackLang]?.body ||
       "",
     ).trim();
     if (byOperator) return this.interpolateTemplate(byOperator, (input.vars || {}) as Record<string, unknown>);

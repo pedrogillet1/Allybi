@@ -136,6 +136,12 @@ function extractAttachedDocumentIdsFromBody(body: any): string[] {
   const ids = new Set<string>();
   if (!body || typeof body !== "object") return [];
 
+  const fromLegacyIds = Array.isArray(body.documentIds) ? body.documentIds : [];
+  for (const id of fromLegacyIds) {
+    const normalized = typeof id === "string" ? id.trim() : "";
+    if (normalized) ids.add(normalized);
+  }
+
   const fromArray = Array.isArray(body.attachedDocuments)
     ? body.attachedDocuments
     : [];
@@ -291,15 +297,12 @@ router.post(
       return;
     }
 
-    const { message, conversationId, attachedDocuments, language, isRegenerate } = parsed.data;
+    const { message, conversationId, language, isRegenerate } = parsed.data;
     const confirmationToken = (parsed.data as any).confirmationToken as string | undefined;
 
-    // Extract document IDs from attachments (frontend sends [{id, name, type}])
-    const attachedDocumentIds = Array.isArray(attachedDocuments)
-      ? attachedDocuments.map((d: any) => d?.id).filter(Boolean) as string[]
-      : [];
+    const attachedDocumentIds = extractAttachedDocumentIdsFromBody(parsed.data);
 
-    // Server-side language resolution: explicit language wins; otherwise infer from user query.
+    // Server-side language resolution: infer from user query text (language is query-driven).
     const preferredLanguage = resolvePreferredLanguage(language, message);
 
     const rawMeta = (parsed.data as any).meta as Record<string, unknown> | undefined;
@@ -424,12 +427,10 @@ router.post(
       return;
     }
 
-    const { message, attachedDocuments, language, isRegenerate } = parsed.data;
+    const { message, language, isRegenerate } = parsed.data;
     const confirmationToken = (parsed.data as any).confirmationToken as string | undefined;
 
-    const attachedDocumentIds = Array.isArray(attachedDocuments)
-      ? attachedDocuments.map((d: any) => d?.id).filter(Boolean) as string[]
-      : [];
+    const attachedDocumentIds = extractAttachedDocumentIdsFromBody(parsed.data);
 
     const preferredLanguage = resolvePreferredLanguage(language, message);
 
@@ -547,11 +548,9 @@ router.post(
       return;
     }
 
-    const { message, conversationId, attachedDocuments: chatAttDocs, language } = parsed.data;
+    const { message, conversationId, language } = parsed.data;
     const confirmationToken = (parsed.data as any).confirmationToken as string | undefined;
-    const chatAttDocIds = Array.isArray(chatAttDocs)
-      ? chatAttDocs.map((d: any) => d?.id).filter(Boolean) as string[]
-      : [];
+    const chatAttDocIds = extractAttachedDocumentIdsFromBody(parsed.data);
 
     try {
       const connectorContext = (parsed.data as any).connectorContext as Record<string, unknown> | undefined;

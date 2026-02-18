@@ -1220,7 +1220,12 @@ export default function ChatInterface({
 
   useEffect(() => {
     if (!isViewerVariant) return;
-    if (!hasViewerSelectionPayload(viewerSelection)) return;
+    if (!hasViewerSelectionPayload(viewerSelection)) {
+      // Viewer explicitly cleared selection (both frozen + live are null) — wipe
+      // cache so the stale "Selection locked" badge disappears immediately.
+      lastViewerSelectionRef.current = { selection: null, at: 0 };
+      return;
+    }
     const docId = String(viewerContext?.activeDocumentId || "").trim();
     lastViewerSelectionRef.current = {
       selection: viewerSelection,

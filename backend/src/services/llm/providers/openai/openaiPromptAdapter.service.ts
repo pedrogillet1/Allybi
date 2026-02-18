@@ -467,7 +467,7 @@ export class OpenAIPromptAdapterService {
       stream: gen.stream,
       temperature: gen.temperature,
       top_p: gen.topP,
-      ...(typeof gen.maxOutputTokens === "number" ? { max_tokens: clampInt(gen.maxOutputTokens, 1, 8192, this.cfg.defaults.maxOutputTokensFinal) } : {}),
+      ...(typeof gen.maxOutputTokens === "number" ? { max_completion_tokens: clampInt(gen.maxOutputTokens, 1, 8192, this.cfg.defaults.maxOutputTokensFinal) } : {}),
       ...(gen.stop ? { stop: gen.stop } : {}),
       ...(tools ? { tools } : {}),
       ...(tool_choice ? { tool_choice } : {}),

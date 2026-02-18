@@ -108,6 +108,10 @@
         "CREATE_CHART": {
           "en": { "body": "Draft ready for chart creation. Review source range, series mapping, and chart type before applying." },
           "pt": { "body": "Previa pronta para criacao de grafico. Revise intervalo fonte, mapeamento de series e tipo de grafico antes de aplicar." }
+        },
+        "*": {
+          "en": { "body": "Draft ready. Review the target and diff before applying." },
+          "pt": { "body": "Previa pronta. Revise o alvo e o diff antes de aplicar." }
         }
       },
       "applied": {
@@ -142,6 +146,10 @@
         "CREATE_CHART": {
           "en": { "body": "Chart created and saved to the workbook." },
           "pt": { "body": "Gráfico criado e salvo na planilha." }
+        },
+        "*": {
+          "en": { "body": "Edit applied and saved successfully." },
+          "pt": { "body": "Edicao aplicada e salva com sucesso." }
         }
       },
       "blocked": {
@@ -176,6 +184,28 @@
         "CREATE_CHART": {
           "en": { "body": "Chart creation needs your confirmation. Review the source range and series mapping." },
           "pt": { "body": "A criação de gráfico precisa da sua confirmação. Revise o intervalo e o mapeamento de séries." }
+        },
+        "*": {
+          "en": { "body": "I need confirmation or more details before applying this edit." },
+          "pt": { "body": "Preciso de confirmacao ou mais detalhes antes de aplicar esta edicao." }
+        }
+      },
+      "noop": {
+        "*": {
+          "en": { "body": "No changes were needed. The document already matches your request." },
+          "pt": { "body": "Nenhuma mudanca foi necessaria. O documento ja corresponde ao seu pedido." }
+        }
+      },
+      "clarification_required": {
+        "*": {
+          "en": { "body": "I need one or two missing details before I can apply this edit safely." },
+          "pt": { "body": "Preciso de um ou dois detalhes faltantes antes de aplicar esta edicao com seguranca." }
+        }
+      },
+      "engine_unsupported": {
+        "*": {
+          "en": { "body": "This action is recognized, but the current editing engine does not support applying it yet." },
+          "pt": { "body": "Esta acao foi reconhecida, mas o mecanismo de edicao atual ainda nao suporta aplica-la." }
         }
       }
     },

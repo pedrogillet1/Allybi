@@ -357,6 +357,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
             "docx_merge_paragraphs", "docx_split_to_list",
             "docx_list_promote_demote", "docx_delete_section",
             "docx_insert_before",
+            "docx_list_apply_bullets", "docx_list_apply_numbering",
+            "docx_list_remove", "docx_list_restart_numbering",
+            "docx_split_paragraph", "docx_update_toc",
           ]);
           const bundleLike = (parsed as any).patches.every((p: any) => {
             const kind = String(p?.kind || "").trim();
@@ -679,6 +682,30 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       if (patchesApplied === 0) {
         throw new Error("EDIT_NOOP: All patches resulted in no changes to the document.");
       }
+
+      // Propagate apply metrics so the orchestrator can report real counts.
+      const affectedParagraphIds = Array.from(
+        new Set(
+          [
+            ...patches
+              .map((patch: any) => String((patch as any)?.paragraphId || "").trim())
+              .filter(Boolean),
+            ...deletePids,
+            ...patches
+              .filter((patch: any) => String((patch as any)?.kind || "").trim() === "docx_merge_paragraphs")
+              .flatMap((patch: any) =>
+                Array.isArray((patch as any)?.paragraphIds)
+                  ? (patch as any).paragraphIds.map((id: any) => String(id || "").trim()).filter(Boolean)
+                  : [],
+              ),
+          ].filter(Boolean),
+        ),
+      );
+      (meta as any).__applyMetrics = {
+        ...(meta as any).__applyMetrics,
+        patchesApplied,
+        affectedParagraphIds,
+      };
 
       // Verification gate: re-parse output and check structural invariants
       try {
@@ -1828,6 +1855,13 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     const rejectedOps = [...translated.rejectedOps, ...statusSummary.rejectedOps];
 
     if (!diff.changed || (diff.changedCellsCount === 0 && diff.changedStructuresCount === 0)) {
+      // Ensure doc stays "ready" — don't leave it in an intermediate status
+      try {
+        await prisma.document.update({
+          where: { id: input.documentId },
+          data: { status: "ready" },
+        });
+      } catch {}
       throw new Error("EDIT_NOOP_NO_CHANGES");
     }
 

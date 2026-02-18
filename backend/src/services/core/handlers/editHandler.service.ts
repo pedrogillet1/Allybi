@@ -1,13 +1,15 @@
 import {
+  type EditApplyResult,
   EditOrchestratorService,
+  type EditOutcomeType,
+  type EditPlan,
+  type EditReceipt,
   TargetResolverService,
   type DocxParagraphNode,
-  type EditApplyResult,
   type EditExecutionContext,
   type EditPlanRequest,
   type EditPlanResult,
   type EditPreviewResult,
-  type EditReceipt,
   type EditRevisionStore,
   type EditTelemetry,
   type ResolvedTarget,
@@ -15,6 +17,7 @@ import {
   type SlidesTargetNode,
   type UndoResult,
 } from "../../editing";
+import { SupportContractService, type SupportContractResult } from "../../editing/allybi/supportContract.service";
 
 type EditActionMode = "plan" | "preview" | "apply" | "undo";
 
@@ -69,6 +72,7 @@ function syntheticTarget(label: string): ResolvedTarget {
 export class EditHandlerService {
   private readonly orchestrator: EditOrchestratorService;
   private readonly targetResolver: TargetResolverService;
+  private readonly supportContract: SupportContractService;
 
   constructor(opts?: { revisionStore?: EditRevisionStore; telemetry?: EditTelemetry }) {
     this.orchestrator = new EditOrchestratorService({
@@ -76,6 +80,7 @@ export class EditHandlerService {
       telemetry: opts?.telemetry,
     });
     this.targetResolver = new TargetResolverService();
+    this.supportContract = new SupportContractService();
   }
 
   async execute(input: EditHandlerRequest): Promise<EditHandlerResponse> {
@@ -122,6 +127,50 @@ export class EditHandlerService {
 
     if (!resolvedTarget) {
       return { ok: false, mode: input.mode, error: "Could not resolve edit target." };
+    }
+
+    const contract = this.supportContract.evaluatePreApply({
+      instruction: planned.plan.normalizedInstruction,
+      domain: planned.plan.domain,
+      runtimeOperator: planned.plan.operator,
+      canonicalOperator: planned.plan.canonicalOperator || null,
+      intentSource: planned.plan.intentSource,
+      resolvedTargetId: resolvedTarget.id,
+    });
+
+    if (!contract.ok) {
+      const blockedReceipt = this.buildContractBlockedReceipt({
+        plan: planned.plan,
+        target: resolvedTarget,
+        contract,
+      });
+      if (input.mode === "preview") {
+        return {
+          ok: true,
+          mode: "preview",
+          result: {
+            ok: true,
+            target: resolvedTarget,
+            receipt: blockedReceipt,
+            requiresConfirmation: true,
+          },
+          receipt: blockedReceipt,
+          requiresUserChoice: false,
+        };
+      }
+
+      const blockedApply = this.buildContractBlockedApplyResult({
+        plan: planned.plan,
+        receipt: blockedReceipt,
+        contract,
+      });
+      return {
+        ok: true,
+        mode: "apply",
+        result: blockedApply,
+        receipt: blockedReceipt,
+        requiresUserChoice: false,
+      };
     }
 
     if (resolvedTarget.isAmbiguous && input.mode === "apply" && input.userConfirmed !== true) {
@@ -195,5 +244,36 @@ export class EditHandlerService {
       return this.targetResolver.resolveSlidesTarget(hint, input.slidesCandidates);
     }
     return null;
+  }
+
+  private buildContractBlockedReceipt(input: {
+    plan: EditPlan;
+    target: ResolvedTarget;
+    contract: SupportContractResult;
+  }): EditReceipt {
+    const note = input.contract.blockedReason?.message || "This edit is currently blocked by support checks.";
+    return {
+      stage: "blocked",
+      note,
+      actions: [
+        { kind: "cancel", label: "Cancel" },
+        { kind: "pick_target", label: "Pick different target", payload: { targetId: input.target.id } },
+      ],
+    };
+  }
+
+  private buildContractBlockedApplyResult(input: {
+    plan: EditPlan;
+    receipt: EditReceipt;
+    contract: SupportContractResult;
+  }): EditApplyResult {
+    const outcomeType: EditOutcomeType = input.contract.outcomeType || "blocked";
+    return {
+      ok: true,
+      applied: false,
+      outcomeType,
+      blockedReason: input.contract.blockedReason,
+      receipt: input.receipt,
+    };
   }
 }

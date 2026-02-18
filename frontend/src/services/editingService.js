@@ -2,6 +2,8 @@ import api from './api';
 
 export function extractVerifiedApply(response) {
   const result = response?.result || response || {};
+  const receipt = result?.receipt || response?.receipt;
+  const outcomeType = String(result?.outcomeType || response?.outcomeType || '').trim().toLowerCase();
   const newRevisionId =
     result?.newRevisionId ||
     result?.revisionId ||
@@ -20,7 +22,7 @@ export function extractVerifiedApply(response) {
     Number(changeset?.changeCount || 0) > 0 ||
     Boolean(changeset?.changed) ||
     (typeof changeset?.summary === 'string' && changeset.summary.trim().length > 0);
-  const explicitlyNoop = result?.applied === false;
+  const explicitlyNoop = outcomeType === 'noop' || (result?.applied === false && receipt?.stage === 'noop');
   const proofExplicitlyVerified = proof?.verified === true;
   const proofPresentButNotVerified = proof && proof?.verified === false;
   const verified = (proofPresentButNotVerified || explicitlyNoop)
@@ -35,7 +37,9 @@ export function extractVerifiedApply(response) {
 
 export function isNoopResult(response) {
   const result = response?.result || response || {};
-  if (result?.applied === false) return true;
+  const outcomeType = String(result?.outcomeType || response?.outcomeType || '').trim().toLowerCase();
+  if (outcomeType === 'noop') return true;
+  if (result?.applied === false && outcomeType && outcomeType !== 'noop') return false;
   const receipt = result?.receipt || response?.receipt;
   if (receipt?.stage === 'noop') return true;
   const note = String(receipt?.note || '').trim();

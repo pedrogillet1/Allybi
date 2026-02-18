@@ -7,188 +7,18 @@ import { getDocxViewerSelectionV2FromRange } from '../../../utils/editor/docxSel
 import { wordDiff } from '../../../utils/diff/wordDiff';
 import { renderSuggestionHtml } from '../../../utils/diff/renderSuggestionHtml';
 import useDocxEditState from '../../../hooks/useDocxEditState';
-
-function escapeHtml(text) {
-  return String(text || '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
-
-function toHtmlFromPlain(text) {
-  return escapeHtml(text).replace(/\n/g, '<br/>');
-}
-
-function sanitizeDocxRichHtml(html) {
-  // Allow: inline formatting + lists. (We keep this conservative; backend may still normalize.)
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(`<div>${String(html || '')}</div>`, 'text/html');
-  const root = doc.body.firstChild;
-  if (!root) return '';
-
-  const allowedTags = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'S', 'STRIKE', 'BR', 'SPAN', 'UL', 'OL', 'LI', '#text']);
-  const allowedStyle = new Set([
-    'font-size',
-    'color',
-    'font-family',
-    'font-weight',
-    'font-style',
-    'text-decoration',
-    'text-decoration-line',
-  ]);
-
-  const walk = (node) => {
-    const children = Array.from(node.childNodes || []);
-    for (const child of children) {
-      if (child.nodeType === Node.TEXT_NODE) continue;
-      const el = child;
-      const tag = el.nodeName;
-      if (!allowedTags.has(tag)) {
-        // Replace unknown element with its text content (keeps user-visible text).
-        const text = doc.createTextNode(el.textContent || '');
-        el.parentNode?.replaceChild(text, el);
-        continue;
-      }
-
-      // Strip attributes except span style whitelist.
-      if (el.nodeType === Node.ELEMENT_NODE) {
-        const attrs = Array.from(el.attributes || []);
-        for (const a of attrs) {
-          if (tag === 'SPAN' && a.name.toLowerCase() === 'style') continue;
-          el.removeAttribute(a.name);
-        }
-
-        if (tag === 'SPAN') {
-          const style = String(el.getAttribute('style') || '');
-          const cleaned = style
-            .split(';')
-            .map((pair) => pair.trim())
-            .filter(Boolean)
-            .map((pair) => {
-              const idx = pair.indexOf(':');
-              if (idx <= 0) return null;
-              const k = pair.slice(0, idx).trim().toLowerCase();
-              const v = pair.slice(idx + 1).trim();
-              if (!allowedStyle.has(k)) return null;
-              if (!v) return null;
-              if (k === 'color' && !/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(v)) return null;
-              if (k === 'font-size' && !/^[0-9.]+(px|pt)$/.test(v)) return null;
-              if (k === 'font-weight' && !/^(normal|bold|[1-9]00)$/i.test(v)) return null;
-              if (k === 'font-style' && !/^(normal|italic|oblique)$/i.test(v)) return null;
-              if (k === 'text-decoration' || k === 'text-decoration-line') {
-                if (!/^(none|underline|line-through|underline line-through|line-through underline)$/i.test(v)) {
-                  return null;
-                }
-              }
-              return `${k}:${v}`;
-            })
-            .filter(Boolean)
-            .join(';');
-          if (cleaned) el.setAttribute('style', cleaned);
-          else el.removeAttribute('style');
-        }
-      }
-
-      walk(el);
-    }
-  };
-
-  walk(root);
-  return root.innerHTML || '';
-}
-
-function stripHtml(raw) {
-  try {
-    const tmp = document.createElement('div');
-    tmp.innerHTML = String(raw || '');
-    return String(tmp.innerText || tmp.textContent || '').replace(/\u00A0/g, ' ').trim();
-  } catch {
-    return String(raw || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-  }
-}
-
-function looksLikePatchPayloadText(value) {
-  const text = String(value || '').trim();
-  if (!text) return false;
-  if (/^\{\s*"patches"\s*:/i.test(text)) return true;
-  if (/^\[\s*\{\s*"kind"\s*:\s*"docx_/i.test(text)) return true;
-  return false;
-}
-
-function collectLinearSegments(rootEl) {
-  // Build a linear view over text nodes + <br> so we can map offsets to DOM positions.
-  const segs = [];
-  const walk = (node) => {
-    if (!node) return;
-    if (node.nodeType === Node.TEXT_NODE) {
-      const text = node.nodeValue || '';
-      if (text.length) segs.push({ kind: 'text', node, len: text.length });
-      return;
-    }
-    if (node.nodeType !== Node.ELEMENT_NODE) return;
-    const el = node;
-    // Ignore UI-only elements and non-editable decorations.
-    try {
-      const ce = String(el.getAttribute?.('contenteditable') || '').toLowerCase();
-      if (ce === 'false') return;
-      if (el.getAttribute?.('data-allybi-draft-badge') === '1') return;
-      if (el.getAttribute?.('data-allybi-ui') === '1') return;
-    } catch {}
-    if (el.tagName === 'BR') {
-      segs.push({ kind: 'br', node: el, len: 1 });
-      return;
-    }
-    const children = Array.from(el.childNodes || []);
-    for (const c of children) walk(c);
-  };
-  walk(rootEl);
-  return segs;
-}
-
-function normalizeSpaces(s) {
-  return String(s || '').replace(/\u00A0/g, ' ');
-}
-
-function linearTextFromSegments(segs) {
-  return (Array.isArray(segs) ? segs : [])
-    .map((seg) => (seg?.kind === 'br' ? '\n' : normalizeSpaces(seg?.node?.nodeValue || '')))
-    .join('');
-}
-
-function findAllIndices(hay, needle) {
-  const out = [];
-  const h = String(hay || '');
-  const n = String(needle || '');
-  if (!h || !n) return out;
-  let idx = 0;
-  while (idx <= h.length) {
-    const next = h.indexOf(n, idx);
-    if (next < 0) break;
-    out.push(next);
-    idx = next + Math.max(n.length, 1);
-    if (out.length >= 50) break;
-  }
-  return out;
-}
-
-function pickClosestIndex(indices, hintStart) {
-  const list = Array.isArray(indices) ? indices : [];
-  if (!list.length) return -1;
-  const hint = Number.isFinite(Number(hintStart)) ? Number(hintStart) : null;
-  if (hint == null) return list[0];
-  let best = list[0];
-  let bestD = Math.abs(best - hint);
-  for (const i of list.slice(1)) {
-    const d = Math.abs(i - hint);
-    if (d < bestD) {
-      best = i;
-      bestD = d;
-    }
-  }
-  return best;
-}
+import {
+  escapeHtml,
+  toHtmlFromPlain,
+  sanitizeDocxRichHtml,
+  stripHtml,
+  looksLikePatchPayloadText,
+  collectLinearSegments,
+  normalizeSpaces,
+  linearTextFromSegments,
+  findAllIndices,
+  pickClosestIndex,
+} from '../../../utils/docxCanvasUtils';
 
 function indexOfChild(parent, child) {
   if (!parent || !child) return -1;
@@ -361,6 +191,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     reviewMode = false,
     autoSaveOnBlur = true,
     onStatusMsg,
+    onDirtyChange,
   },
   ref
 ) {
@@ -379,6 +210,8 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   const [colorHex, setColorHex] = useState('#111827');
   const reviewModeRef = useRef(Boolean(reviewMode));
   const autoSaveTimerRef = useRef(null);
+  const isFlushingRef = useRef(false);
+  const scheduleAutoSaveRef = useRef(null);
 
   // Centralized editing state (blocks, baselines, drafts, undo/redo, etc.)
   const { state: editState, actions } = useDocxEditState();
@@ -397,6 +230,8 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   onBlocksLoadedRef.current = onBlocksLoaded;
   const onSelectedIdChangeRef = useRef(onSelectedIdChange);
   onSelectedIdChangeRef.current = onSelectedIdChange;
+  const onDirtyChangeRef = useRef(onDirtyChange);
+  onDirtyChangeRef.current = onDirtyChange;
 
   const selectedBlock = useMemo(
     () => blocks.find((b) => b.paragraphId === effectiveSelectedId) || null,
@@ -472,6 +307,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       setError(e?.response?.data?.error || e?.message || 'Failed to load DOCX editor.');
     } finally {
       setLoading(false);
+      onDirtyChangeRef.current?.(false);
     }
   }, [docId]);
 
@@ -685,6 +521,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       const pid = el?.getAttribute?.('data-paragraph-id') || '';
       if (!pid) return;
       actions.markDirty(pid);
+      onDirtyChangeRef.current?.(true);
       if (controlledSelectedId == null) setSelectedId(pid);
       onSelectedIdChange?.(pid);
     } catch {
@@ -756,6 +593,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     if (!el) return false;
     const current = sanitizeDocxRichHtml(el.innerHTML || '');
 
+    // Clone stacks before mutation to avoid mutating refs in place
     const undoStack = actions.getUndoStack(pid);
     const redoStack = actions.getRedoStack(pid);
 
@@ -768,8 +606,10 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       actions.setRedoStack(pid, redoStack);
       actions.setLastHtml(pid, el.innerHTML || '');
       actions.markDirty(pid);
+      actions.updateBaseline(pid, el.innerHTML || '');
       if (controlledSelectedId == null) setSelectedId(pid);
       onSelectedIdChange?.(pid);
+      onDirtyChangeRef.current?.(true);
       return true;
     }
 
@@ -782,8 +622,10 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       actions.setRedoStack(pid, redoStack);
       actions.setLastHtml(pid, el.innerHTML || '');
       actions.markDirty(pid);
+      actions.updateBaseline(pid, el.innerHTML || '');
       if (controlledSelectedId == null) setSelectedId(pid);
       onSelectedIdChange?.(pid);
+      onDirtyChangeRef.current?.(true);
       return true;
     }
 
@@ -797,10 +639,10 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
 
     if (c === 'undo') {
       const ok = applyUndoRedo('undo');
-      if (ok) return true;
+      if (ok) { scheduleAutoSaveRef.current?.(); return true; }
     } else if (c === 'redo') {
       const ok = applyUndoRedo('redo');
-      if (ok) return true;
+      if (ok) { scheduleAutoSaveRef.current?.(); return true; }
     }
 
     const pid = getActiveParagraphIdFromDom() || (effectiveSelectedId ? String(effectiveSelectedId) : null);
@@ -1009,11 +851,13 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   const applyDraft = useCallback(({ draftId, targetId, beforeText, afterText, afterHtml }) => {
     const paragraphId = targetId;
     if (!draftId || !paragraphId) return false;
+    // Guard: never write raw patch JSON into the visible document body.
+    if (!afterHtml && looksLikePatchPayloadText(afterText)) return false;
     const el = findParagraphEl(paragraphId);
     if (!el) return false;
 
     if (!actions.hasDraft(draftId)) {
-      actions.snapshotDraft(draftId, { [paragraphId]: { html: el.innerHTML || '' } });
+      actions.snapshotDraft(draftId, { [paragraphId]: { html: el.innerHTML || '', cssText: el.style.cssText || '' } });
     }
     actions.startDraft(draftId);
 
@@ -1163,7 +1007,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       if (!pid && kind !== 'docx_merge_paragraphs') continue;
       const el = pid ? findParagraphEl(pid) : null;
       if (!el && kind !== 'docx_merge_paragraphs') continue;
-      if (el && !paragraphs[pid]) paragraphs[pid] = { html: el.innerHTML || '' };
+      if (el && !paragraphs[pid]) paragraphs[pid] = { html: el.innerHTML || '', cssText: el.style.cssText || '' };
 
       if (kind === 'docx_delete_paragraph') {
         // Preview deletes by hiding the paragraph (so discard can restore it).
@@ -1288,13 +1132,13 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
           if (pids.length < 2) continue;
           const firstEl = findParagraphEl(pids[0]);
           if (!firstEl) continue;
-          if (!paragraphs[pids[0]]) paragraphs[pids[0]] = { html: firstEl.innerHTML || '' };
+          if (!paragraphs[pids[0]]) paragraphs[pids[0]] = { html: firstEl.innerHTML || '', cssText: firstEl.style.cssText || '' };
           // Collect text from all
           const texts = [];
           for (const mergePid of pids) {
             const mergeEl = findParagraphEl(mergePid);
             if (mergeEl) {
-              if (!paragraphs[mergePid]) paragraphs[mergePid] = { html: mergeEl.innerHTML || '' };
+              if (!paragraphs[mergePid]) paragraphs[mergePid] = { html: mergeEl.innerHTML || '', cssText: mergeEl.style.cssText || '' };
               texts.push((mergeEl.innerText || '').replace(/\u00A0/g, ' '));
             }
           }
@@ -1335,6 +1179,31 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
         continue;
       }
 
+      // --- List structural patches: bullet/numbering apply and remove ---
+      if (kind === 'docx_list_apply_bullets' || kind === 'docx_list_apply_numbering') {
+        try {
+          if (el.dataset.allybiOrigClass == null) el.dataset.allybiOrigClass = el.className || '';
+          if (el.dataset.allybiOrigListLevel == null) el.dataset.allybiOrigListLevel = String(el.getAttribute('data-list-level') || '0');
+          nextListOverrides[pid] = { isList: true, level: 0 };
+          decorateAsDraft(el, draftId);
+          touched += 1;
+        } catch {}
+        continue;
+      }
+
+      if (kind === 'docx_list_remove') {
+        try {
+          if (el.dataset.allybiOrigClass == null) el.dataset.allybiOrigClass = el.className || '';
+          if (el.dataset.allybiOrigListLevel == null) el.dataset.allybiOrigListLevel = String(el.getAttribute('data-list-level') || '0');
+          el.classList.remove('koda-docx-li');
+          el.setAttribute('data-list-level', '0');
+          nextListOverrides[pid] = { isList: false, level: 0 };
+          decorateAsDraft(el, draftId);
+          touched += 1;
+        } catch {}
+        continue;
+      }
+
       if (kind === 'docx_list_promote_demote') {
         try {
           const direction = String(p?.direction || '').toLowerCase();
@@ -1364,7 +1233,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
               if (child.headingLevel != null && child.headingLevel <= headingBlock.headingLevel) break;
               const childEl = findParagraphEl(child.paragraphId);
               if (childEl) {
-                if (!paragraphs[child.paragraphId]) paragraphs[child.paragraphId] = { html: childEl.innerHTML || '' };
+                if (!paragraphs[child.paragraphId]) paragraphs[child.paragraphId] = { html: childEl.innerHTML || '', cssText: childEl.style.cssText || '' };
                 if (childEl.dataset.allybiOrigDisplay == null) childEl.dataset.allybiOrigDisplay = childEl.style.display || '';
                 childEl.dataset.allybiDeleted = '1';
                 childEl.style.display = 'none';
@@ -1472,7 +1341,17 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       touched += 1;
     }
 
+    // IMPORTANT: update baselines for all modified paragraphs BEFORE merging list
+    // overrides.  mergeListOverrides triggers a React state update which may cause
+    // DOM elements to be recreated (e.g. switching from flex+bullet wrapper to plain
+    // wrapper).  When React recreates a DOM element, the ref callback re-seeds
+    // innerHTML from the baseline.  If we don't update baselines first, the ref
+    // re-seed reverts the preview changes we just applied.
     if (Object.keys(nextListOverrides).length) {
+      for (const pid of Object.keys(nextListOverrides)) {
+        const el = findParagraphEl(pid);
+        if (el) actions.updateBaseline(pid, el.innerHTML || '');
+      }
       actions.mergeListOverrides(nextListOverrides);
     }
 
@@ -1489,15 +1368,25 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       return false;
     }
 
-    // Restore DOM innerHTML from draft snapshots for ALL affected paragraphs
+    // Restore DOM innerHTML and inline styles from draft snapshots for ALL affected paragraphs.
+    // IMPORTANT: also update the baseline so that when clearListOverridesForPids triggers a
+    // React re-render (which may recreate DOM elements), the ref re-seed uses the restored
+    // content instead of stale data.
     for (const pid of ids) {
       const el = findParagraphEl(pid);
       if (!el) continue;
-      el.innerHTML = String(paragraphs[pid]?.html || '');
-      markAppliedDecoration(el);
-      try { setUndoState(pid, el.innerHTML || '', { clearHistory: true }); } catch {}
+      const restoredHtml = String(paragraphs[pid]?.html || '');
+      el.innerHTML = restoredHtml;
+      // Restore inline styles that formatting patches may have changed
+      if (paragraphs[pid]?.cssText != null) {
+        el.style.cssText = String(paragraphs[pid].cssText);
+      }
+      clearDraftDecoration(el);
+      // Update baseline so React re-seed after list-override change uses the correct content
+      actions.updateBaseline(pid, restoredHtml);
+      try { setUndoState(pid, restoredHtml, { clearHistory: true }); } catch {}
     }
-    // Clear list overrides for affected paragraphs
+    // Clear list overrides for affected paragraphs (triggers React re-render)
     actions.clearListOverridesForPids(ids);
     actions.deleteDraft(draftId);
     // Also remove inserted elements for this draft
@@ -1632,12 +1521,24 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       if (isNoopResult(res)) {
         console.warn('[DocxEditCanvas] Manual save: backend says noop', { res, paragraphId, beforeText, effectiveProposedText });
         actions.clearDirty(paragraphId);
+        onDirtyChangeRef.current?.(actions.getDirtyPids().length > 0);
         if (!silent) {
           setStatusMsg('No changes detected.');
           onStatusMsg?.('No changes detected.');
           setTimeout(() => { setStatusMsg(''); onStatusMsg?.(''); }, 1800);
         }
         return { ok: true, noop: true };
+      }
+
+      const outcomeType = String(res?.outcomeType || res?.result?.outcomeType || '').toLowerCase();
+      if (outcomeType && outcomeType !== 'applied') {
+        const blockedMsg = String(
+          res?.blockedReason?.message ||
+          res?.result?.blockedReason?.message ||
+          res?.receipt?.note ||
+          'This edit was blocked before apply.',
+        ).trim();
+        return { ok: false, error: blockedMsg };
       }
 
       const verified = extractVerifiedApply(res);
@@ -1656,6 +1557,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       actions.updateBaseline(paragraphId, String(nextHtml || '').trim());
       actions.updateBlockText(paragraphId, effectiveProposedText);
       actions.clearDirty(paragraphId);
+      onDirtyChangeRef.current?.(actions.getDirtyPids().length > 0);
       onApplied?.({ revisionId });
       try { markAppliedDecoration(findParagraphEl(paragraphId)); } catch {}
 
@@ -1685,21 +1587,105 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   );
 
   // Debounced auto-save: flush all dirty paragraphs after 1.2s of inactivity.
+  // Guarded by isFlushingRef to prevent concurrent save interleaving.
   const flushDirtyParagraphs = useCallback(async () => {
-    const dirty = actions.getDirtyPids();
-    for (const pid of dirty) {
-      await submitSingleEdit({ paragraphId: pid, operator: 'EDIT_PARAGRAPH', silent: true });
+    if (isFlushingRef.current) return [];
+    isFlushingRef.current = true;
+    try {
+      const dirty = actions.getDirtyPids();
+      const results = [];
+      for (const pid of dirty) {
+        const res = await submitSingleEdit({ paragraphId: pid, operator: 'EDIT_PARAGRAPH', silent: false, userConfirmed: true });
+        results.push(res);
+      }
+      onDirtyChangeRef.current?.(false);
+      return results;
+    } finally {
+      isFlushingRef.current = false;
     }
   }, [actions, submitSingleEdit]);
 
+  // Dedicated save function that bypasses dirty-tracking and submitSingleEdit early-returns.
+  // Compares every block's original text against the live DOM and calls applyEdit() directly.
+  const saveAllManualEdits = useCallback(async () => {
+    const results = [];
+    for (const block of blocks) {
+      const pid = block.paragraphId;
+      if (!pid || !docId) continue;
+      if (actions.isInflight(pid)) continue;
+
+      const liveText = getLiveTextFor(pid);
+      const liveHtml = getLiveHtmlFor(pid);
+      if (liveText == null || liveHtml == null) continue;
+
+      // Normalize NBSP→space in originalText to match getLiveTextFor's normalization
+      const originalText = String(block.text || '').replace(/\u00A0/g, ' ').trim();
+      const proposedText = String(liveText || '').trim();
+
+      // Skip paragraphs where text hasn't changed
+      if (proposedText === originalText) continue;
+      // Backend rejects empty/whitespace-only beforeText or proposedText with 400.
+      // Skip paragraphs where either side is empty (empty→typed or typed→cleared).
+      if (!proposedText || !originalText) continue;
+
+      const beforeText = String(block.text || '').trim();
+
+      actions.startInflight(pid);
+      try {
+        const res = await applyEdit({
+          instruction: `Manual edit in viewer: ${cleanDocumentName(document?.filename)}`,
+          operator: 'EDIT_PARAGRAPH',
+          domain: 'docx',
+          documentId: docId,
+          targetHint: pid,
+          target: { id: pid, label: 'Paragraph', confidence: 1, candidates: [], decisionMargin: 1, isAmbiguous: false, resolutionReason: 'viewer_submit' },
+          beforeText,
+          proposedText,
+          proposedHtml: liveHtml,
+          userConfirmed: true,
+        });
+
+        const verified = extractVerifiedApply(res);
+        const revisionId = verified?.newRevisionId || null;
+
+        if (revisionId) {
+          actions.updateBaseline(pid, String(liveHtml || '').trim());
+          actions.updateBlockText(pid, proposedText);
+          actions.clearDirty(pid);
+          results.push({ pid, ok: true, revisionId });
+        } else if (isNoopResult(res)) {
+          actions.clearDirty(pid);
+          results.push({ pid, ok: true, noop: true });
+        } else {
+          results.push({ pid, ok: false, error: 'No revision ID returned' });
+        }
+      } catch (e) {
+        console.error('[DocxEditCanvas] saveAllManualEdits failed for', pid, e);
+        results.push({ pid, ok: false, error: e?.message || 'Save failed' });
+      } finally {
+        actions.endInflight(pid);
+      }
+    }
+    // Notify parent once after all saves (not per-paragraph) to avoid
+    // multiple re-renders and replaceState calls mid-loop.
+    const lastRevisionId = results.findLast(r => r.ok && r.revisionId)?.revisionId;
+    if (lastRevisionId) onApplied?.({ revisionId: lastRevisionId });
+    onDirtyChangeRef.current?.(false);
+    return results;
+  }, [blocks, docId, document?.filename, actions, getLiveTextFor, getLiveHtmlFor, onApplied]);
+
   const scheduleAutoSave = useCallback(() => {
     if (readOnly) return;
+    // When the parent provides onDirtyChange, explicit Save/Discard buttons
+    // control the save lifecycle — skip the debounced auto-save.
+    if (onDirtyChangeRef.current) return;
     if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
     autoSaveTimerRef.current = setTimeout(() => {
       autoSaveTimerRef.current = null;
       flushDirtyParagraphs();
     }, 1200);
   }, [readOnly, flushDirtyParagraphs]);
+  scheduleAutoSaveRef.current = scheduleAutoSave;
 
   // Cleanup timer on unmount — flush any pending dirty paragraphs immediately
   useEffect(() => {
@@ -1754,10 +1740,10 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       // Prefer internal history for undo/redo; fall back to execCommand if empty.
       if (c === 'undo') {
         const ok = applyUndoRedo('undo');
-        if (ok) return;
+        if (ok) { scheduleAutoSaveRef.current?.(); return; }
       } else if (c === 'redo') {
         const ok = applyUndoRedo('redo');
-        if (ok) return;
+        if (ok) { scheduleAutoSaveRef.current?.(); return; }
       }
 
       // Snapshot before programmatic commands, so toolbar actions are undoable.
@@ -1799,6 +1785,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     commitParagraph,
     commitParagraphs,
     flushDirtyParagraphs,
+    saveAllManualEdits,
     focus: () => {
       try { pageHostRef.current?.focus?.(); } catch {}
     },
@@ -1831,6 +1818,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     commitParagraph,
     commitParagraphs,
     flushDirtyParagraphs,
+    saveAllManualEdits,
   ]);
 
   if (loading) {
@@ -1993,6 +1981,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
               actions.updateBaseline(pid, liveHtml);
             } catch {}
             actions.markDirty(pid);
+            onDirtyChangeRef.current?.(true);
             scheduleAutoSave();
             if (controlledSelectedId == null) setSelectedId(pid);
             onSelectedIdChange?.(pid);
@@ -2000,6 +1989,8 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
           onBlur={() => {
             if (readOnly) return;
             if (!autoSaveOnBlur) return;
+            // When parent provides onDirtyChange, explicit buttons handle save.
+            if (onDirtyChangeRef.current) return;
             // Save any paragraphs touched since last focus. (Keeps "edit like Word" feel.)
             (async () => {
               const dirty = actions.getDirtyPids();

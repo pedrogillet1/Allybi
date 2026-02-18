@@ -80,6 +80,7 @@ export default function AllybiEditingToolbar({
   onCommand,
   wordSecondaryActionLabel,
   onWordSecondaryAction,
+  wordSecondaryActionDisabled,
   wordPrimaryActionLabel,
   onWordPrimaryAction,
   wordPrimaryActionDisabled,
@@ -541,6 +542,28 @@ export default function AllybiEditingToolbar({
 	              {iconBtn('Align right', AlignRightIcon, () => onCommand?.('justifyRight'), { active: alignment === 'right', disabled: alignment === 'right' })}
 	              {iconBtn('Justify', AlignJustifyIcon, () => onCommand?.('justifyFull'), { active: alignment === 'justify', disabled: alignment === 'justify' })}
 	            </div>
+
+	            {(wordSecondaryActionLabel || wordPrimaryActionLabel) ? (
+	              <>
+	                {divider()}
+	                <div className="toolbar-section" style={{ gap: 6, marginLeft: 4 }}>
+	                  {wordPrimaryActionLabel ? (
+	                    <button
+	                      type="button"
+	                      className="toolbar-btn text-btn word-save-btn"
+	                      title={wordPrimaryActionLabel}
+	                      style={{ padding: '6px 14px', fontWeight: 600 }}
+	                      onClick={() => onWordPrimaryAction?.()}
+	                    >
+	                      {wordPrimaryActionLabel}
+	                    </button>
+	                  ) : null}
+	                  {wordSecondaryActionLabel
+	                    ? textBtn(wordSecondaryActionLabel, wordSecondaryActionLabel, () => onWordSecondaryAction?.())
+	                    : null}
+	                </div>
+	              </>
+	            ) : null}
           </>
         ) : null}
 

@@ -114,6 +114,25 @@ export function diffSpreadsheetModels(before: SpreadsheetModel, after: Spreadshe
     }
   }
 
+  // Model-level structural additions: charts, tables, named ranges
+  const beforeChartCount = (before.charts || []).length;
+  const afterChartCount = (after.charts || []).length;
+  if (beforeChartCount !== afterChartCount) {
+    changedStructuresCount += Math.abs(afterChartCount - beforeChartCount);
+  }
+
+  const beforeTableCount = (before.tables || []).length;
+  const afterTableCount = (after.tables || []).length;
+  if (beforeTableCount !== afterTableCount) {
+    changedStructuresCount += Math.abs(afterTableCount - beforeTableCount);
+  }
+
+  const beforeNamedCount = (before.namedRanges || []).length;
+  const afterNamedCount = (after.namedRanges || []).length;
+  if (beforeNamedCount !== afterNamedCount) {
+    changedStructuresCount += Math.abs(afterNamedCount - beforeNamedCount);
+  }
+
   const normalizedRanges = Array.from(new Set(affectedRanges.map((item) => {
     try {
       return formatRangeA1(parseA1Range(item));

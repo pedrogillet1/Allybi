@@ -400,6 +400,26 @@ function parseRowInsertIntent(message: string): { count: number; row: number } |
   return { count, row };
 }
 
+function parseRowDeleteIntent(message: string): { startRow: number; count: number } | null {
+  const text = String(message || "").toLowerCase();
+  if (!/\b(delete|remove)\b/.test(text) || !/\brow/.test(text)) return null;
+  // "delete rows 5 through 10" / "delete rows 5 to 10" / "delete rows 5-10"
+  const rangeMatch = text.match(/rows?\s+(\d+)\s*(?:through|to|-)\s*(\d+)/);
+  if (rangeMatch) {
+    const r1 = Number(rangeMatch[1]);
+    const r2 = Number(rangeMatch[2]);
+    if (Number.isFinite(r1) && Number.isFinite(r2)) {
+      return { startRow: Math.min(r1, r2), count: Math.abs(r2 - r1) + 1 };
+    }
+  }
+  // "delete row 5"
+  const singleMatch = text.match(/row\s+(\d+)/);
+  if (singleMatch?.[1]) {
+    return { startRow: Number(singleMatch[1]), count: 1 };
+  }
+  return null;
+}
+
 function parseSetCellNumericIntent(message: string): { cellA1: string; value: number; sheetName?: string } | null {
   const text = String(message || "");
   const m = text.match(/\b(?:on\s+([A-Za-z0-9_.-]+)\s*,?\s*)?(?:set|change|update)\s+([A-Za-z]{1,3}\d{1,7})\s+to\s+(-?[\d,]+(?:\.\d+)?)/i);
@@ -569,44 +589,57 @@ function toComputeOp(
         frozenColumnCount: Number(params.frozenColumnCount || params.columns || 0),
       };
     }
-    case "XLSX_INSERT_ROWS": {
-      const inferredSheet = effectiveSheet || (rangeA1 ? sheetFromRange(rangeA1) : null);
-      if (!inferredSheet) return null;
-      return {
-        kind: "insert_rows",
-        sheetName: inferredSheet,
-        startIndex: Number(params.startIndex || 0),
-        count: Math.max(1, Number(params.count || 1)),
-      };
-    }
+    case "XLSX_INSERT_ROWS":
     case "XLSX_DELETE_ROWS": {
       const inferredSheet = effectiveSheet || (rangeA1 ? sheetFromRange(rangeA1) : null);
       if (!inferredSheet) return null;
+      // Derive startIndex/count from rangeA1 when not explicitly provided
+      let rowStart = Number(params.startIndex ?? -1);
+      let rowCount = Number(params.count ?? 0);
+      if ((rowStart < 0 || !rowCount) && rangeA1) {
+        const rowNums = String(rangeA1).match(/(\d+)/g);
+        const r1 = rowNums?.[0] ? Number(rowNums[0]) : 0;
+        const r2 = rowNums?.[1] ? Number(rowNums[1]) : r1;
+        if (r1 > 0) {
+          rowStart = r1 - 1; // 0-based
+          rowCount = Math.max(1, r2 - r1 + 1);
+        }
+      }
+      if (rowStart < 0) rowStart = 0;
+      if (!rowCount) rowCount = 1;
+      const rowKind = step.op === "XLSX_INSERT_ROWS" ? "insert_rows" : "delete_rows";
       return {
-        kind: "delete_rows",
+        kind: rowKind,
         sheetName: inferredSheet,
-        startIndex: Number(params.startIndex || 0),
-        count: Math.max(1, Number(params.count || 1)),
+        startIndex: rowStart,
+        count: rowCount,
       };
     }
-    case "XLSX_INSERT_COLUMNS": {
-      const inferredSheet = effectiveSheet || (rangeA1 ? sheetFromRange(rangeA1) : null);
-      if (!inferredSheet) return null;
-      return {
-        kind: "insert_columns",
-        sheetName: inferredSheet,
-        startIndex: Number(params.startIndex || 0),
-        count: Math.max(1, Number(params.count || 1)),
-      };
-    }
+    case "XLSX_INSERT_COLUMNS":
     case "XLSX_DELETE_COLUMNS": {
       const inferredSheet = effectiveSheet || (rangeA1 ? sheetFromRange(rangeA1) : null);
       if (!inferredSheet) return null;
+      // Derive startIndex/count from rangeA1 when not explicitly provided
+      let colStart = Number(params.startIndex ?? -1);
+      let colCount = Number(params.count ?? 0);
+      if ((colStart < 0 || !colCount) && rangeA1) {
+        const colLetters = String(rangeA1).match(/([A-Z]+)/gi);
+        const colToNum = (s: string) => s.toUpperCase().split("").reduce((acc, ch) => acc * 26 + (ch.charCodeAt(0) - 64), 0);
+        const c1 = colLetters?.[0] ? colToNum(colLetters[0]) : 0;
+        const c2 = colLetters?.[1] ? colToNum(colLetters[1]) : c1;
+        if (c1 > 0) {
+          colStart = c1 - 1; // 0-based
+          colCount = Math.max(1, c2 - c1 + 1);
+        }
+      }
+      if (colStart < 0) colStart = 0;
+      if (!colCount) colCount = 1;
+      const colKind = step.op === "XLSX_INSERT_COLUMNS" ? "insert_columns" : "delete_columns";
       return {
-        kind: "delete_columns",
+        kind: colKind,
         sheetName: inferredSheet,
-        startIndex: Number(params.startIndex || 0),
-        count: Math.max(1, Number(params.count || 1)),
+        startIndex: colStart,
+        count: colCount,
       };
     }
     case "XLSX_CHART_CREATE": {
@@ -682,6 +715,50 @@ export class ExcelSourceOfTruthService {
         sourcePatternIds: ["heuristic:insert_rows"],
         canonicalOps: ["XLSX_INSERT_ROWS"],
       };
+    }
+
+    // Hard guard: row deletion requests with explicit row numbers.
+    const rowDelete = parseRowDeleteIntent(message);
+    if (rowDelete) {
+      return {
+        kind: "plan",
+        ops: [
+          {
+            kind: "delete_rows",
+            sheetName: chosenSheet || "Sheet1",
+            startIndex: Math.max(0, rowDelete.startRow - 1),
+            count: rowDelete.count,
+          },
+        ],
+        sourcePatternIds: ["heuristic:delete_rows"],
+        canonicalOps: ["XLSX_DELETE_ROWS"],
+      };
+    }
+
+    // Hard guard: "delete these/selected rows" — derive from viewer selection.
+    const low = message.toLowerCase();
+    if (/\b(delete|remove)\b/.test(low) && /\b(these|selected|this)\b/.test(low) && /\brows?\b/.test(low)) {
+      const viewerRange = input.viewerRangeA1;
+      if (viewerRange) {
+        const rowNums = String(viewerRange).match(/(\d+)/g);
+        const r1 = rowNums?.[0] ? Number(rowNums[0]) : 0;
+        const r2 = rowNums?.[1] ? Number(rowNums[1]) : r1;
+        if (r1 > 0) {
+          return {
+            kind: "plan",
+            ops: [
+              {
+                kind: "delete_rows",
+                sheetName: chosenSheet || "Sheet1",
+                startIndex: r1 - 1,
+                count: Math.max(1, r2 - r1 + 1),
+              },
+            ],
+            sourcePatternIds: ["heuristic:delete_rows_selection"],
+            canonicalOps: ["XLSX_DELETE_ROWS"],
+          };
+        }
+      }
     }
 
     // Hard guard: explicit numeric set-cell commands.

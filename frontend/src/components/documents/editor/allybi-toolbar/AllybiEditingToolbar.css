@@ -423,6 +423,17 @@
   border-color: #0b1220;
 }
 
+.toolbar-btn.word-save-btn {
+  background-color: #111827 !important;
+  color: #ffffff !important;
+  border-color: #111827 !important;
+}
+
+.toolbar-btn.word-save-btn:hover {
+  background-color: #0b1220 !important;
+  border-color: #0b1220 !important;
+}
+
 .formatting-toolbar.allybi-one-line .toolbar-btn.active {
   background: #111827 !important;
   border-color: #111827 !important;
@@ -942,7 +953,8 @@
   }
 
   /* Keep Word/Docs-like active inversion even if OS is dark */
-  .formatting-toolbar.allybi-one-line .toolbar-btn.active {
+  .formatting-toolbar.allybi-one-line .toolbar-btn.active,
+  .formatting-toolbar.allybi-one-line .toolbar-btn.word-save-btn {
     background-color: #111827 !important;
     border-color: #111827 !important;
     color: #ffffff !important;

@@ -1758,6 +1758,16 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
           setTimeout(() => { setStatusMsg(''); onStatusMsg?.(''); }, 1800);
           return;
         }
+        const outcomeType = String(res?.outcomeType || res?.result?.outcomeType || '').toLowerCase();
+        if (outcomeType && outcomeType !== 'applied') {
+          const blockedMsg = String(
+            res?.blockedReason?.message ||
+            res?.result?.blockedReason?.message ||
+            res?.receipt?.note ||
+            'This edit was blocked before apply.',
+          ).trim();
+          throw new Error(blockedMsg);
+        }
         const revisionId = extractRevisionId(res);
         if (!revisionId) {
           throw new Error('Apply proof verification failed.');
@@ -1789,6 +1799,16 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
           onStatusMsg?.('No changes detected.');
           setTimeout(() => { setStatusMsg(''); onStatusMsg?.(''); }, 1800);
           return;
+        }
+        const outcomeType = String(res?.outcomeType || res?.result?.outcomeType || '').toLowerCase();
+        if (outcomeType && outcomeType !== 'applied') {
+          const blockedMsg = String(
+            res?.blockedReason?.message ||
+            res?.result?.blockedReason?.message ||
+            res?.receipt?.note ||
+            'This edit was blocked before apply.',
+          ).trim();
+          throw new Error(blockedMsg);
         }
         const revisionId = extractRevisionId(res);
         if (!revisionId) {
@@ -2110,6 +2130,16 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
         const payload = entry?.payload && typeof entry.payload === 'object' ? entry.payload : null;
         if (!payload) throw new Error('Redo payload is missing.');
         const res = await applyEdit(payload);
+        const outcomeType = String(res?.outcomeType || res?.result?.outcomeType || '').toLowerCase();
+        if (outcomeType && outcomeType !== 'applied' && outcomeType !== 'noop') {
+          const blockedMsg = String(
+            res?.blockedReason?.message ||
+            res?.result?.blockedReason?.message ||
+            res?.receipt?.note ||
+            'Redo edit was blocked.',
+          ).trim();
+          throw new Error(blockedMsg);
+        }
         nextRevisionId = extractRevisionId(res);
         if (!nextRevisionId) throw new Error('Redo did not create a revision.');
       }

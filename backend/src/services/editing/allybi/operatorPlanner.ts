@@ -45,9 +45,15 @@ export type AllybiOperatorClass =
 
 function operatorFromCatalog(domain: EditDomain, canonicalOperator: string): any | null {
   const banks = loadAllybiBanks();
-  const catalog = domain === "docx" ? banks.docxOperators : domain === "sheets" ? banks.xlsxOperators : null;
-  if (!catalog || !catalog.operators || typeof catalog.operators !== "object") return null;
-  return (catalog.operators as Record<string, any>)[canonicalOperator] || null;
+  const catalog = banks.operatorCatalog?.operators && typeof banks.operatorCatalog.operators === "object"
+    ? (banks.operatorCatalog.operators as Record<string, any>)
+    : {};
+  const operator = catalog[canonicalOperator];
+  if (!operator || typeof operator !== "object") return null;
+  const opDomain = String((operator as any).domain || "").trim().toLowerCase();
+  if (domain === "docx" && opDomain && opDomain !== "docx") return null;
+  if (domain === "sheets" && opDomain && opDomain !== "excel") return null;
+  return operator;
 }
 
 function isFormattingDirective(message: string): boolean {
@@ -296,8 +302,21 @@ export function planAllybiOperator(input: {
       canonicalOperator: candidate,
       runtimeOperator: mapped.operator,
       domain: input.domain,
-      requiresConfirmation: Boolean(info?.requires_confirmation),
-      previewRenderType: mapRenderType(input.domain, candidate, String(info?.preview_render_type || "text_diff")),
+      requiresConfirmation: Boolean(
+        info?.confirmationPolicy?.requiresExplicitConfirm ??
+        info?.requires_confirmation ??
+        false,
+      ),
+      previewRenderType: mapRenderType(
+        input.domain,
+        candidate,
+        String(
+          info?.previewType ||
+          info?.preview_render_type ||
+          info?.diffType ||
+          "text_diff",
+        ),
+      ),
       operatorClass: expectedOperatorClass,
       targetHint: input.scope.targetHint,
       scopeKind: input.scope.scopeKind,

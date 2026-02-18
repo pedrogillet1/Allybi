@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -332,8 +332,69 @@ const ChartSurface = React.memo(function ChartSurface({ chart, height = 240 }) {
   );
 });
 
+function svgToPngBlob(svgEl, scale = 2) {
+  return new Promise((resolve, reject) => {
+    const svgData = new XMLSerializer().serializeToString(svgEl);
+    const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = svgEl.clientWidth * scale;
+      canvas.height = svgEl.clientHeight * scale;
+      const ctx = canvas.getContext("2d");
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("toBlob failed"))), "image/png");
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("SVG load failed")); };
+    img.src = url;
+  });
+}
+
 export default function ChartCard({ chart }) {
   const [expanded, setExpanded] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState("");
+  const expandedChartRef = useRef(null);
+
+  const getSvg = useCallback(() => {
+    return expandedChartRef.current?.querySelector?.("svg.recharts-surface");
+  }, []);
+
+  const handleDownloadPng = useCallback(async () => {
+    const svg = getSvg();
+    if (!svg) return;
+    try {
+      const blob = await svgToPngBlob(svg);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${String(chart?.title || "chart").replace(/[^a-zA-Z0-9_-]/g, "_")}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("[ChartCard] download failed:", err);
+    }
+  }, [getSvg, chart?.title]);
+
+  const handleCopyToClipboard = useCallback(async () => {
+    const svg = getSvg();
+    if (!svg) return;
+    try {
+      const blob = await svgToPngBlob(svg);
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+      setCopyFeedback("Copied!");
+      setTimeout(() => setCopyFeedback(""), 2000);
+    } catch (err) {
+      console.error("[ChartCard] copy failed:", err);
+      setCopyFeedback("Failed");
+      setTimeout(() => setCopyFeedback(""), 2000);
+    }
+  }, [getSvg]);
+
   if (!chart || chart.type !== "chart") return null;
   const data = Array.isArray(chart.data) ? chart.data : [];
   if (!data.length) return null;
@@ -384,9 +445,21 @@ export default function ChartCard({ chart }) {
             <span className="koda-chart-card__typePill">{chartTypeLabel}</span>
             {sourceRange ? <span className="koda-chart-card__range">{sourceRange}</span> : null}
           </div>
+          <div className="koda-chart-card__toolbar">
+            <button type="button" onClick={handleDownloadPng} title="Download as PNG">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v9m0 0L5 7m3 3l3-3M2 12v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              Download
+            </button>
+            <button type="button" onClick={handleCopyToClipboard} title="Copy to clipboard">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M3 11V3a1 1 0 011-1h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              {copyFeedback || "Copy"}
+            </button>
+          </div>
           {explainLine ? <div className="koda-chart-card__axisNote">{explainLine}</div> : null}
           {chartWarning ? <div className="koda-chart-card__warning">{chartWarning}</div> : null}
-          <ChartSurface chart={chart} height={520} />
+          <div ref={expandedChartRef}>
+            <ChartSurface chart={chart} height={520} />
+          </div>
         </Modal>
       ) : null}
     </div>

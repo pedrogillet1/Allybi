@@ -193,8 +193,10 @@ export class EditOrchestratorService {
       proposedText: request.proposedText,
       preserveTokens: request.plan.preserveTokens,
     });
-    if (!preview.ok) return { ok: false, applied: false, error: preview.error };
-    if (!this.revisionStore) return { ok: false, applied: false, preview, error: "Revision store is not configured." };
+    if (!preview.ok) return { ok: false, applied: false, outcomeType: "blocked", error: preview.error };
+    if (!this.revisionStore) {
+      return { ok: false, applied: false, outcomeType: "engine_unsupported", preview, error: "Revision store is not configured." };
+    }
 
     const mustConfirm =
       Boolean(preview.requiresConfirmation) ||
@@ -204,6 +206,7 @@ export class EditOrchestratorService {
       return {
         ok: true,
         applied: false,
+        outcomeType: "blocked",
         preview,
         receipt: this.receiptBuilder.build({
           stage: "blocked",
@@ -272,32 +275,41 @@ export class EditOrchestratorService {
       const backendMetrics = (created as any).applyMetrics && typeof (created as any).applyMetrics === "object"
         ? (created as any).applyMetrics
         : null;
+      const derivedMetrics = this.deriveApplyMetrics({
+        operator: request.plan.operator,
+        targetId: request.target?.id || null,
+        proposedText: request.proposedText,
+      });
+      const affectedRanges = this.uniqueStrings([
+        ...(Array.isArray((backendMetrics as any)?.affectedRanges) ? (backendMetrics as any).affectedRanges : []),
+        ...derivedMetrics.affectedRanges,
+      ]);
+      const affectedParagraphIds = this.uniqueStrings([
+        ...(Array.isArray((backendMetrics as any)?.affectedParagraphIds) ? (backendMetrics as any).affectedParagraphIds : []),
+        ...derivedMetrics.affectedParagraphIds,
+      ]);
       const applyMetrics = backendMetrics
         ? {
             affectedTargetsCount: Math.max(
               1,
               Number((backendMetrics as any).changedCellsCount || 0) > 0
                 ? Number((backendMetrics as any).changedCellsCount || 0)
-                : (Array.isArray((backendMetrics as any).affectedRanges) ? (backendMetrics as any).affectedRanges.length : 1),
+                : (affectedRanges.length || affectedParagraphIds.length || 1),
             ),
             changedCellsCount: Math.max(0, Number((backendMetrics as any).changedCellsCount || 0)),
             changedStructuresCount: Math.max(0, Number((backendMetrics as any).changedStructuresCount || 0)),
-            affectedRanges: Array.isArray((backendMetrics as any).affectedRanges)
-              ? (backendMetrics as any).affectedRanges.map((item: any) => String(item || "").trim()).filter(Boolean)
-              : [],
-            affectedParagraphIds: [] as string[],
+            affectedRanges,
+            affectedParagraphIds,
             rejectedOps: Array.isArray((backendMetrics as any).rejectedOps)
               ? (backendMetrics as any).rejectedOps.map((item: any) => String(item || "").trim()).filter(Boolean)
               : [],
+            patchesApplied: Math.max(0, Number((backendMetrics as any).patchesApplied || 0)),
           }
         : {
-            ...this.deriveApplyMetrics({
-              operator: request.plan.operator,
-              targetId: request.target?.id || null,
-              proposedText: request.proposedText,
-            }),
+            ...derivedMetrics,
             changedStructuresCount: 0,
             rejectedOps: [] as string[],
+            patchesApplied: 0,
           };
       const diff = preview.diff;
       const changeCount = (() => {
@@ -330,6 +342,42 @@ export class EditOrchestratorService {
         ...(applyMetrics.affectedRanges.length ? { affectedRanges: applyMetrics.affectedRanges } : {}),
         ...(applyMetrics.affectedParagraphIds.length ? { affectedParagraphIds: applyMetrics.affectedParagraphIds } : {}),
         ...(applyMetrics.rejectedOps.length ? { rejectedOps: applyMetrics.rejectedOps } : {}),
+        metrics: {
+          changedObjectsCount: Math.max(
+            Number(applyMetrics.changedCellsCount || 0) +
+              Number(applyMetrics.changedStructuresCount || 0),
+            applyMetrics.affectedParagraphIds.length,
+          ),
+          changedCellsCount: Number(applyMetrics.changedCellsCount || 0),
+          changedStructuresCount: Number(applyMetrics.changedStructuresCount || 0),
+          ...(Number(applyMetrics.patchesApplied || 0) > 0 ? { patchesApplied: Number(applyMetrics.patchesApplied || 0) } : {}),
+        },
+        targets: [
+          ...applyMetrics.affectedParagraphIds.map((pid) => ({
+            kind: "docx_paragraph" as const,
+            id: pid,
+            beforeHash: fileHashBefore,
+            afterHash: fileHashAfter,
+          })),
+          ...applyMetrics.affectedRanges.map((range) => ({
+            kind: "xlsx_range" as const,
+            range,
+            beforeHash: fileHashBefore,
+            afterHash: fileHashAfter,
+          })),
+          ...(applyMetrics.affectedParagraphIds.length === 0 && applyMetrics.affectedRanges.length === 0 && targets.length
+            ? targets.map((targetId) => ({
+                kind: "target" as const,
+                id: targetId,
+                beforeHash: fileHashBefore,
+                afterHash: fileHashAfter,
+              }))
+            : []),
+        ],
+        highlights: {
+          ...(applyMetrics.affectedParagraphIds.length ? { docxParagraphIds: applyMetrics.affectedParagraphIds } : {}),
+          ...(applyMetrics.affectedRanges.length ? { xlsxRanges: applyMetrics.affectedRanges } : {}),
+        },
         ...(verification.reasons.length ? { warnings: verification.reasons } : {}),
       };
 
@@ -344,6 +392,7 @@ export class EditOrchestratorService {
         return {
           ok: true,
           applied: false,
+          outcomeType: "noop",
           preview,
           receipt: this.receiptBuilder.build({
             stage: "noop",
@@ -354,12 +403,19 @@ export class EditOrchestratorService {
             domain: request.plan.domain,
             note: "EDIT_NOOP_NO_CHANGES",
           }),
+          proof,
+          blockedReason: {
+            code: "EDIT_NOOP_NO_CHANGES",
+            gate: "apply_proof",
+            message: "No document mutation was verified.",
+          },
         };
       }
 
       return {
         ok: true,
         applied: true,
+        outcomeType: "applied",
         revisionId: created.revisionId,
         baseRevisionId: request.plan.documentId,
         newRevisionId: created.revisionId,
@@ -396,6 +452,7 @@ export class EditOrchestratorService {
         return {
           ok: true,
           applied: false,
+          outcomeType: "noop",
           preview,
           receipt: this.receiptBuilder.build({
             stage: "noop",
@@ -406,6 +463,11 @@ export class EditOrchestratorService {
             domain: request.plan.domain,
             note: "EDIT_NOOP_NO_CHANGES",
           }),
+          blockedReason: {
+            code: "EDIT_NOOP_NO_CHANGES",
+            gate: "apply_proof",
+            message: "No document mutation was verified.",
+          },
         };
       }
       logger.error("[Editing] apply failed", {
@@ -415,7 +477,7 @@ export class EditOrchestratorService {
         clientMessageId: ctx.clientMessageId,
         error: message,
       });
-      return { ok: false, applied: false, preview, error: message };
+      return { ok: false, applied: false, outcomeType: "blocked", preview, error: message };
     }
   }
 
@@ -430,6 +492,7 @@ export class EditOrchestratorService {
     affectedRanges: string[];
     affectedParagraphIds: string[];
     rejectedOps: string[];
+    patchesApplied: number;
   } {
     const affectedRanges = new Set<string>();
     const affectedParagraphIds = new Set<string>();
@@ -477,7 +540,21 @@ export class EditOrchestratorService {
       affectedRanges: Array.from(affectedRanges),
       affectedParagraphIds: Array.from(affectedParagraphIds),
       rejectedOps: [],
+      patchesApplied: 0,
     };
+  }
+
+  private uniqueStrings(values: unknown[]): string[] {
+    const out: string[] = [];
+    const seen = new Set<string>();
+    for (const raw of values) {
+      const v = String(raw || "").trim();
+      if (!v) continue;
+      if (seen.has(v)) continue;
+      seen.add(v);
+      out.push(v);
+    }
+    return out;
   }
 
   private estimateRangeCellCount(a1: string): number {
@@ -567,7 +644,7 @@ export class EditOrchestratorService {
   }
 
   private async track(
-    event: "edit_planned" | "edit_previewed" | "edit_applied" | "edit_failed",
+    event: "edit_planned" | "edit_previewed" | "edit_applied" | "edit_failed" | "edit_noop",
     ctx: EditExecutionContext,
     payload: Record<string, unknown>,
   ): Promise<void> {

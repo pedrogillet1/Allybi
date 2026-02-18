@@ -366,6 +366,28 @@ export function applyPatchOpsToSpreadsheetModel(modelInput: SpreadsheetModel, pa
           hasHeader: op.hasHeader !== false,
           style: op.style,
         });
+
+        // Apply thin borders to all cells so the live preview shows table outlines
+        const tableSheet = ensureSheetByName(model, parsed.sheetName);
+        const thinBorder = { style: "thin" };
+        const borderPatch = { border: { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder } };
+        for (let r = parsed.start.row; r <= parsed.end.row; r++) {
+          for (let c = parsed.start.col; c <= parsed.end.col; c++) {
+            const k = cellKey(r, c);
+            const existing = tableSheet.cells[k] || {};
+            const currentStyle = existing.s ? model.styles[existing.s] : {};
+            // Header row: bold + accent fill
+            const isHeader = op.hasHeader !== false && r === parsed.start.row;
+            const extra = isHeader
+              ? { font: { bold: true }, fill: { color: "#4472C4" } }
+              : {};
+            const merged = mergeStyleModels(currentStyle, { ...borderPatch, ...extra });
+            const ref = registerStyle(model, merged);
+            tableSheet.cells[k] = { ...existing, ...(ref ? { s: ref } : {}) };
+            bumpGridBounds(tableSheet, r, c);
+          }
+        }
+
         changed = true;
         changedStructuresCount += 1;
       } else if (op.op === "SET_VALIDATION") {

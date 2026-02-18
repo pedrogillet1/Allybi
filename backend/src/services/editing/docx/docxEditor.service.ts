@@ -871,39 +871,60 @@ export class DocxEditorService {
       }
       const pStyle = asArray(pPr["w:pStyle"] as XmlNode | XmlNode[] | undefined)[0];
       const styleVal = readAttr(pStyle, "w:val", "val");
-      if (styleVal && /\b(list|bullet|number)\b/i.test(styleVal)) {
+      if (styleVal && /(list|bullet|number)/i.test(styleVal)) {
         delete (pPr as any)["w:pStyle"];
+        // Clear list-inherited indentation so the paragraph renders as a
+        // normal body paragraph instead of staying visually indented.
+        if ((pPr as any)['w:ind']) {
+          delete (pPr as any)['w:ind'];
+        }
       }
       stripLeadingBulletText(paragraph);
     }
 
     if (opts?.applyNumbering) {
-      const fromNearest = (() => {
+      const preferredType = opts?.applyNumberingType === "numbered" ? "numbered" : "bulleted";
+
+      // First try to resolve the correct numId for the requested list type
+      // from numbering.xml so we get the right bullet vs numbered definition.
+      let numPr: { numId: string; ilvl: string } | null = null;
+      const listNumId = await resolveListNumId(zip, preferredType);
+      if (listNumId) {
+        numPr = { numId: listNumId, ilvl: "0" };
+      }
+
+      // Fallback: use nearest paragraph's numbering if resolveListNumId found nothing.
+      if (!numPr?.numId) {
         for (let i = Math.max(0, xmlIndex - 8); i <= Math.min(parsed.paragraphs.length - 1, xmlIndex + 8); i++) {
           if (i === xmlIndex) continue;
-          const numPr = readParagraphNumPr(parsed.paragraphs[i]!);
-          if (numPr?.numId) return numPr;
+          const nearby = readParagraphNumPr(parsed.paragraphs[i]!);
+          if (nearby?.numId) { numPr = nearby; break; }
         }
-        for (const p of parsed.paragraphs) {
-          const numPr = readParagraphNumPr(p);
-          if (numPr?.numId) return numPr;
-        }
-        return null;
-      })();
-
-      let numPr = fromNearest;
+      }
       if (!numPr?.numId) {
-        const preferredType = opts?.applyNumberingType === "numbered" ? "numbered" : "bulleted";
-        const listNumId = await resolveListNumId(zip, preferredType);
-        if (listNumId) numPr = { numId: listNumId, ilvl: "0" };
+        for (const p of parsed.paragraphs) {
+          const nearby = readParagraphNumPr(p);
+          if (nearby?.numId) { numPr = nearby; break; }
+        }
       }
 
       if (numPr?.numId) {
         applyNumberingToParagraph(paragraph, numPr);
       } else {
         // Fallback when no numbering definitions exist in the DOCX.
-        if (opts?.applyNumberingType === "numbered") prependNumberGlyphIfNeeded(paragraph);
+        if (preferredType === "numbered") prependNumberGlyphIfNeeded(paragraph);
         else prependBulletGlyphIfNeeded(paragraph);
+      }
+
+      // Also remove list-like pStyle if present, since we're switching to
+      // numPr-based numbering and the old style may conflict.
+      if (numPr?.numId) {
+        const pPr = ensureParagraphProps(paragraph);
+        const pStyleNode = asArray(pPr["w:pStyle"] as XmlNode | XmlNode[] | undefined)[0];
+        const currentStyle = readAttr(pStyleNode, "w:val", "val");
+        if (currentStyle && /(list|bullet|number)/i.test(currentStyle)) {
+          delete (pPr as any)["w:pStyle"];
+        }
       }
     }
 
@@ -1303,7 +1324,7 @@ export class DocxEditorService {
       delete (pPr as any)['w:numPr'];
       const pStyle = asArray(pPr['w:pStyle'] as XmlNode | XmlNode[] | undefined)[0];
       const styleVal = readAttr(pStyle, 'w:val', 'val');
-      if (styleVal && /\b(list|bullet|number)\b/i.test(styleVal)) {
+      if (styleVal && /(list|bullet|number)/i.test(styleVal)) {
         delete (pPr as any)['w:pStyle'];
       }
     }

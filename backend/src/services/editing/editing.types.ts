@@ -19,6 +19,31 @@ export type EditOperator =
 
 export type EditDomain = "docx" | "sheets" | "slides";
 
+export type EditIntentSource = "classified" | "explicit_operator";
+
+export type EditOutcomeType =
+  | "applied"
+  | "clarification_required"
+  | "engine_unsupported"
+  | "noop"
+  | "unknown_unsupported"
+  | "blocked";
+
+export type EditSupportGateId =
+  | "pattern_coverage"
+  | "slot_fill"
+  | "scope_resolution"
+  | "operator_catalog"
+  | "executor_branch"
+  | "apply_proof";
+
+export interface EditBlockedReason {
+  code: string;
+  gate: EditSupportGateId;
+  message: string;
+  details?: Record<string, unknown>;
+}
+
 export interface EditExecutionContext {
   userId: string;
   conversationId: string;
@@ -39,6 +64,8 @@ export interface EditConstraintSet {
 export interface EditPlanRequest {
   instruction: string;
   operator: EditOperator;
+  canonicalOperator?: string;
+  intentSource?: EditIntentSource;
   domain: EditDomain;
   documentId: string;
   targetHint?: string;
@@ -54,6 +81,8 @@ export interface EditPlanDiagnostics {
 
 export interface EditPlan {
   operator: EditOperator;
+  canonicalOperator?: string;
+  intentSource?: EditIntentSource;
   domain: EditDomain;
   documentId: string;
   targetHint?: string;
@@ -203,6 +232,8 @@ export interface EditApplyRequest {
 export interface EditApplyResult {
   ok: boolean;
   applied: boolean;
+  outcomeType: EditOutcomeType;
+  blockedReason?: EditBlockedReason;
   revisionId?: string;
   baseRevisionId?: string;
   newRevisionId?: string;
@@ -226,6 +257,25 @@ export interface EditApplyResult {
     affectedParagraphIds?: string[];
     warnings?: string[];
     rejectedOps?: string[];
+    metrics?: {
+      changedObjectsCount: number;
+      changedCellsCount: number;
+      changedStructuresCount: number;
+      createdChartsCount?: number;
+      patchesApplied?: number;
+    };
+    targets?: Array<{
+      kind: "docx_paragraph" | "xlsx_range" | "target";
+      id?: string;
+      range?: string;
+      sheetName?: string;
+      beforeHash?: string;
+      afterHash?: string;
+    }>;
+    highlights?: {
+      docxParagraphIds?: string[];
+      xlsxRanges?: string[];
+    };
   };
   preview?: EditPreviewResult;
   receipt?: EditReceipt;
@@ -253,7 +303,7 @@ export interface EditPolicy {
 
 export interface EditTelemetry {
   track(
-    event: "edit_planned" | "edit_previewed" | "edit_applied" | "edit_failed",
+    event: "edit_planned" | "edit_previewed" | "edit_applied" | "edit_failed" | "edit_noop",
     payload: Record<string, unknown>,
   ): Promise<void>;
 }
@@ -278,9 +328,11 @@ export interface EditRevisionStore {
       changedCellsCount?: number;
       changedStructuresCount?: number;
       affectedRanges?: string[];
+      affectedParagraphIds?: string[];
       locateRange?: string | null;
       changedSamples?: Array<{ sheetName: string; cell: string; before: string; after: string }>;
       rejectedOps?: string[];
+      patchesApplied?: number;
     };
   }>;
   undoToRevision(input: {

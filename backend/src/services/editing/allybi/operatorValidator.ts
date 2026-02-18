@@ -45,11 +45,17 @@ function supportsScope(canonicalOperator: string, scopeKind: string | undefined)
   return true;
 }
 
-function getOperatorSchema(domain: "docx" | "sheets", canonicalOperator: string): any | null {
+function getOperatorEntry(domain: "docx" | "sheets", canonicalOperator: string): any | null {
   const banks = loadAllybiBanks();
-  const catalog = domain === "docx" ? banks.docxOperators : banks.xlsxOperators;
-  const op = catalog?.operators?.[canonicalOperator];
-  return op?.schema || null;
+  const catalog = banks.operatorCatalog?.operators && typeof banks.operatorCatalog.operators === "object"
+    ? (banks.operatorCatalog.operators as Record<string, any>)
+    : {};
+  const op = catalog?.[canonicalOperator];
+  if (!op || typeof op !== "object") return null;
+  const opDomain = String((op as any).domain || "").trim().toLowerCase();
+  if (domain === "docx" && opDomain && opDomain !== "docx") return null;
+  if (domain === "sheets" && opDomain && opDomain !== "excel") return null;
+  return op;
 }
 
 export function validateAllybiOperatorPayload(
@@ -99,10 +105,16 @@ export function validateAllybiOperatorPayload(
     };
   }
 
-  const schema = getOperatorSchema(domain, plan.canonicalOperator);
-  if (!schema || typeof schema !== "object") return { ok: true };
+  const operatorEntry = getOperatorEntry(domain, plan.canonicalOperator);
+  if (!operatorEntry || typeof operatorEntry !== "object") return { ok: true };
 
-  const required = Array.isArray((schema as any).required) ? (schema as any).required : [];
+  const required = Array.isArray((operatorEntry as any).requiredSlots)
+    ? (operatorEntry as any).requiredSlots
+    : Array.isArray((operatorEntry as any)?.slotSchema?.required)
+      ? (operatorEntry as any).slotSchema.required
+      : Array.isArray((operatorEntry as any)?.schema?.required)
+        ? (operatorEntry as any).schema.required
+        : [];
   for (const reqField of required) {
     if (!(reqField in payload)) {
       return {

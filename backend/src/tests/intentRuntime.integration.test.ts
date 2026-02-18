@@ -56,5 +56,71 @@ describe("intentRuntime integration (critical editing paths)", () => {
     expect(op).toBeTruthy();
     expect(String(op?.params?.rangeA1 || "").toUpperCase()).toContain("D9");
   });
+
+  test("EN 'convert bullets to paragraphs' produces LIST_REMOVE + MERGE_PARAGRAPHS", () => {
+    const result = analyzeMessageToPlan({
+      message: "Convert bullets to paragraphs",
+      domain: "docx",
+      viewerContext: {
+        selection: {
+          ranges: [
+            { paragraphId: "docx:p:10", text: "Bullet A" },
+            { paragraphId: "docx:p:11", text: "Bullet B" },
+          ],
+        },
+      },
+      language: "en",
+    });
+    expect(result).not.toBeNull();
+    expect(result?.kind).toBe("plan");
+    if (result?.kind !== "plan") return;
+    const ops = result.ops.map((o) => o.op);
+    expect(ops).toContain("DOCX_LIST_REMOVE");
+    expect(ops).toContain("DOCX_MERGE_PARAGRAPHS");
+  });
+
+  test("EN 'merge these paragraphs' resolves targetIds (not literal $targets)", () => {
+    const result = analyzeMessageToPlan({
+      message: "Merge these paragraphs",
+      domain: "docx",
+      viewerContext: {
+        selection: {
+          ranges: [
+            { paragraphId: "docx:p:20", text: "Para A" },
+            { paragraphId: "docx:p:21", text: "Para B" },
+          ],
+        },
+      },
+      language: "en",
+    });
+    expect(result).not.toBeNull();
+    expect(result?.kind).toBe("plan");
+    if (result?.kind !== "plan") return;
+    const mergeStep = result.ops.find((o) => o.op === "DOCX_MERGE_PARAGRAPHS");
+    expect(mergeStep).toBeTruthy();
+    const targetIds = mergeStep?.params?.targetIds;
+    // targetIds should not be the literal string "$targets"
+    expect(targetIds).not.toBe("$targets");
+    expect(targetIds).not.toEqual(["$targets"]);
+  });
+
+  test("PT heading set produces 'Heading 2' with space", () => {
+    const result = analyzeMessageToPlan({
+      message: "Aplique título 2",
+      domain: "docx",
+      viewerContext: {
+        selection: {
+          ranges: [{ paragraphId: "docx:p:30", text: "Some heading" }],
+        },
+      },
+      language: "pt",
+    });
+    expect(result).not.toBeNull();
+    expect(result?.kind).toBe("plan");
+    if (result?.kind !== "plan") return;
+    const styleStep = result.ops.find((o) => o.op === "DOCX_SET_PARAGRAPH_STYLE");
+    expect(styleStep).toBeTruthy();
+    expect(styleStep?.params?.styleName).toBe("Heading 2");
+  });
 });
 

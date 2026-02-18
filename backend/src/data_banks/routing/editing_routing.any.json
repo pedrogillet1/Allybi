@@ -183,7 +183,7 @@
       },
       "then": {
         "intent": "EDITING",
-        "operator": "EDIT_PARAGRAPH",
+        "operator": "EDIT_DOCX_BUNDLE",
         "domain": "docx",
         "scope": "documents",
         "defaultEntities": {

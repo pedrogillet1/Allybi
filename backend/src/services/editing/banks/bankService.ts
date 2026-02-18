@@ -23,6 +23,13 @@ const FALLBACK_CATEGORIES = [
 
 const cache = new Map<string, unknown | null>();
 
+function shouldAllowFilesystemFallback(): boolean {
+  const explicit = String(process.env.KODA_EDITING_ALLOW_FILESYSTEM_FALLBACK || "").trim().toLowerCase();
+  if (explicit === "true") return true;
+  const env = String(process.env.NODE_ENV || "").trim().toLowerCase();
+  return env === "test" || env === "local";
+}
+
 export function clearEditingBankCache(): void {
   cache.clear();
 }
@@ -39,7 +46,12 @@ export function safeEditingBank<T = unknown>(id: string): T | null {
       return loaded;
     }
   } catch {
-    // fall through to file fallback
+    // fall through to optional filesystem fallback.
+  }
+
+  if (!shouldAllowFilesystemFallback()) {
+    cache.set(key, null);
+    return null;
   }
 
   try {
@@ -78,4 +90,3 @@ export function safeEditingBank<T = unknown>(id: string): T | null {
   cache.set(key, null);
   return null;
 }
-

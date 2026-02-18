@@ -69,8 +69,13 @@ export interface GeminiSafetySetting {
   threshold: string;
 }
 
+export interface GeminiSystemInstruction {
+  parts: GeminiPartText[];
+}
+
 export interface GeminiRequestPayload {
   contents: GeminiContent[];
+  systemInstruction?: GeminiSystemInstruction;
   tools?: GeminiToolSchema[];
   generationConfig?: GeminiGenerationConfig;
   safetySettings?: GeminiSafetySetting[]; // optional; set by higher-level policy if needed
@@ -118,8 +123,14 @@ export interface GeminiParsedOutput {
 /** Adapter config */
 export interface GeminiPromptAdapterConfig {
   /**
-   * If true, we include system/developer messages as a single user preface.
-   * (Gemini API doesn’t have system role in the same way; this is standard practice.)
+   * If true, we use the top-level `systemInstruction` field for system/developer messages.
+   * If false, we fold them into the first user message as a preface (legacy behavior).
+   */
+  useSystemInstruction: boolean;
+
+  /**
+   * Legacy: If true and useSystemInstruction is false, fold system/developer into user preface.
+   * Ignored when useSystemInstruction is true.
    */
   foldSystemAndDeveloperIntoUser: boolean;
 
@@ -166,12 +177,19 @@ export class GeminiPromptAdapterService {
    * Convert a Allybi LLMRequest into a GeminiRequestPayload.
    */
   toGeminiRequest(req: LLMRequest): GeminiRequestPayload {
-    const contents = this.buildContents(req.messages);
+    const { contents, systemParts } = this.buildContents(req.messages);
 
     const payload: GeminiRequestPayload = {
       contents,
       generationConfig: this.buildGenerationConfig(req.sampling),
     };
+
+    // Use top-level systemInstruction when enabled and system messages exist
+    if (this.cfg.useSystemInstruction && systemParts.length > 0) {
+      payload.systemInstruction = {
+        parts: systemParts.map((text) => ({ text })),
+      };
+    }
 
     if (this.cfg.includeToolsInRequest && req.tools?.enabled) {
       const toolSchema = this.buildToolSchema(req.tools.registry);
@@ -271,23 +289,31 @@ export class GeminiPromptAdapterService {
 
   /* ------------------------- message building ------------------------- */
 
-  private buildContents(messages: LLMMessage[]): GeminiContent[] {
+  private buildContents(messages: LLMMessage[]): { contents: GeminiContent[]; systemParts: string[] } {
     const cleaned = this.cfg.dropEmptyMessages ? messages.filter(m => !isEffectivelyEmpty(m)) : messages;
 
     const out: GeminiContent[] = [];
+    const systemParts: string[] = [];
     const systemPreface: string[] = [];
 
     for (const m of cleaned) {
       if (m.role === 'system' || m.role === 'developer') {
-        if (this.cfg.foldSystemAndDeveloperIntoUser) {
-          if (m.content?.trim()) systemPreface.push(m.content.trim());
+        const text = (m.content ?? '').trim();
+        if (!text) continue;
+
+        if (this.cfg.useSystemInstruction) {
+          // Collect for top-level systemInstruction field
+          systemParts.push(text);
+        } else if (this.cfg.foldSystemAndDeveloperIntoUser) {
+          // Legacy: fold into user preface
+          systemPreface.push(text);
         }
         continue;
       }
 
       if (m.role === 'user') {
-        // If we have a preface, inject it once before the first user message.
-        if (this.cfg.foldSystemAndDeveloperIntoUser && systemPreface.length > 0) {
+        // If we have a legacy preface, inject it once before the first user message.
+        if (!this.cfg.useSystemInstruction && this.cfg.foldSystemAndDeveloperIntoUser && systemPreface.length > 0) {
           out.push({
             role: 'user',
             parts: [{ text: systemPreface.join('\n\n') }],
@@ -310,7 +336,7 @@ export class GeminiPromptAdapterService {
           parts.push(...this.assistantToolCallsToGeminiParts(m.toolCalls));
         }
 
-        // If there’s no content and no tool calls, keep deterministic empty model message only if not dropping empties
+        // If there's no content and no tool calls, keep deterministic empty model message only if not dropping empties
         if (parts.length === 0 && !this.cfg.dropEmptyMessages) {
           parts.push({ text: '' });
         }
@@ -334,15 +360,15 @@ export class GeminiPromptAdapterService {
       out.push({ role: 'user', parts: [{ text: m.content ?? '' }] });
     }
 
-    // If systemPreface never got injected (no user message), inject once at end
-    if (this.cfg.foldSystemAndDeveloperIntoUser && systemPreface.length > 0) {
+    // If legacy systemPreface never got injected (no user message), inject once at end
+    if (!this.cfg.useSystemInstruction && this.cfg.foldSystemAndDeveloperIntoUser && systemPreface.length > 0) {
       out.push({
         role: 'user',
         parts: [{ text: systemPreface.join('\n\n') }],
       });
     }
 
-    return out;
+    return { contents: out, systemParts };
   }
 
   /* ------------------------- tools schema ------------------------- */

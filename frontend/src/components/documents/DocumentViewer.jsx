@@ -636,6 +636,8 @@ const DocumentViewer = () => {
   const [docxListType, setDocxListType] = useState('');
   // No default active alignment button; Word-like behavior comes from the document itself.
   const [docxAlignment, setDocxAlignment] = useState('');
+  const [docxHasPendingEdits, setDocxHasPendingEdits] = useState(false);
+  const [docxSaveNotice, setDocxSaveNotice] = useState(''); // 'Saved!' / 'Discarded' / ''
 
   // XLSX toolbar state
   const [excelSelectedInfo, setExcelSelectedInfo] = useState(null);
@@ -724,6 +726,26 @@ const DocumentViewer = () => {
     setDocxListType('');
     setDocxAlignment('');
   }, [documentId]);
+
+  const handleExcelHistoryStateChange = useCallback((next) => {
+    setExcelHistoryState({
+      canUndo: Boolean(next?.canUndo),
+      canRedo: Boolean(next?.canRedo),
+    });
+  }, []);
+
+  const handleExcelSelectedInfoChange = useCallback((info) => {
+    setExcelSelectedInfo(info);
+    const fmt = info?.format;
+    setExcelFontFamily(fmt?.fontFamily || 'Calibri');
+    setExcelFontSizePt(fmt?.fontSizePt ?? 11);
+    setExcelColorHex(fmt?.color || '#000000');
+    setExcelBold(fmt?.bold ?? false);
+    setExcelItalic(fmt?.italic ?? false);
+    setExcelUnderline(fmt?.underline ?? false);
+  }, []);
+
+  const handleExcelApplied = useCallback(() => setPreviewVersion(v => v + 1), []);
 
   const editSessionSignature = useCallback((sessionLike) => {
     const s = sessionLike || {};
@@ -839,7 +861,7 @@ const DocumentViewer = () => {
         if (matchingDraftIds.size === 0) return '';
         return matchingDraftIds.has(String(prev)) ? '' : prev;
       });
-      if (matchingDraftIds.size > 0) {
+      if (matchingDraftIds.size > 0 || domain === 'sheets') {
         setFrozenSelection(null);
         setLiveViewerSelection(null);
         lastSelectionRef.current = null;
@@ -1144,7 +1166,7 @@ const DocumentViewer = () => {
   const clearFrozenSelection = useCallback((opts = {}) => {
     const preserveExcelSelection = Boolean(opts?.preserveExcelSelection);
     if (!preserveExcelSelection) {
-      suppressExcelLiveSelectionUntilRef.current = Date.now() + 1500;
+      suppressExcelLiveSelectionUntilRef.current = Date.now() + 400;
       setFrozenSelection(null);
       frozenSelectionRef.current = null; // sync ref immediately to prevent stale lock in selectionchange
       setLiveViewerSelection(null);
@@ -2933,10 +2955,16 @@ const DocumentViewer = () => {
     const op = String(session?.operator || '').trim().toUpperCase();
     const canonicalOp = String(session?.canonicalOperator || '').trim().toUpperCase();
     const looksDocxCanonical = canonicalOp.startsWith('DOCX_');
-    if (op !== 'EDIT_DOCX_BUNDLE' && !looksDocxCanonical) return [];
     const parsed = parseJsonPayload(session?.proposedText) || parseJsonPayload(session?.diff?.after) || null;
     const parsedPatches = Array.isArray(parsed?.patches) ? parsed.patches : [];
-    return parsedPatches.filter((p) => p && typeof p === 'object');
+    const filtered = parsedPatches.filter((p) => p && typeof p === 'object');
+    if (op === 'EDIT_DOCX_BUNDLE' || looksDocxCanonical) return filtered;
+    // Content-aware: if all parsed patches have docx_-prefixed kinds, treat as bundle
+    // regardless of operator name to prevent raw JSON fallthrough.
+    if (filtered.length > 0 && filtered.every((p) => String(p?.kind || '').startsWith('docx_'))) {
+      return filtered;
+    }
+    return [];
   };
 
   /**
@@ -4245,6 +4273,38 @@ const DocumentViewer = () => {
         pptxControlsEnabled={false}
         pdfControlsEnabled={false}
 
+        wordPrimaryActionLabel="Save"
+        onWordPrimaryAction={async () => {
+          try {
+            const results = await docxCanvasRef.current?.saveAllManualEdits?.();
+            const saved = (results || []).filter(r => r.ok && r.revisionId);
+            const failed = (results || []).filter(r => !r.ok);
+            if (saved.length > 0) {
+              setDocxHasPendingEdits(false);
+              setDocxSaveNotice('Saved!');
+              setTimeout(() => setDocxSaveNotice(''), 2000);
+            } else if (failed.length > 0) {
+              setDocxSaveNotice('Save failed');
+              setTimeout(() => setDocxSaveNotice(''), 3000);
+            } else {
+              setDocxHasPendingEdits(false);
+              setDocxSaveNotice('No changes to save');
+              setTimeout(() => setDocxSaveNotice(''), 2000);
+            }
+          } catch (e) {
+            console.error('[DocxSave] save failed', e);
+            setDocxSaveNotice('Save failed');
+            setTimeout(() => setDocxSaveNotice(''), 3000);
+          }
+        }}
+        wordSecondaryActionLabel="Discard"
+        onWordSecondaryAction={async () => {
+          await docxCanvasRef.current?.reload?.();
+          setDocxHasPendingEdits(false);
+          setDocxSaveNotice('Discarded');
+          setTimeout(() => setDocxSaveNotice(''), 2000);
+        }}
+
         onBackgroundClick={() => {
           // Clicking empty toolbar area clears the document selection.
           clearFrozenSelection();
@@ -4340,6 +4400,7 @@ const DocumentViewer = () => {
                       autoSaveOnBlur
                       ref={docxCanvasRef}
                       onStatusMsg={setEditorStatusMsg}
+                      onDirtyChange={setDocxHasPendingEdits}
                       onApplied={({ revisionId } = {}) => {
                         setPreviewVersion(v => v + 1);
                         // Silently update the URL to the new revision so navigating
@@ -4351,6 +4412,17 @@ const DocumentViewer = () => {
                     />
                   </div>
                 </Suspense>
+                {docxSaveNotice ? (
+                  <div style={{
+                    position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)',
+                    background: docxSaveNotice === 'Save failed' ? '#dc2626' : '#111827',
+                    color: '#fff', padding: '10px 24px', borderRadius: 8,
+                    fontSize: 14, fontWeight: 600, zIndex: 9999,
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
+                  }}>
+                    {docxSaveNotice}
+                  </div>
+                ) : null}
               </div>
             );
           }
@@ -4367,16 +4439,7 @@ const DocumentViewer = () => {
 	                          hideSheetTabs
 	                          draftValue={excelDraftValue}
 	                          onDraftValueChange={setExcelDraftValue}
-	                          onSelectedInfoChange={(info) => {
-	                            setExcelSelectedInfo(info);
-	                            const fmt = info?.format;
-	                            setExcelFontFamily(fmt?.fontFamily || 'Calibri');
-	                            setExcelFontSizePt(fmt?.fontSizePt ?? 11);
-	                            setExcelColorHex(fmt?.color || '#000000');
-	                            setExcelBold(fmt?.bold ?? false);
-	                            setExcelItalic(fmt?.italic ?? false);
-	                            setExcelUnderline(fmt?.underline ?? false);
-	                          }}
+	                          onSelectedInfoChange={handleExcelSelectedInfoChange}
 		                          onLiveSelectionChange={handleExcelLiveSelectionChange}
 		                          onAskAllybi={handleExcelAskAllybi}
                             selectionHint={
@@ -4387,13 +4450,8 @@ const DocumentViewer = () => {
                             clearSelectionNonce={excelSelectionClearNonce}
 	                          onStatusMsg={setEditorStatusMsg}
 	                          onSheetMetaChange={setExcelSheetMeta}
-                              onHistoryStateChange={(next) => {
-                                setExcelHistoryState({
-                                  canUndo: Boolean(next?.canUndo),
-                                  canRedo: Boolean(next?.canRedo),
-                                });
-                              }}
-	                          onApplied={() => setPreviewVersion(v => v + 1)}
+                              onHistoryStateChange={handleExcelHistoryStateChange}
+	                          onApplied={handleExcelApplied}
 	                          onCountUpdate={setChildPreviewCount}
 	                        />
                       </Suspense>

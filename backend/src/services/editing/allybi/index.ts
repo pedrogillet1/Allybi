@@ -8,3 +8,4 @@ export { buildAllybiExecutionEnvelope } from "./operatorExecutor";
 export { buildAllybiDiff } from "./diffBuilder";
 export { buildDocumentCapabilities } from "./capabilities.service";
 export { buildMultiIntentPlan } from "./multiIntentPlanner";
+export { SupportContractService } from "./supportContract.service";

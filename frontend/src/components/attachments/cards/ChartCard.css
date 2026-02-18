@@ -91,6 +91,33 @@
   color: #6B7280;
 }
 
+.koda-chart-card__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.koda-chart-card__toolbar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid #D1D5DB;
+  background: #FFFFFF;
+  color: #111827;
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.koda-chart-card__toolbar button:hover {
+  background: #F3F4F6;
+}
+
 .koda-chart-card__axisNote {
   margin-bottom: 10px;
   font-size: 12px;

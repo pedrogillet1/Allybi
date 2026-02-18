@@ -54,6 +54,10 @@ function asBoolean(value: unknown): boolean {
   return false;
 }
 
+function intentSourceFromRawOperator(value: unknown): "classified" | "explicit_operator" {
+  return asString(value) ? "explicit_operator" : "classified";
+}
+
 function normalizeDocxBundleProposedText(
   runtimeOperator: string | null | undefined,
   proposedText: string | null,
@@ -330,6 +334,7 @@ export class EditingController {
           targetHint: asString(body.targetHint) || null,
         })
       : { runtimeOperator: null, canonicalOperator: null };
+    const intentSource = intentSourceFromRawOperator(operator);
 
     if (!instruction || !isEditDomain(domain) || !normalized.runtimeOperator || !documentId) {
       return sendErr(res, 'INVALID_PLAN_INPUT', 'instruction, domain, and documentId are required.', 400);
@@ -341,6 +346,8 @@ export class EditingController {
       planRequest: {
         instruction,
         operator: normalized.runtimeOperator,
+        canonicalOperator: normalized.canonicalOperator || undefined,
+        intentSource,
         domain,
         documentId,
         targetHint: asString(body.targetHint) || undefined,
@@ -387,6 +394,7 @@ export class EditingController {
           targetHint: asString(body.targetHint) || null,
         })
       : { runtimeOperator: null, canonicalOperator: null };
+    const intentSource = intentSourceFromRawOperator(operator);
 
     const forceDocxBundle = domain === 'docx' && hasDocxBundlePayload(proposedTextRaw, body.bundlePatches);
     const runtimeOperator = forceDocxBundle ? 'EDIT_DOCX_BUNDLE' : normalized.runtimeOperator;
@@ -403,6 +411,8 @@ export class EditingController {
       planRequest: {
         instruction,
         operator: runtimeOperator,
+        canonicalOperator: canonicalOperator || undefined,
+        intentSource,
         domain,
         documentId,
         targetHint: asString(body.targetHint) || undefined,
@@ -458,6 +468,7 @@ export class EditingController {
           targetHint: asString(body.targetHint) || null,
         })
       : { runtimeOperator: null, canonicalOperator: null };
+    const intentSource = intentSourceFromRawOperator(operator);
 
     const forceDocxBundle = domain === 'docx' && hasDocxBundlePayload(proposedTextRaw, body.bundlePatches);
     const runtimeOperator = forceDocxBundle ? 'EDIT_DOCX_BUNDLE' : normalized.runtimeOperator;
@@ -474,6 +485,8 @@ export class EditingController {
       planRequest: {
         instruction,
         operator: runtimeOperator,
+        canonicalOperator: canonicalOperator || undefined,
+        intentSource,
         domain,
         documentId,
         targetHint: asString(body.targetHint) || undefined,

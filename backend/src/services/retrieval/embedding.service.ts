@@ -359,6 +359,7 @@ export class EmbeddingsService {
         const res = await this.openai.embeddings.create({
           model: this.cfg.model,
           input: cleaned,
+          dimensions: this.cfg.dimensions,
         });
 
         const out = res.data.map((d) => d.embedding);

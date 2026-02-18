@@ -57,6 +57,8 @@ export class EditReceiptService {
     const fromOperator = String(
       bank?.copy?.byOperator?.[stage]?.[op]?.[loc]?.body ||
       bank?.copy?.byOperator?.[stage]?.[op]?.[fallbackLang]?.body ||
+      bank?.copy?.byOperator?.[stage]?.["*"]?.[loc]?.body ||
+      bank?.copy?.byOperator?.[stage]?.["*"]?.[fallbackLang]?.body ||
       "",
     ).trim();
     return fromOperator;

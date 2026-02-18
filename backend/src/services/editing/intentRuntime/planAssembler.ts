@@ -23,21 +23,39 @@ import { buildWorklog } from "./worklog";
 // Slot substitution
 // ---------------------------------------------------------------------------
 
-function substituteSlots(
+function substituteSlotValue(value: unknown, filled: FilledSlots): unknown {
+  if (typeof value === "string") {
+    // Exact match: entire value is a single slot reference (e.g. "$target")
+    const exactMatch = /^\$([a-zA-Z_]\w*)$/.exec(value);
+    if (exactMatch) {
+      return filled[exactMatch[1]] ?? null;
+    }
+    // Embedded interpolation: "Heading $level" → "Heading 2"
+    if (value.includes("$")) {
+      return value.replace(/\$([a-zA-Z_]\w*)/g, (_match, name) => {
+        const resolved = filled[name];
+        return resolved != null ? String(resolved) : "";
+      });
+    }
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => substituteSlotValue(item, filled));
+  }
+  if (typeof value === "object" && value !== null) {
+    return substituteSlots(value as Record<string, unknown>, filled);
+  }
+  return value;
+}
+
+export function substituteSlots(
   template: Record<string, unknown>,
   filled: FilledSlots,
 ): Record<string, unknown> {
   const result: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(template)) {
-    if (typeof value === "string" && value.startsWith("$")) {
-      const slotName = value.slice(1);
-      result[key] = filled[slotName] ?? null;
-    } else if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-      result[key] = substituteSlots(value as Record<string, unknown>, filled);
-    } else {
-      result[key] = value;
-    }
+    result[key] = substituteSlotValue(value, filled);
   }
 
   return result;

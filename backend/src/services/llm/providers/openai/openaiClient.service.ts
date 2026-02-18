@@ -217,9 +217,8 @@ function buildChatCompletionPayload(request: LlmRequest, cfg: OpenAIConfig, stre
     top_p,
     stop,
 
-    // The OpenAI Chat Completions API has used max_tokens historically.
-    // Some newer models may accept max_completion_tokens; we keep max_tokens (most compatible).
-    ...(typeof maxOut === "number" ? { max_tokens: Math.max(1, Math.floor(maxOut)) } : {}),
+    // GPT-5+ models require max_completion_tokens (max_tokens is deprecated for these models).
+    ...(typeof maxOut === "number" ? { max_completion_tokens: Math.max(1, Math.floor(maxOut)) } : {}),
 
     // Tools (function calling)
     ...(tools ? { tools } : {}),

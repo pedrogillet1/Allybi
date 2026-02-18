@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
+import { sanitizeDocxRichHtml } from '../utils/docxCanvasUtils';
 
 /**
  * Centralized state management for the DOCX edit canvas.
@@ -6,63 +7,6 @@ import { useCallback, useRef, useState } from 'react';
  * Consolidates the 8+ independent state/ref stores that previously lived
  * inline in DocxEditCanvas into a single hook with named actions.
  */
-
-function sanitizeDocxRichHtml(html) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(`<div>${String(html || '')}</div>`, 'text/html');
-  const root = doc.body.firstChild;
-  if (!root) return '';
-
-  const allowedTags = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'BR', 'SPAN', 'UL', 'OL', 'LI', '#text']);
-  const allowedStyle = new Set(['font-size', 'color', 'font-family']);
-
-  const walk = (node) => {
-    const children = Array.from(node.childNodes || []);
-    for (const child of children) {
-      if (child.nodeType === Node.TEXT_NODE) continue;
-      const el = child;
-      const tag = el.nodeName;
-      if (!allowedTags.has(tag)) {
-        const text = doc.createTextNode(el.textContent || '');
-        el.parentNode?.replaceChild(text, el);
-        continue;
-      }
-      if (el.nodeType === Node.ELEMENT_NODE) {
-        const attrs = Array.from(el.attributes || []);
-        for (const a of attrs) {
-          if (tag === 'SPAN' && a.name.toLowerCase() === 'style') continue;
-          el.removeAttribute(a.name);
-        }
-        if (tag === 'SPAN') {
-          const style = String(el.getAttribute('style') || '');
-          const cleaned = style
-            .split(';')
-            .map((pair) => pair.trim())
-            .filter(Boolean)
-            .map((pair) => {
-              const idx = pair.indexOf(':');
-              if (idx <= 0) return null;
-              const k = pair.slice(0, idx).trim().toLowerCase();
-              const v = pair.slice(idx + 1).trim();
-              if (!allowedStyle.has(k)) return null;
-              if (!v) return null;
-              if (k === 'color' && !/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(v)) return null;
-              if (k === 'font-size' && !/^[0-9.]+(px|pt)$/.test(v)) return null;
-              return `${k}:${v}`;
-            })
-            .filter(Boolean)
-            .join(';');
-          if (cleaned) el.setAttribute('style', cleaned);
-          else el.removeAttribute('style');
-        }
-      }
-      walk(el);
-    }
-  };
-
-  walk(root);
-  return root.innerHTML || '';
-}
 
 export default function useDocxEditState() {
   // --- Core paragraph state ---
@@ -248,11 +192,11 @@ export default function useDocxEditState() {
   }, []);
 
   const getUndoStack = useCallback((pid) => {
-    return undoByPidRef.current.get(pid) || [];
+    return [...(undoByPidRef.current.get(pid) || [])];
   }, []);
 
   const getRedoStack = useCallback((pid) => {
-    return redoByPidRef.current.get(pid) || [];
+    return [...(redoByPidRef.current.get(pid) || [])];
   }, []);
 
   const setUndoStack = useCallback((pid, stack) => {

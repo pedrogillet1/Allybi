@@ -252,13 +252,15 @@
   pointer-events: none;
 }
 
-/* Table visualization (persisted or draft): keep subtle so cell content stays primary */
+/* Table visualization (persisted or draft): visible borders so table structure is clear */
 .excel-cell.excel-cell-table {
-  border-color: #B9C4D8 !important;
+  border-right: 1px solid #8B9DC3 !important;
+  border-bottom: 1px solid #8B9DC3 !important;
 }
 
 .excel-cell.excel-cell-table-header {
   font-weight: 700;
+  color: #fff;
 }
 
 /* Persistent highlight for applied/located targets */
