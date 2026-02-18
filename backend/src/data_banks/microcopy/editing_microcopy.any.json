@@ -191,9 +191,79 @@
         }
       },
       "noop": {
+        "EDIT_DOCX_BUNDLE": {
+          "en": { "body": "No structural or formatting changes were needed. The document already reflects your request." },
+          "pt": { "body": "Nenhuma alteracao estrutural ou de formatacao foi necessaria. O documento ja reflete seu pedido." }
+        },
+        "EDIT_PARAGRAPH": {
+          "en": { "body": "The paragraph already contains the requested content. No rewrite was needed." },
+          "pt": { "body": "O paragrafo ja contem o conteudo solicitado. Nenhuma reescrita foi necessaria." }
+        },
+        "EDIT_SPAN": {
+          "en": { "body": "The selected text already matches. No replacement was needed." },
+          "pt": { "body": "O texto selecionado ja corresponde. Nenhuma substituicao foi necessaria." }
+        },
+        "ADD_PARAGRAPH": {
+          "en": { "body": "No insertion was performed. The content may already exist at the target location." },
+          "pt": { "body": "Nenhuma insercao foi realizada. O conteudo pode ja existir no local indicado." }
+        },
+        "COMPUTE_BUNDLE": {
+          "en": { "body": "No spreadsheet changes were needed. Cell values already match the expected result." },
+          "pt": { "body": "Nenhuma alteracao na planilha foi necessaria. Os valores das celulas ja correspondem ao resultado esperado." }
+        },
+        "EDIT_CELL": {
+          "en": { "body": "The cell already contains the requested value. No change was needed." },
+          "pt": { "body": "A celula ja contem o valor solicitado. Nenhuma alteracao foi necessaria." }
+        },
+        "EDIT_RANGE": {
+          "en": { "body": "The range already contains the expected values. No changes were applied." },
+          "pt": { "body": "O intervalo ja contem os valores esperados. Nenhuma alteracao foi aplicada." }
+        },
+        "CREATE_CHART": {
+          "en": { "body": "No chart changes were needed. The chart configuration already matches your request." },
+          "pt": { "body": "Nenhuma alteracao no grafico foi necessaria. A configuracao ja corresponde ao seu pedido." }
+        },
         "*": {
           "en": { "body": "No changes were needed. The document already matches your request." },
           "pt": { "body": "Nenhuma mudanca foi necessaria. O documento ja corresponde ao seu pedido." }
+        }
+      },
+      "failed": {
+        "EDIT_DOCX_BUNDLE": {
+          "en": { "body": "The DOCX bundle operation could not be completed. Please check the target paragraphs and try again." },
+          "pt": { "body": "A operacao em lote DOCX nao pôde ser concluida. Verifique os paragrafos alvo e tente novamente." }
+        },
+        "EDIT_PARAGRAPH": {
+          "en": { "body": "The paragraph rewrite failed. Please select a valid paragraph and retry." },
+          "pt": { "body": "A reescrita do paragrafo falhou. Selecione um paragrafo valido e tente novamente." }
+        },
+        "EDIT_SPAN": {
+          "en": { "body": "The text replacement failed. The selected span may have changed since preview." },
+          "pt": { "body": "A substituicao de texto falhou. O trecho selecionado pode ter mudado desde a previa." }
+        },
+        "ADD_PARAGRAPH": {
+          "en": { "body": "Paragraph insertion failed. The target location may no longer be valid." },
+          "pt": { "body": "A insercao de paragrafo falhou. O local alvo pode nao ser mais valido." }
+        },
+        "COMPUTE_BUNDLE": {
+          "en": { "body": "The spreadsheet operation failed. Please verify the cell ranges and formulas." },
+          "pt": { "body": "A operacao na planilha falhou. Verifique os intervalos e formulas." }
+        },
+        "EDIT_CELL": {
+          "en": { "body": "The cell edit failed. The target cell may be protected or the value invalid." },
+          "pt": { "body": "A edicao da celula falhou. A celula pode estar protegida ou o valor invalido." }
+        },
+        "EDIT_RANGE": {
+          "en": { "body": "The range edit failed. Please verify the target range and values." },
+          "pt": { "body": "A edicao do intervalo falhou. Verifique o intervalo alvo e os valores." }
+        },
+        "CREATE_CHART": {
+          "en": { "body": "Chart creation failed. Please verify the source range contains valid data." },
+          "pt": { "body": "A criacao do grafico falhou. Verifique se o intervalo fonte contem dados validos." }
+        },
+        "*": {
+          "en": { "body": "This edit could not be applied. Please check the target and try a more specific instruction." },
+          "pt": { "body": "Esta edicao nao pôde ser aplicada. Verifique o alvo e tente uma instrucao mais especifica." }
         }
       },
       "clarification_required": {

@@ -867,7 +867,7 @@
         },
         {
           "type": "FONT_SIZE",
-          "out": "fontSizePt"
+          "out": "fontSize"
         }
       ],
       "scopeRules": {
@@ -880,13 +880,13 @@
           "op": "DOCX_SET_RUN_STYLE",
           "targets": "$targets",
           "style": {
-            "fontSizePt": "$fontSizePt"
+            "fontSizePt": "$fontSize"
           }
         }
       ],
       "clarifyIfMissing": [
         {
-          "slot": "fontSizePt",
+          "slot": "fontSize",
           "ask_en": "What font size should I use?",
           "ask_pt": "Qual tamanho de fonte devo usar?"
         }
@@ -1543,7 +1543,7 @@
         },
         {
           "type": "HEADING_LEVEL",
-          "out": "level",
+          "out": "headingLevel",
           "defaultValue": 1
         }
       ],
@@ -1556,7 +1556,7 @@
         {
           "op": "DOCX_SET_PARAGRAPH_STYLE",
           "targets": "$targets",
-          "styleName": "Heading $level"
+          "styleName": "Heading $headingLevel"
         }
       ],
       "examples": {

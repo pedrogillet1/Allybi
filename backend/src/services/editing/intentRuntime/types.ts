@@ -158,12 +158,23 @@ export interface SlotFillResult {
 // Plan Assembler output
 // ---------------------------------------------------------------------------
 
+export interface PlanStepUiMeta {
+  /** Human-readable operation name (from microcopy or fallback). */
+  label: string;
+  /** Operation category icon hint: format, structure, content. */
+  icon: "format" | "structure" | "content";
+  /** Brief description of what's being changed. */
+  targetDescription: string;
+}
+
 export interface ResolvedPlanStep {
   op: string;
   params: Record<string, unknown>;
   stepId: string;
   /** Locale conversions applied during slot fill (e.g. "SOMA → SUM"). */
   localeConversions?: string[];
+  /** UI metadata for rich preview of pending operations. */
+  uiMeta?: PlanStepUiMeta;
 }
 
 export interface IntentPlan {

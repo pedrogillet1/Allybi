@@ -8,6 +8,7 @@ import type {
 } from "../editing.types";
 import { analyzeMessageToPlan } from "../intentRuntime";
 import { loadOperatorCatalog } from "../intentRuntime/loaders";
+import { safeEditingBank } from "../banks/bankService";
 
 interface SupportGateResult {
   gate: EditSupportGateId;
@@ -83,6 +84,19 @@ function makeBlocked(
   details?: Record<string, unknown>,
 ): EditBlockedReason {
   return { code, gate, message, ...(details ? { details } : {}) };
+}
+
+function hydrateClarificationMessage(missingSlots: string[], language: "en" | "pt" = "en"): string {
+  try {
+    const microcopy = safeEditingBank<any>("editing_microcopy");
+    const template = microcopy?.copy?.clarifications?.[language]?.missing_entities
+      || microcopy?.copy?.clarifications?.en?.missing_entities
+      || "I need one more detail to continue: {{missing}}.";
+    const slotList = missingSlots.join(", ");
+    return template.replace(/\{\{missing\}\}/g, slotList);
+  } catch {
+    return `Missing required parameters: ${missingSlots.join(", ")}`;
+  }
 }
 
 export class SupportContractService {
@@ -185,13 +199,16 @@ export class SupportContractService {
     }
 
     if (!slotsSatisfied) {
+      const clarificationMessage = clarificationSlots.length
+        ? hydrateClarificationMessage(clarificationSlots)
+        : "Missing required parameters before this edit can be applied.";
       return {
         ok: false,
         outcomeType: "clarification_required",
         blockedReason: makeBlocked(
           "slot_fill",
           "CLARIFICATION_REQUIRED",
-          "Missing required parameters before this edit can be applied.",
+          clarificationMessage,
           clarificationSlots.length ? { missingSlots: clarificationSlots } : undefined,
         ),
         gates,

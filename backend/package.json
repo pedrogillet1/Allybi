@@ -11,6 +11,7 @@
     "editing:derive-banks": "node scripts/editing/generate-derived-banks.mjs --write",
     "editing:derive-banks:check": "node scripts/editing/generate-derived-banks.mjs",
     "editing:validate-banks": "node scripts/editing/validate-editing-banks.mjs",
+    "editing:validate-banks:ci": "node scripts/editing/validate-editing-banks.mjs --strict",
     "build:runtime-patterns": "ts-node --transpile-only tools/build/compile_runtime_patterns.ts",
     "build:win": "prisma generate && tsc && xcopy /E /I /Y src\\data dist\\data",
     "build:ignore-errors": "tsc --skipLibCheck --noEmitOnError false",

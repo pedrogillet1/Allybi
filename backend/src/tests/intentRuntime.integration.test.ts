@@ -122,5 +122,150 @@ describe("intentRuntime integration (critical editing paths)", () => {
     expect(styleStep).toBeTruthy();
     expect(styleStep?.params?.styleName).toBe("Heading 2");
   });
+
+  // ---------------------------------------------------------------------------
+  // Structural editing integration tests
+  // ---------------------------------------------------------------------------
+
+  test("EN 'add bullets to paragraphs' produces LIST_APPLY_BULLETS", () => {
+    const result = analyzeMessageToPlan({
+      message: "Add bullets to paragraphs 2-4",
+      domain: "docx",
+      viewerContext: {
+        selection: {
+          ranges: [
+            { paragraphId: "docx:p:2", text: "Para 2" },
+            { paragraphId: "docx:p:3", text: "Para 3" },
+            { paragraphId: "docx:p:4", text: "Para 4" },
+          ],
+        },
+      },
+      language: "en",
+    });
+    expect(result).not.toBeNull();
+    expect(result?.kind).toBe("plan");
+    if (result?.kind !== "plan") return;
+    const ops = result.ops.map((o) => o.op);
+    expect(ops).toContain("DOCX_LIST_APPLY_BULLETS");
+  });
+
+  test("EN 'remove bullets from the list' produces LIST_REMOVE", () => {
+    const result = analyzeMessageToPlan({
+      message: "Remove bullets from the list",
+      domain: "docx",
+      viewerContext: {
+        selection: {
+          ranges: [
+            { paragraphId: "docx:p:5", text: "Bullet A" },
+            { paragraphId: "docx:p:6", text: "Bullet B" },
+          ],
+        },
+      },
+      language: "en",
+    });
+    expect(result).not.toBeNull();
+    expect(result?.kind).toBe("plan");
+    if (result?.kind !== "plan") return;
+    const ops = result.ops.map((o) => o.op);
+    expect(ops).toContain("DOCX_LIST_REMOVE");
+  });
+
+  test("EN 'center the title' produces SET_ALIGNMENT", () => {
+    const result = analyzeMessageToPlan({
+      message: "Center the title",
+      domain: "docx",
+      viewerContext: {
+        selection: {
+          ranges: [{ paragraphId: "docx:p:1", text: "My Title" }],
+        },
+      },
+      language: "en",
+    });
+    expect(result).not.toBeNull();
+    expect(result?.kind).toBe("plan");
+    if (result?.kind !== "plan") return;
+    const ops = result.ops.map((o) => o.op);
+    expect(ops).toContain("DOCX_SET_ALIGNMENT");
+    const alignStep = result.ops.find((o) => o.op === "DOCX_SET_ALIGNMENT");
+    expect(alignStep?.params?.alignment).toBe("center");
+  });
+
+  test("EN 'make it uppercase' produces SET_TEXT_CASE", () => {
+    const result = analyzeMessageToPlan({
+      message: "Make it uppercase",
+      domain: "docx",
+      viewerContext: {
+        selection: {
+          ranges: [{ paragraphId: "docx:p:10", text: "some text" }],
+        },
+      },
+      language: "en",
+    });
+    expect(result).not.toBeNull();
+    expect(result?.kind).toBe("plan");
+    if (result?.kind !== "plan") return;
+    const ops = result.ops.map((o) => o.op);
+    expect(ops).toContain("DOCX_SET_TEXT_CASE");
+    const caseStep = result.ops.find((o) => o.op === "DOCX_SET_TEXT_CASE");
+    expect(caseStep?.params?.targetCase).toBe("uppercase");
+  });
+
+  test("EN 'delete paragraph 3' produces DELETE_PARAGRAPH", () => {
+    const result = analyzeMessageToPlan({
+      message: "Delete paragraph 3",
+      domain: "docx",
+      viewerContext: {
+        selection: {
+          ranges: [{ paragraphId: "docx:p:3", text: "To be deleted" }],
+        },
+      },
+      language: "en",
+    });
+    expect(result).not.toBeNull();
+    expect(result?.kind).toBe("plan");
+    if (result?.kind !== "plan") return;
+    const ops = result.ops.map((o) => o.op);
+    expect(ops).toContain("DOCX_DELETE_PARAGRAPH");
+  });
+
+  test("EN 'split this paragraph after the first sentence' produces SPLIT_PARAGRAPH", () => {
+    const result = analyzeMessageToPlan({
+      message: "Split this paragraph after the first sentence",
+      domain: "docx",
+      viewerContext: {
+        selection: {
+          ranges: [{ paragraphId: "docx:p:7", text: "First sentence. Second sentence." }],
+        },
+      },
+      language: "en",
+    });
+    expect(result).not.toBeNull();
+    expect(result?.kind).toBe("plan");
+    if (result?.kind !== "plan") return;
+    const ops = result.ops.map((o) => o.op);
+    expect(ops).toContain("DOCX_SPLIT_PARAGRAPH");
+  });
+
+  test("plan steps include uiMeta with label and icon", () => {
+    const result = analyzeMessageToPlan({
+      message: "Bold the selected text",
+      domain: "docx",
+      viewerContext: {
+        selection: {
+          ranges: [{ paragraphId: "docx:p:1", text: "Hello" }],
+        },
+      },
+      language: "en",
+    });
+    expect(result).not.toBeNull();
+    expect(result?.kind).toBe("plan");
+    if (result?.kind !== "plan") return;
+    expect(result.ops.length).toBeGreaterThan(0);
+    for (const step of result.ops) {
+      expect(step.uiMeta).toBeDefined();
+      expect(step.uiMeta?.label).toBeTruthy();
+      expect(["format", "structure", "content"]).toContain(step.uiMeta?.icon);
+    }
+  });
 });
 

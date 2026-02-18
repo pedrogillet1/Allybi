@@ -265,6 +265,16 @@
   }
 }
 
+/* DOCX post-apply highlight flash */
+@keyframes koda-docx-highlight-pulse {
+  0% { background-color: rgba(250, 204, 21, 0.35); }
+  100% { background-color: transparent; }
+}
+
+.koda-docx-highlight-flash {
+  animation: koda-docx-highlight-pulse 1.5s ease-out forwards;
+}
+
 /* Dark mode is intentionally not supported for this toolbar: it stays white. */
 
 /* Accessibility */
@@ -376,14 +386,20 @@
 }
 
 .allybi-toolbar-center {
-  width: 100%;
+  width: auto;
+  flex: 1 1 auto;
   max-width: 860px;
   margin: 0 auto;
   padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
+  min-width: 0;
   overflow: visible; /* allow dropdowns/popovers */
+}
+
+.allybi-toolbar-side-spacer {
+  display: none;
 }
 
 /* Excel needs the full width — sheet nav far-left, formatting, then value bar. */
@@ -392,13 +408,41 @@
 }
 
 .allybi-toolbar-zoom {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+  position: relative;
+  right: auto;
+  top: auto;
+  transform: none;
+  margin-left: auto;
+  padding-right: 2px;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.formatting-toolbar.allybi-one-line.allybi-balanced {
+  --allybi-toolbar-side-slot: clamp(92px, 8vw, 124px);
+}
+
+.formatting-toolbar.allybi-one-line.allybi-balanced .allybi-toolbar-side-spacer {
+  display: block;
+  flex: 0 0 var(--allybi-toolbar-side-slot);
+}
+
+.formatting-toolbar.allybi-one-line.allybi-balanced .allybi-toolbar-zoom {
+  flex: 0 0 var(--allybi-toolbar-side-slot);
+  margin-left: 0;
+  justify-content: flex-end;
+}
+
+.formatting-toolbar.allybi-one-line.allybi-balanced .allybi-toolbar-center {
+  overflow-x: hidden;
+  overflow-y: visible;
+  justify-content: center;
+}
+
+.formatting-toolbar.allybi-one-line.allybi-balanced .allybi-toolbar-center > * {
+  min-width: 0;
 }
 
 .toolbar-btn:disabled {
@@ -460,7 +504,7 @@
 .allybi-excel-row {
   width: 100%;
   max-width: none;
-  padding: 0 130px 0 16px; /* right padding reserves space for the absolutely-positioned zoom controls */
+  padding: 0 16px;
   margin: 0;
   display: flex;
   align-items: center;
@@ -714,9 +758,14 @@
   .allybi-toolbar-center {
     max-width: none;
     width: 100%;
-    overflow-x: auto;
+    flex: 1 1 auto;
+    overflow-x: hidden;
     overflow-y: visible;
-    justify-content: flex-start;
+    justify-content: center;
+  }
+
+  .allybi-toolbar-side-spacer {
+    display: none !important;
   }
 
   .allybi-excel-row {

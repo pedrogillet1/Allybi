@@ -118,11 +118,29 @@ const VIEWER_STARTER_PROMPTS = {
     "Rewrite the intro to be more concise and professional.",
     "Fix grammar and tighten the bullet points.",
     "Change the tone to match an executive summary.",
+    "Turn this section into clear bullet points with action verbs.",
+    "Shorten this text by 30% without removing key facts.",
+    "Rewrite this in a formal and professional tone.",
+    "Convert passive voice to active voice in this selection.",
+    "Standardize terminology and capitalization in this section.",
+    "Extract key commitments and deadlines into bullet points.",
+    "Improve readability to make this easier for non-experts.",
+    "Rewrite this as an executive summary in 5 bullets.",
+    "Improve transitions between these paragraphs for better flow.",
   ],
   xlsx: [
     "Analyze this sheet and summarize the key trends in plain language.",
     "Convert this selection into a clean table with clear headers.",
     "Create formulas for totals, growth %, and variance across rows.",
+    "Highlight outliers and explain what might be driving them.",
+    "Format currency, percentages, and dates consistently in this sheet.",
+    "Build a KPI summary with total, average, min, and max.",
+    "Write formulas for month-over-month and year-over-year change.",
+    "Create conditional formatting for top and bottom performers.",
+    "Find duplicate rows and flag them for review.",
+    "Detect missing values and suggest how to handle them.",
+    "Suggest the best chart types for the key metrics here.",
+    "Create a quick forecast for the next 3 periods.",
   ],
   pptx: [
     "Rewrite this slide to be clearer and more executive-friendly.",
@@ -130,6 +148,147 @@ const VIEWER_STARTER_PROMPTS = {
     "Improve this slide title and subtitle for clarity.",
   ],
 };
+const VIEWER_STARTER_PROMPT_COUNT = 3;
+const VIEWER_STARTER_OPEN_COUNT_FALLBACK = new Map();
+const VIEWER_STARTER_LAST_SIG_FALLBACK = new Map();
+
+function getViewerPromptBucket(fileType) {
+  const ft = String(fileType || "").trim().toLowerCase();
+  if (
+    ft === "excel" ||
+    ft === "xlsx" ||
+    ft === "xls" ||
+    ft === "sheet" ||
+    ft === "sheets" ||
+    ft === "spreadsheet"
+  ) {
+    return "xlsx";
+  }
+  if (ft === "powerpoint" || ft === "ppt" || ft === "pptx" || ft === "slides") {
+    return "pptx";
+  }
+  return "docx";
+}
+
+function uniquePrompts(pool) {
+  const out = [];
+  const seen = new Set();
+  for (const raw of Array.isArray(pool) ? pool : []) {
+    const prompt = String(raw || "").trim();
+    if (!prompt) continue;
+    const key = prompt.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(prompt);
+  }
+  return out;
+}
+
+function hashString32(value) {
+  const input = String(value || "");
+  let hash = 2166136261;
+  for (let i = 0; i < input.length; i += 1) {
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function shuffleSeeded(items, seed) {
+  const out = [...items];
+  const rand = mulberry32(seed);
+  for (let i = out.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rand() * (i + 1));
+    const tmp = out[i];
+    out[i] = out[j];
+    out[j] = tmp;
+  }
+  return out;
+}
+
+function promptsSignature(prompts) {
+  return (Array.isArray(prompts) ? prompts : [])
+    .map((p) => String(p || "").trim().toLowerCase())
+    .filter(Boolean)
+    .sort()
+    .join("||");
+}
+
+function readSessionNumber(key) {
+  try {
+    const n = Number(sessionStorage.getItem(key) || "0");
+    if (Number.isFinite(n) && n >= 0) return Math.trunc(n);
+  } catch {}
+  return Math.trunc(Number(VIEWER_STARTER_OPEN_COUNT_FALLBACK.get(key) || 0));
+}
+
+function writeSessionNumber(key, n) {
+  const next = Math.max(0, Math.trunc(Number(n) || 0));
+  try {
+    sessionStorage.setItem(key, String(next));
+  } catch {
+    VIEWER_STARTER_OPEN_COUNT_FALLBACK.set(key, next);
+  }
+}
+
+function readLastSignature(key) {
+  try {
+    return String(sessionStorage.getItem(key) || "");
+  } catch {
+    return String(VIEWER_STARTER_LAST_SIG_FALLBACK.get(key) || "");
+  }
+}
+
+function writeLastSignature(key, sig) {
+  const value = String(sig || "");
+  try {
+    sessionStorage.setItem(key, value);
+  } catch {
+    VIEWER_STARTER_LAST_SIG_FALLBACK.set(key, value);
+  }
+}
+
+function pickRotatingViewerPrompts(params) {
+  const count = Math.max(1, Math.trunc(Number(params?.count) || VIEWER_STARTER_PROMPT_COUNT));
+  const contextKey = String(params?.contextKey || "");
+  const openCountKey = `koda_viewer_starter_prompts_open_count:${contextKey}`;
+  const lastSigKey = `koda_viewer_starter_prompts_last_sig:${contextKey}`;
+  const pool = uniquePrompts(params?.pool);
+  if (pool.length <= count) {
+    const fallback = pool.slice(0, count);
+    writeLastSignature(lastSigKey, promptsSignature(fallback));
+    return fallback;
+  }
+
+  const openCount = readSessionNumber(openCountKey) + 1;
+  writeSessionNumber(openCountKey, openCount);
+
+  const lastSig = readLastSignature(lastSigKey);
+  const maxAttempts = Math.max(4, pool.length * 2);
+  let chosen = pool.slice(0, count);
+
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    const seed = hashString32(`${contextKey}:${openCount}:${attempt}`);
+    const candidate = shuffleSeeded(pool, seed).slice(0, count);
+    if (!lastSig || promptsSignature(candidate) !== lastSig) {
+      chosen = candidate;
+      break;
+    }
+  }
+
+  writeLastSignature(lastSigKey, promptsSignature(chosen));
+  return chosen;
+}
 
 // Session cache keys
 const cacheKeyFor = (conversationId) => `koda_chat_messages_${conversationId}`;
@@ -690,6 +849,13 @@ function extractDocxBundlePatchesForApply(session) {
 function InlineEditActions({ editSession, lang, onFileClick }) {
   const [status, setStatus] = React.useState("idle"); // idle | applying | applied | rejected | error
   const [errMsg, setErrMsg] = React.useState("");
+  const lastErrRef = React.useRef({ msg: "", ts: 0 });
+  const dedupSetErr = React.useCallback((msg) => {
+    const now = Date.now();
+    if (msg === lastErrRef.current.msg && now - lastErrRef.current.ts < 2000) return;
+    lastErrRef.current = { msg, ts: now };
+    setErrMsg(msg);
+  }, []);
   const s = (x) => typeof x === "string" ? x : x == null ? "" : String(x);
 
   if (!editSession) return null;
@@ -707,7 +873,7 @@ function InlineEditActions({ editSession, lang, onFileClick }) {
       const wantsBundleApply = useRuntimeOperator && runtimeOperator === "EDIT_DOCX_BUNDLE";
       if (wantsBundleApply && effectiveBundlePatches.length === 0) {
         setStatus("error");
-        setErrMsg("Bundle apply payload is missing patches. Please retry the edit.");
+        dedupSetErr("Bundle apply payload is missing patches. Please retry the edit.");
         return;
       }
       const isBundleApply = wantsBundleApply && effectiveBundlePatches.length > 0;
@@ -750,14 +916,14 @@ function InlineEditActions({ editSession, lang, onFileClick }) {
         } catch {}
       } else if (explicitNoop) {
         setStatus("error");
-        setErrMsg("No changes were saved because the document already matched the requested edit.");
+        dedupSetErr("No changes were saved because the document already matched the requested edit.");
       } else {
         setStatus("error");
-        setErrMsg("Apply did not return a saved revision. Please retry.");
+        dedupSetErr("Apply did not return a saved revision. Please retry.");
       }
     } catch (e) {
       setStatus("error");
-      setErrMsg(e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || "Apply failed.");
+      dedupSetErr(e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || "Apply failed.");
     }
   };
 
@@ -1206,23 +1372,30 @@ export default function ChatInterface({
   const isEphemeral = conversationId === "new" || currentConversation?.isEphemeral;
   const isViewerVariant = variant === "viewer";
   const viewerFileType = String(viewerContext?.fileType || "").trim().toLowerCase();
-  const viewerStarterPrompts = useMemo(() => {
-    if (
-      viewerFileType === "excel" ||
-      viewerFileType === "xlsx" ||
-      viewerFileType === "xls" ||
-      viewerFileType === "sheet" ||
-      viewerFileType === "sheets" ||
-      viewerFileType === "spreadsheet"
-    ) {
-      return VIEWER_STARTER_PROMPTS.xlsx;
-    }
-    if (viewerFileType === "powerpoint" || viewerFileType === "ppt" || viewerFileType === "pptx" || viewerFileType === "slides") {
-      return VIEWER_STARTER_PROMPTS.pptx;
-    }
-    return VIEWER_STARTER_PROMPTS.docx;
-  }, [viewerFileType]);
+  const viewerPromptBucket = useMemo(() => getViewerPromptBucket(viewerFileType), [viewerFileType]);
+  const [viewerStarterPrompts, setViewerStarterPrompts] = useState(() =>
+    uniquePrompts(VIEWER_STARTER_PROMPTS.docx).slice(0, VIEWER_STARTER_PROMPT_COUNT),
+  );
   const lastViewerSelectionRef = useRef({ selection: null, at: 0 });
+
+  useEffect(() => {
+    const pool = VIEWER_STARTER_PROMPTS[viewerPromptBucket] || VIEWER_STARTER_PROMPTS.docx;
+    const documentId = String(viewerContext?.activeDocumentId || "").trim() || "none";
+    const contextKey = [
+      "viewer",
+      viewerPromptBucket,
+      String(conversationId || "new"),
+      documentId,
+    ].join(":");
+    const prompts = isViewerVariant
+      ? pickRotatingViewerPrompts({
+          pool,
+          count: VIEWER_STARTER_PROMPT_COUNT,
+          contextKey,
+        })
+      : uniquePrompts(pool).slice(0, VIEWER_STARTER_PROMPT_COUNT);
+    setViewerStarterPrompts(prompts);
+  }, [isViewerVariant, viewerPromptBucket, conversationId, viewerContext?.activeDocumentId]);
 
   useEffect(() => {
     if (!isViewerVariant) return;

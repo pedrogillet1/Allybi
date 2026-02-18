@@ -7,6 +7,7 @@ import { EditReceiptService } from "./editReceipt.service";
 import { RationaleBuilderService } from "./rationaleBuilder.service";
 import { ApplyVerificationService } from "./apply/applyVerification.service";
 import { EditingPolicyService } from "./policy/EditingPolicyService";
+import { validateEditResult } from "./contracts";
 import type {
   EditApplyRequest,
   EditApplyResult,
@@ -412,7 +413,7 @@ export class EditOrchestratorService {
         };
       }
 
-      return {
+      const applyResult: EditApplyResult = {
         ok: true,
         applied: true,
         outcomeType: "applied",
@@ -439,6 +440,12 @@ export class EditOrchestratorService {
           domain: request.plan.domain,
         }),
       };
+      // Contract validation (warn-only, never blocks)
+      const contractCheck = validateEditResult(applyResult);
+      if (!contractCheck.ok) {
+        logger.warn("[Editing] applyEdit result failed contract validation", { error: contractCheck.error });
+      }
+      return applyResult;
     } catch (error) {
       const message = error instanceof Error ? error.message : "Apply failed";
       const isNoop = message.startsWith("EDIT_NOOP");

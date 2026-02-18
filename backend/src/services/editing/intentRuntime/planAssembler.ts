@@ -15,6 +15,7 @@ import type {
   WorklogStep,
   MatchResult,
   SlotFillResult,
+  PlanStepUiMeta,
 } from "./types";
 import { loadOperatorCatalog } from "./loaders";
 import { buildWorklog } from "./worklog";
@@ -204,6 +205,72 @@ function validateRequiredSlots(
 }
 
 // ---------------------------------------------------------------------------
+// UI Metadata
+// ---------------------------------------------------------------------------
+
+const STRUCTURE_OPS = new Set([
+  "DOCX_INSERT_BEFORE", "DOCX_INSERT_AFTER", "DOCX_DELETE_PARAGRAPH",
+  "DOCX_MERGE_PARAGRAPHS", "DOCX_SPLIT_PARAGRAPH",
+  "DOCX_LIST_APPLY_BULLETS", "DOCX_LIST_APPLY_NUMBERING", "DOCX_LIST_REMOVE",
+  "DOCX_LIST_PROMOTE_DEMOTE", "DOCX_LIST_RESTART_NUMBERING", "DOCX_NUMBERING_REPAIR",
+  "XLSX_INSERT_ROWS", "XLSX_DELETE_ROWS", "XLSX_INSERT_COLUMNS", "XLSX_DELETE_COLUMNS",
+  "XLSX_ADD_SHEET", "XLSX_RENAME_SHEET", "XLSX_DELETE_SHEET",
+  "XLSX_MERGE_CELLS", "XLSX_TABLE_CREATE", "XLSX_SORT_RANGE", "XLSX_FILTER_APPLY",
+  "XLSX_FILTER_CLEAR", "XLSX_FREEZE_PANES", "XLSX_HIDE_ROWS_COLS", "XLSX_SHOW_ROWS_COLS",
+]);
+
+const FORMAT_OPS = new Set([
+  "DOCX_SET_RUN_STYLE", "DOCX_CLEAR_RUN_STYLE", "DOCX_SET_PARAGRAPH_STYLE",
+  "DOCX_SET_HEADING_LEVEL", "DOCX_SET_ALIGNMENT", "DOCX_SET_INDENTATION",
+  "DOCX_SET_LINE_SPACING", "DOCX_SET_PARAGRAPH_SPACING", "DOCX_SET_TEXT_CASE",
+  "XLSX_FORMAT_RANGE", "XLSX_SET_NUMBER_FORMAT", "XLSX_WRAP_TEXT", "XLSX_AUTO_FIT",
+  "XLSX_COND_FORMAT_DATA_BARS", "XLSX_COND_FORMAT_COLOR_SCALE", "XLSX_COND_FORMAT_TOP_N",
+  "XLSX_DATA_VALIDATION_SET",
+]);
+
+function getIconCategory(op: string): PlanStepUiMeta["icon"] {
+  if (STRUCTURE_OPS.has(op)) return "structure";
+  if (FORMAT_OPS.has(op)) return "format";
+  return "content";
+}
+
+function buildTargetDescription(
+  op: string,
+  params: Record<string, unknown>,
+): string {
+  const target = params.targetId || params.targets || params.rangeA1 || params.range || "";
+  const targetStr = Array.isArray(target)
+    ? target.slice(0, 3).join(", ") + (target.length > 3 ? "..." : "")
+    : String(target || "").slice(0, 60);
+  if (targetStr) return targetStr;
+  return "";
+}
+
+function buildUiMeta(
+  op: string,
+  params: Record<string, unknown>,
+  language: "en" | "pt",
+): PlanStepUiMeta {
+  const catalog = loadOperatorCatalog();
+  const entry = catalog[op];
+  let label: string;
+  if (entry?.uiStepTemplate) {
+    const template = language === "pt" ? entry.uiStepTemplate.pt : entry.uiStepTemplate.en;
+    label = template.replace(/\{\{(\w+)\}\}/g, (_m, slot) => {
+      const v = params[slot];
+      return v != null ? String(v) : "...";
+    }).replace(/\.{3}$/, "").trim();
+  } else {
+    label = op.replace(/^(?:XLSX_|DOCX_)/, "").replace(/_/g, " ").toLowerCase();
+  }
+  return {
+    label,
+    icon: getIconCategory(op),
+    targetDescription: buildTargetDescription(op, params),
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -271,10 +338,11 @@ export function assemblePlan(
     (a, b) => getOpOrder(a.op) - getOpOrder(b.op),
   );
 
-  // Re-assign step IDs after ordering
+  // Re-assign step IDs after ordering and attach uiMeta
   const finalSteps = ordered.map((step, idx) => ({
     ...step,
     stepId: `step_${idx + 1}`,
+    uiMeta: buildUiMeta(step.op, step.params, input.language),
   }));
 
   // Check for conflicts (warnings only, don't block)

@@ -350,7 +350,7 @@ export default function AllybiEditingToolbar({
 
   return (
     <div
-      className="formatting-toolbar allybi-one-line"
+      className={`formatting-toolbar allybi-one-line${showWordControls ? ' allybi-balanced' : ''}`}
       onMouseDown={(e) => {
         // When clicking non-interactive areas (empty gaps, padding, dividers),
         // signal the parent to clear the document selection.
@@ -360,10 +360,33 @@ export default function AllybiEditingToolbar({
         onBackgroundClick?.();
       }}
     >
+      <div className="allybi-toolbar-side-spacer" aria-hidden="true" />
       {/* Content: centered, file-type specific */}
       <div className="allybi-toolbar-center">
         {showWordControls ? (
           <>
+            {(wordSecondaryActionLabel || wordPrimaryActionLabel) ? (
+              <>
+                <div className="toolbar-section" style={{ gap: 6, marginRight: 4 }}>
+                  {wordPrimaryActionLabel ? (
+                    <button
+                      type="button"
+                      className="toolbar-btn text-btn word-save-btn"
+                      title={wordPrimaryActionLabel}
+                      style={{ padding: '6px 14px', fontWeight: 600 }}
+                      onClick={() => onWordPrimaryAction?.()}
+                    >
+                      {wordPrimaryActionLabel}
+                    </button>
+                  ) : null}
+                  {wordSecondaryActionLabel
+                    ? textBtn(wordSecondaryActionLabel, wordSecondaryActionLabel, () => onWordSecondaryAction?.())
+                    : null}
+                </div>
+                {divider()}
+              </>
+            ) : null}
+
             <div className="toolbar-section">
               {iconBtn('Undo', UndoIcon, () => onCommand?.('undo'))}
               {iconBtn('Redo', RedoIcon, () => onCommand?.('redo'))}
@@ -543,27 +566,6 @@ export default function AllybiEditingToolbar({
 	              {iconBtn('Justify', AlignJustifyIcon, () => onCommand?.('justifyFull'), { active: alignment === 'justify', disabled: alignment === 'justify' })}
 	            </div>
 
-	            {(wordSecondaryActionLabel || wordPrimaryActionLabel) ? (
-	              <>
-	                {divider()}
-	                <div className="toolbar-section" style={{ gap: 6, marginLeft: 4 }}>
-	                  {wordPrimaryActionLabel ? (
-	                    <button
-	                      type="button"
-	                      className="toolbar-btn text-btn word-save-btn"
-	                      title={wordPrimaryActionLabel}
-	                      style={{ padding: '6px 14px', fontWeight: 600 }}
-	                      onClick={() => onWordPrimaryAction?.()}
-	                    >
-	                      {wordPrimaryActionLabel}
-	                    </button>
-	                  ) : null}
-	                  {wordSecondaryActionLabel
-	                    ? textBtn(wordSecondaryActionLabel, wordSecondaryActionLabel, () => onWordSecondaryAction?.())
-	                    : null}
-	                </div>
-	              </>
-	            ) : null}
           </>
         ) : null}
 

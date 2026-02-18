@@ -224,6 +224,20 @@
       "requires_confirmation": true,
       "undo_strategy": "restore_previous_scope",
       "schema": { "type": "object", "required": ["targets", "sources"], "properties": { "targets": { "type": "array", "items": { "type": "string" } }, "sources": { "type": "array", "items": { "type": "object" } } } }
+    },
+    "DOCX_SET_HEADING_LEVEL": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "format_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_paragraph_props",
+      "schema": { "type": "object", "required": ["targets", "headingLevel"], "properties": { "targets": { "type": "array", "items": { "type": "string" } }, "headingLevel": { "type": "number", "minimum": 1, "maximum": 6 } } }
+    },
+    "DOCX_SET_TEXT_CASE": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "text_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_runs",
+      "schema": { "type": "object", "required": ["targets", "targetCase"], "properties": { "targets": { "type": "array", "items": { "type": "string" } }, "targetCase": { "type": "string", "enum": ["uppercase", "lowercase", "titlecase", "sentencecase"] } } }
     }
   }
 }

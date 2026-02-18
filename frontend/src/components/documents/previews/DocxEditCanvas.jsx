@@ -1430,6 +1430,23 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     return true;
   }, [actions, findParagraphEl, setUndoState]);
 
+  const highlightAffectedParagraphs = useCallback((paragraphIds) => {
+    if (!Array.isArray(paragraphIds) || !paragraphIds.length) return;
+    for (const pid of paragraphIds) {
+      const el = findParagraphEl(pid);
+      if (!el) continue;
+      el.classList.remove('koda-docx-highlight-flash');
+      // Force reflow to restart animation if already applied
+      void el.offsetWidth;
+      el.classList.add('koda-docx-highlight-flash');
+      const onEnd = () => {
+        el.classList.remove('koda-docx-highlight-flash');
+        el.removeEventListener('animationend', onEnd);
+      };
+      el.addEventListener('animationend', onEnd);
+    }
+  }, [findParagraphEl]);
+
   const scrollToTarget = useCallback((paragraphId) => {
     const el = findParagraphEl(paragraphId);
     if (!el) return false;
@@ -1621,14 +1638,19 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       // Normalize NBSP→space in originalText to match getLiveTextFor's normalization
       const originalText = String(block.text || '').replace(/\u00A0/g, ' ').trim();
       const proposedText = String(liveText || '').trim();
+      const baselineHtml = String(actions.getBaseline(pid) || toHtmlFromPlain(block.text || '') || '').trim();
+      const baselineHtmlCompact = baselineHtml.replace(/\s+/g, ' ').trim();
+      const liveHtmlCompact = String(liveHtml || '').replace(/\s+/g, ' ').trim();
+      const textChanged = proposedText !== originalText;
+      const htmlChanged = liveHtmlCompact !== baselineHtmlCompact;
+      const dirty = actions.isDirty(pid);
 
-      // Skip paragraphs where text hasn't changed
-      if (proposedText === originalText) continue;
-      // Backend rejects empty/whitespace-only beforeText or proposedText with 400.
-      // Skip paragraphs where either side is empty (empty→typed or typed→cleared).
-      if (!proposedText || !originalText) continue;
+      // Save only when we have an explicit dirty signal or an actual text/html diff.
+      if (!dirty && !textChanged && !htmlChanged) continue;
 
-      const beforeText = String(block.text || '').trim();
+      // Backend requires non-empty before/proposed text payloads.
+      const beforeText = originalText || ' ';
+      const effectiveProposedText = proposedText || ' ';
 
       actions.startInflight(pid);
       try {
@@ -1640,7 +1662,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
           targetHint: pid,
           target: { id: pid, label: 'Paragraph', confidence: 1, candidates: [], decisionMargin: 1, isAmbiguous: false, resolutionReason: 'viewer_submit' },
           beforeText,
-          proposedText,
+          proposedText: effectiveProposedText,
           proposedHtml: liveHtml,
           userConfirmed: true,
         });
@@ -1670,7 +1692,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     // multiple re-renders and replaceState calls mid-loop.
     const lastRevisionId = results.findLast(r => r.ok && r.revisionId)?.revisionId;
     if (lastRevisionId) onApplied?.({ revisionId: lastRevisionId });
-    onDirtyChangeRef.current?.(false);
+    onDirtyChangeRef.current?.(actions.getDirtyPids().length > 0);
     return results;
   }, [blocks, docId, document?.filename, actions, getLiveTextFor, getLiveHtmlFor, onApplied]);
 
@@ -1780,12 +1802,14 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     discardDraft,
     acceptDraft,
     scrollToTarget,
+    highlightAffectedParagraphs,
     restoreSelection,
     getViewerSelectionV2,
     commitParagraph,
     commitParagraphs,
     flushDirtyParagraphs,
     saveAllManualEdits,
+    hasPendingEdits: () => actions.getDirtyPids().length > 0,
     focus: () => {
       try { pageHostRef.current?.focus?.(); } catch {}
     },
@@ -1810,6 +1834,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     discardDraft,
     acceptDraft,
     scrollToTarget,
+    highlightAffectedParagraphs,
     applyParagraphStyleFromSelection,
     applyUndoRedo,
     getActiveParagraphIdFromDom,

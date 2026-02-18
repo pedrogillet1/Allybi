@@ -825,6 +825,7 @@ const DocumentViewer = () => {
     const onEditApplied = async (e) => {
       const es = e?.detail?.editSession;
       const revisionId = e?.detail?.revisionId;
+      const applyResult = e?.detail?.result;
       if (!es) return;
       // Match by documentId
       if (es.documentId && es.documentId !== documentId) return;
@@ -888,6 +889,15 @@ const DocumentViewer = () => {
             // Sync toolbar to reflect the new formatting state
             const targetPid = es?.target?.id || es?.patches?.[0]?.paragraphId || '';
             syncToolbarAfterDocxReloadRef.current?.(targetPid);
+            // Highlight affected paragraphs after reload
+            const affectedIds = applyResult?.proof?.affectedParagraphIds
+              || applyResult?.proof?.highlights?.docxParagraphIds
+              || (targetPid ? [targetPid] : []);
+            if (affectedIds.length) {
+              setTimeout(() => {
+                try { docxCanvasRef.current?.highlightAffectedParagraphs?.(affectedIds); } catch {}
+              }, 100);
+            }
           }
           if (domain === 'sheets') await excelCanvasRef.current?.reload?.();
         } catch (reloadErr) {
@@ -4275,24 +4285,28 @@ const DocumentViewer = () => {
 
         wordPrimaryActionLabel="Save"
         onWordPrimaryAction={async () => {
+          const hadPendingBeforeSave = Boolean(docxCanvasRef.current?.hasPendingEdits?.() ?? docxHasPendingEdits);
           try {
             const results = await docxCanvasRef.current?.saveAllManualEdits?.();
             const saved = (results || []).filter(r => r.ok && r.revisionId);
             const failed = (results || []).filter(r => !r.ok);
+            const stillPending = Boolean(docxCanvasRef.current?.hasPendingEdits?.());
             if (saved.length > 0) {
-              setDocxHasPendingEdits(false);
+              setDocxHasPendingEdits(stillPending);
               setDocxSaveNotice('Saved!');
               setTimeout(() => setDocxSaveNotice(''), 2000);
-            } else if (failed.length > 0) {
+            } else if (failed.length > 0 || (hadPendingBeforeSave && stillPending)) {
+              setDocxHasPendingEdits(true);
               setDocxSaveNotice('Save failed');
               setTimeout(() => setDocxSaveNotice(''), 3000);
             } else {
               setDocxHasPendingEdits(false);
-              setDocxSaveNotice('No changes to save');
+              setDocxSaveNotice('All changes already saved');
               setTimeout(() => setDocxSaveNotice(''), 2000);
             }
           } catch (e) {
             console.error('[DocxSave] save failed', e);
+            setDocxHasPendingEdits(true);
             setDocxSaveNotice('Save failed');
             setTimeout(() => setDocxSaveNotice(''), 3000);
           }
