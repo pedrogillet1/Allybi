@@ -22,7 +22,7 @@ export function sanitizeDocxRichHtml(html) {
   const root = doc.body.firstChild;
   if (!root) return '';
 
-  const allowedTags = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'S', 'STRIKE', 'BR', 'SPAN', 'UL', 'OL', 'LI', '#text']);
+  const allowedTags = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'S', 'STRIKE', 'BR', 'SPAN', 'DIV', 'UL', 'OL', 'LI', '#text']);
   const allowedStyle = new Set([
     'font-size',
     'color',
@@ -31,6 +31,8 @@ export function sanitizeDocxRichHtml(html) {
     'font-style',
     'text-decoration',
     'text-decoration-line',
+    'text-align',
+    'line-height',
   ]);
 
   const walk = (node) => {
@@ -48,11 +50,11 @@ export function sanitizeDocxRichHtml(html) {
       if (el.nodeType === Node.ELEMENT_NODE) {
         const attrs = Array.from(el.attributes || []);
         for (const a of attrs) {
-          if (tag === 'SPAN' && a.name.toLowerCase() === 'style') continue;
+          if ((tag === 'SPAN' || tag === 'DIV') && a.name.toLowerCase() === 'style') continue;
           el.removeAttribute(a.name);
         }
 
-        if (tag === 'SPAN') {
+        if (tag === 'SPAN' || tag === 'DIV') {
           const style = String(el.getAttribute('style') || '');
           const cleaned = style
             .split(';')
@@ -74,6 +76,8 @@ export function sanitizeDocxRichHtml(html) {
                   return null;
                 }
               }
+              if (k === 'text-align' && !/^(left|center|right|justify)$/i.test(v)) return null;
+              if (k === 'line-height' && !/^[0-9.]+$/.test(v)) return null;
               return `${k}:${v}`;
             })
             .filter(Boolean)

@@ -668,15 +668,21 @@ function extractDocxBundlePatchesForApply(session) {
       if (item && typeof item === "object") candidates.push(item);
     }
   };
+  // Prefer explicit bundlePatches when available; only fall back to parsing
+  // proposedText JSON when no explicit patches exist.  This prevents
+  // duplicating patches (the chat service sets BOTH bundlePatches and
+  // proposedText = JSON.stringify({patches}) to the same array).
   pushList(session?.bundlePatches);
-  pushList(session?.bundle?.patches);
-  pushList(session?.bundle?.ops);
-  pushList(session?.plan?.ops);
-  try {
-    const parsed = JSON.parse(String(session?.proposedText || "").trim() || "{}");
-    pushList(parsed?.patches);
-    pushList(parsed?.ops);
-  } catch {}
+  if (!candidates.length) pushList(session?.bundle?.patches);
+  if (!candidates.length) pushList(session?.bundle?.ops);
+  if (!candidates.length) pushList(session?.plan?.ops);
+  if (!candidates.length) {
+    try {
+      const parsed = JSON.parse(String(session?.proposedText || "").trim() || "{}");
+      pushList(parsed?.patches);
+      if (!candidates.length) pushList(parsed?.ops);
+    } catch {}
+  }
   return candidates;
 }
 
