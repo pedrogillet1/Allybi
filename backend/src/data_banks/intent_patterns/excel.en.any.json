@@ -22,6 +22,7 @@
         "tokens_any": [
           "set",
           "change",
+          "replace",
           "update",
           "put",
           "write",
@@ -30,8 +31,25 @@
         "tokens_all": [
           "value"
         ],
+        "tokens_none": [
+          "format",
+          "currency",
+          "percent",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "sort",
+          "filter",
+          "chart",
+          "formula",
+          "merge",
+          "wrap"
+        ],
         "regex_any": [
-          "\\b(?:set|change|put|write|enter)\\b.*\\b(?:to|=|value)\\b"
+          "\\b(?:set|change|replace|put|write|enter)\\b.*\\b(?:to|=|value|with)\\b",
+          "\\breplace\\b.*\\b(?:selected\\s+(?:cell|value|values)|selection|this\\s+cell)\\b.*\\bwith\\b"
         ]
       },
       "slotExtractors": [
@@ -93,11 +111,28 @@
           "set",
           "fill",
           "change",
+          "replace",
           "update",
           "put"
         ],
+        "tokens_none": [
+          "format",
+          "currency",
+          "percent",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "sort",
+          "filter",
+          "chart",
+          "formula",
+          "merge",
+          "wrap"
+        ],
         "regex_any": [
-          "\\b(?:set|fill|change|put)\\b.*\\b(?:every|all|each|cells?)\\b.*\\b(?:to|=|with)\\b",
+          "\\b(?:set|fill|change|replace|put)\\b.*\\b(?:every|all|each|cells?|selection|selected\\s+cells?)\\b.*\\b(?:to|=|with)\\b",
           "\\bset\\b.*\\bto\\b\\s*\\d"
         ]
       },

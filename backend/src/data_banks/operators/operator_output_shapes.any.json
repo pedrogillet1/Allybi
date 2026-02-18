@@ -308,6 +308,12 @@
         "paragraph"
       ]
     },
+    "DELETE_SHEET": {
+      "defaultShape": "paragraph",
+      "allowedShapes": [
+        "paragraph"
+      ]
+    },
     "CREATE_CHART": {
       "defaultShape": "paragraph",
       "allowedShapes": [

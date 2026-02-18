@@ -116,7 +116,24 @@ function getDocxViewerSelectionV2FromRangeAny(documentContainerEl, range, opts) 
   const allowMulti = opts?.allowMulti !== false;
   if (!range) return null;
   try {
-    if (range.collapsed) return null;
+    if (range.collapsed) {
+      // Cursor in a paragraph with no text selected — return cursor-only payload.
+      const node = range.startContainer;
+      const el = node?.nodeType === 1 ? node : node?.parentElement;
+      const paraEl = el?.closest?.("[data-paragraph-id]");
+      const pid = String(paraEl?.getAttribute?.("data-paragraph-id") || "").trim();
+      if (!pid || !documentContainerEl?.contains?.(paraEl)) return null;
+      return {
+        domain: "docx",
+        paragraphId: pid,
+        text: "",
+        ranges: [],
+        cursorParagraphId: pid,
+        frozenAtIso: new Date().toISOString(),
+        preview: "",
+        selectionKind: "cursor",
+      };
+    }
   } catch {}
 
   const ancestor = range.commonAncestorContainer;

@@ -115,15 +115,29 @@
     "pt": {
       "EDIT_CELL": "Atualizou **{{targetHint}}** para `{{value}}`.",
       "EDIT_RANGE": "Atualizou intervalo **{{targetHint}}** com novos valores.",
-      "COMPUTE_BUNDLE__default": "Aplicou mudancas em **{{targetHint}}**.",
-      "CREATE_CHART": "Criou grafico {{chartType}} de **{{targetHint}}**.",
-      "EDIT_PARAGRAPH": "Editou paragrafo: {{changeSummary}}.",
+      "COMPUTE_BUNDLE__formula": "Aplicou fórmula `={{formula}}` em **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__aggregation": "Calculou {{aggFn}} de **{{sourceRange}}** → resultado em **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__format": "Formatou **{{targetHint}}**{{formatDetails}}.",
+      "COMPUTE_BUNDLE__table": "Criou tabela a partir de **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__sort": "Ordenou **{{targetHint}}**{{sortDetails}}.",
+      "COMPUTE_BUNDLE__filter": "Aplicou filtro em **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__conditional_format": "Adicionou formatação condicional em **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__insert_rows": "Inseriu {{count}} linha(s) em **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__insert_columns": "Inseriu {{count}} coluna(s) em **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__delete_rows": "Excluiu linha(s) em **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__delete_columns": "Excluiu coluna(s) em **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__number_format": "Aplicou formato {{formatType}} em **{{targetHint}}**.",
+      "COMPUTE_BUNDLE__default": "Aplicou mudanças em **{{targetHint}}**.",
+      "CREATE_CHART": "Criou gráfico {{chartType}} de **{{targetHint}}**.",
+      "EDIT_PARAGRAPH": "Editou parágrafo: {{changeSummary}}.",
       "EDIT_SPAN": "Substituiu \"{{before}}\" por \"{{after}}\".",
-      "EDIT_DOCX_BUNDLE__translate": "Traduziu {{changes}} paragrafo(s) para {{targetLanguage}}.",
-      "EDIT_DOCX_BUNDLE__replace_all": "Substituiu {{changes}} ocorrencia(s) de \"{{query}}\" por \"{{replacement}}\".",
-      "EDIT_DOCX_BUNDLE__default": "Fez {{changes}} mudanca(s) no documento.",
-      "ADD_PARAGRAPH": "Inseriu novo paragrafo{{locationHint}}.",
-      "fallback": "Edicao aplicada em **{{filename}}**."
+      "EDIT_DOCX_BUNDLE__translate": "Traduziu {{changes}} parágrafo(s) para {{targetLanguage}}.",
+      "EDIT_DOCX_BUNDLE__format": "Aplicou formatação em {{changes}} parágrafo(s){{formatDetails}}.",
+      "EDIT_DOCX_BUNDLE__replace_all": "Substituiu {{changes}} ocorrência(s) de \"{{query}}\" por \"{{replacement}}\".",
+      "EDIT_DOCX_BUNDLE__heading": "Definiu nível de cabeçalho em {{changes}} parágrafo(s).",
+      "EDIT_DOCX_BUNDLE__default": "Fez {{changes}} mudança(s) no documento.",
+      "ADD_PARAGRAPH": "Inseriu novo parágrafo{{locationHint}}.",
+      "fallback": "Edição aplicada em **{{filename}}**."
     }
   }
 }

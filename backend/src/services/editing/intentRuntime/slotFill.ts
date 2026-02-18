@@ -28,6 +28,19 @@ function extractA1Ranges(text: string): string[] {
   const results: string[] = [];
   const seen = new Set<string>();
 
+  // Prefer explicit target indicators ("in D9", "at B2", "into cell C5")
+  // so formula references like =SUM(D5:D8) do not hijack the edit target.
+  const targetCellMatch = text.match(
+    /\b(?:in|at|into)\s+(?:cell\s+)?([A-Za-z]{1,3}\d{1,7}(?::[A-Za-z]{1,3}\d{1,7})?)\s*(?:[,.\s;]|for\b|$)/i,
+  );
+  if (targetCellMatch?.[1]) {
+    const idx = targetCellMatch.index || 0;
+    const before = text.slice(0, idx);
+    if (!/=\s*[A-Za-z_]+\s*\([^)]*$/i.test(before)) {
+      return [String(targetCellMatch[1]).toUpperCase()];
+    }
+  }
+
   // Sheet!Range patterns first
   let sheetMatch: RegExpExecArray | null;
   const sheetRe = new RegExp(SHEET_RANGE_RE.source, SHEET_RANGE_RE.flags);
@@ -348,8 +361,24 @@ function extractFormatPattern(text: string): string | null {
   );
   if (explicitMatch) return explicitMatch[1];
 
-  // Dictionary lookup for named formats
+  // Dictionary lookup for named formats.
+  // PT keywords map to EN bank keys so the lookup resolves correctly.
   const low = text.toLowerCase();
+  const ptToEnMap: Record<string, string> = {
+    moeda: "currency",
+    porcentagem: "percentage",
+    percentual: "percent",
+    data: "date",
+    numero: "number",
+    número: "number",
+    contabil: "accounting",
+    contábil: "accounting",
+    científico: "scientific",
+    cientifico: "scientific",
+    texto: "text",
+    geral: "general",
+  };
+
   const formatNames = [
     "currency",
     "percent",
@@ -360,17 +389,13 @@ function extractFormatPattern(text: string): string | null {
     "scientific",
     "text",
     "general",
-    "moeda",
-    "porcentagem",
-    "percentual",
-    "data",
-    "numero",
-    "contabil",
+    ...Object.keys(ptToEnMap),
   ];
 
   for (const name of formatNames) {
     if (low.includes(name)) {
-      const result = lookupParserEntry("excel_number_formats", name);
+      const bankKey = ptToEnMap[name] || name;
+      const result = lookupParserEntry("excel_number_formats", bankKey);
       if (result) return result;
     }
   }
@@ -435,7 +460,7 @@ function extractBooleanFlag(
   if (/\b(?:without|no|disable|remove|off|sem|desabilite)\b/.test(low))
     return false;
   if (
-    /\b(?:with|yes|enable|add|on|com|habilite|ative)\\b/.test(low)
+    /\b(?:with|yes|enable|add|on|com|habilite|ative)\b/.test(low)
   )
     return true;
   return null;
@@ -494,6 +519,60 @@ function extractLocatorText(text: string): string | null {
   const quotedMatch = text.match(/['"]([^'"]+)['"]/);
   if (quotedMatch) return quotedMatch[1];
 
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Scope extraction
+// ---------------------------------------------------------------------------
+
+function extractScope(text: string): string | null {
+  const low = text.toLowerCase();
+  // "all headings" / "every header" / "all titles"
+  if (/\b(?:all|every|each|todos?\s+os?)\s+(?:headings?|headers?|titles?|títulos?|cabeçalhos?)\b/i.test(low)) return "all_headings";
+  // "this section" / "esta seção"
+  if (/\b(?:this|the|current|esta|essa)\s+(?:section|seção|secao)\b/i.test(low)) return "section";
+  // "all bullets" / "all list items" / "every bullet point"
+  if (/\b(?:all|every|each|todos?\s+os?)\s+(?:bullets?|list\s*items?|bullet\s*points?|itens?\s+de?\s+lista|marcadores?)\b/i.test(low)) return "all_list_items";
+  // "entire document" / "whole document"
+  if (/\b(?:entire|whole|all|todo\s+o?)\s+(?:document|documento|doc)\b/i.test(low)) return "document";
+  // "all paragraphs"
+  if (/\b(?:all|every|each|todos?\s+os?)\s+(?:paragraphs?|parágrafos?|paragrafos?)\b/i.test(low)) return "all_paragraphs";
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Text case extraction
+// ---------------------------------------------------------------------------
+
+function extractTextCase(text: string): string | null {
+  const low = text.toLowerCase();
+  if (/\b(?:title\s*case|capitalize|maiúscula\s+inicial)\b/i.test(low)) return "title";
+  if (/\b(?:upper\s*case|all\s*caps|maiúscul[ao]s?|caixa\s*alta)\b/i.test(low)) return "upper";
+  if (/\b(?:lower\s*case|no\s*caps|minúscul[ao]s?|caixa\s*baixa)\b/i.test(low)) return "lower";
+  if (/\b(?:sentence\s*case|frase)\b/i.test(low)) return "sentence";
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// List type extraction
+// ---------------------------------------------------------------------------
+
+function extractListType(text: string): string | null {
+  const low = text.toLowerCase();
+  if (/\b(?:numbered|numbering|numbers?|ordered|numerada|numerado|numerad[ao]s?|números)\b/.test(low)) return "numbered";
+  if (/\b(?:bullet|bullets|bulleted|unordered|marcadores?|marcador)\b/.test(low)) return "bulleted";
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Direction extraction (promote/demote)
+// ---------------------------------------------------------------------------
+
+function extractDirection(text: string): string | null {
+  const low = text.toLowerCase();
+  if (/\b(?:promote|indent|increase\s+level|promov|recuar)\b/.test(low)) return "promote";
+  if (/\b(?:demote|outdent|decrease\s+level|rebaixar|avançar)\b/.test(low)) return "demote";
   return null;
 }
 
@@ -584,10 +663,22 @@ function runExtractor(
 
     case "AXIS": {
       const low = text.toLowerCase();
-      if (/\brows?\b|\\blinhas?\\b/.test(low)) return "rows";
-      if (/\bcolumns?\b|\\bcolunas?\\b/.test(low)) return "columns";
+      if (/\brows?\b|\blinhas?\b/.test(low)) return "rows";
+      if (/\bcolumns?\b|\bcolunas?\b/.test(low)) return "columns";
       return null;
     }
+
+    case "SCOPE":
+      return extractScope(text);
+
+    case "TEXT_CASE":
+      return extractTextCase(text);
+
+    case "LIST_TYPE":
+      return extractListType(text);
+
+    case "DIRECTION":
+      return extractDirection(text);
 
     default:
       return null;

@@ -85,6 +85,19 @@ class KodaV3Container {
           validateSchemas,
         });
 
+        try {
+          const { BankIntegrityService } = await import('../services/editing/banks/bankIntegrity.service');
+          const integrity = new BankIntegrityService().validateEditingBanks();
+          if (!integrity.ok) {
+            console.warn('[Container] Editing bank integrity warnings', {
+              missingBanks: integrity.missingBanks,
+              missingOperators: integrity.missingOperators,
+            });
+          }
+        } catch (integrityErr: any) {
+          console.warn(`[Container] Editing bank integrity check failed (non-fatal): ${integrityErr?.message || integrityErr}`);
+        }
+
         this._banksInitialized = true;
         console.log('[Container] Banks initialized successfully');
       } catch (e: any) {

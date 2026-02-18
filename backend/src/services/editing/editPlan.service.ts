@@ -17,6 +17,7 @@ const REQUIRED_ENTITY_BY_OPERATOR: Record<EditOperator, string[]> = {
   EDIT_RANGE: ["range"],
   ADD_SHEET: ["sheet_name"],
   RENAME_SHEET: ["sheet_name"],
+  DELETE_SHEET: ["sheet_name"],
   CREATE_CHART: ["range"],
   COMPUTE: [],
   COMPUTE_BUNDLE: [],
@@ -25,7 +26,7 @@ const REQUIRED_ENTITY_BY_OPERATOR: Record<EditOperator, string[]> = {
   REPLACE_SLIDE_IMAGE: ["slide"],
 };
 
-const DESTRUCTIVE_OR_HINTED_OPS = new Set<EditOperator>(["EDIT_RANGE", "REPLACE_SLIDE_IMAGE"]);
+const DESTRUCTIVE_OR_HINTED_OPS = new Set<EditOperator>(["EDIT_RANGE", "DELETE_SHEET", "REPLACE_SLIDE_IMAGE"]);
 
 function normalize(input: string): string {
   return input.replace(/\s+/g, " ").trim();

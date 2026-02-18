@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '../../../services/api';
-import { applyEdit } from '../../../services/editingService';
+import { applyEdit, extractVerifiedApply, isNoopResult, undoEdit } from '../../../services/editingService';
 import cleanDocumentName from '../../../utils/cleanDocumentName';
 import { getPreviewCountForFile, getFileExtension } from '../../../utils/files/previewCount';
 import EditorToolbar from '../editor/EditorToolbar';
@@ -176,6 +176,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     onDraftValueChange,
     onStatusMsg,
     onSheetMetaChange,
+    onHistoryStateChange,
     onAskAllybi,
     selectionHint = null,
     clearSelectionNonce = 0,
@@ -208,6 +209,9 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   const [dragAnchor, setDragAnchor] = useState(null);   // { rowIdx, colIdx } — where drag started
   const [dragEnd, setDragEnd] = useState(null);          // { rowIdx, colIdx } — current drag position
   const isDraggingRef = React.useRef(false);
+  const editUndoStackRef = useRef([]); // [{ kind, revisionId, payload }]
+  const editRedoStackRef = useRef([]); // [{ kind, revisionId, payload }]
+  const [editHistoryVersion, setEditHistoryVersion] = useState(0);
   const selectionHistoryRef = useRef({ items: [], index: -1 });
   const [selectionHistoryVersion, setSelectionHistoryVersion] = useState(0);
   const selectedRef = useRef(selected);
@@ -228,6 +232,29 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   const pendingSelectionHintRef = React.useRef(null);
 
   const scale = zoom / 100;
+
+  const extractRevisionId = useCallback((res) => {
+    const verified = extractVerifiedApply(res);
+    return (
+      verified?.newRevisionId ||
+      res?.result?.revisionId ||
+      res?.result?.restoredRevisionId ||
+      res?.receipt?.documentId ||
+      res?.result?.receipt?.documentId ||
+      null
+    );
+  }, []);
+
+  const pushEditHistory = useCallback((entry) => {
+    if (!entry || !entry.revisionId) return;
+    const next = [...(editUndoStackRef.current || []), entry];
+    editUndoStackRef.current = next.slice(-40);
+    editRedoStackRef.current = [];
+    setEditHistoryVersion((v) => v + 1);
+  }, []);
+
+  const canUndoEdit = useCallback(() => (editUndoStackRef.current?.length || 0) > 0, []);
+  const canRedoEdit = useCallback(() => (editRedoStackRef.current?.length || 0) > 0, []);
 
   const load = useCallback(async () => {
     if (!docId) return;
@@ -394,6 +421,26 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   const canUndoSelection = selectionHistoryTick >= 0 && Number(selectionHistoryState.index || -1) > 0;
   const canRedoSelection =
     Number(selectionHistoryState.index || -1) < ((selectionHistoryState.items?.length || 0) - 1);
+
+  useEffect(() => {
+    onHistoryStateChange?.({
+      canUndoEdit: canUndoEdit(),
+      canRedoEdit: canRedoEdit(),
+      canUndoSelection: Boolean(canUndoSelection),
+      canRedoSelection: Boolean(canRedoSelection),
+      canUndo: Boolean(canUndoEdit() || canUndoSelection),
+      canRedo: Boolean(canRedoEdit() || canRedoSelection),
+    });
+  }, [
+    onHistoryStateChange,
+    canUndoEdit,
+    canRedoEdit,
+    canUndoSelection,
+    canRedoSelection,
+    editHistoryVersion,
+    selectionHistoryVersion,
+  ]);
+
   const undoSelection = useCallback(() => {
     const timeline = selectionHistoryRef.current;
     if (!timeline || timeline.index <= 0) return;
@@ -1685,7 +1732,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
         const rangeA1 = `${colLetter}${rowNumber}:${endCol}${endRow}`;
         const rangeTargetId = `${currentSheetName}!${rangeA1}`;
 
-        await applyEdit({
+        const payload = {
           instruction: `Manual edit (range) in viewer: ${cleanDocumentName(document?.filename)}`,
           operator: 'EDIT_RANGE',
           domain: 'sheets',
@@ -1703,9 +1750,21 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
           beforeText: beforeText || '(range)',
           proposedText,
           userConfirmed: true,
-        });
+        };
+        const res = await applyEdit(payload);
+        if (isNoopResult(res)) {
+          setStatusMsg('No changes detected.');
+          onStatusMsg?.('No changes detected.');
+          setTimeout(() => { setStatusMsg(''); onStatusMsg?.(''); }, 1800);
+          return;
+        }
+        const revisionId = extractRevisionId(res);
+        if (!revisionId) {
+          throw new Error('Apply proof verification failed.');
+        }
+        pushEditHistory({ kind: 'applyEdit', revisionId, payload });
       } else {
-        await applyEdit({
+        const payload = {
           instruction: `Manual edit in viewer: ${cleanDocumentName(document?.filename)}`,
           operator: 'EDIT_CELL',
           domain: 'sheets',
@@ -1723,7 +1782,19 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
           beforeText: beforeText || '(empty)',
           proposedText,
           userConfirmed: true,
-        });
+        };
+        const res = await applyEdit(payload);
+        if (isNoopResult(res)) {
+          setStatusMsg('No changes detected.');
+          onStatusMsg?.('No changes detected.');
+          setTimeout(() => { setStatusMsg(''); onStatusMsg?.(''); }, 1800);
+          return;
+        }
+        const revisionId = extractRevisionId(res);
+        if (!revisionId) {
+          throw new Error('Apply proof verification failed.');
+        }
+        pushEditHistory({ kind: 'applyEdit', revisionId, payload });
       }
 
       setStatusMsg('Applied. Refreshing…');
@@ -1745,7 +1816,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     } finally {
       setIsApplying(false);
     }
-  }, [docId, selectedInfo, selected, effectiveDraftValue, currentSheetName, document?.filename, load, onApplied, onStatusMsg, mergeHighlightRects, setHighlightsForSheet]);
+  }, [docId, selectedInfo, selected, effectiveDraftValue, currentSheetName, document?.filename, load, onApplied, onStatusMsg, mergeHighlightRects, setHighlightsForSheet, extractRevisionId, pushEditHistory]);
 
   const compute = useCallback(async (ops) => {
     if (!docId) return;
@@ -1777,6 +1848,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
         ops: usableOps,
       });
       const responseData = response?.data?.data || {};
+      const revisionId = String(responseData?.revisionId || '').trim() || null;
       const acceptedOps = Array.isArray(responseData?.acceptedOps) ? responseData.acceptedOps : [];
       const affectedRanges = Array.isArray(responseData?.affectedRanges) ? responseData.affectedRanges : [];
       const backendWarning = String(responseData?.warning || '').trim();
@@ -1785,6 +1857,17 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
         setStatusMsg(msg);
         onStatusMsg?.(msg);
         return;
+      }
+      if (revisionId) {
+        pushEditHistory({
+          kind: 'compute',
+          revisionId,
+          payload: {
+            instruction: `Manual compute in viewer: ${cleanDocumentName(document?.filename)}`,
+            activeSheetName: currentSheetName,
+            ops: acceptedOps,
+          },
+        });
       }
       const responseHighlightRects = affectedRanges.length
         ? computeHighlightRectsFromRanges(affectedRanges)
@@ -1866,7 +1949,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     } finally {
       setIsApplying(false);
     }
-  }, [docId, document?.filename, currentSheetName, load, onApplied, onStatusMsg, computeFlashRectFromOps, computeHighlightRectsFromOps, computeHighlightRectsFromRanges, isUsableComputeOp, mergeHighlightRects, normalizeComputeOpsForRequest, setHighlightsForSheet]);
+  }, [docId, document?.filename, currentSheetName, load, onApplied, onStatusMsg, computeFlashRectFromOps, computeHighlightRectsFromOps, computeHighlightRectsFromRanges, isUsableComputeOp, mergeHighlightRects, normalizeComputeOpsForRequest, setHighlightsForSheet, pushEditHistory]);
 
   const revert = useCallback(() => {
     if (!selectedInfo) return;
@@ -1972,6 +2055,133 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     });
   }, [compute, selectedInfo?.targetId, selectedRangeInfo?.targetId]);
 
+  const undoAction = useCallback(async () => {
+    if (!docId) return false;
+    const stack = editUndoStackRef.current || [];
+    if (!stack.length) return false;
+    const entry = stack[stack.length - 1];
+    editUndoStackRef.current = stack.slice(0, -1);
+    setEditHistoryVersion((v) => v + 1);
+    setIsApplying(true);
+    setStatusMsg('');
+    onStatusMsg?.('');
+    try {
+      await undoEdit({ documentId: docId, revisionId: entry?.revisionId || undefined });
+      editRedoStackRef.current = [...(editRedoStackRef.current || []), entry].slice(-40);
+      setEditHistoryVersion((v) => v + 1);
+      await load();
+      const msg = 'Undid last change.';
+      setStatusMsg(msg);
+      onStatusMsg?.(msg);
+      setTimeout(() => setStatusMsg(''), 1200);
+      return true;
+    } catch (e) {
+      editUndoStackRef.current = [...(editUndoStackRef.current || []), entry].slice(-40);
+      setEditHistoryVersion((v) => v + 1);
+      const msg = e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || 'Undo failed.';
+      setStatusMsg(msg);
+      onStatusMsg?.(msg);
+      return false;
+    } finally {
+      setIsApplying(false);
+    }
+  }, [docId, load, onStatusMsg]);
+
+  const redoAction = useCallback(async () => {
+    if (!docId) return false;
+    const stack = editRedoStackRef.current || [];
+    if (!stack.length) return false;
+    const entry = stack[stack.length - 1];
+    editRedoStackRef.current = stack.slice(0, -1);
+    setEditHistoryVersion((v) => v + 1);
+    setIsApplying(true);
+    setStatusMsg('');
+    onStatusMsg?.('');
+    try {
+      let nextRevisionId = null;
+      if (entry?.kind === 'compute') {
+        const payload = entry?.payload && typeof entry.payload === 'object' ? entry.payload : null;
+        if (!payload) throw new Error('Redo payload is missing.');
+        const response = await api.post(`/api/documents/${docId}/studio/sheets/compute`, payload);
+        const responseData = response?.data?.data || {};
+        nextRevisionId = String(responseData?.revisionId || '').trim() || null;
+        if (!nextRevisionId) throw new Error('Redo did not create a revision.');
+      } else {
+        const payload = entry?.payload && typeof entry.payload === 'object' ? entry.payload : null;
+        if (!payload) throw new Error('Redo payload is missing.');
+        const res = await applyEdit(payload);
+        nextRevisionId = extractRevisionId(res);
+        if (!nextRevisionId) throw new Error('Redo did not create a revision.');
+      }
+      const nextEntry = { ...entry, revisionId: nextRevisionId };
+      editUndoStackRef.current = [...(editUndoStackRef.current || []), nextEntry].slice(-40);
+      setEditHistoryVersion((v) => v + 1);
+      await load();
+      const msg = 'Redid last change.';
+      setStatusMsg(msg);
+      onStatusMsg?.(msg);
+      setTimeout(() => setStatusMsg(''), 1200);
+      return true;
+    } catch (e) {
+      editRedoStackRef.current = [...(editRedoStackRef.current || []), entry].slice(-40);
+      setEditHistoryVersion((v) => v + 1);
+      const msg = e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || 'Redo failed.';
+      setStatusMsg(msg);
+      onStatusMsg?.(msg);
+      return false;
+    } finally {
+      setIsApplying(false);
+    }
+  }, [docId, extractRevisionId, load, onStatusMsg]);
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      const key = String(e.key || '').toLowerCase();
+      const isMod = Boolean(e.metaKey || e.ctrlKey);
+      if (!isMod) return;
+      if (e.altKey) return;
+      const tag = String(e.target?.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea') return;
+
+      if (key === 'z' && e.shiftKey) {
+        e.preventDefault();
+        if (canRedoEdit()) {
+          redoAction();
+          return;
+        }
+        if (canRedoSelection) redoSelection();
+        return;
+      }
+
+      if (key === 'z') {
+        e.preventDefault();
+        if (canUndoEdit()) {
+          undoAction();
+          return;
+        }
+        if (canUndoSelection) undoSelection();
+        return;
+      }
+
+      if (key === 'y') {
+        e.preventDefault();
+        if (canRedoEdit()) {
+          redoAction();
+          return;
+        }
+        if (canRedoSelection) redoSelection();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, [canRedoSelection, canUndoSelection, redoSelection, undoSelection, undoAction, redoAction, canUndoEdit, canRedoEdit]);
+
+  useEffect(() => {
+    editUndoStackRef.current = [];
+    editRedoStackRef.current = [];
+    setEditHistoryVersion((v) => v + 1);
+  }, [docId]);
+
   useImperativeHandle(ref, () => ({
     apply,
     revert,
@@ -2034,6 +2244,12 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       }).filter((c) => c.a1);
     },
     clearLockedCells: () => setLockedCells(new Set()),
+    undo: undoAction,
+    redo: redoAction,
+    canUndo: () => canUndoEdit(),
+    canRedo: () => canRedoEdit(),
+    canUndoSelection: () => Boolean(canUndoSelection),
+    canRedoSelection: () => Boolean(canRedoSelection),
     undoSelection,
     redoSelection,
     getViewerSelection: () => {
@@ -2060,7 +2276,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       return null;
     },
     clearSelection,
-  }), [apply, revert, compute, selectedInfo, effectiveDraftValue, controlledDraftValue, onDraftValueChange, isApplying, load, sheetMeta, lockedCells, current, cellA1At, currentSheetName, activeAskBubble, selectedRange, selected, viewerSelectionForRange, clearSelection, undoSelection, redoSelection]);
+  }), [apply, revert, compute, selectedInfo, effectiveDraftValue, controlledDraftValue, onDraftValueChange, isApplying, load, sheetMeta, lockedCells, current, cellA1At, currentSheetName, activeAskBubble, selectedRange, selected, viewerSelectionForRange, clearSelection, undoSelection, redoSelection, undoAction, redoAction, canUndoEdit, canRedoEdit, canUndoSelection, canRedoSelection, editHistoryVersion, selectionHistoryVersion]);
 
   if (loading) {
     return (

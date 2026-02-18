@@ -322,6 +322,25 @@ export class SheetsEditorService {
     );
   }
 
+  async deleteSheet(
+    spreadsheetId: string,
+    sheetIdOrName: number | string,
+    ctx?: SheetsRequestContext,
+  ): Promise<void> {
+    const { sheetId } = await this.resolveSheetId(spreadsheetId, sheetIdOrName, ctx);
+    await this.sheetsClient.batchUpdate(
+      spreadsheetId,
+      [
+        {
+          deleteSheet: {
+            sheetId,
+          },
+        },
+      ],
+      ctx,
+    );
+  }
+
   async editCell(
     spreadsheetId: string,
     sheetName: string,
@@ -572,6 +591,82 @@ export class SheetsEditorService {
           },
         },
       ],
+      ctx,
+    );
+  }
+
+  async formatRange(
+    spreadsheetId: string,
+    rangeA1: string,
+    format: {
+      color?: string;
+      bold?: boolean;
+      italic?: boolean;
+      underline?: boolean;
+      fontSizePt?: number;
+      fontFamily?: string;
+    },
+    ctx?: SheetsRequestContext,
+  ): Promise<void> {
+    const parsed = this.parseRangeA1(rangeA1);
+    const bounds = await this.validators.validateRangeWithinBounds(spreadsheetId, rangeA1, ctx);
+    if (!bounds.valid) {
+      throw new SheetsClientError(bounds.reason ?? "Range out of bounds.", {
+        code: "RANGE_OUT_OF_BOUNDS", retryable: false,
+      });
+    }
+    const { sheetId } = await this.resolveSheetId(spreadsheetId, parsed.sheetName, ctx);
+
+    const textFormat: Record<string, unknown> = {};
+    const fields: string[] = [];
+
+    if (format.color) {
+      const hex = format.color.replace(/^#/, '');
+      textFormat.foregroundColor = {
+        red:   parseInt(hex.slice(0, 2), 16) / 255,
+        green: parseInt(hex.slice(2, 4), 16) / 255,
+        blue:  parseInt(hex.slice(4, 6), 16) / 255,
+      };
+      fields.push('userEnteredFormat.textFormat.foregroundColor');
+    }
+    if (typeof format.bold === 'boolean') {
+      textFormat.bold = format.bold;
+      fields.push('userEnteredFormat.textFormat.bold');
+    }
+    if (typeof format.italic === 'boolean') {
+      textFormat.italic = format.italic;
+      fields.push('userEnteredFormat.textFormat.italic');
+    }
+    if (typeof format.underline === 'boolean') {
+      textFormat.underline = format.underline;
+      fields.push('userEnteredFormat.textFormat.underline');
+    }
+    if (format.fontSizePt && format.fontSizePt > 0) {
+      textFormat.fontSize = format.fontSizePt;
+      fields.push('userEnteredFormat.textFormat.fontSize');
+    }
+    if (format.fontFamily) {
+      textFormat.fontFamily = format.fontFamily;
+      fields.push('userEnteredFormat.textFormat.fontFamily');
+    }
+
+    if (!fields.length) return;
+
+    await this.sheetsClient.batchUpdate(
+      spreadsheetId,
+      [{
+        repeatCell: {
+          range: {
+            sheetId,
+            startRowIndex: parsed.startRowIndex,
+            endRowIndex: parsed.endRowIndexExclusive,
+            startColumnIndex: parsed.startColumnIndex,
+            endColumnIndex: parsed.endColumnIndexExclusive,
+          },
+          cell: { userEnteredFormat: { textFormat } },
+          fields: fields.join(','),
+        },
+      }],
       ctx,
     );
   }

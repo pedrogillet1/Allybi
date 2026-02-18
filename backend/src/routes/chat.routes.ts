@@ -25,6 +25,7 @@ import { rateLimitMiddleware } from "../middleware/rateLimit.middleware";
 import { chatRequestSchema, titleUpdateSchema } from "../schemas/request.schemas";
 import { validate } from "../middleware/validate.middleware";
 import { logger } from "../utils/logger";
+import { ConversationNotFoundError } from "../services/prismaChat.service";
 
 import type {
   StreamSink,
@@ -46,6 +47,51 @@ function getUserId(req: Request): string | null {
   const anyReq = req as any;
   const userId = anyReq?.user?.id || anyReq?.userId || anyReq?.auth?.userId;
   return typeof userId === "string" && userId.trim() ? userId.trim() : null;
+}
+
+type ChatLanguage = "en" | "pt" | "es";
+const SUPPORTED_CHAT_LANGUAGES = new Set<ChatLanguage>(["en", "pt", "es"]);
+
+function detectMessageLanguage(message: string): ChatLanguage {
+  const text = String(message || "").toLowerCase();
+  if (!text.trim()) return "en";
+
+  const esMarkers = ["cuál", "cuáles", "dónde", "cómo", "por qué", "hola", "gracias", "necesito", "quiero", "puedes", "tengo", "archivo", "prueba"];
+  const ptMarkers = ["quais", "onde", "como", "por que", "olá", "obrigado", "obrigada", "preciso", "quero", "tenho", "arquivo", "exame", "teste"];
+  const hits = (markers: string[]) =>
+    markers.reduce((count, marker) => (
+      count + (new RegExp(`\\b${marker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(text) ? 1 : 0)
+    ), 0);
+
+  let esScore = hits(esMarkers);
+  let ptScore = hits(ptMarkers);
+
+  if (/[¿¡ñ]/.test(text)) esScore += 2;
+  if (/[ãõç]/.test(text)) ptScore += 2;
+
+  if (esScore > ptScore && esScore > 0) return "es";
+  if (ptScore > esScore && ptScore > 0) return "pt";
+  if (/[ãõç]/.test(text)) return "pt";
+  if (/[¿¡ñ]/.test(text)) return "es";
+
+  return "en";
+}
+
+function resolvePreferredLanguage(
+  language: unknown,
+  message: string,
+): ChatLanguage {
+  if (typeof language === "string" && SUPPORTED_CHAT_LANGUAGES.has(language as ChatLanguage)) {
+    return language as ChatLanguage;
+  }
+  return detectMessageLanguage(message);
+}
+
+function isConversationNotFoundError(e: unknown): boolean {
+  if (!e) return false;
+  if (e instanceof ConversationNotFoundError) return true;
+  const anyErr = e as any;
+  return String(anyErr?.code || "").trim() === "CONVERSATION_NOT_FOUND";
 }
 
 const DEFAULT_STREAMING_CONFIG: LLMStreamingConfig = {
@@ -181,10 +227,8 @@ router.post(
       ? attachedDocuments.map((d: any) => d?.id).filter(Boolean) as string[]
       : [];
 
-    // Resolve preferred language (frontend sends ui language)
-    const preferredLanguage = (typeof language === "string" && ["en", "pt", "es"].includes(language))
-      ? language as "en" | "pt" | "es"
-      : undefined;
+    // Server-side language resolution: explicit language wins; otherwise infer from user query.
+    const preferredLanguage = resolvePreferredLanguage(language, message);
 
     const rawMeta = (parsed.data as any).meta as Record<string, unknown> | undefined;
     const meta: Record<string, unknown> = {
@@ -269,6 +313,12 @@ router.post(
         })}\n\n`);
       }
     } catch (e: any) {
+      if (isConversationNotFoundError(e)) {
+        if (!res.writableEnded) {
+          res.write(`data: ${JSON.stringify({ type: "error", message: "Conversation not found" })}\n\n`);
+        }
+        return;
+      }
       logger.error("[Chat] stream error", { path: req.path, error: e?.message, stack: e?.stack });
       if (!res.writableEnded) {
         res.write(`data: ${JSON.stringify({ type: "worklog", eventType: "RUN_ERROR", summary: "Request failed" })}\n\n`);
@@ -309,9 +359,7 @@ router.post(
       ? attachedDocuments.map((d: any) => d?.id).filter(Boolean) as string[]
       : [];
 
-    const preferredLanguage = (typeof language === "string" && ["en", "pt", "es"].includes(language))
-      ? language as "en" | "pt" | "es"
-      : undefined;
+    const preferredLanguage = resolvePreferredLanguage(language, message);
 
     res.writeHead(200, {
       "Content-Type": "text/event-stream; charset=utf-8",
@@ -389,6 +437,12 @@ router.post(
         logger.warn("[Chat] viewer stream cleanup failed", { path: req.path, error: cleanupErr?.message });
       }
     } catch (e: any) {
+      if (isConversationNotFoundError(e)) {
+        if (!res.writableEnded) {
+          res.write(`data: ${JSON.stringify({ type: "error", message: "Conversation not found" })}\n\n`);
+        }
+        return;
+      }
       logger.error("[Chat] viewer stream error", { path: req.path, error: e?.message, stack: e?.stack });
       if (!res.writableEnded) {
         res.write(`data: ${JSON.stringify({ type: "worklog", eventType: "RUN_ERROR", summary: "Request failed" })}\n\n`);
@@ -421,7 +475,7 @@ router.post(
       return;
     }
 
-    const { message, conversationId, attachedDocuments: chatAttDocs } = parsed.data;
+    const { message, conversationId, attachedDocuments: chatAttDocs, language } = parsed.data;
     const confirmationToken = (parsed.data as any).confirmationToken as string | undefined;
     const chatAttDocIds = Array.isArray(chatAttDocs)
       ? chatAttDocs.map((d: any) => d?.id).filter(Boolean) as string[]
@@ -444,6 +498,7 @@ router.post(
         conversationId,
         message: message.trim(),
         attachedDocumentIds: chatAttDocIds,
+        preferredLanguage: resolvePreferredLanguage(language, message),
         confirmationToken,
         connectorContext: connectorContext as any,
         meta,
@@ -451,6 +506,10 @@ router.post(
       });
       res.json({ ok: true, data: result });
     } catch (e: any) {
+      if (isConversationNotFoundError(e)) {
+        res.status(404).json({ error: "Conversation not found", code: "CONVERSATION_NOT_FOUND" });
+        return;
+      }
       logger.error("[Chat] chat error", { path: req.path, error: e?.message, stack: e?.stack });
       res.status(500).json({ error: "Failed to process chat" });
     }
@@ -635,6 +694,10 @@ router.post(
         },
       });
     } catch (e) {
+      if (isConversationNotFoundError(e)) {
+        res.status(404).json({ error: "Conversation not found", code: "CONVERSATION_NOT_FOUND" });
+        return;
+      }
       logger.error("[Chat] send message error", { path: req.path });
       res.status(500).json({ error: "Failed to send message" });
     }
@@ -670,6 +733,10 @@ router.post(
         confidence: 1.0,
       });
     } catch (e) {
+      if (isConversationNotFoundError(e)) {
+        res.status(404).json({ error: "Conversation not found", code: "CONVERSATION_NOT_FOUND" });
+        return;
+      }
       logger.error("[Chat] adaptive message error", { path: req.path });
       res.status(500).json({ error: "Failed to process adaptive message" });
     }
@@ -737,6 +804,15 @@ router.post(
 
       res.end();
     } catch (e: any) {
+      if (isConversationNotFoundError(e)) {
+        if (!res.headersSent) {
+          res.status(404).json({ error: "Conversation not found", code: "CONVERSATION_NOT_FOUND" });
+        } else if (!res.writableEnded) {
+          res.write(`data: ${JSON.stringify({ type: "error", message: "Conversation not found" })}\n\n`);
+          res.end();
+        }
+        return;
+      }
       logger.error("[Chat] adaptive stream error", { path: req.path });
       if (!res.headersSent) {
         res.status(500).json({ error: "Failed to stream" });

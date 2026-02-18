@@ -1,5 +1,6 @@
 import { loadAllybiBanks } from "./loadBanks";
 import { resolveFontIntent } from "./fontIntentResolver";
+import { analyzeMessageToPlan } from "../intentRuntime";
 
 export interface ClassifiedIntent {
   intentId: string;
@@ -11,6 +12,57 @@ export interface ClassifiedIntent {
   fontCandidates?: string[];
   clarificationRequired?: boolean;
   isFormattingIntent?: boolean;
+}
+
+function mapRuntimeOpsToLegacyIntent(
+  ops: string[],
+  filetype: "docx" | "xlsx",
+): { intentId: string; isFormattingIntent?: boolean } {
+  const upperOps = ops.map((op) => String(op || "").toUpperCase());
+
+  if (filetype === "docx") {
+    if (upperOps.some((op) => op.startsWith("DOCX_LIST_"))) {
+      return { intentId: "DOCX_LIST_CONVERT" };
+    }
+    if (upperOps.some((op) => op === "DOCX_FIND_REPLACE")) {
+      return { intentId: "DOCX_FIND_REPLACE" };
+    }
+    if (upperOps.some((op) => op === "DOCX_TRANSLATE_SCOPE")) {
+      return { intentId: "DOCX_TRANSLATE" };
+    }
+    if (upperOps.some((op) => op === "DOCX_SET_TEXT_CASE"))
+      return { intentId: "DOCX_TEXT_CASE", isFormattingIntent: true };
+    if (upperOps.some((op) => op === "DOCX_SET_RUN_STYLE" || op === "DOCX_CLEAR_RUN_STYLE" || op === "DOCX_SET_PARAGRAPH_STYLE" || op === "DOCX_SET_HEADING_LEVEL" || op === "DOCX_SET_ALIGNMENT")) {
+      return { intentId: "DOCX_FORMAT_INLINE", isFormattingIntent: true };
+    }
+    if (upperOps.some((op) => op === "DOCX_REPLACE_SPAN" || op === "DOCX_REWRITE_PARAGRAPH" || op === "DOCX_REWRITE_SECTION")) {
+      return { intentId: "DOCX_REWRITE" };
+    }
+    if (upperOps.some((op) => op === "DOCX_INSERT_AFTER" || op === "DOCX_INSERT_BEFORE")) {
+      return { intentId: "DOCX_INSERT_PARAGRAPH" };
+    }
+    return { intentId: "DOCX_REWRITE" };
+  }
+
+  if (upperOps.some((op) => op === "XLSX_SET_NUMBER_FORMAT" || op === "XLSX_FORMAT_RANGE" || op.includes("COND_FORMAT"))) {
+    return { intentId: "XLSX_FORMAT_RANGE", isFormattingIntent: true };
+  }
+  if (upperOps.some((op) => op === "XLSX_SET_CELL_FORMULA" || op === "XLSX_SET_RANGE_FORMULAS" || op === "XLSX_FILL_DOWN" || op === "XLSX_FILL_RIGHT")) {
+    return { intentId: "XLSX_FORMULA" };
+  }
+  if (upperOps.some((op) => op.startsWith("XLSX_CHART_"))) {
+    return { intentId: "XLSX_CHART" };
+  }
+  if (upperOps.some((op) => op === "XLSX_SORT_RANGE")) {
+    return { intentId: "XLSX_SORT" };
+  }
+  if (upperOps.some((op) => op === "XLSX_FILTER_APPLY" || op === "XLSX_FILTER_CLEAR")) {
+    return { intentId: "XLSX_FILTER" };
+  }
+  if (upperOps.some((op) => op === "XLSX_SET_RANGE_VALUES" || op === "XLSX_SET_CELL_VALUE")) {
+    return { intentId: "XLSX_SET_VALUE" };
+  }
+  return { intentId: "XLSX_SET_VALUE" };
 }
 
 function detectLanguage(message: string): "en" | "pt" {
@@ -105,6 +157,47 @@ function overlapScore(a: string, b: string): number {
 }
 
 export function classifyAllybiIntent(message: string, filetype: "docx" | "xlsx" | "global", languageHint?: "en" | "pt"): ClassifiedIntent | null {
+  if (filetype === "docx" || filetype === "xlsx") {
+    const runtimeDomain = filetype === "docx" ? "docx" : "excel";
+    const runtime = analyzeMessageToPlan({
+      message,
+      domain: runtimeDomain,
+      viewerContext: {},
+      ...(languageHint ? { language: languageHint } : {}),
+    });
+
+    if (runtime?.kind === "plan" && Array.isArray(runtime.ops) && runtime.ops.length > 0) {
+      const operatorCandidates = Array.from(
+        new Set(runtime.ops.map((op) => String(op?.op || "").trim()).filter(Boolean)),
+      );
+      const mapped = mapRuntimeOpsToLegacyIntent(operatorCandidates, filetype);
+      return {
+        intentId: mapped.intentId,
+        confidence: 0.9,
+        operatorCandidates,
+        language: runtime.language,
+        reason: `intent_runtime:${runtime.sourcePatternIds.join(",")}`,
+        ...(mapped.isFormattingIntent ? { isFormattingIntent: true } : {}),
+      };
+    }
+
+    if (runtime?.kind === "clarification") {
+      const operatorCandidates = Array.from(
+        new Set((runtime.partialOps || []).map((op) => String(op?.op || "").trim()).filter(Boolean)),
+      );
+      const mapped = mapRuntimeOpsToLegacyIntent(operatorCandidates, filetype);
+      return {
+        intentId: mapped.intentId,
+        confidence: 0.62,
+        operatorCandidates,
+        language: languageHint || detectLanguage(message),
+        reason: `intent_runtime:clarification:${runtime.sourcePatternIds.join(",")}`,
+        clarificationRequired: true,
+        ...(mapped.isFormattingIntent ? { isFormattingIntent: true } : {}),
+      };
+    }
+  }
+
   const banks = loadAllybiBanks();
   const intentBank = banks.intents;
   const triggerBank = banks.languageTriggers;

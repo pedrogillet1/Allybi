@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { applyEdit } from "../../../services/editingService";
+import { applyEdit, extractVerifiedApply } from "../../../services/editingService";
 import { buildRoute } from "../../../constants/routes";
 import kodaIconBlack from "../../../assets/koda-dark-knot.svg";
 import docIcon from "../../../assets/doc.svg";
@@ -37,7 +37,7 @@ function sanitizeHumanText(raw) {
 }
 
 function extractPatchText(obj, direction = "after") {
-  const patches = Array.isArray(obj?.patches) ? obj.patches : [];
+  const patches = Array.isArray(obj?.patches) ? obj.patches : Array.isArray(obj) ? obj : [];
   if (!patches.length) return "";
   const keyText = direction === "before" ? "beforeText" : "afterText";
   const keyHtml = direction === "before" ? "beforeHtml" : "afterHtml";
@@ -62,6 +62,10 @@ function extractHumanEditText(raw, direction = "after") {
 
   const fromObject = (obj) => {
     if (!obj || typeof obj !== "object") return "";
+    if (Array.isArray(obj)) {
+      const fromArray = extractPatchText(obj, direction);
+      if (fromArray) return fromArray;
+    }
     const fromDiff = sanitizeHumanText(direction === "before" ? obj?.diff?.before : obj?.diff?.after || "");
     if (fromDiff) return fromDiff;
     const fromPatches = extractPatchText(obj, direction);
@@ -82,6 +86,14 @@ function extractHumanEditText(raw, direction = "after") {
     return fromSuffix || prefix || input;
   }
 
+  const patchArrayStart = input.search(/\[\s*\{\s*"kind"\s*:/);
+  if (patchArrayStart >= 0) {
+    const prefix = sanitizeHumanText(input.slice(0, patchArrayStart).trim());
+    const parsedArray = tryParse(input.slice(patchArrayStart));
+    const fromArray = fromObject(parsedArray);
+    return fromArray || prefix || input;
+  }
+
   return input;
 }
 
@@ -94,6 +106,50 @@ function isStructuredPatchPayload(raw) {
   } catch {
     return false;
   }
+}
+
+function shouldPreferRuntimeOperator(session) {
+  const runtime = String(session?.operator || "").trim().toUpperCase();
+  const proposed = String(session?.proposedText || "").trim();
+  const explicitBundle = Array.isArray(session?.bundlePatches) && session.bundlePatches.length > 0;
+  if (runtime === "EDIT_DOCX_BUNDLE") {
+    if (explicitBundle) return true;
+    if (!proposed) return false;
+    try {
+      const parsed = JSON.parse(proposed);
+      return Array.isArray(parsed?.patches) && parsed.patches.length > 0;
+    } catch {
+      return false;
+    }
+  }
+  if (explicitBundle) return true;
+  if (!proposed) return false;
+  try {
+    const parsed = JSON.parse(proposed);
+    return Array.isArray(parsed?.patches) && parsed.patches.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+function extractDocxBundlePatchesForApply(session, rawProposedText = "") {
+  const candidates = [];
+  const pushList = (value) => {
+    if (!Array.isArray(value)) return;
+    for (const item of value) {
+      if (item && typeof item === "object") candidates.push(item);
+    }
+  };
+  pushList(session?.bundlePatches);
+  pushList(session?.bundle?.patches);
+  pushList(session?.bundle?.ops);
+  pushList(session?.plan?.ops);
+  try {
+    const parsed = JSON.parse(String(rawProposedText || "").trim() || "{}");
+    pushList(parsed?.patches);
+    pushList(parsed?.ops);
+  } catch {}
+  return candidates;
 }
 
 function normalizeCandidates(session) {
@@ -249,7 +305,18 @@ export default function EditSessionCard({ session, onOpenDoc }) {
     setApplyErr("");
     setApplyPhaseSteps({ apply: "running", save: "queued", refresh: "queued" });
     try {
-      const operatorForApply = safeString(session?.canonicalOperator || session?.operator);
+      const preferRuntime = shouldPreferRuntimeOperator(session);
+      const runtimeOperator = safeString(session?.operator || session?.canonicalOperator).toUpperCase();
+      const fallbackOperator = safeString(session?.canonicalOperator || session?.operator);
+      const effectiveBundlePatches = extractDocxBundlePatchesForApply(session, rawProposedText);
+      const wantsBundleApply = preferRuntime && runtimeOperator === 'EDIT_DOCX_BUNDLE';
+      if (wantsBundleApply && effectiveBundlePatches.length === 0) {
+        setApplyErr("Bundle apply payload is missing patches. Please retry this edit.");
+        setApplyPhaseSteps((prev) => ({ ...prev, apply: "error" }));
+        return;
+      }
+      const isBundleApply = wantsBundleApply && effectiveBundlePatches.length > 0;
+      const operatorForApply = isBundleApply ? 'EDIT_DOCX_BUNDLE' : fallbackOperator;
       const payload = {
         instruction: safeString(session.instruction),
         operator: operatorForApply,
@@ -258,8 +325,8 @@ export default function EditSessionCard({ session, onOpenDoc }) {
         targetHint: session?.targetHint || undefined,
         target: selectedTarget || undefined,
         beforeText: safeString(session.beforeText || beforeText || "(bulk edit)"),
-        proposedText: isBundle
-          ? safeString(rawProposedText || JSON.stringify({ patches: Array.isArray(session?.bundlePatches) ? session.bundlePatches : [] }))
+        proposedText: isBundleApply
+          ? safeString(JSON.stringify({ patches: effectiveBundlePatches }))
           // Prefer canonical proposedText; draftAfter may be a shortened diff rendering.
           : safeString(rawProposedText || (hasStructuredRawProposed && !manualEdit ? rawProposedText : draftAfter)),
         userConfirmed: requiresConfirmation ? confirmed : true,
@@ -273,12 +340,33 @@ export default function EditSessionCard({ session, onOpenDoc }) {
         return;
       }
 
-      const revisionId = res?.result?.revisionId || res?.result?.restoredRevisionId || null;
-      if (revisionId) {
+      const verified = extractVerifiedApply(res);
+      const explicitNoop =
+        res?.result?.applied === false ||
+        res?.applied === false ||
+        /^no changes were needed/i.test(String(res?.receipt?.note || res?.result?.receipt?.note || "").trim());
+      const revisionId =
+        verified?.newRevisionId ||
+        res?.result?.revisionId ||
+        res?.result?.restoredRevisionId ||
+        res?.receipt?.documentId ||
+        res?.result?.receipt?.documentId ||
+        null;
+      const applySucceeded = !explicitNoop && Boolean(revisionId);
+      if (applySucceeded) {
         setApplyPhaseSteps({ apply: "done", save: "done", refresh: "done" });
         setAppliedRevisionId(revisionId);
+        // Notify DocumentViewer to reload canvas so user sees the applied change immediately
+        try {
+          window.dispatchEvent(new CustomEvent("koda:edit-applied", {
+            detail: { editSession: session, revisionId, result: res },
+          }));
+        } catch {}
+      } else if (explicitNoop) {
+        setApplyErr("No changes were saved because the document already matched the requested edit.");
+        setApplyPhaseSteps((prev) => ({ ...prev, apply: "done", save: "error" }));
       } else {
-        setApplyErr("Applied, but no revisionId was returned.");
+        setApplyErr("Apply did not return a saved revision. Please retry.");
         setApplyPhaseSteps((prev) => ({ ...prev, apply: "done", save: "error" }));
       }
     } catch (e) {

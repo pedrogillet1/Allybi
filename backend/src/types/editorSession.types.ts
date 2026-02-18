@@ -81,6 +81,7 @@ export interface EditorSessionApplyRequest {
 export interface EditorSessionApplyResponse {
   sessionId: string;
   status: EditorSessionStatus;
+  applyPath?: string;
   applied?: EditApplyResult;
   receipt?: EditReceipt | null;
   requiresUserChoice?: boolean;

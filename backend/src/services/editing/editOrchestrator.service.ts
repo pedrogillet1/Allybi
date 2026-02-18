@@ -1,9 +1,12 @@
 import { clamp01 } from "../../types/common.types";
 import { logger } from "../../utils/logger";
+import crypto from "crypto";
 import { DiffBuilderService } from "./diffBuilder.service";
 import { EditPlanService } from "./editPlan.service";
 import { EditReceiptService } from "./editReceipt.service";
 import { RationaleBuilderService } from "./rationaleBuilder.service";
+import { ApplyVerificationService } from "./apply/applyVerification.service";
+import { EditingPolicyService } from "./policy/EditingPolicyService";
 import type {
   EditApplyRequest,
   EditApplyResult,
@@ -19,13 +22,6 @@ import type {
   UndoRequest,
   UndoResult,
 } from "./editing.types";
-
-const DEFAULT_POLICY: EditPolicy = {
-  minConfidenceForAutoApply: 0.88,
-  minDecisionMarginForAutoApply: 0.14,
-  minSimilarityForAutoApply: 0.28,
-  alwaysRequireConfirmation: ["EDIT_RANGE", "REPLACE_SLIDE_IMAGE"],
-};
 
 function normalize(input: string): string {
   return input
@@ -55,11 +51,17 @@ function containsAllTokens(text: string, tokens: string[]): boolean {
   return tokens.every((token) => normalized.includes(normalize(token)));
 }
 
+function looksLikeDocxAnnotatedMarkdown(value: string): boolean {
+  return /<!--\s*docx:\d+\s*-->/i.test(String(value || ""));
+}
+
 export class EditOrchestratorService {
   private readonly planService: EditPlanService;
   private readonly diffBuilder: DiffBuilderService;
   private readonly rationaleBuilder: RationaleBuilderService;
   private readonly receiptBuilder: EditReceiptService;
+  private readonly applyVerification: ApplyVerificationService;
+  private readonly policyService: EditingPolicyService;
   private readonly revisionStore?: EditRevisionStore;
   private readonly telemetry?: EditTelemetry;
   private readonly policy: EditPolicy;
@@ -69,6 +71,8 @@ export class EditOrchestratorService {
     diffBuilder?: DiffBuilderService;
     rationaleBuilder?: RationaleBuilderService;
     receiptBuilder?: EditReceiptService;
+    applyVerification?: ApplyVerificationService;
+    policyService?: EditingPolicyService;
     revisionStore?: EditRevisionStore;
     telemetry?: EditTelemetry;
     policy?: Partial<EditPolicy>;
@@ -77,9 +81,11 @@ export class EditOrchestratorService {
     this.diffBuilder = options?.diffBuilder || new DiffBuilderService();
     this.rationaleBuilder = options?.rationaleBuilder || new RationaleBuilderService();
     this.receiptBuilder = options?.receiptBuilder || new EditReceiptService();
+    this.applyVerification = options?.applyVerification || new ApplyVerificationService();
+    this.policyService = options?.policyService || new EditingPolicyService();
     this.revisionStore = options?.revisionStore;
     this.telemetry = options?.telemetry;
-    this.policy = { ...DEFAULT_POLICY, ...(options?.policy || {}) };
+    this.policy = this.policyService.resolvePolicy(options?.policy || {});
   }
 
   async planEdit(ctx: EditExecutionContext, request: EditPlanRequest): Promise<EditPlanResult> {
@@ -140,6 +146,8 @@ export class EditOrchestratorService {
         language: ctx.language || request.plan.constraints.outputLanguage,
         documentId: request.plan.documentId,
         targetId: request.target.id,
+        operator: request.plan.operator,
+        domain: request.plan.domain,
         // UI requirement: do not show internal policy reasons like "similarity below threshold"
         // in the user-facing assistant message. The preview card already indicates review/apply.
         note: undefined,
@@ -202,6 +210,8 @@ export class EditOrchestratorService {
           language: ctx.language || request.plan.constraints.outputLanguage,
           documentId: request.plan.documentId,
           targetId: request.target.id,
+          operator: request.plan.operator,
+          domain: request.plan.domain,
           note: "User confirmation required before committing revision.",
         }),
       };
@@ -213,6 +223,10 @@ export class EditOrchestratorService {
         (request.plan.operator === "EDIT_PARAGRAPH" || request.plan.operator === "EDIT_SPAN" || request.plan.operator === "ADD_PARAGRAPH") &&
         typeof request.proposedHtml === "string" &&
         request.proposedHtml.trim().length > 0;
+      const usesMarkdownDocxBundle =
+        request.plan.domain === "docx" &&
+        request.plan.operator === "EDIT_DOCX_BUNDLE" &&
+        looksLikeDocxAnnotatedMarkdown(request.proposedText);
 
       const revisionContent = canUseRichDocx ? request.proposedHtml!.trim() : request.proposedText;
       const created = await this.revisionStore.createRevision({
@@ -238,7 +252,7 @@ export class EditOrchestratorService {
                 contentFormat: "html",
                 contentPlainText: request.proposedText,
               }
-            : { contentFormat: "plain" }),
+            : { contentFormat: usesMarkdownDocxBundle ? "markdown" : "plain" }),
         },
       });
 
@@ -249,26 +263,151 @@ export class EditOrchestratorService {
         revisionId: created.revisionId,
       });
 
+      const hash = (value: string): string =>
+        crypto.createHash("sha256").update(String(value || ""), "utf8").digest("hex");
+      const beforeMaterial = String(request.beforeText || "");
+      const afterMaterial = canUseRichDocx ? String(request.proposedHtml || "") : String(request.proposedText || "");
+      const fileHashBefore = String(created.fileHashBefore || "").trim() || hash(beforeMaterial);
+      const fileHashAfter = String(created.fileHashAfter || "").trim() || hash(afterMaterial);
+      const backendMetrics = (created as any).applyMetrics && typeof (created as any).applyMetrics === "object"
+        ? (created as any).applyMetrics
+        : null;
+      const applyMetrics = backendMetrics
+        ? {
+            affectedTargetsCount: Math.max(
+              1,
+              Number((backendMetrics as any).changedCellsCount || 0) > 0
+                ? Number((backendMetrics as any).changedCellsCount || 0)
+                : (Array.isArray((backendMetrics as any).affectedRanges) ? (backendMetrics as any).affectedRanges.length : 1),
+            ),
+            changedCellsCount: Math.max(0, Number((backendMetrics as any).changedCellsCount || 0)),
+            changedStructuresCount: Math.max(0, Number((backendMetrics as any).changedStructuresCount || 0)),
+            affectedRanges: Array.isArray((backendMetrics as any).affectedRanges)
+              ? (backendMetrics as any).affectedRanges.map((item: any) => String(item || "").trim()).filter(Boolean)
+              : [],
+            affectedParagraphIds: [] as string[],
+            rejectedOps: Array.isArray((backendMetrics as any).rejectedOps)
+              ? (backendMetrics as any).rejectedOps.map((item: any) => String(item || "").trim()).filter(Boolean)
+              : [],
+          }
+        : {
+            ...this.deriveApplyMetrics({
+              operator: request.plan.operator,
+              targetId: request.target?.id || null,
+              proposedText: request.proposedText,
+            }),
+            changedStructuresCount: 0,
+            rejectedOps: [] as string[],
+          };
+      const diff = preview.diff;
+      const changeCount = (() => {
+        if (backendMetrics) {
+          return Math.max(0, Number(applyMetrics.changedCellsCount || 0) + Number(applyMetrics.changedStructuresCount || 0));
+        }
+        if (Array.isArray(diff?.changes) && diff!.changes.length > 0) return diff!.changes.length;
+        if (fileHashBefore !== fileHashAfter) return 1;
+        return 0;
+      })();
+      const changesetKind: NonNullable<EditApplyResult["changeset"]>["kind"] =
+        request.plan.operator === "EDIT_DOCX_BUNDLE" || request.plan.operator === "COMPUTE_BUNDLE"
+          ? "bundle"
+          : (diff?.kind || "paragraph");
+      const targets = request.target?.id ? [String(request.target.id)] : [];
+      const verification = this.applyVerification.verify({
+        revisionId: created.revisionId || null,
+        fileHashBefore,
+        fileHashAfter,
+        diff: backendMetrics ? undefined : diff,
+        changeCount,
+      });
+      const proof = {
+        verified: verification.verified,
+        fileHashBefore,
+        fileHashAfter,
+        affectedTargetsCount: Math.max(1, applyMetrics.affectedTargetsCount || targets.length),
+        ...(applyMetrics.changedCellsCount > 0 ? { changedCellsCount: applyMetrics.changedCellsCount } : {}),
+        ...(applyMetrics.changedStructuresCount > 0 ? { changedStructuresCount: applyMetrics.changedStructuresCount } : {}),
+        ...(applyMetrics.affectedRanges.length ? { affectedRanges: applyMetrics.affectedRanges } : {}),
+        ...(applyMetrics.affectedParagraphIds.length ? { affectedParagraphIds: applyMetrics.affectedParagraphIds } : {}),
+        ...(applyMetrics.rejectedOps.length ? { rejectedOps: applyMetrics.rejectedOps } : {}),
+        ...(verification.reasons.length ? { warnings: verification.reasons } : {}),
+      };
+
+      // If the document did not actually change, return noop instead of applied.
+      const actuallyChanged = verification.changed;
+      if (!actuallyChanged) {
+        await this.track("edit_noop" as any, ctx, {
+          stage: "noop",
+          documentId: request.plan.documentId,
+          operator: request.plan.operator,
+        });
+        return {
+          ok: true,
+          applied: false,
+          preview,
+          receipt: this.receiptBuilder.build({
+            stage: "noop",
+            language: ctx.language || request.plan.constraints.outputLanguage,
+            documentId: request.plan.documentId,
+            targetId: request.target.id,
+            operator: request.plan.operator,
+            domain: request.plan.domain,
+            note: "EDIT_NOOP_NO_CHANGES",
+          }),
+        };
+      }
+
       return {
         ok: true,
         applied: true,
         revisionId: created.revisionId,
+        baseRevisionId: request.plan.documentId,
+        newRevisionId: created.revisionId,
+        changeset: {
+          kind: changesetKind,
+          changed: true,
+          summary: String(diff?.summary || "Change applied."),
+          changeCount,
+          sampleBefore: String(diff?.before || request.beforeText || ""),
+          sampleAfter: String(diff?.after || request.proposedText || ""),
+          targets,
+        },
+        proof,
         preview,
         receipt: this.receiptBuilder.build({
           stage: "applied",
           language: ctx.language || request.plan.constraints.outputLanguage,
           documentId: created.revisionId,
           targetId: request.target.id,
+          operator: request.plan.operator,
+          domain: request.plan.domain,
         }),
       };
     } catch (error) {
       const message = error instanceof Error ? error.message : "Apply failed";
-      await this.track("edit_failed", ctx, {
-        stage: "apply",
-        operator: request.plan.operator,
+      const isNoop = message.startsWith("EDIT_NOOP");
+      await this.track(isNoop ? "edit_noop" as any : "edit_failed", ctx, {
+        stage: isNoop ? "noop" : "apply",
         documentId: request.plan.documentId,
+        operator: request.plan.operator,
         error: message,
       });
+      if (isNoop) {
+        return {
+          ok: true,
+          applied: false,
+          preview,
+          receipt: this.receiptBuilder.build({
+            stage: "noop",
+            language: ctx.language || request.plan.constraints.outputLanguage,
+            documentId: request.plan.documentId,
+            targetId: request.target.id,
+            operator: request.plan.operator,
+            domain: request.plan.domain,
+            note: "EDIT_NOOP_NO_CHANGES",
+          }),
+        };
+      }
       logger.error("[Editing] apply failed", {
         userId: ctx.userId,
         conversationId: ctx.conversationId,
@@ -278,6 +417,90 @@ export class EditOrchestratorService {
       });
       return { ok: false, applied: false, preview, error: message };
     }
+  }
+
+  private deriveApplyMetrics(input: {
+    operator: EditOperator;
+    targetId: string | null;
+    proposedText: string;
+  }): {
+    affectedTargetsCount: number;
+    changedCellsCount: number;
+    changedStructuresCount: number;
+    affectedRanges: string[];
+    affectedParagraphIds: string[];
+    rejectedOps: string[];
+  } {
+    const affectedRanges = new Set<string>();
+    const affectedParagraphIds = new Set<string>();
+    let changedCellsCount = 0;
+
+    const addRange = (value: unknown) => {
+      const raw = String(value || "").trim();
+      if (!raw) return;
+      if (/^[A-Za-z0-9_ ]+![A-Za-z]{1,3}\d{1,7}(?::[A-Za-z]{1,3}\d{1,7})?$/.test(raw) || /^[A-Za-z]{1,3}\d{1,7}(?::[A-Za-z]{1,3}\d{1,7})?$/.test(raw)) {
+        affectedRanges.add(raw);
+        changedCellsCount += this.estimateRangeCellCount(raw);
+      }
+    };
+
+    const addParagraph = (value: unknown) => {
+      const pid = String(value || "").trim();
+      if (!pid) return;
+      if (pid.startsWith("docx:p:")) affectedParagraphIds.add(pid);
+    };
+
+    addRange(input.targetId);
+    addParagraph(input.targetId);
+
+    try {
+      const payload = JSON.parse(String(input.proposedText || "{}"));
+      if (Array.isArray(payload?.patches)) {
+        for (const patch of payload.patches) {
+          addRange((patch as any)?.rangeA1 || (patch as any)?.a1 || (patch as any)?.range);
+          addParagraph((patch as any)?.paragraphId);
+        }
+      }
+      if (Array.isArray(payload?.ops)) {
+        for (const op of payload.ops) {
+          addRange((op as any)?.rangeA1 || (op as any)?.a1 || (op as any)?.range || (op as any)?.sourceRange);
+        }
+      }
+    } catch {
+      // plain-text edits do not carry JSON ops.
+    }
+
+    return {
+      affectedTargetsCount: Math.max(affectedRanges.size, affectedParagraphIds.size, input.targetId ? 1 : 0),
+      changedCellsCount,
+      changedStructuresCount: 0,
+      affectedRanges: Array.from(affectedRanges),
+      affectedParagraphIds: Array.from(affectedParagraphIds),
+      rejectedOps: [],
+    };
+  }
+
+  private estimateRangeCellCount(a1: string): number {
+    const range = String(a1 || "").split("!").pop() || "";
+    const m = range.match(/^([A-Za-z]{1,3})(\d{1,7})(?::([A-Za-z]{1,3})(\d{1,7}))?$/);
+    if (!m) return 0;
+    const c1 = this.colToIndex(m[1]);
+    const r1 = Number(m[2]);
+    const c2 = m[3] ? this.colToIndex(m[3]) : c1;
+    const r2 = m[4] ? Number(m[4]) : r1;
+    if (!Number.isFinite(c1) || !Number.isFinite(c2) || !Number.isFinite(r1) || !Number.isFinite(r2)) return 0;
+    return Math.max(1, (Math.abs(c2 - c1) + 1) * (Math.abs(r2 - r1) + 1));
+  }
+
+  private colToIndex(col: string): number {
+    let out = 0;
+    const s = String(col || "").toUpperCase();
+    for (let i = 0; i < s.length; i += 1) {
+      const code = s.charCodeAt(i);
+      if (code < 65 || code > 90) return 0;
+      out = out * 26 + (code - 64);
+    }
+    return out;
   }
 
   async undoEdit(ctx: EditExecutionContext, request: UndoRequest): Promise<UndoResult> {

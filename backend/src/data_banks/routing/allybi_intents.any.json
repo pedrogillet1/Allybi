@@ -99,6 +99,30 @@
       "negative_examples": ["Set heading size to 16pt"]
     },
     {
+      "intent_id": "DOCX_TEXT_CASE",
+      "filetype_scope": ["docx"],
+      "requires_selection": "optional",
+      "requires_explicit_range": false,
+      "requires_confirmation": true,
+      "default_scope": "selection_then_paragraph",
+      "allowed_fallbacks": [],
+      "examples_en": ["Make all headings title case", "Make this uppercase", "Convert to lowercase", "Apply sentence case"],
+      "examples_pt": ["Coloque todos os títulos com iniciais maiúsculas", "Deixe em maiúsculas", "Converter para minúsculas", "Coloque em caixa de frase"],
+      "negative_examples": ["Make this bold", "Rewrite this paragraph", "Coloque em negrito"]
+    },
+    {
+      "intent_id": "DOCX_SUMMARIZE_TO_BULLETS",
+      "filetype_scope": ["docx"],
+      "requires_selection": "optional",
+      "requires_explicit_range": false,
+      "requires_confirmation": false,
+      "default_scope": "selection_then_paragraph",
+      "allowed_fallbacks": ["DOCX_LIST_CONVERT"],
+      "examples_en": ["Summarize into bullet points", "Extract key points as bullets", "Break down into key points as bullets"],
+      "examples_pt": ["Resuma em tópicos", "Extraia os pontos chave em bullets", "Sintetize em marcadores"],
+      "negative_examples": ["Convert to bullet points", "Add bullets", "Converta em tópicos"]
+    },
+    {
       "intent_id": "XLSX_SET_VALUE",
       "filetype_scope": ["xlsx"],
       "requires_selection": "optional",

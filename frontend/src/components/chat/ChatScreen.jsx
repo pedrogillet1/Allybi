@@ -28,7 +28,7 @@ import chatService from "../../services/chatService";
  *  - URL contains conversation ID for refresh persistence (uses replaceState to avoid re-renders)
  */
 
-const STORAGE_KEY = "currentConversationId";
+const STORAGE_KEY_PREFIX = "currentConversationId";
 
 function makeEphemeralConversation() {
   const now = new Date().toISOString();
@@ -61,8 +61,12 @@ export default function ChatScreen() {
   const { conversationId: urlConversationId } = useParams();
   const isMobile = useIsMobile();
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { open: openOnboarding } = useOnboarding();
+  const conversationStorageKey = useMemo(
+    () => `${STORAGE_KEY_PREFIX}:${String(user?.id || "anon")}`,
+    [user?.id]
+  );
 
   const [showNotificationsPopup, setShowNotificationsPopup] = useState(false);
 
@@ -95,7 +99,7 @@ export default function ChatScreen() {
       return navConvo;
     }
 
-    const savedId = localStorage.getItem(STORAGE_KEY);
+    const savedId = localStorage.getItem(conversationStorageKey);
     if (savedId && savedId !== "new") {
       hadInitialConversationRef.current = true;
       return { id: savedId, title: "Loading…" };
@@ -113,6 +117,13 @@ export default function ChatScreen() {
     }
   }, [location.state]);
 
+  useEffect(() => {
+    if (!currentConversation || !isEphemeral(currentConversation)) return;
+    const savedId = localStorage.getItem(conversationStorageKey);
+    if (!savedId || savedId === "new") return;
+    setCurrentConversation({ id: savedId, title: "Loading…" });
+  }, [conversationStorageKey, currentConversation]);
+
   // ---------------------------------------------------------------------------
   // Persist current conversation id + sync URL bar
   // ---------------------------------------------------------------------------
@@ -120,13 +131,13 @@ export default function ChatScreen() {
     if (!currentConversation) return;
 
     if (!isEphemeral(currentConversation) && currentConversation.id) {
-      localStorage.setItem(STORAGE_KEY, currentConversation.id);
+      localStorage.setItem(conversationStorageKey, currentConversation.id);
       silentReplaceUrl(buildRoute.chat(currentConversation.id));
     } else {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(conversationStorageKey);
       silentReplaceUrl(ROUTES.CHAT);
     }
-  }, [currentConversation]);
+  }, [conversationStorageKey, currentConversation]);
 
   // ---------------------------------------------------------------------------
   // If we only have a minimal placeholder (title === "Loading…"), resolve the
@@ -173,8 +184,25 @@ export default function ChatScreen() {
         if (match) {
           setCurrentConversation((prev) => ({ ...prev, ...match }));
         } else {
-          // Conversation was deleted — reset to new chat
-          setCurrentConversation(makeEphemeralConversation());
+          try {
+            const convo = await chatService.getConversation(currentConversation.id);
+            if (cancelled) return;
+            if (convo?.id) {
+              setCurrentConversation((prev) => ({
+                ...prev,
+                id: convo.id,
+                title: convo.title || prev?.title || "New Chat",
+                updatedAt: convo.updatedAt || prev?.updatedAt,
+                createdAt: convo.createdAt || prev?.createdAt,
+                isEphemeral: false,
+              }));
+              return;
+            }
+          } catch (detailErr) {
+            if (detailErr?.response?.status === 404) {
+              setCurrentConversation(makeEphemeralConversation());
+            }
+          }
         }
       } catch {
         // Keep current state on transient errors (500, network, rate-limit)

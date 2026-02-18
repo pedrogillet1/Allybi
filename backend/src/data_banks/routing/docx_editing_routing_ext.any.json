@@ -27,6 +27,92 @@
   },
   "rules": [
     {
+      "ruleId": "DX_122_docx_text_case",
+      "priority": 122,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\btitle\\s*case\\b",
+              "\\b(?:upper\\s*case|uppercase|all\\s+caps)\\b",
+              "\\b(?:lower\\s*case|lowercase)\\b",
+              "\\bsentence\\s*case\\b",
+              "\\bcapitali[sz]e\\b.{0,20}\\b(?:words?|each)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(?:mai[uú]sculas?|caixa\\s+alta)\\b",
+              "\\b(?:min[uú]sculas?|caixa\\s+baixa)\\b",
+              "\\bcapitalizar\\b",
+              "\\biniciais\\s+mai[uú]sculas?\\b",
+              "\\bcaixa\\s+de\\s+frase\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_DOCX_BUNDLE",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "transform": "text_case_change"
+        }
+      },
+      "confidenceBoost": 0.16,
+      "reasonCode": "docx_text_case"
+    },
+    {
+      "ruleId": "DX_121_docx_summarize_to_bullets",
+      "priority": 121,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(?:summarize|summarise)\\b.{0,20}\\b(?:into|as|to)\\b.{0,10}\\bbullet(?:s|\\s+points?)?\\b",
+              "\\b(?:break\\s+down|extract)\\b.{0,20}\\b(?:key|main)\\s+points?\\b.{0,15}\\bbullets?\\b",
+              "\\bextract\\b.{0,15}\\bkey\\s+points?\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(?:resumir|resuma|sintetizar|sintetize)\\b.{0,20}\\b(?:em|como|para)\\b.{0,10}\\b(?:t[oó]picos|bullets?|marcadores?)\\b",
+              "\\b(?:extrair|extraia)\\b.{0,20}\\b(?:pontos|ideias)\\s+(?:chave|principais)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_DOCX_BUNDLE",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "transform": "paragraph_to_bullets_semantic",
+          "summarize": true
+        }
+      },
+      "confidenceBoost": 0.14,
+      "reasonCode": "docx_summarize_to_bullets"
+    },
+    {
       "ruleId": "DX_120_docx_word_or_selection_precise_edit",
       "priority": 120,
       "supportedLocales": [

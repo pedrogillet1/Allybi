@@ -57,6 +57,7 @@
       "EDIT_RANGE",
       "ADD_SHEET",
       "RENAME_SHEET",
+      "DELETE_SHEET",
       "CREATE_CHART",
       "COMPUTE",
       "COMPUTE_BUNDLE",
@@ -66,6 +67,7 @@
     ],
     "alwaysConfirm": [
       "EDIT_RANGE",
+      "DELETE_SHEET",
       "COMPUTE_BUNDLE",
       "REPLACE_SLIDE_IMAGE"
     ]

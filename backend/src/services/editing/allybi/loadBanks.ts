@@ -1,7 +1,4 @@
-import { getOptionalBank } from "../../core/banks/bankLoader.service";
-import * as fs from "fs";
-import * as path from "path";
-import { resolveDataDir } from "../../../utils/resolveDataDir";
+import { safeEditingBank } from "../banks/bankService";
 
 export interface AllybiBanks {
   capabilities: any;
@@ -45,43 +42,7 @@ export interface AllybiBanks {
 }
 
 function safeBank<T = any>(id: string): T | null {
-  try {
-    const loaded = getOptionalBank<T>(id);
-    if (loaded) return loaded;
-  } catch {
-    // Ignore and attempt file fallback below.
-  }
-
-  // Fallback for test environments where bank loader is not initialized.
-  try {
-    const dataDir = resolveDataDir();
-    const categories = [
-      "semantics",
-      "routing",
-      "operators",
-      "triggers",
-      "scope",
-      "microcopy",
-      "overlays",
-      "policies",
-      "quality",
-      "dictionaries",
-      "templates",
-      "probes",
-      "intent_patterns",
-      "lexicons",
-      "parsers",
-    ];
-    for (const category of categories) {
-      const p = path.join(dataDir, category, `${id}.any.json`);
-      if (!fs.existsSync(p)) continue;
-      const parsed = JSON.parse(fs.readFileSync(p, "utf8")) as T;
-      return parsed;
-    }
-  } catch {
-    return null;
-  }
-  return null;
+  return safeEditingBank<T>(id);
 }
 
 export function loadAllybiBanks(): AllybiBanks {

@@ -5,7 +5,7 @@ import { SlidesClientService } from "../services/editing/slides/slidesClient.ser
 import { UPLOAD_CONFIG } from "../config/upload.config";
 import { createNanoBananaClientFromEnv } from "../services/creative/nanoBananaFactory";
 import RevisionService from "../services/documents/revision.service";
-import { addDocumentJob } from "../queues/document.queue";
+import DocumentRevisionStoreService from "../services/editing/documentRevisionStore.service";
 import * as crypto from "crypto";
 
 type SlidesStudioContext = {
@@ -1025,26 +1025,16 @@ router.post("/export", async (req: any, res: Response): Promise<void> => {
       return;
     }
 
-    const storageKey = `users/${userId}/docs/${sourceDoc.id}/${Date.now()}-${(sourceDoc.filename || "deck.pptx").replace(/[^a-zA-Z0-9._-]+/g, "-")}`;
-    await uploadFile(storageKey, pptxBytes, mimeType);
-
-    await prisma.document.update({
-      where: { id: sourceDoc.id },
-      data: {
-        encryptedFilename: storageKey,
-        fileSize: pptxBytes.length,
-        mimeType,
-        status: "uploaded",
-        error: null,
-      },
-    });
-
-    await addDocumentJob({
+    const store = new DocumentRevisionStoreService();
+    await store.storeEditedBuffer({
       documentId: sourceDoc.id,
       userId,
-      filename: sourceDoc.filename || "deck.pptx",
-      mimeType,
-      encryptedFilename: storageKey,
+      editedBuffer: pptxBytes,
+      operator: "EXPORT_SLIDES",
+      correlationId: ctx.correlationId,
+      conversationId: ctx.conversationId,
+      clientMessageId: ctx.clientMessageId,
+      metadata: { source: "pptx_studio", slidesPresentationId: presentationId },
     });
 
     res.json({ ok: true, mode: "overwrite", documentId: sourceDoc.id });

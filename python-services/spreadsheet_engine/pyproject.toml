@@ -1,0 +1,16 @@
+[project]
+name = "koda-spreadsheet-engine"
+version = "0.1.0"
+description = "Python-centered spreadsheet execution engine for Koda"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.30.0",
+  "pydantic>=2.7.0",
+  "google-api-python-client>=2.149.0",
+  "google-auth>=2.35.0",
+]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"

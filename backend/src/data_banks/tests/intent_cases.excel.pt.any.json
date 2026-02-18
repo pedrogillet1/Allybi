@@ -117,6 +117,30 @@
       }
     },
     {
+      "_comment": "=== DEFINIR VALOR: substituir valor selecionado ===",
+      "id": "pt_set_value_single_02_replace_selected",
+      "input": "Substitua o valor selecionado por aprovado",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "F2"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.single"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_CELL_VALUE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
       "_comment": "=== DEFINIR VALOR: converter numérico ===",
       "id": "pt_set_value_numeric_convert_01",
       "input": "Converta os valores de texto em B2:B100 para numérico",

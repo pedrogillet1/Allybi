@@ -9,17 +9,22 @@ import { logger } from "../../infra/logger";
 import cacheService from "../cache.service";
 import type { EditRevisionStore } from "./editing.types";
 import { DocxEditorService } from "./docx/docxEditor.service";
-import { XlsxFileEditorService } from "./xlsx/xlsxFileEditor.service";
+import { buildDocxBundlePatchesFromMarkdown } from "./docx/docxMarkdownBridge.service";
 import { SlidesClientService } from "./slides/slidesClient.service";
 import { SlidesEditorService } from "./slides/slidesEditor.service";
-import { SheetsEditorService } from "./sheets/sheetsEditor.service";
-import { SheetsChartService } from "./sheets/sheetsChart.service";
-import { SheetsFormulaService } from "./sheets/sheetsFormula.service";
-import { SheetsTableService } from "./sheets/sheetsTable.service";
 import SheetsBridgeService from "./sheets/sheetsBridge.service";
-import { SheetsBridgeError } from "./sheets/sheetsBridge.service";
-import { SheetsClientError } from "./sheets/sheetsClient.service";
+import {
+  applyPatchOpsToSpreadsheetModel,
+  buildSemanticIndex,
+  buildSpreadsheetModelFromXlsx,
+  compileSpreadsheetModelToXlsx,
+  computeOpsToPatchPlan,
+  diffSpreadsheetModels,
+  summarizePatchStatuses,
+} from "./spreadsheetModel";
 import { looksLikeTruncatedSpanPayload } from "./docxSpanPayloadGuard";
+import SpreadsheetEngineService from "../spreadsheetEngine/spreadsheetEngine.service";
+import type { SpreadsheetEngineOp } from "../spreadsheetEngine/spreadsheetEngine.types";
 
 function asString(v: unknown): string | null {
   return typeof v === "string" && v.trim() ? v.trim() : null;
@@ -56,6 +61,15 @@ function keepUndoHistory(): boolean {
 
 function sha256(buffer: Buffer): string {
   return crypto.createHash("sha256").update(buffer).digest("hex");
+}
+
+function isParagraphTargetNotFoundError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error || "");
+  return /Paragraph target not found:/i.test(message);
+}
+
+function looksLikeDocxAnnotatedMarkdown(value: string): boolean {
+  return /<!--\s*docx:\d+\s*-->/i.test(String(value || ""));
 }
 
 function safeJsonParseObject(value: unknown): Record<string, any> {
@@ -202,6 +216,7 @@ type EditOperatorLike =
   | "EDIT_RANGE"
   | "ADD_SHEET"
   | "RENAME_SHEET"
+  | "DELETE_SHEET"
   | "CREATE_CHART"
   | "COMPUTE"
   | "COMPUTE_BUNDLE"
@@ -213,37 +228,25 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
   private readonly idempotencyResults = new Map<string, { revisionId: string; createdAtMs: number }>();
   private readonly revisionService: RevisionService;
   private readonly docxEditor: DocxEditorService;
-  private readonly xlsxEditor: XlsxFileEditorService;
   private readonly slidesClient: SlidesClientService;
   private readonly slidesEditor: SlidesEditorService;
-  private readonly sheetsEditor: SheetsEditorService;
-  private readonly sheetsChart: SheetsChartService;
-  private readonly sheetsFormula: SheetsFormulaService;
-  private readonly sheetsTable: SheetsTableService;
   private readonly sheetsBridge: SheetsBridgeService;
+  private readonly spreadsheetEngine: SpreadsheetEngineService;
 
   constructor(opts?: {
     revisionService?: RevisionService;
     docxEditor?: DocxEditorService;
-    xlsxEditor?: XlsxFileEditorService;
     slidesClient?: SlidesClientService;
     slidesEditor?: SlidesEditorService;
-    sheetsEditor?: SheetsEditorService;
-    sheetsChart?: SheetsChartService;
-    sheetsFormula?: SheetsFormulaService;
-    sheetsTable?: SheetsTableService;
     sheetsBridge?: SheetsBridgeService;
+    spreadsheetEngine?: SpreadsheetEngineService;
   }) {
     this.revisionService = opts?.revisionService ?? new RevisionService();
     this.docxEditor = opts?.docxEditor ?? new DocxEditorService();
-    this.xlsxEditor = opts?.xlsxEditor ?? new XlsxFileEditorService();
     this.slidesClient = opts?.slidesClient ?? new SlidesClientService();
     this.slidesEditor = opts?.slidesEditor ?? new SlidesEditorService();
-    this.sheetsEditor = opts?.sheetsEditor ?? new SheetsEditorService();
-    this.sheetsChart = opts?.sheetsChart ?? new SheetsChartService();
-    this.sheetsFormula = opts?.sheetsFormula ?? new SheetsFormulaService();
-    this.sheetsTable = opts?.sheetsTable ?? new SheetsTableService();
     this.sheetsBridge = opts?.sheetsBridge ?? new SheetsBridgeService();
+    this.spreadsheetEngine = opts?.spreadsheetEngine ?? new SpreadsheetEngineService();
   }
 
   private async reprocessEditedDocument(input: {
@@ -313,7 +316,7 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     expectedDocumentUpdatedAtIso?: string;
     expectedDocumentFileHash?: string;
     metadata?: Record<string, unknown>;
-  }): Promise<{ revisionId: string }> {
+  }): Promise<{ revisionId: string; fileHashBefore?: string; fileHashAfter?: string }> {
     const docId = input.documentId.trim();
     const userId = input.userId.trim();
     const meta = input.metadata ?? {};
@@ -334,7 +337,37 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       op = "COMPUTE_BUNDLE";
     }
     const beforeText = asString(meta.beforeText) ?? null;
-    const contentFormat = asString(meta.contentFormat) === "html" ? "html" : "plain";
+    const rawContentFormat = String(asString(meta.contentFormat) || "").trim().toLowerCase();
+    const contentFormat: "plain" | "html" | "markdown" =
+      rawContentFormat === "html" ? "html" : rawContentFormat === "markdown" ? "markdown" : "plain";
+    const paragraphContentFormat = contentFormat === "html" ? "html" : "plain";
+    // Defensive routing: if a DOCX edit payload contains bundle patches but the
+    // caller sent a non-bundle operator, force bundle apply to avoid writing raw
+    // JSON text into a paragraph.
+    if (op !== "EDIT_DOCX_BUNDLE") {
+      try {
+        const parsed = JSON.parse(String(input.content || "{}"));
+        if (Array.isArray((parsed as any)?.patches) && (parsed as any).patches.length > 0) {
+          const docxPatchKinds = new Set([
+            "docx_paragraph", "docx_delete_paragraph",
+            "docx_set_run_style", "docx_clear_run_style",
+            "docx_set_alignment", "docx_set_indentation",
+            "docx_set_line_spacing", "docx_set_para_spacing",
+            "docx_set_para_style", "docx_set_text_case",
+            "docx_merge_paragraphs", "docx_split_to_list",
+            "docx_list_promote_demote", "docx_delete_section",
+            "docx_insert_before",
+          ]);
+          const bundleLike = (parsed as any).patches.every((p: any) => {
+            const kind = String(p?.kind || "").trim();
+            return docxPatchKinds.has(kind);
+          });
+          if (bundleLike) op = "EDIT_DOCX_BUNDLE";
+        }
+      } catch {
+        // non-JSON content: keep original operator
+      }
+    }
 
     const doc = await prisma.document.findFirst({
       where: { id: docId, userId },
@@ -384,13 +417,14 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     }
 
     const original = await downloadFile(doc.encryptedFilename);
+    const fileHashBefore = String(doc.fileHash || "").trim() || sha256(original);
 
     let edited: Buffer;
 
     if (op === "EDIT_PARAGRAPH") {
       assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "EDIT_PARAGRAPH");
       if (!targetId) throw new Error("EDIT_PARAGRAPH requires targetId.");
-      edited = await this.docxEditor.applyParagraphEdit(original, targetId, input.content, { format: contentFormat });
+      edited = await this.docxEditor.applyParagraphEdit(original, targetId, input.content, { format: paragraphContentFormat });
     } else if (op === "EDIT_SPAN") {
       assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "EDIT_SPAN");
       if (!targetId) throw new Error("EDIT_SPAN requires targetId.");
@@ -404,36 +438,285 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
           );
         }
       }
-      edited = await this.docxEditor.applyParagraphEdit(original, targetId, input.content, { format: contentFormat });
+      edited = await this.docxEditor.applyParagraphEdit(original, targetId, input.content, { format: paragraphContentFormat });
     } else if (op === "EDIT_DOCX_BUNDLE") {
       assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "EDIT_DOCX_BUNDLE");
-      // content is JSON: { patches: [{ kind:"docx_paragraph", paragraphId, afterHtml }] }
-      let payload: any = {};
+      const rawContent = String(input.content || "").trim();
+      let patches: any[] = [];
+
       try {
-        payload = JSON.parse(String(input.content || "{}"));
+        const payload = JSON.parse(rawContent || "{}");
+        patches = Array.isArray(payload?.patches) ? payload.patches : [];
       } catch {
-        throw new Error('EDIT_DOCX_BUNDLE requires JSON content like {"patches":[...]}');
+        // Non-JSON payloads can still be valid when bundle content is markdown.
       }
-      const patches = Array.isArray(payload?.patches) ? payload.patches : [];
+
+      if (patches.length === 0 && rawContent) {
+        const shouldUseMarkdownBridge = contentFormat === "markdown" || looksLikeDocxAnnotatedMarkdown(rawContent);
+        if (shouldUseMarkdownBridge) {
+          const markdownParagraphMap = Array.isArray((meta as any).paragraphMap)
+            ? (meta as any).paragraphMap
+            : undefined;
+          const markdownPlan = await buildDocxBundlePatchesFromMarkdown(original, rawContent, markdownParagraphMap);
+          patches = Array.isArray(markdownPlan.bundlePatches) ? markdownPlan.bundlePatches : [];
+        }
+      }
+
+      if (patches.length === 0) {
+        throw new Error(
+          'EDIT_DOCX_BUNDLE requires JSON {"patches":[...]} or annotated markdown content (<!-- docx:N --> markers).',
+        );
+      }
+
       let buf = original;
+      let patchesApplied = 0;
+
+      // Phase 1: Apply all content edits (docx_paragraph) first
       for (const p of patches) {
         if (!p || typeof p !== "object") continue;
         const kind = String((p as any).kind || "").trim();
-        if (kind === "docx_paragraph") {
-          const pid = String((p as any).paragraphId || "").trim();
-          const afterHtml = String((p as any).afterHtml || "").trim();
-          const removeNumbering = Boolean((p as any).removeNumbering);
-          const applyNumbering = Boolean((p as any).applyNumbering);
-          if (!pid || !afterHtml) continue;
+        if (kind !== "docx_paragraph") continue;
+        const pid = String((p as any).paragraphId || "").trim();
+        const afterHtml = String((p as any).afterHtml || "").trim();
+        const removeNumbering = Boolean((p as any).removeNumbering);
+        const applyNumbering = Boolean((p as any).applyNumbering);
+        const applyNumberingType = String((p as any).applyNumberingType || "").trim().toLowerCase() === "numbered"
+          ? "numbered"
+          : (String((p as any).applyNumberingType || "").trim().toLowerCase() === "bulleted" ? "bulleted" : undefined);
+        if (!pid || !afterHtml) continue;
+        const before = buf;
+        try {
           // eslint-disable-next-line no-await-in-loop
-          buf = await this.docxEditor.applyParagraphEdit(buf, pid, afterHtml, { format: "html", removeNumbering, applyNumbering });
-        } else if (kind === "docx_delete_paragraph") {
-          const pid = String((p as any).paragraphId || "").trim();
-          if (!pid) continue;
-          // eslint-disable-next-line no-await-in-loop
-          buf = await this.docxEditor.deleteParagraph(buf, pid);
+          buf = await this.docxEditor.applyParagraphEdit(buf, pid, afterHtml, { format: "html", removeNumbering, applyNumbering, applyNumberingType });
+          if (!buf.equals(before)) patchesApplied++;
+        } catch (error) {
+          if (isParagraphTargetNotFoundError(error)) {
+            logger.warn("[Editing][DOCX_BUNDLE] Skipping stale paragraph patch target", {
+              kind,
+              paragraphId: pid,
+            });
+            continue;
+          }
+          throw error;
         }
       }
+
+      // Phase 1.5: Structural & formatting patches
+      for (const p of patches) {
+        if (!p || typeof p !== "object") continue;
+        const kind = String((p as any).kind || "").trim();
+        const pid = String((p as any).paragraphId || "").trim();
+        const before = buf;
+        try {
+          switch (kind) {
+          // --- Run-level formatting ---
+          case "docx_set_run_style": {
+            if (!pid) continue;
+            const style: Record<string, unknown> = {};
+            if ((p as any).bold != null) style.bold = Boolean((p as any).bold);
+            if ((p as any).italic != null) style.italic = Boolean((p as any).italic);
+            if ((p as any).underline != null) style.underline = Boolean((p as any).underline);
+            if ((p as any).color) style.color = String((p as any).color);
+            if ((p as any).fontFamily) style.fontFamily = String((p as any).fontFamily);
+            if ((p as any).fontSizePt) style.fontSizePt = Number((p as any).fontSizePt);
+            buf = await this.docxEditor.applyRunStyle(buf, pid, style as any);
+            break;
+          }
+          case "docx_clear_run_style": {
+            if (!pid) continue;
+            buf = await this.docxEditor.clearRunStyle(buf, pid);
+            break;
+          }
+          // --- Paragraph-level formatting ---
+          case "docx_set_alignment": {
+            if (!pid) continue;
+            const alignment = String((p as any).alignment || "").trim().toLowerCase();
+            if (!alignment) continue;
+            buf = await this.docxEditor.setAlignment(buf, pid, alignment);
+            break;
+          }
+          case "docx_set_indentation": {
+            if (!pid) continue;
+            const opts: Record<string, number> = {};
+            if ((p as any).leftPt != null) opts.leftPt = Number((p as any).leftPt);
+            if ((p as any).rightPt != null) opts.rightPt = Number((p as any).rightPt);
+            if ((p as any).firstLinePt != null) opts.firstLinePt = Number((p as any).firstLinePt);
+            buf = await this.docxEditor.setIndentation(buf, pid, opts as any);
+            break;
+          }
+          case "docx_set_line_spacing": {
+            if (!pid) continue;
+            const multiplier = Number((p as any).lineSpacing || (p as any).multiplier);
+            if (!Number.isFinite(multiplier) || multiplier <= 0) continue;
+            buf = await this.docxEditor.setLineSpacing(buf, pid, multiplier);
+            break;
+          }
+          case "docx_set_para_spacing": {
+            if (!pid) continue;
+            const opts: Record<string, number> = {};
+            if ((p as any).beforePt != null) opts.beforePt = Number((p as any).beforePt);
+            if ((p as any).afterPt != null) opts.afterPt = Number((p as any).afterPt);
+            buf = await this.docxEditor.setParagraphSpacing(buf, pid, opts as any);
+            break;
+          }
+          case "docx_set_para_style": {
+            if (!pid) continue;
+            const styleName = String((p as any).styleName || "").trim();
+            if (!styleName) continue;
+            buf = await this.docxEditor.setParagraphStyle(buf, pid, styleName);
+            break;
+          }
+          // --- Text case ---
+          case "docx_set_text_case": {
+            if (!pid) continue;
+            const targetCase = String((p as any).targetCase || (p as any).caseType || "").trim().toLowerCase();
+            if (!targetCase) continue;
+            buf = await this.docxEditor.setTextCase(buf, pid, targetCase);
+            break;
+          }
+          // --- List structural ---
+          case "docx_merge_paragraphs": {
+            const pids = Array.isArray((p as any).paragraphIds)
+              ? (p as any).paragraphIds.map((id: any) => String(id || "").trim()).filter(Boolean)
+              : [];
+            if (pids.length < 2) continue;
+            const separator = typeof (p as any).joinSeparator === "string" ? (p as any).joinSeparator : " ";
+            buf = await this.docxEditor.mergeParagraphs(buf, pids, separator);
+            break;
+          }
+          case "docx_split_to_list": {
+            if (!pid) continue;
+            const items = Array.isArray((p as any).items) ? (p as any).items.map((i: any) => String(i || "")) : [];
+            if (!items.length) continue;
+            const listType = String((p as any).listType || "bulleted").trim().toLowerCase() === "numbered" ? "numbered" : "bulleted";
+            buf = await this.docxEditor.splitParagraphToList(buf, pid, items, listType as any);
+            break;
+          }
+          case "docx_list_promote_demote": {
+            if (!pid) continue;
+            const direction = String((p as any).direction || "").trim().toLowerCase();
+            if (direction !== "promote" && direction !== "demote") continue;
+            buf = await this.docxEditor.promoteOrDemoteListLevel(buf, pid, direction as any);
+            break;
+          }
+          case "docx_list_apply_bullets": {
+            if (!pid) continue;
+            buf = await this.docxEditor.applyListFormatting(buf, pid, "bulleted");
+            break;
+          }
+          case "docx_list_apply_numbering": {
+            if (!pid) continue;
+            buf = await this.docxEditor.applyListFormatting(buf, pid, "numbered");
+            break;
+          }
+          case "docx_list_remove": {
+            if (!pid) continue;
+            buf = await this.docxEditor.removeListFormatting(buf, pid);
+            break;
+          }
+          case "docx_list_restart_numbering": {
+            if (!pid) continue;
+            const startAt = (p as any).startAt != null ? Number((p as any).startAt) : 1;
+            buf = await this.docxEditor.restartListNumbering(buf, pid, startAt);
+            break;
+          }
+          case "docx_split_paragraph": {
+            if (!pid) continue;
+            const splitItems = Array.isArray((p as any).items) ? (p as any).items.map((i: any) => String(i || "")) : [];
+            const splitListType = String((p as any).listType || "bulleted").trim().toLowerCase() === "numbered" ? "numbered" : "bulleted";
+            if (!splitItems.length) continue;
+            buf = await this.docxEditor.splitParagraphToList(buf, pid, splitItems, splitListType as any);
+            break;
+          }
+          case "docx_update_toc": {
+            buf = await this.docxEditor.updateTableOfContents(buf);
+            break;
+          }
+          // --- Section operations ---
+          case "docx_delete_section": {
+            const headingPid = String((p as any).headingParagraphId || pid || "").trim();
+            if (!headingPid) continue;
+            buf = await this.docxEditor.deleteSection(buf, headingPid);
+            break;
+          }
+          case "docx_insert_before": {
+            if (!pid) continue;
+            const content = String((p as any).content || (p as any).afterText || (p as any).afterHtml || "").trim();
+            if (!content) continue;
+            const format = String((p as any).format || "plain").trim().toLowerCase() === "html" ? "html" : "plain";
+            buf = await this.docxEditor.insertParagraphBefore(buf, pid, content, { format: format as any });
+            break;
+          }
+          default:
+            // Unknown patch kind — skip (docx_paragraph and docx_delete_paragraph handled in other phases)
+            continue;
+          }
+        } catch (error) {
+          if (isParagraphTargetNotFoundError(error)) {
+            logger.warn("[Editing][DOCX_BUNDLE] Skipping stale structural/format patch target", {
+              kind,
+              paragraphId: pid || null,
+            });
+            continue;
+          }
+          throw error;
+        }
+
+        if (!buf.equals(before)) patchesApplied++;
+      }
+
+      // Phase 2: Batch all deletions in a single pass (reverse order preserves indices)
+      const deletePids = patches
+        .filter((p: any) => p && String((p as any).kind || "").trim() === "docx_delete_paragraph")
+        .map((p: any) => String((p as any).paragraphId || "").trim())
+        .filter(Boolean);
+      if (deletePids.length) {
+        const before = buf;
+        buf = await this.docxEditor.deleteParagraphs(buf, deletePids);
+        if (!buf.equals(before)) patchesApplied += deletePids.length;
+      }
+
+      if (patchesApplied === 0) {
+        throw new Error("EDIT_NOOP: All patches resulted in no changes to the document.");
+      }
+
+      // Verification gate: re-parse output and check structural invariants
+      try {
+        const { DocxAnchorsService } = await import("./docx/docxAnchors.service");
+        const verifyAnchors = new DocxAnchorsService();
+        const originalAnchors = await verifyAnchors.extractParagraphNodes(original);
+        const editedAnchors = await verifyAnchors.extractParagraphNodes(buf);
+        const origCount = originalAnchors.length;
+        const editCount = editedAnchors.length;
+        // Sanity: document should not lose more than half its paragraphs unexpectedly
+        if (editCount < Math.ceil(origCount * 0.3) && origCount > 4) {
+          throw new Error(
+            `EDIT_VERIFY_FAIL: Document shrank from ${origCount} to ${editCount} paragraphs (>70% loss). ` +
+            `Rolling back to prevent data loss.`
+          );
+        }
+        // Check merge invariant: if docx_merge_paragraphs was used, verify the merge target still exists
+        const mergePatch = patches.find((p: any) => String(p?.kind || "") === "docx_merge_paragraphs");
+        if (mergePatch) {
+          const mergedPids: string[] = Array.isArray((mergePatch as any).paragraphIds) ? (mergePatch as any).paragraphIds : [];
+          const removedCount = mergedPids.length - 1; // all but first should be removed
+          const expectedCount = origCount - removedCount;
+          if (editCount > expectedCount + 1 || editCount < expectedCount - 1) {
+            logger.warn("[Editing][DOCX_BUNDLE] Merge paragraph count mismatch", {
+              expected: expectedCount, actual: editCount, mergedPids: mergedPids.length,
+            });
+          }
+        }
+      } catch (verifyErr: any) {
+        if (String(verifyErr?.message || "").startsWith("EDIT_VERIFY_FAIL:")) {
+          throw verifyErr;
+        }
+        // Non-fatal verification errors: log but don't block the edit
+        logger.warn("[Editing][DOCX_BUNDLE] Post-apply verification failed (non-fatal)", {
+          error: String(verifyErr?.message || verifyErr),
+        });
+      }
+
       edited = buf;
     } else if (op === "ADD_PARAGRAPH") {
       assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "ADD_PARAGRAPH");
@@ -441,7 +724,7 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       // If inserting after a list item, default to a normal paragraph (not another bullet).
       // Callers can override by setting meta.keepNumbering=true.
       const keepNumbering = Boolean((meta as any)?.keepNumbering);
-      edited = await this.docxEditor.insertParagraphAfter(original, targetId, input.content, { format: contentFormat, removeNumbering: !keepNumbering });
+      edited = await this.docxEditor.insertParagraphAfter(original, targetId, input.content, { format: paragraphContentFormat, removeNumbering: !keepNumbering });
     } else if (op === "EDIT_CELL") {
       assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "EDIT_CELL");
       if (!targetId) throw new Error("EDIT_CELL requires targetId.");
@@ -508,6 +791,25 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         filename: doc.filename || "sheet.xlsx",
         targetId: null,
         content: toName,
+        meta,
+        ctx: {
+          correlationId: input.correlationId,
+          userId: input.userId,
+          conversationId: input.conversationId,
+          clientMessageId: input.clientMessageId,
+        },
+      });
+    } else if (op === "DELETE_SHEET") {
+      assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "DELETE_SHEET");
+      const sheetName = String(input.content || asString(meta.sheetName) || "").trim();
+      if (!sheetName) throw new Error("DELETE_SHEET requires content (sheet name to delete).");
+      edited = await this.applyXlsxEdit(original, {
+        op,
+        documentId: docId,
+        userId,
+        filename: doc.filename || "sheet.xlsx",
+        targetId: null,
+        content: sheetName,
         meta,
         ctx: {
           correlationId: input.correlationId,
@@ -833,7 +1135,11 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         const dedupeKey = `${userId}:${docId}:${idempotencyKey}`;
         this.idempotencyResults.set(dedupeKey, { revisionId: docId, createdAtMs: Date.now() });
       }
-      return { revisionId: docId };
+      const applyMetrics =
+        (meta as any).__applyMetrics && typeof (meta as any).__applyMetrics === "object"
+          ? (meta as any).__applyMetrics
+          : undefined;
+      return { revisionId: docId, fileHashBefore, fileHashAfter: sha256(edited), ...(applyMetrics ? { applyMetrics } : {}) };
     }
 
     const created = await this.revisionService.createRevision(
@@ -863,7 +1169,11 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       const dedupeKey = `${userId}:${docId}:${idempotencyKey}`;
       this.idempotencyResults.set(dedupeKey, { revisionId: created.id, createdAtMs: Date.now() });
     }
-    return { revisionId: created.id };
+    const applyMetrics =
+      (meta as any).__applyMetrics && typeof (meta as any).__applyMetrics === "object"
+        ? (meta as any).__applyMetrics
+        : undefined;
+    return { revisionId: created.id, fileHashBefore, fileHashAfter: sha256(edited), ...(applyMetrics ? { applyMetrics } : {}) };
   }
 
   private sweepIdempotency(): void {
@@ -874,6 +1184,107 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         this.idempotencyResults.delete(key);
       }
     }
+  }
+
+  /**
+   * Store an externally-produced edited buffer for a document, replacing its
+   * content in-place with proper cleanup of derived artifacts + re-indexing.
+   * Used by routes that build the edited bytes themselves (e.g. Slides export).
+   */
+  async storeEditedBuffer(input: {
+    documentId: string;
+    userId: string;
+    editedBuffer: Buffer;
+    operator: string;
+    correlationId?: string;
+    conversationId?: string;
+    clientMessageId?: string;
+    metadata?: Record<string, unknown>;
+  }): Promise<{ revisionId: string; fileHashBefore: string; fileHashAfter: string }> {
+    const docId = input.documentId.trim();
+    const userId = input.userId.trim();
+
+    const doc = await prisma.document.findFirst({
+      where: { id: docId, userId },
+      select: { id: true, encryptedFilename: true, filename: true, mimeType: true, fileHash: true },
+    });
+    if (!doc) throw new Error("Document not found or not accessible.");
+    if (!doc.encryptedFilename) throw new Error("Document storage key missing.");
+
+    const original = await downloadFile(doc.encryptedFilename);
+    const fileHashBefore = String(doc.fileHash || "").trim() || sha256(original);
+    const fileHashAfter = sha256(input.editedBuffer);
+
+    // Overwrite content at the same storage key.
+    await uploadFile(doc.encryptedFilename, input.editedBuffer, doc.mimeType || "application/octet-stream");
+    try { await cacheService.del(`document_buffer:${docId}`); } catch {}
+
+    const op = String(input.operator || "").trim();
+    const isSlidesEdit = op.includes("SLIDE") || op === "EXPORT_SLIDES";
+    const isSheetsEdit = op.includes("SHEET") || op.includes("CELL") || op.includes("RANGE") || op.includes("CHART") || op.includes("COMPUTE");
+
+    await prisma.$transaction(async (tx) => {
+      await tx.documentChunk.deleteMany({ where: { documentId: docId } });
+      await tx.documentEmbedding.deleteMany({ where: { documentId: docId } });
+
+      if (isSlidesEdit || isSheetsEdit) {
+        const existingMeta = await tx.documentMetadata.findUnique({
+          where: { documentId: docId },
+          select: { pptxMetadata: true },
+        });
+        await tx.documentMetadata.upsert({
+          where: { documentId: docId },
+          update: {
+            markdownContent: null,
+            markdownUrl: null,
+            markdownStructure: null,
+            sheetCount: null,
+            slideCount: null,
+            slidesData: null,
+            pptxMetadata: (existingMeta as any)?.pptxMetadata ?? null,
+            slideGenerationStatus: isSlidesEdit ? "pending" : undefined,
+            slideGenerationError: isSlidesEdit ? null : undefined,
+            previewPdfStatus: "pending",
+            previewPdfKey: null,
+            previewPdfError: null,
+            previewPdfAttempts: 0,
+            previewPdfUpdatedAt: null,
+          } as any,
+          create: { documentId: docId } as any,
+        });
+      } else {
+        await tx.documentMetadata.deleteMany({ where: { documentId: docId } });
+      }
+
+      await tx.documentProcessingMetrics.deleteMany({ where: { documentId: docId } });
+      await tx.document.update({
+        where: { id: docId },
+        data: {
+          fileSize: input.editedBuffer.length,
+          fileHash: fileHashAfter,
+          status: "uploaded",
+          chunksCount: 0,
+          embeddingsGenerated: false,
+          error: null,
+          rawText: null,
+          previewText: null,
+          renderableContent: null,
+          extractedTextEncrypted: null,
+          previewTextEncrypted: null,
+          renderableContentEncrypted: null,
+        },
+      });
+    });
+
+    await this.reprocessEditedDocument({
+      documentId: docId,
+      userId,
+      filename: doc.filename || "document",
+      mimeType: doc.mimeType || "application/octet-stream",
+      encryptedFilename: doc.encryptedFilename,
+    });
+
+    return { revisionId: docId, fileHashBefore, fileHashAfter };
   }
 
   async undoToRevision(input: {
@@ -1221,38 +1632,45 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       return Object.keys(out).length ? out : undefined;
     };
 
-    // Best effort: prefer Sheets-backed edits (true calc engine + charts).
-    // Fall back to direct XLSX edits when Google APIs are not configured.
-    try {
-      const ensured = await this.ensureSheetsSpreadsheetForDocument({
-        documentId: input.documentId,
-        userId: input.userId,
-        xlsxBytes: originalXlsx,
-        filename: input.filename,
-        correlationId: input.ctx.correlationId,
-        conversationId: input.ctx.conversationId,
-        clientMessageId: input.ctx.clientMessageId,
-      });
+    const parseComputePayloadOps = (): SpreadsheetEngineOp[] => {
+      let payload: any = {};
+      try {
+        payload = JSON.parse(String(input.content || "{}"));
+      } catch {
+        throw new Error('COMPUTE requires JSON content like {"ops":[...]}');
+      }
+      const ops = Array.isArray(payload?.ops) ? payload.ops : [];
+      return ops.filter((item: any) => item && typeof item === "object") as SpreadsheetEngineOp[];
+    };
 
-      (input.meta as any).sheetsSpreadsheetId = ensured.spreadsheetId;
-      (input.meta as any).sheetsSpreadsheetUrl = ensured.url;
-
+    const buildSpreadsheetEngineOps = (): SpreadsheetEngineOp[] => {
       if (input.op === "EDIT_CELL") {
         const [sheetName, a1] = String(input.targetId || "").split("!");
         if (!sheetName || !a1) throw new Error("EDIT_CELL requires targetId like Sheet1!B2");
-        await this.sheetsEditor.editCell(ensured.spreadsheetId, sheetName, a1, input.content, input.ctx);
-      } else if (input.op === "EDIT_RANGE") {
-        const range = String(input.targetId || "").trim();
-        const grid = parseTsvOrCsvGrid(input.content);
-        await this.sheetsEditor.editRange(ensured.spreadsheetId, range, grid, input.ctx);
-      } else if (input.op === "ADD_SHEET") {
-        await this.sheetsEditor.createSheet(ensured.spreadsheetId, input.content, input.ctx);
-      } else if (input.op === "RENAME_SHEET") {
-        const fromName = asString((input.meta as any).fromSheetName) || null;
-        if (!fromName) throw new Error("RENAME_SHEET requires fromSheetName in metadata.");
-        const sheetId = await this.sheetsEditor.getSheetIdByName(ensured.spreadsheetId, fromName, input.ctx);
-        await this.sheetsEditor.renameSheet(ensured.spreadsheetId, sheetId, input.content, input.ctx);
-      } else if (input.op === "CREATE_CHART") {
+        return [{ kind: "set_values", rangeA1: `${sheetName}!${a1}`, values: [[String(input.content ?? "")]] }];
+      }
+      if (input.op === "EDIT_RANGE") {
+        const rangeA1 = String(input.targetId || "").trim();
+        if (!rangeA1) throw new Error("EDIT_RANGE requires targetId.");
+        return [{ kind: "set_values", rangeA1, values: parseTsvOrCsvGrid(input.content) }];
+      }
+      if (input.op === "ADD_SHEET") {
+        const title = String(input.content || "").trim();
+        if (!title) throw new Error("ADD_SHEET requires content (sheet name).");
+        return [{ kind: "add_sheet", title }];
+      }
+      if (input.op === "RENAME_SHEET") {
+        const fromName = asString((input.meta as any).fromSheetName);
+        const toName = String(input.content || "").trim();
+        if (!fromName || !toName) throw new Error("RENAME_SHEET requires fromSheetName and content.");
+        return [{ kind: "rename_sheet", fromName, toName }];
+      }
+      if (input.op === "DELETE_SHEET") {
+        const sheetName = String(input.content || "").trim();
+        if (!sheetName) throw new Error("DELETE_SHEET requires content (sheet name).");
+        return [{ kind: "delete_sheet", sheetName }];
+      }
+      if (input.op === "CREATE_CHART") {
         const raw = String(input.content || "").trim();
         let spec: any = null;
         try {
@@ -1260,380 +1678,206 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         } catch {
           throw new Error('CREATE_CHART requires JSON content like {"type":"PIE","range":"Sheet1!A1:B10"}');
         }
-        const spreadsheet = await this.sheetsEditor.getSpreadsheet(ensured.spreadsheetId, input.ctx);
-        const firstSheetId = spreadsheet.sheets?.[0]?.properties?.sheetId;
-        const created = await this.sheetsChart.createChart(
-          ensured.spreadsheetId,
-          typeof firstSheetId === "number" ? firstSheetId : 0,
-          spec,
-          input.ctx,
-        );
+        if (!spec || typeof spec !== "object") {
+          throw new Error("CREATE_CHART requires a JSON object payload.");
+        }
+        return [{ kind: "create_chart", spec }];
+      }
+      if (input.op === "COMPUTE") {
+        return parseComputePayloadOps();
+      }
+      throw new Error(`Unsupported XLSX operator for Python spreadsheet engine: ${input.op}`);
+    };
+
+    const persistSpreadsheetEngineArtifacts = (response: any): void => {
+      if (response?.artifacts && typeof response.artifacts === "object") {
+        (input.meta as any).__pythonSpreadsheetArtifacts = response.artifacts;
+      }
+      if (response?.answer_context && typeof response.answer_context === "object") {
+        (input.meta as any).__pythonSpreadsheetAnswerContext = response.answer_context;
+      }
+      if (response?.proof && typeof response.proof === "object") {
+        (input.meta as any).__pythonSpreadsheetProof = response.proof;
+      }
+      if (Array.isArray(response?.warnings)) {
+        (input.meta as any).__pythonSpreadsheetWarnings = response.warnings
+          .map((item: any) => String(item || "").trim())
+          .filter(Boolean);
+      }
+
+      const artifacts = response?.artifacts && typeof response.artifacts === "object"
+        ? response.artifacts
+        : {};
+
+      const chartEntries = Array.isArray((artifacts as any).chartEntries)
+        ? (artifacts as any).chartEntries
+        : [];
+      for (const entry of chartEntries) {
+        const range = String(entry?.range || "").trim();
+        if (!range) continue;
         rememberChart({
-          chartId: created.chartId,
-          type: String(spec?.type || ""),
-          range: String(spec?.range || ""),
-          ...(spec?.title ? { title: String(spec.title) } : {}),
-          ...(extractChartSettings(spec) ? { settings: extractChartSettings(spec) } : {}),
+          ...(typeof entry?.chartId === "number" ? { chartId: entry.chartId } : {}),
+          type: String(entry?.type || "LINE"),
+          range,
+          ...(entry?.title ? { title: String(entry.title) } : {}),
+          ...(entry?.settings && typeof entry.settings === "object" ? { settings: entry.settings } : {}),
         });
-      } else if (input.op === "COMPUTE") {
-        // content is a JSON payload with ops
-        let payload: any = {};
-        try {
-          payload = JSON.parse(String(input.content || "{}"));
-        } catch {
-          throw new Error('COMPUTE requires JSON content like {"ops":[...]}');
-        }
-        const ops = Array.isArray(payload?.ops) ? payload.ops : [];
-        for (const op of ops) {
-          if (!op || typeof op !== "object") continue;
-          const kind = String((op as any).kind || "").trim();
-          if (kind === "set_values") {
-            const rangeA1 = String((op as any).rangeA1 || "").trim();
-            const values = (op as any).values;
-            if (!rangeA1 || !Array.isArray(values)) throw new Error("set_values requires rangeA1 and values[][]");
-            await this.sheetsEditor.editRange(ensured.spreadsheetId, rangeA1, values, input.ctx);
-          } else if (kind === "set_formula") {
-            const a1 = String((op as any).a1 || "").trim();
-            const formula = String((op as any).formula || "").trim();
-            if (!a1 || !formula) throw new Error("set_formula requires a1 and formula");
-            await this.sheetsFormula.setFormula(ensured.spreadsheetId, a1, formula, input.ctx);
-          } else if (kind === "insert_rows") {
-            const sheet = (op as any).sheetName ?? (op as any).sheetId ?? "Sheet1";
-            const startIndex = Number((op as any).startIndex);
-            const count = Number((op as any).count ?? 1);
-            await this.sheetsEditor.insertRows(ensured.spreadsheetId, sheet, startIndex, count, input.ctx);
-          } else if (kind === "delete_rows") {
-            const sheet = (op as any).sheetName ?? (op as any).sheetId ?? "Sheet1";
-            const startIndex = Number((op as any).startIndex);
-            const count = Number((op as any).count ?? 1);
-            await this.sheetsEditor.deleteRows(ensured.spreadsheetId, sheet, startIndex, count, input.ctx);
-          } else if (kind === "insert_columns") {
-            const sheet = (op as any).sheetName ?? (op as any).sheetId ?? "Sheet1";
-            const startIndex = Number((op as any).startIndex);
-            const count = Number((op as any).count ?? 1);
-            await this.sheetsEditor.insertColumns(ensured.spreadsheetId, sheet, startIndex, count, input.ctx);
-          } else if (kind === "delete_columns") {
-            const sheet = (op as any).sheetName ?? (op as any).sheetId ?? "Sheet1";
-            const startIndex = Number((op as any).startIndex);
-            const count = Number((op as any).count ?? 1);
-            await this.sheetsEditor.deleteColumns(ensured.spreadsheetId, sheet, startIndex, count, input.ctx);
-          } else if (kind === "create_chart") {
-            const spec = (op as any).spec;
-            if (!spec) throw new Error("create_chart requires spec");
-            const spreadsheet = await this.sheetsEditor.getSpreadsheet(ensured.spreadsheetId, input.ctx);
-            const sheetId = spreadsheet.sheets?.find((s: any) => s.properties?.title === String(spec.range || "").split("!")[0])?.properties?.sheetId
-              ?? spreadsheet.sheets?.[0]?.properties?.sheetId
-              ?? 0;
-            const created = await this.sheetsChart.createChart(ensured.spreadsheetId, typeof sheetId === "number" ? sheetId : 0, spec, input.ctx);
-            rememberChart({
-              chartId: created.chartId,
-              type: String(spec?.type || ""),
-              range: String(spec?.range || ""),
-              ...(spec?.title ? { title: String(spec.title) } : {}),
-              ...(extractChartSettings(spec) ? { settings: extractChartSettings(spec) } : {}),
-            });
-          } else if (kind === "create_table") {
-            const rangeA1 = String((op as any).rangeA1 || (op as any).range || "").trim();
-            const hasHeader = (op as any).hasHeader !== false;
-            const styleRaw = String((op as any).style || "").trim().toLowerCase();
-            const style =
-              styleRaw === "blue" || styleRaw === "green" || styleRaw === "orange" || styleRaw === "teal" || styleRaw === "gray" || styleRaw === "light_gray"
-                ? styleRaw
-                : "light_gray";
-            const rawColors = ((op as any).colors && typeof (op as any).colors === "object")
-              ? (op as any).colors
-              : {};
-            const colors = {
-              ...(String(rawColors?.header || "").trim() ? { header: String(rawColors.header).trim() } : {}),
-              ...(String(rawColors?.stripe || "").trim() ? { stripe: String(rawColors.stripe).trim() } : {}),
-              ...(String(rawColors?.totals || "").trim() ? { totals: String(rawColors.totals).trim() } : {}),
-              ...(String(rawColors?.border || "").trim() ? { border: String(rawColors.border).trim() } : {}),
-            };
-            if (!rangeA1) throw new Error("create_table requires rangeA1");
-            const spreadsheet = await this.sheetsEditor.getSpreadsheet(ensured.spreadsheetId, input.ctx);
-            const sheetName = String(rangeA1).includes("!") ? String(rangeA1).split("!")[0] : "";
-            const sheetId = spreadsheet.sheets?.find((s: any) => s.properties?.title === sheetName)?.properties?.sheetId
-              ?? spreadsheet.sheets?.[0]?.properties?.sheetId
-              ?? 0;
-            await this.sheetsTable.createTable(
-              ensured.spreadsheetId,
-              typeof sheetId === "number" ? sheetId : 0,
-              {
-                rangeA1,
-                hasHeader,
-                style: style as any,
-                ...(Object.keys(colors).length ? { colors } : {}),
-              },
-              input.ctx,
-            );
-            rememberTable({
-              range: rangeA1,
-              hasHeader,
-              style,
-              ...(Object.keys(colors).length ? { colors } : {}),
-            });
-          } else if (kind === "sort_range") {
-            const rangeA1 = String((op as any).rangeA1 || (op as any).range || "").trim();
-            if (!rangeA1) throw new Error("sort_range requires rangeA1");
-            const bang = rangeA1.indexOf("!");
-            const a1Part = bang > 0 ? rangeA1.slice(bang + 1) : rangeA1;
-            const startCell = String(a1Part.split(":")[0] || "").replace(/\$/g, "").trim();
-            const endCell = String(a1Part.split(":")[1] || startCell).replace(/\$/g, "").trim();
-            const parseCol = (cell: string) => {
-              const m = String(cell || "").toUpperCase().match(/^([A-Z]+)/);
-              if (!m) return 0;
-              let out = 0;
-              for (const ch of m[1]) out = out * 26 + (ch.charCodeAt(0) - 64);
-              return out - 1;
-            };
-            const startCol = parseCol(startCell);
-            const endCol = parseCol(endCell);
-            const width = Math.max(1, endCol - startCol + 1);
-            const toDimension = (raw: any): number | null => {
-              if (raw == null) return null;
-              if (typeof raw === "string" && /^[A-Za-z]+$/.test(raw.trim())) return parseCol(raw.trim());
-              const n = Number(raw);
-              if (!Number.isFinite(n)) return null;
-              const ni = Math.trunc(n);
-              if (ni >= 1 && ni <= width) return startCol + (ni - 1);
-              if (ni >= 0 && ni < width) return startCol + ni;
-              return ni;
-            };
-            const rawSpecs = Array.isArray((op as any).sortSpecs) ? (op as any).sortSpecs : [op];
-            const sortSpecs = rawSpecs
-              .map((s: any) => {
-                const dim = toDimension(s?.dimensionIndex ?? s?.columnIndex ?? s?.column ?? (op as any).column);
-                if (dim == null) return null;
-                const orderRaw = String(s?.sortOrder || s?.order || (op as any).order || "ASC").toUpperCase();
-                return {
-                  dimensionIndex: dim,
-                  sortOrder: orderRaw.startsWith("DESC") ? "DESCENDING" : "ASCENDING",
-                };
-              })
-              .filter(Boolean) as Array<{ dimensionIndex: number; sortOrder: "ASCENDING" | "DESCENDING" }>;
-            await this.sheetsEditor.sortRange(ensured.spreadsheetId, rangeA1, sortSpecs, input.ctx);
-          } else if (kind === "filter_range") {
-            const rangeA1 = String((op as any).rangeA1 || (op as any).range || "").trim();
-            if (!rangeA1) throw new Error("filter_range requires rangeA1");
-            await this.sheetsEditor.applyBasicFilter(ensured.spreadsheetId, rangeA1, input.ctx);
-          } else if (kind === "clear_filter") {
-            const sheet = (op as any).sheetName ?? (op as any).sheetId
-              ?? (String((op as any).rangeA1 || "").includes("!") ? String((op as any).rangeA1).split("!")[0] : "Sheet1");
-            await this.sheetsEditor.clearBasicFilter(ensured.spreadsheetId, sheet, input.ctx);
-          } else if (kind === "set_number_format") {
-            const rangeA1 = String((op as any).rangeA1 || (op as any).range || "").trim();
-            const pattern = String((op as any).pattern || (op as any).format || "").trim();
-            if (!rangeA1 || !pattern) throw new Error("set_number_format requires rangeA1 and pattern");
-            await this.sheetsEditor.setNumberFormat(ensured.spreadsheetId, rangeA1, pattern, input.ctx);
-          } else if (kind === "set_freeze_panes") {
-            const sheet = (op as any).sheetName ?? (op as any).sheetId
-              ?? (String((op as any).rangeA1 || "").includes("!") ? String((op as any).rangeA1).split("!")[0] : "Sheet1");
-            const frozenRowCount = Number((op as any).frozenRowCount ?? (op as any).rows ?? 0);
-            const frozenColumnCount = Number((op as any).frozenColumnCount ?? (op as any).columns ?? 0);
-            await this.sheetsEditor.setFreezePanes(
-              ensured.spreadsheetId,
-              sheet,
-              Number.isFinite(frozenRowCount) ? Math.max(0, Math.trunc(frozenRowCount)) : 0,
-              Number.isFinite(frozenColumnCount) ? Math.max(0, Math.trunc(frozenColumnCount)) : 0,
-              input.ctx,
-            );
-          } else if (kind === "set_data_validation") {
-            const rangeA1 = String((op as any).rangeA1 || (op as any).range || "").trim();
-            if (!rangeA1) throw new Error("set_data_validation requires rangeA1");
-            const rule = ((op as any).rule && typeof (op as any).rule === "object") ? (op as any).rule : (op as any);
-            const type = String(rule.type || "ONE_OF_LIST").toUpperCase();
-            const values = Array.isArray(rule.values) ? rule.values.map((v: any) => String(v)) : [];
-            const min = Number(rule.min);
-            const max = Number(rule.max);
-            await this.sheetsEditor.setDataValidation(
-              ensured.spreadsheetId,
-              rangeA1,
-              {
-                type: type as any,
-                values,
-                ...(Number.isFinite(min) ? { min } : {}),
-                ...(Number.isFinite(max) ? { max } : {}),
-                ...(typeof rule.strict === "boolean" ? { strict: rule.strict } : {}),
-                ...(typeof rule.showCustomUi === "boolean" ? { showCustomUi: rule.showCustomUi } : {}),
-                ...(String(rule.inputMessage || "").trim() ? { inputMessage: String(rule.inputMessage) } : {}),
-              },
-              input.ctx,
-            );
-          } else if (kind === "clear_data_validation") {
-            const rangeA1 = String((op as any).rangeA1 || (op as any).range || "").trim();
-            if (!rangeA1) throw new Error("clear_data_validation requires rangeA1");
-            await this.sheetsEditor.clearDataValidation(ensured.spreadsheetId, rangeA1, input.ctx);
-          } else if (kind === "apply_conditional_format") {
-            const rangeA1 = String((op as any).rangeA1 || (op as any).range || "").trim();
-            if (!rangeA1) throw new Error("apply_conditional_format requires rangeA1");
-            const rule = ((op as any).rule && typeof (op as any).rule === "object") ? (op as any).rule : (op as any);
-            const type = String(rule.type || "NUMBER_GREATER").toUpperCase();
-            const value = rule.value ?? rule.threshold ?? "0";
-            await this.sheetsEditor.applyConditionalFormat(
-              ensured.spreadsheetId,
-              rangeA1,
-              {
-                type: type as any,
-                value,
-                ...(String(rule.backgroundHex || "").trim() ? { backgroundHex: String(rule.backgroundHex).trim() } : {}),
-                ...(String(rule.textHex || "").trim() ? { textHex: String(rule.textHex).trim() } : {}),
-              },
-              input.ctx,
-            );
-          } else if (kind === "set_print_layout") {
-            const sheet = (op as any).sheetName ?? (op as any).sheetId
-              ?? (String((op as any).rangeA1 || "").includes("!") ? String((op as any).rangeA1).split("!")[0] : "Sheet1");
-            await this.sheetsEditor.setPrintLayout(
-              ensured.spreadsheetId,
-              sheet,
-              {
-                ...(typeof (op as any).hideGridlines === "boolean" ? { hideGridlines: Boolean((op as any).hideGridlines) } : {}),
-              },
-              input.ctx,
-            );
-          } else if (kind === "update_chart") {
-            const chartId = Number((op as any).chartId);
-            const spec = (op as any).spec;
-            if (!Number.isInteger(chartId) || chartId <= 0 || !spec) {
-              throw new Error("update_chart requires chartId and spec");
-            }
-            await this.sheetsChart.updateChart(ensured.spreadsheetId, chartId, spec, input.ctx);
-            rememberChart({
-              chartId,
-              type: String(spec?.type || ""),
-              range: String(spec?.range || ""),
-              ...(spec?.title ? { title: String(spec.title) } : {}),
-              ...(extractChartSettings(spec) ? { settings: extractChartSettings(spec) } : {}),
-            });
-          } else {
-            throw new Error(`Unsupported compute op: ${kind}`);
-          }
-        }
-      } else {
-        throw new Error(`Unsupported XLSX operator for Sheets-backed edit: ${input.op}`);
       }
 
-      return await this.sheetsBridge.exportSpreadsheetToXlsx(ensured.spreadsheetId, input.ctx);
-    } catch (e: any) {
-      // If auth is missing or any Sheets API error, fall back to direct XLSX edits for basic ops.
-      const isSheetsError = (e instanceof SheetsBridgeError || e instanceof SheetsClientError);
-      const isAuthError = isSheetsError && (e as any).code === "AUTH_ERROR";
-      const sheetsErrorCode = String((e as any)?.code || "").trim().toUpperCase();
-      const passthroughChartCodes = new Set([
-        "INVALID_CHART_SPEC",
-        "INVALID_CHART_TYPE",
-        "INVALID_CHART_RANGE",
-        "INVALID_A1_CELL",
-        "CHART_RANGE_OUT_OF_BOUNDS",
-        "CHART_INCOMPATIBLE_SHAPE_EMPTY",
-        "CHART_INCOMPATIBLE_SHAPE_SERIES",
-        "CHART_INCOMPATIBLE_SHAPE_SCATTER",
-        "CHART_INCOMPATIBLE_SHAPE_STACKED",
-        "CHART_INCOMPATIBLE_SHAPE_COMBO",
-        "CHART_INCOMPATIBLE_SHAPE_BUBBLE",
-        "CHART_INCOMPATIBLE_SHAPE_HISTOGRAM",
-        "CHART_INCOMPATIBLE_SHAPE_PIE",
-        "CHART_INCOMPATIBLE_SHAPE_RADAR",
-        "CHART_TYPE_NOT_SUPPORTED",
-      ]);
-      const isChartValidationError = passthroughChartCodes.has(sheetsErrorCode);
-
-      // Never return false-success for chart creation. Preserve user-facing shape errors.
-      if (isSheetsError && input.op === "CREATE_CHART") {
-        if (isChartValidationError) {
-          throw new Error(String(e?.message || "The selected range is not compatible with this chart type."));
-        }
-        throw new Error("CHART_ENGINE_UNAVAILABLE: chart creation requires a Sheets-capable engine for this workbook.");
+      const tableEntries = Array.isArray((artifacts as any).tableEntries)
+        ? (artifacts as any).tableEntries
+        : [];
+      for (const entry of tableEntries) {
+        const range = String(entry?.range || "").trim();
+        if (!range) continue;
+        rememberTable({
+          range,
+          hasHeader: entry?.hasHeader !== false,
+          ...(entry?.style ? { style: String(entry.style) } : {}),
+          ...(entry?.colors && typeof entry.colors === "object" ? { colors: entry.colors } : {}),
+        });
       }
+    };
 
-      if (isAuthError) {
-        if (input.op === "EDIT_CELL" && input.targetId) return this.xlsxEditor.editCell(originalXlsx, input.targetId, input.content);
-        if (input.op === "EDIT_RANGE" && input.targetId) return this.xlsxEditor.editRange(originalXlsx, input.targetId, input.content);
-        if (input.op === "ADD_SHEET") return this.xlsxEditor.addSheet(originalXlsx, input.content);
-        if (input.op === "RENAME_SHEET") {
-          const fromName = asString((input.meta as any).fromSheetName) || "";
-          if (!fromName) throw e;
-          return this.xlsxEditor.renameSheet(originalXlsx, fromName, input.content);
+    const spreadsheetEngineOps = buildSpreadsheetEngineOps();
+    const spreadsheetEngineMode = this.spreadsheetEngine.mode();
+    const requiresRemotePython = spreadsheetEngineOps.some((op) => {
+      const kind = String((op as any)?.kind || "").trim().toLowerCase();
+      return kind.startsWith("python_") || kind === "insight" || kind === "analysis";
+    });
+    const shouldCallPythonEngine = input.op === "COMPUTE" && this.spreadsheetEngine.enabled() && requiresRemotePython;
+
+    if (shouldCallPythonEngine) {
+      try {
+        const ensured = await this.ensureSheetsSpreadsheetForDocument({
+          documentId: input.documentId,
+          userId: input.userId,
+          xlsxBytes: originalXlsx,
+          filename: input.filename,
+          correlationId: input.ctx.correlationId,
+          conversationId: input.ctx.conversationId,
+          clientMessageId: input.ctx.clientMessageId,
+        });
+
+        (input.meta as any).sheetsSpreadsheetId = ensured.spreadsheetId;
+        (input.meta as any).sheetsSpreadsheetUrl = ensured.url;
+
+        const response = await this.spreadsheetEngine.execute({
+          requestId: `${input.ctx.correlationId}:${Date.now()}`,
+          documentId: input.documentId,
+          userId: input.userId,
+          correlationId: input.ctx.correlationId,
+          spreadsheetId: ensured.spreadsheetId,
+          ops: spreadsheetEngineOps,
+          context: {
+            activeSheetName: asString((input.meta as any).activeSheetName) || asString((input.meta as any).sheetName),
+            selectionRangeA1:
+              asString((input.meta as any).selectionRangeA1) ||
+              asString((input.meta as any).rangeA1) ||
+              asString(input.targetId),
+            language: asString((input.meta as any).language),
+            conversationId: input.ctx.conversationId,
+          },
+          options: {
+            sourceOperator: input.op,
+            source: "documentRevisionStore.canonical",
+          },
+        });
+
+        persistSpreadsheetEngineArtifacts(response);
+
+        const statuses = Array.isArray(response?.applied_ops) ? response.applied_ops : [];
+        const failed = statuses.filter((status: any) => String(status?.status || "").toLowerCase() === "failed");
+        if (failed.length > 0 && spreadsheetEngineMode === "enforced") {
+          const failedSummary = failed
+            .map((item: any) => `${String(item?.kind || "unknown")}${item?.message ? ` (${String(item.message)})` : ""}`)
+            .join("; ");
+          throw new Error(`PYTHON_SPREADSHEET_ENGINE_FAILED: ${failedSummary || "operation failed"}`);
         }
+      } catch (error: any) {
+        const message = String(error?.message || error || "");
+        const isInfraDisabled =
+          /service_disabled|sheets\.googleapis\.com|google sheets api has not been used|auth_error|permission denied|403/i.test(message);
+
+        if (spreadsheetEngineMode === "enforced" && !isInfraDisabled) {
+          throw new Error(`PYTHON_SPREADSHEET_ENGINE_FAILED: ${String(error?.message || error)}`);
+        }
+        const warningList = Array.isArray((input.meta as any).__pythonSpreadsheetWarnings)
+          ? (input.meta as any).__pythonSpreadsheetWarnings
+          : [];
+        warningList.push(`python_engine_bypassed:${message || "python engine failed"}`);
+        (input.meta as any).__pythonSpreadsheetWarnings = warningList.filter(Boolean).slice(-20);
       }
-	      // COMPUTE fallback: catch any Sheets-related error (not just AUTH_ERROR)
-	      if (isSheetsError && input.op === "COMPUTE") {
-	        let parsedOps: any[] | null = null;
-	        try {
-	          const payload = JSON.parse(String(input.content || "{}"));
-	          parsedOps = Array.isArray(payload?.ops) ? payload.ops : [];
-	        } catch {
-	          parsedOps = null;
-	        }
+    }
 
-	        const ops = Array.isArray(parsedOps) ? parsedOps : [];
-	        const chartOps = ops.filter((op: any) => {
-	          const kind = String(op?.kind || "").trim();
-	          return kind === "create_chart" || kind === "update_chart";
-	        });
-	        const nonChartOps = ops.filter((op: any) => {
-	          const kind = String(op?.kind || "").trim();
-	          return kind !== "create_chart" && kind !== "update_chart";
-	        });
+    const modelBefore = await buildSpreadsheetModelFromXlsx(originalXlsx);
+    const semanticIndex = buildSemanticIndex(modelBefore);
+    const translated = computeOpsToPatchPlan({
+      ops: spreadsheetEngineOps as Array<Record<string, unknown>>,
+      activeSheetName: asString((input.meta as any).activeSheetName) || asString((input.meta as any).sheetName),
+      semanticIndex,
+    });
 
-	        if (chartOps.length && isChartValidationError) {
-	          throw new Error(String(e?.message || "The selected range is not compatible with this chart type."));
-	        }
+    if (!translated.patchOps.length && translated.rejectedOps.length) {
+      throw new Error(`PATCH_REJECTED: ${translated.rejectedOps.join("; ")}`);
+    }
 
-	        let out = originalXlsx;
-	        if (parsedOps == null) {
-	          out = await this.xlsxEditor.computeOps(originalXlsx, input.content);
-	        } else if (nonChartOps.length) {
-	          out = await this.xlsxEditor.computeOps(originalXlsx, JSON.stringify({ ops: nonChartOps }));
-	        }
+    const applyResult = applyPatchOpsToSpreadsheetModel(modelBefore, translated.patchOps);
+    const statusSummary = summarizePatchStatuses(applyResult.statuses);
+    const diff = diffSpreadsheetModels(modelBefore, applyResult.model);
+    const rejectedOps = [...translated.rejectedOps, ...statusSummary.rejectedOps];
 
-	        // Persist chart/table specs requested inside COMPUTE ops for preview rendering.
-	        for (const op of ops) {
-	          if (!op || typeof op !== "object") continue;
-	          const kind = String((op as any).kind || "").trim();
-	          if (kind === "create_chart" || kind === "update_chart") {
-	            const spec = ((op as any).spec && typeof (op as any).spec === "object")
-	              ? (op as any).spec
-	              : {};
-	            const range = String(spec?.range || (op as any).rangeA1 || (op as any).range || "").trim();
-	            if (!range) {
-	              throw new Error("INVALID_CHART_SPEC: chart operations require a source range.");
-	            }
-	            rememberChart({
-	              ...(Number.isInteger(Number((op as any).chartId)) ? { chartId: Number((op as any).chartId) } : {}),
-	              type: String(spec?.type || "BAR"),
-	              range,
-	              ...(String(spec?.title || "").trim() ? { title: String(spec.title).trim() } : {}),
-	              ...(extractChartSettings(spec) ? { settings: extractChartSettings(spec) } : {}),
-	            });
-	            continue;
-	          }
-	          if (kind === "create_table") {
-	            const rangeA1 = String((op as any).rangeA1 || (op as any).range || "").trim();
-	            if (!rangeA1) continue;
-	            const hasHeader = (op as any).hasHeader !== false;
-	            const rawColors = ((op as any).colors && typeof (op as any).colors === "object")
-	              ? (op as any).colors
-	              : {};
-	            const colors = {
-	              ...(String(rawColors?.header || "").trim() ? { header: String(rawColors.header).trim() } : {}),
-	              ...(String(rawColors?.stripe || "").trim() ? { stripe: String(rawColors.stripe).trim() } : {}),
-	              ...(String(rawColors?.totals || "").trim() ? { totals: String(rawColors.totals).trim() } : {}),
-	              ...(String(rawColors?.border || "").trim() ? { border: String(rawColors.border).trim() } : {}),
-	            };
-	            rememberTable({
-	              range: rangeA1,
-	              hasHeader,
-	              style: String((op as any).style || "").trim().toLowerCase(),
-	              ...(Object.keys(colors).length ? { colors } : {}),
-	            });
-	          }
-	        }
-	        return out;
-	      }
-	      throw e;
-	    }
-	  }
+    if (!diff.changed || (diff.changedCellsCount === 0 && diff.changedStructuresCount === 0)) {
+      throw new Error("EDIT_NOOP_NO_CHANGES");
+    }
+
+    // Keep chat metadata for chart/table cards sourced from canonical patch ops.
+    for (const op of translated.patchOps) {
+      if (op.op === "CREATE_CHART_CARD") {
+        rememberChart({
+          type: String(op.chart?.type || "BAR"),
+          range: String(op.range || ""),
+          ...(op.chart?.title ? { title: String(op.chart.title) } : {}),
+          ...(op.chart?.settings && typeof op.chart.settings === "object" ? { settings: op.chart.settings } : {}),
+        });
+      } else if (op.op === "CREATE_TABLE") {
+        rememberTable({
+          range: String(op.range || ""),
+          hasHeader: op.hasHeader !== false,
+          ...(op.style?.style ? { style: String(op.style.style) } : {}),
+          ...(op.style?.colors && typeof op.style.colors === "object" ? { colors: op.style.colors } : {}),
+        });
+      }
+    }
+
+    (input.meta as any).__canonicalSpreadsheet = {
+      canonicalOps: translated.canonicalOps,
+      patchOpsCount: translated.patchOps.length,
+      rejectedOpsCount: rejectedOps.length,
+      changedCellsCount: diff.changedCellsCount,
+      changedStructuresCount: diff.changedStructuresCount,
+      locateRange: diff.locateRange,
+    };
+
+    (input.meta as any).__applyMetrics = {
+      changedCellsCount: diff.changedCellsCount,
+      changedStructuresCount: diff.changedStructuresCount,
+      affectedRanges: diff.affectedRanges,
+      locateRange: diff.locateRange,
+      changedSamples: diff.changedSamples,
+      rejectedOps,
+    };
+
+    if (rejectedOps.length) {
+      const warningList = Array.isArray((input.meta as any).__pythonSpreadsheetWarnings)
+        ? (input.meta as any).__pythonSpreadsheetWarnings
+        : [];
+      for (const rejected of rejectedOps) warningList.push(`PATCH_REJECTED:${rejected}`);
+      (input.meta as any).__pythonSpreadsheetWarnings = warningList.filter(Boolean).slice(-50);
+    }
+
+    return compileSpreadsheetModelToXlsx(applyResult.model);
+  }
 }
 
 export default DocumentRevisionStoreService;

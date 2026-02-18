@@ -104,6 +104,10 @@ export default function AllybiEditingToolbar({
   onExcelPrevSheet,
   onExcelNextSheet,
   onExcelSetSheetIndex,
+  onExcelUndo,
+  onExcelRedo,
+  excelCanUndo = false,
+  excelCanRedo = false,
   excelStatusMsg,
   excelLogoSrc,
   onExcelLogoClick,
@@ -206,15 +210,23 @@ export default function AllybiEditingToolbar({
     const endRow = rowNumber + (r - 1);
     return { r, c, rangeA1: `${colLetter}${rowNumber}:${endCol}${endRow}` };
   }, [fileType, excelDraftValue, excelSelectedInfo?.a1]);
+  const excelIsGridPayload = useMemo(
+    () => fileType === 'excel' && isGridPayload(excelDraftValue || ''),
+    [fileType, excelDraftValue],
+  );
 
   useEffect(() => {
     if (fileType !== 'excel') return;
     const el = excelValueRef.current;
     if (!el) return;
+    if (!excelIsGridPayload) {
+      el.style.height = '32px';
+      return;
+    }
     el.style.height = '0px';
     const next = Math.min(el.scrollHeight, 96);
     el.style.height = `${Math.max(32, next)}px`;
-  }, [fileType, excelDraftValue]);
+  }, [fileType, excelDraftValue, excelIsGridPayload]);
 
   useEffect(() => {
     const anyOpen = colorMenuOpen || fontMenuOpen || sizeMenuOpen || xlColorMenuOpen || xlFontMenuOpen || xlSizeMenuOpen;
@@ -536,6 +548,14 @@ export default function AllybiEditingToolbar({
           <div className="allybi-excel-row">
             <div className="allybi-excel-left">
               <div className="allybi-excel-sheet-combo">
+                {iconBtn('Undo', UndoIcon, () => onExcelUndo?.(), {
+                  disabled: !excelCanUndo,
+                })}
+                {iconBtn('Redo', RedoIcon, () => onExcelRedo?.(), {
+                  disabled: !excelCanRedo,
+                })}
+                {divider()}
+
                 {iconBtn('Previous sheet', chevronLeftIcon, () => onExcelPrevSheet?.(), {
                   disabled: !(excelSheetMeta?.sheetCount > 1) || (excelSheetMeta?.activeIndex ?? 0) <= 0,
                   iconStyle: { transform: 'rotate(180deg)' },
@@ -741,13 +761,14 @@ export default function AllybiEditingToolbar({
 	                  ref={excelValueRef}
 	                  value={excelDraftValue || ''}
 	                  onChange={(e) => onExcelDraftValueChange?.(e.target.value)}
-	                  className="toolbar-input allybi-excel-value"
+	                  className={`toolbar-input allybi-excel-value${excelIsGridPayload ? ' is-grid' : ''}`}
 	                  placeholder="Value or paste a grid"
 	                  spellCheck={false}
 	                  autoCorrect="off"
 	                  autoCapitalize="off"
 	                  data-gramm="false"
 	                  rows={1}
+                    wrap={excelIsGridPayload ? 'soft' : 'off'}
 	                  onKeyDown={(e) => {
 	                    if (e.key === 'Escape') {
 	                      e.preventDefault();

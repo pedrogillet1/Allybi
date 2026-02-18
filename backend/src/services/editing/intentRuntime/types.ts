@@ -30,7 +30,11 @@ export type SlotType =
   | "LOCATOR_TEXT"
   | "PERCENTAGE"
   | "ALIGNMENT"
-  | "AXIS";
+  | "AXIS"
+  | "SCOPE"
+  | "TEXT_CASE"
+  | "LIST_TYPE"
+  | "DIRECTION";
 
 export interface SlotExtractor {
   /** Parser type — selects the extraction strategy. */
@@ -94,6 +98,8 @@ export interface IntentPattern {
     tokens_any?: string[];
     tokens_all?: string[];
     regex_any?: string[];
+    /** Hard-block tokens: if ANY of these are found, this pattern scores 0. */
+    tokens_none?: string[];
   };
   /** Ordered slot extraction rules, run in sequence. */
   slotExtractors: SlotExtractor[];

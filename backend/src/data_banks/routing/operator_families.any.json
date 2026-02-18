@@ -253,15 +253,13 @@
         "EDIT_RANGE",
         "ADD_SHEET",
         "RENAME_SHEET",
+        "DELETE_SHEET",
         "CREATE_CHART",
         "COMPUTE",
         "COMPUTE_BUNDLE",
         "ADD_SLIDE",
         "REWRITE_SLIDE_TEXT",
-        "REPLACE_SLIDE_IMAGE",
-        "edit.plan",
-        "edit.apply",
-        "edit.undo"
+        "REPLACE_SLIDE_IMAGE"
       ],
       "allowedAnswerModes": [
         "action_receipt",

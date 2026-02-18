@@ -27,6 +27,22 @@
           "reformular",
           "melhorar"
         ],
+        "tokens_none": [
+          "marcadores",
+          "numeração",
+          "lista numerada",
+          "lista de marcadores",
+          "mescle",
+          "divida",
+          "combine",
+          "cabeçalho",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "alinhe",
+          "recuo",
+          "traduza"
+        ],
         "regex_any": [
           "\\b(?:reescreva|reformule|melhore|reescrever|reformular|melhorar)\\b.{0,30}\\b(?:o|este|esse|a|esta|essa)?\\s*(?:par[aá]grafo|texto|trecho)\\b",
           "\\b(?:refazer|reescrever)\\b.{0,20}\\b(?:este|esse)\\b.{0,20}\\b(?:par[aá]grafo|trecho)\\b"
@@ -35,7 +51,7 @@
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targetId"
+          "out": "target"
         }
       ],
       "scopeRules": {
@@ -46,7 +62,7 @@
       "planTemplate": [
         {
           "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$targetId",
+          "targetId": "$target",
           "afterText": "$llmGenerated"
         }
       ],
@@ -84,7 +100,7 @@
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targetId"
+          "out": "target"
         }
       ],
       "scopeRules": {
@@ -95,7 +111,7 @@
       "planTemplate": [
         {
           "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$targetId",
+          "targetId": "$target",
           "afterText": "$llmGenerated",
           "tone": "formal"
         }
@@ -137,7 +153,7 @@
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targetId"
+          "out": "target"
         }
       ],
       "scopeRules": {
@@ -148,7 +164,7 @@
       "planTemplate": [
         {
           "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$targetId",
+          "targetId": "$target",
           "afterText": "$llmGenerated",
           "tone": "concise"
         }
@@ -191,7 +207,7 @@
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targetId"
+          "out": "target"
         }
       ],
       "scopeRules": {
@@ -202,7 +218,7 @@
       "planTemplate": [
         {
           "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$targetId",
+          "targetId": "$target",
           "afterText": "$llmGenerated",
           "tone": "expand"
         }
@@ -243,7 +259,7 @@
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targetId"
+          "out": "target"
         },
         {
           "type": "NUMBER_OR_TEXT",
@@ -258,7 +274,7 @@
       "planTemplate": [
         {
           "op": "DOCX_REPLACE_SPAN",
-          "targetId": "$targetId",
+          "targetId": "$target",
           "start": "$start",
           "end": "$end",
           "afterText": "$afterText"
@@ -1617,7 +1633,7 @@
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targetId"
+          "out": "target"
         },
         {
           "type": "NUMBER_OR_TEXT",
@@ -1632,7 +1648,7 @@
       "planTemplate": [
         {
           "op": "DOCX_INSERT_AFTER",
-          "targetId": "$targetId",
+          "targetId": "$target",
           "afterText": "$afterText"
         }
       ],
@@ -1671,7 +1687,7 @@
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targetId"
+          "out": "target"
         },
         {
           "type": "NUMBER_OR_TEXT",
@@ -1686,7 +1702,7 @@
       "planTemplate": [
         {
           "op": "DOCX_INSERT_BEFORE",
-          "targetId": "$targetId",
+          "targetId": "$target",
           "afterText": "$afterText"
         }
       ],
@@ -1724,7 +1740,7 @@
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targetId"
+          "out": "target"
         }
       ],
       "scopeRules": {
@@ -1735,7 +1751,7 @@
       "planTemplate": [
         {
           "op": "DOCX_DELETE_PARAGRAPH",
-          "targetId": "$targetId"
+          "targetId": "$target"
         }
       ],
       "examples": {
@@ -1820,7 +1836,7 @@
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targetId"
+          "out": "target"
         },
         {
           "type": "NUMBER_OR_TEXT",
@@ -1835,7 +1851,7 @@
       "planTemplate": [
         {
           "op": "DOCX_SPLIT_PARAGRAPH",
-          "targetId": "$targetId",
+          "targetId": "$target",
           "splitAt": "$splitAt"
         }
       ],
@@ -2011,7 +2027,7 @@
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targetId"
+          "out": "target"
         }
       ],
       "scopeRules": {
@@ -2022,7 +2038,7 @@
       "planTemplate": [
         {
           "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$targetId",
+          "targetId": "$target",
           "afterText": "$llmGenerated",
           "tone": "informal"
         }
@@ -2054,7 +2070,7 @@
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targetId"
+          "out": "target"
         }
       ],
       "scopeRules": {
@@ -2065,7 +2081,7 @@
       "planTemplate": [
         {
           "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$targetId",
+          "targetId": "$target",
           "afterText": "$llmGenerated",
           "tone": "friendly"
         }
@@ -2143,7 +2159,7 @@
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targetId"
+          "out": "target"
         }
       ],
       "scopeRules": {
@@ -2154,7 +2170,7 @@
       "planTemplate": [
         {
           "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$targetId",
+          "targetId": "$target",
           "afterText": "$llmGenerated",
           "tone": "grammar_fix"
         }
@@ -2393,6 +2409,234 @@
         "negative": [
           "Reescreva este parágrafo",
           "Torne mais formal"
+        ]
+      }
+    },
+    {
+      "id": "docx.case.title",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 82,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:iniciais|primeira\\s+letra)\\b.{0,20}\\b(?:mai[uú]sculas?|capitalizar)\\b",
+          "\\bcapitalizar\\s+cada\\s+palavra\\b",
+          "\\b(?:colocar|deixar|converter|transformar)\\b.{0,30}\\b(?:iniciais\\s+mai[uú]sculas|primeira\\s+letra\\s+mai[uú]scula)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_TEXT_CASE",
+          "targets": [
+            "$target"
+          ],
+          "targetCase": "title_case"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Coloque todos os títulos com iniciais maiúsculas",
+          "Capitalizar cada palavra",
+          "Deixe com a primeira letra maiúscula"
+        ],
+        "negative": [
+          "Deixe em maiúsculas",
+          "Coloque em negrito"
+        ]
+      }
+    },
+    {
+      "id": "docx.case.upper",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 82,
+      "triggers": {
+        "tokens_any": [
+          "maiúsculas",
+          "maiusculas"
+        ],
+        "regex_any": [
+          "\\b(?:mai[uú]sculas?|caixa\\s+alta|tudo\\s+em\\s+mai[uú]sculas?)\\b",
+          "\\b(?:colocar|deixar|converter|transformar)\\b.{0,30}\\b(?:mai[uú]sculas?|caixa\\s+alta)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_TEXT_CASE",
+          "targets": [
+            "$target"
+          ],
+          "targetCase": "uppercase"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Deixe em maiúsculas",
+          "Coloque em caixa alta",
+          "Tudo em maiúsculas",
+          "Converter para maiúsculas"
+        ],
+        "negative": [
+          "Deixe em minúsculas",
+          "Coloque em negrito"
+        ]
+      }
+    },
+    {
+      "id": "docx.case.lower",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 82,
+      "triggers": {
+        "tokens_any": [
+          "minúsculas",
+          "minusculas"
+        ],
+        "regex_any": [
+          "\\b(?:min[uú]sculas?|caixa\\s+baixa)\\b",
+          "\\b(?:colocar|deixar|converter|transformar)\\b.{0,30}\\b(?:min[uú]sculas?|caixa\\s+baixa)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_TEXT_CASE",
+          "targets": [
+            "$target"
+          ],
+          "targetCase": "lowercase"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Deixe em minúsculas",
+          "Coloque em caixa baixa",
+          "Converter para minúsculas"
+        ],
+        "negative": [
+          "Deixe em maiúsculas",
+          "Coloque em negrito"
+        ]
+      }
+    },
+    {
+      "id": "docx.case.sentence",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 82,
+      "triggers": {
+        "regex_any": [
+          "\\bcaixa\\s+de\\s+frase\\b",
+          "\\b(?:colocar|deixar|converter)\\b.{0,30}\\bcaixa\\s+de\\s+frase\\b",
+          "\\bmai[uú]scula\\s+s[oó]\\s+no\\s+in[ií]cio\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_TEXT_CASE",
+          "targets": [
+            "$target"
+          ],
+          "targetCase": "sentence_case"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Coloque em caixa de frase",
+          "Maiúscula só no início da frase"
+        ],
+        "negative": [
+          "Deixe em maiúsculas",
+          "Coloque em caixa alta"
+        ]
+      }
+    },
+    {
+      "id": "docx.summarize.to_bullets",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 83,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:resumir|resuma|sintetizar|sintetize)\\b.{0,20}\\b(?:em|como|para)\\b.{0,10}\\b(?:t[oó]picos|bullets?|marcadores?)\\b",
+          "\\b(?:extrair|extraia)\\b.{0,20}\\b(?:pontos|ideias)\\s+(?:chave|principais)\\b",
+          "\\b(?:separar|separe|dividir|divida)\\b.{0,20}\\b(?:pontos|ideias)\\s+(?:chave|principais)\\b.{0,15}\\b(?:em)?\\s*(?:t[oó]picos|bullets?)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_LIST_APPLY_BULLETS",
+          "targets": [
+            "$target"
+          ],
+          "summarize": true
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Resuma em tópicos",
+          "Resumir este parágrafo em bullets",
+          "Extraia os pontos chave",
+          "Sintetize em marcadores"
+        ],
+        "negative": [
+          "Converta em tópicos",
+          "Adicione marcadores",
+          "Resuma esta seção em um parágrafo"
         ]
       }
     }

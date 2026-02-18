@@ -17,6 +17,7 @@ import { generateSlideImagesForDocument } from "../services/preview/pptxSlideIma
 import { publishExtractJob, isPubSubAvailable } from "../services/jobs/pubsubPublisher.service";
 import { env } from "../config/env";
 import { DocxAnchorsService } from "../services/editing/docx/docxAnchors.service";
+import { toMarkdown, buildDocxBundlePatchesFromMarkdown } from "../services/editing/docx/docxMarkdownBridge.service";
 import { extractXlsxWithAnchors } from "../services/extraction/xlsxExtractor.service";
 import { SlidesClientService } from "../services/editing/slides/slidesClient.service";
 import { EditSuggestionsService } from "../services/editing/editSuggestions.service";
@@ -30,6 +31,7 @@ import sheetsStudioRouter from "./sheetsStudio.routes";
 const router = Router();
 
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+const ENABLE_DOCX_MARKDOWN_API = String(process.env.KODA_ENABLE_DOCX_MARKDOWN_API || "").trim().toLowerCase() === "true";
 
 function isDocxDocumentLike(input: { mimeType?: string | null; filename?: string | null }): boolean {
   const mime = String(input?.mimeType || "").trim().toLowerCase();
@@ -124,13 +126,16 @@ router.post("/processing-status", statusPollingLimiter, validate(documentIdsSche
     }
 
     // "indexed" means embeddings are written and the doc is AI-usable.
-    // Some docs only reach "ready" after preview generation; don't block UI on previews.
-    const readyLike = new Set(['ready', 'indexed', 'skipped']);
+    // "ready" may be reached after previews/metadata finalize.
+    // "skipped" is NOT AI-usable (usually no extractable text), so it must not count as ready.
+    const readyLike = new Set(['ready', 'indexed']);
     const readyCount = docs.filter(d => readyLike.has(d.status)).length;
     const failedCount = docs.filter(d => d.status === 'failed').length;
+    const indexedCount = docs.filter(d => d.status === 'indexed').length;
+    const skippedCount = docs.filter(d => d.status === 'skipped').length;
     const totalCount = documentIds.length;
 
-    res.json({ statuses, readyCount, failedCount, totalCount, allReady: readyCount === totalCount });
+    res.json({ statuses, readyCount, failedCount, indexedCount, skippedCount, totalCount, allReady: readyCount === totalCount });
   } catch (e: any) {
     console.error("POST /documents/processing-status error:", e);
     res.status(500).json({ error: "Failed to check processing status" });
@@ -785,6 +790,149 @@ router.get("/:id/editing/docx-html", rateLimitMiddleware, async (req: any, res: 
   } catch (e: any) {
     console.error("GET /documents/:id/editing/docx-html error:", e);
     res.status(500).json({ error: "Failed to render DOCX HTML." });
+  }
+});
+
+/**
+ * GET /:id/editing/markdown — Internal endpoint.
+ * Extract DOCX as annotated Markdown with paragraph identity markers.
+ */
+router.get("/:id/editing/markdown", rateLimitMiddleware, async (req: any, res: Response): Promise<void> => {
+  if (!ENABLE_DOCX_MARKDOWN_API) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+
+  const userId = req.user?.id;
+  if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  try {
+    const doc = await prisma.document.findFirst({
+      where: { id: req.params.id, userId },
+      select: { id: true, filename: true, encryptedFilename: true, mimeType: true, updatedAt: true },
+    });
+    if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
+    if (!doc.encryptedFilename) { res.status(422).json({ error: "Document storage key missing" }); return; }
+    if (!isDocxDocumentLike(doc)) {
+      res.status(400).json({ error: "Markdown editing is only available for DOCX files." });
+      return;
+    }
+
+    const bytes = await downloadFile(doc.encryptedFilename);
+    const anchors = new DocxAnchorsService();
+    const richNodes = await anchors.extractRichParagraphNodes(bytes);
+    const numberingFormats = await anchors.extractNumberingFormats(bytes);
+    const result = toMarkdown(richNodes, numberingFormats);
+
+    // File hash for optimistic locking
+    const crypto = await import("crypto");
+    const fileHash = crypto.createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+
+    res.json({
+      documentId: doc.id,
+      markdown: result.markdown,
+      paragraphMap: result.paragraphMap,
+      fileHash,
+      updatedAt: doc.updatedAt,
+    });
+  } catch (e: any) {
+    console.error("GET /documents/:id/editing/markdown error:", e);
+    res.status(500).json({ error: "Failed to extract Markdown." });
+  }
+});
+
+/**
+ * POST /:id/editing/markdown — Internal endpoint.
+ * Save Markdown edits back to DOCX.
+ * Diffs submitted Markdown against current DOCX, generates EDIT_DOCX_BUNDLE patches.
+ * Body: { markdown: string, paragraphMap: ParagraphMapEntry[], expectedFileHash: string }
+ */
+router.post("/:id/editing/markdown", rateLimitMiddleware, async (req: any, res: Response): Promise<void> => {
+  if (!ENABLE_DOCX_MARKDOWN_API) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+
+  const userId = req.user?.id;
+  if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  try {
+    const { markdown, paragraphMap, expectedFileHash } = req.body || {};
+    if (!markdown || typeof markdown !== "string") {
+      res.status(400).json({ error: "markdown is required." });
+      return;
+    }
+    if (!paragraphMap || !Array.isArray(paragraphMap)) {
+      res.status(400).json({ error: "paragraphMap is required." });
+      return;
+    }
+
+    const doc = await prisma.document.findFirst({
+      where: { id: req.params.id, userId },
+      select: { id: true, filename: true, encryptedFilename: true, mimeType: true },
+    });
+    if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
+    if (!doc.encryptedFilename) { res.status(422).json({ error: "Document storage key missing" }); return; }
+    if (!isDocxDocumentLike(doc)) {
+      res.status(400).json({ error: "Markdown editing is only available for DOCX files." });
+      return;
+    }
+
+    const bytes = await downloadFile(doc.encryptedFilename);
+
+    // Optimistic lock check
+    if (expectedFileHash) {
+      const crypto = await import("crypto");
+      const currentHash = crypto.createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+      if (currentHash !== expectedFileHash) {
+        res.status(409).json({
+          error: "Document was modified since you loaded it. Please reload.",
+          currentFileHash: currentHash,
+          expectedFileHash,
+        });
+        return;
+      }
+    }
+
+    const markdownPlan = await buildDocxBundlePatchesFromMarkdown(bytes, markdown, paragraphMap);
+    if (markdownPlan.markdownPatches.length === 0) {
+      res.json({ ok: true, patchCount: 0, noop: true });
+      return;
+    }
+
+    const bundlePatches = markdownPlan.bundlePatches;
+    if (bundlePatches.length === 0) {
+      res.json({ ok: true, patchCount: 0, noop: true });
+      return;
+    }
+
+    // Dispatch through the existing editing pipeline
+    const revisionStore = req.app?.locals?.services?.documentRevisionStore;
+    if (!revisionStore) {
+      res.status(503).json({ error: "DocumentRevisionStore not available." });
+      return;
+    }
+
+    const result = await revisionStore.createRevision({
+      documentId: doc.id,
+      userId,
+      correlationId: req.headers["x-correlation-id"] as string || "",
+      conversationId: req.headers["x-conversation-id"] as string || "",
+      clientMessageId: req.headers["x-client-message-id"] as string || "",
+      content: JSON.stringify({ patches: bundlePatches }),
+      metadata: { operator: "EDIT_DOCX_BUNDLE" },
+    });
+
+    res.json({
+      ok: true,
+      patchCount: bundlePatches.length,
+      fileHashBefore: result?.fileHashBefore || expectedFileHash || null,
+      fileHashAfter: result?.fileHashAfter || null,
+      revisionId: result?.revisionId || null,
+    });
+  } catch (e: any) {
+    console.error("POST /documents/:id/editing/markdown error:", e);
+    res.status(500).json({ error: e.message || "Failed to apply Markdown edits." });
   }
 });
 

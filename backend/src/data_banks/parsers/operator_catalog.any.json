@@ -1209,6 +1209,26 @@
         "en": "Repairing document numbering...",
         "pt": "Reparando numeração do documento..."
       }
+    },
+    "DOCX_SET_TEXT_CASE": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets",
+        "targetCase"
+      ],
+      "optionalSlots": [
+        "scope"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Applying {{targetCase}} to text...",
+        "pt": "Aplicando {{targetCase}} ao texto..."
+      }
     }
   }
 }

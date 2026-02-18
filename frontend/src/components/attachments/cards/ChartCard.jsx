@@ -59,6 +59,13 @@ function formatValue(value, valueFormat = {}) {
   }
 }
 
+function shortLabel(text, max = 18) {
+  const raw = String(text ?? "").trim();
+  if (!raw) return "";
+  if (raw.length <= max) return raw;
+  return `${raw.slice(0, max - 1).trimEnd()}…`;
+}
+
 function normalizeSeries(chart) {
   const list = Array.isArray(chart?.series) ? chart.series : [];
   if (list.length) {
@@ -68,6 +75,8 @@ function normalizeSeries(chart) {
         label: String(s?.label || s?.name || s?.yKey || "").trim(),
         color: typeof s?.color === "string" ? s.color : undefined,
         role: typeof s?.role === "string" ? String(s.role).toLowerCase() : undefined,
+        axis: typeof s?.axis === "string" ? String(s.axis).toLowerCase() : undefined,
+        format: s?.format && typeof s.format === "object" ? s.format : undefined,
       }))
       .filter((s) => s.yKey);
   }
@@ -87,9 +96,25 @@ const ChartSurface = React.memo(function ChartSurface({ chart, height = 240 }) {
 
   const xKey = String(chart?.xKey || "category");
   const valueFormat = chart?.valueFormat || {};
+  const axisFormats = chart?.axisFormats && typeof chart.axisFormats === "object"
+    ? chart.axisFormats
+    : {};
   const series = normalizeSeries(chart);
   const type = buildChartType(chart);
   const palette = ["#111827", "#2563EB", "#10B981", "#F59E0B", "#DC2626", "#7C3AED", "#0891B2"];
+  const rowCount = data.length;
+  const xInterval = rowCount > 24 ? Math.ceil(rowCount / 12) - 1 : (rowCount > 14 ? 1 : 0);
+  const tickAngle = rowCount > 12 ? -30 : 0;
+  const tickAnchor = tickAngle < 0 ? "end" : "middle";
+  const tickHeight = tickAngle < 0 ? 58 : 36;
+  const hasDualAxis = series.some((s) => s.axis === "right");
+  const formatForSeries = (yKey) => {
+    const found = series.find((s) => s.yKey === yKey);
+    if (found?.format) return found.format;
+    if (found?.axis === "right" && axisFormats?.right) return axisFormats.right;
+    if (found?.axis === "left" && axisFormats?.left) return axisFormats.left;
+    return valueFormat;
+  };
 
   const pieSeriesKey = series[0]?.yKey || "amount";
   const pieData = data.map((d) => ({
@@ -97,7 +122,10 @@ const ChartSurface = React.memo(function ChartSurface({ chart, height = 240 }) {
     value: safeNum(d?.[pieSeriesKey]),
   }));
 
-  const tooltipFormatter = (value) => formatValue(value, valueFormat);
+  const tooltipFormatter = (value, name, item) => {
+    const dataKey = String(item?.dataKey || "");
+    return formatValue(value, formatForSeries(dataKey));
+  };
 
   const common = (
     <>
@@ -105,15 +133,32 @@ const ChartSurface = React.memo(function ChartSurface({ chart, height = 240 }) {
       <XAxis
         dataKey={xKey}
         tick={{ fontSize: 12, fill: "#6B7280" }}
-        interval={0}
-        angle={-30}
-        textAnchor="end"
-        height={58}
+        interval={xInterval}
+        tickFormatter={(v) => shortLabel(v, 20)}
+        minTickGap={16}
+        angle={tickAngle}
+        textAnchor={tickAnchor}
+        height={tickHeight}
       />
-      <YAxis tick={{ fontSize: 12, fill: "#6B7280" }} tickFormatter={(v) => formatValue(v, valueFormat)} width={78} />
+      <YAxis
+        yAxisId="left"
+        tick={{ fontSize: 12, fill: "#6B7280" }}
+        tickFormatter={(v) => formatValue(v, axisFormats?.left || valueFormat)}
+        width={82}
+      />
+      {hasDualAxis ? (
+        <YAxis
+          yAxisId="right"
+          orientation="right"
+          tick={{ fontSize: 12, fill: "#6B7280" }}
+          tickFormatter={(v) => formatValue(v, axisFormats?.right || valueFormat)}
+          width={72}
+        />
+      ) : null}
       <Tooltip
         isAnimationActive={false}
         formatter={tooltipFormatter}
+        labelFormatter={(v) => String(v ?? "")}
         labelStyle={{ color: "#111827", fontWeight: 700 }}
         contentStyle={{ borderRadius: 12, border: "1px solid #E5E7EB" }}
       />
@@ -153,11 +198,12 @@ const ChartSurface = React.memo(function ChartSurface({ chart, height = 240 }) {
               key={s.yKey}
               dataKey={s.yKey}
               name={s.label || s.yKey}
-              stroke={s.color || palette[idx % palette.length]}
-              strokeWidth={2.25}
-              dot={false}
-              isAnimationActive={false}
-            />
+                  stroke={s.color || palette[idx % palette.length]}
+                  strokeWidth={2.25}
+                  dot={false}
+                  yAxisId={s.axis === "right" ? "right" : "left"}
+                  isAnimationActive={false}
+                />
           ))}
         </LineChart>
       </ResponsiveContainer>
@@ -174,11 +220,12 @@ const ChartSurface = React.memo(function ChartSurface({ chart, height = 240 }) {
               key={s.yKey}
               dataKey={s.yKey}
               name={s.label || s.yKey}
-              stroke={s.color || palette[idx % palette.length]}
-              fill={s.color || palette[idx % palette.length]}
-              fillOpacity={0.22}
-              isAnimationActive={false}
-            />
+                  stroke={s.color || palette[idx % palette.length]}
+                  fill={s.color || palette[idx % palette.length]}
+                  fillOpacity={0.22}
+                  yAxisId={s.axis === "right" ? "right" : "left"}
+                  isAnimationActive={false}
+                />
           ))}
         </AreaChart>
       </ResponsiveContainer>
@@ -245,6 +292,7 @@ const ChartSurface = React.memo(function ChartSurface({ chart, height = 240 }) {
                   stroke={s.color || palette[idx % palette.length]}
                   strokeWidth={2.4}
                   dot={false}
+                  yAxisId={s.axis === "right" ? "right" : "left"}
                   isAnimationActive={false}
                 />
               : <Bar
@@ -252,6 +300,7 @@ const ChartSurface = React.memo(function ChartSurface({ chart, height = 240 }) {
                   dataKey={s.yKey}
                   name={s.label || s.yKey}
                   fill={s.color || palette[idx % palette.length]}
+                  yAxisId={s.axis === "right" ? "right" : "left"}
                   radius={[5, 5, 0, 0]}
                   isAnimationActive={false}
                 />
@@ -272,6 +321,7 @@ const ChartSurface = React.memo(function ChartSurface({ chart, height = 240 }) {
             dataKey={s.yKey}
             name={s.label || s.yKey}
             fill={s.color || palette[idx % palette.length]}
+            yAxisId={s.axis === "right" ? "right" : "left"}
             radius={stacked ? [0, 0, 0, 0] : [5, 5, 0, 0]}
             stackId={stacked ? "a" : undefined}
             isAnimationActive={false}
@@ -290,6 +340,13 @@ export default function ChartCard({ chart }) {
 
   const chartTypeLabel = String(chart?.chartType || chart?.type || "chart").toUpperCase();
   const sourceRange = String(chart?.sourceRange || chart?.range || chart?.meta?.range || "").trim();
+  const axisFormats = chart?.axisFormats && typeof chart.axisFormats === "object"
+    ? chart.axisFormats
+    : null;
+  const explainLine = axisFormats
+    ? `Left axis: ${String(axisFormats?.left?.style || "value")}. Right axis: ${String(axisFormats?.right?.style || "value")}.`
+    : "";
+  const chartWarning = String(chart?.warning || "").trim();
 
   return (
     <div className="koda-chart-card">
@@ -314,6 +371,7 @@ export default function ChartCard({ chart }) {
       <div className="koda-chart-card__body" onClick={() => setExpanded(true)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter") setExpanded(true); }}>
         <ChartSurface chart={chart} height={240} />
       </div>
+      {chartWarning ? <div className="koda-chart-card__warning">{chartWarning}</div> : null}
 
       {expanded ? (
         <Modal
@@ -326,6 +384,8 @@ export default function ChartCard({ chart }) {
             <span className="koda-chart-card__typePill">{chartTypeLabel}</span>
             {sourceRange ? <span className="koda-chart-card__range">{sourceRange}</span> : null}
           </div>
+          {explainLine ? <div className="koda-chart-card__axisNote">{explainLine}</div> : null}
+          {chartWarning ? <div className="koda-chart-card__warning">{chartWarning}</div> : null}
           <ChartSurface chart={chart} height={520} />
         </Modal>
       ) : null}

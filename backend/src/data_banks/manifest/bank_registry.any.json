@@ -3869,6 +3869,29 @@
       "lastUpdated": "2026-02-12"
     },
     {
+      "id": "allybi_font_aliases",
+      "category": "dictionaries",
+      "path": "dictionaries/allybi_font_aliases.any.json",
+      "filename": "allybi_font_aliases.any.json",
+      "version": "1.0.0",
+      "contentType": "dictionaries",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-17"
+    },
+    {
       "id": "excel_formula_catalog",
       "category": "semantics",
       "path": "semantics/excel_formula_catalog.any.json",
@@ -4262,6 +4285,20 @@
       "requiredByEnv": { "production": true, "staging": true, "dev": true, "local": true },
       "checksumSha256": "",
       "lastUpdated": "2026-02-16"
+    },
+    {
+      "id": "edit_error_catalog",
+      "category": "microcopy",
+      "path": "microcopy/edit_error_catalog.any.json",
+      "filename": "edit_error_catalog.any.json",
+      "version": "1.0.0",
+      "contentType": "microcopy",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
+      "requiredByEnv": { "production": true, "staging": true, "dev": true, "local": true },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-17"
     }
   ],
   "tests": [

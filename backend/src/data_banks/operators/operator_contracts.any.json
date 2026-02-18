@@ -867,6 +867,26 @@
       }
     },
     {
+      "id": "DELETE_SHEET",
+      "family": "editing",
+      "description": "Delete a sheet/tab from an XLSX spreadsheet. Destructive operation that requires explicit confirmation.",
+      "requires": {
+        "docIndexAvailable": true,
+        "retrieval": false,
+        "explicitDocRefAllowed": true
+      },
+      "preferredAnswerMode": "action_confirmation",
+      "outputs": {
+        "primaryShape": "paragraph",
+        "allowedShapes": [
+          "paragraph"
+        ],
+        "sources": {
+          "required": false
+        }
+      }
+    },
+    {
       "id": "CREATE_CHART",
       "family": "editing",
       "description": "Create a chart in an XLSX spreadsheet.",

@@ -2,9 +2,9 @@ import type { Request, Response } from 'express';
 import { randomUUID } from 'crypto';
 
 import {
-  EditHandlerService,
   type EditHandlerRequest,
 } from '../services/core/handlers/editHandler.service';
+import { EditingFacadeService } from '../services/editing/entrypoints/editingFacade.service';
 
 import type {
   DocxParagraphNode,
@@ -328,7 +328,7 @@ export class EditorSessionController {
   private readonly store: EditorSessionStore;
 
   constructor(
-    private readonly editHandler: EditHandlerService = new EditHandlerService(),
+    private readonly editingFacade: EditingFacadeService = new EditingFacadeService(),
     opts?: { ttlMs?: number },
   ) {
     this.store = new EditorSessionStore(opts?.ttlMs ?? 15 * 60 * 1000);
@@ -392,7 +392,7 @@ export class EditorSessionController {
       return sendErr(res, 'DOCUMENT_NOT_FOUND', 'Document not found or not accessible.', 404);
     }
 
-    const previewResult = await this.editHandler.execute({
+    const previewResult = await this.editingFacade.execute({
       mode: 'preview',
       context: ctx,
       planRequest: {
@@ -517,7 +517,7 @@ export class EditorSessionController {
     }
 
     const idempotencyKey = asString(body.idempotencyKey) || `${session.id}:apply`;
-    const applied = await this.editHandler.execute({
+    const applied = await this.editingFacade.execute({
       mode: 'apply',
       context: ctx,
       planRequest: {
@@ -555,6 +555,7 @@ export class EditorSessionController {
       const data: EditorSessionApplyResponse = {
         sessionId: session.id,
         status: session.status,
+        applyPath: 'editing_facade',
         requiresUserChoice: true,
         previewIfChoiceRequired: applied.result as any,
         receipt: (applied.receipt as any) ?? null,
@@ -569,6 +570,7 @@ export class EditorSessionController {
     const data: EditorSessionApplyResponse = {
       sessionId: session.id,
       status: session.status,
+      applyPath: 'editing_facade',
       applied: applied.result as any,
       receipt: (applied.receipt as any) ?? null,
       requiresUserChoice: false,
@@ -595,7 +597,7 @@ export class EditorSessionController {
 
 export function createEditorSessionController(): EditorSessionController {
   return new EditorSessionController(
-    new EditHandlerService({
+    new EditingFacadeService({
       revisionStore: new DocumentRevisionStoreService(),
     }),
   );

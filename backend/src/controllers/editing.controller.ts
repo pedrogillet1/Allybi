@@ -1,9 +1,9 @@
 import type { Request, Response } from 'express';
 import { randomUUID } from 'crypto';
 import {
-  EditHandlerService,
   type EditHandlerRequest,
 } from '../services/core/handlers/editHandler.service';
+import { EditingFacadeService } from '../services/editing/entrypoints/editingFacade.service';
 import type {
   DocxParagraphNode,
   EditDomain,
@@ -76,6 +76,18 @@ function normalizeDocxBundleProposedText(
   }
 
   return proposedText;
+}
+
+function hasDocxBundlePayload(proposedText: string | null, rawBundlePatches: unknown): boolean {
+  if (Array.isArray(rawBundlePatches) && rawBundlePatches.length > 0) return true;
+  const text = String(proposedText || '').trim();
+  if (!text) return false;
+  try {
+    const parsed = JSON.parse(text);
+    return Array.isArray(parsed?.patches) && parsed.patches.length > 0;
+  } catch {
+    return false;
+  }
 }
 
 function userIdFromReq(req: Request): string | null {
@@ -298,7 +310,7 @@ function parseSlidesCandidates(raw: unknown): SlidesTargetNode[] {
 }
 
 export class EditingController {
-  constructor(private readonly editHandler: EditHandlerService = new EditHandlerService()) {}
+  constructor(private readonly editingFacade: EditingFacadeService = new EditingFacadeService()) {}
 
   plan = async (req: Request, res: Response): Promise<Response> => {
     const context = buildContext(req);
@@ -323,7 +335,7 @@ export class EditingController {
       return sendErr(res, 'INVALID_PLAN_INPUT', 'instruction, domain, and documentId are required.', 400);
     }
 
-    const result = await this.editHandler.execute({
+    const result = await this.editingFacade.execute({
       mode: 'plan',
       context,
       planRequest: {
@@ -376,18 +388,21 @@ export class EditingController {
         })
       : { runtimeOperator: null, canonicalOperator: null };
 
-    const proposedText = normalizeDocxBundleProposedText(normalized.runtimeOperator, proposedTextRaw, body.bundlePatches);
+    const forceDocxBundle = domain === 'docx' && hasDocxBundlePayload(proposedTextRaw, body.bundlePatches);
+    const runtimeOperator = forceDocxBundle ? 'EDIT_DOCX_BUNDLE' : normalized.runtimeOperator;
+    const canonicalOperator = forceDocxBundle ? 'DOCX_SET_RUN_STYLE' : normalized.canonicalOperator;
+    const proposedText = normalizeDocxBundleProposedText(runtimeOperator, proposedTextRaw, body.bundlePatches);
 
-    if (!instruction || !isEditDomain(domain) || !normalized.runtimeOperator || !documentId || !beforeText || !proposedText) {
+    if (!instruction || !isEditDomain(domain) || !runtimeOperator || !documentId || !beforeText || !proposedText) {
       return sendErr(res, 'INVALID_PREVIEW_INPUT', 'instruction, domain, documentId, beforeText, and proposedText are required.', 400);
     }
 
-    const result = await this.editHandler.execute({
+    const result = await this.editingFacade.execute({
       mode: 'preview',
       context,
       planRequest: {
         instruction,
-        operator: normalized.runtimeOperator,
+        operator: runtimeOperator,
         domain,
         documentId,
         targetHint: asString(body.targetHint) || undefined,
@@ -411,7 +426,7 @@ export class EditingController {
 
     return sendOk(res, {
       mode: 'preview',
-      canonicalOperator: normalized.canonicalOperator,
+      canonicalOperator,
       canonicalOperators: normalized.canonicalOperators || [],
       result: result.result,
       receipt: result.receipt || null,
@@ -444,18 +459,21 @@ export class EditingController {
         })
       : { runtimeOperator: null, canonicalOperator: null };
 
-    const proposedText = normalizeDocxBundleProposedText(normalized.runtimeOperator, proposedTextRaw, body.bundlePatches);
+    const forceDocxBundle = domain === 'docx' && hasDocxBundlePayload(proposedTextRaw, body.bundlePatches);
+    const runtimeOperator = forceDocxBundle ? 'EDIT_DOCX_BUNDLE' : normalized.runtimeOperator;
+    const canonicalOperator = forceDocxBundle ? 'DOCX_SET_RUN_STYLE' : normalized.canonicalOperator;
+    const proposedText = normalizeDocxBundleProposedText(runtimeOperator, proposedTextRaw, body.bundlePatches);
 
-    if (!instruction || !isEditDomain(domain) || !normalized.runtimeOperator || !documentId || !beforeText || !proposedText) {
+    if (!instruction || !isEditDomain(domain) || !runtimeOperator || !documentId || !beforeText || !proposedText) {
       return sendErr(res, 'INVALID_APPLY_INPUT', 'instruction, domain, documentId, beforeText, and proposedText are required.', 400);
     }
 
-    const result = await this.editHandler.execute({
+    const result = await this.editingFacade.execute({
       mode: 'apply',
       context,
       planRequest: {
         instruction,
-        operator: normalized.runtimeOperator,
+        operator: runtimeOperator,
         domain,
         documentId,
         targetHint: asString(body.targetHint) || undefined,
@@ -486,7 +504,8 @@ export class EditingController {
         res,
         {
           mode: 'apply',
-          canonicalOperator: normalized.canonicalOperator,
+          applyPath: 'editing_facade',
+          canonicalOperator,
           canonicalOperators: normalized.canonicalOperators || [],
           result: result.result,
           receipt: result.receipt || null,
@@ -498,7 +517,8 @@ export class EditingController {
 
     return sendOk(res, {
       mode: 'apply',
-      canonicalOperator: normalized.canonicalOperator,
+      applyPath: 'editing_facade',
+      canonicalOperator,
       canonicalOperators: normalized.canonicalOperators || [],
       result: result.result,
       receipt: result.receipt || null,
@@ -514,7 +534,7 @@ export class EditingController {
     const documentId = asString(body.documentId);
     if (!documentId) return sendErr(res, 'DOCUMENT_ID_REQUIRED', 'documentId is required.', 400);
 
-    const result = await this.editHandler.execute({
+    const result = await this.editingFacade.execute({
       mode: 'undo',
       context,
       undo: {
@@ -530,16 +550,17 @@ export class EditingController {
 
     return sendOk(res, {
       mode: 'undo',
+      applyPath: 'editing_facade',
       result: result.result,
       receipt: result.receipt || null,
     });
   };
 }
 
-export function createEditingController(handler?: EditHandlerService): EditingController {
+export function createEditingController(facade?: EditingFacadeService): EditingController {
   return new EditingController(
-    handler ??
-      new EditHandlerService({
+    facade ??
+      new EditingFacadeService({
         revisionStore: new DocumentRevisionStoreService(),
       }),
   );

@@ -214,6 +214,8 @@ const ChatHistory = ({
       return [];
     }
   });
+  const [hasSuccessfulConversationFetch, setHasSuccessfulConversationFetch] = useState(false);
+  const [listStatus, setListStatus] = useState(() => isAuthenticated ? 'loading' : 'ready');
 
   // Hover state for showing actions
   const [hoveredId, setHoveredId] = useState(null);
@@ -237,7 +239,10 @@ const ChatHistory = ({
   // Load conversations (API) - skip for unauthenticated users (guest mode)
   const loadConversations = useCallback(async () => {
     // Skip API calls for unauthenticated users (guest mode on mobile)
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      setListStatus('ready');
+      return;
+    }
 
     const meta = loadConversationsMetaRef.current;
     const now = Date.now();
@@ -245,10 +250,13 @@ const ChatHistory = ({
     if (now - meta.lastTs < 3000) return;
     meta.inFlight = true;
     meta.lastTs = now;
+    if (!hasSuccessfulConversationFetch) setListStatus('loading');
 
     try {
       const data = await chatService.getConversations();
       const normalized = normalizeConversations(data);
+      setHasSuccessfulConversationFetch(true);
+      setListStatus('ready');
 
       setConversations((prev) => {
         // Preserve any locally known currentConversation if API is behind
@@ -262,12 +270,20 @@ const ChatHistory = ({
         return merged;
       });
     } catch (e) {
-      // keep cached view; no UI copy here
+      const cached = safeSessionStorage.getItem('koda_chat_conversations');
+      let hasCached = false;
+      if (cached) {
+        try {
+          hasCached = normalizeConversations(JSON.parse(cached)).length > 0;
+        } catch {}
+      }
+      if (!hasCached && conversations.length > 0) hasCached = true;
+      setListStatus(hasCached ? 'degraded' : 'error');
       console.error('ChatHistory loadConversations error', e);
     } finally {
       loadConversationsMetaRef.current.inFlight = false;
     }
-  }, [currentConversation?.id, isAuthenticated]);
+  }, [conversations.length, currentConversation?.id, hasSuccessfulConversationFetch, isAuthenticated]);
 
   useEffect(() => {
     loadConversations();
@@ -285,6 +301,7 @@ const ChatHistory = ({
       const newUpdatedAt = currentConversation.updatedAt || new Date().toISOString();
 
       if (idx === -1) {
+        if (!hasSuccessfulConversationFetch && prev.length === 0) return prev;
         const updated = [{ ...currentConversation, title: newTitle, updatedAt: newUpdatedAt }, ...prev]
           .filter((c) => !isLoadingPlaceholderConversation(c));
         safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
@@ -309,7 +326,7 @@ const ChatHistory = ({
       safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(sanitized));
       return sanitized;
     });
-  }, [currentConversation?.id, currentConversation?.title, currentConversation?.updatedAt]);
+  }, [currentConversation?.id, currentConversation?.title, currentConversation?.updatedAt, hasSuccessfulConversationFetch]);
 
   // Expose list update callback (optional, if parent wants to push updates)
   useEffect(() => {
@@ -320,6 +337,7 @@ const ChatHistory = ({
       setConversations((prev) => {
         const idx = prev.findIndex((c) => c.id === updatedConversation.id);
         if (idx === -1) {
+          if (!hasSuccessfulConversationFetch && prev.length === 0) return prev;
           const next = [{ ...updatedConversation, title: normalizeTitle(updatedConversation) }, ...prev]
             .filter((c) => !isLoadingPlaceholderConversation(c));
           safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(next));
@@ -337,7 +355,12 @@ const ChatHistory = ({
         return sanitized;
       });
     });
-  }, [onConversationUpdate]);
+  }, [hasSuccessfulConversationFetch, onConversationUpdate]);
+
+  const retryLoadConversations = useCallback(() => {
+    loadConversationsMetaRef.current.lastTs = 0;
+    loadConversations();
+  }, [loadConversations]);
 
   // Cmd/Ctrl+K to open search modal (ChatGPT-like)
   useEffect(() => {
@@ -932,6 +955,46 @@ const ChatHistory = ({
         {/* Conversation list */}
         {isExpanded && (
           <div className="chat-history-scrollbar" style={{ flex: '1 1 auto', overflowY: 'auto' }}>
+            {(listStatus === 'degraded' || listStatus === 'error') && (
+              <div
+                style={{
+                  marginBottom: 12,
+                  padding: '10px 12px',
+                  borderRadius: 10,
+                  border: '1px solid #FEC84B',
+                  background: '#FFF7E6',
+                  color: '#7A4B00',
+                  fontFamily: 'Plus Jakarta Sans',
+                  fontSize: 12,
+                  lineHeight: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 10,
+                }}
+              >
+                <span>
+                  {listStatus === 'degraded'
+                    ? 'Showing cached conversations. Live sync is unavailable.'
+                    : 'Unable to load conversations right now.'}
+                </span>
+                <button
+                  onClick={retryLoadConversations}
+                  style={{
+                    border: '1px solid #E0B03D',
+                    background: '#fff',
+                    borderRadius: 8,
+                    padding: '4px 8px',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: '#7A4B00',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Retry
+                </button>
+              </div>
+            )}
             {Object.entries(grouped).map(([day, list]) => {
               if (!list.length) return null;
               return (

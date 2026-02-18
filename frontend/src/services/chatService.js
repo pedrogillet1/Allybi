@@ -112,6 +112,37 @@ function _parseRetryAfterMs(retryAfterHeader) {
   return 0;
 }
 
+function _normalizeConversationsError(error) {
+  const status = error?.response?.status;
+  if (status === 401) {
+    const err = new Error('Authentication required');
+    err.code = 'AUTH_REQUIRED';
+    err.status = 401;
+    err.source = 'conversations';
+    return err;
+  }
+  if (status === 429) {
+    const err = new Error('Rate limited');
+    err.code = 'RATE_LIMITED';
+    err.status = 429;
+    err.source = 'conversations';
+    err.retryAfterMs = _parseRetryAfterMs(error?.response?.headers?.['retry-after']) || 3000;
+    return err;
+  }
+  if (!error?.response) {
+    const err = new Error('Network unavailable');
+    err.code = 'NETWORK_ERROR';
+    err.status = null;
+    err.source = 'conversations';
+    return err;
+  }
+  const err = new Error('Failed to load conversations');
+  err.code = 'CONVERSATIONS_FETCH_FAILED';
+  err.status = status || null;
+  err.source = 'conversations';
+  return err;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // ✅ FIX #9: WebSocket Reconnection with Exponential Backoff
 // ═══════════════════════════════════════════════════════════════════════════
@@ -412,7 +443,7 @@ export const getConversations = async () => {
         const retryAfterMs = _parseRetryAfterMs(e?.response?.headers?.['retry-after']) || 3000;
         _conversationsBackoffUntil = _now() + retryAfterMs;
       }
-      throw e;
+      throw _normalizeConversationsError(e);
     } finally {
       _conversationsInFlight = null;
     }
@@ -729,7 +760,7 @@ export const deleteConversation = async (conversationId) => {
  * Update conversation title
  */
 export const updateConversationTitle = async (conversationId, title) => {
-  const response = await api.patch(`/conversations/${conversationId}`, { title });
+  const response = await api.patch(`/conversations/${conversationId}/title`, { title });
   return response.data;
 };
 

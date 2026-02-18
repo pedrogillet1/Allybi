@@ -100,6 +100,17 @@ function scorePattern(pattern: IntentPattern, text: string): number {
     }
   }
 
+  // tokens_none: hard-block if ANY of these tokens are found in the text.
+  // Used to prevent collisions like "format as currency" matching a value-set pattern.
+  if (pattern.triggers.tokens_none && pattern.triggers.tokens_none.length > 0) {
+    for (const tok of pattern.triggers.tokens_none) {
+      const normTok = normalize(tok);
+      if (textTokens.has(normTok) || normText.includes(normTok)) {
+        return { score: 0, matchedTriggers: [] } as any;
+      }
+    }
+  }
+
   // A1 range bonus
   if (hasExplicitA1Range(text)) {
     score += POINTS.A1_RANGE_BONUS;

@@ -35,6 +35,15 @@
     "radar": "radar",
     "cascata": "waterfall",
     "mapa de árvore": "treemap",
-    "funil": "funnel"
+    "funil": "funnel",
+    "área empilhada": "stacked_area",
+    "gráfico de área empilhada": "stacked_area",
+    "barra 100% empilhada": "percent_stacked_bar",
+    "coluna 100% empilhada": "percent_stacked_column",
+    "explosão solar": "sunburst",
+    "sunburst": "sunburst",
+    "gráfico de dispersão": "scatter",
+    "aranha": "radar",
+    "gráfico combinado": "combo"
   }
 }

@@ -208,6 +208,32 @@
       }
     },
     {
+      "id": "SV_004_replace_selected_value",
+      "input": "Replace the selected value with approved",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "F2"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.single"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_CELL_VALUE",
+            "rangeA1": "F2",
+            "value": "approved",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
       "_comment": "========== SET VALUE: RANGE ==========",
       "id": "SVR_001_fill_range_zero",
       "input": "Fill A1:A100 with 0",

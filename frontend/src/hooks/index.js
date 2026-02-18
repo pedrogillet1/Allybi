@@ -14,3 +14,4 @@ export { useStreamingAnimation } from './useStreamingAnimation';
 export { useStreamingAnimationWithSound } from './useStreamingAnimationWithSound';
 export { default as useSwipeGestures, usePullToRefresh } from './useSwipeGestures';
 export { useCategoryMove } from './useCategoryMove';
+export { default as useDocxEditState } from './useDocxEditState';

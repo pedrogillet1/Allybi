@@ -26,7 +26,7 @@ import EmailPreviewModal from "../connectors/EmailPreviewModal";
 import UniversalUploadModal from "../upload/UniversalUploadModal";
 import { DocumentScanner } from "../scanner";
 
-import { applyEdit } from "../../services/editingService";
+import { applyEdit, extractVerifiedApply } from "../../services/editingService";
 import StreamingMarkdown from "./streaming/StreamingMarkdown";
 import MessageActions from "./messages/MessageActions";
 import useStageLabel from "./messages/useStageLabel";
@@ -112,6 +112,24 @@ const CONNECTOR_OPTIONS = [
   { provider: "outlook", label: "Outlook", family: "email", icon: outlookSvg },
   { provider: "slack", label: "Slack", family: "messages", icon: slackSvg },
 ];
+
+const VIEWER_STARTER_PROMPTS = {
+  docx: [
+    "Rewrite the intro to be more concise and professional.",
+    "Fix grammar and tighten the bullet points.",
+    "Change the tone to match an executive summary.",
+  ],
+  xlsx: [
+    "Analyze this sheet and summarize the key trends in plain language.",
+    "Convert this selection into a clean table with clear headers.",
+    "Create formulas for totals, growth %, and variance across rows.",
+  ],
+  pptx: [
+    "Rewrite this slide to be clearer and more executive-friendly.",
+    "Turn this content into 3 concise bullet points.",
+    "Improve this slide title and subtitle for clarity.",
+  ],
+};
 
 // Session cache keys
 const cacheKeyFor = (conversationId) => `koda_chat_messages_${conversationId}`;
@@ -290,7 +308,8 @@ function hasViewerSelectionPayload(selection) {
     (
       (typeof selection?.text === "string" && selection.text.trim()) ||
       (typeof selection?.rangeA1 === "string" && selection.rangeA1.trim()) ||
-      (Array.isArray(selection?.ranges) && selection.ranges.length > 0)
+      (Array.isArray(selection?.ranges) && selection.ranges.length > 0) ||
+      (typeof selection?.cursorParagraphId === "string" && selection.cursorParagraphId.trim())
     )
   );
 }
@@ -616,6 +635,51 @@ function getEditSessionFromAttachments(attachments) {
   return attachments.find((a) => a && a.type === "edit_session") || null;
 }
 
+function shouldPreferRuntimeOperator(session) {
+  const runtime = String(session?.operator || "").trim().toUpperCase();
+  const explicitBundle = Array.isArray(session?.bundlePatches) && session.bundlePatches.length > 0;
+  if (runtime === "EDIT_DOCX_BUNDLE") {
+    if (explicitBundle) return true;
+    const proposed = String(session?.proposedText || "").trim();
+    if (!proposed) return false;
+    try {
+      const parsed = JSON.parse(proposed);
+      return Array.isArray(parsed?.patches) && parsed.patches.length > 0;
+    } catch {
+      return false;
+    }
+  }
+  if (explicitBundle) return true;
+  const proposed = String(session?.proposedText || "").trim();
+  if (!proposed) return false;
+  try {
+    const parsed = JSON.parse(proposed);
+    return Array.isArray(parsed?.patches) && parsed.patches.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+function extractDocxBundlePatchesForApply(session) {
+  const candidates = [];
+  const pushList = (value) => {
+    if (!Array.isArray(value)) return;
+    for (const item of value) {
+      if (item && typeof item === "object") candidates.push(item);
+    }
+  };
+  pushList(session?.bundlePatches);
+  pushList(session?.bundle?.patches);
+  pushList(session?.bundle?.ops);
+  pushList(session?.plan?.ops);
+  try {
+    const parsed = JSON.parse(String(session?.proposedText || "").trim() || "{}");
+    pushList(parsed?.patches);
+    pushList(parsed?.ops);
+  } catch {}
+  return candidates;
+}
+
 /* Compact approve/reject actions for the inline diff in the worklog card */
 function InlineEditActions({ editSession, lang, onFileClick }) {
   const [status, setStatus] = React.useState("idle"); // idle | applying | applied | rejected | error
@@ -630,28 +694,60 @@ function InlineEditActions({ editSession, lang, onFileClick }) {
     setStatus("applying");
     setErrMsg("");
     try {
+      const useRuntimeOperator = shouldPreferRuntimeOperator(editSession);
+      const runtimeOperator = s(editSession.operator || editSession.canonicalOperator).toUpperCase();
+      const fallbackOperator = s(editSession.canonicalOperator || editSession.operator);
+      const effectiveBundlePatches = extractDocxBundlePatchesForApply(editSession);
+      const wantsBundleApply = useRuntimeOperator && runtimeOperator === "EDIT_DOCX_BUNDLE";
+      if (wantsBundleApply && effectiveBundlePatches.length === 0) {
+        setStatus("error");
+        setErrMsg("Bundle apply payload is missing patches. Please retry the edit.");
+        return;
+      }
+      const isBundleApply = wantsBundleApply && effectiveBundlePatches.length > 0;
+      const operatorForApply = isBundleApply ? "EDIT_DOCX_BUNDLE" : fallbackOperator;
+      const proposedTextForApply = isBundleApply
+        ? JSON.stringify({ patches: effectiveBundlePatches })
+        : s(editSession.proposedText || editSession.diff?.after || "");
+
       const res = await applyEdit({
         instruction: s(editSession.instruction),
-        operator: s(editSession.canonicalOperator || editSession.operator),
+        operator: operatorForApply,
         domain: editSession.domain,
         documentId: editSession.documentId,
         targetHint: editSession.targetHint || undefined,
         target: editSession.target || undefined,
         beforeText: s(editSession.beforeText || editSession.diff?.before || "(bulk edit)"),
-        // Use canonical proposedText first. diff.after may be a shortened preview snippet.
-        proposedText: s(
-          editSession.proposedText ||
-            (Array.isArray(editSession.bundlePatches)
-              ? JSON.stringify({ patches: editSession.bundlePatches })
-              : editSession.diff?.after),
-        ),
+        proposedText: proposedTextForApply,
         userConfirmed: true,
       });
-      if (res?.result?.revisionId || res?.result?.restoredRevisionId) {
+      const verified = extractVerifiedApply(res);
+      const explicitNoop =
+        res?.result?.applied === false ||
+        res?.applied === false ||
+        /^no changes were needed/i.test(String(res?.receipt?.note || res?.result?.receipt?.note || "").trim());
+      const revisionId =
+        verified?.newRevisionId ||
+        res?.result?.revisionId ||
+        res?.result?.restoredRevisionId ||
+        res?.receipt?.documentId ||
+        res?.result?.receipt?.documentId ||
+        null;
+      const applySucceeded = !explicitNoop && Boolean(revisionId);
+      if (applySucceeded) {
         setStatus("applied");
+        // Notify the document viewer to accept the draft and reload
+        try {
+          window.dispatchEvent(new CustomEvent("koda:edit-applied", {
+            detail: { editSession, revisionId, result: res },
+          }));
+        } catch {}
+      } else if (explicitNoop) {
+        setStatus("error");
+        setErrMsg("No changes were saved because the document already matched the requested edit.");
       } else {
         setStatus("error");
-        setErrMsg("Applied, but no revision ID returned.");
+        setErrMsg("Apply did not return a saved revision. Please retry.");
       }
     } catch (e) {
       setStatus("error");
@@ -1103,6 +1199,23 @@ export default function ChatInterface({
   const conversationId = currentConversation?.id || "new";
   const isEphemeral = conversationId === "new" || currentConversation?.isEphemeral;
   const isViewerVariant = variant === "viewer";
+  const viewerFileType = String(viewerContext?.fileType || "").trim().toLowerCase();
+  const viewerStarterPrompts = useMemo(() => {
+    if (
+      viewerFileType === "excel" ||
+      viewerFileType === "xlsx" ||
+      viewerFileType === "xls" ||
+      viewerFileType === "sheet" ||
+      viewerFileType === "sheets" ||
+      viewerFileType === "spreadsheet"
+    ) {
+      return VIEWER_STARTER_PROMPTS.xlsx;
+    }
+    if (viewerFileType === "powerpoint" || viewerFileType === "ppt" || viewerFileType === "pptx" || viewerFileType === "slides") {
+      return VIEWER_STARTER_PROMPTS.pptx;
+    }
+    return VIEWER_STARTER_PROMPTS.docx;
+  }, [viewerFileType]);
   const lastViewerSelectionRef = useRef({ selection: null, at: 0 });
 
   useEffect(() => {
@@ -1154,6 +1267,29 @@ export default function ChatInterface({
 
   const viewerSelectionLabel = (() => {
     if (!hasViewerSelection) return "";
+    const ranges = Array.isArray(resolvedViewerSelection?.ranges) ? resolvedViewerSelection.ranges : [];
+    let multiCount = 0;
+    if (String(resolvedViewerSelection?.domain || "").toLowerCase() === "docx") {
+      const paragraphIds = new Set(
+        ranges
+          .map((r) => String(r?.paragraphId || "").trim())
+          .filter(Boolean),
+      );
+      const fallbackParagraphId = String(resolvedViewerSelection?.paragraphId || "").trim();
+      if (fallbackParagraphId) paragraphIds.add(fallbackParagraphId);
+      multiCount = paragraphIds.size;
+    } else if (String(resolvedViewerSelection?.domain || "").toLowerCase() === "sheets") {
+      const rangeKeys = new Set(
+        ranges
+          .map((r) => `${String(r?.sheetName || "").trim().toLowerCase()}!${String(r?.rangeA1 || "").trim().toUpperCase()}`)
+          .filter((v) => v && v !== "!"),
+      );
+      const fallbackKey = `${String(resolvedViewerSelection?.sheetName || "").trim().toLowerCase()}!${String(resolvedViewerSelection?.rangeA1 || "").trim().toUpperCase()}`;
+      if (fallbackKey !== "!") rangeKeys.add(fallbackKey);
+      multiCount = rangeKeys.size;
+    } else {
+      multiCount = ranges.filter(Boolean).length;
+    }
     const preview = String(
       resolvedViewerSelection?.preview ||
       resolvedViewerSelection?.text ||
@@ -1161,7 +1297,8 @@ export default function ChatInterface({
       resolvedViewerSelection?.ranges?.[0]?.rangeA1 ||
       "Selected target"
     ).trim();
-    return preview.length > 72 ? `${preview.slice(0, 72)}...` : preview;
+    const clipped = preview.length > 72 ? `${preview.slice(0, 72)}...` : preview;
+    return multiCount > 1 ? `${multiCount} targets selected • ${clipped}` : clipped;
   })();
   const ViewerSelectionPill = !hasViewerSelection ? null : (
     <div
@@ -2612,6 +2749,7 @@ export default function ChatInterface({
                     ...(Array.isArray(effectiveViewerSelection.ranges) ? { ranges: effectiveViewerSelection.ranges } : {}),
                     ...(effectiveViewerSelection.frozenAtIso ? { frozenAtIso: String(effectiveViewerSelection.frozenAtIso) } : {}),
                     ...(effectiveViewerSelection.preview ? { preview: String(effectiveViewerSelection.preview) } : {}),
+                    ...(effectiveViewerSelection.cursorParagraphId ? { cursorParagraphId: String(effectiveViewerSelection.cursorParagraphId) } : {}),
                   },
                 }
               : {}),
@@ -3404,6 +3542,13 @@ export default function ChatInterface({
       const token = getCompatAccessToken();
       try {
         const overrideProvider = snapshot?.provider === "gmail" || snapshot?.provider === "outlook" ? snapshot.provider : null;
+        const resendLang = (() => {
+          const storedLangPref = localStorage.getItem("answerLanguage");
+          const inferred = (!storedLangPref || storedLangPref === "match")
+            ? detectMessageLang(userMsg.content)
+            : answerLang;
+          return ["pt", "es"].includes(inferred) ? inferred : "en";
+        })();
         const response = await fetch(ENDPOINT, {
           method: "POST",
           headers: {
@@ -3416,7 +3561,7 @@ export default function ChatInterface({
             conversationId,
             message: userMsg.content,
             confirmationToken: tokenOverride || confirmation.confirmationId,
-            language: "en",
+            language: resendLang,
             client: { wantsStreaming: true },
             connectorContext: {
               // Force the provider implied by the draft, so sending doesn't depend on the user
@@ -4127,11 +4272,7 @@ export default function ChatInterface({
                   </div>
 
                   <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {[
-                      'Rewrite the intro to be more concise and professional.',
-                      'Fix grammar and tighten the bullet points.',
-                      'Change the tone to match an executive summary.',
-                    ].map((ex) => (
+                    {viewerStarterPrompts.map((ex) => (
                       <button
                         key={ex}
                         onClick={() => setInput(ex)}
@@ -4283,6 +4424,15 @@ export default function ChatInterface({
                             const steps = Array.isArray(wl.steps) ? wl.steps : [];
                             const narration = Array.isArray(wl.narration) ? wl.narration : [];
                             const isEditWorklog = String(wl.mode || "") === "editing";
+                            // Edit worklogs never render a card — answer text appears as normal chat
+                            if (isEditWorklog) return null;
+                            // Suppress empty worklog card for clarification/fallback responses.
+                            // When the edit pipeline returns guidance text without an edit_session
+                            // attachment, only the text phrase should render — not a stale card.
+                            if (
+                              (m.answerMode === 'action_receipt' || m.answerMode === 'fallback') &&
+                              !getEditSessionFromAttachments(m.attachments)
+                            ) return null;
                             const editLang = normalizeEditLang(i18n.language);
                             const editVars = (wl.editVars && typeof wl.editVars === "object") ? wl.editVars : {};
                             const editComplexity = String(editVars?.complexity || "quick");
@@ -4292,8 +4442,6 @@ export default function ChatInterface({
                             const totalCount = steps.length;
                             const showCard = Boolean(isStreamingMsg || totalCount || narration.length || wl.summary);
                             if (!showCard) return null;
-                            // Quick edits: hide the entire card once done; only show a compact indicator while running
-                            if (isQuickEdit && wl.status === "done") return null;
                             const isCollapsed = Boolean(wl.collapsed) && wl.status === "done" && !isStreamingMsg;
                             const toggleCollapse = () => {
                               setMessages((prev) =>
@@ -5162,6 +5310,7 @@ export default function ChatInterface({
                 <textarea
                   ref={inputRef}
                   data-chat-input="true"
+                  data-testid="viewer-chat-input"
                   className="chat-v3-textarea"
                   value={input}
                   placeholder={t('chat.inputPlaceholder')}

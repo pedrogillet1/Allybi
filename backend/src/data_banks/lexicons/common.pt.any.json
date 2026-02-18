@@ -60,7 +60,9 @@
       "e também",
       "e depois",
       "a seguir",
-      "adicionalmente"
+      "adicionalmente",
+      "ademais",
+      "outrossim"
     ],
     "scope_modifiers": [
       "todo",
@@ -92,7 +94,9 @@
       "crescente",
       "decrescente",
       "acima",
-      "abaixo"
+      "abaixo",
+      "asc",
+      "desc"
     ],
     "negation": [
       "não",

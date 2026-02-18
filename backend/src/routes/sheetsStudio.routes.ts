@@ -1,7 +1,7 @@
 import { Router, type Response } from 'express';
 import { randomUUID } from 'crypto';
 import prisma from '../config/database';
-import cacheService from '../services/cache.service';
+import { EditHandlerService } from '../services/core/handlers/editHandler.service';
 import DocumentRevisionStoreService from '../services/editing/documentRevisionStore.service';
 
 const router = Router({ mergeParams: true });
@@ -123,7 +123,7 @@ function normalizeComputeKind(value: unknown): string {
     xlsx_set_range_formulas: 'set_formula',
     xlsx_fill_down: 'set_formula',
     xlsx_fill_right: 'set_formula',
-    xlsx_format_range: 'set_number_format',
+    xlsx_format_range: 'format_range',
     xlsx_set_number_format: 'set_number_format',
     xlsx_sort_range: 'sort_range',
     xlsx_filter_apply: 'filter_range',
@@ -136,6 +136,7 @@ function normalizeComputeKind(value: unknown): string {
     xlsx_chart_set_titles: 'update_chart',
     xlsx_chart_set_axes: 'update_chart',
     xlsx_chart_move_resize: 'update_chart',
+    format_range: 'format_range',
   };
   return alias[compact] || '';
 }
@@ -227,6 +228,12 @@ function normalizeComputeOp(raw: unknown, fallbackSheetName?: string): Record<st
   if (kind === 'set_number_format') {
     const pattern = asString(src.pattern ?? src.format ?? src.numberFormat ?? src.formatString);
     if (pattern) op.pattern = pattern;
+  }
+
+  if (kind === 'format_range') {
+    if (rangeA1) op.rangeA1 = rangeA1;
+    const fmt = (src.format && typeof src.format === 'object') ? src.format : {};
+    op.format = fmt;
   }
 
   if (kind === 'set_freeze_panes') {
@@ -331,6 +338,9 @@ function normalizeComputeOps(
     if (kind === 'filter_range' || kind === 'set_number_format' || kind === 'set_data_validation' || kind === 'clear_data_validation' || kind === 'apply_conditional_format') {
       return hasA1(op.rangeA1);
     }
+    if (kind === 'format_range') {
+      return hasA1(op.rangeA1) && op.format && typeof op.format === 'object' && Object.keys(op.format as object).length > 0;
+    }
     if (kind === 'clear_filter') return hasSheet(op.sheetName);
     if (kind === 'set_freeze_panes') {
       const hasRows = Number.isFinite(Number(op.frozenRowCount ?? (op as any).rows ?? (op as any).row));
@@ -422,7 +432,7 @@ interface ChangeMetrics {
 }
 
 const VALUE_KINDS = new Set(['set_values', 'paste_grid', 'fill_down', 'fill_right']);
-const FORMAT_KINDS = new Set(['set_number_format', 'apply_conditional_format', 'set_column_width', 'set_row_height', 'autofit']);
+const FORMAT_KINDS = new Set(['set_number_format', 'format_range', 'apply_conditional_format', 'set_column_width', 'set_row_height', 'autofit']);
 const FORMULA_KINDS = new Set(['set_formula']);
 const OBJECT_KINDS = new Set(['create_chart', 'update_chart', 'create_table']);
 const STRUCTURE_KINDS = new Set(['insert_rows', 'insert_columns', 'delete_rows', 'delete_columns', 'sort_range', 'filter_range', 'clear_filter', 'merge_cells', 'unmerge_cells']);
@@ -526,35 +536,52 @@ router.post('/compute', async (req: any, res: Response): Promise<void> => {
   }
 
   const ctx = buildContext(req);
-  const store = new DocumentRevisionStoreService();
+  const handler = new EditHandlerService({
+    revisionStore: new DocumentRevisionStoreService(),
+  });
 
   const applyComputeRevision = async (opsToApply: Array<Record<string, unknown>>) => {
     const content = JSON.stringify({ ops: opsToApply });
-    return await store.createRevision({
-      documentId,
-      userId,
-      correlationId: ctx.correlationId,
-      conversationId: ctx.conversationId,
-      clientMessageId: ctx.clientMessageId,
-      content,
-      metadata: {
-        operator: 'COMPUTE',
-        instruction,
-        contentFormat: 'plain',
+    const result = await handler.execute({
+      mode: 'apply',
+      context: {
+        userId,
+        conversationId: ctx.conversationId,
+        correlationId: ctx.correlationId,
+        clientMessageId: ctx.clientMessageId,
       },
+      planRequest: {
+        instruction,
+        operator: 'COMPUTE_BUNDLE',
+        domain: 'sheets',
+        documentId,
+      },
+      target: {
+        id: `synthetic:compute:${documentId}`,
+        label: 'Compute',
+        confidence: 1,
+        candidates: [],
+        decisionMargin: 1,
+        isAmbiguous: false,
+        resolutionReason: 'compute_route',
+      },
+      beforeText: '(structured compute)',
+      proposedText: content,
+      userConfirmed: true,
     });
+    if (!result.ok) throw new Error(result.error || 'Compute apply failed.');
+    const applyResult = result.result as any;
+    return { revisionId: applyResult?.newRevisionId || applyResult?.revisionId || null };
   };
 
   try {
     const created = await applyComputeRevision(acceptedOps);
 
-    // Invalidate the cached document buffer so the frontend serves the fresh file
-    await cacheService.del(`document_buffer:${documentId}`);
-
     const affectedRanges = extractAffectedRanges(acceptedOps);
     res.json({
       ok: true,
       data: {
+        applyPath: 'sheets_studio_compute',
         revisionId: created.revisionId,
         acceptedOps,
         rejectedOps,
@@ -573,7 +600,6 @@ router.post('/compute', async (req: any, res: Response): Promise<void> => {
     if (isChartEngineUnavailable && chartOps.length > 0 && nonChartOps.length > 0) {
       try {
         const created = await applyComputeRevision(nonChartOps);
-        await cacheService.del(`document_buffer:${documentId}`);
         const chartRejected = chartOps.map((op) => ({
           kind: String(op?.kind || ''),
           reason: 'chart_engine_unavailable',
@@ -582,6 +608,7 @@ router.post('/compute', async (req: any, res: Response): Promise<void> => {
         res.json({
           ok: true,
           data: {
+            applyPath: 'sheets_studio_compute',
             revisionId: created.revisionId,
             acceptedOps: nonChartOps,
             rejectedOps: [...rejectedOps, ...chartRejected],
@@ -599,6 +626,7 @@ router.post('/compute', async (req: any, res: Response): Promise<void> => {
       res.json({
         ok: true,
         data: {
+          applyPath: 'sheets_studio_compute',
           revisionId: null,
           acceptedOps: [],
           rejectedOps: chartOps.map((op) => ({ kind: String(op?.kind || ''), reason: 'chart_engine_unavailable' })),

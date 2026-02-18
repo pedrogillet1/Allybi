@@ -9,6 +9,7 @@ export type EditOperator =
   | "EDIT_RANGE"
   | "ADD_SHEET"
   | "RENAME_SHEET"
+  | "DELETE_SHEET"
   | "CREATE_CHART"
   | "COMPUTE"
   | "COMPUTE_BUNDLE"
@@ -150,7 +151,7 @@ export interface EditAction {
 }
 
 export interface EditReceipt {
-  stage: "preview" | "applied" | "blocked";
+  stage: "preview" | "applied" | "blocked" | "noop";
   actions: EditAction[];
   note?: string;
 }
@@ -203,6 +204,29 @@ export interface EditApplyResult {
   ok: boolean;
   applied: boolean;
   revisionId?: string;
+  baseRevisionId?: string;
+  newRevisionId?: string;
+  changeset?: {
+    kind: "paragraph" | "cell" | "slide" | "structural" | "bundle";
+    changed: boolean;
+    summary: string;
+    changeCount: number;
+    sampleBefore?: string;
+    sampleAfter?: string;
+    targets?: string[];
+  };
+  proof?: {
+    verified: boolean;
+    fileHashBefore: string;
+    fileHashAfter: string;
+    affectedTargetsCount: number;
+    changedCellsCount?: number;
+    changedStructuresCount?: number;
+    affectedRanges?: string[];
+    affectedParagraphIds?: string[];
+    warnings?: string[];
+    rejectedOps?: string[];
+  };
   preview?: EditPreviewResult;
   receipt?: EditReceipt;
   error?: string;
@@ -246,7 +270,19 @@ export interface EditRevisionStore {
     expectedDocumentUpdatedAtIso?: string;
     expectedDocumentFileHash?: string;
     metadata?: Record<string, unknown>;
-  }): Promise<{ revisionId: string }>;
+  }): Promise<{
+    revisionId: string;
+    fileHashBefore?: string;
+    fileHashAfter?: string;
+    applyMetrics?: {
+      changedCellsCount?: number;
+      changedStructuresCount?: number;
+      affectedRanges?: string[];
+      locateRange?: string | null;
+      changedSamples?: Array<{ sheetName: string; cell: string; before: string; after: string }>;
+      rejectedOps?: string[];
+    };
+  }>;
   undoToRevision(input: {
     documentId: string;
     userId: string;

@@ -75,6 +75,110 @@
         }
       }
     },
+    "byOperator": {
+      "preview": {
+        "EDIT_DOCX_BUNDLE": {
+          "en": { "body": "Draft ready for DOCX structural/style changes. Review the affected paragraphs and diff before applying." },
+          "pt": { "body": "Previa pronta para alteracoes estruturais/de estilo em DOCX. Revise os paragrafos afetados e o diff antes de aplicar." }
+        },
+        "EDIT_PARAGRAPH": {
+          "en": { "body": "Draft ready for paragraph rewrite. Review wording and formatting before applying." },
+          "pt": { "body": "Previa pronta para reescrita de paragrafo. Revise texto e formatacao antes de aplicar." }
+        },
+        "EDIT_SPAN": {
+          "en": { "body": "Draft ready for selected text change. Review the exact span diff before applying." },
+          "pt": { "body": "Previa pronta para alteracao no texto selecionado. Revise o diff exato do trecho antes de aplicar." }
+        },
+        "ADD_PARAGRAPH": {
+          "en": { "body": "Draft ready for paragraph insertion. Review the insertion point and new content before applying." },
+          "pt": { "body": "Previa pronta para insercao de paragrafo. Revise o ponto de insercao e o novo conteudo antes de aplicar." }
+        },
+        "COMPUTE_BUNDLE": {
+          "en": { "body": "Draft ready for spreadsheet operation bundle. Review ranges and operation order before applying." },
+          "pt": { "body": "Previa pronta para pacote de operacoes na planilha. Revise os intervalos e a ordem das operacoes antes de aplicar." }
+        },
+        "EDIT_CELL": {
+          "en": { "body": "Draft ready for cell edit. Review the target cell and value/formula before applying." },
+          "pt": { "body": "Previa pronta para edicao de celula. Revise a celula alvo e o valor/formula antes de aplicar." }
+        },
+        "EDIT_RANGE": {
+          "en": { "body": "Draft ready for range edit. Review all affected cells and formatting before applying." },
+          "pt": { "body": "Previa pronta para edicao de intervalo. Revise todas as celulas afetadas e a formatacao antes de aplicar." }
+        },
+        "CREATE_CHART": {
+          "en": { "body": "Draft ready for chart creation. Review source range, series mapping, and chart type before applying." },
+          "pt": { "body": "Previa pronta para criacao de grafico. Revise intervalo fonte, mapeamento de series e tipo de grafico antes de aplicar." }
+        }
+      },
+      "applied": {
+        "EDIT_DOCX_BUNDLE": {
+          "en": { "body": "DOCX bundle applied and saved to the document revision." },
+          "pt": { "body": "Pacote DOCX aplicado e salvo na revisao do documento." }
+        },
+        "EDIT_PARAGRAPH": {
+          "en": { "body": "Paragraph edit applied and saved." },
+          "pt": { "body": "Edicao de paragrafo aplicada e salva." }
+        },
+        "EDIT_SPAN": {
+          "en": { "body": "Selected text edit applied and saved." },
+          "pt": { "body": "Edicao do texto selecionado aplicada e salva." }
+        },
+        "ADD_PARAGRAPH": {
+          "en": { "body": "New paragraph inserted and saved." },
+          "pt": { "body": "Novo paragrafo inserido e salvo." }
+        },
+        "COMPUTE_BUNDLE": {
+          "en": { "body": "Spreadsheet operation bundle applied and saved." },
+          "pt": { "body": "Pacote de operacoes da planilha aplicado e salvo." }
+        },
+        "EDIT_CELL": {
+          "en": { "body": "Cell edit applied and saved." },
+          "pt": { "body": "Edicao de celula aplicada e salva." }
+        },
+        "EDIT_RANGE": {
+          "en": { "body": "Range edit applied and saved." },
+          "pt": { "body": "Edicao de intervalo aplicada e salva." }
+        },
+        "CREATE_CHART": {
+          "en": { "body": "Chart created and saved to the workbook." },
+          "pt": { "body": "Gráfico criado e salvo na planilha." }
+        }
+      },
+      "blocked": {
+        "EDIT_DOCX_BUNDLE": {
+          "en": { "body": "This DOCX bundle needs confirmation or a narrower target before apply." },
+          "pt": { "body": "Este pacote DOCX precisa de confirmação ou de um alvo mais restrito antes de aplicar." }
+        },
+        "COMPUTE_BUNDLE": {
+          "en": { "body": "This spreadsheet bundle needs confirmation before apply." },
+          "pt": { "body": "Este pacote de planilha precisa de confirmação antes de aplicar." }
+        },
+        "EDIT_PARAGRAPH": {
+          "en": { "body": "This paragraph rewrite needs confirmation — the proposed change is significant or the target confidence is low." },
+          "pt": { "body": "Esta reescrita de parágrafo precisa de confirmação — a mudança proposta é significativa ou a confiança no alvo é baixa." }
+        },
+        "EDIT_SPAN": {
+          "en": { "body": "This span replacement needs confirmation. Review the selected text diff before confirming." },
+          "pt": { "body": "Esta substituição de trecho precisa de confirmação. Revise o diff antes de confirmar." }
+        },
+        "ADD_PARAGRAPH": {
+          "en": { "body": "This paragraph insertion needs confirmation. Verify the insertion point and content." },
+          "pt": { "body": "Esta inserção de parágrafo precisa de confirmação. Verifique o ponto de inserção e o conteúdo." }
+        },
+        "EDIT_CELL": {
+          "en": { "body": "This cell edit needs confirmation. Review the target cell and new value." },
+          "pt": { "body": "Esta edição de célula precisa de confirmação. Revise a célula alvo e o novo valor." }
+        },
+        "EDIT_RANGE": {
+          "en": { "body": "Range edits always require explicit confirmation. Review all affected cells." },
+          "pt": { "body": "Edições de intervalo exigem confirmação explícita. Revise todas as células afetadas." }
+        },
+        "CREATE_CHART": {
+          "en": { "body": "Chart creation needs your confirmation. Review the source range and series mapping." },
+          "pt": { "body": "A criação de gráfico precisa da sua confirmação. Revise o intervalo e o mapeamento de séries." }
+        }
+      }
+    },
     "errors": {
       "target_not_found": {
         "en": "I could not resolve the target precisely. Please choose one of the suggested targets.",
@@ -89,8 +193,8 @@
         "pt": "O armazenamento de edição está temporariamente indisponível. Tente novamente em instantes."
       },
       "unknown": {
-        "en": "I could not complete this edit. Please retry.",
-        "pt": "Não consegui concluir esta edição. Tente novamente."
+        "en": "I could not complete this edit. Select the exact target (a selection, heading, or range) and try a more specific instruction.",
+        "pt": "Não consegui concluir esta edição. Selecione o alvo exato (uma seleção, cabeçalho ou intervalo) e tente uma instrução mais específica."
       }
     },
     "clarifications": {

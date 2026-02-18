@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Document, Page, pdfjs } from 'react-pdf';
 import api from '../../services/api';
-import { applyEdit, undoEdit } from '../../services/editingService';
+import { applyEdit, undoEdit, extractVerifiedApply } from '../../services/editingService';
 import LeftNav from '../app-shell/LeftNav';
 import NotificationPanel from '../notifications/NotificationPanel';
 import SearchInDocumentModal from './SearchInDocumentModal';
@@ -154,6 +154,88 @@ function getFirstTextProbeElement(root, range = null) {
   return textNode?.parentElement || null;
 }
 
+function getFirstTextNode(root) {
+  if (!root || typeof window === 'undefined' || !window.document?.createTreeWalker) return null;
+  const showText = window.NodeFilter?.SHOW_TEXT ?? 4;
+  const accept = window.NodeFilter?.FILTER_ACCEPT ?? 1;
+  const skip = window.NodeFilter?.FILTER_SKIP ?? 3;
+  const walker = window.document.createTreeWalker(
+    root,
+    showText,
+    {
+      acceptNode(node) {
+        const text = String(node?.nodeValue || '');
+        return text.trim() ? accept : skip;
+      },
+    }
+  );
+  return walker.nextNode() || null;
+}
+
+function resolveStyledProbeWithinParagraph(paragraphEl) {
+  if (!paragraphEl) return null;
+  const selectors = ['strong', 'b', 'em', 'i', 'u', 'strike', 's'];
+  for (const selector of selectors) {
+    const nodes = Array.from(paragraphEl.querySelectorAll?.(selector) || []);
+    for (const node of nodes) {
+      const textNode = getFirstTextNode(node);
+      if (textNode) return textNode.parentElement || node;
+    }
+  }
+
+  // Detect class-based styling (not only inline style attrs) by comparing each text run's
+  // computed style against the paragraph's base style.
+  try {
+    const base = window.getComputedStyle?.(paragraphEl) || null;
+    const baseColor = normalizeCssColorToHex(base?.color || '', '');
+    const baseWeight = String(base?.fontWeight || '').trim().toLowerCase();
+    const baseStyle = String(base?.fontStyle || '').trim().toLowerCase();
+    const baseDeco = String(base?.textDecorationLine || base?.textDecoration || '').trim().toLowerCase();
+    const showText = window.NodeFilter?.SHOW_TEXT ?? 4;
+    const accept = window.NodeFilter?.FILTER_ACCEPT ?? 1;
+    const skip = window.NodeFilter?.FILTER_SKIP ?? 3;
+    const walker = window.document.createTreeWalker(
+      paragraphEl,
+      showText,
+      {
+        acceptNode(node) {
+          const text = String(node?.nodeValue || '');
+          return text.trim() ? accept : skip;
+        },
+      }
+    );
+    let textNode = walker.nextNode();
+    while (textNode) {
+      const el = textNode.parentElement || null;
+      if (el) {
+        const cs = window.getComputedStyle?.(el) || null;
+        const color = normalizeCssColorToHex(cs?.color || '', '');
+        const weight = String(cs?.fontWeight || '').trim().toLowerCase();
+        const style = String(cs?.fontStyle || '').trim().toLowerCase();
+        const deco = String(cs?.textDecorationLine || cs?.textDecoration || '').trim().toLowerCase();
+        const differs =
+          (color && baseColor && color !== baseColor) ||
+          (weight && baseWeight && weight !== baseWeight) ||
+          (style && baseStyle && style !== baseStyle) ||
+          (deco && baseDeco && deco !== baseDeco);
+        if (differs) return el;
+      }
+      textNode = walker.nextNode();
+    }
+  } catch {
+    // best effort
+  }
+
+  // Last chance: explicit inline style inside this paragraph.
+  const styledNodes = Array.from(paragraphEl.querySelectorAll?.('[style]') || []);
+  for (const node of styledNodes) {
+    const textNode = getFirstTextNode(node);
+    if (textNode) return textNode.parentElement || node;
+  }
+
+  return getFirstTextProbeElement(paragraphEl);
+}
+
 function resolveDocxSelectionProbeElement({ container, selection, range, fallbackParagraphIds = [] }) {
   if (!container) return null;
   const candidates = [];
@@ -190,6 +272,7 @@ function resolveDocxSelectionProbeElement({ container, selection, range, fallbac
     })();
     const paragraphEl = container.querySelector?.(`[data-paragraph-id="${safeId}"]`) || null;
     if (!paragraphEl) continue;
+    pushCandidate(resolveStyledProbeWithinParagraph(paragraphEl));
     pushCandidate(getFirstTextProbeElement(paragraphEl));
     pushCandidate(paragraphEl);
   }
@@ -260,10 +343,6 @@ function listTypeFromElement(el, container) {
   if (!listEl || !container.contains(listEl)) return '';
   return listEl.tagName?.toLowerCase?.() === 'ol' ? 'numbered' : 'bullet';
 }
-
-// ⚡ PERFORMANCE: Code-split MarkdownEditor to reduce initial bundle size
-// react-markdown, remark-gfm, and rehype-raw add ~200KB to the bundle
-const MarkdownEditor = lazy(() => import('./previews/MarkdownEditor'));
 
 // ⚡ PERFORMANCE: Code-split ExcelPreview for Excel HTML table rendering
 const ExcelPreview = lazy(() => import('./previews/ExcelPreview'));
@@ -546,6 +625,8 @@ const DocumentViewer = () => {
 
   const docxCanvasRef = useRef(null);
   const excelCanvasRef = useRef(null);
+  // Ref to hold syncToolbarAfterDocxReload (defined later) so early useEffects can call it.
+  const syncToolbarAfterDocxReloadRef = useRef(null);
 
   // DOCX formatting controls (drives execCommand + span styling).
   const [docxFontFamily, setDocxFontFamily] = useState('Calibri');
@@ -566,6 +647,10 @@ const DocumentViewer = () => {
   const [excelBold, setExcelBold] = useState(false);
   const [excelItalic, setExcelItalic] = useState(false);
   const [excelUnderline, setExcelUnderline] = useState(false);
+  const [excelHistoryState, setExcelHistoryState] = useState({
+    canUndo: false,
+    canRedo: false,
+  });
   const excelCanApply = useMemo(() => {
     if (!excelSelectedInfo?.a1) return false;
     const draft = String(excelDraftValue ?? '');
@@ -624,6 +709,7 @@ const DocumentViewer = () => {
     setExcelSelectedInfo(null);
     setExcelDraftValue('');
     setExcelSheetMeta(null);
+    setExcelHistoryState({ canUndo: false, canRedo: false });
     setExcelFontFamily('Calibri');
     setExcelFontSizePt(11);
     setExcelColorHex('#000000');
@@ -639,6 +725,26 @@ const DocumentViewer = () => {
     setDocxAlignment('');
   }, [documentId]);
 
+  const editSessionSignature = useCallback((sessionLike) => {
+    const s = sessionLike || {};
+    const targetId = String(s?.target?.id || s?.targetId || s?.targetHint || '').trim();
+    const afterText = String(s?.proposedText || s?.diff?.after || '').trim().slice(0, 240);
+    const beforeText = String(s?.beforeText || s?.diff?.before || '').trim().slice(0, 240);
+    const op = String(s?.canonicalOperator || s?.operator || '').trim().toUpperCase();
+    const domain = String(s?.domain || '').trim().toLowerCase();
+    const docId = String(s?.documentId || '').trim();
+    return `${docId}|${domain}|${op}|${targetId}|${beforeText}|${afterText}`;
+  }, []);
+
+  const matchesIncomingEditSession = useCallback((queueEntry, incomingSession) => {
+    if (!queueEntry || !incomingSession) return false;
+    const queueSession = queueEntry?.session || {};
+    const entryDocId = String(queueSession?.documentId || '').trim();
+    const incomingDocId = String(incomingSession?.documentId || '').trim();
+    if (entryDocId && incomingDocId && entryDocId !== incomingDocId) return false;
+    return editSessionSignature(queueSession) === editSessionSignature(incomingSession);
+  }, [editSessionSignature]);
+
   // Listen for edit discard events from the chat (Cancel button)
   useEffect(() => {
     const onEditDiscard = (e) => {
@@ -646,11 +752,18 @@ const DocumentViewer = () => {
       if (!es) return;
       // Match by documentId — only discard drafts for this viewer's document
       if (es.documentId && es.documentId !== documentId) return;
-      // Discard all pending drafts in the canvas and update state
+      const matchingDraftIds = new Set(
+        (Array.isArray(editSessionsQueue) ? editSessionsQueue : [])
+          .filter((entry) => entry?.status === 'drafted' && matchesIncomingEditSession(entry, es))
+          .map((entry) => String(entry?.id || ''))
+          .filter(Boolean),
+      );
+      // Discard only matching pending drafts in the canvas and update state
       setDraftEdits((prev) => {
         if (!Array.isArray(prev)) return prev;
         return prev.map((d) => {
           if (d?.status !== 'drafted') return d;
+          if (matchingDraftIds.size > 0 && !matchingDraftIds.has(String(d?.id || ''))) return d;
           const domain = String(d?.session?.domain || '').trim().toLowerCase();
           try {
             if (domain === 'docx') docxCanvasRef.current?.discardDraft?.({ draftId: d.id });
@@ -663,15 +776,106 @@ const DocumentViewer = () => {
       setEditSessionsQueue((prev) => {
         if (!Array.isArray(prev)) return prev;
         return prev.map((entry) => {
-          if (entry?.status === 'drafted') return { ...entry, status: 'discarded' };
-          return entry;
+          if (entry?.status !== 'drafted') return entry;
+          if (matchingDraftIds.size > 0 && !matchingDraftIds.has(String(entry?.id || ''))) return entry;
+          return { ...entry, status: 'discarded' };
         });
       });
-      setActiveDraftId('');
+      setActiveDraftId((prev) => {
+        if (!prev) return '';
+        if (matchingDraftIds.size === 0) return '';
+        return matchingDraftIds.has(String(prev)) ? '' : prev;
+      });
+      if (matchingDraftIds.size > 0) {
+        setFrozenSelection(null);
+        setLiveViewerSelection(null);
+        lastSelectionRef.current = null;
+        setSelectionOverlay({ rects: [], frozen: false });
+        try { window.getSelection?.()?.removeAllRanges?.(); } catch {}
+      }
     };
     window.addEventListener('koda:edit-discard', onEditDiscard);
     return () => window.removeEventListener('koda:edit-discard', onEditDiscard);
-  }, [documentId]);
+  }, [documentId, editSessionsQueue, matchesIncomingEditSession]);
+
+  // Listen for edit applied events from the chat (Apply button)
+  useEffect(() => {
+    const onEditApplied = async (e) => {
+      const es = e?.detail?.editSession;
+      const revisionId = e?.detail?.revisionId;
+      if (!es) return;
+      // Match by documentId
+      if (es.documentId && es.documentId !== documentId) return;
+      const domain = String(es?.domain || '').trim().toLowerCase();
+      const matchingDraftIds = new Set(
+        (Array.isArray(editSessionsQueue) ? editSessionsQueue : [])
+          .filter((entry) => entry?.status === 'drafted' && matchesIncomingEditSession(entry, es))
+          .map((entry) => String(entry?.id || ''))
+          .filter(Boolean),
+      );
+
+      // Accept only matching drafted entries in the canvas and mark them applied
+      setDraftEdits((prev) => {
+        if (!Array.isArray(prev)) return prev;
+        return prev.map((d) => {
+          if (d?.status !== 'drafted') return d;
+          if (matchingDraftIds.size > 0 && !matchingDraftIds.has(String(d?.id || ''))) return d;
+          try {
+            if (domain === 'docx') docxCanvasRef.current?.acceptDraft?.({ draftId: d.id });
+          } catch {}
+          return { ...d, status: 'applied', revisionId: revisionId || null };
+        });
+      });
+      setEditSessionsQueue((prev) => {
+        if (!Array.isArray(prev)) return prev;
+        return prev.map((entry) => {
+          if (entry?.status !== 'drafted') return entry;
+          if (matchingDraftIds.size > 0 && !matchingDraftIds.has(String(entry?.id || ''))) return entry;
+          return { ...entry, status: 'applied', revisionId: revisionId || null };
+        });
+      });
+      setActiveDraftId((prev) => {
+        if (!prev) return '';
+        if (matchingDraftIds.size === 0) return '';
+        return matchingDraftIds.has(String(prev)) ? '' : prev;
+      });
+      if (matchingDraftIds.size > 0) {
+        setFrozenSelection(null);
+        setLiveViewerSelection(null);
+        lastSelectionRef.current = null;
+        setSelectionOverlay({ rects: [], frozen: false });
+        try { window.getSelection?.()?.removeAllRanges?.(); } catch {}
+      }
+
+      // Reload the document to reflect the saved revision
+      if (revisionId && revisionId !== documentId) {
+        // New revision ID — navigate to it
+        try {
+          if (domain === 'docx' || domain === 'sheets') {
+            sessionStorage.setItem('koda_open_allybi_for_doc', String(revisionId));
+          }
+        } catch {}
+        try { navigate(buildRoute.document(revisionId)); } catch {}
+      } else {
+        // Same document ID (overwrite mode) — reload canvas
+        // Small delay to ensure backend file upload propagated to storage
+        await new Promise((r) => setTimeout(r, 350));
+        try {
+          if (domain === 'docx') {
+            await docxCanvasRef.current?.reload?.();
+            // Sync toolbar to reflect the new formatting state
+            const targetPid = es?.target?.id || es?.patches?.[0]?.paragraphId || '';
+            syncToolbarAfterDocxReloadRef.current?.(targetPid);
+          }
+          if (domain === 'sheets') await excelCanvasRef.current?.reload?.();
+        } catch (reloadErr) {
+          console.error('[koda:edit-applied] reload failed:', reloadErr);
+        }
+      }
+    };
+    window.addEventListener('koda:edit-applied', onEditApplied);
+    return () => window.removeEventListener('koda:edit-applied', onEditApplied);
+  }, [documentId, editSessionsQueue, matchesIncomingEditSession, navigate]);
 
   // (intentionally removed) zoom presets dropdown UI
 
@@ -702,6 +906,92 @@ const DocumentViewer = () => {
   useEffect(() => {
     frozenSelectionRef.current = frozenSelection || null;
   }, [frozenSelection]);
+
+  const mergeDocxSelections = useCallback((baseSel, incomingSel) => {
+    if (!incomingSel || String(incomingSel?.domain || '') !== 'docx') return baseSel || null;
+    if (!baseSel || String(baseSel?.domain || '') !== 'docx') return incomingSel;
+
+    const toRanges = (sel) => {
+      const existing = Array.isArray(sel?.ranges) ? sel.ranges : [];
+      if (existing.length) return existing;
+      const pid = String(sel?.paragraphId || '').trim();
+      if (!pid) return [];
+      const text = String(sel?.text || '').trim();
+      const start = Number.isFinite(Number(sel?.start)) ? Number(sel.start) : 0;
+      const end = Number.isFinite(Number(sel?.end)) ? Number(sel.end) : (text ? text.length : start);
+      return [{ paragraphId: pid, text, start, end }];
+    };
+
+    const all = [...toRanges(baseSel), ...toRanges(incomingSel)].filter(Boolean);
+    const byParagraph = new Map();
+    const noParagraph = [];
+    for (const range of all) {
+      const paragraphId = String(range?.paragraphId || '').trim();
+      if (!paragraphId) {
+        noParagraph.push(range);
+        continue;
+      }
+      // Keep the latest complete range object for each paragraph so hash/offset metadata survives.
+      const normalized = {
+        ...range,
+        paragraphId,
+      };
+      byParagraph.set(paragraphId, normalized);
+    }
+    const mergedRanges = [
+      ...Array.from(byParagraph.values()),
+      ...noParagraph,
+    ];
+
+    const mergedText = mergedRanges
+      .map((range) => String(range?.text || '').trim())
+      .filter(Boolean)
+      .join('\n')
+      .slice(0, 2000);
+
+    return {
+      ...incomingSel,
+      domain: 'docx',
+      paragraphId: String(baseSel?.paragraphId || incomingSel?.paragraphId || mergedRanges?.[0]?.paragraphId || '').trim(),
+      ranges: mergedRanges,
+      text: mergedText || String(incomingSel?.text || baseSel?.text || '').slice(0, 2000),
+    };
+  }, []);
+
+  const mergeSheetsSelections = useCallback((baseSel, incomingSel) => {
+    if (!incomingSel || String(incomingSel?.domain || '') !== 'sheets') return baseSel || null;
+    if (!baseSel || String(baseSel?.domain || '') !== 'sheets') return incomingSel;
+
+    const toRanges = (sel) => {
+      const existing = Array.isArray(sel?.ranges) ? sel.ranges : [];
+      if (existing.length) return existing;
+      const rangeA1 = String(sel?.rangeA1 || '').trim().toUpperCase();
+      if (!rangeA1) return [];
+      return [{ sheetName: String(sel?.sheetName || '').trim(), rangeA1 }];
+    };
+
+    const all = [...toRanges(baseSel), ...toRanges(incomingSel)].filter(Boolean);
+    const seen = new Set();
+    const mergedRanges = all.filter((range) => {
+      const key = `${String(range?.sheetName || '').trim().toLowerCase()}!${String(range?.rangeA1 || '').trim().toUpperCase()}`;
+      if (!key || key === '!' || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    const mergedText = [String(baseSel?.text || '').trim(), String(incomingSel?.text || '').trim()]
+      .filter(Boolean)
+      .join(' | ')
+      .slice(0, 2000);
+
+    return {
+      ...incomingSel,
+      domain: 'sheets',
+      ranges: mergedRanges,
+      sheetName: String(incomingSel?.sheetName || baseSel?.sheetName || mergedRanges?.[0]?.sheetName || '').trim(),
+      rangeA1: mergedRanges.length === 1 ? String(mergedRanges[0]?.rangeA1 || '').trim() : '',
+      text: mergedText || String(incomingSel?.text || '').slice(0, 2000),
+    };
+  }, []);
 
   const holdSelectionOverlayPosition = useCallback((ms = 220) => {
     selectionFreezeGateUntilRef.current = Date.now() + Math.max(80, Number(ms) || 0);
@@ -931,13 +1221,17 @@ const DocumentViewer = () => {
 
   const handleExcelAskAllybi = useCallback((sel) => {
     if (!hasSheetsSelectionPayload(sel)) return;
-    const nextKey = sheetsSelectionKey(sel);
-    setFrozenSelection((prev) => (sheetsSelectionKey(prev) === nextKey ? prev : sel));
-    setLiveViewerSelection((prev) => (sheetsSelectionKey(prev) === nextKey ? prev : sel));
+    const shouldMerge = Boolean(editingOpenRef.current && frozenSelectionRef.current);
+    const nextSel = shouldMerge
+      ? mergeSheetsSelections(frozenSelectionRef.current, sel)
+      : sel;
+    const nextKey = sheetsSelectionKey(nextSel);
+    setFrozenSelection((prev) => (sheetsSelectionKey(prev) === nextKey ? prev : nextSel));
+    setLiveViewerSelection((prev) => (sheetsSelectionKey(prev) === nextKey ? prev : nextSel));
     setEditingOpen(true);
     setSelectionOverlay({ rects: [], frozen: false });
     setViewerFocusNonce((n) => n + 1);
-  }, [hasSheetsSelectionPayload, sheetsSelectionKey]);
+  }, [hasSheetsSelectionPayload, mergeSheetsSelections, sheetsSelectionKey]);
 
   useEffect(() => {
     if (!editingOpen) return;
@@ -954,6 +1248,8 @@ const DocumentViewer = () => {
   useEffect(() => {
     // Clear selection UI when switching documents.
     clearSelectionBubble();
+    setFrozenSelection(null);
+    setLiveViewerSelection(null);
     setSelectionOverlay({ rects: [], frozen: false });
     lastSelectionRef.current = null;
     lastSelectionCapturedAtRef.current = 0;
@@ -1112,7 +1408,8 @@ const DocumentViewer = () => {
         (
           (typeof s?.text === 'string' && s.text.trim()) ||
           (typeof s?.rangeA1 === 'string' && s.rangeA1.trim()) ||
-          (Array.isArray(s?.ranges) && s.ranges.length > 0)
+          (Array.isArray(s?.ranges) && s.ranges.length > 0) ||
+          (typeof s?.cursorParagraphId === 'string' && s.cursorParagraphId.trim())
         )
       );
       const stickyLiveSelection =
@@ -1122,6 +1419,34 @@ const DocumentViewer = () => {
 
       const sel = window.getSelection?.();
       if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
+        // Cursor-only: detect if the collapsed cursor is inside a paragraph in our
+        // editor surface and expose it as a cursor-only selection for formatting ops.
+        if (sel?.rangeCount > 0 && sel.isCollapsed && editingOpenRef.current) {
+          try {
+            const range = sel.getRangeAt(0);
+            const node = range?.startContainer;
+            const el = node?.nodeType === 1 ? node : node?.parentElement;
+            const paraEl = el?.closest?.('[data-paragraph-id]');
+            const pid = String(paraEl?.getAttribute?.('data-paragraph-id') || '').trim();
+            if (pid && container?.contains?.(paraEl)) {
+              const cursorSel = {
+                domain: 'docx',
+                paragraphId: pid,
+                text: '',
+                ranges: [],
+                cursorParagraphId: pid,
+                frozenAtIso: new Date().toISOString(),
+                preview: '',
+                selectionKind: 'cursor',
+              };
+              setLiveViewerSelection(cursorSel);
+              lastSelectionRef.current = cursorSel;
+              lastSelectionCapturedAtRef.current = Date.now();
+              setFrozenSelection(cursorSel);
+              return;
+            }
+          } catch {}
+        }
         if (hasFrozenLock) {
           setLiveViewerSelection((prev) => prev || frozenSelection);
           setSelectionOverlay((prev) => (prev?.frozen ? prev : { rects: [], frozen: false }));
@@ -1225,20 +1550,24 @@ const DocumentViewer = () => {
         ? { ...v2, paragraphId: effectiveParagraphId, text: String(v2.text || rawText || '').slice(0, 2000) }
         : { domain: 'docx', paragraphId: effectiveParagraphId, text: rawText.slice(0, 2000) };
 
-      // Always update the active viewer selection, including multi-paragraph selections.
-      // This prevents stale "Selection locked" targets from previous turns.
-      setLiveViewerSelection(selectionPayload);
-      lastSelectionRef.current = selectionPayload;
+      // A fresh user selection should replace stale locked targets.
+      // Merging with previous frozen selections can incorrectly keep old title targets,
+      // causing follow-up transforms to apply to the wrong paragraph.
+      const nextSelectionPayload = selectionPayload;
+
+      // Always update the active viewer selection, including merged multi-paragraph selections.
+      setLiveViewerSelection(nextSelectionPayload);
+      lastSelectionRef.current = nextSelectionPayload;
       lastSelectionCapturedAtRef.current = Date.now();
 
       // When the editing panel is open, freeze the selection so it persists
       // when focus moves to the chat input. This also enables the "Selection
       // locked" pill and Clear button in the chat.
       if (editingOpenRef.current) {
-        setFrozenSelection(selectionPayload);
+        setFrozenSelection(nextSelectionPayload);
       }
 
-      // Keep a visible lock highlight in the document on the exact selected words.
+      // Keep a visible lock highlight in the document.
       try {
         const toContainerRect = (r, pad = 0) => {
           const top = containerRect ? (r.top - containerRect.top + container.scrollTop) : r.top;
@@ -1254,7 +1583,6 @@ const DocumentViewer = () => {
           .filter((r) => r && r.width > 0 && r.height > 0)
           .slice(0, 16)
           .map((r) => toContainerRect(r, 0));
-
         setSelectionOverlay({ rects, frozen: !!editingOpen });
       } catch {}
 
@@ -1264,10 +1592,11 @@ const DocumentViewer = () => {
         paragraphId: effectiveParagraphId,
         rect: { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
       });
+
     } catch {
       // ignore
     }
-  }, [clearSelectionBubble, clipSelection, currentFileType, refreshFrozenOverlay]);
+  }, [clearSelectionBubble, clipSelection, currentFileType]);
 
   // Keep viewer selection lock in sync with the user's active selection, even when
   // mouseup/keyup do not fire on the container (e.g., drag release outside bounds).
@@ -1417,7 +1746,8 @@ const DocumentViewer = () => {
       clearSelectionBubble();
       setFrozenSelection(null);
     } else {
-      // Opening
+      // Opening — flush any pending manual edits so they aren't lost
+      try { docxCanvasRef.current?.flushDirtyParagraphs?.(); } catch {}
       holdSelectionOverlayPosition(280);
       const hasActiveDomSelection = () => {
         try {
@@ -1474,7 +1804,15 @@ const DocumentViewer = () => {
           const existing = new Set(ranges.map((r) => String(r?.paragraphId || '').trim()).filter(Boolean));
           const add = domParagraphIds
             .filter((pid) => !existing.has(pid))
-            .map((pid) => ({ paragraphId: pid }));
+            .map((pid) => {
+              const block = Array.isArray(docxBlocks)
+                ? docxBlocks.find((b) => String(b?.paragraphId || '').trim() === pid)
+                : null;
+              const text = String(block?.text || '').trim();
+              return text
+                ? { paragraphId: pid, text, start: 0, end: text.length }
+                : { paragraphId: pid };
+            });
           next.ranges = [...ranges, ...add];
           return next;
         })();
@@ -1500,7 +1838,7 @@ const DocumentViewer = () => {
     }
     setShowAskKoda(false);
     try { sessionStorage.setItem('askKodaDismissed', 'true'); } catch {}
-  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, clearSelectionBubble, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, refreshFrozenOverlay, supportsViewerEditing, showInfo, t]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, docxBlocks, clearSelectionBubble, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, refreshFrozenOverlay, supportsViewerEditing, showInfo, t]);
 
   const openEditingPanel = useCallback(({ seedSelection = true, focusInput = true } = {}) => {
     if (!supportsViewerEditing) {
@@ -1593,7 +1931,15 @@ const DocumentViewer = () => {
           const existing = new Set(ranges.map((r) => String(r?.paragraphId || '').trim()).filter(Boolean));
           const add = domParagraphIds
             .filter((pid) => !existing.has(pid))
-            .map((pid) => ({ paragraphId: pid }));
+            .map((pid) => {
+              const block = Array.isArray(docxBlocks)
+                ? docxBlocks.find((b) => String(b?.paragraphId || '').trim() === pid)
+                : null;
+              const text = String(block?.text || '').trim();
+              return text
+                ? { paragraphId: pid, text, start: 0, end: text.length }
+                : { paragraphId: pid };
+            });
           next.ranges = [...ranges, ...add];
           return next;
         })();
@@ -1617,7 +1963,7 @@ const DocumentViewer = () => {
       }
     }
     if (focusInput) setViewerFocusNonce((n) => n + 1);
-  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, refreshFrozenOverlay, supportsViewerEditing, frozenSelection, liveViewerSelection, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, showInfo, t]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, docxBlocks, refreshFrozenOverlay, supportsViewerEditing, frozenSelection, liveViewerSelection, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, showInfo, t]);
 
   // Measure container width for responsive PDF/DOCX sizing
   useEffect(() => {
@@ -1674,26 +2020,6 @@ const DocumentViewer = () => {
       previewType: 'pdf'
     }, t);
   }, [document, numPages, currentPage, loading, t]);
-
-  // Handler for saving markdown edits
-  const handleSaveMarkdown = async (docId, newMarkdownContent) => {
-    try {
-      await api.patch(`/api/documents/${docId}/markdown`, {
-        markdownContent: newMarkdownContent
-      });
-
-      // Update local document state
-      setDocument(prev => ({
-        ...prev,
-        metadata: {
-          ...prev.metadata,
-          markdownContent: newMarkdownContent
-        }
-      }));
-    } catch (error) {
-      throw error; // Re-throw to let the editor handle the error
-    }
-  };
 
   // Handler for exporting document
   const handleExport = async (format) => {
@@ -2340,11 +2666,14 @@ const DocumentViewer = () => {
             container.querySelector('[contenteditable="true"]');
         }
         if (targetEl) {
+          const cursorProbe = targetEl.matches?.('[data-paragraph-id]')
+            ? resolveStyledProbeWithinParagraph(targetEl) || targetEl
+            : targetEl;
           // Focus the contentEditable host first (required for execCommand/queryCommand).
-          const host = targetEl.closest?.('[contenteditable="true"]') || targetEl;
+          const host = cursorProbe.closest?.('[contenteditable="true"]') || cursorProbe;
           host.focus?.();
           const r = window.document.createRange();
-          r.selectNodeContents(targetEl);
+          r.selectNodeContents(cursorProbe);
           r.collapse(true); // collapse to start
           sel.removeAllRanges();
           sel.addRange(r);
@@ -2358,6 +2687,7 @@ const DocumentViewer = () => {
     requestAnimationFrame(doSync);
     setTimeout(doSync, 150);
   }, [syncDocxToolbarStateFromSelection]);
+  syncToolbarAfterDocxReloadRef.current = syncToolbarAfterDocxReload;
 
   // After navigating to a new revision (edit created a new doc), sync the toolbar
   // to reflect the edited paragraph's formatting (font, size, color, etc.).
@@ -2601,10 +2931,30 @@ const DocumentViewer = () => {
     const explicit = Array.isArray(session?.bundlePatches) ? session.bundlePatches : [];
     if (explicit.length) return explicit;
     const op = String(session?.operator || '').trim().toUpperCase();
-    if (op !== 'EDIT_DOCX_BUNDLE') return [];
+    const canonicalOp = String(session?.canonicalOperator || '').trim().toUpperCase();
+    const looksDocxCanonical = canonicalOp.startsWith('DOCX_');
+    if (op !== 'EDIT_DOCX_BUNDLE' && !looksDocxCanonical) return [];
     const parsed = parseJsonPayload(session?.proposedText) || parseJsonPayload(session?.diff?.after) || null;
     const parsedPatches = Array.isArray(parsed?.patches) ? parsed.patches : [];
     return parsedPatches.filter((p) => p && typeof p === 'object');
+  };
+
+  /**
+   * Resolve the best paragraph ID for post-edit focus.
+   * For structural edits (split_to_list) the original paragraph still exists → use it.
+   * For delete patches, the paragraph is gone → use session target or hint as fallback
+   * (the backend may attach __focusAfterApply if available).
+   */
+  const resolveFocusParagraphId = (patches, session) => {
+    if (!Array.isArray(patches) || !patches.length) return session?.target?.id || session?.targetHint || '';
+    // If all patches are deletions, try focusAfterApply or fall back to session target
+    const allDeletes = patches.every((p) => String(p?.kind || '') === 'docx_delete_paragraph');
+    if (allDeletes) {
+      return patches.__focusAfterApply || session?.target?.id || session?.targetHint || '';
+    }
+    // For split_to_list the original paragraph ID is kept; for other types, use the first patch's paragraph
+    const first = patches.find((p) => p?.paragraphId && String(p?.kind || '') !== 'docx_delete_paragraph');
+    return first?.paragraphId || patches[0]?.paragraphId || session?.target?.id || session?.targetHint || '';
   };
 
   const normalizeOpsList = (value) => {
@@ -3089,6 +3439,16 @@ const DocumentViewer = () => {
     setEditorStatusMsg('Applying edit…');
 
     try {
+      const resolveAppliedNote = (responseLike, fallback = 'Applied.') => {
+        const note =
+          String(
+            responseLike?.receipt?.note ||
+            responseLike?.result?.receipt?.note ||
+            responseLike?.note ||
+            '',
+          ).trim();
+        return note || fallback;
+      };
       const sessionDomain = String(session?.domain || '').trim().toLowerCase();
 
       if (sessionDomain === 'sheets') {
@@ -3099,8 +3459,8 @@ const DocumentViewer = () => {
           await applyViaCanvas(ops);
           try { await excelCanvasRef.current?.discardDraftOps?.({ draftId: entryId }); } catch {}
           patchEditEntry(entryId, { status: 'applied', revisionId: null, appliedAt: new Date().toISOString() });
-          clearFrozenSelection({ preserveExcelSelection: true });
-          setEditorStatusMsg('Applied.');
+          clearFrozenSelection();
+          setEditorStatusMsg(resolveAppliedNote(session, 'Applied.'));
           setTimeout(() => setEditorStatusMsg(''), 900);
           return true;
         }
@@ -3116,7 +3476,7 @@ const DocumentViewer = () => {
       // DOCX bundle edits: draft paragraph patches into the canvas for a preview,
       // then apply once to create a single new revision.
       const docxBundlePatches = extractDocxBundlePatches(session);
-      if (sessionDomain === 'docx' && String(session?.operator) === 'EDIT_DOCX_BUNDLE' && docxBundlePatches.length) {
+      if (sessionDomain === 'docx' && docxBundlePatches.length) {
         await docxCanvasRef.current?.applyParagraphPatches?.({ draftId: entryId, patches: docxBundlePatches });
         let bundlePayloadText = String(session.proposedText || '').trim();
         if (!bundlePayloadText) {
@@ -3143,9 +3503,26 @@ const DocumentViewer = () => {
           expectedDocumentFileHash: session?.baseDocumentFileHash || undefined,
           userConfirmed: true,
         });
-        const revisionId = res?.result?.revisionId || res?.result?.restoredRevisionId || res?.revisionId || null;
+        const verified = extractVerifiedApply(res);
+        const explicitNoop =
+          res?.result?.applied === false ||
+          res?.applied === false ||
+          /^no changes were needed/i.test(String(res?.receipt?.note || res?.result?.receipt?.note || '').trim());
+        const revisionId =
+          verified?.newRevisionId ||
+          res?.result?.revisionId ||
+          res?.result?.restoredRevisionId ||
+          res?.receipt?.documentId ||
+          res?.result?.receipt?.documentId ||
+          null;
+        if (explicitNoop) {
+          const err = 'No changes were saved because the document already matched this edit.';
+          patchEditEntry(entryId, { status: 'failed', error: err });
+          setEditorStatusMsg(err);
+          return false;
+        }
         if (!revisionId) {
-          const err = 'Apply failed: no revision was created for this DOCX change.';
+          const err = 'Apply did not return a saved revision. Please retry.';
           patchEditEntry(entryId, { status: 'failed', error: err });
           setEditorStatusMsg(err);
           return false;
@@ -3153,15 +3530,18 @@ const DocumentViewer = () => {
         patchEditEntry(entryId, { status: 'applied', revisionId, appliedAt: new Date().toISOString() });
         if (revisionId && document?.id && revisionId !== document.id) {
           clearFrozenSelection();
-          try { sessionStorage.setItem('koda_toolbar_sync_paragraph', docxBundlePatches?.[0]?.paragraphId || session?.target?.id || session?.targetHint || ''); } catch {}
+          try { sessionStorage.setItem('koda_toolbar_sync_paragraph', resolveFocusParagraphId(docxBundlePatches, session)); } catch {}
+          try { sessionStorage.setItem('koda_open_allybi_for_doc', String(revisionId)); } catch {}
           navigate(buildRoute.document(revisionId));
           return true;
         }
         const accepted = await docxCanvasRef.current?.acceptDraft?.({ draftId: entryId });
-        if (!accepted) await docxCanvasRef.current?.reload?.();
+        // Always reload to ensure canvas reflects server-saved content
+        await new Promise((r) => setTimeout(r, 350));
+        await docxCanvasRef.current?.reload?.();
+        syncToolbarAfterDocxReload(resolveFocusParagraphId(docxBundlePatches, session));
         clearFrozenSelection();
-        syncToolbarAfterDocxReload(docxBundlePatches?.[0]?.paragraphId || session?.target?.id || session?.targetHint);
-        setEditorStatusMsg('Applied.');
+        setEditorStatusMsg(resolveAppliedNote(res, 'Applied.'));
         setTimeout(() => setEditorStatusMsg(''), 900);
         return true;
       }
@@ -3195,14 +3575,16 @@ const DocumentViewer = () => {
         if (document?.id && committedRevisionId !== document.id) {
           clearFrozenSelection();
           try { sessionStorage.setItem('koda_toolbar_sync_paragraph', session?.patches?.[0]?.paragraphId || session?.target?.id || session?.targetHint || ''); } catch {}
+          try { sessionStorage.setItem('koda_open_allybi_for_doc', String(committedRevisionId)); } catch {}
           navigate(buildRoute.document(committedRevisionId));
           return true;
         }
         const accepted = await docxCanvasRef.current?.acceptDraft?.({ draftId: entryId });
-        if (!accepted) await docxCanvasRef.current?.reload?.();
-        clearFrozenSelection();
+        await new Promise((r) => setTimeout(r, 350));
+        await docxCanvasRef.current?.reload?.();
         syncToolbarAfterDocxReload(session?.patches?.[0]?.paragraphId || session?.target?.id || session?.targetHint);
-        setEditorStatusMsg('Applied.');
+        clearFrozenSelection();
+        setEditorStatusMsg(resolveAppliedNote(committed, 'Applied.'));
         setTimeout(() => setEditorStatusMsg(''), 900);
         return true;
       }
@@ -3242,10 +3624,17 @@ const DocumentViewer = () => {
       };
 
       const resolvedTarget = resolveViewerTarget();
+      const preferRuntimeOperator =
+        sessionDomain === 'docx' &&
+        (String(session?.operator || '').trim().toUpperCase() === 'EDIT_DOCX_BUNDLE' || docxBundlePatches.length);
 
       const res = await applyEdit({
         instruction: String(session.instruction || '').trim() || `Edit in viewer: ${cleanDocumentName(document?.filename)}`,
-        operator: String(session?.canonicalOperator || session?.operator || '').trim(),
+        operator: String(
+          preferRuntimeOperator
+            ? (session?.operator || session?.canonicalOperator || '')
+            : (session?.canonicalOperator || session?.operator || ''),
+        ).trim(),
         domain: sessionDomain || session.domain,
         documentId: session.documentId,
         targetHint: session?.targetHint || undefined,
@@ -3267,9 +3656,26 @@ const DocumentViewer = () => {
         return false;
       }
 
-      const revisionId = res?.result?.revisionId || res?.result?.restoredRevisionId || null;
-      if (sessionDomain === 'docx' && !revisionId) {
-        const err = 'Apply failed: no revision was created for this DOCX change.';
+      const verified = extractVerifiedApply(res);
+      const explicitNoop =
+        res?.result?.applied === false ||
+        res?.applied === false ||
+        /^no changes were needed/i.test(String(res?.receipt?.note || res?.result?.receipt?.note || '').trim());
+      const revisionId =
+        verified?.newRevisionId ||
+        res?.result?.revisionId ||
+        res?.result?.restoredRevisionId ||
+        res?.receipt?.documentId ||
+        res?.result?.receipt?.documentId ||
+        null;
+      if (explicitNoop) {
+        const err = 'No changes were saved because the document already matched this edit.';
+        patchEditEntry(entryId, { status: 'failed', error: err });
+        setEditorStatusMsg(err);
+        return false;
+      }
+      if (!revisionId) {
+        const err = 'Apply did not return a saved revision. Please retry.';
         patchEditEntry(entryId, { status: 'failed', error: err });
         setEditorStatusMsg(err);
         return false;
@@ -3282,13 +3688,19 @@ const DocumentViewer = () => {
         if (sessionDomain === 'docx') {
           try { sessionStorage.setItem('koda_toolbar_sync_paragraph', session?.target?.id || session?.targetHint || ''); } catch {}
         }
+        if (sessionDomain === 'docx' || sessionDomain === 'sheets') {
+          try { sessionStorage.setItem('koda_open_allybi_for_doc', String(revisionId)); } catch {}
+        }
         navigate(buildRoute.document(revisionId));
         return true;
       }
 
       if (sessionDomain === 'docx') {
         const accepted = await docxCanvasRef.current?.acceptDraft?.({ draftId: entryId });
-        if (!accepted) await docxCanvasRef.current?.reload?.();
+        // Always reload after apply — even if acceptDraft succeeded — to ensure
+        // the canvas reflects the server-saved content (especially in overwrite mode).
+        await new Promise((r) => setTimeout(r, 350));
+        await docxCanvasRef.current?.reload?.();
       } else if (sessionDomain === 'sheets') {
         await excelCanvasRef.current?.reload?.();
       } else if (sessionDomain === 'slides') {
@@ -3300,14 +3712,9 @@ const DocumentViewer = () => {
           setSlidesSelectedAnchorId((prev) => prev || nextAnchors?.[0]?.objectId || '');
         } catch {}
       }
-
-      if (sessionDomain === 'sheets') {
-        clearFrozenSelection({ preserveExcelSelection: true });
-      } else {
-        clearFrozenSelection();
-      }
       if (sessionDomain === 'docx') syncToolbarAfterDocxReload(session?.target?.id || session?.targetHint);
-      setEditorStatusMsg('Applied.');
+      clearFrozenSelection();
+      setEditorStatusMsg(resolveAppliedNote(res, 'Applied.'));
       setTimeout(() => setEditorStatusMsg(''), 900);
       return true;
     } catch (e) {
@@ -3442,7 +3849,8 @@ const DocumentViewer = () => {
               (
               (typeof s?.text === 'string' && s.text.trim()) ||
               (typeof s?.rangeA1 === 'string' && s.rangeA1.trim()) ||
-              (Array.isArray(s?.ranges) && s.ranges.length > 0)
+              (Array.isArray(s?.ranges) && s.ranges.length > 0) ||
+              (typeof s?.cursorParagraphId === 'string' && s.cursorParagraphId.trim())
               )
             )
           );
@@ -3540,11 +3948,11 @@ const DocumentViewer = () => {
     </div>
   );
 
-  const clip = (s, n = 48) => {
+  function clip(s, n = 48) {
     const t = String(s || '').trim().replace(/\s+/g, ' ');
     if (!t) return '';
     return t.length <= n ? t : t.slice(0, n).trimEnd() + '…';
-  };
+  }
 
   const isEditableType = currentFileType === 'word' || currentFileType === 'excel';
 
@@ -3754,6 +4162,26 @@ const DocumentViewer = () => {
         onExcelPrevSheet={() => excelCanvasRef.current?.prevSheet?.()}
         onExcelNextSheet={() => excelCanvasRef.current?.nextSheet?.()}
         onExcelSetSheetIndex={(i) => excelCanvasRef.current?.setActiveSheet?.(i)}
+        onExcelUndo={() => {
+          if (excelCanvasRef.current?.canUndo?.()) {
+            excelCanvasRef.current?.undo?.();
+            return;
+          }
+          if (excelCanvasRef.current?.canUndoSelection?.()) {
+            excelCanvasRef.current?.undoSelection?.();
+          }
+        }}
+        onExcelRedo={() => {
+          if (excelCanvasRef.current?.canRedo?.()) {
+            excelCanvasRef.current?.redo?.();
+            return;
+          }
+          if (excelCanvasRef.current?.canRedoSelection?.()) {
+            excelCanvasRef.current?.redoSelection?.();
+          }
+        }}
+        excelCanUndo={Boolean(excelHistoryState?.canUndo)}
+        excelCanRedo={Boolean(excelHistoryState?.canRedo)}
         excelFontFamily={excelFontFamily}
         excelFontSizePt={excelFontSizePt}
         excelColorHex={excelColorHex}
@@ -3761,7 +4189,22 @@ const DocumentViewer = () => {
         excelItalic={excelItalic}
         excelUnderline={excelUnderline}
         onExcelFormatChange={(fmt) => {
-          if (fmt?.undo || fmt?.redo) return;
+          if (fmt?.undo) {
+            if (excelCanvasRef.current?.canUndo?.()) {
+              excelCanvasRef.current?.undo?.();
+            } else {
+              excelCanvasRef.current?.undoSelection?.();
+            }
+            return;
+          }
+          if (fmt?.redo) {
+            if (excelCanvasRef.current?.canRedo?.()) {
+              excelCanvasRef.current?.redo?.();
+            } else {
+              excelCanvasRef.current?.redoSelection?.();
+            }
+            return;
+          }
           if (fmt?.fontFamily) setExcelFontFamily(fmt.fontFamily);
           if (fmt?.fontSizePt != null) setExcelFontSizePt(fmt.fontSizePt);
           if (fmt?.color) setExcelColorHex(fmt.color);
@@ -3851,9 +4294,9 @@ const DocumentViewer = () => {
                 left: r.left,
                 width: r.width,
                 height: r.height,
-                background: 'rgba(107, 114, 128, 0.22)',
+                background: 'rgba(107, 114, 128, 0.18)',
                 borderRadius: 3,
-                boxShadow: 'inset 0 0 0 1.5px rgba(107, 114, 128, 0.38)',
+                boxShadow: 'inset 0 0 0 1.5px rgba(107, 114, 128, 0.35)',
               }}
             />
           ))}
@@ -3897,7 +4340,14 @@ const DocumentViewer = () => {
                       autoSaveOnBlur
                       ref={docxCanvasRef}
                       onStatusMsg={setEditorStatusMsg}
-                      onApplied={() => setPreviewVersion(v => v + 1)}
+                      onApplied={({ revisionId } = {}) => {
+                        setPreviewVersion(v => v + 1);
+                        // Silently update the URL to the new revision so navigating
+                        // away and back shows the saved content (not the old version).
+                        if (revisionId && revisionId !== document?.id) {
+                          try { window.history.replaceState(null, '', buildRoute.document(revisionId)); } catch {}
+                        }
+                      }}
                     />
                   </div>
                 </Suspense>
@@ -3937,6 +4387,12 @@ const DocumentViewer = () => {
                             clearSelectionNonce={excelSelectionClearNonce}
 	                          onStatusMsg={setEditorStatusMsg}
 	                          onSheetMetaChange={setExcelSheetMeta}
+                              onHistoryStateChange={(next) => {
+                                setExcelHistoryState({
+                                  canUndo: Boolean(next?.canUndo),
+                                  canRedo: Boolean(next?.canRedo),
+                                });
+                              }}
 	                          onApplied={() => setPreviewVersion(v => v + 1)}
 	                          onCountUpdate={setChildPreviewCount}
 	                        />
@@ -4806,6 +5262,7 @@ const DocumentViewer = () => {
               </button>
             </div>
               <button
+                data-testid="viewer-ask-allybi-toggle"
                 type="button"
                 onMouseDown={(e) => {
                   if (!handleAskAllybiClick(e)) return;
@@ -4910,80 +5367,58 @@ const DocumentViewer = () => {
           )}
         </div>
 
-        {/* Document Toolbar + Preview + optional editing panel */}
+        {/* Document Toolbar + Preview + optional editing panel.
+            IMPORTANT: The canvas (previewCanvas) must always live in the same
+            React tree position regardless of editingOpen. Moving it between
+            different parent branches causes React to unmount/remount it, which
+            destroys manual DOM edits (contentEditable changes). */}
         <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
-          {editingOpen && !isMobile ? (
-            <>
-              {/* Document column: toolbar aligned with document, not spanning the panel */}
-              <div style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-                {/* Toolbar */}
-                <div style={{
-                  alignSelf: 'stretch',
-                  paddingLeft: 24,
-                  paddingRight: 24,
-                  paddingTop: 13,
-                  paddingBottom: 13,
-                  background: 'white',
-                  borderBottom: '1px #E6E6EC solid',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  gap: 12,
-                  display: 'flex',
-                  flexWrap: 'nowrap',
-                  position: 'relative',
-                }}>
-                  <div style={{ width: '100%', minWidth: 0 }}>
-                    {renderEditingToolsBar()}
-                  </div>
-                </div>
-                {previewCanvas}
+          <div style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            {/* Toolbar */}
+            <div style={{
+              alignSelf: 'stretch',
+              paddingLeft: (editingOpen && !isMobile) ? 24 : (isMobile ? 8 : 24),
+              paddingRight: (editingOpen && !isMobile) ? 24 : (isMobile ? 8 : 24),
+              paddingTop: (editingOpen && !isMobile) ? 13 : (isMobile ? 4 : 4),
+              paddingBottom: (editingOpen && !isMobile) ? 13 : (isMobile ? 4 : 4),
+              background: 'white',
+              borderBottom: '1px #E6E6EC solid',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: (editingOpen && !isMobile) ? 12 : (isMobile ? 8 : 12),
+              display: 'flex',
+              flexWrap: 'nowrap',
+              position: 'relative',
+            }}>
+              <div style={{ width: '100%', minWidth: 0 }}>
+                {renderEditingToolsBar()}
               </div>
-              {/* Right: Allybi (Ask/Targets/Changes) */}
-              <div style={{ width: 520, minWidth: 520, maxWidth: 580, height: '100%', display: 'flex', flexDirection: 'column', borderLeft: '1px solid #E6E6EC', background: 'rgba(255,255,255,0.92)' }}>
-                <div style={{ flex: 1, minHeight: 0 }}>
-                  {assistantRightPanel}
-                </div>
-              </div>
-            </>
-          ) : (
-            <div style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-              {/* Toolbar */}
-              <div style={{
-                alignSelf: 'stretch',
-                paddingLeft: isMobile ? 8 : 24,
-                paddingRight: isMobile ? 8 : 24,
-                paddingTop: isMobile ? 4 : 4,
-                paddingBottom: isMobile ? 4 : 4,
-                background: 'white',
-                borderBottom: '1px #E6E6EC solid',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                gap: isMobile ? 8 : 12,
-                display: 'flex',
-                flexWrap: 'nowrap',
-                position: 'relative',
-              }}>
-                <div style={{ width: '100%', minWidth: 0 }}>
-                  {renderEditingToolsBar()}
-                </div>
-              </div>
-              {editingOpen && isMobile ? (
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'white',
-                  zIndex: 2000,
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}>
-                  <div style={{ flex: 1, minHeight: 0 }}>
-                    {assistantRightPanel}
-                  </div>
-                </div>
-              ) : null}
-              {previewCanvas}
             </div>
-          )}
+            {previewCanvas}
+          </div>
+          {/* Right: Allybi panel (desktop) */}
+          {editingOpen && !isMobile ? (
+            <div style={{ width: 520, minWidth: 520, maxWidth: 580, height: '100%', display: 'flex', flexDirection: 'column', borderLeft: '1px solid #E6E6EC', background: 'rgba(255,255,255,0.92)' }}>
+              <div style={{ flex: 1, minHeight: 0 }}>
+                {assistantRightPanel}
+              </div>
+            </div>
+          ) : null}
+          {/* Mobile: Allybi overlay */}
+          {editingOpen && isMobile ? (
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'white',
+              zIndex: 2000,
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              <div style={{ flex: 1, minHeight: 0 }}>
+                {assistantRightPanel}
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
 

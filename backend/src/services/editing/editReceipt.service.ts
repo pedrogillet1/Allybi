@@ -1,13 +1,16 @@
 import type { LanguageCode } from "../../types/common.types";
 import type { EditAction, EditReceipt } from "./editing.types";
+import { getOptionalBank } from "../core/banks/bankLoader.service";
 
 export interface EditReceiptInput {
-  stage: EditReceipt["stage"];
+  stage: EditReceipt["stage"] | "noop";
   language?: LanguageCode;
   documentId: string;
   targetId?: string;
   locationLabel?: string;
   note?: string;
+  operator?: string;
+  domain?: string;
 }
 
 const LABELS: Record<LanguageCode, Record<EditAction["kind"], string>> = {
@@ -41,6 +44,36 @@ const LABELS: Record<LanguageCode, Record<EditAction["kind"], string>> = {
 };
 
 export class EditReceiptService {
+  private resolveOperatorStageNote(
+    stage: "preview" | "applied" | "blocked",
+    language: LanguageCode,
+    operator?: string,
+  ): string {
+    const bank = getOptionalBank<any>("editing_microcopy");
+    const loc = String(language || "en").toLowerCase().startsWith("pt") ? "pt" : "en";
+    const fallbackLang = String(bank?.config?.fallbackLanguage || "en").toLowerCase().startsWith("pt") ? "pt" : "en";
+    const op = String(operator || "").trim().toUpperCase();
+    if (!op) return "";
+    const fromOperator = String(
+      bank?.copy?.byOperator?.[stage]?.[op]?.[loc]?.body ||
+      bank?.copy?.byOperator?.[stage]?.[op]?.[fallbackLang]?.body ||
+      "",
+    ).trim();
+    return fromOperator;
+  }
+
+  private resolveStageNote(stage: "preview" | "applied" | "blocked", language: LanguageCode): string {
+    const bank = getOptionalBank<any>("editing_microcopy");
+    const copy = bank?.copy?.[stage];
+    const fallbackLang = String(bank?.config?.fallbackLanguage || "en").toLowerCase().startsWith("pt") ? "pt" : "en";
+    const loc = String(language || "en").toLowerCase().startsWith("pt") ? "pt" : "en";
+    const fromLocalized = String(copy?.[loc]?.body || "").trim();
+    if (fromLocalized) return fromLocalized;
+    const fromFallback = String(copy?.[fallbackLang]?.body || "").trim();
+    if (fromFallback) return fromFallback;
+    return "";
+  }
+
   build(input: EditReceiptInput): EditReceipt {
     const lang = input.language || "en";
     if (input.stage === "preview") {
@@ -51,7 +84,10 @@ export class EditReceiptService {
           this.action("cancel", lang),
           this.action("pick_target", lang, { documentId: input.documentId }),
         ],
-        note: input.note || "Draft ready. Review and confirm to apply this change to the selected content.",
+        note:
+          input.note ||
+          this.resolveOperatorStageNote("preview", lang, input.operator) ||
+          this.resolveStageNote("preview", lang),
       };
     }
 
@@ -68,7 +104,20 @@ export class EditReceiptService {
           }),
           this.action("export", lang),
         ],
-        note: input.note || "Edit applied.",
+        note:
+          input.note ||
+          this.resolveOperatorStageNote("applied", lang, input.operator) ||
+          this.resolveStageNote("applied", lang),
+      };
+    }
+
+    if (input.stage === "noop") {
+      return {
+        stage: "noop",
+        actions: [
+          this.action("open_doc", lang, { documentId: input.documentId }),
+        ],
+        note: input.note || this.resolveStageNote("applied", lang),
       };
     }
 
@@ -79,7 +128,10 @@ export class EditReceiptService {
         this.action("cancel", lang),
         this.action("pick_target", lang, { documentId: input.documentId }),
       ],
-      note: input.note || "Edit is blocked pending explicit confirmation.",
+      note:
+        input.note ||
+        this.resolveOperatorStageNote("blocked", lang, input.operator) ||
+        this.resolveStageNote("blocked", lang),
     };
   }
 

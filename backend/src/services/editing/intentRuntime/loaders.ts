@@ -5,10 +5,7 @@
  * intent patterns, lexicons, and parser dictionaries.
  */
 
-import * as fs from "fs";
-import * as path from "path";
-import { getOptionalBank } from "../../core/banks/bankLoader.service";
-import { resolveDataDir } from "../../../utils/resolveDataDir";
+import { safeEditingBank } from "../banks/bankService";
 import type {
   IntentPattern,
   PatternBankFile,
@@ -22,41 +19,7 @@ import type {
 // ---------------------------------------------------------------------------
 
 function safeBank<T = any>(id: string): T | null {
-  try {
-    const loaded = getOptionalBank<T>(id);
-    if (loaded) return loaded;
-  } catch {
-    // fall through to file-based fallback
-  }
-
-  try {
-    const dataDir = resolveDataDir();
-    const categories = [
-      "intent_patterns",
-      "lexicons",
-      "parsers",
-      "semantics",
-      "routing",
-      "operators",
-      "triggers",
-      "scope",
-      "microcopy",
-      "overlays",
-      "policies",
-      "quality",
-      "dictionaries",
-      "templates",
-      "probes",
-    ];
-    for (const category of categories) {
-      const p = path.join(dataDir, category, `${id}.any.json`);
-      if (!fs.existsSync(p)) continue;
-      return JSON.parse(fs.readFileSync(p, "utf8")) as T;
-    }
-  } catch {
-    return null;
-  }
-  return null;
+  return safeEditingBank<T>(id);
 }
 
 // ---------------------------------------------------------------------------

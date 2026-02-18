@@ -22,6 +22,8 @@
         "tokens_any": [
           "defina",
           "altere",
+          "substitua",
+          "troque",
           "mude",
           "atualize",
           "coloque",
@@ -31,8 +33,25 @@
         "tokens_all": [
           "valor"
         ],
+        "tokens_none": [
+          "formate",
+          "formato",
+          "moeda",
+          "porcentagem",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "ordene",
+          "filtre",
+          "gráfico",
+          "fórmula",
+          "mescle"
+        ],
         "regex_any": [
-          "\\b(?:defina|altere|coloque|escreva|insira)\\b.*\\b(?:para|=|valor)\\b"
+          "\\b(?:defina|altere|substitua|troque|coloque|escreva|insira)\\b.*\\b(?:para|=|valor|com)\\b",
+          "\\b(?:substitua|troque)\\b.*\\b(?:valor\\s+selecionado|c[eé]lula\\s+selecionada|sele[cç][aã]o)\\b.*\\bcom\\b"
         ]
       },
       "slotExtractors": [
@@ -93,11 +112,29 @@
           "defina",
           "preencha",
           "altere",
+          "substitua",
+          "troque",
           "atualize",
           "coloque"
         ],
+        "tokens_none": [
+          "formate",
+          "formato",
+          "moeda",
+          "porcentagem",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "ordene",
+          "filtre",
+          "gráfico",
+          "fórmula",
+          "mescle"
+        ],
         "regex_any": [
-          "\\b(?:defina|preencha|altere|coloque)\\b.*\\b(?:toda|todo|todas|todos|cada|células?)\\b.*\\b(?:para|=|com)\\b",
+          "\\b(?:defina|preencha|altere|substitua|troque|coloque)\\b.*\\b(?:toda|todo|todas|todos|cada|c[eé]lulas?|sele[cç][aã]o|c[eé]lulas?\\s+selecionadas?)\\b.*\\b(?:para|=|com)\\b",
           "\\bdefina\\b.*\\bpara\\b\\s*\\d"
         ]
       },

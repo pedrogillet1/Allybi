@@ -27,6 +27,22 @@
           "improve",
           "refine"
         ],
+        "tokens_none": [
+          "bullets",
+          "numbering",
+          "numbered list",
+          "bullet list",
+          "merge",
+          "split",
+          "combine",
+          "heading",
+          "bold",
+          "italic",
+          "underline",
+          "align",
+          "indent",
+          "translate"
+        ],
         "regex_any": [
           "\\b(?:rewrite|rephrase|reword|polish|improve|refine)\\b.*\\b(?:this|the|selected|paragraph|text|sentence)\\b",
           "\\b(?:make|write)\\b.*\\b(?:better|clearer|nicer|smoother)\\b"
@@ -2349,7 +2365,7 @@
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targetId"
+          "out": "target"
         }
       ],
       "scopeRules": {
@@ -2360,7 +2376,7 @@
       "planTemplate": [
         {
           "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$targetId",
+          "targetId": "$target",
           "afterText": "$llmGenerated",
           "tone": "grammar_fix"
         }
@@ -2416,6 +2432,244 @@
         "negative": [
           "Make this formal",
           "Make this concise"
+        ]
+      }
+    },
+    {
+      "id": "docx.case.title",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 82,
+      "triggers": {
+        "tokens_any": [
+          "title case"
+        ],
+        "regex_any": [
+          "\\btitle\\s*case\\b",
+          "\\bcapitali[sz]e\\s+each\\s+word\\b",
+          "\\b(?:make|set|apply|convert)\\b.{0,30}\\btitle\\s*case\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_TEXT_CASE",
+          "targets": [
+            "$target"
+          ],
+          "targetCase": "title_case"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Make all headings title case",
+          "Title case this paragraph",
+          "Capitalize each word",
+          "Apply title case to the heading"
+        ],
+        "negative": [
+          "Make this uppercase",
+          "Make this bold",
+          "Capitalize the first letter"
+        ]
+      }
+    },
+    {
+      "id": "docx.case.upper",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 82,
+      "triggers": {
+        "tokens_any": [
+          "uppercase",
+          "upper case"
+        ],
+        "regex_any": [
+          "\\b(?:upper\\s*case|uppercase)\\b",
+          "\\ball\\s+caps\\b",
+          "\\b(?:make|set|convert|change)\\b.{0,30}\\b(?:upper\\s*case|uppercase|all\\s+caps)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_TEXT_CASE",
+          "targets": [
+            "$target"
+          ],
+          "targetCase": "uppercase"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Make this uppercase",
+          "Convert to all caps",
+          "UPPERCASE this heading",
+          "Make selected text uppercase"
+        ],
+        "negative": [
+          "Make this lowercase",
+          "Title case",
+          "Make this bold"
+        ]
+      }
+    },
+    {
+      "id": "docx.case.lower",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 82,
+      "triggers": {
+        "tokens_any": [
+          "lowercase",
+          "lower case"
+        ],
+        "regex_any": [
+          "\\b(?:lower\\s*case|lowercase)\\b",
+          "\\b(?:make|set|convert|change)\\b.{0,30}\\b(?:lower\\s*case|lowercase)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_TEXT_CASE",
+          "targets": [
+            "$target"
+          ],
+          "targetCase": "lowercase"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Make this lowercase",
+          "Convert to lowercase",
+          "Lowercase this text",
+          "Change to lower case"
+        ],
+        "negative": [
+          "Make this uppercase",
+          "Title case",
+          "Make this bold"
+        ]
+      }
+    },
+    {
+      "id": "docx.case.sentence",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 82,
+      "triggers": {
+        "regex_any": [
+          "\\bsentence\\s*case\\b",
+          "\\b(?:make|set|convert|change)\\b.{0,30}\\bsentence\\s*case\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_TEXT_CASE",
+          "targets": [
+            "$target"
+          ],
+          "targetCase": "sentence_case"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Make this sentence case",
+          "Convert to sentence case",
+          "Apply sentence case"
+        ],
+        "negative": [
+          "Make this uppercase",
+          "Title case this",
+          "Rewrite this sentence"
+        ]
+      }
+    },
+    {
+      "id": "docx.summarize.to_bullets",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 83,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:summarize|summarise)\\b.{0,20}\\b(?:into|as|to)\\b.{0,10}\\bbullet(?:s|\\s+points?)?\\b",
+          "\\b(?:break\\s+down|extract)\\b.{0,20}\\b(?:key|main)\\s+points?\\b.{0,15}\\b(?:as|into)?\\s*bullets?\\b",
+          "\\bextract\\b.{0,15}\\bkey\\s+points?\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_LIST_APPLY_BULLETS",
+          "targets": [
+            "$target"
+          ],
+          "summarize": true
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Summarize into bullet points",
+          "Summarize this paragraph into bullets",
+          "Extract key points as bullets",
+          "Break down into key points as bullets"
+        ],
+        "negative": [
+          "Convert to bullet points",
+          "Add bullets",
+          "Summarize this section into one paragraph"
         ]
       }
     }

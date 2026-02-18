@@ -593,8 +593,10 @@
 
 .allybi-excel-valuewrap {
   position: relative;
-  flex: 1 1 auto;
-  min-width: 0;
+  flex: 0 0 auto;
+  width: 360px;
+  min-width: 280px;
+  max-width: 420px;
   display: flex;
   align-items: center;
 }
@@ -602,7 +604,9 @@
 .toolbar-input.allybi-excel-value {
   width: 100%;
   resize: none;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: pre;
   height: 32px;
   min-height: 32px;
   max-height: 96px;
@@ -613,6 +617,11 @@
   background: #ffffff;
   font-weight: 800;
   box-shadow: inset 0 1px 0 rgba(17, 24, 39, 0.04);
+}
+
+.toolbar-input.allybi-excel-value.is-grid {
+  overflow-y: auto;
+  white-space: pre-wrap;
 }
 
 .allybi-excel-valuewrap:hover .toolbar-input.allybi-excel-value {
@@ -732,6 +741,12 @@
     min-height: 30px;
     height: 30px;
     padding: 6px 8px;
+  }
+
+  .allybi-excel-valuewrap {
+    width: 280px;
+    min-width: 220px;
+    max-width: 280px;
   }
 
   .allybi-excel-status {
