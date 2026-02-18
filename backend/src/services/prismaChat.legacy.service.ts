@@ -14766,10 +14766,10 @@ export class PrismaChatService {
     if (sources.length > 0) {
       const scores = chunkScores ?? [];
       const topScore = scores.length > 0 ? Math.max(...scores) : Infinity;
-      // Adequacy threshold: top chunk must have score >= 3 (at least 3 keyword hits,
-      // or 1 filename match which gives 5). This prevents single-keyword noise
-      // from triggering doc_grounded mode with irrelevant source pills.
-      if (topScore < 3) {
+      // Dynamic adequacy threshold:
+      // - short/specific medical-style asks should still ground to attached docs
+      // - longer broad asks require stronger evidence to avoid noisy source pills
+      if (topScore < this.docGroundedMinScore(query)) {
         return 'general_answer';
       }
       const uniqueDocs = new Set(sources.map(s => s.documentId));
@@ -14777,6 +14777,18 @@ export class PrismaChatService {
     }
 
     return 'general_answer';
+  }
+
+  private docGroundedMinScore(query: string): number {
+    const terms = String(query || "")
+      .toLowerCase()
+      .replace(/[^\w\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 2 && !STOP_WORDS.has(w));
+
+    if (terms.length <= 1) return 1;
+    if (terms.length <= 3) return 2;
+    return 3;
   }
 
   /**
@@ -17232,6 +17244,64 @@ export class PrismaChatService {
 
       if (!chunksReady) {
         console.warn('[Chat] Attached documents have no chunks after wait', attachedDocumentIds);
+
+        const diagnosticText =
+          await this.buildNoEvidenceDiagnosticMessage({
+            userId: params.req.userId,
+            documentIds: attachedDocumentIds,
+            language: params.req.preferredLanguage,
+          }) || this.localizeNoEvidenceMessage('processing', params.req.preferredLanguage);
+
+        let attachmentMeta: Record<string, unknown> | undefined;
+        if (attachedDocumentIds.length > 0) {
+          const attachedDocs = await prisma.document.findMany({
+            where: { id: { in: attachedDocumentIds }, userId: params.req.userId },
+            select: { id: true, filename: true, mimeType: true },
+          });
+          attachmentMeta = {
+            attachments: attachedDocs.map(d => ({
+              type: 'attached_file',
+              id: d.id,
+              filename: d.filename || 'Document',
+              mimeType: d.mimeType || 'application/octet-stream',
+            })),
+          };
+        }
+
+        const userMsg = existingUserMsgId
+          ? { id: existingUserMsgId }
+          : await this.createMessage({
+            conversationId,
+            role: 'user',
+            content: params.req.message,
+            userId: params.req.userId,
+            ...(attachmentMeta ? { metadata: attachmentMeta } : {}),
+          });
+
+        if (params.sink.isOpen()) {
+          params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+          params.sink.write({ event: 'delta', data: { text: diagnosticText } } as any);
+        }
+
+        const assistantMsg = await this.createMessage({
+          conversationId,
+          role: 'assistant',
+          content: diagnosticText,
+          userId: params.req.userId,
+          metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+        });
+
+        return {
+          conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: diagnosticText,
+          attachmentsPayload: [],
+          sources: [],
+          answerMode: 'general_answer' as AnswerMode,
+          answerClass: 'GENERAL' as AnswerClass,
+          navType: null,
+        };
       }
     }
 

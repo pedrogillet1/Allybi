@@ -52,12 +52,55 @@ function getUserId(req: Request): string | null {
 type ChatLanguage = "en" | "pt" | "es";
 const SUPPORTED_CHAT_LANGUAGES = new Set<ChatLanguage>(["en", "pt", "es"]);
 
-function detectMessageLanguage(message: string): ChatLanguage {
-  const text = String(message || "").toLowerCase();
-  if (!text.trim()) return "en";
+function normalizeLanguageText(value: string): string {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
 
-  const esMarkers = ["cuál", "cuáles", "dónde", "cómo", "por qué", "hola", "gracias", "necesito", "quiero", "puedes", "tengo", "archivo", "prueba"];
-  const ptMarkers = ["quais", "onde", "como", "por que", "olá", "obrigado", "obrigada", "preciso", "quero", "tenho", "arquivo", "exame", "teste"];
+function detectMessageLanguage(message: string): ChatLanguage {
+  const raw = String(message || "");
+  if (!raw.trim()) return "en";
+  const text = normalizeLanguageText(raw);
+
+  const esMarkers = [
+    "cual",
+    "cuales",
+    "donde",
+    "como",
+    "porque",
+    "hola",
+    "gracias",
+    "necesito",
+    "quiero",
+    "puedes",
+    "puede",
+    "tengo",
+    "archivo",
+    "documento",
+    "resultado",
+    "prueba",
+    "analisis",
+  ];
+  const ptMarkers = [
+    "quais",
+    "onde",
+    "como",
+    "porque",
+    "ola",
+    "obrigado",
+    "obrigada",
+    "preciso",
+    "quero",
+    "tenho",
+    "arquivo",
+    "documento",
+    "resultado",
+    "exame",
+    "teste",
+    "voce",
+  ];
   const hits = (markers: string[]) =>
     markers.reduce((count, marker) => (
       count + (new RegExp(`\\b${marker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(text) ? 1 : 0)
@@ -66,13 +109,13 @@ function detectMessageLanguage(message: string): ChatLanguage {
   let esScore = hits(esMarkers);
   let ptScore = hits(ptMarkers);
 
-  if (/[¿¡ñ]/.test(text)) esScore += 2;
-  if (/[ãõç]/.test(text)) ptScore += 2;
+  if (/[¿¡ñ]/.test(raw)) esScore += 2;
+  if (/[ãõç]/i.test(raw)) ptScore += 2;
 
   if (esScore > ptScore && esScore > 0) return "es";
   if (ptScore > esScore && ptScore > 0) return "pt";
-  if (/[ãõç]/.test(text)) return "pt";
-  if (/[¿¡ñ]/.test(text)) return "es";
+  if (/[ãõç]/i.test(raw)) return "pt";
+  if (/[¿¡ñ]/.test(raw)) return "es";
 
   return "en";
 }
@@ -81,10 +124,39 @@ function resolvePreferredLanguage(
   language: unknown,
   message: string,
 ): ChatLanguage {
+  const inferred = detectMessageLanguage(message);
+  if (String(message || "").trim()) return inferred;
   if (typeof language === "string" && SUPPORTED_CHAT_LANGUAGES.has(language as ChatLanguage)) {
     return language as ChatLanguage;
   }
-  return detectMessageLanguage(message);
+  return inferred;
+}
+
+function extractAttachedDocumentIdsFromBody(body: any): string[] {
+  const ids = new Set<string>();
+  if (!body || typeof body !== "object") return [];
+
+  const fromArray = Array.isArray(body.attachedDocuments)
+    ? body.attachedDocuments
+    : [];
+  for (const item of fromArray) {
+    const id = typeof item?.id === "string" ? item.id.trim() : "";
+    if (id) ids.add(id);
+  }
+
+  const single = typeof body.attachedDocumentId === "string"
+    ? body.attachedDocumentId.trim()
+    : "";
+  if (single) ids.add(single);
+
+  return [...ids];
+}
+
+function readRouteMessage(body: any): string {
+  const raw = typeof body?.content === "string"
+    ? body.content
+    : (typeof body?.message === "string" ? body.message : "");
+  return raw.trim();
 }
 
 function isConversationNotFoundError(e: unknown): boolean {
@@ -672,18 +744,24 @@ router.post(
     if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
 
     const conversationId = req.params.conversationId;
-    const content = req.body?.content;
-    if (!content) { res.status(400).json({ error: "content is required" }); return; }
+    const message = readRouteMessage(req.body);
+    if (!message) { res.status(400).json({ error: "content is required" }); return; }
 
     try {
       const chat = getChatService(req);
-      const result = await chat.chat({ userId, conversationId, message: content });
+      const result = await chat.chat({
+        userId,
+        conversationId,
+        message,
+        attachedDocumentIds: extractAttachedDocumentIdsFromBody(req.body),
+        preferredLanguage: resolvePreferredLanguage(req.body?.language, message),
+      });
 
       res.json({
         userMessage: {
           id: result.userMessageId,
           role: "user",
-          content,
+          content: message,
           createdAt: new Date().toISOString(),
         },
         assistantMessage: {
@@ -717,12 +795,18 @@ router.post(
     if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
 
     const conversationId = req.params.conversationId;
-    const content = req.body?.content;
-    if (!content) { res.status(400).json({ error: "content is required" }); return; }
+    const message = readRouteMessage(req.body);
+    if (!message) { res.status(400).json({ error: "content is required" }); return; }
 
     try {
       const chat = getChatService(req);
-      const result = await chat.chat({ userId, conversationId, message: content });
+      const result = await chat.chat({
+        userId,
+        conversationId,
+        message,
+        attachedDocumentIds: extractAttachedDocumentIdsFromBody(req.body),
+        preferredLanguage: resolvePreferredLanguage(req.body?.language, message),
+      });
 
       res.json({
         id: result.assistantMessageId,
@@ -756,8 +840,8 @@ router.post(
     if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
 
     const conversationId = req.params.conversationId;
-    const content = req.body?.content;
-    if (!content) { res.status(400).json({ error: "content is required" }); return; }
+    const message = readRouteMessage(req.body);
+    if (!message) { res.status(400).json({ error: "content is required" }); return; }
 
     try {
       const chat = getChatService(req);
@@ -779,7 +863,13 @@ router.post(
       let result;
       try {
         result = await chat.streamChat({
-          req: { userId, conversationId, message: content },
+          req: {
+            userId,
+            conversationId,
+            message,
+            attachedDocumentIds: extractAttachedDocumentIdsFromBody(req.body),
+            preferredLanguage: resolvePreferredLanguage(req.body?.language, message),
+          },
           sink,
           streamingConfig: DEFAULT_STREAMING_CONFIG,
         });
