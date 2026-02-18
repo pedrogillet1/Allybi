@@ -89,10 +89,35 @@ function RootRoute() {
 // Inner component that uses NotificationsStore hook
 function AppContent() {
   const isMobile = useIsMobile();
-  const { activeToasts, removeToast } = useNotifications();
+  const { activeToasts, removeToast, showWarning } = useNotifications();
 
   // Initialize viewport CSS variables for mobile
   useVisualViewportVars({ enabled: isMobile });
+
+  useEffect(() => {
+    const handleDocumentSkipped = (event) => {
+      const detail = event?.detail || {};
+      const documentId = typeof detail.documentId === 'string' ? detail.documentId : null;
+      const filename = typeof detail.filename === 'string' ? detail.filename : 'This file';
+      const reason = typeof detail.reason === 'string' ? detail.reason : 'No extractable text content';
+
+      showWarning('File uploaded but not searchable', {
+        eventKey: 'documents.skipped.hidden',
+        message: `${filename} has no extractable text and is hidden from Library.`,
+        details: reason,
+        duration: 8000,
+        meta: {
+          scope: 'upload',
+          source: 'documentsContext',
+          relatedIds: documentId ? [documentId] : [],
+          dedupeKey: documentId ? `document-skipped:${documentId}` : `document-skipped:${filename}`,
+        },
+      });
+    };
+
+    window.addEventListener('koda:document-skipped', handleDocumentSkipped);
+    return () => window.removeEventListener('koda:document-skipped', handleDocumentSkipped);
+  }, [showWarning]);
 
   function RouterLayer() {
     const location = useLocation();

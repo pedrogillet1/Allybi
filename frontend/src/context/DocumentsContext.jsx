@@ -8,6 +8,7 @@ import { UPLOAD_CONFIG } from '../config/upload.config';
 import { encryptData, decryptData } from '../utils/security/encryption';
 import { useAuth } from './AuthContext';
 const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
+const SKIPPED_PROBE_WINDOW_MS = 30 * 60 * 1000; // 30 minutes
 
 const DocumentsContext = createContext();
 
@@ -54,6 +55,9 @@ export const DocumentsProvider = ({ children }) => {
 
   // 🗑️ PERFECT DELETE: jobId→folderId mapping for folder tombstone clearing
   const folderJobIdToFolderIdRef = useRef(new Map());
+  const documentsRef = useRef([]);
+  const skippedNotifiedRef = useRef(new Set());
+  const skippedProbeInFlightRef = useRef(new Set());
 
   // ✅ FIX #2: Refetch Coordinator - Batches and deduplicates refetch requests
   const refetchCoordinatorRef = useRef({
@@ -65,6 +69,91 @@ export const DocumentsProvider = ({ children }) => {
   const REFETCH_BATCH_DELAY = 1500; // ✅ FIX: Wait 1.5s to batch requests (was 500ms) - allows all documents to be created
   const REFETCH_COOLDOWN = 3000; // ✅ FIX: Minimum 3s between refetches (was 2s) - prevents count fluctuation
 
+  useEffect(() => {
+    documentsRef.current = documents;
+  }, [documents]);
+
+  const notifySkippedDocument = useCallback((payload = {}) => {
+    const rawId = typeof payload.documentId === 'string' ? payload.documentId.trim() : '';
+    const rawFilename = typeof payload.filename === 'string' ? payload.filename.trim() : '';
+    const dedupeKey = rawId || (rawFilename ? `name:${rawFilename}` : '');
+
+    if (dedupeKey && skippedNotifiedRef.current.has(dedupeKey)) {
+      return;
+    }
+    if (dedupeKey) {
+      skippedNotifiedRef.current.add(dedupeKey);
+    }
+    if (rawId) {
+      uploadRegistryRef.current.delete(rawId);
+    }
+
+    window.dispatchEvent(new CustomEvent('koda:document-skipped', {
+      detail: {
+        documentId: rawId || null,
+        filename: rawFilename || 'This file',
+        reason: typeof payload.reason === 'string' ? payload.reason : 'No extractable text content',
+      },
+    }));
+  }, []);
+
+  const markDocumentSkipped = useCallback((payload = {}) => {
+    const rawId = typeof payload.documentId === 'string' ? payload.documentId.trim() : '';
+
+    if (rawId) {
+      setDocuments(prev => prev.filter(doc => doc.id !== rawId));
+      setRecentDocuments(prev => prev.filter(doc => doc.id !== rawId));
+    }
+
+    notifySkippedDocument(payload);
+  }, [notifySkippedDocument]);
+
+  const probeForSkippedDocuments = useCallback(async (previousDocs = [], fetchedDocs = []) => {
+    const fetchedIds = new Set((fetchedDocs || []).map(doc => doc?.id).filter(Boolean));
+    const now = Date.now();
+    const candidates = (previousDocs || []).filter((doc) => {
+      const docId = typeof doc?.id === 'string' ? doc.id.trim() : '';
+      if (!docId || docId.startsWith('temp-')) return false;
+      if (fetchedIds.has(docId)) return false;
+      if (pendingDeletionIdsRef.current.has(docId)) return false;
+      if (skippedProbeInFlightRef.current.has(docId)) return false;
+      if (skippedNotifiedRef.current.has(docId)) return false;
+
+      const status = String(doc?.status || '').toLowerCase();
+      const isProcessingLike = ['uploading', 'processing', 'completed', 'uploaded', 'enriching', 'indexed'].includes(status);
+      const updatedAtMs = Date.parse(doc?.updatedAt || doc?.createdAt || '');
+      const isRecent = Number.isFinite(updatedAtMs) && (now - updatedAtMs) < SKIPPED_PROBE_WINDOW_MS;
+      const isProtectedByRegistry = uploadRegistryRef.current.has(docId);
+
+      return isProcessingLike || isRecent || isProtectedByRegistry;
+    }).slice(0, 12);
+
+    if (!candidates.length) return;
+
+    await Promise.allSettled(candidates.map(async (doc) => {
+      const docId = doc.id;
+      skippedProbeInFlightRef.current.add(docId);
+      try {
+        const response = await api.get(`/api/documents/${docId}`);
+        const body = response?.data?.ok && response?.data?.data ? response.data.data : response?.data;
+        const status = String(body?.status || '').toLowerCase();
+        if (status === 'skipped') {
+          markDocumentSkipped({
+            documentId: docId,
+            filename: body?.filename || doc?.filename || 'This file',
+            reason: body?.error || doc?.errorMessage || 'No extractable text content',
+          });
+        }
+      } catch (error) {
+        if (error?.response?.status !== 404) {
+          console.warn('[DocumentsContext] Failed probing skipped status', { documentId: docId, error: error?.message });
+        }
+      } finally {
+        skippedProbeInFlightRef.current.delete(docId);
+      }
+    }));
+  }, [markDocumentSkipped]);
+
   // Fetch all documents
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
@@ -72,6 +161,7 @@ export const DocumentsProvider = ({ children }) => {
       const timestamp = new Date().getTime();
       const response = await api.get(`/api/documents?limit=10000&_t=${timestamp}`);
       const fetchedDocs = response.data.documents || [];
+      const previousDocs = documentsRef.current;
 
 
       const docsByFolder = {};
@@ -85,6 +175,8 @@ export const DocumentsProvider = ({ children }) => {
       Object.keys(docsByFolder).forEach(fId => {
 
       });
+
+      void probeForSkippedDocuments(previousDocs, fetchedDocs);
 
       // ✅ FIX #1: Use Upload Registry to protect recently uploaded documents (30s window)
       setDocuments(prev => {
@@ -155,7 +247,7 @@ export const DocumentsProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [probeForSkippedDocuments]);
 
   // Fetch all folders
   const fetchFolders = useCallback(async () => {
@@ -273,9 +365,12 @@ export const DocumentsProvider = ({ children }) => {
       const fetchedFolders = payload?.folders || [];
       const fetchedRecent = payload?.recentDocuments || [];
       const meta = payload?.meta || payload?.stats || raw?.meta || raw?.stats;
+      const previousDocs = documentsRef.current;
 
       const duration = Date.now() - startTime;
 
+
+      void probeForSkippedDocuments(previousDocs, fetchedDocs);
 
       // Decrypt folder names if encryption is enabled
       let decryptedFolders = fetchedFolders;
@@ -350,7 +445,7 @@ export const DocumentsProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [encryptionPassword, fetchDocuments, fetchFolders, fetchRecentDocuments]);
+  }, [encryptionPassword, fetchDocuments, fetchFolders, fetchRecentDocuments, probeForSkippedDocuments]);
 
   // ✅ Cache invalidation function
   const invalidateCache = useCallback(() => {
@@ -773,6 +868,15 @@ export const DocumentsProvider = ({ children }) => {
       }
     });
 
+    socket.on('document-skipped', (data) => {
+      markDocumentSkipped({
+        documentId: data?.documentId,
+        filename: data?.filename,
+        reason: data?.reason || 'No extractable text content',
+      });
+      invalidateCache();
+    });
+
     socket.on('document-moved', () => {
 
       // ✅ FIX: Invalidate cache AND trigger refetch for consistency across tabs
@@ -981,6 +1085,7 @@ export const DocumentsProvider = ({ children }) => {
       socket.off('folders-changed');
       socket.off('document-created');
       socket.off('document-deleted');
+      socket.off('document-skipped');
       socket.off('document-moved');
       socket.off('folder-created');
       socket.off('folder-deleted');
@@ -993,7 +1098,7 @@ export const DocumentsProvider = ({ children }) => {
       socket.disconnect();
       window.removeEventListener('document-uploaded', handleDocumentUploaded);
     };
-  }, [initialized, isAuthenticated, fetchDocuments, fetchFolders, fetchRecentDocuments, fetchAllData, smartRefetch, invalidateCache]);
+  }, [initialized, isAuthenticated, fetchDocuments, fetchFolders, fetchRecentDocuments, fetchAllData, smartRefetch, invalidateCache, markDocumentSkipped]);
 
   // ✅ FIX #3: Upload Verification - Polls backend to verify document exists
   const startUploadVerification = useCallback((documentId, filename) => {
@@ -1211,7 +1316,9 @@ export const DocumentsProvider = ({ children }) => {
     try {
       // ✅ PERFECT DELETE: Backend now returns 202 Accepted with jobId
       console.log(`🗑️ [PERFECT DELETE] Requesting deletion for document ${documentId}`);
-      const response = await api.delete(`/api/documents/${documentId}`);
+      const response = await api.delete(`/api/documents/${documentId}`, {
+        headers: { 'x-delete-source': 'user_delete' }
+      });
 
       // Handle 202 Accepted (new job) or 200 OK (existing job)
       const { jobId, status, isExisting } = response.data;

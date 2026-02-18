@@ -952,7 +952,9 @@ async function uploadFileToSignedUrl(file, presignedUrl, documentId, onProgress,
 
         // Rollback: Delete orphaned database record
         try {
-          await api.delete(`/api/documents/${documentId}`);
+          await api.delete(`/api/documents/${documentId}`, {
+            headers: { 'x-delete-source': 'upload_rollback' }
+          });
         } catch (rollbackError) {
           console.warn(`⚠️ Failed to rollback document ${documentId}`);
         }
@@ -981,7 +983,9 @@ async function uploadFileToSignedUrl(file, presignedUrl, documentId, onProgress,
 
   // Rollback orphaned record
   try {
-    await api.delete(`/api/documents/${documentId}`);
+    await api.delete(`/api/documents/${documentId}`, {
+      headers: { 'x-delete-source': 'upload_rollback' }
+    });
   } catch (rollbackError) {
     console.warn(`⚠️ Failed to rollback document ${documentId}`);
   }

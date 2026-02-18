@@ -60,7 +60,7 @@ export interface DocumentService {
 
   upload(input: { userId: string; data: UploadInput }): Promise<DocumentRecord>;
 
-  delete(input: { userId: string; documentId: string }): Promise<{ deleted: true }>;
+  delete(input: { userId: string; documentId: string; source?: string }): Promise<{ deleted: true }>;
 
   preview(input: {
     userId: string;
@@ -335,7 +335,11 @@ export class DocumentController {
     if (!documentId) return err(res, "VALIDATION_DOC_ID_REQUIRED", "Document id is required.", 400);
 
     try {
-      const out = await this.docs.delete({ userId, documentId });
+      const sourceHeader = Array.isArray(req.headers['x-delete-source'])
+        ? req.headers['x-delete-source'][0]
+        : req.headers['x-delete-source'];
+      const source = asString(sourceHeader) ?? asString(req.query.source) ?? undefined;
+      const out = await this.docs.delete({ userId, documentId, source });
       return ok(res, out, 200);
     } catch (e) {
       const mapped = mapError(e);

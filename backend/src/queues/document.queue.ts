@@ -668,6 +668,11 @@ export async function processDocumentJobData(
 
       const totalTime = Date.now() - startTime;
       logger.info('[ProcessJob] Document skipped (no content)', { filename, reason: skipReason, durationMs: totalTime });
+      if (keepVisibleWithoutText) {
+        emitToUser(userId, 'document-ready', { documentId, filename, hasPreview: false, hasContent: false });
+      } else {
+        emitToUser(userId, 'document-skipped', { documentId, filename, reason: skipReason || 'No extractable content' });
+      }
       return { success: true, documentId, skipped: true, processingTime: totalTime };
     }
 
@@ -684,6 +689,11 @@ export async function processDocumentJobData(
 
       const totalTime = Date.now() - startTime;
       logger.info('[ProcessJob] Document skipped (0 chunks after processing)', { filename, durationMs: totalTime });
+      if (keepVisibleWithoutText) {
+        emitToUser(userId, 'document-ready', { documentId, filename, hasPreview: false, hasContent: false });
+      } else {
+        emitToUser(userId, 'document-skipped', { documentId, filename, reason: 'No extractable content' });
+      }
       return { success: true, documentId, skipped: true, processingTime: totalTime };
     }
 

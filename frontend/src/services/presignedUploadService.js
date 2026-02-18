@@ -507,7 +507,9 @@ class PresignedUploadService {
         if (retries >= maxRetries) {
           // ✅ ROLLBACK: Delete orphaned database record since S3 upload failed
           try {
-            await api.delete(`/api/documents/${documentId}`);
+            await api.delete(`/api/documents/${documentId}`, {
+              headers: { 'x-delete-source': 'upload_rollback' }
+            });
           } catch (rollbackError) {
           }
 

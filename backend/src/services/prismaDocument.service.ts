@@ -198,18 +198,28 @@ export class PrismaDocumentService implements DocumentService {
     return toRecord(doc);
   }
 
-  async delete(input: { userId: string; documentId: string }): Promise<{ deleted: true }> {
+  async delete(input: { userId: string; documentId: string; source?: string }): Promise<{ deleted: true }> {
     // Get document size before deleting to update user storage
     const doc = await prisma.document.findFirst({
       where: { id: input.documentId, userId: input.userId },
       select: { fileSize: true },
     });
 
+    const deleteSource = input.source || 'unknown';
+    console.info('[DocumentDelete] Request received', {
+      documentId: input.documentId,
+      userId: input.userId,
+      source: deleteSource,
+      exists: !!doc,
+    });
+
+    let deletedCount = 0;
     await prisma.$transaction(async (tx) => {
       // Delete the document
-      await tx.document.deleteMany({
+      const deleted = await tx.document.deleteMany({
         where: { id: input.documentId, userId: input.userId },
       });
+      deletedCount = deleted.count;
 
       // Decrement user's storage usage if document existed
       if (doc && doc.fileSize > 0) {
@@ -221,6 +231,13 @@ export class PrismaDocumentService implements DocumentService {
         });
       }
     }, { maxWait: 10000, timeout: 60000 });
+
+    console.info('[DocumentDelete] Request completed', {
+      documentId: input.documentId,
+      userId: input.userId,
+      source: deleteSource,
+      deletedCount,
+    });
 
     return { deleted: true };
   }
