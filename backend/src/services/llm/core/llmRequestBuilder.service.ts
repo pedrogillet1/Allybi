@@ -157,12 +157,13 @@ export class LlmRequestBuilderService {
 
   build(input: BuildRequestInput): LlmRequest {
     const maxQuestions = typeof input.signals.maxQuestions === "number" ? input.signals.maxQuestions : 1;
+    const disambiguationSignal = this.normalizeDisambiguationSignal(input, maxQuestions);
 
     // Determine prompt type
-    const promptType = this.choosePromptType(input);
+    const promptType = this.choosePromptType(input, disambiguationSignal);
 
     // Build prompt context
-    const promptCtx = this.buildPromptContext(input, promptType, maxQuestions);
+    const promptCtx = this.buildPromptContext(input, promptType, maxQuestions, disambiguationSignal);
 
     // Pull base prompt messages from prompt registry
     const prompt = this.prompts.buildPrompt(promptType, promptCtx);
@@ -181,7 +182,7 @@ export class LlmRequestBuilderService {
 
     messages.push({
       role: "user",
-      content: this.buildUserPayload(input),
+      content: this.buildUserPayload(input, disambiguationSignal),
     });
 
     // Generation options (streaming by default, ChatGPT-like)
@@ -233,9 +234,12 @@ export class LlmRequestBuilderService {
   // Prompt selection
   // -------------------------
 
-  private choosePromptType(input: BuildRequestInput): "system" | "retrieval" | "compose_answer" | "disambiguation" | "fallback" | "tool" {
+  private choosePromptType(
+    input: BuildRequestInput,
+    disambiguationSignal: DisambiguationPayload | null,
+  ): "system" | "retrieval" | "compose_answer" | "disambiguation" | "fallback" | "tool" {
     // Disambiguation always wins
-    if (input.signals.disambiguation?.active) return "disambiguation";
+    if (disambiguationSignal?.active || input.signals.answerMode === "rank_disambiguate") return "disambiguation";
 
     // Retrieval planning flows
     if (
@@ -256,7 +260,12 @@ export class LlmRequestBuilderService {
     return "compose_answer";
   }
 
-  private buildPromptContext(input: BuildRequestInput, promptType: string, maxQuestions: number) {
+  private buildPromptContext(
+    input: BuildRequestInput,
+    promptType: string,
+    maxQuestions: number,
+    disambiguationSignal: DisambiguationPayload | null,
+  ) {
     const evidenceStats = input.evidencePack?.stats ?? {};
     const evidenceSummary = input.evidencePack
       ? {
@@ -284,11 +293,11 @@ export class LlmRequestBuilderService {
 
       evidenceSummary,
 
-      disambiguation: input.signals.disambiguation
+      disambiguation: disambiguationSignal
         ? {
             active: true,
-            candidateType: input.signals.disambiguation.candidateType,
-            options: input.signals.disambiguation.options.map((o) => ({ id: o.id, label: o.label })),
+            candidateType: disambiguationSignal.candidateType,
+            options: disambiguationSignal.options.map((o) => ({ id: o.id, label: o.label })),
           }
         : { active: false },
 
@@ -296,7 +305,7 @@ export class LlmRequestBuilderService {
 
       constraints: {
         maxQuestions,
-        maxOptions: input.signals.disambiguation?.maxOptions ?? 4,
+        maxOptions: disambiguationSignal?.maxOptions ?? 4,
         disallowJsonOutput: input.signals.disallowJsonOutput !== false,
         navPillsStrict: input.signals.answerMode === "nav_pills",
         numericStrict: false,
@@ -314,7 +323,7 @@ export class LlmRequestBuilderService {
   // User payload construction
   // -------------------------
 
-  private buildUserPayload(input: BuildRequestInput): string {
+  private buildUserPayload(input: BuildRequestInput, disambiguationSignal: DisambiguationPayload | null): string {
     const parts: string[] = [];
 
     // Memory context (bounded, already packed)
@@ -328,8 +337,8 @@ export class LlmRequestBuilderService {
     }
 
     // Disambiguation options (if active) — keep minimal; prompt handles rendering policy
-    if (input.signals.disambiguation?.active) {
-      const opts = input.signals.disambiguation.options.slice(0, input.signals.disambiguation.maxOptions);
+    if (disambiguationSignal?.active) {
+      const opts = disambiguationSignal.options.slice(0, disambiguationSignal.maxOptions);
       parts.push(
         [
           "### Options",
@@ -399,6 +408,18 @@ export class LlmRequestBuilderService {
 
     // Keep short to avoid huge keys
     return core;
+  }
+
+  private normalizeDisambiguationSignal(input: BuildRequestInput, maxQuestions: number): DisambiguationPayload | null {
+    if (input.signals.disambiguation?.active) return input.signals.disambiguation;
+    if (input.signals.answerMode !== "rank_disambiguate") return null;
+    return {
+      active: true,
+      candidateType: "document",
+      options: [],
+      maxOptions: 4,
+      maxQuestions: Math.max(1, Math.min(2, maxQuestions || 1)),
+    };
   }
 }
 

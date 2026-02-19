@@ -19,7 +19,6 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { BRAND_NAME } from '../config/brand';
-import { resolveDataDir } from '../utils/resolveDataDir';
 
 // Encryption imports for filename decryption in retrieval path
 import { EncryptionService } from './security/encryption.service';
@@ -83,7 +82,10 @@ import {
   type ChatResult,
   type ChatRole,
   type ConversationDTO,
+  type ConversationListOptions,
+  type ConversationMessagesOptions,
   type ConversationWithMessagesDTO,
+  type CreateMessageParams,
   type NavType,
 } from './chatRuntime.contracts';
 
@@ -96,7 +98,10 @@ export type {
   ChatResult,
   ChatRole,
   ConversationDTO,
+  ConversationListOptions,
+  ConversationMessagesOptions,
   ConversationWithMessagesDTO,
+  CreateMessageParams,
   NavType,
 } from './chatRuntime.contracts';
 export { ConversationNotFoundError } from './chatRuntime.contracts';
@@ -237,7 +242,7 @@ export class ChatRuntimeService {
     return toConversationDTO(created);
   }
 
-  async listConversations(userId: string, opts: { limit?: number; cursor?: string } = {}): Promise<ConversationDTO[]> {
+  async listConversations(userId: string, opts: ConversationListOptions = {}): Promise<ConversationDTO[]> {
     const limit = clampLimit(opts.limit, 50);
 
     const rows = await prisma.conversation.findMany({
@@ -273,7 +278,7 @@ export class ChatRuntimeService {
   async getConversationWithMessages(
     userId: string,
     conversationId: string,
-    opts: { limit?: number; order?: "asc" | "desc" } = {}
+    opts: ConversationMessagesOptions = {}
   ): Promise<ConversationWithMessagesDTO | null> {
     const conv = await prisma.conversation.findFirst({
       where: { id: conversationId, userId, isDeleted: false },
@@ -348,7 +353,7 @@ export class ChatRuntimeService {
   async listMessages(
     userId: string,
     conversationId: string,
-    opts: { limit?: number; order?: "asc" | "desc" } = {}
+    opts: ConversationMessagesOptions = {}
   ): Promise<ChatMessageDTO[]> {
     const conv = await prisma.conversation.findFirst({
       where: { id: conversationId, userId, isDeleted: false },
@@ -374,14 +379,7 @@ export class ChatRuntimeService {
     return rows.map(toMessageDTO);
   }
 
-  async createMessage(params: {
-    conversationId: string;
-    role: ChatRole;
-    content: string;
-    userId?: string;
-    attachments?: unknown | null;
-    metadata?: Record<string, unknown> | null;
-  }): Promise<ChatMessageDTO> {
+  async createMessage(params: CreateMessageParams): Promise<ChatMessageDTO> {
     const now = new Date();
     const metadataJson = params.metadata ? JSON.stringify(params.metadata) : null;
 
@@ -18215,12 +18213,8 @@ export class ChatRuntimeService {
   }
 
   private loadCapabilitiesCatalog(): any | null {
-    try {
-      const p = path.join(resolveDataDir(), "semantics/capabilities_catalog.any.json");
-      return JSON.parse(fs.readFileSync(p, "utf8"));
-    } catch {
-      return null;
-    }
+    const bank = getOptionalBank<any>("capabilities_catalog");
+    return bank?.config?.enabled === false ? null : bank;
   }
 
   private renderCapabilitiesAnswer(lang: "en" | "pt" | "es"): string {
@@ -18259,12 +18253,8 @@ export class ChatRuntimeService {
   }
 
   private loadFollowupBank(): any | null {
-    try {
-      const p = path.join(resolveDataDir(), "microcopy/followup_suggestions.any.json");
-      return JSON.parse(fs.readFileSync(p, "utf8"));
-    } catch {
-      return null;
-    }
+    const bank = getOptionalBank<any>("followup_suggestions");
+    return bank?.config?.enabled === false ? null : bank;
   }
 
   private selectFollowups(input: {

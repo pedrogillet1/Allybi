@@ -76,13 +76,15 @@ class KodaV3Container {
         const env = coerceEnvName(process.env.NODE_ENV);
         const rootDir = resolveDataBanksRootDir();
         const strict = env === 'production' || env === 'staging';
-        const validateSchemas = (process.env.BANK_VALIDATE_SCHEMAS ?? '').toLowerCase().trim() === 'true';
+        const override = (process.env.BANK_VALIDATE_SCHEMAS ?? '').toLowerCase().trim();
+        const validateSchemas = override ? override === 'true' : strict;
 
         await initializeBanks({
           env,
           rootDir,
           strict,
           validateSchemas,
+          allowEmptyChecksumsInNonProd: !strict,
         });
 
         try {

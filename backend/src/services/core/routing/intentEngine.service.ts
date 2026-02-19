@@ -46,7 +46,15 @@ import { getBank, getOptionalBank } from "../banks/bankLoader.service";
 export type LanguageCode = "en" | "pt" | "es";
 export type IntentFamily = "documents" | "file_actions" | "help" | "conversation" | "doc_stats" | "editing" | "connectors" | "email" | "error";
 
-export type OutputShape = "paragraph" | "bullets" | "numbered_list" | "table" | "file_list" | "button_only";
+export type OutputShape =
+  | "paragraph"
+  | "bullets"
+  | "numbered_list"
+  | "table"
+  | "file_list"
+  | "button_only"
+  | "quote"
+  | "breadcrumbs";
 
 export interface ConversationState {
   activeDocRef?: { docId?: string; filename?: string; lockType?: "hard" | "soft" };
@@ -124,27 +132,37 @@ interface OperatorPriorityBank {
   }>;
 }
 
+interface OperatorOutputShapeEntry {
+  defaultShape?: OutputShape;
+  allowShapes?: OutputShape[];
+  navPills?: boolean;
+}
+
 interface OperatorOutputShapesBank {
   _meta: any;
-  operators: Record<string, { defaultShape: OutputShape; allowShapes?: OutputShape[]; navPills?: boolean }>;
+  operators?: Record<string, OperatorOutputShapeEntry>;
+  mapping?: Record<string, OperatorOutputShapeEntry>;
+}
+
+interface OperatorContractEntry {
+  id?: string;
+  description?: string;
+  requiresDocs?: boolean;
+  produces?: {
+    outputShape?: OutputShape;
+    requireSourceButtons?: boolean;
+  };
+  outputs?: {
+    primaryShape?: OutputShape;
+    sources?: { required?: boolean };
+  };
+  allowedSignals?: string[];
+  disallowSignals?: string[];
 }
 
 interface OperatorContractsBank {
   _meta: any;
-  operators: Record<
-    string,
-    {
-      description?: string;
-      requiresDocs?: boolean;
-      produces?: {
-        // "button_only" is UI behavior; still treated as OutputShape constraint
-        outputShape?: OutputShape;
-        requireSourceButtons?: boolean;
-      };
-      allowedSignals?: string[];
-      disallowSignals?: string[];
-    }
-  >;
+  operators?: Record<string, OperatorContractEntry> | OperatorContractEntry[];
 }
 
 interface IntentPatternsBank {
@@ -906,15 +924,21 @@ export class KodaIntentEngineV3Service {
     const constraints: IntentResult["constraints"] = { ...(triggerContext.constraints ?? {}), ...(chosen.constraints ?? {}) };
 
     // Apply operator_output_shapes defaults
-    const opShape = this.operatorOutputShapes.operators?.[chosen.operator];
+    const opShape = this.getOperatorOutputShapeEntry(chosen.operator);
     if (opShape?.defaultShape && !constraints.outputShape) {
       constraints.outputShape = mapOutputShapeToConstraint(opShape.defaultShape);
     }
 
     // Apply operator contract requirements
-    const contract = this.operatorContracts.operators?.[chosen.operator];
+    const contract = this.getOperatorContractEntry(chosen.operator);
     if (contract?.produces?.requireSourceButtons) constraints.requireSourceButtons = true;
-    if (contract?.produces?.outputShape && !constraints.outputShape) constraints.outputShape = contract.produces.outputShape;
+    if (contract?.outputs?.sources?.required) constraints.requireSourceButtons = true;
+    if (contract?.produces?.outputShape && !constraints.outputShape) {
+      constraints.outputShape = mapOutputShapeToConstraint(contract.produces.outputShape);
+    }
+    if (contract?.outputs?.primaryShape && !constraints.outputShape) {
+      constraints.outputShape = mapOutputShapeToConstraint(contract.outputs.primaryShape);
+    }
 
     // If operator is nav_pills operator → button_only outputShape
     if (opShape?.navPills) {
@@ -936,6 +960,30 @@ export class KodaIntentEngineV3Service {
     }
 
     return constraints;
+  }
+
+  private getOperatorOutputShapeEntry(operatorId: string): OperatorOutputShapeEntry | null {
+    const fromOperators = this.operatorOutputShapes?.operators?.[operatorId] ?? null;
+    const fromMapping = this.operatorOutputShapes?.mapping?.[operatorId] ?? null;
+    if (!fromOperators && !fromMapping) return null;
+
+    const merged: OperatorOutputShapeEntry = {
+      ...(fromOperators ?? {}),
+      ...(fromMapping ?? {}),
+    };
+
+    // Canonical nav behavior in new banks is encoded as defaultShape=button_only.
+    if (merged.navPills == null && merged.defaultShape === "button_only") merged.navPills = true;
+    return merged;
+  }
+
+  private getOperatorContractEntry(operatorId: string): OperatorContractEntry | null {
+    const operators = this.operatorContracts?.operators;
+    if (!operators) return null;
+    if (Array.isArray(operators)) {
+      return operators.find((op) => String(op?.id || "").trim() === operatorId) ?? null;
+    }
+    return (operators as Record<string, OperatorContractEntry>)[operatorId] ?? null;
   }
 
   // -----------------------------

@@ -311,12 +311,14 @@ export async function initializeBanks(opts?: Partial<BankLoaderInitOptions>): Pr
   const instance = getBankLoaderInstance();
 
   const env = (process.env.NODE_ENV || 'local') as EnvName;
+  const resolvedEnv = (opts?.env ?? ((env as string) === 'development' ? 'dev' : env)) as EnvName;
+  const strictEnv = resolvedEnv === "production" || resolvedEnv === "staging";
   const fullOpts: BankLoaderInitOptions = {
-    env: opts?.env ?? ((env as string) === 'development' ? 'dev' : env) as EnvName,
+    env: resolvedEnv,
     rootDir: opts?.rootDir ?? path.join(process.cwd(), 'backend/src/data_banks'),
     strict: opts?.strict,
-    validateSchemas: opts?.validateSchemas ?? false,
-    allowEmptyChecksumsInNonProd: opts?.allowEmptyChecksumsInNonProd ?? true,
+    validateSchemas: opts?.validateSchemas ?? strictEnv,
+    allowEmptyChecksumsInNonProd: opts?.allowEmptyChecksumsInNonProd ?? !strictEnv,
     enableHotReload: opts?.enableHotReload ?? (env !== 'production'),
     logger: opts?.logger ?? {
       info: (msg, meta) => console.log(`[BankLoader] ${msg}`, meta || ''),

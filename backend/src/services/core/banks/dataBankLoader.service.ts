@@ -616,12 +616,13 @@ export class DataBankLoaderService {
   private async validateChecksumPolicy(entry: BankRegistryEntry, filePath: string): Promise<void> {
     const declared = (entry.checksumSha256 ?? "").trim();
     if (!declared) {
-      if (this.opts.env === "production" && !this.opts.allowEmptyChecksumsInNonProd) {
-        // production strictness: if you want to enforce checksums, set allowEmptyChecksumsInNonProd=false
-        // Here we only enforce if strict and policy says so
-        if (this.opts.strict) {
-          this.logger.warn("Empty checksum in production registry entry", { id: entry.id, path: entry.path });
-        }
+      const strictEnv = this.opts.env === "production" || this.opts.env === "staging";
+      if (strictEnv && !this.opts.allowEmptyChecksumsInNonProd) {
+        throw new DataBankError(`Empty checksum is not allowed in ${this.opts.env}`, {
+          id: entry.id,
+          path: entry.path,
+          env: this.opts.env,
+        });
       }
       return;
     }

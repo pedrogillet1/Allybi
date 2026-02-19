@@ -7,6 +7,7 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 import { useAuthModal } from '../../context/AuthModalContext';
 import { isAuthPathname } from '../../context/AuthModalContext';
 import { ROUTES, AUTH_MODES, DEFAULT_AUTH_REDIRECT, STORAGE_KEYS } from '../../constants/routes';
+import { trackAllybiPublicVisit } from '../../services/allybiTelemetryService';
 import logo from '../../assets/koda-knot-black.svg';
 import googleIcon from '../../assets/Social icon 2.svg';
 import appleIcon from '../../assets/Social icon.svg';
@@ -78,6 +79,42 @@ const UnifiedAuth = ({ variant = 'page' }) => {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.HAS_VISITED, 'true');
   }, []);
+
+  // Track public landing/auth visits (e.g., paid ad traffic before login).
+  useEffect(() => {
+    if (isModal || typeof window === 'undefined') return;
+
+    const params = new URLSearchParams(location.search || '');
+    const utmSource = String(params.get('utm_source') || '').trim();
+    const utmMedium = String(params.get('utm_medium') || '').trim();
+    const utmCampaign = String(params.get('utm_campaign') || '').trim();
+    const utmContent = String(params.get('utm_content') || '').trim();
+    const utmTerm = String(params.get('utm_term') || '').trim();
+    const referrerRaw = String(document.referrer || '').trim();
+    let referrerHost = '';
+    if (referrerRaw) {
+      try {
+        referrerHost = new URL(referrerRaw).hostname || '';
+      } catch {
+        referrerHost = '';
+      }
+    }
+
+    void trackAllybiPublicVisit({
+      locale: String(navigator.language || '').trim() || undefined,
+      meta: {
+        surface: 'public_auth',
+        source: utmSource ? 'utm' : 'direct',
+        path: location.pathname || '/',
+        utmSource: utmSource || null,
+        utmMedium: utmMedium || null,
+        utmCampaign: utmCampaign || null,
+        utmContent: utmContent || null,
+        utmTerm: utmTerm || null,
+        referrerHost: referrerHost || null,
+      },
+    });
+  }, [isModal, location.pathname, location.search]);
 
   // Validate password in real-time (for signup)
   useEffect(() => {

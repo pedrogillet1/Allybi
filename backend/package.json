@@ -47,6 +47,8 @@
     "typecheck:chat": "tsc --noEmit src/controllers/chat.controller.ts src/controllers/rag.controller.ts src/services/chat.service.ts src/services/rag.service.ts",
     "lint:routing": "node scripts/lint-routing-priority.mjs",
     "lint:prompts": "node scripts/lint/no-inline-prompts.mjs",
+    "banks:checksum:generate": "node scripts/lint/generate-bank-checksums.mjs",
+    "banks:checksum:check": "node scripts/lint/generate-bank-checksums.mjs --check",
     "audit:routing": "ts-node --transpile-only scripts/audit-routing-alignment.ts",
     "check:all": "npm run typecheck && npm run lint && npm run lint:routing && npm run format:check",
     "fix:all": "npm run lint:fix && npm run format",

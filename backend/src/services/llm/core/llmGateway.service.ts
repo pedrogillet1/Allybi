@@ -40,6 +40,14 @@ interface PreparedGatewayRequest {
   promptTrace: GatewayPromptTrace;
 }
 
+type GatewayDisambiguation = {
+  active: boolean;
+  candidateType: "document" | "sheet" | "operator";
+  options: Array<{ id: string; label: string; score?: number }>;
+  maxOptions: number;
+  maxQuestions: number;
+};
+
 function mapProviderForRequest(provider: LLMProvider): LLMProvider {
   if (provider === "unknown") return "google";
   return provider;
@@ -142,6 +150,7 @@ export class LlmGatewayService {
         maxQuestions: 1,
         navType: parsed.navType,
         fallback: parsed.fallback,
+        disambiguation: parsed.disambiguation,
       },
       evidencePack: parsed.evidencePack,
       memoryPack: parsed.memoryPack,
@@ -217,6 +226,7 @@ export class LlmGatewayService {
     operatorFamily?: string | null;
     navType: "open" | "where" | "discover" | null;
     fallback?: { triggered: boolean; reasonCode?: string | null };
+    disambiguation?: GatewayDisambiguation | null;
     evidencePack?: EvidencePackLike;
     memoryPack?: MemoryPackLike;
   } {
@@ -277,6 +287,7 @@ export class LlmGatewayService {
 
     const outputLanguage = this.detectOutputLanguage(rawMeta, rawContext, systemBlocks);
     const answerMode = this.detectAnswerMode(rawMeta, systemBlocks, evidencePack);
+    const disambiguation = this.detectDisambiguation(rawMeta, rawContext, answerMode);
     const operatorFamily = answerMode === "nav_pills" ? "file_actions" : null;
     const navType = (rawMeta.navType as any) ?? (answerMode === "nav_pills" ? "discover" : null);
 
@@ -291,6 +302,7 @@ export class LlmGatewayService {
       operatorFamily: promptTask ? 'file_actions' : operatorFamily,
       navType,
       fallback: reasonCode ? { triggered: true, reasonCode } : { triggered: false },
+      disambiguation,
       evidencePack,
       memoryPack,
     };
@@ -321,6 +333,9 @@ export class LlmGatewayService {
     if (typeof meta.answerMode === "string" && meta.answerMode.trim()) {
       return meta.answerMode;
     }
+    if (meta.needsClarification === true || (meta.disambiguation as any)?.active === true) {
+      return "rank_disambiguate";
+    }
 
     const joined = systemBlocks.join("\n");
     if (/NAVIGATION MODE/i.test(joined)) return "nav_pills";
@@ -330,6 +345,44 @@ export class LlmGatewayService {
     }
 
     return "general_answer";
+  }
+
+  private detectDisambiguation(
+    meta: Record<string, unknown>,
+    context: Record<string, unknown>,
+    answerMode: string,
+  ): GatewayDisambiguation | null {
+    const dm = (meta.disambiguation as any) || (context.disambiguation as any) || null;
+    const active =
+      answerMode === "rank_disambiguate" ||
+      meta.needsClarification === true ||
+      dm?.active === true;
+
+    if (!active) return null;
+
+    const rawOptions = Array.isArray(dm?.options) ? dm.options : [];
+    const options = rawOptions
+      .map((o: any, idx: number) => ({
+        id: String(o?.id || `opt_${idx + 1}`),
+        label: String(o?.label || o?.title || "").trim(),
+        score: typeof o?.score === "number" ? o.score : undefined,
+      }))
+      .filter((o: { label: string }) => o.label.length > 0);
+
+    const candidateType = ["document", "sheet", "operator"].includes(String(dm?.candidateType))
+      ? (dm.candidateType as "document" | "sheet" | "operator")
+      : "document";
+
+    const maxOptions = Math.max(2, Math.min(6, Number(dm?.maxOptions ?? 4) || 4));
+    const maxQuestions = Math.max(1, Math.min(2, Number(dm?.maxQuestions ?? 1) || 1));
+
+    return {
+      active: true,
+      candidateType,
+      options,
+      maxOptions,
+      maxQuestions,
+    };
   }
 
   private extractEvidenceFromSystemBlocks(systemBlocks: string[]): EvidencePackLike["evidence"] {

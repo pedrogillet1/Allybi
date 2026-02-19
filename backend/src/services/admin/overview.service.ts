@@ -63,6 +63,11 @@ const ALLYBI_CLICK_EVENT_TYPES = [
   'FILE_PILL_CLICKED',
 ] as const;
 
+const ALLYBI_VISIT_EVENT_TYPES = [
+  'ALLYBI_VISIT_STARTED',
+  'ALLYBI_PUBLIC_VISIT_STARTED',
+] as const;
+
 /**
  * Get overview KPIs for the dashboard
  */
@@ -133,7 +138,10 @@ async function calculateKpis(prisma: PrismaClient, window: TimeWindow): Promise<
       ? safe(
           () => prisma.usageEvent.groupBy({
             by: ['userId'],
-            where: { at: { gte: from, lt: to } },
+            where: {
+              at: { gte: from, lt: to },
+              eventType: { not: 'ALLYBI_PUBLIC_VISIT_STARTED' },
+            },
           }),
           []
         )
@@ -173,7 +181,7 @@ async function calculateKpis(prisma: PrismaClient, window: TimeWindow): Promise<
     supportsModel(prisma, 'usageEvent')
       ? safe(
           () => prisma.usageEvent.count({
-            where: { at: { gte: from, lt: to }, eventType: 'ALLYBI_VISIT_STARTED' },
+            where: { at: { gte: from, lt: to }, eventType: { in: [...ALLYBI_VISIT_EVENT_TYPES] } },
           }),
           0
         )
@@ -387,7 +395,7 @@ async function calculateTimeseries(
     case 'allybi_visits': {
       if (!supportsModel(prisma, 'usageEvent')) break;
       const visits = await prisma.usageEvent.findMany({
-        where: { at: { gte: from, lt: to }, eventType: 'ALLYBI_VISIT_STARTED' },
+        where: { at: { gte: from, lt: to }, eventType: { in: [...ALLYBI_VISIT_EVENT_TYPES] } },
         select: { at: true },
         take: 100000,
       });

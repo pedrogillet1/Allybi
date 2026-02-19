@@ -9,6 +9,10 @@ import type {
   ChatMessageDTO,
   ConversationDTO,
   ConversationWithMessagesDTO,
+  ConversationListOptions,
+  ConversationMessagesOptions,
+  CreateMessageParams,
+  PrismaChatServicePort,
   AnswerMode,
   AnswerClass,
   NavType,
@@ -25,6 +29,10 @@ export type {
   ChatMessageDTO,
   ConversationDTO,
   ConversationWithMessagesDTO,
+  ConversationListOptions,
+  ConversationMessagesOptions,
+  CreateMessageParams,
+  PrismaChatServicePort,
   AnswerMode,
   AnswerClass,
   NavType,
@@ -38,7 +46,7 @@ export { ConversationNotFoundError };
  * - Uses core implementation for persistence + shared operations
  * - Optionally routes turns through ChatKernelService
  */
-export class PrismaChatService {
+export class PrismaChatService implements PrismaChatServicePort {
   private readonly runtime: ChatRuntimeService;
   private readonly kernel: ChatKernelService;
   private readonly useKernel: boolean;
@@ -79,7 +87,7 @@ export class PrismaChatService {
     return this.runtime.createConversation(params);
   }
 
-  async listConversations(userId: string, opts: { limit?: number; cursor?: string } = {}): Promise<ConversationDTO[]> {
+  async listConversations(userId: string, opts: ConversationListOptions = {}): Promise<ConversationDTO[]> {
     return this.runtime.listConversations(userId, opts);
   }
 
@@ -90,7 +98,7 @@ export class PrismaChatService {
   async getConversationWithMessages(
     userId: string,
     conversationId: string,
-    opts: { limit?: number; order?: "asc" | "desc" } = {},
+    opts: ConversationMessagesOptions = {},
   ): Promise<ConversationWithMessagesDTO | null> {
     return this.runtime.getConversationWithMessages(userId, conversationId, opts);
   }
@@ -110,20 +118,12 @@ export class PrismaChatService {
   async listMessages(
     userId: string,
     conversationId: string,
-    opts: { limit?: number; order?: "asc" | "desc" } = {},
+    opts: ConversationMessagesOptions = {},
   ): Promise<ChatMessageDTO[]> {
     return this.runtime.listMessages(userId, conversationId, opts);
   }
 
-  async createMessage(params: {
-    conversationId: string;
-    role: ChatRole;
-    content: string;
-    userId: string;
-    attachments?: unknown | null;
-    telemetry?: Record<string, unknown> | null;
-    metadata?: Record<string, unknown> | null;
-  }): Promise<ChatMessageDTO> {
+  async createMessage(params: CreateMessageParams): Promise<ChatMessageDTO> {
     return this.runtime.createMessage(params);
   }
 }

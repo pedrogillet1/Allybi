@@ -24,6 +24,26 @@ export interface ConversationWithMessagesDTO extends ConversationDTO {
   messages: ChatMessageDTO[];
 }
 
+export interface ConversationListOptions {
+  limit?: number;
+  cursor?: string;
+}
+
+export interface ConversationMessagesOptions {
+  limit?: number;
+  order?: "asc" | "desc";
+}
+
+export interface CreateMessageParams {
+  conversationId: string;
+  role: ChatRole;
+  content: string;
+  userId: string;
+  attachments?: unknown | null;
+  telemetry?: Record<string, unknown> | null;
+  metadata?: Record<string, unknown> | null;
+}
+
 export interface ChatRequest {
   userId: string;
   conversationId?: string;
@@ -117,3 +137,24 @@ export class ConversationNotFoundError extends Error {
   }
 }
 
+export interface PrismaChatServicePort {
+  chat(req: ChatRequest): Promise<ChatResult>;
+  streamChat(params: { req: ChatRequest; sink: StreamSink; streamingConfig: LLMStreamingConfig }): Promise<ChatResult>;
+  createConversation(params: { userId: string; title?: string }): Promise<ConversationDTO>;
+  listConversations(userId: string, opts?: ConversationListOptions): Promise<ConversationDTO[]>;
+  getConversation(userId: string, conversationId: string): Promise<ConversationDTO | null>;
+  getConversationWithMessages(
+    userId: string,
+    conversationId: string,
+    opts?: ConversationMessagesOptions,
+  ): Promise<ConversationWithMessagesDTO | null>;
+  updateTitle(userId: string, conversationId: string, title: string): Promise<ConversationDTO | null>;
+  deleteConversation(userId: string, conversationId: string): Promise<{ ok: boolean }>;
+  deleteAllConversations(userId: string): Promise<{ ok: boolean; deleted: number }>;
+  listMessages(
+    userId: string,
+    conversationId: string,
+    opts?: ConversationMessagesOptions,
+  ): Promise<ChatMessageDTO[]>;
+  createMessage(params: CreateMessageParams): Promise<ChatMessageDTO>;
+}

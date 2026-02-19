@@ -99,7 +99,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "48c11be3f0523cd9a47afe9766d331210bd89750493cb137cdf621a7600f8a79",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -125,7 +125,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "e7546dc7361eda4bf4039541ac630ef2603fde53607203b05b5e8ec61ab40289",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -135,7 +135,8 @@
       "filename": "ambiguity_rank_features.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "b855576a2a0bc29bea8cb5149e2b0e5e644f3754e3e41c00250ac941d13a52b6"
     },
     {
       "id": "ambiguity_tests",
@@ -161,7 +162,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "90f5d96593927f84406a743e776d81380aec2e055cc4dcfd045c6832bcb59624",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -171,7 +172,8 @@
       "filename": "clarification_phrases.any.json",
       "version": "1.1.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "d3d137f59fd0a426a78d0f7f373740d82d99df97ccd7f0e2d7f0bf34cfb63a90"
     },
     {
       "id": "confidence_calibration",
@@ -180,7 +182,8 @@
       "filename": "confidence_calibration.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "9d576017e680a30f109664a3900f7c6904ac5ff9b5b431476b3f7486a9cd7477"
     },
     {
       "id": "disambiguation_policies",
@@ -189,7 +192,8 @@
       "filename": "disambiguation_policies.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "50d038f774c892f4ddcdd81502524d1fba61cdb030568f1c3fa9b8df9935ebec"
     },
     {
       "id": "disambiguation_render_policy",
@@ -198,7 +202,8 @@
       "filename": "disambiguation_render_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "8689c838ccb07f6fcbf7404c45b0b7c7247e34099fc2a5881005a800bcdfc886"
     },
     {
       "id": "option_labeling_rules",
@@ -207,7 +212,8 @@
       "filename": "option_labeling_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "797c1cc4a6a1ffc316816a64a0f81ff6d72fe197ce28bf5ca92bd8958b0f689f"
     },
     {
       "id": "fallback_extraction_recovery",
@@ -216,7 +222,8 @@
       "filename": "fallback_extraction_recovery.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "a01cbd74e53e3070802f9b4a3ce37e2c5556f75d6d8eb1fd0d45452bd918f9ea"
     },
     {
       "id": "fallback_not_found_scope",
@@ -225,7 +232,8 @@
       "filename": "fallback_not_found_scope.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "7233d869872aa78a8b6e4fbeb7bc89b27f83f5916361de6f377d49a92363b8ed"
     },
     {
       "id": "fallback_processing",
@@ -234,7 +242,8 @@
       "filename": "fallback_processing.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "f91436df3c92e7c02fe45fb267a77ed55cc16aafcd8e30a3e40c0c0d98fdca27"
     },
     {
       "id": "fallback_router",
@@ -243,7 +252,8 @@
       "filename": "fallback_router.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-27"
+      "lastUpdated": "2026-01-27",
+      "checksumSha256": "de69305ab0e6b43f5c1793cf3ef8e21c117c3e728cabe1f006c44d43af1a3bfe"
     },
     {
       "id": "fallback_scope_empty",
@@ -252,7 +262,8 @@
       "filename": "fallback_scope_empty.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "b5abccbad9df46d2148d57d9c709e8847112c36a84a6f40b17656c36a32bc9c3"
     },
     {
       "id": "answer_closers",
@@ -261,7 +272,8 @@
       "filename": "answer_closers.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "1194445a6190136ab40627c581731fdb69aea77da5f465d7e187c5e997616434"
     },
     {
       "id": "answer_openers",
@@ -270,7 +282,8 @@
       "filename": "answer_openers.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "f15942feef8cfe73a05406ca82477e9fff99ca69b8b4adaf7881794d787a32bd"
     },
     {
       "id": "answer_style_policy",
@@ -279,7 +292,8 @@
       "filename": "answer_style_policy.any.json",
       "version": "6.1.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "4d78ccc1b69f97467a81de7824e8793393c849d80f02edcba64de6380211bbfb"
     },
     {
       "id": "banned_phrases",
@@ -288,7 +302,8 @@
       "filename": "banned_phrases.any.json",
       "version": "2.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "ed424f48d8f7c1b836ff2654fda5e44a897a34264fb96316d5f878f77cd4de74"
     },
     {
       "id": "boilerplate_phrases",
@@ -297,7 +312,8 @@
       "filename": "boilerplate_phrases.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "8546c0e58d2a53b4e229e6bf1a72cb64232932200134da870f729207ec0a2584"
     },
     {
       "id": "bolding_rules",
@@ -306,7 +322,8 @@
       "filename": "bolding_rules.any.json",
       "version": "2.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "1f01a212808240cd3f3a8e0b74a899887381402ed51fdc804505e2795fa3d722"
     },
     {
       "id": "bullet_rules",
@@ -315,7 +332,8 @@
       "filename": "bullet_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "d955c519737c4c00ae1700c89cfd8363438f8e3f04d3dde12e1a536ce5ce4fec"
     },
     {
       "id": "citation_styles",
@@ -324,7 +342,8 @@
       "filename": "citation_styles.any.json",
       "version": "2.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "d2fe6b892a94de288d80f32fc8defac245c28b7c861ccd426a8bf78475c091b4"
     },
     {
       "id": "followup_templates",
@@ -333,7 +352,8 @@
       "filename": "followup_templates.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "dff60805a099996426540fc4261bcbc3c4fe92387ac39ce3a920a8d776310200"
     },
     {
       "id": "list_styles",
@@ -342,7 +362,8 @@
       "filename": "list_styles.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "265d682a66738b4be46adbed7e2eaf7f48cafa5c58043eafd35a0e683d298210"
     },
     {
       "id": "paragraph_rules",
@@ -351,7 +372,8 @@
       "filename": "paragraph_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "669514049758ab3f0986102a2a7b7bff6f4d117eb1d6aedc5b43ae90a59f8047"
     },
     {
       "id": "quote_styles",
@@ -360,7 +382,8 @@
       "filename": "quote_styles.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "e0509734fe5d0de872a5e984203538012eec3aceb2120b28b9d5f953cfe9e713"
     },
     {
       "id": "render_policy",
@@ -369,7 +392,8 @@
       "filename": "render_policy.any.json",
       "version": "6.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "dd4e5fba2049cef5883c28095ef7b87d60174f9d81551b6fcaa513ece08ae62d"
     },
     {
       "id": "table_rules",
@@ -378,7 +402,8 @@
       "filename": "table_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "d308ab1e082b7d0190f15fe42db5db12f3c3cd87925211df08d24c24c1ef36c3"
     },
     {
       "id": "table_styles",
@@ -387,7 +412,8 @@
       "filename": "table_styles.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "d3fb32e06653361e99f17c3ea12776c3c856658a877920f61fc69578d0b225a5"
     },
     {
       "id": "truncation_and_limits",
@@ -396,7 +422,8 @@
       "filename": "truncation_and_limits.any.json",
       "version": "2.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "f446cd983d094e05510320648d15efe727ea0f78e428997c4fd84e4c112f692d"
     },
     {
       "id": "bank_aliases",
@@ -421,7 +448,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "6e749e60cfdca71c13433a8b00efdd46839ef0d10af6aefea06db4ec46547305",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -431,7 +458,8 @@
       "filename": "bank_checksums.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "17416880186950ff0ec03f9f9b66830551791f34b57c203d346a93b0b130f9a3"
     },
     {
       "id": "bank_dependencies",
@@ -440,7 +468,8 @@
       "filename": "bank_dependencies.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "7500514183fe6e7975f6e34758c04a7a3a3408c5773391b98d335f5c26db372b"
     },
     {
       "id": "bank_manifest",
@@ -463,7 +492,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "f222f6e8a0f838061ab6570d7e9d6482cfcef9f10fc4a27f655e1906e7fbccd2",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -489,7 +518,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "4bd622852440dd244530d787102380488218a03f44370b1e709fcb24a57755dd",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -515,7 +544,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "b957674fe19b0ca4ecaf3bd17dc3dd068b56561015935a6ede2cef7242cfb7ec",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -541,7 +570,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "6c434cc16e85b614de7d61944387d9085ec76a804a6d7ff1685192bd4f763b45",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -567,7 +596,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "b1c440bcee83890b31b3eefcee0a4477ead81f952fc0da24204140b00fe41f1b",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -593,7 +622,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "1a15774d34248e86f06757de506ac362dc5266e91d34b8af66e1c30c0e0ba21d",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -603,7 +632,8 @@
       "filename": "clarification_phrases.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "4f999da80d75de06e1e0c380854b9aacb3a34a76f368be4a9abf1f6db13f421a"
     },
     {
       "id": "connectors_microcopy",
@@ -612,7 +642,8 @@
       "filename": "connectors_microcopy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "3ed71d2dff9265d625c5bffbc1cce3c5261ee42f3c8d257819f314f8bf89bbd9"
     },
     {
       "id": "conversation_messages",
@@ -621,7 +652,8 @@
       "filename": "conversation_messages.any.json",
       "version": "1.2.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "5891f0f5077e16cd81a628348fb919b36d0616a50d6272526b7b32158f250e32"
     },
     {
       "id": "creative_microcopy",
@@ -630,7 +662,8 @@
       "filename": "creative_microcopy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "dbc287cae8fca7cfc7757c62cb9785aa9364f811a3019171833e0812f69182a5"
     },
     {
       "id": "disambiguation_microcopy",
@@ -639,7 +672,8 @@
       "filename": "disambiguation_microcopy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "fddcb3f8b83127d0ec09fdde06a051f3397699e094e073868fd55165cb4240fc"
     },
     {
       "id": "editing_microcopy",
@@ -648,7 +682,8 @@
       "filename": "editing_microcopy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "57ba504001ecddc58cbbcf4042265a4a5d0fcbdb96ed05ba5043c5f5a62c0c8d"
     },
     {
       "id": "extraction_recovery_messages",
@@ -657,7 +692,8 @@
       "filename": "extraction_recovery_messages.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "42cc1464c5ae6ea525cdb91c6f26e97bbb299737fe44cfc0cf6cd5e95131abe5"
     },
     {
       "id": "fallback_extraction_recovery_stub_microcopy",
@@ -666,7 +702,8 @@
       "filename": "fallback_extraction_recovery.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "0c324cd1631413cba137933935f2972fc08de90eb0a2a728be6fbd69360b74b4"
     },
     {
       "id": "fallback_not_found_scope_stub_microcopy",
@@ -675,7 +712,8 @@
       "filename": "fallback_not_found_scope.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "fd05dee6c8b14e9f46d090f6319b493f66ee097407ba79546ab12e59b2b6f39b"
     },
     {
       "id": "fallback_processing_stub_microcopy",
@@ -684,7 +722,8 @@
       "filename": "fallback_processing.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "cb94f0e6ba64e044821c2514b32e2bfa7ca93b28f5e02f9b9e3ff20c6a13778d"
     },
     {
       "id": "fallback_scope_empty_stub_microcopy",
@@ -693,7 +732,8 @@
       "filename": "fallback_scope_empty.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "43d19c9954c020d54951ee0dd98e05df5417768a8af10833f22f368109af39e6"
     },
     {
       "id": "file_actions_microcopy",
@@ -702,7 +742,8 @@
       "filename": "file_actions_microcopy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "b9eaa03375cfd89a0bac5699a892087c396de542ca8fc74133d99540ee1ce376"
     },
     {
       "id": "nav_microcopy",
@@ -711,7 +752,8 @@
       "filename": "nav_microcopy.any.json",
       "version": "1.2.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "9320c1ccc544b0ce7453f7502fca29d1d87e25cc04e0b722294740523f7c82d2"
     },
     {
       "id": "no_docs_messages",
@@ -720,7 +762,8 @@
       "filename": "no_docs_messages.any.json",
       "version": "4.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "8a2c040cc8bf356b86b3913d99051bed7ad501be89406d16ab4fece5e68ea076"
     },
     {
       "id": "not_found_scope_messages",
@@ -729,7 +772,8 @@
       "filename": "not_found_scope_messages.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "71dbfff579fb8257fef7b7f5e39b66b255793bc5e145658c585a09f403448c45"
     },
     {
       "id": "processing_messages",
@@ -738,7 +782,8 @@
       "filename": "processing_messages.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "a253a2fd47578a905a0dd0603871716c389fe7a4ba851916b850d16e98ca2b93"
     },
     {
       "id": "refusal_phrases",
@@ -747,7 +792,8 @@
       "filename": "refusal_phrases.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "7a9bdc6149d73e80ff5c2e73b2c2bba0c7e782264f24269872ac07ee241dfaf6"
     },
     {
       "id": "scope_empty_messages",
@@ -756,7 +802,8 @@
       "filename": "scope_empty_messages.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "fcc360606d83d03337ca745da562013a200f7ee3ce350ed2e6722d647e3c099c"
     },
     {
       "id": "scoped_not_found_messages",
@@ -765,7 +812,8 @@
       "filename": "scoped_not_found_messages.any.json",
       "version": "3.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "e6255d128558d6ecb299e5a08173663751b27e9bba73fe829cd2a6a262f0c88c"
     },
     {
       "id": "ui_intro_neutral",
@@ -774,7 +822,8 @@
       "filename": "ui_intro_neutral.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "cfe11aed32b8daa9ee7ca5f28adad40cd06cb25cc0afacb24e152a296332e778"
     },
     {
       "id": "ui_next_step_suggestion",
@@ -783,7 +832,8 @@
       "filename": "ui_next_step_suggestion.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "16121e3531d7d3ad8f4cfcad514475878d32b28569cd3d62f3cc7fbb7491c472"
     },
     {
       "id": "ui_soft_close",
@@ -792,7 +842,8 @@
       "filename": "ui_soft_close.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "793bed4344a34a4c4a5f0a562797aa36e9e04d3c1abd2e839582f6df4f3c2b72"
     },
     {
       "id": "denylist_terms",
@@ -801,7 +852,8 @@
       "filename": "denylist_terms.any.json",
       "version": "1.1.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "a0460ac0c0d4fa9c361536c4b830cbab0fbf34d94704d7f4072426b83653b05d"
     },
     {
       "id": "disambiguation_negatives",
@@ -826,7 +878,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "5ce289ac70b23b321f1fa8f45b5d3fc2e8f51395f07b9fa1d08ad4c6c2c69e66",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -836,7 +888,8 @@
       "filename": "hallucination_redflags.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "8d2b77324b9cb632d307a3dad5095290df3623761446ee2cd8f7ede5c4af337a"
     },
     {
       "id": "negation_and_exclusions",
@@ -845,7 +898,8 @@
       "filename": "negation_and_exclusions.any.json",
       "version": "1.2.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "824ac799793a2953a2047e8adf27fbb018fde49dad5627c6340e523c5b1fa93f"
     },
     {
       "id": "privacy_redflags",
@@ -854,7 +908,8 @@
       "filename": "privacy_redflags.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "616b5a7069d2eba4dae92a87eb99e0c8be4e02a78455696a60d626d9a2e07a2f"
     },
     {
       "id": "scope_negatives",
@@ -879,7 +934,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "b02cd3e0c3e3f67bccc24d1e66f15450c0ffaab9ba3b27ef9c660dade90441f4",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -889,7 +944,8 @@
       "filename": "unsafe_patterns.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "45e78bfeb1b7398e798be6598afea4e9a309464bc8c923b89f16d8364d8c3291"
     },
     {
       "id": "weak_terms",
@@ -914,7 +970,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "a8dc693d3447d08857fc68c31bf7e06facce0eff95d5d1fbe89538412abc1708",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -941,7 +997,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "dda954a525f37d186202e7202534d117c7e87a1d3c2dbba9bf208c9f8ec56d75",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -967,7 +1023,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "cb1a5fd9148bf19832b80c77fd741c7d52026217a640c7dcbcc856b31525fc81",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -977,7 +1033,8 @@
       "filename": "currency_formats.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "e7a6feca57061475d54eb2fc8cf3cb11f4f7d70793e3c6568c2756b75d1ff456"
     },
     {
       "id": "doc_aliases",
@@ -1002,7 +1059,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "132797f42d9a9cb4b28ad40f2d66acb03e3bbe139b2a37a233c394fa7771210c",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -1012,7 +1069,8 @@
       "filename": "entity_aliases.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "908a914844e201fb688333e8860d586ff414bde0e47b3aa45171d3eb7c838b71"
     },
     {
       "id": "filename_normalization",
@@ -1021,7 +1079,8 @@
       "filename": "filename_normalization.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "8965e55d8976d26c96b6a410aa618a0f5cecbf9e9993e8e8fe94fb7a86cacacc"
     },
     {
       "id": "language_indicators",
@@ -1046,7 +1105,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "7fe754e14936a0489bdb501d75ba61d3d74c1f2f508c5bdbcc0228ae50d529e0",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -1056,7 +1115,8 @@
       "filename": "locale_formats.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "2aee4e6602e685cabc50a65e36d444a10664e85819895145b2b8fd86539dd338"
     },
     {
       "id": "month_normalization",
@@ -1082,7 +1142,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "d70b48457a817c6436dc47a045aa97cbfc1482d060aba1a17accce0399685891",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -1092,7 +1152,8 @@
       "filename": "number_normalization.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "d61bac83041c3aa9ca32ae19ca09733f2b75e9ae6678e07cdc1863dc8b82960a"
     },
     {
       "id": "punctuation_rules",
@@ -1101,7 +1162,8 @@
       "filename": "punctuation_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "7b2bad3d96595c327f49eebbc2627f6cd80ba1cd69f50b528ba038e50b3eb264"
     },
     {
       "id": "query_normalization",
@@ -1126,7 +1188,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "fc8a818c1a6ddee7a0e840e1afe7193a653cdd92c19fb15e1a7606434f62c762",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -1152,7 +1214,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "04c9f2f8ac0c71767a4f49f0cfa4637d2edf3a3d367c72d708c4f93064fdf158",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -1179,7 +1241,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "d7be277135f91b631b2de16fa12a4b039c8bf0ac838b1cf127b86068fd9f92d4",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -1205,7 +1267,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "b664e4834526f144eb4d722b4aa954fbb40766a069b1e0129231e78df7a4bb93",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -1215,7 +1277,8 @@
       "filename": "units_normalization.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "7eb90d7227c731fff6d0d05228eefc58ea501fff2416fc18cad76acc2416d065"
     },
     {
       "id": "whitespace_rules",
@@ -1240,7 +1303,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "3e0d5aa552a884c9aefa761783f6d3e1735466627362a1eb9ddd407ddb41c5a1",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -1266,7 +1329,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "3f1f56eb3816b73920b5e14ff70c0979054c2ecb24da83bd9baba1be046983ea",
       "lastUpdated": "2026-02-07"
     },
     {
@@ -1292,7 +1355,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "36a06c572d5ef6d155420d493481f77b0a9e2b494b5acb00b7a70dffacba9773",
       "lastUpdated": "2026-02-07"
     },
     {
@@ -1318,7 +1381,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "f02116a9a863d860b0ecbd62919c1c59c8ff6c928ac2ec04b865f9a4fa122e20",
       "lastUpdated": "2026-02-07"
     },
     {
@@ -1344,7 +1407,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "e7b0b2148b39d54d4b7179e1540d9910f98a436d6de0b0d84b30cb1acbf5c9e8",
       "lastUpdated": "2026-02-07"
     },
     {
@@ -1370,7 +1433,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "643a7d7cd96c3c36fd91e21a623c0977a94e0b48b14dae2b65197f7fdf888490",
       "lastUpdated": "2026-02-06"
     },
     {
@@ -1396,7 +1459,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "e6a763954edab92788a5b0a65b11d7e44c9eeca63353aba33099f5700425ec8f",
       "lastUpdated": "2026-02-09"
     },
     {
@@ -1406,7 +1469,8 @@
       "filename": "list_first_operators.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "3b98be5777b05d124c28571dd6cfe38bae2dba6eaca3a88628cd86b2523cd04d"
     },
     {
       "id": "operator_collision_matrix",
@@ -1415,7 +1479,8 @@
       "filename": "operator_collision_matrix.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "dc493c58f3b8d85729c44b701f34c7982e40fbfb6b80e8adef3d1ccab3407367"
     },
     {
       "id": "operator_contracts",
@@ -1440,7 +1505,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "e0aabec7dbca5b047daa11bf63b284ddfc85c5d4ec677cd3cff20db5904bb233",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -1450,7 +1515,8 @@
       "filename": "operator_examples.any.json",
       "version": "2.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "6730300915226c414b099a54469ccaa854598ca8a32dac029adb55aaaf4389b9"
     },
     {
       "id": "operator_negatives",
@@ -1475,7 +1541,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "443a3c75c9143aaf4051ed79abb4c6dc27072122edb4995f4e1859efa8daf3fc",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -1501,7 +1567,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "abcc2437c197beb281fd07b9e3e1974c377e2a431850323b18127d817aff863f",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -1511,7 +1577,8 @@
       "filename": "discourse_markers.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "c441668557a905d7bbc6bae39e97af11f2218f25a4ae3b27e08058aaee1648fe"
     },
     {
       "id": "followup_indicators",
@@ -1520,7 +1587,8 @@
       "filename": "followup_indicators.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "1255ab9d2ff64e57bc042050c07fb802898560e3c83360479f9bc1706e1be61e"
     },
     {
       "id": "format_triggers_stub_overlay",
@@ -1529,7 +1597,8 @@
       "filename": "format_triggers.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "2b587991b6de8e1dfbba3f0b7d61403171f7d4442464ba26daed36fee0aad13e"
     },
     {
       "id": "formatting_overlays",
@@ -1538,7 +1607,8 @@
       "filename": "formatting_overlays.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "d89a1578b4d57c3bafab1e883c94fadbd74085ee29a894375899f2b16d64a722"
     },
     {
       "id": "nav_triggers_stub_overlay",
@@ -1547,7 +1617,8 @@
       "filename": "nav_triggers.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "00190a9b608bfa06bc7d3742e3e9ec92c092a614e2f6c1786c749251ebbbf445"
     },
     {
       "id": "retrieval_overlays",
@@ -1556,7 +1627,8 @@
       "filename": "retrieval_overlays.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "2f745f66172c4ec5c2bf09ef200e4874977d9200fb5ee2de55439b769048fc2b"
     },
     {
       "id": "routing_overlays",
@@ -1565,7 +1637,8 @@
       "filename": "routing_overlays.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "2c160dcec2c482a31cd90d60066b1430193012010b636dfd5af2fe8b3222edea"
     },
     {
       "id": "scope_hints",
@@ -1574,7 +1647,8 @@
       "filename": "scope_hints.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "7f6a3d40917d953cf5598073cbd44308da03cda31b84b6fce5179bf9a1e312e7"
     },
     {
       "id": "ui_contracts",
@@ -1583,7 +1657,8 @@
       "filename": "ui_contracts.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "57de4bde81ea19bb358d01fee62f31300c2baa2966cc82f67a77d80dc857fb35"
     },
     {
       "id": "admin_controls_policy",
@@ -1592,7 +1667,8 @@
       "filename": "admin_controls.policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "6043520036fd4387b503bb5ca40464ed3af2b961a1b3a595cda5919773b934bf"
     },
     {
       "id": "autopick_policy",
@@ -1601,7 +1677,8 @@
       "filename": "autopick_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "500c949745a0f21cb47e292fc773b87b4c72c56904dc49ea4ce14fd2ae9e137a"
     },
     {
       "id": "clarification_policy",
@@ -1610,7 +1687,8 @@
       "filename": "clarification_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "1f9eae6319e025096d3e045e29d9c71d343a39af2decb4712e5174a109142518"
     },
     {
       "id": "compliance_policy",
@@ -1619,7 +1697,8 @@
       "filename": "compliance_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "b7aa247c0f5798f5e646bb26d8c980d6905cb1af5f071bc7c933f95adb2174e7"
     },
     {
       "id": "connectors_policy",
@@ -1628,7 +1707,8 @@
       "filename": "connectors.policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "886e2358fbfc9f9a8e0b30fd6614f4b30910f8e8fec1847ad347d591725e6038"
     },
     {
       "id": "copyright_policy",
@@ -1637,7 +1717,8 @@
       "filename": "copyright_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "7737b57e33e86dcf1da9f9b4e399dbd91778ac1f407e0f4fc07498d6bb4b9b81"
     },
     {
       "id": "creative_policy",
@@ -1646,7 +1727,8 @@
       "filename": "creative.policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "f159237a692809362a1cf7cc6596a8ce482768cad021d4d3f461eb44feffd0a4"
     },
     {
       "id": "debug_policy",
@@ -1655,7 +1737,8 @@
       "filename": "debug_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "2f886be451e6c7c5a7773bf87dbdca0f687bb86fa73aadd87ef95cdd9f58f625"
     },
     {
       "id": "doc_access_policy",
@@ -1664,7 +1747,8 @@
       "filename": "doc_access_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "04426c3397ebbbe87d671416583b71c0e958cfafa613fdeabb869eae6ba44afe"
     },
     {
       "id": "domain_policy",
@@ -1673,7 +1757,8 @@
       "filename": "domain_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "62c87e043f4b05358ee2712a6847b6b7cc120670afa16ba0351efeca9e50560f"
     },
     {
       "id": "domain_policy_tests",
@@ -1682,7 +1767,8 @@
       "filename": "domain_policy_tests.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "138cc696a563b333814e2ebd27e9d0b111019e7007c725c03ccda490cae62fa4"
     },
     {
       "id": "editing_policy",
@@ -1691,7 +1777,8 @@
       "filename": "editing.policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "01b8ca5e23f7a1841a1f6e3f1ff9c938c935c3d8d79e6736d4e84f0e4867ed4e"
     },
     {
       "id": "fallback_policy",
@@ -1700,7 +1787,8 @@
       "filename": "fallback_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "f7d165b1027788cff2734b82ed94400e5e6211aa8716d86f94bd362cfff0d8d5"
     },
     {
       "id": "fallback_policy_tests",
@@ -1709,7 +1797,8 @@
       "filename": "fallback_policy_tests.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "e670f2300e6acd0db44a645d63f5e75d5d19206a9ef6fea43db9e7d32fde75d5"
     },
     {
       "id": "formatting_policy",
@@ -1718,7 +1807,8 @@
       "filename": "formatting_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "c6da036858b9ffa1883bf69a2530cb99d1effb601151a6242ecec6b26ce89006"
     },
     {
       "id": "formatting_policy_tests",
@@ -1727,7 +1817,8 @@
       "filename": "formatting_policy_tests.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "4db575887ec4ce8ed8a53859617ec6076e6eb5d945e36f0087f0cea8d5db0186"
     },
     {
       "id": "global_system_policies",
@@ -1736,7 +1827,8 @@
       "filename": "global_system_policies.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "e5baf393d5b77f21877ad6eafd16416dfaeed0a2e1e30209559c9aa9ca0db95f"
     },
     {
       "id": "grounding_policy",
@@ -1745,7 +1837,8 @@
       "filename": "grounding_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "4015c63b523630262ffdef7150ac8176200c6b263cd750e04f6df0e997b04c08"
     },
     {
       "id": "hallucination_policy",
@@ -1754,7 +1847,8 @@
       "filename": "hallucination_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "41b6042a36405f7f97992f9f3885fcb0c28723be4b80198f5b241f44c3e1c96f"
     },
     {
       "id": "logging_policy",
@@ -1763,7 +1857,8 @@
       "filename": "logging_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "e6e02e5999399e30b62477ca8529d16d0f507f761f88670d1198d5f69cc7d40b"
     },
     {
       "id": "memory_policy",
@@ -1772,7 +1867,8 @@
       "filename": "memory_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "bcf380513770dd40fae9fdf4117fc42ccd6642653a1f5a2a78c5d186f0709d2b"
     },
     {
       "id": "nav_pills_policy",
@@ -1781,7 +1877,8 @@
       "filename": "nav_pills_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "466f05738fdb9af63382323d8986fb798a7b985ea8c677994063ba6b1bc46b93"
     },
     {
       "id": "numeric_policy",
@@ -1790,7 +1887,8 @@
       "filename": "numeric_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "74e7690d13dc02d127035736002e60152aa1be989759a90bfe06c152a20fb58f"
     },
     {
       "id": "pii_policy",
@@ -1799,7 +1897,8 @@
       "filename": "pii_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "93cf22fe43a182481d7f4777a8ed4cc6e7f2503e3239af009cec7de06f38efb5"
     },
     {
       "id": "policy_manifest",
@@ -1808,7 +1907,8 @@
       "filename": "policy_manifest.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "1e9890720253540bd817cf45adec29b8d7b4d44b32c85cf347b2b524f08baea0"
     },
     {
       "id": "policy_regression",
@@ -1817,7 +1917,8 @@
       "filename": "policy_regression.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "7e4cc2415b4c613b06447d48c0bb0733c9a375ca6ff2c05349fa931c2e76d07c"
     },
     {
       "id": "privacy_policy",
@@ -1826,7 +1927,8 @@
       "filename": "privacy_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "9a653f1e79558b3aa95e0204b0c032abc592510e3139c4e4e675f40362eb4f02"
     },
     {
       "id": "privacy_redaction_policy",
@@ -1835,7 +1937,8 @@
       "filename": "privacy_redaction.policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "9811182ea182b1bb925db77ea644bd8a3fe63d3e9122a7879bf80638e2d65015"
     },
     {
       "id": "quote_policy",
@@ -1844,7 +1947,8 @@
       "filename": "quote_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "5809d72d511676d952046464401bf83e65ac43c6bd78cb4381553c8813daed16"
     },
     {
       "id": "rate_limit_policy",
@@ -1853,7 +1957,8 @@
       "filename": "rate_limit_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "398093c7930f6af7be6fd2d0a2e67475f4ae593eab3685e8eb69facd5eff1940"
     },
     {
       "id": "refusal_policy",
@@ -1862,7 +1967,8 @@
       "filename": "refusal_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "c4fd32a22a2e74911054f7054aab40841d2b2f95df3d5a6fbce014ee53aad905"
     },
     {
       "id": "safety_policy",
@@ -1871,7 +1977,8 @@
       "filename": "safety_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "8c0fd8f713181c9b40a7093a98332756eede99af5375b5476fe6e6b76f015335"
     },
     {
       "id": "safety_privacy_tests",
@@ -1880,7 +1987,8 @@
       "filename": "safety_privacy_tests.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "f9a53ede56907853f98d84dd2e92d95a789e0d99306ce492903b62163c543d56"
     },
     {
       "id": "scope_policy",
@@ -1889,7 +1997,8 @@
       "filename": "scope_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "d2650702f32b69d50fd47d960beff2bb6e1425f27ffa650005d9970442df86a2"
     },
     {
       "id": "source_policy",
@@ -1898,7 +2007,8 @@
       "filename": "source_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "d908eaa53f88f62cf6e60f0d418b1fd47e17d3f1b4bd4cd2983352b6778d86eb"
     },
     {
       "id": "terminology_policy",
@@ -1907,7 +2017,8 @@
       "filename": "terminology_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "19c1c16bb0a44fc1a7fce1d78b278384769abd8e07ad46aa73f560387aea2d25"
     },
     {
       "id": "failure_mode_tests",
@@ -1916,7 +2027,8 @@
       "filename": "failure_mode_tests.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "748386a80a96b0ca8e1c874524f787b4c4dc81ca7c2c56aaab689f49d85d82fb"
     },
     {
       "id": "fallback_probes",
@@ -1925,7 +2037,8 @@
       "filename": "fallback_probes.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "8be1c082cf7bd34a2dc5860c6b2a8fcbaeb5b56fc5d50d200b23204508c1fe51"
     },
     {
       "id": "formatting_probes",
@@ -1934,7 +2047,8 @@
       "filename": "formatting_probes.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "fa1c0fac6676c85d8830f555a2d3cdec04786d744c61223b8aeee1275f9d3713"
     },
     {
       "id": "hallucination_probes",
@@ -1943,7 +2057,8 @@
       "filename": "hallucination_probes.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "135e6724298acdfbe1aab6a53244ec613ab86d38eba6b2a985bc4e3c6f5d7c5c"
     },
     {
       "id": "load_tests",
@@ -1952,7 +2067,8 @@
       "filename": "load_tests.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "947e571d773a8c206e6fdec9661122aa2905c2bca8ebc5bfbab59c18d4a49b0e"
     },
     {
       "id": "multilingual_probes",
@@ -1961,7 +2077,8 @@
       "filename": "multilingual_probes.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "1b666beb745c4d180a7bac17eb5bb9bbe7a6f4eb2c0dd9c147f027e0c5cdfb46"
     },
     {
       "id": "numeric_probes",
@@ -1987,7 +2104,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "4dbcabc1150fabc2e631eecc239c4ea9f8be2e226695ef9553e01bbb10e3a971",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -1997,7 +2114,8 @@
       "filename": "parity_queries.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "ddb59b966285aa623a59dfef17edc58c1090181941f72e46f93f84b7f2276ba7"
     },
     {
       "id": "probes_manifest",
@@ -2006,7 +2124,8 @@
       "filename": "probes_manifest.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "72667da5a85e5289b39016a69fa905798a5f2a58816418c009e4645cb8cddb18"
     },
     {
       "id": "regression_queries",
@@ -2015,7 +2134,8 @@
       "filename": "regression_queries.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "c2a7cad6a8e5b62bb2aaa81f0b3a194b042b7856401715f0dbe704e2dfb7ec32"
     },
     {
       "id": "routing_probes",
@@ -2024,7 +2144,8 @@
       "filename": "routing_probes.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "d211313a8d018692b84e4f4330e7ea93ad809a115c232d3ccc2d19945a85e873"
     },
     {
       "id": "security_probes",
@@ -2033,7 +2154,8 @@
       "filename": "security_probes.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "ab3602c732b096744aa3ec83437a69c9b55754b8a30520ce46e7c3e322ad94f3"
     },
     {
       "id": "ui_probes",
@@ -2058,7 +2180,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "ecfea900dd99141427c24ab47eb0b6b724b1ec99e785cf8c62a7a71df58691d9",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -2068,7 +2190,8 @@
       "filename": "compose_answer_prompt.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "d23b2c49452c9d55d063e777180df6bdf40d4aac63d784f7de8d3ec77ed59b56"
     },
     {
       "id": "disambiguation_prompt",
@@ -2077,7 +2200,8 @@
       "filename": "disambiguation_prompt.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "c9a7e8d5befacda466249e5a57d51a95bebfbebd261398973c4b4e0e280b0cb3"
     },
     {
       "id": "fallback_prompt",
@@ -2086,7 +2210,8 @@
       "filename": "fallback_prompt.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "ad9886f4ca1c712af435d01253b57ef66d5f6c76b9b007a62fc31edbaab27e37"
     },
     {
       "id": "prompt_registry",
@@ -2095,7 +2220,8 @@
       "filename": "prompt_registry.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "5b91d275a98a472c04260b1f738f2ea85fe658f93b67290f0216f2f08b04239e"
     },
     {
       "id": "retrieval_prompt",
@@ -2104,7 +2230,8 @@
       "filename": "retrieval_prompt.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "3ad40a1742cb40bd561a415ec56ac6f9ea612e5d6a92d0113da0c7a4d26ff361"
     },
     {
       "id": "system_prompt",
@@ -2113,7 +2240,8 @@
       "filename": "system_prompt.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "735b57a4903415f816979200d1614ca2c7eb74adcd6d6c52dbe1a03b40e42fe2"
     },
     {
       "id": "tool_prompts",
@@ -2122,7 +2250,8 @@
       "filename": "tool_prompts.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "e58b8956e394230cf0b85252be5a8495435b5c8d8883680704984bbd22df4189"
     },
     {
       "id": "system_base",
@@ -2131,7 +2260,8 @@
       "filename": "system_base.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-19"
+      "lastUpdated": "2026-02-19",
+      "checksumSha256": "0dcd2a8a990a3d5a8f7f78c1571fdbee608489c7e9e06ee7fe53fbb9f6ee8f1a"
     },
     {
       "id": "mode_chat",
@@ -2140,7 +2270,8 @@
       "filename": "mode_chat.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-19"
+      "lastUpdated": "2026-02-19",
+      "checksumSha256": "f2dc85f4e429374eef46535ec475fa61379b336ffbaa9c826d8c6912d6bf9bb9"
     },
     {
       "id": "mode_editing",
@@ -2149,7 +2280,8 @@
       "filename": "mode_editing.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-19"
+      "lastUpdated": "2026-02-19",
+      "checksumSha256": "54f072ed1f1332820cf97bad759fec6c285d5df8ef03e291018630ddcad7eae1"
     },
     {
       "id": "rag_policy",
@@ -2158,7 +2290,8 @@
       "filename": "rag_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-19"
+      "lastUpdated": "2026-02-19",
+      "checksumSha256": "f8bf187bd120d15c0a2b43320219e2dda914e78c5976c1517efc53e874627fce"
     },
     {
       "id": "task_answer_with_sources",
@@ -2167,7 +2300,8 @@
       "filename": "task_answer_with_sources.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-19"
+      "lastUpdated": "2026-02-19",
+      "checksumSha256": "34f6b15ff3024321353f2b98c864879654f546d703b4f4fd57d6a706fc35e79f"
     },
     {
       "id": "task_plan_generation",
@@ -2176,7 +2310,8 @@
       "filename": "task_plan_generation.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-19"
+      "lastUpdated": "2026-02-19",
+      "checksumSha256": "8b51d3a53cfde921907ced5310e8518734a7c383f60be63ef15b05233b39ffdd"
     },
     {
       "id": "policy_citations",
@@ -2185,7 +2320,8 @@
       "filename": "policy_citations.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-19"
+      "lastUpdated": "2026-02-19",
+      "checksumSha256": "386e850e4e7c6ea6a282184c38235bb426175f68ff35a3e0bfd59fd58199aad0"
     },
     {
       "id": "editing_task_prompts",
@@ -2194,7 +2330,8 @@
       "filename": "editing_task_prompts.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-19"
+      "lastUpdated": "2026-02-19",
+      "checksumSha256": "c0b38a51dae0cac1be0323de7b3c7902e0db8f9c9c2801a23c61e3e518450eb1"
     },
     {
       "id": "connectors_quality",
@@ -2203,7 +2340,8 @@
       "filename": "connectors_quality.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "2c56abb042c69e1163c03069ccd63fa624a44759b8e1dc955d3cc3ce544ac741"
     },
     {
       "id": "creative_quality",
@@ -2212,7 +2350,8 @@
       "filename": "creative_quality.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "80ce3202a314666a2d17f7f214ab01f69e6dcdb1e4b2f921dba9c187aec092b6"
     },
     {
       "id": "dedupe_and_repetition",
@@ -2221,7 +2360,8 @@
       "filename": "dedupe_and_repetition.any.json",
       "version": "2.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "95aabc9e37cded67bc3578510f8d3b39be722ce90ad2fcbd6db0e0be981634b7"
     },
     {
       "id": "doc_grounding_checks",
@@ -2230,7 +2370,8 @@
       "filename": "doc_grounding_checks.any.json",
       "version": "2.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "537cb1be058c8530e50a134e0a33f85ec23c1582e0c66f30e3bf14a62553632a"
     },
     {
       "id": "edit_quality",
@@ -2239,7 +2380,8 @@
       "filename": "edit_quality.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "a57b56e88475bfc2ef83c6b5a9a0b4984e1ab3199cba4c6aff8cd499de03e8c0"
     },
     {
       "id": "hallucination_guards",
@@ -2248,7 +2390,8 @@
       "filename": "hallucination_guards.any.json",
       "version": "2.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "0285969b670cb4b0606d12d857bdd4dccd602026a243b5af92507298e443a83f"
     },
     {
       "id": "numeric_integrity_rules",
@@ -2257,7 +2400,8 @@
       "filename": "numeric_integrity_rules.any.json",
       "version": "2.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "d4dbad0588a8a01a8c702786f09e78793ffae0de9d25c5326675ccd685eb646f"
     },
     {
       "id": "pii_field_labels",
@@ -2266,7 +2410,8 @@
       "filename": "pii_field_labels.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "718f4a5ede8e8454dc5393920460b03f27b9275ff21e3c4fa1059f36d2f130dc"
     },
     {
       "id": "privacy_minimal_rules",
@@ -2275,7 +2420,8 @@
       "filename": "privacy_minimal_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "b112274db4e156324a63a98eb5da3234899be55f0f45e548e2aef52e29bb97e1"
     },
     {
       "id": "quality_gates",
@@ -2284,7 +2430,8 @@
       "filename": "quality_gates.any.json",
       "version": "3.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "329992e2d62d4c82a36b8b3acd4b79573eeec0a212f7399234407e5d0fac31c6"
     },
     {
       "id": "refusal_phrase_labels_stub_quality",
@@ -2293,7 +2440,8 @@
       "filename": "refusal_phrases.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "606d85304e38be6c47411109db54ada3e9e968a33b7a9b1f78ca387b128646ca"
     },
     {
       "id": "response_contract",
@@ -2302,7 +2450,8 @@
       "filename": "response_contract.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "1941528ae9a5209c71315f37b7d3bbfec1ac490dc9c016a038446099ae691061"
     },
     {
       "id": "diversification_rules",
@@ -2327,7 +2476,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "12df8af28ad8469419fdef3d6d90e723af96228fa6c66a51875d3b232e4caace",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -2337,7 +2486,8 @@
       "filename": "doc_title_boost_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "ca053a102585eaf340d2624b4101ff3aa76b7be80bf36923cec7e1d130b604cb"
     },
     {
       "id": "doc_type_boost_rules",
@@ -2346,7 +2496,8 @@
       "filename": "doc_type_boost_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "51919d2cd378c72820f6d46b8f84c1b9497ce819d6c16b7c9e9b5bbae3cd60ef"
     },
     {
       "id": "evidence_packaging",
@@ -2355,7 +2506,8 @@
       "filename": "evidence_packaging.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "b2dcb58245f0b7c0fb84823ac6f722f4afd63a97b55c2bb7848b1446ae41d3ec"
     },
     {
       "id": "keyword_boost_rules",
@@ -2364,7 +2516,8 @@
       "filename": "keyword_boost_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "cf0519b489b704cd81693bec4c801a04d71d22c0b21b3e527fb30eae13e4ee93"
     },
     {
       "id": "recency_boost_rules",
@@ -2373,7 +2526,8 @@
       "filename": "recency_boost_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "9522d56186d2865b8ac88c2e353c86b716b60996c568185cc81e070f53afa934"
     },
     {
       "id": "retrieval_negatives",
@@ -2398,7 +2552,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "0ed14f2e912bfecf75dad2330e51d66a3404a95cbfc1bb06a8b0c2edbace3e39",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -2408,7 +2562,8 @@
       "filename": "retrieval_ranker_config.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "c7c0378396758e5b0f42ab75c847361d02d2f60be1f162adf632dd56bc0a2f61"
     },
     {
       "id": "semantic_search_config",
@@ -2417,7 +2572,8 @@
       "filename": "semantic_search_config.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "fdd6d776ca142b2c03356daab470bcecaf0458ab4903d302580e7eea26b7d3a1"
     },
     {
       "id": "source_engine",
@@ -2426,7 +2582,8 @@
       "filename": "source_engine.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-04"
+      "lastUpdated": "2026-02-04",
+      "checksumSha256": "f7cd21ae5e1742f5eca28490423d9c69be3c1c522a357bf5bc3c3f312c4e2381"
     },
     {
       "id": "table_extraction_rules",
@@ -2435,7 +2592,8 @@
       "filename": "table_extraction_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "c5e5c2a8fbbe0138585d59c20e378a3a14a68a226471da60e824bdb277c26f8b"
     },
     {
       "id": "answer_mode_router",
@@ -2460,7 +2618,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "7c1ee38478e93e7592cbe4b487eb00b09ba8095d7b293640946bd007b606f081",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -2487,7 +2645,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "175a6247d5b77b0c0ed7e3f5e714cfea7645d76e91aeb212e9a78f860fa1e032",
       "lastUpdated": "2026-02-07"
     },
     {
@@ -2514,7 +2672,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "79f529443c3ca31def074ca1f052d09d00f8bc05edd99b704855f57619bfd15e",
       "lastUpdated": "2026-02-09"
     },
     {
@@ -2541,7 +2699,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "14e694721e3b4828049181048450cc57af2bcda18580b002aeab735fb59ed1b4",
       "lastUpdated": "2026-02-07"
     },
     {
@@ -2568,7 +2726,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "b8e8f7f2e266a1140deb2cbad92ea5fd96992a7eedee4c332372993be443cea7",
       "lastUpdated": "2026-02-07"
     },
     {
@@ -2594,7 +2752,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "e2d4c92623af40ca8bf37aaf73faad2209f17cc22b2200e6357cfe56585a6d0c",
       "lastUpdated": "2026-02-10"
     },
     {
@@ -2620,7 +2778,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "9e9301c5e6562a5dfd985f246409ceb2a6c5d8b7d826acfe54ee095874c5f974",
       "lastUpdated": "2026-02-10"
     },
     {
@@ -2646,7 +2804,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "ddd06ef32bc821c874d0c534dfef415ce88465b1406ea90e9e4783db6e92b113",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -2672,7 +2830,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "9132397107202caf70d99cb854c94a1d43ecec415d50282513d851250f569c15",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -2698,7 +2856,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "b09332a270c2d2dcdaa1d66c244d03089717c4ebc1efa5867b3eadd581e65eef",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -2708,7 +2866,8 @@
       "filename": "intent_transition_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "85a9289c5c6835752557e0af88046ad44f7142f03f8c63900f0cfc08fa6e6d8c"
     },
     {
       "id": "nav_pills_operators",
@@ -2717,7 +2876,8 @@
       "filename": "nav_pills_operators.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "bb34a2e3306fd1ef52a41d6f4f84df9522cfeac9536ffe7ae5d8ad72b8e9e6d5"
     },
     {
       "id": "operator_aliases",
@@ -2726,7 +2886,8 @@
       "filename": "operator_aliases.any.json",
       "version": "1.2.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "4440c687ad5de35a65974a704c87d466c935d7dd7daad568ab7dbf4d1721b38b"
     },
     {
       "id": "operator_constraints",
@@ -2735,7 +2896,8 @@
       "filename": "operator_constraints.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "00bc170f113b1dd36e3e68d20f9695a6807fb822befde7a9343ddc5735000d1b"
     },
     {
       "id": "operator_discovery_rules",
@@ -2744,7 +2906,8 @@
       "filename": "operator_discovery_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "d4d22384e182a49e0cb119a7a3f275e859b38075f4d9b82c4be204f35a989940"
     },
     {
       "id": "operator_families",
@@ -2769,7 +2932,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "1de6e615a4770d1fb61ec553d320254ebb1c5c74f617a9fafdd007c64e23a203",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -2779,7 +2942,8 @@
       "filename": "operator_reason_code_map.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "789f97c1b12dd0701f627c0b495d55be2d9f4d539195e64942d6f8b7f670e649"
     },
     {
       "id": "operator_signals",
@@ -2788,7 +2952,8 @@
       "filename": "operator_signals.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "45befb19b031c12af88154162e0a7d5788703449d26191ca43df314cd99331e9"
     },
     {
       "id": "query_rewrite",
@@ -2797,7 +2962,8 @@
       "filename": "query_rewrite.any.json",
       "version": "2.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "070e5399f737e09353cb60da1b4f9df9b17c4fa3ad19b3ca080e9db302b096e7"
     },
     {
       "id": "routing_operator_tiebreakers",
@@ -2806,7 +2972,8 @@
       "filename": "routing_operator_tiebreakers.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "297a6c5ae976ce03bc4c3ea6316e4a0aa5e32d0b69f29cf0019a9b7efac7fa89"
     },
     {
       "id": "routing_priority",
@@ -2815,7 +2982,8 @@
       "filename": "routing_priority.any.json",
       "version": "2.1.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "6951e3739ef7b65e7afdb3a7336e6492b22b371f34d57c3864ab84a697098192"
     },
     {
       "id": "source_selection_routing",
@@ -2840,7 +3008,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "3cdeb5237956dca849d3fdf9e2ebc134469f7ce860b4284adb21983eeaadea38",
       "lastUpdated": "2026-02-07"
     },
     {
@@ -2850,7 +3018,8 @@
       "filename": "tool_router.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "095297002c2ad31d195c215489a6be584d72f42c8dd41a6911aea0bfb0e7701b"
     },
     {
       "id": "attachment_schema",
@@ -2875,7 +3044,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "4462c30a8eed5d661edf1354ff01bff8254e1d42a0ef6c691208ee6d85827c3f",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -2901,7 +3070,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "99e966d0b72f33819263ab724af7d89e7f10e0b034d218b84018db07f1121fde",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -2927,7 +3096,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "b197dc78fed970f28240efcbafc837aeba839b5f10c437751c46af2885e5b70b",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -2953,7 +3122,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "5129de8c3b02bd7e52eb1c0b16172516486d43d381438e5ba33b1efbd9fe931e",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -2979,7 +3148,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "15230d3127e32b525fda4846a1dcd8c28e6b54cbb68239ab2d190e792797efb6",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3005,7 +3174,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "88341f08f461321f778cbff195db5ece9852c552256863d96752f44fdcac428a",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3031,7 +3200,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "33ac8d1e10ed784271e51779fe936c8b876715919fd708ead8e7d0b6e7c451ac",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3041,7 +3210,8 @@
       "filename": "active_doc_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "9ef1b1490cbf5ca21e144da34b4dccb8b378df97bff5c839005cbd273b64b0e2"
     },
     {
       "id": "candidate_filters",
@@ -3050,7 +3220,8 @@
       "filename": "candidate_filters.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "58fe1b58b923506a0223bfb63fe256f1e3840a1d3a365b26c097e19a18de8468"
     },
     {
       "id": "scope_resolution",
@@ -3059,7 +3230,8 @@
       "filename": "scope_resolution.any.json",
       "version": "2.2.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-25"
+      "lastUpdated": "2026-01-25",
+      "checksumSha256": "2ea842d114e686ec49368ec30c8c5084c5a9577bad5c708b75f43bef7ac1a11e"
     },
     {
       "id": "chunking_rules",
@@ -3068,7 +3240,8 @@
       "filename": "chunking_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "0b90bad1cce9eaf385380f7169d49bd6e72e13c19f31ccff0c6306d88c17e6ce"
     },
     {
       "id": "domain_detection",
@@ -3094,7 +3267,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "ebb35dcde976a983b3e43602b59346ab26fa6cb1036e3e022dd347f62278949f",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3120,7 +3293,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "14acfd45a62c34cdc04b2cad443c9c135b176aa69bd84a36a73f5a5cad97b83f",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3130,7 +3303,8 @@
       "filename": "entity_semantics.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "100552d1f38e01ca3fd52c30fd87cd6eb9822732a3478b2c219bd673e36d2dcb"
     },
     {
       "id": "format_semantics",
@@ -3142,7 +3316,7 @@
       "schemaId": "bank_schema",
       "dependsOn": [
         "tokenization_rules",
-        "language_indicators_semantic"
+        "language_indicators"
       ],
       "enabledByEnv": {
         "production": true,
@@ -3156,7 +3330,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "40e3879f86b4390d5257af4caa6febeef43980d3f8f0e7b82b61cb5e6bf7f992",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3166,7 +3340,8 @@
       "filename": "intent_semantics.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "74ac1266033dffab3a11c49a12a1df90f67f04afbfebb8977e290a21ec8b0a29"
     },
     {
       "id": "layout_signals",
@@ -3175,7 +3350,8 @@
       "filename": "layout_signals.any.json",
       "version": "2.1.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "f275c8b03e4826f286167c1bd25550897b054eb1fbbdf0643e4db10e9cee3c16"
     },
     {
       "id": "numeric_semantics",
@@ -3200,7 +3376,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "f98c028d1401aaa8fcb28c15d6ce803466023bf4a8cf0e389f3e3160b19be192",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3210,7 +3386,8 @@
       "filename": "pdf_semantics.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "88bf0a785b46c3afda352b39b20c2271af69643d0cbe4ac749d66e2c1292b3fa"
     },
     {
       "id": "section_heading_patterns",
@@ -3219,7 +3396,8 @@
       "filename": "section_heading_patterns.any.json",
       "version": "2.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "dfb469967438f71fe2cfda232eebb35d034fd810600fe9e59966dd29e6518ce4"
     },
     {
       "id": "semantics_tests",
@@ -3228,7 +3406,8 @@
       "filename": "semantics_tests.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "eaaaf59e4b85bf31532edd2a16937d141a3c16287bce62f5c2c2b15e566a4e57"
     },
     {
       "id": "spreadsheet_semantics",
@@ -3237,7 +3416,8 @@
       "filename": "spreadsheet_semantics.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "c02bd51ba491b202ba0a77380559754e24de2339af83ccf93c4fa351f28bdb45"
     },
     {
       "id": "stopwords_docnames",
@@ -3262,7 +3442,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "780a3a57d62430d9c828577de5c0efeeaa26aa8e7ae1da7c3e47b5967eda0571",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3272,7 +3452,8 @@
       "filename": "table_extraction_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "fb02845230ace03c0641a3edc63d8d5addc3f5bcf2ee24236840a6956ce4581b"
     },
     {
       "id": "terminology_domains",
@@ -3281,7 +3462,8 @@
       "filename": "terminology_domains.any.json",
       "version": "3.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "a4a7fa28aa086cf2b7dda8afc88adbf013f3c687d307d724e52ace751a25850c"
     },
     {
       "id": "time_semantics",
@@ -3306,7 +3488,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "a9b9b642bc0d05a22d4f2a5e4714ffc4144b63c7bf156114b351f504d5136cb9",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3316,7 +3498,8 @@
       "filename": "conversation_state_schema.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "157db1ba5023c810821ea501d975ee6c8fd6dcbcd4464cb0056ae449c8af323c"
     },
     {
       "id": "memory_decay_rules",
@@ -3325,7 +3508,8 @@
       "filename": "memory_decay_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "ce01d5fd6bcc8b6aadf4b254615340dad6f160775c4bc5c99dc8d3c878ae9b23"
     },
     {
       "id": "state_debug_policy",
@@ -3334,7 +3518,8 @@
       "filename": "state_debug_policy.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "0200a35dd87be167b2467b7b7305c632c005036a0fc4c6f0213e5d0b9d52df91"
     },
     {
       "id": "state_update_rules",
@@ -3343,7 +3528,8 @@
       "filename": "state_update_rules.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "44903a1c61c64570510174dcd9c1363246592bdd7e25d2a9bc5069eef7934470"
     },
     {
       "id": "chart_blueprints",
@@ -3352,7 +3538,8 @@
       "filename": "chart_blueprints.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "0f6411b72c0b303a7fed30aa24cf034fb5b26704db79681ed5d4ebccc042327c"
     },
     {
       "id": "edit_rationale_templates",
@@ -3361,7 +3548,8 @@
       "filename": "edit_rationale_templates.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "d82bba88a1bc7c835820e9d99c2b8388abccc4b06ae97baf8ca2a282501e3ad1"
     },
     {
       "id": "proof_templates",
@@ -3370,7 +3558,8 @@
       "filename": "proof_templates.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "c786d06ff7ea5f965743e39df08ff81dea5399e7faea7bf16dd2fb8b03d65d5f"
     },
     {
       "id": "slide_blueprints",
@@ -3379,7 +3568,8 @@
       "filename": "slide_blueprints.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-07"
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "ba1546f4ca457629db12f383cf9cc637e9c0d98498a0665fb5801d93aecf4a4d"
     },
     {
       "id": "collision_cases",
@@ -3388,7 +3578,8 @@
       "filename": "collision_cases.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "968e26eb86632b74721a44a35bc2f97d0db6fd1109ecd00d1603f2b87de1e878"
     },
     {
       "id": "negatives_regression",
@@ -3397,7 +3588,8 @@
       "filename": "negatives_regression.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "checksumSha256": "56a3dbf0411750870440bc6e4ef27d3e431ab81780258fd72c12aa2ed91fb15f"
     },
     {
       "id": "normalization_tests",
@@ -3427,7 +3619,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "fcb8350e26c54052a635431d33e0a22334affe93280373844a63123f7dc9d783",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3456,7 +3648,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "6e492e20aa74c2ea2381080cef739e99aec2cb6b52b6dd8d602c284d53f3900c",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3482,7 +3674,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "bb178412be85d56262527bfb380def46611e59b08057d0c8ac0f9169904d70b6",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3508,7 +3700,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "b4b33508a5bfbbe92d141269fc616cd384457be0e6b1f8fc73e846ada8fcaf74",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3534,7 +3726,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "6b86a68a276bae95f5640bf769d17a250786287b77c26f14e9c014baecff0054",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3560,7 +3752,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "f24502e7ec5e9c1ebf245f0cee527956877ccd366ad54c24a977cf839e72fbea",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3586,7 +3778,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "dca4b568542e216d16b830c33e5a3239c9d55e7265baf2b85198df99d79e7f2f",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3612,7 +3804,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "",
+      "checksumSha256": "326963f6ed0329b43e88646f835bfa12e3ea5e3a4db535c1bab64d2d00fa17e6",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -3638,7 +3830,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "ce3dec1af20a80ed0454a15664bfe16cdaf81db1c6b1db8a54b6d07f233083e5",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -3661,7 +3853,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "6a616009a7880ccc58271ccb162a4278ebb550b42d41cee1879a41256df3cd9f",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -3684,7 +3876,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "09134aba16b78d32c3f7f2897ea060f46486758ed799e87b37b493a8b8496cfa",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -3707,7 +3899,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "4cf5a01a347761164596727c864730cfbca736eeff53f2c9ace2a2d0deb25e5e",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -3730,7 +3922,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "fb3b22d8b744f47bd50db0da9a559cd7568621124927c9a22b37ea55f819b209",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -3753,7 +3945,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "46669cebeb140b71572f007ee32fed3c4c9a8f917fd3018b0652c2386b1a8297",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -3776,7 +3968,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "98875f8aaeb4d071f9ce60f00062c7a65a78baf3798ade1882e3f23f1a9e27f8",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -3799,7 +3991,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "391343b578b8a040fc64eb4554853f7d7bd89842bb8348141db414d9da441501",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -3822,7 +4014,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "fc3fce52fcedc589628e5b18c1a434464db1f16cfe9b0c7b03685c600d6b4c8d",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -3845,7 +4037,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "09c345fed045bcff80add5bbfe29b1540c753246300742535276865d47254c1e",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -3868,7 +4060,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "ee0f9a2e97cd6b06b1ebc06a884908a89f9c29b8c1f3a87d260ba24ed634cde8",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -3891,7 +4083,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "1acb7224c1707eceee7301e3e3b488bde6b87f824f199b15c5ac770a66431394",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -3914,7 +4106,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "98ef1a0632887bfdc512809e1d15f363b56927fbb695e4e0250eafb218f93aab",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -3937,7 +4129,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "00893d02f23840ba2edebd34a412275e48d722e6282f72866de97b73c8863773",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -3960,7 +4152,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "2e2da233bc03674786fc7836bfe01bdf3fd3c0ed4edb292fc911d77970a612ff",
       "lastUpdated": "2026-02-17"
     },
     {
@@ -3983,7 +4175,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "8853083baace84ad6449be61a749ebcaffe9056334fedc4957e50cc89c7528ec",
       "lastUpdated": "2026-02-13"
     },
     {
@@ -4006,7 +4198,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "6472a5039d79f932de97cae0cf8dbc4d2704013d6fbb1067da695afd79fc0bf8",
       "lastUpdated": "2026-02-13"
     },
     {
@@ -4029,7 +4221,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "",
+      "checksumSha256": "ef924535dc86acdd171970358cdec3505dbc92ef3ab979223b75334a61b2934d",
       "lastUpdated": "2026-02-13"
     },
     {
@@ -4040,9 +4232,19 @@
       "version": "1.0.0",
       "contentType": "patterns",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "1133788f5363ccc470693a048ad277ff59a880d26dc2faea351811963c409349",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4053,9 +4255,19 @@
       "version": "1.0.0",
       "contentType": "patterns",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "9dcddcff038b1aca3ffd0c33663597edb1ffc82c0c7528feccc155c05587abab",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4066,9 +4278,19 @@
       "version": "1.0.0",
       "contentType": "patterns",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "3f24d854b6c76f71967bae99431b85a06659b18172434042f4484128e1ae0d93",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4079,9 +4301,19 @@
       "version": "1.0.0",
       "contentType": "patterns",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "e5daad50e1e297657603049193aa2eda343f7e7991d94456910155c693162142",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4092,9 +4324,19 @@
       "version": "1.0.0",
       "contentType": "lexicon",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "229c37aae6e3a8a7d18cddf771d0a6355352dc4bfd9c8ae8e858476acf23ed93",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4105,9 +4347,19 @@
       "version": "1.0.0",
       "contentType": "lexicon",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "5b7921d7bf5b505413cc1073aef7013d4aa4cf5cbb5770254cba6d05a4bb6b70",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4118,9 +4370,19 @@
       "version": "1.0.0",
       "contentType": "lexicon",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "69208ea9eb8aab5439411010467a6b2866438b33defa220c4af3e30bcf9cb4ae",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4131,9 +4393,19 @@
       "version": "1.0.0",
       "contentType": "lexicon",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "f788e76169ec4e2b3dea5af8f9f5ca27087df45be606de9167e487114beec2da",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4144,9 +4416,19 @@
       "version": "1.0.0",
       "contentType": "lexicon",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "6f6a34216115ec032359b89e93af8d75d440a9e5243923261ec99625f3c29e81",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4157,9 +4439,19 @@
       "version": "1.0.0",
       "contentType": "lexicon",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "58bee4c69b52f7e74027f17dc852ad99b5abedafab6c8cb7bbb07e9c4e7b7902",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4170,9 +4462,19 @@
       "version": "1.0.0",
       "contentType": "catalog",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "2c690821515981007a9ee48e630e1a17964c55d730141b42f487573217e8a5fb",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4183,9 +4485,19 @@
       "version": "1.0.0",
       "contentType": "dictionary",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "5fe4e5ff06f28fefb8bc4b1b2de257d633b7e9a665181f079529ecebb79bf3a4",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4196,9 +4508,19 @@
       "version": "1.0.0",
       "contentType": "dictionary",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "534867f2f8d57b665319146ee37f7e7b15ad1c0309bb3e1431f20b7910568765",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4209,9 +4531,19 @@
       "version": "1.0.0",
       "contentType": "dictionary",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "ddd13be331c50d83f913b0e52cf4ff2214578f1cbd327b8bc344f364a1e88b71",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4222,9 +4554,19 @@
       "version": "1.0.0",
       "contentType": "dictionary",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "d9213caa51e9fadd7530fb0699c30d836f9dc5102aea0ec1f36c8234e6deef05",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4235,9 +4577,19 @@
       "version": "1.0.0",
       "contentType": "dictionary",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "f9b23a2a483ac0f98aeb2a5ac5493b254737e90ac482cef2a5377ec1af03b959",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4248,9 +4600,19 @@
       "version": "1.0.0",
       "contentType": "dictionary",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "bd32a92caf1846784c6454f3d3dc6adfcabda92584fe1cd25bc1e15f0aa32654",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4261,9 +4623,19 @@
       "version": "1.0.0",
       "contentType": "dictionary",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "8f22f99cabbe88c3559eb76041c619662913c16016a2244d3d9e0564147e9a81",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4274,9 +4646,19 @@
       "version": "1.0.0",
       "contentType": "dictionary",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "96fd133e52555c0f085da82ed5567214d8ce81f846e69bf169e04eb0594f1006",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4287,9 +4669,19 @@
       "version": "1.0.0",
       "contentType": "dictionary",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "452e42331fceb5b2a77996a16dd810c3ce43970b3f83efeea6c2a325a9da84b6",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4300,9 +4692,19 @@
       "version": "1.0.0",
       "contentType": "test_suite",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": false, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": false,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "91d900ba4c5f0ec35d56adb6a841206d8384f25a7cc91610906b52cac560972d",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4313,9 +4715,19 @@
       "version": "1.0.0",
       "contentType": "test_suite",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": false, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": false,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "bc3b7ab5987d34cf55e96f5e81582bb472baba6135b4c9c4ee160e1aa5301851",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4326,9 +4738,19 @@
       "version": "1.0.0",
       "contentType": "test_suite",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": false, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": false,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "39e56f49eab4f78b0edcfdbdab6c8be97c810d89374b9bfe83dd11e83de9caf1",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4339,9 +4761,19 @@
       "version": "1.0.0",
       "contentType": "test_suite",
       "schemaId": "bank_schema",
-      "enabledByEnv": { "production": false, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": false, "staging": false, "dev": false, "local": false },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": false,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "f2ccd180745fdd47ec18a7bf09846b9b1b701bd1c7092a96d1e45c42d6f9a197",
       "lastUpdated": "2026-02-12"
     },
     {
@@ -4353,9 +4785,19 @@
       "contentType": "microcopy",
       "schemaId": "bank_schema",
       "dependsOn": [],
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "a8f8fc0385414a4348969bb1ee79e58008e63a379b430a55301223a215ccd6de",
       "lastUpdated": "2026-02-16"
     },
     {
@@ -4367,10 +4809,73 @@
       "contentType": "microcopy",
       "schemaId": "bank_schema",
       "dependsOn": [],
-      "enabledByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "requiredByEnv": { "production": true, "staging": true, "dev": true, "local": true },
-      "checksumSha256": "",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "39437715cabdb01c368ed962dd052c116aa44e26d35cc8700405f4dad7323192",
       "lastUpdated": "2026-02-17"
+    },
+    {
+      "id": "capabilities_catalog",
+      "category": "semantics",
+      "path": "semantics/capabilities_catalog.any.json",
+      "filename": "capabilities_catalog.any.json",
+      "version": "2.0.0",
+      "contentType": "catalog",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "operator_contracts",
+        "operator_output_shapes"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "f8bc19721c372a3780e0cf03b06681a44d0b3913ea69911559871992f5279282",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "followup_suggestions",
+      "category": "microcopy",
+      "path": "microcopy/followup_suggestions.any.json",
+      "filename": "followup_suggestions.any.json",
+      "version": "1.0.0",
+      "contentType": "microcopy",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "conversation_messages"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "36b2a9a38197542b0989c03d1b1f4139c79ae81a81cbf2ded0a572bc0394a3bd",
+      "lastUpdated": "2026-02-10"
     }
   ],
   "tests": [

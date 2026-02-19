@@ -101,9 +101,10 @@ export async function trackAllybiEvent(eventType, options = {}) {
     deviceType: getDeviceType(),
     meta: baseMeta(options.meta),
   };
+  const endpoint = safeTrim(options.endpoint || '/api/telemetry/usage', 128) || '/api/telemetry/usage';
 
   try {
-    await api.post('/api/telemetry/usage', payload);
+    await api.post(endpoint, payload);
     if (dedupeMs > 0) markDedupe(safeEventType, dedupeKey);
   } catch {
     // Fail-open: telemetry never blocks UX actions.
@@ -119,6 +120,23 @@ export function trackAllybiVisit(options = {}) {
   );
   return trackAllybiEvent('ALLYBI_VISIT_STARTED', {
     ...options,
+    dedupeMs: Number(options.dedupeMs || VISIT_DEDUPE_MS),
+    dedupeKey,
+    meta,
+  });
+}
+
+export function trackAllybiPublicVisit(options = {}) {
+  const meta = options.meta || {};
+  const dedupeKey = safeTrim(
+    options.dedupeKey ||
+      `${safeTrim(meta.surface || '', 64)}:${safeTrim(meta.path || '', 128)}:${safeTrim(meta.utmSource || '', 64)}`,
+    190
+  );
+
+  return trackAllybiEvent('ALLYBI_PUBLIC_VISIT_STARTED', {
+    ...options,
+    endpoint: '/api/telemetry/public/visit',
     dedupeMs: Number(options.dedupeMs || VISIT_DEDUPE_MS),
     dedupeKey,
     meta,
