@@ -90,6 +90,11 @@ const PPTX_MIMES = [
   'application/vnd.ms-powerpoint',
 ];
 
+/** Images are visual-first — they should remain visible even if OCR finds no text. */
+function isImageMime(mime: string): boolean {
+  return mime.startsWith('image/');
+}
+
 // ---------------------------------------------------------------------------
 // Smart Image OCR Filter - Skip likely non-text images to save 80%+ OCR time
 // ---------------------------------------------------------------------------
@@ -141,8 +146,8 @@ async function extractText(buffer: Buffer, mimeType: string, filename?: string) 
     if (filename) {
       const skipCheck = shouldSkipImageOcr(filename, buffer.length);
       if (skipCheck.skip) {
-        logger.info('[OCR] Skipping image OCR, saving with empty content', { filename, reason: skipCheck.reason });
-        return { text: '', wordCount: 0, confidence: 1.0, skipped: true, skipReason: skipCheck.reason };
+        logger.info('[OCR] Skipping image OCR, saving as visual-only', { filename, reason: skipCheck.reason });
+        return { text: '', wordCount: 0, confidence: 1.0, skipped: true, skipReason: `Image saved as visual-only (${skipCheck.reason})` };
       }
     }
 
@@ -153,8 +158,8 @@ async function extractText(buffer: Buffer, mimeType: string, filename?: string) 
     // Use extractTextWithRetry to handle transient RST_STREAM errors
     const ocrResult = await visionService.extractTextWithRetry(buffer, { mode: 'document' });
     if (!ocrResult.text || ocrResult.text.trim().length === 0) {
-      logger.info('[OCR] Image OCR produced no text, saving with empty content', { filename, mimeType });
-      return { text: '', wordCount: 0, confidence: 1.0, skipped: true, skipReason: 'OCR produced no text' };
+      logger.info('[OCR] Image OCR produced no text, saving as visual-only', { filename, mimeType });
+      return { text: '', wordCount: 0, confidence: 1.0, skipped: true, skipReason: 'Image contains no text (visual-only)' };
     }
     return { text: ocrResult.text, wordCount: ocrResult.text.split(/\s+/).length, confidence: ocrResult.confidence ?? 0.8 };
   }
@@ -302,11 +307,43 @@ interface PipelineTimings {
   extractionMs: number;
   extractionMethod: string;
   ocrUsed: boolean;
+  ocrSuccess: boolean;
+  ocrConfidence: number | null;
+  ocrPageCount: number | null;
+  ocrMode: string | null;
+  textQuality: 'high' | 'medium' | 'low' | 'none';
+  textQualityScore: number | null;
+  extractionWarnings: string[];
   textLength: number;
   rawChunkCount: number;
   chunkCount: number;
   embeddingMs: number;
   pageCount: number | null;
+}
+
+function clamp01(value: unknown): number | null {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return null;
+  return Math.max(0, Math.min(1, n));
+}
+
+function deriveTextQuality(extraction: any, fullText: string): { label: 'high' | 'medium' | 'low' | 'none'; score: number | null } {
+  const score = clamp01(extraction?.textQualityScore ?? extraction?.confidence);
+  if (!fullText || fullText.trim().length === 0) return { label: 'none', score: 0 };
+  if (typeof extraction?.textQuality === 'string') {
+    const normalized = extraction.textQuality.toLowerCase();
+    if (normalized.includes('high')) return { label: 'high', score };
+    if (normalized.includes('medium')) return { label: 'medium', score };
+    if (normalized.includes('low') || normalized.includes('weak')) return { label: 'low', score };
+  }
+  if (score != null) {
+    if (score >= 0.8) return { label: 'high', score };
+    if (score >= 0.55) return { label: 'medium', score };
+    return { label: 'low', score };
+  }
+  if (fullText.length >= 2000) return { label: 'high', score: null };
+  if (fullText.length >= 600) return { label: 'medium', score: null };
+  return { label: 'low', score: null };
 }
 
 const processDocumentAsync = async (
@@ -340,6 +377,24 @@ const processDocumentAsync = async (
   // Skipped files return { text: '', skipped: true, skipReason: '...' }
   const fullText = (extraction as any).text || '';
   const wasSkipped = (extraction as any).skipped === true;
+  const extractedOcrUsed = Boolean(
+    mimeType.startsWith('image/') ||
+      (extraction as any).ocrApplied ||
+      (extraction as any).ocrUsed ||
+      ((extraction as any).ocrPageCount ?? 0) > 0
+  );
+  const ocrConfidence = extractedOcrUsed
+    ? clamp01((extraction as any).ocrConfidence ?? (mimeType.startsWith('image/') ? (extraction as any).confidence : null))
+    : null;
+  const ocrPageCount = Number.isFinite(Number((extraction as any).ocrPageCount))
+    ? Number((extraction as any).ocrPageCount)
+    : null;
+  const ocrMode = typeof (extraction as any).ocrMode === 'string' ? String((extraction as any).ocrMode) : null;
+  const textQuality = deriveTextQuality(extraction, fullText);
+  const extractionWarnings = [
+    ...((Array.isArray((extraction as any).weakTextReasons) ? (extraction as any).weakTextReasons : []) as string[]),
+    ...((Array.isArray((extraction as any).extractionWarnings) ? (extraction as any).extractionWarnings : []) as string[]),
+  ];
 
   if (!fullText || fullText.trim().length < 10) {
     const skipReason = wasSkipped
@@ -358,7 +413,14 @@ const processDocumentAsync = async (
       storageDownloadMs: tExtract - tDownload,
       extractionMs: Date.now() - tExtract,
       extractionMethod: mimeType.startsWith('image/') ? 'ocr' : 'text',
-      ocrUsed: mimeType.startsWith('image/'),
+      ocrUsed: extractedOcrUsed,
+      ocrSuccess: false,
+      ocrConfidence,
+      ocrPageCount,
+      ocrMode,
+      textQuality: 'none',
+      textQualityScore: 0,
+      extractionWarnings,
       textLength: 0,
       rawChunkCount: 0,
       chunkCount: 0,
@@ -426,7 +488,7 @@ const processDocumentAsync = async (
   // Determine extraction method from mimeType
   const isOcr = mimeType.startsWith('image/');
   let extractionMethod = 'text';
-  if (PDF_MIMES.includes(mimeType)) extractionMethod = 'pdf';
+  if (PDF_MIMES.includes(mimeType)) extractionMethod = extractedOcrUsed ? 'pdf_ocr' : 'pdf_text';
   else if (DOCX_MIMES.includes(mimeType)) extractionMethod = 'docx';
   else if (XLSX_MIMES.includes(mimeType)) extractionMethod = 'xlsx';
   else if (PPTX_MIMES.includes(mimeType)) extractionMethod = 'pptx';
@@ -436,7 +498,14 @@ const processDocumentAsync = async (
     storageDownloadMs: tExtract - tDownload,
     extractionMs: tEmbed - tExtract,
     extractionMethod,
-    ocrUsed: isOcr,
+    ocrUsed: extractedOcrUsed,
+    ocrSuccess: extractedOcrUsed ? fullText.trim().length > 0 : false,
+    ocrConfidence,
+    ocrPageCount,
+    ocrMode,
+    textQuality: textQuality.label,
+    textQualityScore: textQuality.score,
+    extractionWarnings,
     textLength: fullText.length,
     rawChunkCount: rawChunks.length,
     chunkCount: inputChunks.length,
@@ -656,13 +725,13 @@ export async function processDocumentJobData(
     const skipReason = (timings as any).skipReason;
 
     if (wasSkipped) {
-      const keepVisibleWithoutText = XLSX_MIMES.includes(effectiveMimeType);
+      const keepVisibleWithoutText = XLSX_MIMES.includes(effectiveMimeType) || isImageMime(effectiveMimeType);
       await prisma.document.update({
         where: { id: documentId },
         data: {
           status: keepVisibleWithoutText ? 'ready' : 'skipped',
           chunksCount: 0,
-          error: skipReason || 'No extractable content',
+          error: keepVisibleWithoutText ? null : (skipReason || 'No extractable content'),
         },
       });
 
@@ -677,13 +746,13 @@ export async function processDocumentJobData(
     }
 
     if (timings.chunkCount === 0) {
-      const keepVisibleWithoutText = XLSX_MIMES.includes(effectiveMimeType);
+      const keepVisibleWithoutText = XLSX_MIMES.includes(effectiveMimeType) || isImageMime(effectiveMimeType);
       await prisma.document.update({
         where: { id: documentId },
         data: {
           status: keepVisibleWithoutText ? 'ready' : 'skipped',
           chunksCount: 0,
-          error: 'No extractable text content',
+          error: keepVisibleWithoutText ? null : 'No extractable text content',
         },
       });
 
@@ -726,6 +795,8 @@ export async function processDocumentJobData(
       textExtractionTime: timings.extractionMs,
       textLength: timings.textLength,
       ocrUsed: timings.ocrUsed,
+      ocrSuccess: timings.ocrSuccess,
+      ocrConfidence: timings.ocrConfidence,
       embeddingDuration: timings.embeddingMs,
       embeddingsCreated: timings.chunkCount,
       chunksCreated: timings.chunkCount,
@@ -735,6 +806,34 @@ export async function processDocumentJobData(
       create: { documentId, ...metricsData },
       update: metricsData,
     }).catch(err => logger.warn('[ProcessJob] Failed to persist processing metrics', { documentId, err: err.message }));
+
+    prisma.ingestionEvent.create({
+      data: {
+        userId,
+        documentId,
+        filename: filename || document.filename || 'unknown',
+        mimeType: effectiveMimeType,
+        sizeBytes: document.fileSize || null,
+        status: 'ok',
+        extractionMethod: timings.extractionMethod || 'unknown',
+        pages: timings.pageCount || null,
+        ocrUsed: timings.ocrUsed || false,
+        ocrConfidence: timings.ocrConfidence ?? null,
+        extractedTextLength: timings.textLength || null,
+        chunkCount: timings.chunkCount || null,
+        embeddingProvider: 'openai',
+        embeddingModel: process.env.OPENAI_EMBEDDING_MODEL || 'text-embedding-3-small',
+        durationMs: totalTime,
+        at: new Date(),
+        meta: {
+          ocrMode: timings.ocrMode,
+          ocrPageCount: timings.ocrPageCount,
+          textQuality: timings.textQuality,
+          textQualityScore: timings.textQualityScore,
+          extractionWarnings: timings.extractionWarnings.slice(0, 20),
+        },
+      },
+    }).catch(err => logger.warn('[ProcessJob] Failed to log ingestion telemetry', { err: err.message }));
 
     return { success: true, documentId, processingTime: totalTime, chunks: timings.chunkCount };
   } catch (err: any) {
@@ -867,7 +966,7 @@ export function startDocumentWorker() {
         const skipReason = (timings as any).skipReason;
 
         if (wasSkipped) {
-          const keepVisibleWithoutText = XLSX_MIMES.includes(effectiveMimeType);
+          const keepVisibleWithoutText = XLSX_MIMES.includes(effectiveMimeType) || isImageMime(effectiveMimeType);
           // Mark as 'skipped' for most file types (hides from library). For Excel, keep it visible:
           // users still expect to view/download the file even if we couldn't extract searchable text.
           await prisma.document.update({
@@ -896,7 +995,7 @@ export function startDocumentWorker() {
         // STEP 4: Check if we have any chunks - if not, mark as skipped
         // ═══════════════════════════════════════════════════════════════
         if (timings.chunkCount === 0) {
-          const keepVisibleWithoutText = XLSX_MIMES.includes(effectiveMimeType);
+          const keepVisibleWithoutText = XLSX_MIMES.includes(effectiveMimeType) || isImageMime(effectiveMimeType);
           await prisma.document.update({
             where: { id: documentId },
             data: {
@@ -952,6 +1051,8 @@ export function startDocumentWorker() {
           textExtractionTime: timings.extractionMs,
           textLength: timings.textLength,
           ocrUsed: timings.ocrUsed,
+          ocrSuccess: timings.ocrSuccess,
+          ocrConfidence: timings.ocrConfidence,
           embeddingDuration: timings.embeddingMs,
           embeddingsCreated: timings.chunkCount,
           chunksCreated: timings.chunkCount,
@@ -974,12 +1075,20 @@ export function startDocumentWorker() {
             extractionMethod: timings.extractionMethod || 'unknown',
             pages: timings.pageCount || null,
             ocrUsed: timings.ocrUsed || false,
+            ocrConfidence: timings.ocrConfidence ?? null,
             extractedTextLength: timings.textLength || null,
             chunkCount: timings.chunkCount || null,
             embeddingProvider: 'openai',
             embeddingModel: process.env.OPENAI_EMBEDDING_MODEL || 'text-embedding-3-small',
             durationMs: totalTime,
             at: new Date(),
+            meta: {
+              ocrMode: timings.ocrMode,
+              ocrPageCount: timings.ocrPageCount,
+              textQuality: timings.textQuality,
+              textQualityScore: timings.textQualityScore,
+              extractionWarnings: timings.extractionWarnings.slice(0, 20),
+            },
           },
         }).catch(err => logger.warn('[Worker] Failed to log ingestion telemetry', { err: err.message }));
 

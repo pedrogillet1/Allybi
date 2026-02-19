@@ -26,6 +26,9 @@ import { extractPDFWithTables } from '../../utils/pdfTableExtractor';
 
 /** Minimum characters per page to consider PDF as having a text layer */
 const MIN_CHARS_PER_PAGE_THRESHOLD = 100;
+const MIN_MEANINGFUL_CHARS_PER_PAGE = 80;
+const MIN_MEANINGFUL_WORDS_PER_PAGE = 18;
+const MIN_TOKEN_DIVERSITY = 0.22;
 
 /** Form feed character used as page separator in some PDFs */
 const FORM_FEED = '\f';
@@ -74,6 +77,74 @@ function fixUtf8Encoding(text: string): string {
   return text;
 }
 
+function stripPageMarkers(text: string): string {
+  return String(text || '')
+    .replace(/--\s*\d+\s*(?:of|de)\s*\d+\s*--/gi, ' ')
+    .replace(/---\s*Page\s*\d+\s*---/gi, ' ')
+    .replace(/\f/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function estimatePageCount(rawText: string, parserPageCount: number): number {
+  let estimated = Math.max(1, parserPageCount || 1);
+
+  const markerMatches = [...rawText.matchAll(/--\s*\d+\s*(?:of|de)\s*(\d+)\s*--/gi)];
+  for (const match of markerMatches) {
+    const total = Number(match[1]);
+    if (Number.isFinite(total) && total > estimated) estimated = total;
+  }
+
+  const formFeedPages = rawText.split(FORM_FEED).length;
+  if (formFeedPages > estimated) estimated = formFeedPages;
+
+  const explicitPageMarkers = rawText.match(/---\s*Page\s*\d+\s*---/gi)?.length ?? 0;
+  if (explicitPageMarkers > estimated) estimated = explicitPageMarkers;
+
+  return Math.max(1, estimated);
+}
+
+function evaluateNativeTextQuality(rawText: string, pageCount: number): { weak: boolean; reasons: string[]; score: number } {
+  const reasons: string[] = [];
+  const meaningful = stripPageMarkers(rawText);
+  const charsPerPage = meaningful.length / Math.max(1, pageCount);
+  const words = meaningful
+    .split(/\s+/)
+    .map((w) => w.trim())
+    .filter(Boolean);
+  const wordsPerPage = words.length / Math.max(1, pageCount);
+
+  const lexicalWords = words
+    .map((w) => w.toLowerCase().replace(/[^a-z0-9\u00c0-\u024f]/gi, ''))
+    .filter((w) => w.length >= 3);
+  const uniqueWords = new Set(lexicalWords);
+  const tokenDiversity = lexicalWords.length > 0 ? uniqueWords.size / lexicalWords.length : 0;
+
+  if (charsPerPage < MIN_MEANINGFUL_CHARS_PER_PAGE) reasons.push('low_chars_per_page');
+  if (wordsPerPage < MIN_MEANINGFUL_WORDS_PER_PAGE) reasons.push('low_words_per_page');
+  if (lexicalWords.length >= 40 && tokenDiversity < MIN_TOKEN_DIVERSITY) reasons.push('low_token_diversity');
+
+  const markerTokens = rawText.match(/--\s*\d+\s*(?:of|de)\s*\d+\s*--|---\s*Page\s*\d+\s*---/gi) || [];
+  const markerOnlyLength = markerTokens.reduce((sum, token) => sum + token.length, 0);
+  if (markerOnlyLength > 0 && meaningful.length < markerOnlyLength * 1.5) reasons.push('marker_heavy_text');
+
+  const score = Math.max(
+    0,
+    Math.min(
+      1,
+      (charsPerPage / (MIN_MEANINGFUL_CHARS_PER_PAGE * 2)) * 0.45 +
+        (wordsPerPage / (MIN_MEANINGFUL_WORDS_PER_PAGE * 2)) * 0.35 +
+        tokenDiversity * 0.2
+    )
+  );
+
+  return {
+    weak: reasons.length > 0,
+    reasons,
+    score,
+  };
+}
+
 // ============================================================================
 // Per-Page Extraction with pdf-parse v2
 // ============================================================================
@@ -91,6 +162,9 @@ async function extractPagesNative(buffer: Buffer): Promise<{
   pages: PdfExtractedPage[];
   pageCount: number;
   hasTextLayer: boolean;
+  forceOcrAll: boolean;
+  weakTextReasons: string[];
+  nativeQualityScore: number;
 }> {
   // Use require for pdf-parse v2 (CommonJS module)
   const { PDFParse } = require('pdf-parse');
@@ -98,16 +172,17 @@ async function extractPagesNative(buffer: Buffer): Promise<{
 
   // Get page count from getInfo() - required in pdf-parse v2
   const info = await parser.getInfo();
-  const pageCount = info.total || 1;
+  const parserPageCount = info.total || 1;
 
   // Get raw text with page separators
   const data = await parser.getText();
 
   // Fix UTF-8 encoding
-  let fullText = fixUtf8Encoding(data.text || '');
+  const fullText = fixUtf8Encoding(data.text || '');
+  const pageCount = estimatePageCount(fullText, parserPageCount);
 
   // Check if PDF has meaningful text
-  const avgCharsPerPage = fullText.length / pageCount;
+  const avgCharsPerPage = fullText.length / Math.max(1, pageCount);
   let hasTextLayer = avgCharsPerPage >= MIN_CHARS_PER_PAGE_THRESHOLD;
 
   // Guard: if text is almost entirely page markers (e.g. "-- 1 of 31 --"),
@@ -125,6 +200,9 @@ async function extractPagesNative(buffer: Buffer): Promise<{
       pages: [],
       pageCount,
       hasTextLayer: false,
+      forceOcrAll: true,
+      weakTextReasons: ['low_text_density'],
+      nativeQualityScore: 0,
     };
   }
 
@@ -176,10 +254,29 @@ async function extractPagesNative(buffer: Buffer): Promise<{
   }
 
   await parser.destroy();
+
+  const quality = evaluateNativeTextQuality(fullText, pageCount);
+  if (quality.weak) {
+    console.log(
+      `⚠️ [PDF] Native text appears weak/boilerplate (score ${quality.score.toFixed(2)}): ${quality.reasons.join(', ')}`
+    );
+    return {
+      pages,
+      pageCount,
+      hasTextLayer: false,
+      forceOcrAll: true,
+      weakTextReasons: quality.reasons,
+      nativeQualityScore: quality.score,
+    };
+  }
+
   return {
     pages,
     pageCount,
     hasTextLayer: true,
+    forceOcrAll: false,
+    weakTextReasons: [],
+    nativeQualityScore: quality.score,
   };
 }
 
@@ -194,25 +291,31 @@ async function extractPagesNative(buffer: Buffer): Promise<{
 async function extractPagesSelectiveOCR(
   buffer: Buffer,
   nativePages: PdfExtractedPage[],
-  totalPageCount: number
+  totalPageCount: number,
+  forceOcrAll = false
 ): Promise<{
   pages: PdfExtractedPage[];
   pageCount: number;
   overallConfidence: number;
   ocrPageCount: number;
+  ocrMode: 'direct' | 'split' | 'none';
+  warnings: string[];
 }> {
   if (!googleVisionOCR.isAvailable()) {
     throw new Error('Google Vision OCR not available');
   }
 
-  // Identify which pages need OCR (low text density)
-  const pagesToOcr: number[] = [];
-  for (let i = 0; i < totalPageCount; i++) {
-    const page = nativePages[i];
-    const textLength = page?.text?.length || 0;
-    // Page needs OCR if it has very little text (likely scanned)
-    if (textLength < MIN_CHARS_PER_PAGE_THRESHOLD) {
-      pagesToOcr.push(i + 1); // 1-indexed
+  // Identify which pages need OCR (low text density), or force all pages when native text quality is weak.
+  const pagesToOcr: number[] = forceOcrAll
+    ? Array.from({ length: totalPageCount }, (_, i) => i + 1)
+    : [];
+  if (!forceOcrAll) {
+    for (let i = 0; i < totalPageCount; i++) {
+      const page = nativePages[i];
+      const textLength = page?.text?.length || 0;
+      if (textLength < MIN_CHARS_PER_PAGE_THRESHOLD) {
+        pagesToOcr.push(i + 1); // 1-indexed
+      }
     }
   }
 
@@ -224,6 +327,8 @@ async function extractPagesSelectiveOCR(
       pageCount: totalPageCount,
       overallConfidence: 1.0,
       ocrPageCount: 0,
+      ocrMode: 'none',
+      warnings: [],
     };
   }
 
@@ -231,45 +336,23 @@ async function extractPagesSelectiveOCR(
   if (pagesToOcr.length === totalPageCount) {
     console.log(`🔍 [PDF] All ${totalPageCount} pages need OCR, using batch...`);
     const fullOcr = await extractPagesOCR(buffer);
-    return { ...fullOcr, ocrPageCount: totalPageCount };
+    return { ...fullOcr, ocrPageCount: totalPageCount, ocrMode: fullOcr.ocrMode, warnings: fullOcr.warnings };
   }
 
   // SELECTIVE OCR: Only OCR the pages that need it
   console.log(`🔍 [PDF] Selective OCR: ${pagesToOcr.length}/${totalPageCount} pages need OCR`);
-
-  // Use Google Vision batchAnnotateFiles with specific page numbers
-  const BATCH_SIZE = 5;
-  const batches: number[][] = [];
-  for (let i = 0; i < pagesToOcr.length; i += BATCH_SIZE) {
-    batches.push(pagesToOcr.slice(i, i + BATCH_SIZE));
-  }
-
-  const ocrResults = new Map<number, { text: string; confidence: number }>();
-
-  await Promise.all(
-    batches.map(async (pageRange) => {
-      try {
-        const [result] = await (googleVisionOCR as any).client!.batchAnnotateFiles({
-          requests: [{
-            inputConfig: { content: buffer, mimeType: 'application/pdf' },
-            features: [{ type: 'DOCUMENT_TEXT_DETECTION' }],
-            pages: pageRange,
-          }],
-        });
-
-        const responses = result.responses?.[0]?.responses || [];
-        for (let i = 0; i < responses.length; i++) {
-          const pageNum = pageRange[i];
-          const pageText = responses[i]?.fullTextAnnotation?.text || '';
-          const blocks = responses[i]?.fullTextAnnotation?.pages?.flatMap((p: any) => p.blocks || []) || [];
-          const confs = blocks.map((b: any) => b.confidence).filter((c: any): c is number => typeof c === 'number');
-          const confidence = confs.length > 0 ? confs.reduce((a: number, b: number) => a + b, 0) / confs.length : 0.7;
-          ocrResults.set(pageNum, { text: postProcessText(pageText), confidence });
-        }
-      } catch (err: any) {
-        console.warn(`[PDF] OCR batch failed for pages ${pageRange.join(',')}:`, err.message);
-      }
-    })
+  const ocrPagesResult = await (googleVisionOCR as any).processPdfPages(buffer, {
+    pages: pagesToOcr,
+    maxPages: totalPageCount,
+  });
+  const ocrResults = new Map<number, { text: string; confidence: number }>(
+    (ocrPagesResult.pages || []).map((page: any) => [
+      page.page,
+      {
+        text: postProcessText(String(page.text || '')),
+        confidence: Number(page.confidence || 0.7),
+      },
+    ])
   );
 
   // Merge native pages with OCR results
@@ -314,6 +397,8 @@ async function extractPagesSelectiveOCR(
     pageCount: totalPageCount,
     overallConfidence: avgConfidence,
     ocrPageCount: ocrResults.size,
+    ocrMode: (ocrPagesResult.mode as 'direct' | 'split') || 'direct',
+    warnings: Array.isArray(ocrPagesResult.warnings) ? ocrPagesResult.warnings : [],
   };
 }
 
@@ -325,6 +410,8 @@ async function extractPagesOCR(buffer: Buffer): Promise<{
   pages: PdfExtractedPage[];
   pageCount: number;
   overallConfidence: number;
+  ocrMode: 'direct' | 'split' | 'none';
+  warnings: string[];
 }> {
   if (!googleVisionOCR.isAvailable()) {
     throw new Error('Google Vision OCR not available');
@@ -332,59 +419,41 @@ async function extractPagesOCR(buffer: Buffer): Promise<{
 
   console.log('🔍 [PDF] Using Google Vision OCR for full PDF extraction...');
 
-  // Google Vision OCR returns: { text, pageCount, confidence }
-  const ocrResult = await (googleVisionOCR as any).processScannedPDF(buffer);
+  const ocrResult = await (googleVisionOCR as any).processPdfPages(buffer);
+  const pageCount = ocrResult.pageCount || 1;
+  const pagesByNumber = new Map<number, any>(
+    (ocrResult.pages || []).map((page: any) => [Number(page.page), page])
+  );
 
-  // OCR service returns single text blob - split by form feeds for per-page
-  const fullText = ocrResult.text || '';
-  let pageTexts: string[];
-
-  if (fullText.includes(FORM_FEED)) {
-    pageTexts = fullText.split(FORM_FEED);
-  } else {
-    // If no form feeds, split evenly across reported page count
-    const pageCount = ocrResult.pageCount || 1;
-    if (pageCount > 1 && fullText.length > 500) {
-      const paragraphs = fullText.split(/\n\n+/);
-      const perPage = Math.ceil(paragraphs.length / pageCount);
-      pageTexts = [];
-      for (let i = 0; i < pageCount; i++) {
-        const start = i * perPage;
-        const end = Math.min(start + perPage, paragraphs.length);
-        pageTexts.push(paragraphs.slice(start, end).join('\n\n'));
-      }
-    } else {
-      pageTexts = [fullText];
-    }
-  }
-
-  const pages: PdfExtractedPage[] = pageTexts.map((text, index) => {
-    const cleanedText = postProcessText(text);
-    return {
-      page: index + 1,
+  const pages: PdfExtractedPage[] = [];
+  for (let pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
+    const page = pagesByNumber.get(pageNumber);
+    const cleanedText = postProcessText(String(page?.text || ''));
+    pages.push({
+      page: pageNumber,
       text: cleanedText,
       wordCount: cleanedText.split(/\s+/).filter(w => w.length > 0).length,
       ocrApplied: true,
-      ocrConfidence: ocrResult.confidence,
-    };
-  });
+      ocrConfidence: Number(page?.confidence || ocrResult.confidence || 0.7),
+    });
+  }
 
-  // Ensure we have the reported number of pages
-  const reportedPageCount = ocrResult.pageCount || pages.length;
-  while (pages.length < reportedPageCount) {
+  while (pages.length < pageCount) {
     pages.push({
       page: pages.length + 1,
       text: '',
       wordCount: 0,
       ocrApplied: true,
-      ocrConfidence: ocrResult.confidence,
+      ocrConfidence: Number(ocrResult.confidence || 0.7),
     });
   }
 
   return {
     pages,
-    pageCount: reportedPageCount,
+    pageCount,
     overallConfidence: ocrResult.confidence,
+    ocrMode: (ocrResult.mode as 'direct' | 'split') || 'direct',
+    warnings: Array.isArray(ocrResult.warnings) ? ocrResult.warnings : [],
   };
 }
 
@@ -446,13 +515,18 @@ export async function extractPdfWithAnchors(
         ocrApplied: false,
         wordCount: totalWordCount,
         confidence: 1.0,
+        textQuality: 'high',
+        textQualityScore: nativeResult.nativeQualityScore,
       };
     }
 
     // Step 2: PDF has low text density - use SELECTIVE OCR
     // This only OCRs pages that need it, cutting OCR time by 70-95%
+    const weakReasonText = nativeResult.weakTextReasons.length > 0
+      ? ` reasons=${nativeResult.weakTextReasons.join(',')}`
+      : '';
     console.log(
-      `📄 [PDF] Low overall text density (${nativeResult.pageCount} pages), using selective OCR...`
+      `📄 [PDF] Native extraction requires OCR (${nativeResult.pageCount} pages).${weakReasonText}`
     );
 
     if (googleVisionOCR.isAvailable()) {
@@ -471,7 +545,8 @@ export async function extractPdfWithAnchors(
         const ocrResult = await extractPagesSelectiveOCR(
           buffer,
           paddedNativePages,
-          nativeResult.pageCount
+          nativeResult.pageCount,
+          nativeResult.forceOcrAll
         );
 
         const totalText = ocrResult.pages.map(p => p.text).join('\n\n');
@@ -493,8 +568,14 @@ export async function extractPdfWithAnchors(
           hasTextLayer: ocrResult.ocrPageCount < ocrResult.pageCount,
           ocrApplied: ocrResult.ocrPageCount > 0,
           ocrConfidence: ocrResult.overallConfidence,
+          ocrPageCount: ocrResult.ocrPageCount,
+          ocrMode: ocrResult.ocrMode,
           wordCount: totalWordCount,
           confidence: ocrResult.overallConfidence,
+          textQuality: 'ocr_enhanced',
+          textQualityScore: ocrResult.overallConfidence,
+          weakTextReasons: nativeResult.weakTextReasons,
+          extractionWarnings: ocrResult.warnings,
         };
       } catch (ocrError: any) {
         console.error('❌ [PDF] OCR failed:', ocrError.message);
@@ -525,6 +606,9 @@ export async function extractPdfWithAnchors(
       ocrApplied: false,
       wordCount: fallbackWordCount,
       confidence: 0.3,
+      textQuality: 'low',
+      textQualityScore: nativeResult.nativeQualityScore,
+      weakTextReasons: nativeResult.weakTextReasons,
     };
   } catch (error: any) {
     console.error('❌ [PDF] Extraction failed:', error.message);

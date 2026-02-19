@@ -13227,6 +13227,7 @@ export class PrismaChatService {
     // --- Document Scoping: load persisted scope ---
     const ragScopeEnabled = (process.env.RAG_SCOPE_ENABLED ?? 'true') !== 'false';
     const ragScopeMinChunks = parseInt(process.env.RAG_SCOPE_MIN_CHUNKS ?? '2', 10) || 2;
+    const strictScopeMode = (process.env.RAG_STRICT_SCOPE_MODE ?? 'true') !== 'false';
 
     let scopeDocIds: string[] = [];
     if (hasAttachments) {
@@ -13344,8 +13345,8 @@ export class PrismaChatService {
       ...(useScope ? { scopeDocumentIds: scopeDocIds } : {}),
     });
 
-    // Fallback: if scoped retrieval is too thin, retry globally without clearing scope
-    if (useScope && chunks.length < ragScopeMinChunks) {
+    // Optional fallback: when strict scope is disabled, retry globally if scoped retrieval is too thin.
+    if (useScope && !strictScopeMode && chunks.length < ragScopeMinChunks) {
       const globalQuery = this.expandQueryFromHistory(req.message, history);
       chunks = await this.retrieveRelevantChunks(req.userId, globalQuery, 15, {
         boostFilenames: focusFilenames,
@@ -13357,7 +13358,11 @@ export class PrismaChatService {
     if (chunks.length < 3 && req.message.trim().length > 5) {
       const expandedQuery = this.expandQueryForRetry(contextualQuery);
       if (expandedQuery !== contextualQuery) {
-        const retryChunks = await this.retrieveRelevantChunks(req.userId, expandedQuery, 15, { boostFilenames: focusFilenames, boostTopicEntities: topicEntities });
+        const retryChunks = await this.retrieveRelevantChunks(req.userId, expandedQuery, 15, {
+          boostFilenames: focusFilenames,
+          boostTopicEntities: topicEntities,
+          ...(useScope ? { scopeDocumentIds: scopeDocIds } : {}),
+        });
         const seen = new Set(chunks.map(c => `${c.documentId}:${c.page}:${c.text.slice(0, 50)}`));
         for (const rc of retryChunks) {
           const key = `${rc.documentId}:${rc.page}:${rc.text.slice(0, 50)}`;
@@ -13663,7 +13668,7 @@ export class PrismaChatService {
   }
 
   private localizeNoEvidenceMessage(
-    kind: 'processing' | 'failed' | 'ocr_or_empty' | 'generic',
+    kind: 'processing' | 'failed' | 'ocr_or_empty' | 'scoped_not_found' | 'generic',
     language?: 'en' | 'pt' | 'es',
   ): string {
     const lang = language || 'en';
@@ -13677,6 +13682,9 @@ export class PrismaChatService {
       if (kind === 'ocr_or_empty') {
         return 'Ainda não consegui extrair texto pesquisável deste documento (pode ser um PDF/imagem escaneado com OCR baixo). Envie uma versão mais nítida ou com OCR.';
       }
+      if (kind === 'scoped_not_found') {
+        return 'Verifiquei apenas os documentos selecionados e não encontrei esse dado neles. Se você quiser, eu procuro em outros arquivos ou você pode indicar página/unidade/seção exata.';
+      }
       return 'Ainda não encontrei conteúdo pesquisável nos documentos selecionados. Aguarde a indexação e tente novamente.';
     }
     if (lang === 'es') {
@@ -13689,6 +13697,9 @@ export class PrismaChatService {
       if (kind === 'ocr_or_empty') {
         return 'Aún no pude extraer texto buscable de este documento (puede ser un PDF/imagen escaneado con OCR bajo). Sube una versión más clara o con OCR.';
       }
+      if (kind === 'scoped_not_found') {
+        return 'Busqué solo en los documentos seleccionados y ese dato no aparece allí. Si quieres, busco en otros archivos o indícame la página/unidad/sección exacta.';
+      }
       return 'Aún no encontré contenido buscable en los documentos seleccionados. Espera a que termine la indexación e inténtalo nuevamente.';
     }
 
@@ -13700,6 +13711,9 @@ export class PrismaChatService {
     }
     if (kind === 'ocr_or_empty') {
       return 'I could not extract searchable text from this document yet (it may be a scanned PDF/image with low OCR quality). Please upload a clearer scan or OCR version.';
+    }
+    if (kind === 'scoped_not_found') {
+      return 'I searched only within the selected documents and that detail is not present there. I can search other files, or you can point me to the exact page/unit/section.';
     }
     return 'I could not find searchable content in the selected documents yet. Please wait for indexing to finish and try again.';
   }
@@ -13738,7 +13752,7 @@ export class PrismaChatService {
     if (statuses.has('skipped') || chunkCount === 0) {
       return this.localizeNoEvidenceMessage('ocr_or_empty', params.language);
     }
-    return this.localizeNoEvidenceMessage('generic', params.language);
+    return this.localizeNoEvidenceMessage('scoped_not_found', params.language);
   }
 
   /**
@@ -17218,6 +17232,7 @@ export class PrismaChatService {
     // --- Document Scoping: load persisted scope ---
     const ragScopeEnabled = (process.env.RAG_SCOPE_ENABLED ?? 'true') !== 'false';
     const ragScopeMinChunks = parseInt(process.env.RAG_SCOPE_MIN_CHUNKS ?? '2', 10) || 2;
+    const strictScopeMode = (process.env.RAG_STRICT_SCOPE_MODE ?? 'true') !== 'false';
 
     let scopeDocIds: string[] = [];
     if (hasAttachments) {
@@ -17448,8 +17463,8 @@ export class PrismaChatService {
 
     this.emitStage(params.sink, { stage: 'reading', key: 'allybi.stage.docs.reading' });
 
-    // Fallback: if scoped retrieval is too thin, retry globally without clearing scope
-    if (useScope && chunks.length < ragScopeMinChunks) {
+    // Optional fallback: when strict scope is disabled, retry globally if scoped retrieval is too thin.
+    if (useScope && !strictScopeMode && chunks.length < ragScopeMinChunks) {
       const globalQuery = this.expandQueryFromHistory(params.req.message, history);
       chunks = await this.retrieveRelevantChunks(params.req.userId, globalQuery, 15, {
         boostFilenames: focusFilenames,
@@ -17461,7 +17476,11 @@ export class PrismaChatService {
     if (chunks.length < 3 && params.req.message.trim().length > 5) {
       const expandedQuery = this.expandQueryForRetry(contextualQuery);
       if (expandedQuery !== contextualQuery) {
-        const retryChunks = await this.retrieveRelevantChunks(params.req.userId, expandedQuery, 15, { boostFilenames: focusFilenames, boostTopicEntities: topicEntities });
+        const retryChunks = await this.retrieveRelevantChunks(params.req.userId, expandedQuery, 15, {
+          boostFilenames: focusFilenames,
+          boostTopicEntities: topicEntities,
+          ...(useScope ? { scopeDocumentIds: scopeDocIds } : {}),
+        });
         // Merge and deduplicate
         const seen = new Set(chunks.map(c => `${c.documentId}:${c.page}:${c.text.slice(0, 50)}`));
         for (const rc of retryChunks) {

@@ -21,6 +21,25 @@ export interface OcrResult {
   warnings: string[];
 }
 
+export interface OcrPdfPageResult {
+  page: number;
+  text: string;
+  confidence: number;
+}
+
+export interface OcrPdfResult {
+  pages: OcrPdfPageResult[];
+  pageCount: number;
+  confidence: number;
+  mode: 'direct' | 'split';
+  warnings: string[];
+}
+
+const OCR_PDF_BATCH_SIZE = 5;
+const OCR_PDF_MAX_PAGES = 50;
+const OCR_PDF_MAX_CONCURRENCY = 3;
+const OCR_PDF_PAYLOAD_LIMIT_BYTES = 40 * 1024 * 1024;
+
 function safeJsonParse(value: string): any | null {
   try {
     return JSON.parse(value);
@@ -101,112 +120,285 @@ export class GoogleVisionOcrService {
 
   /**
    * Process a scanned PDF using Google Vision's document text detection.
-   * Converts PDF pages to images using pdf2pic, then OCRs each page.
    */
   async processScannedPDF(
     buffer: Buffer
   ): Promise<{ text: string; pageCount: number; confidence: number }> {
+    const result = await this.processPdfPages(buffer);
+    const pagesOrdered = [...result.pages].sort((a, b) => a.page - b.page);
+    const fullText = pagesOrdered
+      .map((p) => p.text)
+      .filter((t) => t && t.trim().length > 0)
+      .join('\f');
+
+    return {
+      text: fullText.trim(),
+      pageCount: result.pageCount,
+      confidence: result.confidence,
+    };
+  }
+
+  /**
+   * OCR PDF pages with adaptive fallback:
+   * 1) direct batchAnnotateFiles on the original PDF
+   * 2) if payload/resource limits are hit, split into smaller PDFs and retry
+   */
+  async processPdfPages(
+    buffer: Buffer,
+    opts?: { pages?: number[]; maxPages?: number }
+  ): Promise<OcrPdfResult> {
     if (!this.client) {
       throw new Error(this.initError || 'Google Vision not initialized');
     }
 
-    // Determine total page count
+    const totalPages = await this.detectPdfPageCount(buffer);
+    const maxPages = Math.min(totalPages, Math.max(1, opts?.maxPages ?? OCR_PDF_MAX_PAGES));
+    const targetPages = this.normalizeTargetPages(opts?.pages, maxPages);
+    const warnings: string[] = [];
+
+    if (targetPages.length === 0) {
+      return { pages: [], pageCount: maxPages, confidence: 0, mode: 'direct', warnings: ['NO_TARGET_PAGES'] };
+    }
+
+    console.log(
+      `[OCR] Processing PDF pages ${targetPages.length}/${maxPages} via batchAnnotateFiles (buffer ${(buffer.length / 1024 / 1024).toFixed(1)} MB)...`
+    );
+
+    const direct = await this.runDirectPdfBatches(buffer, targetPages);
+    let pages = direct.pages;
+    let mode: 'direct' | 'split' = 'direct';
+
+    const lowCoverage = targetPages.length > 0 && pages.length < Math.max(1, Math.floor(targetPages.length * 0.6));
+    const shouldSplit =
+      direct.payloadLimitHit ||
+      (direct.resourceExhaustedHit && lowCoverage) ||
+      (buffer.length >= OCR_PDF_PAYLOAD_LIMIT_BYTES && pages.length < targetPages.length);
+
+    if (shouldSplit) {
+      warnings.push(direct.payloadLimitHit ? 'PAYLOAD_LIMIT_FALLBACK_SPLIT' : 'RESOURCE_LIMIT_FALLBACK_SPLIT');
+      const split = await this.runSplitPdfBatches(buffer, targetPages);
+      if (split.pages.length >= pages.length) {
+        pages = split.pages;
+        mode = 'split';
+        warnings.push(...split.warnings);
+      }
+    }
+
+    const byPage = new Map<number, OcrPdfPageResult>();
+    for (const p of pages) {
+      if (!p || !Number.isFinite(p.page) || p.page < 1) continue;
+      const existing = byPage.get(p.page);
+      if (!existing || (p.text?.length ?? 0) > (existing.text?.length ?? 0)) {
+        byPage.set(p.page, p);
+      }
+    }
+
+    const sortedPages = Array.from(byPage.values()).sort((a, b) => a.page - b.page);
+    const confidenceValues = sortedPages.map((p) => p.confidence).filter((c) => Number.isFinite(c) && c > 0);
+    const confidence = confidenceValues.length > 0
+      ? confidenceValues.reduce((sum, c) => sum + c, 0) / confidenceValues.length
+      : 0.7;
+
+    console.log(
+      `[OCR] PDF OCR complete (${mode}): ${sortedPages.length}/${targetPages.length} pages, confidence ${(confidence * 100).toFixed(1)}%`
+    );
+
+    return {
+      pages: sortedPages,
+      pageCount: maxPages,
+      confidence,
+      mode,
+      warnings,
+    };
+  }
+
+  private async detectPdfPageCount(buffer: Buffer): Promise<number> {
     let totalPages = 1;
+
     try {
       const { PDFParse } = require('pdf-parse');
       const parser = new PDFParse({ data: buffer });
-      const pdfData = await parser.getText();
-      totalPages = pdfData.numpages || 1;
-      if (totalPages <= 1 && pdfData.text) {
-        const markers = pdfData.text.match(/--\s*\d+\s*of\s*(\d+)\s*--/gi);
-        if (markers && markers.length > 0) {
-          const last = markers[markers.length - 1].match(/of\s*(\d+)/i);
-          if (last) totalPages = parseInt(last[1], 10) || totalPages;
+      const info = await parser.getInfo();
+      const textInfo = await parser.getText();
+      await parser.destroy();
+
+      const fromInfo = Number(info?.total || info?.numpages || 0);
+      const markerMatches = String(textInfo?.text || '').match(/--\s*\d+\s*(of|de)\s*(\d+)\s*--/gi) || [];
+      let fromMarkers = 0;
+      for (const match of markerMatches) {
+        const mm = match.match(/(?:of|de)\s*(\d+)/i);
+        if (mm) {
+          const n = Number(mm[1]);
+          if (Number.isFinite(n)) fromMarkers = Math.max(fromMarkers, n);
         }
       }
+
+      const formFeeds = String(textInfo?.text || '').split('\f').length;
+      totalPages = Math.max(1, fromInfo, fromMarkers, formFeeds);
     } catch {
       try {
         const { PDFDocument } = require('pdf-lib');
         const pdfDoc = await PDFDocument.load(buffer);
-        totalPages = pdfDoc.getPageCount();
-      } catch {}
+        totalPages = Math.max(1, pdfDoc.getPageCount());
+      } catch {
+        totalPages = 1;
+      }
     }
 
-    const maxPages = Math.min(totalPages, 50);
-    console.log(`[OCR] Processing scanned PDF — ${maxPages} pages via batchAnnotateFiles...`);
+    return totalPages;
+  }
 
-    // Google Vision batchAnnotateFiles handles PDFs natively (max 5 pages per sync request)
-    // Process ALL batches in parallel for maximum throughput
-    const BATCH_SIZE = 5;
-
-    const batches: { start: number; end: number; pageRange: number[] }[] = [];
-    for (let start = 1; start <= maxPages; start += BATCH_SIZE) {
-      const end = Math.min(start + BATCH_SIZE - 1, maxPages);
-      const pageRange = Array.from({ length: end - start + 1 }, (_, i) => start + i);
-      batches.push({ start, end, pageRange });
+  private normalizeTargetPages(pages: number[] | undefined, maxPages: number): number[] {
+    if (!Array.isArray(pages) || pages.length === 0) {
+      return Array.from({ length: maxPages }, (_, i) => i + 1);
     }
 
-    console.log(`[OCR] Launching ${batches.length} parallel batch requests...`);
+    const uniq = new Set<number>();
+    for (const page of pages) {
+      const n = Number(page);
+      if (!Number.isFinite(n)) continue;
+      const rounded = Math.floor(n);
+      if (rounded >= 1 && rounded <= maxPages) uniq.add(rounded);
+    }
+    return Array.from(uniq).sort((a, b) => a - b);
+  }
 
-    const batchResults = await Promise.all(
-      batches.map(async ({ start, end, pageRange }) => {
+  private splitIntoBatches(pages: number[], batchSize: number): number[][] {
+    const out: number[][] = [];
+    for (let i = 0; i < pages.length; i += batchSize) {
+      out.push(pages.slice(i, i + batchSize));
+    }
+    return out;
+  }
+
+  private async runDirectPdfBatches(buffer: Buffer, targetPages: number[]): Promise<{
+    pages: OcrPdfPageResult[];
+    payloadLimitHit: boolean;
+    resourceExhaustedHit: boolean;
+  }> {
+    const pageBatches = this.splitIntoBatches(targetPages, OCR_PDF_BATCH_SIZE);
+    const pages: OcrPdfPageResult[] = [];
+    let payloadLimitHit = false;
+    let resourceExhaustedHit = false;
+    let cursor = 0;
+
+    const workerCount = Math.min(OCR_PDF_MAX_CONCURRENCY, pageBatches.length);
+    const workers = Array.from({ length: workerCount }, async () => {
+      while (true) {
+        const idx = cursor++;
+        if (idx >= pageBatches.length) break;
+        const batchPages = pageBatches[idx];
         try {
           const [result] = await this.client!.batchAnnotateFiles({
             requests: [{
-              inputConfig: {
-                content: buffer,
-                mimeType: 'application/pdf',
-              },
+              inputConfig: { content: buffer, mimeType: 'application/pdf' },
               features: [{ type: 'DOCUMENT_TEXT_DETECTION' as any }],
-              pages: pageRange,
+              pages: batchPages,
             }],
           });
-
-          let batchText = '';
-          let batchConfidence = 0;
-          let batchConfCount = 0;
-          const responses = result.responses?.[0]?.responses || [];
-          for (const resp of responses) {
-            const pageText = resp.fullTextAnnotation?.text || '';
-            if (pageText) {
-              batchText += pageText + '\f';
-            }
-            const blocks = resp.fullTextAnnotation?.pages?.flatMap((p: any) => p.blocks || []) || [];
-            const confs = blocks.map((b: any) => b.confidence).filter((c: any): c is number => typeof c === 'number');
-            if (confs.length > 0) {
-              batchConfidence += confs.reduce((a: number, b: number) => a + b, 0) / confs.length;
-              batchConfCount++;
-            }
-          }
-
-          return { start, batchText, batchConfidence, batchConfCount };
-        } catch (batchErr: any) {
-          console.warn(`[OCR] Batch pages ${start}-${end} failed:`, batchErr.message);
-          return { start, batchText: '', batchConfidence: 0, batchConfCount: 0 };
+          pages.push(...this.collectPdfResponses(result, batchPages, (n) => n));
+        } catch (err: any) {
+          if (this.isPayloadLimitError(err)) payloadLimitHit = true;
+          if (this.isResourceExhaustedError(err)) resourceExhaustedHit = true;
+          console.warn(`[OCR] Direct batch failed for pages ${batchPages.join(',')}:`, err?.message || err);
         }
-      })
-    );
+      }
+    });
 
-    // Reassemble in page order (sort by start page)
-    batchResults.sort((a, b) => a.start - b.start);
+    await Promise.all(workers);
+    return { pages, payloadLimitHit, resourceExhaustedHit };
+  }
 
-    let fullText = '';
-    let totalConfidence = 0;
-    let confCount = 0;
-    for (const { batchText, batchConfidence, batchConfCount } of batchResults) {
-      fullText += batchText;
-      totalConfidence += batchConfidence;
-      confCount += batchConfCount;
+  private async runSplitPdfBatches(buffer: Buffer, targetPages: number[]): Promise<{
+    pages: OcrPdfPageResult[];
+    warnings: string[];
+  }> {
+    const warnings: string[] = [];
+    const out: OcrPdfPageResult[] = [];
+    const { PDFDocument } = require('pdf-lib');
+    const sourcePdf = await PDFDocument.load(buffer);
+
+    const queue = this.splitIntoBatches(targetPages, OCR_PDF_BATCH_SIZE);
+    while (queue.length > 0) {
+      const globalPages = queue.shift()!;
+      let subsetBuffer = await this.buildPdfSubset(sourcePdf, globalPages);
+
+      if (subsetBuffer.length >= OCR_PDF_PAYLOAD_LIMIT_BYTES && globalPages.length > 1) {
+        const mid = Math.ceil(globalPages.length / 2);
+        queue.unshift(globalPages.slice(mid), globalPages.slice(0, mid));
+        warnings.push('SPLIT_BATCH_BY_SIZE');
+        continue;
+      }
+
+      const localPages = Array.from({ length: globalPages.length }, (_, i) => i + 1);
+
+      try {
+        const [result] = await this.client!.batchAnnotateFiles({
+          requests: [{
+            inputConfig: { content: subsetBuffer, mimeType: 'application/pdf' },
+            features: [{ type: 'DOCUMENT_TEXT_DETECTION' as any }],
+            pages: localPages,
+          }],
+        });
+        out.push(
+          ...this.collectPdfResponses(result, localPages, (localPage) => globalPages[localPage - 1] || localPage)
+        );
+      } catch (err: any) {
+        if (this.isResourceExhaustedError(err) && globalPages.length > 1) {
+          const mid = Math.ceil(globalPages.length / 2);
+          queue.unshift(globalPages.slice(mid), globalPages.slice(0, mid));
+          warnings.push('SPLIT_BATCH_BY_RESOURCE');
+          continue;
+        }
+        console.warn(`[OCR] Split batch failed for pages ${globalPages.join(',')}:`, err?.message || err);
+      } finally {
+        subsetBuffer = Buffer.alloc(0);
+      }
     }
 
-    const confidence = confCount > 0 ? totalConfidence / confCount : 0.7;
-    console.log(`[OCR] Extracted ${fullText.length} chars from ${maxPages} pages, confidence: ${(confidence * 100).toFixed(1)}%`);
+    return { pages: out, warnings };
+  }
 
-    return {
-      text: fullText.trim(),
-      pageCount: maxPages,
-      confidence,
-    };
+  private async buildPdfSubset(sourcePdf: any, globalPages: number[]): Promise<Buffer> {
+    const { PDFDocument } = require('pdf-lib');
+    const subset = await PDFDocument.create();
+    const indices = globalPages.map((p) => Math.max(0, p - 1));
+    const copied = await subset.copyPages(sourcePdf, indices);
+    copied.forEach((page: any) => subset.addPage(page));
+    const bytes = await subset.save({ useObjectStreams: false });
+    return Buffer.from(bytes);
+  }
+
+  private collectPdfResponses(result: any, requestedPages: number[], pageResolver: (page: number) => number): OcrPdfPageResult[] {
+    const out: OcrPdfPageResult[] = [];
+    const responses = result?.responses?.[0]?.responses || [];
+
+    for (let i = 0; i < responses.length; i++) {
+      const response = responses[i];
+      const resolvedPage = pageResolver(requestedPages[i] ?? i + 1);
+      const text = String(response?.fullTextAnnotation?.text || '').trim();
+      const blocks = response?.fullTextAnnotation?.pages?.flatMap((p: any) => p.blocks || []) || [];
+      const confs = blocks
+        .map((b: any) => b?.confidence)
+        .filter((c: any): c is number => typeof c === 'number' && Number.isFinite(c));
+      const confidence = confs.length > 0
+        ? confs.reduce((sum: number, c: number) => sum + c, 0) / confs.length
+        : 0.7;
+
+      out.push({ page: resolvedPage, text, confidence });
+    }
+
+    return out;
+  }
+
+  private isPayloadLimitError(err: any): boolean {
+    const msg = String(err?.message || '').toLowerCase();
+    return msg.includes('request payload size exceeds the limit') || msg.includes('41943040');
+  }
+
+  private isResourceExhaustedError(err: any): boolean {
+    const msg = String(err?.message || '').toLowerCase();
+    return err?.code === 8 || msg.includes('resource_exhausted');
   }
 
   /**
