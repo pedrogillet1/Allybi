@@ -163,7 +163,44 @@ export interface ChatResult {
   answerClass?: AnswerClass;
   navType?: NavType;
   generatedTitle?: string;
+  answerProvisional?: boolean;
+  answerSourceMode?: "chunk" | "fallback_raw_text" | "global_relaxed";
+  indexingInProgress?: boolean;
+  scopeRelaxed?: boolean;
+  scopeRelaxReason?: string;
+  fallbackReasonCode?: string;
 }
+
+type NoEvidenceKind = 'processing' | 'failed' | 'ocr_or_empty' | 'scoped_not_found' | 'generic';
+
+type NoEvidenceDoc = {
+  id: string;
+  filename: string | null;
+  mimeType: string | null;
+  status: string;
+  rawText: string | null;
+  previewText: string | null;
+};
+
+type NoEvidenceDiagnostic = {
+  kind: NoEvidenceKind;
+  message: string;
+  docs: NoEvidenceDoc[];
+  hasFallbackText: boolean;
+  isStillProcessing: boolean;
+  chunkCount: number;
+};
+
+type ProvisionalAnswer = {
+  text: string;
+  sources: Array<{ documentId: string; filename: string; mimeType: string | null; page: null }>;
+  metadata: {
+    answerProvisional: true;
+    answerSourceMode: "fallback_raw_text";
+    indexingInProgress: true;
+    fallbackReasonCode: "indexing_in_progress";
+  };
+};
 
 /**
  * The AI engine contract PrismaChatService expects.
@@ -13338,6 +13375,9 @@ export class PrismaChatService {
     const focusFilenames = referentialFollowUp ? this.extractDocumentFocusFromHistory(history) : [];
     const topicEntities = referentialFollowUp ? this.extractTopicEntitiesFromHistory(history) : [];
 
+    let scopeRelaxed = false;
+    let scopeRelaxReason: string | undefined;
+
     // Retrieve relevant document chunks (higher topK for better coverage)
     let chunks = await this.retrieveRelevantChunks(req.userId, contextualQuery, 15, {
       boostFilenames: focusFilenames,
@@ -13371,13 +13411,27 @@ export class PrismaChatService {
       }
     }
 
+    if (useScope && chunks.length === 0 && this.scopeRelaxOnIndexingEnabled()) {
+      const globalQuery = this.expandQueryFromHistory(req.message, history);
+      const relaxedChunks = await this.retrieveRelevantChunks(req.userId, globalQuery, 15, {
+        boostFilenames: focusFilenames,
+        boostTopicEntities: topicEntities,
+      });
+      if (relaxedChunks.length > 0) {
+        chunks = relaxedChunks;
+        scopeRelaxed = true;
+        scopeRelaxReason = 'scoped_indexing_or_empty';
+      }
+    }
+
     if (chunks.length === 0 && (hasAttachments || useScope)) {
-      const diagnosticText =
-        await this.buildNoEvidenceDiagnosticMessage({
+      const diagnostic =
+        await this.buildNoEvidenceDiagnostic({
           userId: req.userId,
           documentIds: hasAttachments ? attachedDocumentIds : scopeDocIds,
           language: req.preferredLanguage,
-        }) || this.localizeNoEvidenceMessage('generic', req.preferredLanguage);
+        });
+      const diagnosticText = diagnostic?.message || this.localizeNoEvidenceMessage('generic', req.preferredLanguage);
 
       let chatAttachmentMeta: Record<string, unknown> | undefined;
       if (attachedDocumentIds.length > 0) {
@@ -13393,6 +13447,62 @@ export class PrismaChatService {
             mimeType: d.mimeType || 'application/octet-stream',
           })),
         };
+      }
+
+      if (
+        this.provisionalIndexingAnswersEnabled() &&
+        diagnostic?.kind === 'processing' &&
+        diagnostic.hasFallbackText
+      ) {
+        const provisional = await this.generateProvisionalIndexingAnswer({
+          traceId,
+          userId: req.userId,
+          conversationId,
+          query: req.message,
+          language: req.preferredLanguage,
+          docs: diagnostic.docs,
+          context: req.context,
+          meta: req.meta,
+        });
+        if (provisional) {
+          const userMsg = await this.createMessage({
+            conversationId,
+            role: 'user',
+            content: req.message,
+            userId: req.userId,
+            ...(chatAttachmentMeta ? { metadata: chatAttachmentMeta } : {}),
+          });
+          const assistantMsg = await this.createMessage({
+            conversationId,
+            role: 'assistant',
+            content: provisional.text,
+            userId: req.userId,
+            metadata: {
+              sources: provisional.sources,
+              attachments: [],
+              answerMode: 'general_answer' as AnswerMode,
+              answerClass: 'GENERAL' as AnswerClass,
+              navType: null,
+              ...provisional.metadata,
+            },
+          });
+
+          return {
+            conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: provisional.text,
+            attachmentsPayload: [],
+            sources: provisional.sources,
+            answerMode: 'general_answer' as AnswerMode,
+            answerClass: 'GENERAL' as AnswerClass,
+            navType: null,
+            answerProvisional: true,
+            answerSourceMode: 'fallback_raw_text',
+            indexingInProgress: true,
+            fallbackReasonCode: 'indexing_in_progress',
+          };
+        }
       }
 
       const userMsg = await this.createMessage({
@@ -13420,6 +13530,7 @@ export class PrismaChatService {
         answerMode: 'general_answer' as AnswerMode,
         answerClass: 'GENERAL' as AnswerClass,
         navType: null,
+        fallbackReasonCode: diagnostic?.kind === 'processing' ? 'indexing_in_progress' : undefined,
       };
     }
 
@@ -13528,6 +13639,9 @@ export class PrismaChatService {
     cleanedText = this.fixCurrencyArtifacts(cleanedText);
     cleanedText = this.stripRawFilenames(cleanedText);
     cleanedText = this.stripRawPaths(cleanedText);
+    if (scopeRelaxed) {
+      cleanedText = `${this.localizeScopeRelaxNotice(req.preferredLanguage)}\n\n${cleanedText}`.trim();
+    }
     cleanedText = this.enforceBrandName(cleanedText);
 
     // Empty response safety net
@@ -13579,8 +13693,8 @@ export class PrismaChatService {
       metadata: answerMode === 'nav_pills'
         ? { listing: this.sourcesToListingItems(reorderedSources), sources: [], attachments: [], answerMode, answerClass, navType }
         : answerClass === 'DOCUMENT'
-          ? { sources: reorderedSources, attachments: [], answerMode, answerClass, navType }
-          : { sources: [], attachments: [], answerMode, answerClass, navType },
+          ? { sources: reorderedSources, attachments: [], answerMode, answerClass, navType, ...(scopeRelaxed ? { scopeRelaxed: true, scopeRelaxReason } : {}) }
+          : { sources: [], attachments: [], answerMode, answerClass, navType, ...(scopeRelaxed ? { scopeRelaxed: true, scopeRelaxReason } : {}) },
     });
 
     return {
@@ -13594,6 +13708,9 @@ export class PrismaChatService {
       answerMode,
       answerClass,
       navType,
+      answerSourceMode: scopeRelaxed ? 'global_relaxed' : 'chunk',
+      scopeRelaxed,
+      scopeRelaxReason,
     };
   }
 
@@ -13668,7 +13785,7 @@ export class PrismaChatService {
   }
 
   private localizeNoEvidenceMessage(
-    kind: 'processing' | 'failed' | 'ocr_or_empty' | 'scoped_not_found' | 'generic',
+    kind: NoEvidenceKind,
     language?: 'en' | 'pt' | 'es',
   ): string {
     const lang = language || 'en';
@@ -13718,24 +13835,193 @@ export class PrismaChatService {
     return 'I could not find searchable content in the selected documents yet. Please wait for indexing to finish and try again.';
   }
 
-  private async buildNoEvidenceDiagnosticMessage(params: {
+  private indexingChunkWaitMs(): number {
+    const raw = Number(process.env.CHAT_CHUNK_WAIT_MS ?? '5000');
+    if (!Number.isFinite(raw)) return 5000;
+    return Math.max(1000, Math.min(30000, Math.trunc(raw)));
+  }
+
+  private provisionalIndexingAnswersEnabled(): boolean {
+    return (process.env.CHAT_ENABLE_PROVISIONAL_INDEXING_ANSWERS ?? 'true') !== 'false';
+  }
+
+  private scopeRelaxOnIndexingEnabled(): boolean {
+    return (process.env.CHAT_SCOPE_RELAX_ON_INDEXING ?? 'true') !== 'false';
+  }
+
+  private localizeProvisionalIndexingNotice(language?: 'en' | 'pt' | 'es'): string {
+    const lang = language || 'en';
+    if (lang === 'pt') {
+      return 'Resposta provisória: usei o texto já disponível enquanto a indexação finaliza.';
+    }
+    if (lang === 'es') {
+      return 'Respuesta provisional: utilicé el texto ya disponible mientras termina la indexación.';
+    }
+    return 'Provisional answer: I used currently available text while indexing finishes.';
+  }
+
+  private localizeScopeRelaxNotice(language?: 'en' | 'pt' | 'es'): string {
+    const lang = language || 'en';
+    if (lang === 'pt') {
+      return 'Não encontrei evidência indexada suficiente apenas nos arquivos selecionados, então também consultei outros documentos indexados.';
+    }
+    if (lang === 'es') {
+      return 'No encontré evidencia indexada suficiente solo en los archivos seleccionados, así que también consulté otros documentos indexados.';
+    }
+    return 'I could not find enough indexed evidence only in the selected files, so I also checked other indexed documents.';
+  }
+
+  private buildFallbackTextCandidates(query: string, docs: NoEvidenceDoc[]): Array<{ doc: NoEvidenceDoc; text: string; score: number }> {
+    const terms = String(query || '')
+      .toLowerCase()
+      .replace(/[^\w\s]/g, ' ')
+      .split(/\s+/)
+      .map((w) => w.trim())
+      .filter((w) => w.length > 2 && !STOP_WORDS.has(w))
+      .slice(0, 12);
+
+    const scored = docs
+      .map((doc) => {
+        const text = String(doc.rawText || doc.previewText || '').trim();
+        if (!text) return null;
+        const lower = text.toLowerCase();
+        const termHits = terms.reduce((acc, term) => (lower.includes(term) ? acc + 1 : acc), 0);
+        const score = termHits > 0 ? termHits : 0.1;
+        return { doc, text, score };
+      })
+      .filter((row): row is { doc: NoEvidenceDoc; text: string; score: number } => Boolean(row))
+      .sort((a, b) => b.score - a.score || b.text.length - a.text.length);
+
+    return scored.slice(0, 3);
+  }
+
+  private async generateProvisionalIndexingAnswer(params: {
+    traceId: string;
+    userId: string;
+    conversationId: string;
+    query: string;
+    language?: 'en' | 'pt' | 'es';
+    docs: NoEvidenceDoc[];
+    context?: Record<string, unknown>;
+    meta?: Record<string, unknown>;
+  }): Promise<ProvisionalAnswer | null> {
+    const candidates = this.buildFallbackTextCandidates(params.query, params.docs);
+    if (candidates.length === 0) return null;
+
+    const corpus = candidates
+      .map((row, idx) => {
+        const title = row.doc.filename || `Document ${idx + 1}`;
+        const text = row.text.slice(0, 2400);
+        return `Document ${idx + 1}: ${title}\n${text}`;
+      })
+      .join('\n\n---\n\n')
+      .slice(0, 9000);
+
+    const lang = params.language || 'en';
+    const languageInstruction =
+      lang === 'pt'
+        ? 'Responda em português.'
+        : lang === 'es'
+          ? 'Responde en español.'
+          : 'Respond in English.';
+
+    const systemPrompt = [
+      'You are Allybi.',
+      'You must answer ONLY using the provided DOCUMENT EXTRACTS.',
+      'If information is missing, explicitly say what is not available.',
+      'Do not invent facts.',
+      languageInstruction,
+    ].join(' ');
+
+    try {
+      const out = await this.engine.generate({
+        traceId: `${params.traceId}:provisional`,
+        userId: params.userId,
+        conversationId: params.conversationId,
+        context: params.context,
+        meta: {
+          ...(params.meta || {}),
+          answerProvisional: true,
+          answerSourceMode: 'fallback_raw_text',
+          indexingInProgress: true,
+          fallbackReasonCode: 'indexing_in_progress',
+        },
+        messages: [
+          { role: 'system', content: systemPrompt },
+          {
+            role: 'user',
+            content: `QUESTION:\n${params.query}\n\nDOCUMENT EXTRACTS:\n${corpus}`,
+          },
+        ],
+      });
+
+      const llmText = String(out?.text || '').trim();
+      if (!llmText) return null;
+
+      const notice = this.localizeProvisionalIndexingNotice(params.language);
+      const finalText = `${notice}\n\n${llmText}`.trim();
+      const sources = candidates.map((row) => ({
+        documentId: row.doc.id,
+        filename: row.doc.filename || 'Document',
+        mimeType: row.doc.mimeType || null,
+        page: null as null,
+      }));
+
+      return {
+        text: finalText,
+        sources,
+        metadata: {
+          answerProvisional: true,
+          answerSourceMode: 'fallback_raw_text',
+          indexingInProgress: true,
+          fallbackReasonCode: 'indexing_in_progress',
+        },
+      };
+    } catch (error: any) {
+      console.warn('[Chat] Provisional indexing answer generation failed', {
+        conversationId: params.conversationId,
+        userId: params.userId,
+        error: error?.message || String(error || 'unknown'),
+      });
+      return null;
+    }
+  }
+
+  private async buildNoEvidenceDiagnostic(params: {
     userId: string;
     documentIds: string[];
     language?: 'en' | 'pt' | 'es';
-  }): Promise<string | null> {
+  }): Promise<NoEvidenceDiagnostic | null> {
     const docIds = [...new Set((params.documentIds || []).map((id) => String(id || '').trim()).filter(Boolean))];
     if (docIds.length === 0) return null;
 
     const docs = await prisma.document.findMany({
       where: { id: { in: docIds }, userId: params.userId },
-      select: { id: true, status: true },
+      select: {
+        id: true,
+        filename: true,
+        mimeType: true,
+        status: true,
+        rawText: true,
+        previewText: true,
+      },
     });
     if (docs.length === 0) return null;
 
-    const statuses = new Set(docs.map((d) => String(d.status || '').toLowerCase()));
+    const mappedDocs: NoEvidenceDoc[] = docs.map((d) => ({
+      id: d.id,
+      filename: d.filename || null,
+      mimeType: d.mimeType || null,
+      status: String(d.status || ''),
+      rawText: d.rawText || null,
+      previewText: d.previewText || null,
+    }));
+
+    const statuses = new Set(mappedDocs.map((d) => String(d.status || '').toLowerCase()));
     const chunkCount = await prisma.documentChunk.count({
-      where: { documentId: { in: docs.map((d) => d.id) } },
+      where: { documentId: { in: mappedDocs.map((d) => d.id) } },
     });
+    const hasFallbackText = mappedDocs.some((d) => String(d.rawText || d.previewText || '').trim().length > 0);
 
     const isStillProcessing =
       statuses.has('uploading') ||
@@ -13743,16 +14029,33 @@ export class PrismaChatService {
       statuses.has('processing') ||
       statuses.has('enriching') ||
       statuses.has('indexing');
+
+    let kind: NoEvidenceKind = 'scoped_not_found';
     if (isStillProcessing) {
-      return this.localizeNoEvidenceMessage('processing', params.language);
+      kind = 'processing';
+    } else if (statuses.has('failed')) {
+      kind = 'failed';
+    } else if (statuses.has('skipped') || chunkCount === 0) {
+      kind = 'ocr_or_empty';
     }
-    if (statuses.has('failed')) {
-      return this.localizeNoEvidenceMessage('failed', params.language);
-    }
-    if (statuses.has('skipped') || chunkCount === 0) {
-      return this.localizeNoEvidenceMessage('ocr_or_empty', params.language);
-    }
-    return this.localizeNoEvidenceMessage('scoped_not_found', params.language);
+
+    return {
+      kind,
+      message: this.localizeNoEvidenceMessage(kind, params.language),
+      docs: mappedDocs,
+      hasFallbackText,
+      isStillProcessing,
+      chunkCount,
+    };
+  }
+
+  private async buildNoEvidenceDiagnosticMessage(params: {
+    userId: string;
+    documentIds: string[];
+    language?: 'en' | 'pt' | 'es';
+  }): Promise<string | null> {
+    const diagnostic = await this.buildNoEvidenceDiagnostic(params);
+    return diagnostic?.message ?? null;
   }
 
   /**
@@ -17283,7 +17586,7 @@ export class PrismaChatService {
 
     // If user attached documents, wait for their chunks to be available (processing is async)
     if (hasAttachments) {
-      const maxWaitMs = 15000;
+      const maxWaitMs = this.indexingChunkWaitMs();
       const pollMs = 1000;
       const startWait = Date.now();
       let chunksReady = false;
@@ -17308,12 +17611,13 @@ export class PrismaChatService {
       if (!chunksReady) {
         console.warn('[Chat] Attached documents have no chunks after wait', attachedDocumentIds);
 
-        const diagnosticText =
-          await this.buildNoEvidenceDiagnosticMessage({
+        const diagnostic =
+          await this.buildNoEvidenceDiagnostic({
             userId: params.req.userId,
             documentIds: attachedDocumentIds,
             language: params.req.preferredLanguage,
-          }) || this.localizeNoEvidenceMessage('processing', params.req.preferredLanguage);
+          });
+        const diagnosticText = diagnostic?.message || this.localizeNoEvidenceMessage('processing', params.req.preferredLanguage);
 
         let attachmentMeta: Record<string, unknown> | undefined;
         if (attachedDocumentIds.length > 0) {
@@ -17329,6 +17633,71 @@ export class PrismaChatService {
               mimeType: d.mimeType || 'application/octet-stream',
             })),
           };
+        }
+
+        if (
+          this.provisionalIndexingAnswersEnabled() &&
+          diagnostic?.kind === 'processing' &&
+          diagnostic.hasFallbackText
+        ) {
+          const provisional = await this.generateProvisionalIndexingAnswer({
+            traceId,
+            userId: params.req.userId,
+            conversationId,
+            query: params.req.message,
+            language: params.req.preferredLanguage,
+            docs: diagnostic.docs,
+            context: params.req.context,
+            meta: params.req.meta,
+          });
+          if (provisional) {
+            const userMsg = existingUserMsgId
+              ? { id: existingUserMsgId }
+              : await this.createMessage({
+                conversationId,
+                role: 'user',
+                content: params.req.message,
+                userId: params.req.userId,
+                ...(attachmentMeta ? { metadata: attachmentMeta } : {}),
+              });
+
+            if (params.sink.isOpen()) {
+              params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+              params.sink.write({ event: 'sources', data: { sources: provisional.sources } } as any);
+              params.sink.write({ event: 'delta', data: { text: provisional.text } } as any);
+            }
+
+            const assistantMsg = await this.createMessage({
+              conversationId,
+              role: 'assistant',
+              content: provisional.text,
+              userId: params.req.userId,
+              metadata: {
+                sources: provisional.sources,
+                attachments: [],
+                answerMode: 'general_answer' as AnswerMode,
+                answerClass: 'GENERAL' as AnswerClass,
+                navType: null,
+                ...provisional.metadata,
+              },
+            });
+
+            return {
+              conversationId,
+              userMessageId: userMsg.id,
+              assistantMessageId: assistantMsg.id,
+              assistantText: provisional.text,
+              attachmentsPayload: [],
+              sources: provisional.sources,
+              answerMode: 'general_answer' as AnswerMode,
+              answerClass: 'GENERAL' as AnswerClass,
+              navType: null,
+              answerProvisional: true,
+              answerSourceMode: 'fallback_raw_text',
+              indexingInProgress: true,
+              fallbackReasonCode: 'indexing_in_progress',
+            };
+          }
         }
 
         const userMsg = existingUserMsgId
@@ -17364,6 +17733,7 @@ export class PrismaChatService {
           answerMode: 'general_answer' as AnswerMode,
           answerClass: 'GENERAL' as AnswerClass,
           navType: null,
+          fallbackReasonCode: diagnostic?.kind === 'processing' ? 'indexing_in_progress' : undefined,
         };
       }
     }
@@ -17467,6 +17837,9 @@ export class PrismaChatService {
     const focusFilenames = referentialFollowUp ? this.extractDocumentFocusFromHistory(history) : [];
     const topicEntities = referentialFollowUp ? this.extractTopicEntitiesFromHistory(history) : [];
 
+    let scopeRelaxed = false;
+    let scopeRelaxReason: string | undefined;
+
     // Retrieve relevant document chunks (higher topK for better coverage)
     this.emitStage(params.sink, {
       stage: 'retrieving',
@@ -17508,13 +17881,27 @@ export class PrismaChatService {
       }
     }
 
+    if (useScope && chunks.length === 0 && this.scopeRelaxOnIndexingEnabled()) {
+      const globalQuery = this.expandQueryFromHistory(params.req.message, history);
+      const relaxedChunks = await this.retrieveRelevantChunks(params.req.userId, globalQuery, 15, {
+        boostFilenames: focusFilenames,
+        boostTopicEntities: topicEntities,
+      });
+      if (relaxedChunks.length > 0) {
+        chunks = relaxedChunks;
+        scopeRelaxed = true;
+        scopeRelaxReason = 'scoped_indexing_or_empty';
+      }
+    }
+
     if (chunks.length === 0 && (hasAttachments || useScope)) {
-      const diagnosticText =
-        await this.buildNoEvidenceDiagnosticMessage({
+      const diagnostic =
+        await this.buildNoEvidenceDiagnostic({
           userId: params.req.userId,
           documentIds: hasAttachments ? attachedDocumentIds : scopeDocIds,
           language: params.req.preferredLanguage,
-        }) || this.localizeNoEvidenceMessage('generic', params.req.preferredLanguage);
+        });
+      const diagnosticText = diagnostic?.message || this.localizeNoEvidenceMessage('generic', params.req.preferredLanguage);
 
       let attachmentMeta: Record<string, unknown> | undefined;
       if (attachedDocumentIds.length > 0) {
@@ -17528,8 +17915,73 @@ export class PrismaChatService {
             id: d.id,
             filename: d.filename || 'Document',
             mimeType: d.mimeType || 'application/octet-stream',
-          })),
-        };
+            })),
+          };
+        }
+
+      if (
+        this.provisionalIndexingAnswersEnabled() &&
+        diagnostic?.kind === 'processing' &&
+        diagnostic.hasFallbackText
+      ) {
+        const provisional = await this.generateProvisionalIndexingAnswer({
+          traceId,
+          userId: params.req.userId,
+          conversationId,
+          query: params.req.message,
+          language: params.req.preferredLanguage,
+          docs: diagnostic.docs,
+          context: params.req.context,
+          meta: params.req.meta,
+        });
+        if (provisional) {
+          const userMsg = existingUserMsgId
+            ? { id: existingUserMsgId }
+            : await this.createMessage({
+              conversationId,
+              role: 'user',
+              content: params.req.message,
+              userId: params.req.userId,
+              ...(attachmentMeta ? { metadata: attachmentMeta } : {}),
+            });
+
+          if (params.sink.isOpen()) {
+            params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+            params.sink.write({ event: 'sources', data: { sources: provisional.sources } } as any);
+            params.sink.write({ event: 'delta', data: { text: provisional.text } } as any);
+          }
+
+          const assistantMsg = await this.createMessage({
+            conversationId,
+            role: 'assistant',
+            content: provisional.text,
+            userId: params.req.userId,
+            metadata: {
+              sources: provisional.sources,
+              attachments: [],
+              answerMode: 'general_answer' as AnswerMode,
+              answerClass: 'GENERAL' as AnswerClass,
+              navType: null,
+              ...provisional.metadata,
+            },
+          });
+
+          return {
+            conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: provisional.text,
+            attachmentsPayload: [],
+            sources: provisional.sources,
+            answerMode: 'general_answer' as AnswerMode,
+            answerClass: 'GENERAL' as AnswerClass,
+            navType: null,
+            answerProvisional: true,
+            answerSourceMode: 'fallback_raw_text',
+            indexingInProgress: true,
+            fallbackReasonCode: 'indexing_in_progress',
+          };
+        }
       }
 
       const userMsg = existingUserMsgId
@@ -17565,6 +18017,7 @@ export class PrismaChatService {
         answerMode: 'general_answer' as AnswerMode,
         answerClass: 'GENERAL' as AnswerClass,
         navType: null,
+        fallbackReasonCode: diagnostic?.kind === 'processing' ? 'indexing_in_progress' : undefined,
       };
     }
 
@@ -17715,6 +18168,9 @@ export class PrismaChatService {
     cleanedText = this.fixCurrencyArtifacts(cleanedText);
     cleanedText = this.stripRawFilenames(cleanedText);
     cleanedText = this.stripRawPaths(cleanedText);
+    if (scopeRelaxed) {
+      cleanedText = `${this.localizeScopeRelaxNotice(preferredLanguage)}\n\n${cleanedText}`.trim();
+    }
 
     // Empty response safety net
     if (!cleanedText.trim()) {
@@ -17780,8 +18236,8 @@ export class PrismaChatService {
       metadata: answerMode === 'nav_pills'
         ? { listing: this.sourcesToListingItems(reorderedSources), sources: [], attachments: [], answerMode, answerClass, navType }
         : answerClass === 'DOCUMENT'
-          ? { sources: reorderedSources, attachments: [], answerMode, answerClass, navType, ...(followups.length ? { followups } : {}) }
-          : { sources: [], attachments: [], answerMode, answerClass, navType, ...(followups.length ? { followups } : {}) },
+          ? { sources: reorderedSources, attachments: [], answerMode, answerClass, navType, ...(followups.length ? { followups } : {}), ...(scopeRelaxed ? { scopeRelaxed: true, scopeRelaxReason } : {}) }
+          : { sources: [], attachments: [], answerMode, answerClass, navType, ...(followups.length ? { followups } : {}), ...(scopeRelaxed ? { scopeRelaxed: true, scopeRelaxReason } : {}) },
     });
 
     const generatedTitle = await this.autoTitleConversationIfNeeded({
@@ -17801,6 +18257,9 @@ export class PrismaChatService {
       answerMode,
       answerClass,
       navType,
+      answerSourceMode: scopeRelaxed ? 'global_relaxed' : 'chunk',
+      scopeRelaxed,
+      scopeRelaxReason,
       generatedTitle,
     };
   }
