@@ -614,103 +614,106 @@ function runExtractor(
     sheetName?: string;
     frozenSelection?: unknown;
   },
-): unknown {
+): { value: unknown; localeConversions?: string[] } {
   switch (extractor.type) {
     case "A1_RANGE": {
       const ranges = extractA1Ranges(text);
-      if (ranges.length > 0) return ranges.length === 1 ? ranges[0] : ranges[0];
+      if (ranges.length > 0)
+        return { value: ranges.length === 1 ? ranges[0] : ranges[0] };
 
       // Fallback to viewer context
       if (viewerContext.selection) {
         const sel = viewerContext.selection as any;
-        return sel?.rangeA1 || sel?.a1 || sel?.range || null;
+        return { value: sel?.rangeA1 || sel?.a1 || sel?.range || null };
       }
       if (viewerContext.frozenSelection) {
         const frozen = viewerContext.frozenSelection as any;
-        return frozen?.rangeA1 || frozen?.a1 || frozen?.range || null;
+        return { value: frozen?.rangeA1 || frozen?.a1 || frozen?.range || null };
       }
-      return null;
+      return { value: null };
     }
 
     case "SHEET_NAME": {
       const sheet = extractSheetName(text);
-      if (sheet) return sheet;
-      return viewerContext.sheetName || null;
+      if (sheet) return { value: sheet };
+      return { value: viewerContext.sheetName || null };
     }
 
     case "NUMBER_OR_TEXT":
-      return extractNumberOrText(text);
+      return { value: extractNumberOrText(text) };
 
     case "COLOR":
-      return extractColor(text, lang);
+      return { value: extractColor(text, lang) };
 
     case "FONT_FAMILY":
-      return extractFontFamily(text);
+      return { value: extractFontFamily(text) };
 
     case "FONT_SIZE":
-      return extractFontSize(text);
+      return { value: extractFontSize(text) };
 
     case "CHART_TYPE":
-      return extractChartType(text, lang);
+      return { value: extractChartType(text, lang) };
 
     case "FORMULA": {
       const formulaResult = extractFormula(text, lang);
-      if (!formulaResult) return null;
-      // Stash conversions on a side channel so fillSlots can collect them
-      if (formulaResult.conversions.length > 0) {
-        (runExtractor as any).__lastConversions = formulaResult.conversions;
-      }
-      return formulaResult.formula;
+      if (!formulaResult) return { value: null };
+      return {
+        value: formulaResult.formula,
+        localeConversions:
+          formulaResult.conversions.length > 0
+            ? formulaResult.conversions
+            : undefined,
+      };
     }
 
     case "FORMAT_PATTERN":
-      return extractFormatPattern(text);
+      return { value: extractFormatPattern(text) };
 
     case "HEADING_LEVEL":
-      return extractHeadingLevel(text, lang);
+      return { value: extractHeadingLevel(text, lang) };
 
     case "LANGUAGE":
-      return extractLanguage(text);
+      return { value: extractLanguage(text) };
 
     case "BOOLEAN_FLAG":
-      return extractBooleanFlag(text, extractor.out);
+      return { value: extractBooleanFlag(text, extractor.out) };
 
     case "STYLE_NAME":
-      return extractLocatorText(text);
+      return { value: extractLocatorText(text) };
 
     case "LOCATOR_TEXT":
-      return extractLocatorText(text);
+      return { value: extractLocatorText(text) };
 
     case "SORT_SPEC":
-      return extractSortSpec(text);
+      return { value: extractSortSpec(text) };
 
     case "PERCENTAGE":
-      return extractPercentage(text);
+      return { value: extractPercentage(text) };
 
     case "ALIGNMENT":
-      return extractAlignment(text);
+      return { value: extractAlignment(text) };
 
     case "AXIS": {
       const low = text.toLowerCase();
-      if (/\brows?\b|\blinhas?\b/.test(low)) return "rows";
-      if (/\bcolumns?\b|\bcolunas?\b/.test(low)) return "columns";
-      return null;
+      if (/\brows?\b|\blinhas?\b/.test(low)) return { value: "rows" };
+      if (/\bcolumns?\b|\bcolunas?\b/.test(low)) return { value: "columns" };
+      return { value: null };
     }
 
     case "SCOPE":
-      return extractScope(text);
+      return { value: extractScope(text) };
 
     case "TEXT_CASE":
-      return extractTextCase(text);
+      return { value: extractTextCase(text) };
 
     case "LIST_TYPE":
-      return extractListType(text);
+      return { value: extractListType(text) };
 
     case "DIRECTION":
-      return extractDirection(text);
+      return { value: extractDirection(text) };
 
     default:
-      return null;
+      return { value: null };
   }
 }
 
@@ -746,18 +749,13 @@ export function fillSlots(
       }
     }
 
-    // Clear side channel before extraction
-    (runExtractor as any).__lastConversions = undefined;
-
-    const value = runExtractor(extractor, text, lang, viewerContext);
-
-    // Collect locale conversions from formula extraction
-    const conversions = (runExtractor as any).__lastConversions as
-      | string[]
-      | undefined;
-    if (conversions?.length) {
-      localeConversions = [...(localeConversions || []), ...conversions];
-      (runExtractor as any).__lastConversions = undefined;
+    const extracted = runExtractor(extractor, text, lang, viewerContext);
+    const value = extracted.value;
+    if (extracted.localeConversions?.length) {
+      localeConversions = [
+        ...(localeConversions || []),
+        ...extracted.localeConversions,
+      ];
     }
 
     if (value !== null && value !== undefined) {

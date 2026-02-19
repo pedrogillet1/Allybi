@@ -148,6 +148,9 @@ export interface LLMCompletionResponse {
 
   usage?: LLMUsage;
 
+  /** Normalized provider finish reason when available (stop, length, safety, etc). */
+  finishReason?: string;
+
   /** Provider request id for traceability */
   requestId?: string;
 
@@ -173,6 +176,8 @@ export interface LLMStreamResponse {
   toolCallRequest?: LLMToolCallRequest;
 
   usage?: LLMUsage;
+  /** Normalized provider finish reason when available (stop, length, safety, etc). */
+  finishReason?: string;
   requestId?: string;
 }
 

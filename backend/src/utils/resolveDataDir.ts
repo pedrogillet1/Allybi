@@ -111,14 +111,11 @@ export function listDataFiles(dataDir: string): string[] {
  * Required data files for PromptConfig (paths relative to data_banks/)
  */
 export const REQUIRED_PROMPT_CONFIG_FILES = [
-  "policies/system_prompts.any.json",
-  "rendering/answer_styles.any.json",
-  "quality/answer_examples.any.json",
-  "rendering/markdown_components.any.json",
-  "rendering/table_presets.any.json",
-  "policies/validation_policies.any.json",
-  "policies/retrieval_policies.any.json",
-  "microcopy/error_messages.any.json",
+  "prompts/system_prompt.any.json",
+  "prompts/system_base.any.json",
+  "prompts/prompt_registry.any.json",
+  "prompts/policy_citations.any.json",
+  "manifest/bank_registry.any.json",
 ];
 
 /**

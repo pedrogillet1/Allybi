@@ -3,7 +3,9 @@
     "id": "bank_dependencies",
     "version": "1.0.0",
     "description": "Explicit dependency graph for Koda data banks. Use when you prefer central dependency declaration instead of (or in addition to) per-bank dependsOn in bank_registry. Enables boot-time validation and stable load ordering.",
-    "languages": ["any"],
+    "languages": [
+      "any"
+    ],
     "lastUpdated": "2026-01-26"
   },
   "config": {
@@ -19,194 +21,339 @@
   "categories": {
     "_comment": "Category-level dependencies used to validate loadOrder. Individual bank deps may be stricter.",
     "manifest": [],
-    "schemas": ["manifest"],
-    "normalizers": ["schemas"],
-    "negatives": ["normalizers"],
-    "routing": ["normalizers", "negatives"],
-    "operators": ["routing"],
-    "retrieval": ["routing", "operators", "normalizers", "negatives"],
-    "formatting": ["routing", "operators"],
-    "microcopy": ["formatting"],
-    "overlays": ["routing", "retrieval", "formatting", "microcopy"],
-    "prompts": ["routing", "operators", "formatting"],
-    "quality": ["routing", "retrieval", "formatting", "microcopy", "prompts"],
-    "triggers": ["routing", "operators", "normalizers"],
-    "ambiguity": ["routing", "retrieval", "operators"],
-    "state": ["schemas", "routing"],
-    "probes": ["routing", "retrieval", "formatting", "quality"]
+    "schemas": [
+      "manifest"
+    ],
+    "normalizers": [
+      "schemas"
+    ],
+    "negatives": [
+      "normalizers"
+    ],
+    "routing": [
+      "normalizers",
+      "negatives"
+    ],
+    "operators": [
+      "routing"
+    ],
+    "retrieval": [
+      "routing",
+      "operators",
+      "normalizers",
+      "negatives"
+    ],
+    "formatting": [
+      "routing",
+      "operators"
+    ],
+    "microcopy": [
+      "formatting"
+    ],
+    "overlays": [
+      "routing",
+      "retrieval",
+      "formatting",
+      "microcopy"
+    ],
+    "prompts": [
+      "routing",
+      "operators",
+      "formatting"
+    ],
+    "quality": [
+      "routing",
+      "retrieval",
+      "formatting",
+      "microcopy",
+      "prompts"
+    ],
+    "triggers": [
+      "routing",
+      "operators",
+      "normalizers"
+    ],
+    "ambiguity": [
+      "routing",
+      "retrieval",
+      "operators"
+    ],
+    "state": [
+      "schemas",
+      "routing"
+    ],
+    "probes": [
+      "routing",
+      "retrieval",
+      "formatting",
+      "quality"
+    ]
   },
   "banks": [
     {
       "id": "bank_registry",
-      "dependsOn": ["manifest"],
-      "notes": ["Registry loads after base manifest category is available."]
+      "dependsOn": [
+        "manifest"
+      ],
+      "notes": [
+        "Registry loads after base manifest category is available."
+      ]
     },
     {
       "id": "bank_aliases",
-      "dependsOn": ["bank_registry"]
+      "dependsOn": [
+        "bank_registry"
+      ]
     },
     {
       "id": "environments",
-      "dependsOn": ["bank_registry"]
+      "dependsOn": [
+        "bank_registry"
+      ]
     },
     {
       "id": "feature_flags",
-      "dependsOn": ["environments"]
+      "dependsOn": [
+        "environments"
+      ]
     },
     {
       "id": "bank_schema",
-      "dependsOn": ["bank_registry"]
+      "dependsOn": [
+        "bank_registry"
+      ]
     },
     {
       "id": "router_input_schema",
-      "dependsOn": ["bank_schema"]
+      "dependsOn": [
+        "bank_schema"
+      ]
     },
     {
       "id": "scope_output_schema",
-      "dependsOn": ["router_input_schema"]
+      "dependsOn": [
+        "router_input_schema"
+      ]
     },
     {
       "id": "candidate_filters_schema",
-      "dependsOn": ["scope_output_schema"]
+      "dependsOn": [
+        "scope_output_schema"
+      ]
     },
     {
       "id": "retrieval_output_schema",
-      "dependsOn": ["candidate_filters_schema"]
+      "dependsOn": [
+        "candidate_filters_schema"
+      ]
     },
     {
       "id": "evidence_schema",
-      "dependsOn": ["retrieval_output_schema"]
+      "dependsOn": [
+        "retrieval_output_schema"
+      ]
     },
     {
       "id": "attachment_schema",
-      "dependsOn": ["evidence_schema"]
+      "dependsOn": [
+        "evidence_schema"
+      ]
     },
-
     {
       "id": "query_normalization",
-      "dependsOn": ["bank_schema"]
+      "dependsOn": [
+        "bank_schema"
+      ]
     },
     {
       "id": "tokenization_rules",
-      "dependsOn": ["query_normalization"]
+      "dependsOn": [
+        "query_normalization"
+      ]
     },
     {
       "id": "language_indicators",
-      "dependsOn": ["query_normalization"]
+      "dependsOn": [
+        "query_normalization"
+      ]
     },
     {
       "id": "abbreviations",
-      "dependsOn": ["tokenization_rules"]
+      "dependsOn": [
+        "tokenization_rules"
+      ]
     },
     {
       "id": "synonym_expansion",
-      "dependsOn": ["abbreviations"]
+      "dependsOn": [
+        "abbreviations"
+      ]
     },
     {
       "id": "doc_aliases",
-      "dependsOn": ["filename_normalization"]
+      "dependsOn": [
+        "filename_normalization"
+      ]
     },
     {
       "id": "filename_normalization",
-      "dependsOn": ["tokenization_rules"]
+      "dependsOn": [
+        "tokenization_rules"
+      ]
     },
-
     {
       "id": "negation_and_exclusions",
-      "dependsOn": ["tokenization_rules", "stopwords_query"]
+      "dependsOn": [
+        "tokenization_rules",
+        "stopwords_query"
+      ]
     },
     {
       "id": "denylist_terms",
-      "dependsOn": ["tokenization_rules"]
+      "dependsOn": [
+        "tokenization_rules"
+      ]
     },
     {
       "id": "stopwords_query",
-      "dependsOn": ["query_normalization"],
+      "dependsOn": [
+        "query_normalization"
+      ],
       "optional": true
     },
     {
       "id": "weak_terms",
-      "dependsOn": ["query_normalization"],
+      "dependsOn": [
+        "query_normalization"
+      ],
       "optional": true
     },
     {
       "id": "ambiguous_terms",
-      "dependsOn": ["query_normalization"],
+      "dependsOn": [
+        "query_normalization"
+      ],
       "optional": true
     },
-
     {
       "id": "intent_patterns",
-      "dependsOn": ["tokenization_rules", "negation_and_exclusions"]
+      "dependsOn": [
+        "tokenization_rules",
+        "negation_and_exclusions"
+      ]
     },
     {
       "id": "operator_families",
-      "dependsOn": ["intent_patterns"]
+      "dependsOn": [
+        "intent_patterns"
+      ]
     },
     {
       "id": "operator_contracts",
-      "dependsOn": ["operator_families"]
+      "dependsOn": [
+        "operator_families"
+      ]
     },
     {
       "id": "operator_output_shapes",
-      "dependsOn": ["operator_contracts"]
+      "dependsOn": [
+        "operator_contracts"
+      ]
     },
     {
       "id": "operator_constraints",
-      "dependsOn": ["operator_contracts"]
+      "dependsOn": [
+        "operator_contracts"
+      ]
     },
     {
       "id": "operator_negatives",
-      "dependsOn": ["operator_families", "intent_patterns"]
+      "dependsOn": [
+        "operator_families",
+        "intent_patterns"
+      ]
     },
     {
       "id": "routing_priority",
-      "dependsOn": ["intent_patterns", "operator_families"]
+      "dependsOn": [
+        "intent_patterns",
+        "operator_families"
+      ]
     },
     {
       "id": "operator_priority",
-      "dependsOn": ["operator_families"]
+      "dependsOn": [
+        "operator_families"
+      ]
     },
     {
       "id": "followup_detection",
-      "dependsOn": ["intent_patterns", "language_indicators"],
+      "dependsOn": [
+        "intent_patterns",
+        "language_indicators"
+      ],
       "optional": false
     },
     {
       "id": "query_rewrite",
-      "dependsOn": ["tokenization_rules", "abbreviations", "synonym_expansion"]
+      "dependsOn": [
+        "tokenization_rules",
+        "abbreviations",
+        "synonym_expansion"
+      ]
     },
     {
       "id": "scope_resolution",
-      "dependsOn": ["query_rewrite", "negation_and_exclusions", "doc_aliases"]
+      "dependsOn": [
+        "query_rewrite",
+        "negation_and_exclusions",
+        "doc_aliases"
+      ]
     },
     {
       "id": "candidate_filters",
-      "dependsOn": ["scope_resolution"]
+      "dependsOn": [
+        "scope_resolution"
+      ]
     },
-
     {
       "id": "semantic_search_config",
-      "dependsOn": ["candidate_filters", "chunking_rules", "table_extraction_rules"]
+      "dependsOn": [
+        "candidate_filters",
+        "chunking_rules",
+        "table_extraction_rules"
+      ]
     },
     {
       "id": "retrieval_ranker_config",
-      "dependsOn": ["semantic_search_config"]
+      "dependsOn": [
+        "semantic_search_config"
+      ]
     },
     {
       "id": "evidence_packaging",
-      "dependsOn": ["retrieval_ranker_config"]
+      "dependsOn": [
+        "retrieval_ranker_config"
+      ]
     },
-
     {
       "id": "answer_style_policy",
-      "dependsOn": ["banned_phrases", "truncation_and_limits", "followup_templates"]
+      "dependsOn": [
+        "banned_phrases",
+        "truncation_and_limits",
+        "followup_templates"
+      ]
     },
     {
       "id": "render_policy",
-      "dependsOn": ["answer_style_policy", "list_styles", "table_styles", "quote_styles", "citation_styles"]
+      "dependsOn": [
+        "answer_style_policy",
+        "list_styles",
+        "table_styles",
+        "quote_styles",
+        "citation_styles"
+      ]
     },
-
     {
       "id": "quality_gates",
       "dependsOn": [
@@ -224,14 +371,41 @@
         "refusal_phrases"
       ]
     },
-
     {
       "id": "state_update_rules",
-      "dependsOn": ["scope_resolution", "answer_mode_router", "followup_detection"]
+      "dependsOn": [
+        "scope_resolution",
+        "answer_mode_router",
+        "followup_detection"
+      ]
     },
     {
       "id": "memory_decay_rules",
-      "dependsOn": ["conversation_state_schema"]
+      "dependsOn": [
+        "conversation_state_schema"
+      ]
+    },
+    {
+      "id": "memory_policy_tests",
+      "dependsOn": [
+        "memory_policy",
+        "followup_detection",
+        "state_update_rules",
+        "memory_decay_rules",
+        "conversation_state_schema"
+      ]
+    },
+    {
+      "id": "memory_semantic_continuity",
+      "dependsOn": [
+        "memory_policy",
+        "followup_detection",
+        "state_update_rules",
+        "memory_decay_rules",
+        "semantic_search_config",
+        "retrieval_ranker_config",
+        "evidence_packaging"
+      ]
     }
   ],
   "tests": {

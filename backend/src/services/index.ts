@@ -2,8 +2,8 @@
  * Services Layer
  *
  * Architecture:
- * - app/: Controller-facing facades (ChatAppService, DocumentAppService, etc.)
- * - core/: Brain orchestration (kodaOrchestrator → intent → scope → retrieval → compose → gates)
+ * - core/: Shared runtime services (banks, routing, retrieval, compose, enforcement)
+ * - chat/: Canonical chat runtime orchestration path
  * - retrieval/: Vector search, embeddings, ranking
  * - extraction/: Document text extraction (PDF, DOCX, PPTX, XLSX)
  * - ingestion/: Document upload processing

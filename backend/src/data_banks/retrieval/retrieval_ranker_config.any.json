@@ -1,10 +1,15 @@
 {
   "_meta": {
     "id": "retrieval_ranker_config",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Deterministic retrieval ranking configuration for Koda. Combines semantic, lexical, structural, title/type/recency boosts, and negative constraints into a stable scoring model with explicit tie-breakers and diversity controls. Prevents wrong-doc dominance, low-quality chunk promotion, and unstable ranking across runs.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-02-19",
     "owner": "koda-retrieval",
     "compat": ">=1.0.0",
     "changeLog": [
@@ -18,7 +23,12 @@
     "mode": "weighted_hybrid_ranker",
     "neverInventEvidence": true,
     "scoreDeterminism": {
-      "stableSortKeys": ["finalScore", "docId", "locationKey", "chunkId"],
+      "stableSortKeys": [
+        "finalScore",
+        "docId",
+        "locationKey",
+        "chunkId"
+      ],
       "roundingDecimals": 6
     },
     "actionsContract": {
@@ -53,15 +63,65 @@
       "recencyBoost": 0.03
     },
     "normalization": {
-      "semanticScore": { "inputRange": [0.0, 1.0], "outputRange": [0.0, 1.0], "curve": "linear" },
-      "lexicalScore": { "inputRange": [0.0, 1.0], "outputRange": [0.0, 1.0], "curve": "sqrt" },
-      "structuralScore": { "inputRange": [0.0, 1.0], "outputRange": [0.0, 1.0], "curve": "linear" }
+      "semanticScore": {
+        "inputRange": [
+          0,
+          1
+        ],
+        "outputRange": [
+          0,
+          1
+        ],
+        "curve": "linear"
+      },
+      "lexicalScore": {
+        "inputRange": [
+          0,
+          1
+        ],
+        "outputRange": [
+          0,
+          1
+        ],
+        "curve": "sqrt"
+      },
+      "structuralScore": {
+        "inputRange": [
+          0,
+          1
+        ],
+        "outputRange": [
+          0,
+          1
+        ],
+        "curve": "linear"
+      }
     },
     "tieBreakers": [
-      { "id": "prefer_scoped", "type": "signal", "signal": "isScopedMatch", "direction": "desc" },
-      { "id": "prefer_title_match", "type": "score_component", "component": "titleBoost", "direction": "desc" },
-      { "id": "prefer_higher_semantic", "type": "score_component", "component": "semantic", "direction": "desc" },
-      { "id": "prefer_structural_anchor", "type": "signal", "signal": "isAnchorMatch", "direction": "desc" }
+      {
+        "id": "prefer_scoped",
+        "type": "signal",
+        "signal": "isScopedMatch",
+        "direction": "desc"
+      },
+      {
+        "id": "prefer_title_match",
+        "type": "score_component",
+        "component": "titleBoost",
+        "direction": "desc"
+      },
+      {
+        "id": "prefer_higher_semantic",
+        "type": "score_component",
+        "component": "semantic",
+        "direction": "desc"
+      },
+      {
+        "id": "prefer_structural_anchor",
+        "type": "signal",
+        "signal": "isAnchorMatch",
+        "direction": "desc"
+      }
     ],
     "diversification": {
       "enabled": true,
@@ -75,11 +135,22 @@
     },
     "negativeConstraints": {
       "enabled": true,
-      "sources": ["retrieval_negatives"],
-      "hardBlockReasons": ["explicit_doc_lock_violation", "single_doc_intent_violation"],
+      "sources": [
+        "retrieval_negatives"
+      ],
+      "hardBlockReasons": [
+        "explicit_doc_lock_violation",
+        "single_doc_intent_violation"
+      ],
       "softPenalties": [
-        { "reasonCode": "low_relevance_chunk", "penalty": 0.25 },
-        { "reasonCode": "query_expansion_blocked", "penalty": 0.15 }
+        {
+          "reasonCode": "low_relevance_chunk",
+          "penalty": 0.25
+        },
+        {
+          "reasonCode": "query_expansion_blocked",
+          "penalty": 0.15
+        }
       ]
     },
     "integrationHooks": {
@@ -89,8 +160,23 @@
         "doc_type_boost_rules",
         "recency_boost_rules"
       ],
-      "diversification": ["diversification_rules"],
-      "packaging": ["evidence_packaging"]
+      "diversification": [
+        "diversification_rules"
+      ],
+      "packaging": [
+        "evidence_packaging"
+      ]
+    },
+    "memoryContinuity": {
+      "enabled": true,
+      "boosts": {
+        "followupActiveDoc": 0.08,
+        "attachedScope": 0.1
+      },
+      "penalties": {
+        "staleScope": 0.12,
+        "crossDocWhenLocked": 0.4
+      }
     }
   },
   "rules": [
@@ -98,16 +184,26 @@
       "id": "compute_final_score",
       "scope": "global",
       "description": "Compute finalScore from normalized components and apply negative constraints deterministically.",
-      "appliesTo": ["ranking_pipeline"],
+      "appliesTo": [
+        "ranking_pipeline"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "action": {
         "type": "score_and_rank",
         "formula": "final = wS*semantic + wL*lexical + wH*structural + wT*titleBoost + wY*typeBoost + wR*recencyBoost - penalties",
-        "applyCaps": { "minFinalScore": 0.58 }
+        "applyCaps": {
+          "minFinalScore": 0.58
+        }
       },
       "reasonCode": "ranker_score_computed",
       "severity": "high"
@@ -116,11 +212,19 @@
       "id": "apply_negative_constraints",
       "scope": "global",
       "description": "Apply hard blocks and soft penalties from retrieval_negatives and low relevance guards.",
-      "appliesTo": ["ranking_pipeline"],
+      "appliesTo": [
+        "ranking_pipeline"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "action": {
         "type": "apply_negatives",
@@ -133,11 +237,19 @@
       "id": "apply_diversification_after_scoring",
       "scope": "global",
       "description": "Apply diversification as a soft constraint after scoring to avoid wrong-doc dominance while preserving top relevance.",
-      "appliesTo": ["ranking_pipeline"],
+      "appliesTo": [
+        "ranking_pipeline"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "action": {
         "type": "apply_diversification",
@@ -150,11 +262,19 @@
       "id": "stable_tie_break",
       "scope": "global",
       "description": "Resolve ties deterministically using configured tieBreakers and stable sort keys.",
-      "appliesTo": ["ranking_pipeline"],
+      "appliesTo": [
+        "ranking_pipeline"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "action": {
         "type": "apply_tie_breakers",
@@ -164,7 +284,12 @@
           "prefer_higher_semantic",
           "prefer_structural_anchor"
         ],
-        "stableSortKeys": ["finalScore", "docId", "locationKey", "chunkId"]
+        "stableSortKeys": [
+          "finalScore",
+          "docId",
+          "locationKey",
+          "chunkId"
+        ]
       },
       "reasonCode": "ranker_tie_break",
       "severity": "medium"
@@ -173,11 +298,19 @@
       "id": "enforce_output_caps",
       "scope": "global",
       "description": "Enforce max chunks per doc and total output caps after diversification.",
-      "appliesTo": ["ranking_pipeline"],
+      "appliesTo": [
+        "ranking_pipeline"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "action": {
         "type": "enforce_caps",
@@ -194,38 +327,129 @@
     "cases": [
       {
         "id": "RRC_001_weighted_score_prefers_semantic_when_strong",
-        "context": { "metrics": { "semantic": 0.9, "lexical": 0.2, "structural": 0.2 }, "signals": { "isScopedMatch": true } },
-        "expect": { "finalScoreAbove": 0.58 }
+        "context": {
+          "metrics": {
+            "semantic": 0.9,
+            "lexical": 0.2,
+            "structural": 0.2
+          },
+          "signals": {
+            "isScopedMatch": true
+          }
+        },
+        "expect": {
+          "finalScoreAbove": 0.58
+        }
       },
       {
         "id": "RRC_002_negative_wins_over_boost",
-        "context": { "signals": { "explicitDocLockViolation": true }, "metrics": { "semantic": 0.95, "titleBoost": 0.2 } },
-        "expect": { "hardBlocked": true }
+        "context": {
+          "signals": {
+            "explicitDocLockViolation": true
+          },
+          "metrics": {
+            "semantic": 0.95,
+            "titleBoost": 0.2
+          }
+        },
+        "expect": {
+          "hardBlocked": true
+        }
       },
       {
         "id": "RRC_003_diversification_limits_wrong_doc_dominance",
-        "context": { "metrics": { "topDocChunkCount": 20 }, "signals": { "diversificationEnabled": true } },
-        "expect": { "topDocChunkCountAfter": 10 }
+        "context": {
+          "metrics": {
+            "topDocChunkCount": 20
+          },
+          "signals": {
+            "diversificationEnabled": true
+          }
+        },
+        "expect": {
+          "topDocChunkCountAfter": 10
+        }
       },
       {
         "id": "RRC_004_tie_break_deterministic",
-        "context": { "metrics": { "finalScoreA": 0.700001, "finalScoreB": 0.700001 }, "signals": { "isScopedMatchA": true, "isScopedMatchB": false } },
-        "expect": { "preferred": "A" }
+        "context": {
+          "metrics": {
+            "finalScoreA": 0.700001,
+            "finalScoreB": 0.700001
+          },
+          "signals": {
+            "isScopedMatchA": true,
+            "isScopedMatchB": false
+          }
+        },
+        "expect": {
+          "preferred": "A"
+        }
       },
       {
         "id": "RRC_005_multilingual_pt_rank_stable",
         "input": "Encontre NOI no relatório",
-        "expect": { "stableSortKeysUsed": true }
+        "expect": {
+          "stableSortKeysUsed": true
+        }
       },
       {
         "id": "RRC_006_regression_prevent_low_relevance_promotion",
-        "context": { "metrics": { "semantic": 0.56, "lexical": 0.02, "chunkRelevance": 0.4 }, "signals": { "lowRelevanceChunk": true } },
-        "expect": { "penalized": true }
+        "context": {
+          "metrics": {
+            "semantic": 0.56,
+            "lexical": 0.02,
+            "chunkRelevance": 0.4
+          },
+          "signals": {
+            "lowRelevanceChunk": true
+          }
+        },
+        "expect": {
+          "penalized": true
+        }
       },
       {
         "id": "RRC_007_output_caps_enforced",
-        "context": { "metrics": { "totalChunks": 60 } },
-        "expect": { "totalChunksMax": 36 }
+        "context": {
+          "metrics": {
+            "totalChunks": 60
+          }
+        },
+        "expect": {
+          "totalChunksMax": 36
+        }
+      },
+      {
+        "id": "RRC_008_followup_active_doc_boost",
+        "context": {
+          "signals": {
+            "isFollowup": true,
+            "activeDocId": "doc_A"
+          },
+          "metrics": {
+            "semantic": 0.7,
+            "lexical": 0.2
+          }
+        },
+        "expect": {
+          "activeDocCandidatesRankHigher": true
+        }
+      },
+      {
+        "id": "RRC_009_cross_doc_penalty_when_locked",
+        "context": {
+          "signals": {
+            "explicitDocLock": true,
+            "candidateOutsideLock": true
+          },
+          "metrics": {
+            "semantic": 0.95
+          }
+        },
+        "expect": {
+          "hardBlockedOrPenalized": true
+        }
       }
     ]
   }

@@ -15,8 +15,7 @@
  * - File actions: NO content, ONLY source_buttons attachment
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import { getOptionalBank } from "../banks/bankLoader.service";
 
 // =============================================================================
 // DATA BANK LOADING
@@ -51,36 +50,36 @@ let _sourceEngineBank: SourceEngineDataBank | null = null;
 function loadSourceEngineBank(): SourceEngineDataBank {
   if (_sourceEngineBank) return _sourceEngineBank;
 
-  const bankPath = path.join(
-    __dirname,
-    "../../../data_banks/retrieval/source_engine.any.json",
-  );
-
-  try {
-    const raw = fs.readFileSync(bankPath, "utf-8");
-    _sourceEngineBank = JSON.parse(raw) as SourceEngineDataBank;
-  } catch (err) {
-    console.error(
-      "[SourceButtons] Failed to load source_engine data bank:",
-      err,
-    );
-    // Fallback to minimal defaults
-    _sourceEngineBank = {
-      sourceFiltering: {
-        matchingRules: {
-          minPhraseLength: 5,
-          minPhraseChars: 25,
-          minMeaningfulWords: 3,
-          minMatchScore: 2,
-          minFallbackScore: 1,
-          requireMultipleTermMatches: 3,
-          numericMatchThreshold: 2,
-        },
-      },
-      stopwords: { en: [], pt: [], es: [] },
-      commonCapitalizedWords: { any: [], pt: [], es: [] },
-    };
+  const loaded = getOptionalBank<SourceEngineDataBank>("source_engine");
+  if (loaded) {
+    _sourceEngineBank = loaded;
+    return _sourceEngineBank;
   }
+
+  const env = String(process.env.NODE_ENV || "development").toLowerCase();
+  const strict = env === "production" || env === "staging";
+  if (strict) {
+    throw new Error(
+      "[SourceButtons] Missing required source_engine bank in strict mode",
+    );
+  }
+
+  // Dev/local fallback only: keep service usable while preserving strict prod behavior.
+  _sourceEngineBank = {
+    sourceFiltering: {
+      matchingRules: {
+        minPhraseLength: 5,
+        minPhraseChars: 25,
+        minMeaningfulWords: 3,
+        minMatchScore: 2,
+        minFallbackScore: 1,
+        requireMultipleTermMatches: 3,
+        numericMatchThreshold: 2,
+      },
+    },
+    stopwords: { en: [], pt: [], es: [] },
+    commonCapitalizedWords: { any: [], pt: [], es: [] },
+  };
 
   return _sourceEngineBank;
 }

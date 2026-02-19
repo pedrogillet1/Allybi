@@ -1,0 +1,384 @@
+{
+  "_meta": {
+    "id": "memory_policy_tests",
+    "version": "1.0.0",
+    "description": "High-coverage validation corpus for Allybi memory policy behavior. Covers scope continuity, follow-up reuse, explicit switches, semantic signal extraction, and drift prevention across EN/PT/ES.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-19"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "minimumCaseCounts": {
+      "total": 45,
+      "perLanguage": {
+        "en": 12,
+        "pt": 12,
+        "es": 12
+      }
+    }
+  },
+  "suites": [
+    {
+      "id": "memory_scope_locking",
+      "description": "Active doc lock and explicit switch correctness.",
+      "weight": 0.3
+    },
+    {
+      "id": "memory_followups",
+      "description": "Follow-up continuity and anti-drift behavior.",
+      "weight": 0.25
+    },
+    {
+      "id": "memory_semantic_signals",
+      "description": "Semantic signal extraction parity and precision.",
+      "weight": 0.2
+    },
+    {
+      "id": "memory_decay_and_reset",
+      "description": "Decay, cooldown, and stale-state protections.",
+      "weight": 0.15
+    },
+    {
+      "id": "memory_multilingual_regressions",
+      "description": "Cross-language regression checks for continuity behavior.",
+      "weight": 0.1
+    }
+  ],
+  "cases": [
+    {
+      "id": "MPT_EN_001_explicit_filename_sets_scope",
+      "suite": "memory_scope_locking",
+      "language": "en",
+      "input": "Use report_q4_2024.pdf and summarize NOI.",
+      "context": { "activeDocId": null, "isFollowup": false },
+      "expect": { "explicitDocRef": true, "shouldSetActiveDoc": true, "shouldNotSearchCorpus": true }
+    },
+    {
+      "id": "MPT_EN_002_followup_reuses_active_doc",
+      "suite": "memory_followups",
+      "language": "en",
+      "input": "Now extract CAPEX from that file.",
+      "context": { "activeDocId": "doc_q4_2024", "isFollowup": true },
+      "expect": { "shouldReuseActiveDoc": true, "shouldNotSwitchDoc": true }
+    },
+    {
+      "id": "MPT_EN_003_unlock_enables_global",
+      "suite": "memory_scope_locking",
+      "language": "en",
+      "input": "Stop using this file and search all documents for churn.",
+      "context": { "activeDocId": "doc_q4_2024", "hardDocLock": true },
+      "expect": { "shouldUnlock": true, "shouldAllowCorpusSearch": true }
+    },
+    {
+      "id": "MPT_EN_004_short_ack_keeps_context",
+      "suite": "memory_followups",
+      "language": "en",
+      "input": "ok",
+      "context": { "activeDocId": "doc_q4_2024", "isFollowup": true },
+      "expect": { "isFollowup": true, "shouldKeepContextAlive": true }
+    },
+    {
+      "id": "MPT_EN_005_quote_signal_detection",
+      "suite": "memory_semantic_signals",
+      "language": "en",
+      "input": "Give me the exact quote for \"net operating income\".",
+      "expect": { "userAskedForQuote": true, "hasQuotedText": true }
+    },
+    {
+      "id": "MPT_EN_006_table_signal_detection",
+      "suite": "memory_semantic_signals",
+      "language": "en",
+      "input": "Return this in a table with rows and columns.",
+      "expect": { "userAskedForTable": true, "tableExpected": true }
+    },
+    {
+      "id": "MPT_EN_007_sheet_and_range_detection",
+      "suite": "memory_semantic_signals",
+      "language": "en",
+      "input": "Check sheet Revenue tab range B2:F18.",
+      "expect": { "sheetHintPresent": true, "rangeExplicit": true }
+    },
+    {
+      "id": "MPT_EN_008_time_constraint_detection",
+      "suite": "memory_semantic_signals",
+      "language": "en",
+      "input": "Compare Q2 2024 versus Q2 2023 margin.",
+      "expect": { "timeConstraintsPresent": true, "explicitYearOrQuarterComparison": true }
+    },
+    {
+      "id": "MPT_EN_009_decay_clears_stale_followup",
+      "suite": "memory_decay_and_reset",
+      "language": "en",
+      "context": { "hardDocLock": false, "turnsSinceLastContentTurn": 9, "isFollowup": true },
+      "expect": { "shouldExpireFollowupContinuity": true }
+    },
+    {
+      "id": "MPT_EN_010_hard_lock_not_decayed",
+      "suite": "memory_decay_and_reset",
+      "language": "en",
+      "context": { "hardDocLock": true, "turnsSinceLastContentTurn": 40 },
+      "expect": { "shouldPreserveHardLock": true }
+    },
+    {
+      "id": "MPT_EN_011_no_false_filename_from_greeting",
+      "suite": "memory_multilingual_regressions",
+      "language": "en",
+      "input": "hello there",
+      "expect": { "hasFilename": false, "isFollowup": false }
+    },
+    {
+      "id": "MPT_EN_012_low_entropy_query_not_forced_global",
+      "suite": "memory_multilingual_regressions",
+      "language": "en",
+      "input": "roi?",
+      "expect": { "shouldBlockGlobalSearchWhenBelowMinChars": true }
+    },
+
+    {
+      "id": "MPT_PT_001_arquivo_explicito_define_escopo",
+      "suite": "memory_scope_locking",
+      "language": "pt",
+      "input": "Use o arquivo balanco_2024.pdf e resuma o NOI.",
+      "context": { "activeDocId": null, "isFollowup": false },
+      "expect": { "explicitDocRef": true, "shouldSetActiveDoc": true }
+    },
+    {
+      "id": "MPT_PT_002_followup_reusa_documento_ativo",
+      "suite": "memory_followups",
+      "language": "pt",
+      "input": "Agora extraia o CAPEX desse documento.",
+      "context": { "activeDocId": "doc_balanco_2024", "isFollowup": true },
+      "expect": { "shouldReuseActiveDoc": true }
+    },
+    {
+      "id": "MPT_PT_003_destravar_permite_busca_global",
+      "suite": "memory_scope_locking",
+      "language": "pt",
+      "input": "Pare de usar esse arquivo e procure em todos os documentos.",
+      "context": { "activeDocId": "doc_balanco_2024", "hardDocLock": true },
+      "expect": { "shouldUnlock": true, "shouldAllowCorpusSearch": true }
+    },
+    {
+      "id": "MPT_PT_004_ack_curto_mantem_contexto",
+      "suite": "memory_followups",
+      "language": "pt",
+      "input": "ok",
+      "context": { "activeDocId": "doc_balanco_2024" },
+      "expect": { "isFollowup": true, "shouldKeepContextAlive": true }
+    },
+    {
+      "id": "MPT_PT_005_sinal_citacao",
+      "suite": "memory_semantic_signals",
+      "language": "pt",
+      "input": "Me traga a citação exata de \"lucro operacional\".",
+      "expect": { "userAskedForQuote": true, "hasQuotedText": true }
+    },
+    {
+      "id": "MPT_PT_006_sinal_tabela",
+      "suite": "memory_semantic_signals",
+      "language": "pt",
+      "input": "Responda em tabela com linhas e colunas.",
+      "expect": { "userAskedForTable": true, "tableExpected": true }
+    },
+    {
+      "id": "MPT_PT_007_sinal_planilha_intervalo",
+      "suite": "memory_semantic_signals",
+      "language": "pt",
+      "input": "Verifique a aba Receita no intervalo C3:H20.",
+      "expect": { "sheetHintPresent": true, "rangeExplicit": true }
+    },
+    {
+      "id": "MPT_PT_008_sinal_tempo_comparacao",
+      "suite": "memory_semantic_signals",
+      "language": "pt",
+      "input": "Compare o Q3 2024 versus Q3 2023.",
+      "expect": { "timeConstraintsPresent": true, "explicitYearOrQuarterComparison": true }
+    },
+    {
+      "id": "MPT_PT_009_decay_remove_followup_obsoleto",
+      "suite": "memory_decay_and_reset",
+      "language": "pt",
+      "context": { "hardDocLock": false, "turnsSinceLastContentTurn": 10, "isFollowup": true },
+      "expect": { "shouldExpireFollowupContinuity": true }
+    },
+    {
+      "id": "MPT_PT_010_hard_lock_preservado",
+      "suite": "memory_decay_and_reset",
+      "language": "pt",
+      "context": { "hardDocLock": true, "turnsSinceLastContentTurn": 50 },
+      "expect": { "shouldPreserveHardLock": true }
+    },
+    {
+      "id": "MPT_PT_011_sem_falso_nome_arquivo_em_saudacao",
+      "suite": "memory_multilingual_regressions",
+      "language": "pt",
+      "input": "oi, tudo bem?",
+      "expect": { "hasFilename": false, "isFollowup": false }
+    },
+    {
+      "id": "MPT_PT_012_consulta_curta_nao_liberar_global",
+      "suite": "memory_multilingual_regressions",
+      "language": "pt",
+      "input": "margem?",
+      "expect": { "shouldBlockGlobalSearchWhenBelowMinChars": true }
+    },
+
+    {
+      "id": "MPT_ES_001_archivo_explicito_define_scope",
+      "suite": "memory_scope_locking",
+      "language": "es",
+      "input": "Usa informe_q4_2024.pdf y resume el NOI.",
+      "context": { "activeDocId": null, "isFollowup": false },
+      "expect": { "explicitDocRef": true, "shouldSetActiveDoc": true }
+    },
+    {
+      "id": "MPT_ES_002_followup_reutiliza_doc_activo",
+      "suite": "memory_followups",
+      "language": "es",
+      "input": "Ahora extrae CAPEX de ese documento.",
+      "context": { "activeDocId": "doc_informe_q4_2024", "isFollowup": true },
+      "expect": { "shouldReuseActiveDoc": true }
+    },
+    {
+      "id": "MPT_ES_003_desbloqueo_habilita_busqueda_global",
+      "suite": "memory_scope_locking",
+      "language": "es",
+      "input": "Deja de usar este archivo y busca en todos los documentos.",
+      "context": { "activeDocId": "doc_informe_q4_2024", "hardDocLock": true },
+      "expect": { "shouldUnlock": true, "shouldAllowCorpusSearch": true }
+    },
+    {
+      "id": "MPT_ES_004_ack_corto_mantiene_contexto",
+      "suite": "memory_followups",
+      "language": "es",
+      "input": "ok",
+      "context": { "activeDocId": "doc_informe_q4_2024" },
+      "expect": { "isFollowup": true, "shouldKeepContextAlive": true }
+    },
+    {
+      "id": "MPT_ES_005_senal_cita",
+      "suite": "memory_semantic_signals",
+      "language": "es",
+      "input": "Dame la cita exacta de \"ingreso operativo neto\".",
+      "expect": { "userAskedForQuote": true, "hasQuotedText": true }
+    },
+    {
+      "id": "MPT_ES_006_senal_tabla",
+      "suite": "memory_semantic_signals",
+      "language": "es",
+      "input": "Devuélvelo en tabla con filas y columnas.",
+      "expect": { "userAskedForTable": true, "tableExpected": true }
+    },
+    {
+      "id": "MPT_ES_007_senal_hoja_rango",
+      "suite": "memory_semantic_signals",
+      "language": "es",
+      "input": "Revisa la hoja Ingresos en el rango A5:E30.",
+      "expect": { "sheetHintPresent": true, "rangeExplicit": true }
+    },
+    {
+      "id": "MPT_ES_008_senal_tiempo_comparacion",
+      "suite": "memory_semantic_signals",
+      "language": "es",
+      "input": "Compara Q1 2024 versus Q1 2023.",
+      "expect": { "timeConstraintsPresent": true, "explicitYearOrQuarterComparison": true }
+    },
+    {
+      "id": "MPT_ES_009_decay_expira_followup_obsoleto",
+      "suite": "memory_decay_and_reset",
+      "language": "es",
+      "context": { "hardDocLock": false, "turnsSinceLastContentTurn": 11, "isFollowup": true },
+      "expect": { "shouldExpireFollowupContinuity": true }
+    },
+    {
+      "id": "MPT_ES_010_hard_lock_preservado",
+      "suite": "memory_decay_and_reset",
+      "language": "es",
+      "context": { "hardDocLock": true, "turnsSinceLastContentTurn": 55 },
+      "expect": { "shouldPreserveHardLock": true }
+    },
+    {
+      "id": "MPT_ES_011_sin_falso_filename_en_saludo",
+      "suite": "memory_multilingual_regressions",
+      "language": "es",
+      "input": "hola, gracias",
+      "expect": { "hasFilename": false, "isFollowup": false }
+    },
+    {
+      "id": "MPT_ES_012_consulta_corta_no_global",
+      "suite": "memory_multilingual_regressions",
+      "language": "es",
+      "input": "margen?",
+      "expect": { "shouldBlockGlobalSearchWhenBelowMinChars": true }
+    },
+
+    {
+      "id": "MPT_ANY_001_explicit_doc_overrides_followup",
+      "suite": "memory_scope_locking",
+      "language": "any",
+      "context": { "activeDocId": "doc_prev", "isFollowup": true },
+      "input": "Switch to contracts_2024.pdf",
+      "expect": { "shouldSwitchDoc": true, "shouldIgnoreCarryover": true }
+    },
+    {
+      "id": "MPT_ANY_002_followup_without_explicit_ref_prefers_active_doc",
+      "suite": "memory_followups",
+      "language": "any",
+      "context": { "activeDocId": "doc_prev", "isFollowup": true },
+      "input": "and now summarize risk section",
+      "expect": { "shouldReuseActiveDoc": true }
+    },
+    {
+      "id": "MPT_ANY_003_unlock_then_followup_allows_multi_doc",
+      "suite": "memory_scope_locking",
+      "language": "any",
+      "context": { "activeDocId": "doc_prev", "hardDocLock": true },
+      "input": "search all files for operating margin",
+      "expect": { "shouldUnlock": true, "allowGlobalScope": true }
+    },
+    {
+      "id": "MPT_ANY_004_no_scope_drift_when_docs_attached",
+      "suite": "memory_multilingual_regressions",
+      "language": "any",
+      "context": { "attachedDocumentIds": ["doc_a"], "isFollowup": true },
+      "input": "what about that metric",
+      "expect": { "shouldStayInAttachedScope": true }
+    },
+    {
+      "id": "MPT_ANY_005_recall_blocks_injected",
+      "suite": "memory_followups",
+      "language": "any",
+      "context": { "conversationHasSummary": true, "conversationHasRecall": true },
+      "expect": { "systemBlocksInclude": ["CONVERSATION_MEMORY_STATE", "CONVERSATION_MEMORY_RECALL"] }
+    },
+    {
+      "id": "MPT_ANY_006_memory_tail_bounded_by_policy",
+      "suite": "memory_decay_and_reset",
+      "language": "any",
+      "context": { "inMemoryTailCount": 200 },
+      "expect": { "memoryTailLimitedBy": "runtimeTuning.memoryRecallMaxItems" }
+    },
+    {
+      "id": "MPT_ANY_007_semantic_signal_patterns_sourced_from_policy",
+      "suite": "memory_semantic_signals",
+      "language": "any",
+      "expect": { "patternsLoadedFrom": "memory_policy.config.runtimeTuning.semanticSignals.patterns" }
+    },
+    {
+      "id": "MPT_ANY_008_global_search_min_chars_enforced",
+      "suite": "memory_multilingual_regressions",
+      "language": "any",
+      "context": { "attachedDocumentIds": [] },
+      "input": "roi",
+      "expect": { "allowGlobalScope": false }
+    },
+    {
+      "id": "MPT_ANY_009_topic_refresh_on_assistant_turn",
+      "suite": "memory_followups",
+      "language": "any",
+      "context": { "role": "assistant", "content": "Detailed summary of operating margin variance." },
+      "expect": { "shouldRefreshConversationSummary": true, "turnsSinceLastSummary": 0 }
+    }
+  ]
+}

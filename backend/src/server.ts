@@ -212,10 +212,6 @@ async function startServer() {
     }
 
     app.locals.services = {
-      core: {
-        kodaOrchestrator: container.getOrchestrator(),
-        orchestrator: container.getOrchestrator(),
-      },
       documents: new PrismaDocumentService(),
       folders: new PrismaFolderService(),
       history: new PrismaHistoryService(),

@@ -20,8 +20,9 @@ import {
   type CreateMessageParams,
   type NavType,
 } from "../domain/chat.contracts";
-import { ChatRuntimeService as LegacyChatRuntimeService } from "../../../services/chatRuntime.legacy.service";
 import { ChatRuntimeOrchestrator } from "../runtime/ChatRuntimeOrchestrator";
+import type { RuntimeDelegate } from "../runtime/ChatRuntimeOrchestrator";
+import { CentralizedChatRuntimeDelegate } from "../runtime/CentralizedChatRuntimeDelegate";
 
 export type {
   AnswerClass,
@@ -44,13 +45,12 @@ export { ConversationNotFoundError } from "../domain/chat.contracts";
 /**
  * ChatRuntimeService v2 facade
  * - concise, centralized runtime entrypoint
- * - delegates feature execution to legacy runtime while migration is in progress
- * - applies v2 contract normalization + scope/evidence policies in orchestrator
+ * - single runtime delegate (no legacy chat runtime import path)
+ * - applies contract normalization + scope/evidence policies in orchestrator
  */
 export class ChatRuntimeService {
-  private readonly delegate: LegacyChatRuntimeService;
+  private readonly delegate: CentralizedChatRuntimeDelegate;
   private readonly orchestrator: ChatRuntimeOrchestrator;
-  private readonly useV2: boolean;
 
   constructor(
     engine: ChatEngine,
@@ -59,13 +59,19 @@ export class ChatRuntimeService {
       encryptedContext?: EncryptedChatContextService;
     },
   ) {
-    this.delegate = new LegacyChatRuntimeService(engine, opts);
-    this.orchestrator = new ChatRuntimeOrchestrator(this.delegate as any);
-    this.useV2 = (process.env.CHAT_RUNTIME_V2_ENABLED ?? "true") !== "false";
+    this.delegate = new CentralizedChatRuntimeDelegate(engine, opts);
+    const delegate: RuntimeDelegate = this.delegate;
+    this.orchestrator = new ChatRuntimeOrchestrator(delegate);
+  }
+
+  wireEncryption(
+    encryptedRepo: EncryptedChatRepo,
+    encryptedContext?: EncryptedChatContextService,
+  ): void {
+    this.delegate.wireEncryption(encryptedRepo, encryptedContext);
   }
 
   async chat(req: ChatRequest): Promise<ChatResult> {
-    if (!this.useV2) return this.delegate.chat(req);
     return this.orchestrator.chat(req);
   }
 
@@ -74,7 +80,6 @@ export class ChatRuntimeService {
     sink: StreamSink;
     streamingConfig: LLMStreamingConfig;
   }): Promise<ChatResult> {
-    if (!this.useV2) return this.delegate.streamChat(params);
     return this.orchestrator.streamChat(params);
   }
 

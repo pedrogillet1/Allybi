@@ -6,6 +6,7 @@ import type { LLMStreamingConfig, StreamSink } from "./llmStreaming.types";
 
 import type { LangCode } from "../prompts/promptRegistry.service";
 import { LlmRouterService } from "./llmRouter.service";
+import { getOptionalBank } from "../../core/banks/bankLoader.service";
 import {
   LlmRequestBuilderService,
   type BuildRequestInput,
@@ -57,6 +58,17 @@ type GatewayDisambiguation = {
   maxQuestions: number;
 };
 
+type MemoryPolicyRuntimeTuning = {
+  gateway?: {
+    userTextCharCap?: number;
+    systemBlockCharCap?: number;
+    dialogueTurnLimit?: number;
+    dialogueMessageCharCap?: number;
+    dialogueCharBudget?: number;
+    memoryPackCharCap?: number;
+  };
+};
+
 function mapProviderForRequest(provider: LLMProvider): LLMProvider {
   if (provider === "unknown") return "google";
   return provider;
@@ -96,6 +108,7 @@ export class LlmGatewayService {
       telemetry: {
         provider: this.cfg.provider,
         model: this.cfg.modelId,
+        finishReason: response.finishReason || "unknown",
         usage: response.usage,
         promptType: prepared.promptType,
         ...prepared.promptTrace,
@@ -126,6 +139,7 @@ export class LlmGatewayService {
       telemetry: {
         provider: this.cfg.provider,
         model: this.cfg.modelId,
+        finishReason: result.finishReason || "unknown",
         usage: result.usage,
         promptType: prepared.promptType,
         ...prepared.promptTrace,
@@ -274,7 +288,10 @@ export class LlmGatewayService {
       lastUserIdx >= 0
         ? messages.length - 1 - lastUserIdx
         : messages.length - 1;
-    const userText = clampText(messages[resolvedIdx]?.content || "", 12000);
+    const userText = clampText(
+      messages[resolvedIdx]?.content || "",
+      this.resolveUserTextCharCap(),
+    );
 
     const history = messages.slice(0, Math.max(0, resolvedIdx));
     const promptTask =
@@ -283,12 +300,9 @@ export class LlmGatewayService {
         : null;
     const systemBlocks = history
       .filter((m) => m.role === "system")
-      .map((m) => clampText(m.content, 5000));
-    const dialogue = history
-      .filter((m) => m.role !== "system")
-      .slice(-12)
-      .map((m) => `${m.role.toUpperCase()}: ${clampText(m.content, 800)}`)
-      .join("\n");
+      .map((m) => clampText(m.content, this.resolveSystemBlockCharCap()));
+    const dialogueHistory = history.filter((m) => m.role !== "system");
+    const dialogue = this.buildDialogueContext(dialogueHistory).join("\n");
 
     const memoryParts: string[] = [];
     if (dialogue) {
@@ -302,10 +316,11 @@ export class LlmGatewayService {
       );
     }
 
+    const joinedMemory = memoryParts.join("\n\n");
     const memoryPack = memoryParts.length
       ? {
-          contextText: clampText(memoryParts.join("\n\n"), 14000),
-          stats: { usedChars: memoryParts.join("\n\n").length },
+          contextText: clampText(joinedMemory, this.resolveMemoryPackCharCap()),
+          stats: { usedChars: joinedMemory.length },
         }
       : undefined;
 
@@ -369,6 +384,120 @@ export class LlmGatewayService {
       evidencePack,
       memoryPack,
     };
+  }
+
+  private buildDialogueContext(
+    history: Array<{ role: GatewayChatRole; content: string }>,
+  ): string[] {
+    if (!history.length) return [];
+
+    const maxTurns = this.resolveDialogueTurnLimit();
+    const perMessageCap = this.resolveDialogueMessageCharCap();
+    const charBudget = this.resolveDialogueCharBudget();
+
+    const selected = history.slice(Math.max(0, history.length - maxTurns));
+    const lines: string[] = [];
+    let used = 0;
+
+    // Keep newest messages first under budget, then restore chronological order.
+    const reverseBuffer: string[] = [];
+    for (let i = selected.length - 1; i >= 0; i--) {
+      const m = selected[i];
+      const line = `${m.role.toUpperCase()}: ${clampText(m.content, perMessageCap)}`;
+      if (line.length + used > charBudget) {
+        if (reverseBuffer.length > 0) break;
+        // Always keep at least one line so continuity never goes empty.
+      }
+      reverseBuffer.push(line);
+      used += line.length + 1;
+      if (used >= charBudget) break;
+    }
+
+    for (let i = reverseBuffer.length - 1; i >= 0; i--) {
+      lines.push(reverseBuffer[i]);
+    }
+
+    return lines;
+  }
+
+  private resolveDialogueTurnLimit(): number {
+    const raw = Number(
+      this.getMemoryPolicyRuntimeTuning().gateway?.dialogueTurnLimit,
+    );
+    if (!Number.isFinite(raw) || raw <= 0) {
+      throw new Error(
+        "memory_policy.config.runtimeTuning.gateway.dialogueTurnLimit is required",
+      );
+    }
+    return Math.floor(raw);
+  }
+
+  private resolveUserTextCharCap(): number {
+    const raw = Number(
+      this.getMemoryPolicyRuntimeTuning().gateway?.userTextCharCap,
+    );
+    if (!Number.isFinite(raw) || raw <= 0) {
+      throw new Error(
+        "memory_policy.config.runtimeTuning.gateway.userTextCharCap is required",
+      );
+    }
+    return Math.floor(raw);
+  }
+
+  private resolveSystemBlockCharCap(): number {
+    const raw = Number(
+      this.getMemoryPolicyRuntimeTuning().gateway?.systemBlockCharCap,
+    );
+    if (!Number.isFinite(raw) || raw <= 0) {
+      throw new Error(
+        "memory_policy.config.runtimeTuning.gateway.systemBlockCharCap is required",
+      );
+    }
+    return Math.floor(raw);
+  }
+
+  private resolveDialogueMessageCharCap(): number {
+    const raw = Number(
+      this.getMemoryPolicyRuntimeTuning().gateway?.dialogueMessageCharCap,
+    );
+    if (!Number.isFinite(raw) || raw <= 0) {
+      throw new Error(
+        "memory_policy.config.runtimeTuning.gateway.dialogueMessageCharCap is required",
+      );
+    }
+    return Math.floor(raw);
+  }
+
+  private resolveDialogueCharBudget(): number {
+    const raw = Number(
+      this.getMemoryPolicyRuntimeTuning().gateway?.dialogueCharBudget,
+    );
+    if (!Number.isFinite(raw) || raw <= 0) {
+      throw new Error(
+        "memory_policy.config.runtimeTuning.gateway.dialogueCharBudget is required",
+      );
+    }
+    return Math.floor(raw);
+  }
+
+  private resolveMemoryPackCharCap(): number {
+    const raw = Number(
+      this.getMemoryPolicyRuntimeTuning().gateway?.memoryPackCharCap,
+    );
+    if (!Number.isFinite(raw) || raw <= 0) {
+      throw new Error(
+        "memory_policy.config.runtimeTuning.gateway.memoryPackCharCap is required",
+      );
+    }
+    return Math.floor(raw);
+  }
+
+  private getMemoryPolicyRuntimeTuning(): MemoryPolicyRuntimeTuning {
+    const bank = getOptionalBank<any>("memory_policy");
+    if (!bank) {
+      throw new Error("Required bank missing: memory_policy");
+    }
+    return (bank.config?.runtimeTuning || {}) as MemoryPolicyRuntimeTuning;
   }
 
   private detectOutputLanguage(

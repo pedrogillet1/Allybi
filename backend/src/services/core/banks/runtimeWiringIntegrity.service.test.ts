@@ -72,6 +72,7 @@ describe("RuntimeWiringIntegrityService", () => {
     expect(result.missingEditingCatalogOperators).toEqual([]);
     expect(result.missingEditingCapabilities).toEqual([]);
     expect(result.unreachablePromptSelectionRules).toEqual([]);
+    expect(result.legacyChatRuntimeImports).toEqual([]);
   });
 
   it("flags missing contracts, shapes, and unreachable prompt rules", () => {
@@ -121,5 +122,6 @@ describe("RuntimeWiringIntegrityService", () => {
       "DOCX_REWRITE_PARAGRAPH",
     );
     expect(result.unreachablePromptSelectionRules).toContain("never_reached");
+    expect(Array.isArray(result.legacyChatRuntimeImports)).toBe(true);
   });
 });

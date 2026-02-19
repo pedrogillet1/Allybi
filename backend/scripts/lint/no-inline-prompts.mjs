@@ -14,14 +14,19 @@ const checks = [
     reason: 'llmChatEngine must not embed root system prompts.',
   },
   {
-    file: 'services/chatRuntime.service.ts',
+    file: 'modules/chat/application/chat-runtime.service.ts',
     patterns: [
-      /SOURCE ATTRIBUTION IS FULLY HANDLED BY THE UI/,
-      /INSTRUCTIONS:\s*$/m,
-      /NAVIGATION MODE:\s+The user wants to find or open a document/,
+      /chatRuntime\.legacy\.service/,
+      /LegacyChatRuntimeService/,
+    ],
+    reason: 'Centralized runtime must not import legacy chat runtime path.',
+  },
+  {
+    file: 'modules/chat/runtime/CentralizedChatRuntimeDelegate.ts',
+    patterns: [
       /\bYou are\b/,
     ],
-    reason: 'Runtime chat service must not embed monolithic inline prompt instructions.',
+    reason: 'Centralized runtime must not embed root system prompts.',
   },
 ];
 

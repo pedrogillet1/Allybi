@@ -1,10 +1,12 @@
 {
   "_meta": {
     "id": "memory_policy",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "ChatGPT-like conversation memory policy for Koda. Governs what conversational state is stored (doc lock/time/metric/domain), how long it persists, how it decays, and how it is reused without causing silent doc drift. Policy-only: does not define user-facing copy.",
-    "languages": ["any"],
-    "lastUpdated": "2026-01-26"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-19"
   },
   "config": {
     "enabled": true,
@@ -17,6 +19,134 @@
       "scopeResolutionBankId": "scope_resolution",
       "followupDetectionBankId": "followup_detection",
       "qualityGatesBankId": "quality_gates"
+    },
+    "runtimeTuning": {
+      "recentContextLimit": 180,
+      "historyClampMax": 320,
+      "inMemoryMessageCacheLimit": 240,
+      "defaultStateSummary": "Conversation active.",
+      "defaultStateTopic": "General inquiry",
+      "memorySummaryMaxChars": 1800,
+      "memoryRecallMaxItems": 6,
+      "memoryRecallSnippetChars": 260,
+      "evidenceSnippetMaxChars": 900,
+      "queryKeywordMaxTerms": 12,
+      "queryKeywordMinLength": 3,
+      "queryStopWords": {
+        "any": [
+          "the",
+          "and",
+          "for",
+          "with",
+          "that",
+          "this",
+          "from",
+          "have",
+          "your",
+          "about",
+          "what",
+          "when",
+          "where",
+          "which",
+          "please",
+          "could",
+          "would"
+        ],
+        "pt": [
+          "como",
+          "onde",
+          "qual",
+          "para",
+          "com",
+          "sobre",
+          "este",
+          "esta",
+          "isso",
+          "por",
+          "que"
+        ],
+        "es": [
+          "como",
+          "donde",
+          "cual",
+          "para",
+          "con",
+          "sobre",
+          "este",
+          "esta",
+          "eso",
+          "por",
+          "que"
+        ]
+      },
+      "memoryArtifactStore": {
+        "recentMessageIdMaxItems": 48,
+        "recallBufferMaxItems": 32,
+        "keyTopicMaxItems": 8,
+        "summaryRefreshAssistantEveryTurns": 1,
+        "staleTopicDecayTurns": 18,
+        "maxPersistedSourceDocumentIds": 24,
+        "maxPersistedRecallBytes": 24000
+      },
+      "semanticSignals": {
+        "regexFlags": "i",
+        "patterns": {
+          "hasQuotedText": [
+            "\"[^\"]{2,}\"",
+            "'[^']{2,}'",
+            "“[^”]{2,}”",
+            "‘[^’]{2,}’"
+          ],
+          "hasFilename": [
+            "\\b\\w[\\w\\-_. ]{0,140}\\.(pdf|docx?|xlsx?|pptx?|txt|csv)\\b",
+            "\\b[^\\s\"']+\\.(pdf|docx?|xlsx?|pptx?|txt|csv|md)\\b"
+          ],
+          "userAskedForTable": [
+            "\\b(table|sheet|rows?|columns?|tabular)\\b",
+            "\\b(tabela|tabla|tabular|linhas?|filas?|colunas?|columnas?)\\b"
+          ],
+          "userAskedForQuote": [
+            "\\b(quote|exact|line|paragraph|citation)\\b",
+            "\\b(cita[cç][aã]o|cita|literal|exacta|exata|par[aá]grafo|parrafo|linha|linea)\\b"
+          ],
+          "sheetHintPresent": [
+            "\\b(sheet|tab)\\b",
+            "\\b(aba|hoja|pesta[nñ]a|planilha)\\b"
+          ],
+          "rangeExplicit": [
+            "\\b[A-Z]{1,3}\\d{1,6}:[A-Z]{1,3}\\d{1,6}\\b",
+            "\\b([A-Z]{1,3}\\d{1,6})\\s*-\\s*([A-Z]{1,3}\\d{1,6})\\b"
+          ],
+          "timeConstraintsPresent": [
+            "\\b(20\\d{2}|19\\d{2}|q[1-4])\\b",
+            "\\b(fy\\s*20\\d{2}|trimestre|trimestre|quarter)\\b"
+          ],
+          "explicitYearOrQuarterComparison": [
+            "\\b(compare|versus|vs\\.?)\\b",
+            "\\b(compar(e|ar|a)|versus|contra|vs\\.?)\\b"
+          ],
+          "tableExpected": [
+            "\\b(table|tabular)\\b",
+            "\\b(tabela|tabla|tabular)\\b"
+          ]
+        }
+      },
+      "gateway": {
+        "userTextCharCap": 12000,
+        "systemBlockCharCap": 5000,
+        "dialogueTurnLimit": 48,
+        "dialogueMessageCharCap": 1600,
+        "dialogueCharBudget": 26000,
+        "memoryPackCharCap": 32000
+      },
+      "semanticRetrieval": {
+        "enableGlobalEvidenceSearch": true,
+        "globalSearchMinQueryChars": 12,
+        "maxEvidenceItemsForAnswer": 8,
+        "preferActiveScopeWhenFollowup": true,
+        "staleScopePenalty": 0.22,
+        "maxGlobalRetrievalsPerTurn": 1
+      }
     }
   },
   "principles": {
@@ -63,7 +193,10 @@
       "disambiguation_choice",
       "user_lock_request"
     ],
-    "softLockSources": ["single_source_inference", "followup_reuse"],
+    "softLockSources": [
+      "single_source_inference",
+      "followup_reuse"
+    ],
     "neverOverwriteHardLockWithoutExplicitSwitch": true,
     "explicitSwitchSignals": [
       "signals.hasExplicitDocRef",
@@ -146,27 +279,116 @@
       {
         "id": "MP_0001_explicit_docref_overwrites_hard_lock",
         "input": {
-          "state": { "activeDocRef": { "docId": "doc:old", "lockType": "hard" } },
-          "signals": { "hasExplicitDocRef": true },
-          "query": { "hints": { "docRefs": { "filenames": ["NewFile.pdf"] } } }
+          "state": {
+            "activeDocRef": {
+              "docId": "doc:old",
+              "lockType": "hard"
+            }
+          },
+          "signals": {
+            "hasExplicitDocRef": true
+          },
+          "query": {
+            "hints": {
+              "docRefs": {
+                "filenames": [
+                  "NewFile.pdf"
+                ]
+              }
+            }
+          }
         },
-        "expect": { "shouldAllowHardLockOverwrite": true }
+        "expect": {
+          "shouldAllowHardLockOverwrite": true
+        }
       },
       {
         "id": "MP_0002_followup_refreshes_ttl_not_switch_docs",
         "input": {
-          "signals": { "isFollowup": true },
-          "state": { "activeDocRef": { "docId": "doc:x", "lockType": "hard", "ttlTurns": 3 } }
+          "signals": {
+            "isFollowup": true
+          },
+          "state": {
+            "activeDocRef": {
+              "docId": "doc:x",
+              "lockType": "hard",
+              "ttlTurns": 3
+            }
+          }
         },
-        "expect": { "refreshTtl": true, "shouldNotSwitchDoc": true }
+        "expect": {
+          "refreshTtl": true,
+          "shouldNotSwitchDoc": true
+        }
       },
       {
         "id": "MP_0003_unlock_allows_corpus_search",
         "input": {
-          "signals": { "searchAllDocsRequested": true },
-          "state": { "activeDocRef": { "docId": "doc:x", "lockType": "hard" } }
+          "signals": {
+            "searchAllDocsRequested": true
+          },
+          "state": {
+            "activeDocRef": {
+              "docId": "doc:x",
+              "lockType": "hard"
+            }
+          }
         },
-        "expect": { "shouldClearActiveDocRef": true }
+        "expect": {
+          "shouldClearActiveDocRef": true
+        }
+      },
+      {
+        "id": "MP_0004_followup_keeps_active_doc_unless_explicit_switch",
+        "input": {
+          "signals": {
+            "isFollowup": true,
+            "hasExplicitDocRef": false
+          },
+          "state": {
+            "activeDocRef": {
+              "docId": "doc:x",
+              "lockType": "hard",
+              "ttlTurns": 8
+            }
+          }
+        },
+        "expect": {
+          "shouldNotSwitchDoc": true
+        }
+      },
+      {
+        "id": "MP_0005_short_query_global_search_blocked_by_min_chars",
+        "input": {
+          "signals": {
+            "searchAllDocsRequested": true
+          },
+          "query": {
+            "text": "roi"
+          },
+          "runtimeTuning": {
+            "semanticRetrieval": {
+              "globalSearchMinQueryChars": 12
+            }
+          }
+        },
+        "expect": {
+          "allowGlobalScope": false
+        }
+      },
+      {
+        "id": "MP_0006_quote_signal_requires_quote_mode_when_evidence_exists",
+        "input": {
+          "signals": {
+            "userAskedForQuote": true
+          },
+          "retrieval": {
+            "evidenceCount": 2
+          }
+        },
+        "expect": {
+          "answerMode": "doc_grounded_quote"
+        }
       }
     ]
   }

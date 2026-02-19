@@ -78,6 +78,7 @@ interface OllamaChatResponse {
   model: string;
   message: OllamaMessage;
   done: boolean;
+  done_reason?: string | null;
   total_duration?: number;
   load_duration?: number;
   prompt_eval_count?: number;
@@ -308,6 +309,9 @@ export class LocalClientService implements LLMClient {
       turnId: req.turnId,
       model: req.model,
       content: json.message?.content ?? "",
+      finishReason: normalizeFinishReason(
+        json.done_reason || (json.done ? "stop" : "unknown"),
+      ),
       usage: {
         promptTokens: json.prompt_eval_count,
         completionTokens: json.eval_count,
@@ -366,6 +370,7 @@ export class LocalClientService implements LLMClient {
     let buffer = "";
     let firstTokenEmitted = false;
     let finalUsage: LLMCompletionResponse["usage"] | undefined;
+    let finishReason = "unknown";
 
     while (sink.isOpen()) {
       const { value, done } = await reader.read();
@@ -417,6 +422,9 @@ export class LocalClientService implements LLMClient {
 
         // Ollama sends done:true on the final chunk with usage stats
         if (chunk.done) {
+          finishReason = normalizeFinishReason(
+            chunk.done_reason || (chunk.done ? "stop" : "unknown"),
+          );
           finalUsage = {
             promptTokens: chunk.prompt_eval_count,
             completionTokens: chunk.eval_count,
@@ -430,7 +438,7 @@ export class LocalClientService implements LLMClient {
 
     // Final event
     this.emitFinalEvent(req, sink, hooks, state, finalUsage);
-    return this.buildStreamReturn(req, state);
+    return this.buildStreamReturn(req, state, finishReason);
   }
 
   // -------------------------------------------------------------------------
@@ -476,6 +484,7 @@ export class LocalClientService implements LLMClient {
       turnId: req.turnId,
       model: req.model,
       content: choice?.message?.content ?? "",
+      finishReason: normalizeFinishReason(choice?.finish_reason || "unknown"),
       usage: json.usage
         ? {
             promptTokens: json.usage.prompt_tokens,
@@ -534,6 +543,7 @@ export class LocalClientService implements LLMClient {
     const decoder = new TextDecoder("utf-8");
     let buffer = "";
     let firstTokenEmitted = false;
+    let finishReason = "unknown";
 
     while (sink.isOpen()) {
       const { value, done } = await reader.read();
@@ -554,6 +564,11 @@ export class LocalClientService implements LLMClient {
 
         const chunk = safeJsonParse(payload) as OAIChatResponse | null;
         if (!chunk) continue;
+        if (chunk.choices?.[0]?.finish_reason) {
+          finishReason = normalizeFinishReason(
+            chunk.choices[0].finish_reason || "unknown",
+          );
+        }
 
         const text = chunk.choices?.[0]?.delta?.content ?? "";
 
@@ -591,7 +606,7 @@ export class LocalClientService implements LLMClient {
     }
 
     this.emitFinalEvent(req, sink, hooks, state, undefined);
-    return this.buildStreamReturn(req, state);
+    return this.buildStreamReturn(req, state, finishReason);
   }
 
   // -------------------------------------------------------------------------
@@ -873,12 +888,14 @@ export class LocalClientService implements LLMClient {
   private buildStreamReturn(
     req: LLMRequest,
     state: StreamState,
+    finishReason: string = "unknown",
   ): LLMStreamResponse {
     return {
       traceId: req.traceId,
       turnId: req.turnId,
       model: req.model,
       finalText: state.accumulatedText,
+      finishReason,
     };
   }
 
@@ -928,6 +945,20 @@ function truncate(s: string, n: number): string {
 function sanitizeErrMessage(e: unknown): string {
   if (e instanceof Error) return truncate(e.message, 800);
   return "unknown_error";
+}
+
+function normalizeFinishReason(raw: unknown): string {
+  const value = String(raw || "").toLowerCase();
+  if (!value) return "unknown";
+  if (value.includes("stop")) return "stop";
+  if (value.includes("length") || value.includes("max_tokens"))
+    return "length";
+  if (value.includes("content_filter") || value.includes("safety"))
+    return "content_filter";
+  if (value.includes("tool")) return "tool_calls";
+  if (value.includes("cancel")) return "cancelled";
+  if (value.includes("error")) return "error";
+  return value;
 }
 
 function chunkText(text: string, maxChars: number): string[] {

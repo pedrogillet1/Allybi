@@ -2,7 +2,7 @@ import type {
   StreamSink,
   LLMStreamingConfig,
 } from "./llm/types/llmStreaming.types";
-import { ChatRuntimeService } from "./chatRuntime.service";
+import { ChatRuntimeService } from "../modules/chat/application/chat-runtime.service";
 import { ConversationNotFoundError } from "./chatRuntime.contracts";
 import type {
   ChatEngine,
@@ -52,7 +52,6 @@ export { ConversationNotFoundError };
 export class PrismaChatService implements PrismaChatServicePort {
   private readonly runtime: ChatRuntimeService;
   private readonly kernel: ChatKernelService;
-  private readonly useKernel: boolean;
 
   constructor(
     engine: ChatEngine,
@@ -62,10 +61,6 @@ export class PrismaChatService implements PrismaChatServicePort {
     },
   ) {
     this.runtime = new ChatRuntimeService(engine, opts);
-    // Staged cutover switch for centralized turn routing.
-    // default=true preserves current behavior unless explicitly disabled.
-    this.useKernel =
-      (process.env.PRISMA_CHAT_KERNEL_ENABLED ?? "true") !== "false";
     this.kernel = new ChatKernelService({
       chat: (req: ChatRequest) => this.runtime.chat(req),
       streamChat: (params: {
@@ -84,14 +79,10 @@ export class PrismaChatService implements PrismaChatServicePort {
     encryptedRepo: EncryptedChatRepo,
     encryptedContext?: EncryptedChatContextService,
   ): void {
-    (this.runtime as any).encryptedRepo = encryptedRepo;
-    if (encryptedContext) {
-      (this.runtime as any).encryptedContext = encryptedContext;
-    }
+    this.runtime.wireEncryption(encryptedRepo, encryptedContext);
   }
 
   async chat(req: ChatRequest): Promise<ChatResult> {
-    if (!this.useKernel) return this.runtime.chat(req);
     return this.kernel.handleTurn(req);
   }
 
@@ -100,7 +91,6 @@ export class PrismaChatService implements PrismaChatServicePort {
     sink: StreamSink;
     streamingConfig: LLMStreamingConfig;
   }): Promise<ChatResult> {
-    if (!this.useKernel) return this.runtime.streamChat(params);
     return this.kernel.streamTurn(params);
   }
 

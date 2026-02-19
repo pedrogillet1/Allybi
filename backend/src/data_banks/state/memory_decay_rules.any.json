@@ -1,10 +1,15 @@
 {
   "_meta": {
     "id": "memory_decay_rules",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Deterministic memory decay rules for Koda conversation state. Controls how persistent preferences, locks, and history signals decay over time/turns to prevent stale scope, repetitive fallbacks, and incorrect follow-up carryover. Ensures ChatGPT-like continuity without 'sticky' wrong context.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-02-19",
     "owner": "koda-state",
     "compat": ">=1.0.0",
     "changeLog": [
@@ -27,7 +32,9 @@
         "followupContinuityTtlTurns": 6,
         "softPreferenceTtlTurns": 24,
         "fallbackCooldownTtlTurns": 6,
-        "maxHistoryDepth": 64
+        "maxHistoryDepth": 64,
+        "staleTopicTtlTurns": 18,
+        "staleScopeTtlTurns": 14
       },
       "conflictResolution": {
         "ifExplicitLock": "preserve",
@@ -44,7 +51,11 @@
         "history.recentOperators",
         "ephemeral.signals.isFollowup"
       ],
-      "emitsSignals": ["memoryDecayed", "followupContinuityExpired", "fallbackCooldownExpired"]
+      "emitsSignals": [
+        "memoryDecayed",
+        "followupContinuityExpired",
+        "fallbackCooldownExpired"
+      ]
     },
     "decayPolicies": {
       "followupContinuity": {
@@ -53,11 +64,17 @@
       },
       "formatPreferences": {
         "ttlTurns": 24,
-        "fields": ["persistent.preferences.formatBias.preferBullets", "persistent.preferences.formatBias.preferTables", "persistent.preferences.formatBias.preferConcise"]
+        "fields": [
+          "persistent.preferences.formatBias.preferBullets",
+          "persistent.preferences.formatBias.preferTables",
+          "persistent.preferences.formatBias.preferConcise"
+        ]
       },
       "fallbackAntiRepetition": {
         "ttlTurns": 6,
-        "fields": ["history.recentFallbacks"]
+        "fields": [
+          "history.recentFallbacks"
+        ]
       },
       "reasonCodeHistory": {
         "maxItems": 48
@@ -67,6 +84,21 @@
       },
       "tokenHistory": {
         "maxItems": 24
+      },
+      "topicContinuity": {
+        "ttlTurns": 18,
+        "clearWhenNoFollowup": true,
+        "fields": [
+          "persistent.scope.activeDocTitle",
+          "persistent.scope.activeFilename"
+        ]
+      },
+      "scopeHints": {
+        "ttlTurns": 14,
+        "fields": [
+          "persistent.scope.activeSheetName",
+          "persistent.scope.activeRangeA1"
+        ]
       }
     }
   },
@@ -75,16 +107,38 @@
       "id": "preserve_explicit_doc_lock_indefinitely",
       "scope": "global",
       "description": "Never decay explicit hard doc lock; it must persist until user explicitly unlocks.",
-      "appliesTo": ["memory_decay"],
-      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "appliesTo": [
+        "memory_decay"
+      ],
+      "triggerPatterns": {
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
+      },
       "when": {
         "all": [
-          { "path": "persistent.scope.hardDocLock", "op": "eq", "value": true }
+          {
+            "path": "persistent.scope.hardDocLock",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "action": {
         "type": "preserve_path",
-        "paths": ["persistent.scope.hardDocLock", "persistent.scope.activeDocId", "persistent.scope.activeFilename", "persistent.locks.lockSetTurn", "persistent.locks.lockReasonCodes"]
+        "paths": [
+          "persistent.scope.hardDocLock",
+          "persistent.scope.activeDocId",
+          "persistent.scope.activeFilename",
+          "persistent.locks.lockSetTurn",
+          "persistent.locks.lockReasonCodes"
+        ]
       },
       "reasonCode": "memory_preserve_explicit_lock",
       "severity": "high"
@@ -93,17 +147,40 @@
       "id": "expire_followup_continuity_soft",
       "scope": "global",
       "description": "Expire follow-up continuity hints after TTL when no explicit lock is active, to prevent stale carryover.",
-      "appliesTo": ["memory_decay"],
-      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "appliesTo": [
+        "memory_decay"
+      ],
+      "triggerPatterns": {
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
+      },
       "when": {
         "all": [
-          { "path": "persistent.scope.hardDocLock", "op": "neq", "value": true },
-          { "path": "metrics.turnsSinceLastContentTurn", "op": "gt", "value": 6 }
+          {
+            "path": "persistent.scope.hardDocLock",
+            "op": "neq",
+            "value": true
+          },
+          {
+            "path": "metrics.turnsSinceLastContentTurn",
+            "op": "gt",
+            "value": 6
+          }
         ]
       },
       "action": {
         "type": "clear_ephemeral_signal",
-        "signals": ["isFollowup", "followupStrength"]
+        "signals": [
+          "isFollowup",
+          "followupStrength"
+        ]
       },
       "reasonCode": "memory_followup_continuity_expired",
       "severity": "medium"
@@ -112,19 +189,44 @@
       "id": "decay_format_preferences",
       "scope": "global",
       "description": "Decay soft format preferences over time to avoid sticky formatting across unrelated tasks.",
-      "appliesTo": ["memory_decay"],
-      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "appliesTo": [
+        "memory_decay"
+      ],
+      "triggerPatterns": {
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
+      },
       "when": {
         "all": [
-          { "path": "metrics.turnsSinceLastFormatPreference", "op": "gt", "value": 24 }
+          {
+            "path": "metrics.turnsSinceLastFormatPreference",
+            "op": "gt",
+            "value": 24
+          }
         ]
       },
       "action": {
         "type": "set_paths",
         "updates": [
-          { "path": "persistent.preferences.formatBias.preferBullets", "value": false },
-          { "path": "persistent.preferences.formatBias.preferTables", "value": false },
-          { "path": "persistent.preferences.formatBias.preferConcise", "value": false }
+          {
+            "path": "persistent.preferences.formatBias.preferBullets",
+            "value": false
+          },
+          {
+            "path": "persistent.preferences.formatBias.preferTables",
+            "value": false
+          },
+          {
+            "path": "persistent.preferences.formatBias.preferConcise",
+            "value": false
+          }
         ]
       },
       "reasonCode": "memory_format_prefs_decayed",
@@ -134,13 +236,29 @@
       "id": "prune_fallback_history_by_ttl",
       "scope": "global",
       "description": "Prune fallback anti-repetition history beyond TTL to prevent unbounded growth and stale cooldown behavior.",
-      "appliesTo": ["memory_decay"],
-      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "appliesTo": [
+        "memory_decay"
+      ],
+      "triggerPatterns": {
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
+      },
       "action": {
         "type": "prune_history_objects",
         "path": "history.recentFallbacks",
         "keepIf": [
-          { "path": "turnId", "op": "gte", "valueFrom": "metrics.currentTurnIdMinusTtlFallback" }
+          {
+            "path": "turnId",
+            "op": "gte",
+            "valueFrom": "metrics.currentTurnIdMinusTtlFallback"
+          }
         ],
         "maxItems": 12
       },
@@ -151,8 +269,20 @@
       "id": "cap_reason_code_history",
       "scope": "global",
       "description": "Cap reason code history to keep state bounded and deterministic.",
-      "appliesTo": ["memory_decay"],
-      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "appliesTo": [
+        "memory_decay"
+      ],
+      "triggerPatterns": {
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
+      },
       "action": {
         "type": "cap_history_array",
         "path": "history.recentReasonCodes",
@@ -165,8 +295,20 @@
       "id": "cap_operator_history",
       "scope": "global",
       "description": "Cap recent operator history to keep state bounded.",
-      "appliesTo": ["memory_decay"],
-      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "appliesTo": [
+        "memory_decay"
+      ],
+      "triggerPatterns": {
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
+      },
       "action": {
         "type": "cap_history_array",
         "path": "history.recentOperators",
@@ -179,8 +321,20 @@
       "id": "cap_token_history",
       "scope": "global",
       "description": "Cap recent UI token history for anti-repetition controls.",
-      "appliesTo": ["memory_decay"],
-      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "appliesTo": [
+        "memory_decay"
+      ],
+      "triggerPatterns": {
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
+      },
       "action": {
         "type": "cap_history_array",
         "path": "history.recentTokens",
@@ -188,6 +342,54 @@
       },
       "reasonCode": "memory_tokens_capped",
       "severity": "low"
+    },
+    {
+      "id": "decay_stale_scope_hints",
+      "scope": "global",
+      "description": "Decay stale sheet/range scope hints when follow-up continuity expires.",
+      "appliesTo": [
+        "memory_decay"
+      ],
+      "triggerPatterns": {
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
+      },
+      "when": {
+        "all": [
+          {
+            "path": "persistent.scope.hardDocLock",
+            "op": "neq",
+            "value": true
+          },
+          {
+            "path": "metrics.turnsSinceLastScopedHint",
+            "op": "gt",
+            "value": 14
+          }
+        ]
+      },
+      "action": {
+        "type": "set_paths",
+        "updates": [
+          {
+            "path": "persistent.scope.activeSheetName",
+            "value": null
+          },
+          {
+            "path": "persistent.scope.activeRangeA1",
+            "value": null
+          }
+        ]
+      },
+      "reasonCode": "memory_scope_hints_decayed",
+      "severity": "medium"
     }
   ],
   "tests": {
@@ -195,40 +397,146 @@
       {
         "id": "MDR_0001_explicit_lock_not_decayed",
         "context": {
-          "persistent": { "scope": { "hardDocLock": true, "activeDocId": "doc_A", "activeFilename": "a.pdf" }, "locks": { "lockSetTurn": 1, "lockReasonCodes": ["explicit_doc_lock"] } },
-          "metrics": { "turnsSinceLastContentTurn": 100 }
+          "persistent": {
+            "scope": {
+              "hardDocLock": true,
+              "activeDocId": "doc_A",
+              "activeFilename": "a.pdf"
+            },
+            "locks": {
+              "lockSetTurn": 1,
+              "lockReasonCodes": [
+                "explicit_doc_lock"
+              ]
+            }
+          },
+          "metrics": {
+            "turnsSinceLastContentTurn": 100
+          }
         },
-        "expect": { "preservedPathsAny": ["persistent.scope.hardDocLock", "persistent.scope.activeDocId"] }
+        "expect": {
+          "preservedPathsAny": [
+            "persistent.scope.hardDocLock",
+            "persistent.scope.activeDocId"
+          ]
+        }
       },
       {
         "id": "MDR_0002_followup_continuity_expires_without_lock",
         "context": {
-          "persistent": { "scope": { "hardDocLock": false } },
-          "ephemeral": { "signals": { "isFollowup": true, "followupStrength": "strong" } },
-          "metrics": { "turnsSinceLastContentTurn": 7 }
+          "persistent": {
+            "scope": {
+              "hardDocLock": false
+            }
+          },
+          "ephemeral": {
+            "signals": {
+              "isFollowup": true,
+              "followupStrength": "strong"
+            }
+          },
+          "metrics": {
+            "turnsSinceLastContentTurn": 7
+          }
         },
-        "expect": { "followupContinuityExpired": true }
+        "expect": {
+          "followupContinuityExpired": true
+        }
       },
       {
         "id": "MDR_0003_format_prefs_decay",
         "context": {
-          "metrics": { "turnsSinceLastFormatPreference": 30 },
-          "persistent": { "preferences": { "formatBias": { "preferBullets": true, "preferTables": true, "preferConcise": true } } }
+          "metrics": {
+            "turnsSinceLastFormatPreference": 30
+          },
+          "persistent": {
+            "preferences": {
+              "formatBias": {
+                "preferBullets": true,
+                "preferTables": true,
+                "preferConcise": true
+              }
+            }
+          }
         },
-        "expect": { "formatBiasReset": true }
+        "expect": {
+          "formatBiasReset": true
+        }
       },
       {
         "id": "MDR_0004_prune_fallback_history",
         "context": {
-          "history": { "recentFallbacks": [{ "reasonCode": "x", "fallbackType": "y", "strategy": "z", "turnId": 1 }, { "reasonCode": "x2", "fallbackType": "y2", "strategy": "z2", "turnId": 100 }] },
-          "metrics": { "currentTurnIdMinusTtlFallback": 95 }
+          "history": {
+            "recentFallbacks": [
+              {
+                "reasonCode": "x",
+                "fallbackType": "y",
+                "strategy": "z",
+                "turnId": 1
+              },
+              {
+                "reasonCode": "x2",
+                "fallbackType": "y2",
+                "strategy": "z2",
+                "turnId": 100
+              }
+            ]
+          },
+          "metrics": {
+            "currentTurnIdMinusTtlFallback": 95
+          }
         },
-        "expect": { "recentFallbacksCountMax": 12, "oldEntriesPruned": true }
+        "expect": {
+          "recentFallbacksCountMax": 12,
+          "oldEntriesPruned": true
+        }
       },
       {
         "id": "MDR_0005_reason_codes_capped",
-        "context": { "history": { "recentReasonCodesCount": 200 } },
-        "expect": { "recentReasonCodesCountMax": 48 }
+        "context": {
+          "history": {
+            "recentReasonCodesCount": 200
+          }
+        },
+        "expect": {
+          "recentReasonCodesCountMax": 48
+        }
+      },
+      {
+        "id": "MDR_0006_scope_hints_decay_after_ttl",
+        "context": {
+          "persistent": {
+            "scope": {
+              "hardDocLock": false,
+              "activeSheetName": "Revenue",
+              "activeRangeA1": "B2:F18"
+            }
+          },
+          "metrics": {
+            "turnsSinceLastScopedHint": 18
+          }
+        },
+        "expect": {
+          "scopeHintsCleared": true
+        }
+      },
+      {
+        "id": "MDR_0007_scope_hints_preserved_with_hard_lock",
+        "context": {
+          "persistent": {
+            "scope": {
+              "hardDocLock": true,
+              "activeSheetName": "Revenue",
+              "activeRangeA1": "B2:F18"
+            }
+          },
+          "metrics": {
+            "turnsSinceLastScopedHint": 30
+          }
+        },
+        "expect": {
+          "scopeHintsCleared": false
+        }
       }
     ]
   }

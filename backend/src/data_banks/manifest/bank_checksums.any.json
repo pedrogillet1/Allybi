@@ -3,7 +3,9 @@
     "id": "bank_checksums",
     "version": "1.0.0",
     "description": "Integrity map for data banks. Stores expected SHA-256 checksums per bank path and optional per-env overrides. Used at boot (and optionally in CI) to detect drift, partial restores, or accidental edits.",
-    "languages": ["any"],
+    "languages": [
+      "any"
+    ],
     "lastUpdated": "2026-01-26"
   },
   "config": {
@@ -70,146 +72,620 @@
       "required": true,
       "category": "manifest"
     },
-
-    "schemas/bank_schema.any.json": { "sha256": "", "required": true, "category": "schemas" },
-    "schemas/router_input_schema.any.json": { "sha256": "", "required": true, "category": "schemas" },
-    "schemas/scope_output_schema.any.json": { "sha256": "", "required": true, "category": "schemas" },
-    "schemas/candidate_filters_schema.any.json": { "sha256": "", "required": true, "category": "schemas" },
-    "schemas/retrieval_output_schema.any.json": { "sha256": "", "required": true, "category": "schemas" },
-    "schemas/evidence_schema.any.json": { "sha256": "", "required": true, "category": "schemas" },
-    "schemas/attachment_schema.any.json": { "sha256": "", "required": true, "category": "schemas" },
-
-    "routing/intent_patterns.any.json": { "sha256": "", "required": true, "category": "routing" },
-    "routing/answer_mode_router.any.json": { "sha256": "", "required": true, "category": "routing" },
-    "routing/routing_priority.any.json": { "sha256": "", "required": true, "category": "routing" },
-    "routing/operator_priority.any.json": { "sha256": "", "required": true, "category": "routing" },
-    "routing/routing_operator_tiebreakers.any.json": { "sha256": "", "required": true, "category": "routing" },
-    "routing/followup_detection.any.json": { "sha256": "", "required": true, "category": "routing" },
-    "routing/query_rewrite.any.json": { "sha256": "", "required": true, "category": "routing" },
-    "routing/intent_config.any.json": { "sha256": "", "required": true, "category": "routing" },
-    "routing/tool_router.any.json": { "sha256": "", "required": true, "category": "routing" },
-
-    "operators/operator_contracts.any.json": { "sha256": "", "required": true, "category": "operators" },
-    "operators/operator_output_shapes.any.json": { "sha256": "", "required": true, "category": "operators" },
-    "operators/operator_constraints.any.json": { "sha256": "", "required": true, "category": "operators" },
-    "operators/operator_signals.any.json": { "sha256": "", "required": true, "category": "operators" },
-    "operators/operator_families.any.json": { "sha256": "", "required": true, "category": "operators" },
-    "operators/operator_aliases.any.json": { "sha256": "", "required": true, "category": "operators" },
-    "operators/operator_negatives.any.json": { "sha256": "", "required": true, "category": "operators" },
-    "operators/list_first_operators.any.json": { "sha256": "", "required": true, "category": "operators" },
-    "operators/nav_pills_operators.any.json": { "sha256": "", "required": true, "category": "operators" },
-
-    "normalizers/query_normalization.any.json": { "sha256": "", "required": true, "category": "normalizers" },
-    "normalizers/language_indicators.any.json": { "sha256": "", "required": true, "category": "normalizers" },
-    "normalizers/abbreviations.any.json": { "sha256": "", "required": true, "category": "normalizers" },
-    "normalizers/synonym_expansion.any.json": { "sha256": "", "required": true, "category": "normalizers" },
-    "normalizers/filename_normalization.any.json": { "sha256": "", "required": true, "category": "normalizers" },
-    "normalizers/doc_aliases.any.json": { "sha256": "", "required": true, "category": "normalizers" },
-    "normalizers/month_normalization.any.json": { "sha256": "", "required": true, "category": "normalizers" },
-    "normalizers/number_normalization.any.json": { "sha256": "", "required": true, "category": "normalizers" },
-    "normalizers/units_normalization.any.json": { "sha256": "", "required": true, "category": "normalizers" },
-
-    "negatives/negation_and_exclusions.any.json": { "sha256": "", "required": true, "category": "negatives" },
-    "negatives/denylist_terms.any.json": { "sha256": "", "required": true, "category": "negatives" },
-    "negatives/stopwords_query.any.json": { "sha256": "", "required": false, "category": "negatives" },
-    "negatives/weak_terms.any.json": { "sha256": "", "required": false, "category": "negatives" },
-    "negatives/ambiguous_terms.any.json": { "sha256": "", "required": false, "category": "negatives" },
-    "negatives/unsafe_patterns.any.json": { "sha256": "", "required": true, "category": "negatives" },
-
-    "retrieval/semantic_search_config.any.json": { "sha256": "", "required": true, "category": "retrieval" },
-    "retrieval/retrieval_ranker_config.any.json": { "sha256": "", "required": true, "category": "retrieval" },
-    "retrieval/keyword_boost_rules.any.json": { "sha256": "", "required": false, "category": "retrieval" },
-    "retrieval/doc_title_boost_rules.any.json": { "sha256": "", "required": false, "category": "retrieval" },
-    "retrieval/doc_type_boost_rules.any.json": { "sha256": "", "required": false, "category": "retrieval" },
-    "retrieval/recency_boost_rules.any.json": { "sha256": "", "required": false, "category": "retrieval" },
-    "retrieval/diversification_rules.any.json": { "sha256": "", "required": false, "category": "retrieval" },
-    "retrieval/evidence_packaging.any.json": { "sha256": "", "required": true, "category": "retrieval" },
-
-    "formatting/answer_style_policy.any.json": { "sha256": "", "required": true, "category": "formatting" },
-    "formatting/render_policy.any.json": { "sha256": "", "required": true, "category": "formatting" },
-    "formatting/bullet_rules.any.json": { "sha256": "", "required": false, "category": "formatting" },
-    "formatting/table_rules.any.json": { "sha256": "", "required": false, "category": "formatting" },
-    "formatting/list_styles.any.json": { "sha256": "", "required": true, "category": "formatting" },
-    "formatting/table_styles.any.json": { "sha256": "", "required": true, "category": "formatting" },
-    "formatting/quote_styles.any.json": { "sha256": "", "required": true, "category": "formatting" },
-    "formatting/citation_styles.any.json": { "sha256": "", "required": true, "category": "formatting" },
-    "formatting/truncation_and_limits.any.json": { "sha256": "", "required": true, "category": "formatting" },
-    "formatting/bolding_rules.any.json": { "sha256": "", "required": false, "category": "formatting" },
-    "formatting/banned_phrases.any.json": { "sha256": "", "required": true, "category": "formatting" },
-    "formatting/answer_openers.any.json": { "sha256": "", "required": false, "category": "formatting" },
-    "formatting/answer_closers.any.json": { "sha256": "", "required": false, "category": "formatting" },
-    "formatting/followup_templates.any.json": { "sha256": "", "required": false, "category": "formatting" },
-
-    "microcopy/conversation_messages.any.json": { "sha256": "", "required": true, "category": "microcopy" },
-    "microcopy/nav_microcopy.any.json": { "sha256": "", "required": true, "category": "microcopy" },
-    "microcopy/file_actions_microcopy.any.json": { "sha256": "", "required": true, "category": "microcopy" },
-    "microcopy/no_docs_messages.any.json": { "sha256": "", "required": true, "category": "microcopy" },
-    "microcopy/scoped_not_found_messages.any.json": { "sha256": "", "required": true, "category": "microcopy" },
-    "microcopy/processing_messages.any.json": { "sha256": "", "required": true, "category": "microcopy" },
-    "microcopy/extraction_recovery_messages.any.json": { "sha256": "", "required": true, "category": "microcopy" },
-    "microcopy/not_found_scope_messages.any.json": { "sha256": "", "required": true, "category": "microcopy" },
-    "microcopy/scope_empty_messages.any.json": { "sha256": "", "required": true, "category": "microcopy" },
-
-    "overlays/scope_hints.any.json": { "sha256": "", "required": false, "category": "overlays" },
-    "overlays/followup_indicators.any.json": { "sha256": "", "required": false, "category": "overlays" },
-    "overlays/ui_contracts.any.json": { "sha256": "", "required": false, "category": "overlays" },
-    "overlays/routing_overlays.any.json": { "sha256": "", "required": false, "category": "overlays" },
-    "overlays/retrieval_overlays.any.json": { "sha256": "", "required": false, "category": "overlays" },
-    "overlays/formatting_overlays.any.json": { "sha256": "", "required": false, "category": "overlays" },
-
-    "prompts/prompt_registry.any.json": { "sha256": "", "required": true, "category": "prompts" },
-    "prompts/system_prompt.any.json": { "sha256": "", "required": true, "category": "prompts" },
-    "prompts/retrieval_prompt.any.json": { "sha256": "", "required": true, "category": "prompts" },
-    "prompts/compose_answer_prompt.any.json": { "sha256": "", "required": true, "category": "prompts" },
-    "prompts/disambiguation_prompt.any.json": { "sha256": "", "required": true, "category": "prompts" },
-    "prompts/fallback_prompt.any.json": { "sha256": "", "required": true, "category": "prompts" },
-    "prompts/tool_prompts.any.json": { "sha256": "", "required": true, "category": "prompts" },
-
-    "quality/quality_gates.any.json": { "sha256": "", "required": true, "category": "quality" },
-    "quality/doc_grounding_checks.any.json": { "sha256": "", "required": true, "category": "quality" },
-    "quality/hallucination_guards.any.json": { "sha256": "", "required": true, "category": "quality" },
-    "quality/dedupe_and_repetition.any.json": { "sha256": "", "required": true, "category": "quality" },
-    "quality/numeric_integrity_rules.any.json": { "sha256": "", "required": true, "category": "quality" },
-    "quality/privacy_minimal_rules.any.json": { "sha256": "", "required": true, "category": "quality" },
-    "quality/refusal_phrases.any.json": { "sha256": "", "required": true, "category": "quality" },
-    "quality/pii_field_labels.any.json": { "sha256": "", "required": true, "category": "quality" },
-
-    "scope/scope_resolution.any.json": { "sha256": "", "required": true, "category": "scope" },
-    "scope/candidate_filters.any.json": { "sha256": "", "required": true, "category": "scope" },
-    "scope/active_doc_rules.any.json": { "sha256": "", "required": true, "category": "scope" },
-
-    "state/conversation_state_schema.any.json": { "sha256": "", "required": true, "category": "state" },
-    "state/state_update_rules.any.json": { "sha256": "", "required": true, "category": "state" },
-    "state/memory_decay_rules.any.json": { "sha256": "", "required": true, "category": "state" },
-    "state/state_debug_policy.any.json": { "sha256": "", "required": false, "category": "state" },
-
-    "ambiguity/ambiguity_rank_features.any.json": { "sha256": "", "required": true, "category": "ambiguity" },
-    "ambiguity/disambiguation_policies.any.json": { "sha256": "", "required": true, "category": "ambiguity" },
-    "ambiguity/disambiguation_render_policy.any.json": { "sha256": "", "required": false, "category": "ambiguity" },
-    "ambiguity/clarification_phrases.any.json": { "sha256": "", "required": true, "category": "ambiguity" },
-
-    "triggers/intent_triggers.any.json": { "sha256": "", "required": false, "category": "triggers" },
-    "triggers/operator_triggers.any.json": { "sha256": "", "required": false, "category": "triggers" },
-    "triggers/format_triggers.any.json": { "sha256": "", "required": false, "category": "triggers" },
-    "triggers/nav_triggers.any.json": { "sha256": "", "required": false, "category": "triggers" },
-    "triggers/domain_triggers.any.json": { "sha256": "", "required": false, "category": "triggers" },
-    "triggers/language_triggers.any.json": { "sha256": "", "required": false, "category": "triggers" },
-
-    "probes/probes_manifest.any.json": { "sha256": "", "required": false, "category": "probes" },
-    "probes/regression_queries.any.json": { "sha256": "", "required": false, "category": "probes" },
-    "probes/parity_queries.any.json": { "sha256": "", "required": false, "category": "probes" },
-    "probes/hallucination_probes.any.json": { "sha256": "", "required": false, "category": "probes" },
-    "probes/numeric_probes.any.json": { "sha256": "", "required": false, "category": "probes" },
-    "probes/ui_probes.any.json": { "sha256": "", "required": false, "category": "probes" },
-    "probes/load_tests.any.json": { "sha256": "", "required": false, "category": "probes" },
-    "probes/failure_mode_tests.any.json": { "sha256": "", "required": false, "category": "probes" }
+    "schemas/bank_schema.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "schemas"
+    },
+    "schemas/router_input_schema.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "schemas"
+    },
+    "schemas/scope_output_schema.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "schemas"
+    },
+    "schemas/candidate_filters_schema.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "schemas"
+    },
+    "schemas/retrieval_output_schema.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "schemas"
+    },
+    "schemas/evidence_schema.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "schemas"
+    },
+    "schemas/attachment_schema.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "schemas"
+    },
+    "routing/intent_patterns.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "routing"
+    },
+    "routing/answer_mode_router.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "routing"
+    },
+    "routing/routing_priority.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "routing"
+    },
+    "routing/operator_priority.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "routing"
+    },
+    "routing/routing_operator_tiebreakers.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "routing"
+    },
+    "routing/followup_detection.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "routing"
+    },
+    "routing/query_rewrite.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "routing"
+    },
+    "routing/intent_config.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "routing"
+    },
+    "routing/tool_router.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "routing"
+    },
+    "operators/operator_contracts.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "operators"
+    },
+    "operators/operator_output_shapes.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "operators"
+    },
+    "operators/operator_constraints.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "operators"
+    },
+    "operators/operator_signals.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "operators"
+    },
+    "operators/operator_families.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "operators"
+    },
+    "operators/operator_aliases.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "operators"
+    },
+    "operators/operator_negatives.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "operators"
+    },
+    "operators/list_first_operators.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "operators"
+    },
+    "operators/nav_pills_operators.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "operators"
+    },
+    "normalizers/query_normalization.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "normalizers"
+    },
+    "normalizers/language_indicators.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "normalizers"
+    },
+    "normalizers/abbreviations.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "normalizers"
+    },
+    "normalizers/synonym_expansion.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "normalizers"
+    },
+    "normalizers/filename_normalization.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "normalizers"
+    },
+    "normalizers/doc_aliases.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "normalizers"
+    },
+    "normalizers/month_normalization.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "normalizers"
+    },
+    "normalizers/number_normalization.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "normalizers"
+    },
+    "normalizers/units_normalization.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "normalizers"
+    },
+    "negatives/negation_and_exclusions.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "negatives"
+    },
+    "negatives/denylist_terms.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "negatives"
+    },
+    "negatives/stopwords_query.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "negatives"
+    },
+    "negatives/weak_terms.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "negatives"
+    },
+    "negatives/ambiguous_terms.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "negatives"
+    },
+    "negatives/unsafe_patterns.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "negatives"
+    },
+    "retrieval/semantic_search_config.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "retrieval"
+    },
+    "retrieval/retrieval_ranker_config.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "retrieval"
+    },
+    "retrieval/keyword_boost_rules.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/doc_title_boost_rules.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/doc_type_boost_rules.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/recency_boost_rules.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/diversification_rules.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/evidence_packaging.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "retrieval"
+    },
+    "formatting/answer_style_policy.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "formatting"
+    },
+    "formatting/render_policy.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "formatting"
+    },
+    "formatting/bullet_rules.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "formatting"
+    },
+    "formatting/table_rules.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "formatting"
+    },
+    "formatting/list_styles.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "formatting"
+    },
+    "formatting/table_styles.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "formatting"
+    },
+    "formatting/quote_styles.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "formatting"
+    },
+    "formatting/citation_styles.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "formatting"
+    },
+    "formatting/truncation_and_limits.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "formatting"
+    },
+    "formatting/bolding_rules.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "formatting"
+    },
+    "formatting/banned_phrases.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "formatting"
+    },
+    "formatting/answer_openers.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "formatting"
+    },
+    "formatting/answer_closers.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "formatting"
+    },
+    "formatting/followup_templates.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "formatting"
+    },
+    "microcopy/conversation_messages.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "microcopy"
+    },
+    "microcopy/nav_microcopy.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "microcopy"
+    },
+    "microcopy/file_actions_microcopy.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "microcopy"
+    },
+    "microcopy/no_docs_messages.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "microcopy"
+    },
+    "microcopy/scoped_not_found_messages.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "microcopy"
+    },
+    "microcopy/processing_messages.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "microcopy"
+    },
+    "microcopy/extraction_recovery_messages.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "microcopy"
+    },
+    "microcopy/not_found_scope_messages.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "microcopy"
+    },
+    "microcopy/scope_empty_messages.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "microcopy"
+    },
+    "overlays/scope_hints.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "overlays"
+    },
+    "overlays/followup_indicators.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "overlays"
+    },
+    "overlays/ui_contracts.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "overlays"
+    },
+    "overlays/routing_overlays.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "overlays"
+    },
+    "overlays/retrieval_overlays.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "overlays"
+    },
+    "overlays/formatting_overlays.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "overlays"
+    },
+    "prompts/prompt_registry.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "prompts"
+    },
+    "prompts/system_prompt.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "prompts"
+    },
+    "prompts/retrieval_prompt.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "prompts"
+    },
+    "prompts/compose_answer_prompt.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "prompts"
+    },
+    "prompts/disambiguation_prompt.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "prompts"
+    },
+    "prompts/fallback_prompt.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "prompts"
+    },
+    "prompts/tool_prompts.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "prompts"
+    },
+    "quality/quality_gates.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "quality"
+    },
+    "quality/doc_grounding_checks.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "quality"
+    },
+    "quality/hallucination_guards.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "quality"
+    },
+    "quality/dedupe_and_repetition.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "quality"
+    },
+    "quality/numeric_integrity_rules.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "quality"
+    },
+    "quality/privacy_minimal_rules.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "quality"
+    },
+    "quality/refusal_phrases.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "quality"
+    },
+    "quality/pii_field_labels.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "quality"
+    },
+    "scope/scope_resolution.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "scope"
+    },
+    "scope/candidate_filters.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "scope"
+    },
+    "scope/active_doc_rules.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "scope"
+    },
+    "state/conversation_state_schema.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "state"
+    },
+    "state/state_update_rules.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "state"
+    },
+    "state/memory_decay_rules.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "state"
+    },
+    "state/state_debug_policy.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "state"
+    },
+    "ambiguity/ambiguity_rank_features.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "ambiguity"
+    },
+    "ambiguity/disambiguation_policies.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "ambiguity"
+    },
+    "ambiguity/disambiguation_render_policy.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "ambiguity"
+    },
+    "ambiguity/clarification_phrases.any.json": {
+      "sha256": "",
+      "required": true,
+      "category": "ambiguity"
+    },
+    "triggers/intent_triggers.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "triggers"
+    },
+    "triggers/operator_triggers.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "triggers"
+    },
+    "triggers/format_triggers.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "triggers"
+    },
+    "triggers/nav_triggers.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "triggers"
+    },
+    "triggers/domain_triggers.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "triggers"
+    },
+    "triggers/language_triggers.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "triggers"
+    },
+    "probes/probes_manifest.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "probes"
+    },
+    "probes/regression_queries.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "probes"
+    },
+    "probes/parity_queries.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "probes"
+    },
+    "probes/hallucination_probes.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "probes"
+    },
+    "probes/numeric_probes.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "probes"
+    },
+    "probes/ui_probes.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "probes"
+    },
+    "probes/load_tests.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "probes"
+    },
+    "probes/failure_mode_tests.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "probes"
+    },
+    "policies/tests/memory_policy_tests.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "tests"
+    },
+    "tests/memory_semantic_continuity.any.json": {
+      "sha256": "",
+      "required": false,
+      "category": "tests"
+    }
   },
   "envOverrides": {
     "_comment": "Optional: override checksum strictness behavior per environment.",
-    "production": { "strict": true, "onMismatch": "fail_boot" },
-    "staging": { "strict": true, "onMismatch": "fail_boot" },
-    "dev": { "strict": false, "onMismatch": "warn" },
-    "local": { "strict": false, "onMismatch": "warn" }
+    "production": {
+      "strict": true,
+      "onMismatch": "fail_boot"
+    },
+    "staging": {
+      "strict": true,
+      "onMismatch": "fail_boot"
+    },
+    "dev": {
+      "strict": false,
+      "onMismatch": "warn"
+    },
+    "local": {
+      "strict": false,
+      "onMismatch": "warn"
+    }
   },
   "tests": {
     "cases": [

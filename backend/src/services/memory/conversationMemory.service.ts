@@ -6,6 +6,7 @@
  */
 
 import prisma from "../../config/database";
+import { getBankLoaderInstance } from "../core/banks/bankLoader.service";
 
 /**
  * Per-message metadata for intent inheritance
@@ -35,7 +36,20 @@ export interface ConversationContext {
 
 export class ConversationMemoryService {
   private cache = new Map<string, ConversationContext>();
-  private readonly maxMessages = 10; // Keep last 10 messages in context
+  private readonly maxMessages: number;
+
+  constructor() {
+    const bank = getBankLoaderInstance().getBank<any>("memory_policy");
+    const configured = Number(
+      bank?.config?.runtimeTuning?.inMemoryMessageCacheLimit,
+    );
+    if (!Number.isFinite(configured) || configured <= 0) {
+      throw new Error(
+        "memory_policy.config.runtimeTuning.inMemoryMessageCacheLimit is required",
+      );
+    }
+    this.maxMessages = Math.floor(configured);
+  }
 
   /**
    * Get conversation context

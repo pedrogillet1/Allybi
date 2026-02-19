@@ -15,7 +15,7 @@ import { clamp } from "../../../utils";
  * Bank: routing/routing_operator_tiebreakers.any.json (bank id: routing_operator_tiebreakers)
  */
 
-import { getBank } from "../banks/bankLoader.service";
+import { getBank, getOptionalBank } from "../banks/bankLoader.service";
 import type { IntentFamily, Operator } from "../../../types/intents.types";
 
 // ============================================================================
@@ -294,7 +294,6 @@ export class OperatorTiebreakersService {
 
     this.compileExplicitRules();
     this.compileTypePreferences();
-    this.compileLegacyOperatorTiebreakers(); // optional fallback only
   }
 
   // ========================================================================
@@ -316,10 +315,6 @@ export class OperatorTiebreakersService {
     // (Return only if it helps; otherwise continue.)
     // NOTE: Your router can call getTypePreferences separately if you prefer.
     // This function keeps routing decisions separate from type hints.
-
-    // 3) Optional legacy operator_tiebreakers fallback (if present)
-    const legacy = this.matchLegacyRoutes(q, lang);
-    if (legacy) return legacy;
 
     // No decision: let router's primary intent selection win
     return null;
@@ -351,24 +346,34 @@ export class OperatorTiebreakersService {
   }
 
   getFallback(hasDocuments: boolean): TiebreakerRoute {
-    if (!this.bank) {
-      // Hardcoded fallback if bank not loaded
-      return hasDocuments
-        ? { intentFamily: "documents", operator: "extract", confidence: 0.5 }
-        : { intentFamily: "help", operator: "capabilities", confidence: 0.4 };
-    }
+    const intentConfig = getOptionalBank<{
+      config?: {
+        defaults?: { fallbackIntentFamily?: string; fallbackOperator?: string };
+      };
+    }>("intent_config");
+    const defaultIntentFamily = (
+      intentConfig?.config?.defaults?.fallbackIntentFamily || "documents"
+    ).toLowerCase() as IntentFamily;
+    const defaultOperator = (
+      intentConfig?.config?.defaults?.fallbackOperator || "extract"
+    ).toLowerCase() as Operator;
+    const defaultConfidence = hasDocuments ? 0.55 : 0.45;
 
     // Support both new format (fallback.hasDocuments) and legacy (fallback_rules.has_documents)
     const bankAny = this.bank as any;
     const fallbackConfig = hasDocuments
       ? bankAny.fallback?.hasDocuments ||
-        this.bank.fallback_rules?.has_documents
-      : bankAny.fallback?.noDocuments || this.bank.fallback_rules?.no_documents;
+        this.bank?.fallback_rules?.has_documents
+      : bankAny.fallback?.noDocuments ||
+        this.bank?.fallback_rules?.no_documents;
 
     if (!fallbackConfig) {
-      return hasDocuments
-        ? { intentFamily: "documents", operator: "extract", confidence: 0.55 }
-        : { intentFamily: "help", operator: "capabilities", confidence: 0.45 };
+      return {
+        intentFamily: defaultIntentFamily,
+        operator: defaultOperator,
+        confidence: defaultConfidence,
+        reason: hasDocuments ? "fallback_config_missing_docs" : "fallback_config_missing_no_docs",
+      };
     }
 
     return {

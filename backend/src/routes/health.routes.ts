@@ -8,6 +8,9 @@
 
 import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
+import prisma from "../config/database";
+import { getBankLoaderInstance } from "../services/core/banks/bankLoader.service";
+import { getContainer } from "../bootstrap/container";
 
 const router = Router();
 
@@ -28,23 +31,104 @@ router.get("/health", (_req: Request, res: Response) => {
  * If you want deeper checks, wire them into a service and return boolean flags.
  */
 router.get("/ready", async (_req: Request, res: Response) => {
-  // Example placeholders; replace with real checks if you have them:
-  const checks = {
-    server: true,
-    // db: await db.ping(),
-    // storage: await storage.ping(),
-    // vector: await vector.ping(),
-    // cache: await cache.ping(),
-  };
+  const env = String(process.env.NODE_ENV || "development").toLowerCase();
+  const strict = env === "production" || env === "staging";
 
-  const ok = Object.values(checks).every(Boolean);
+  const checks: Record<string, boolean> = {
+    server: true,
+    db: false,
+    banks: false,
+    retrievalStorage: false,
+    retrievalEngineLoaded: false,
+    answerEngineLoaded: false,
+  };
+  const details: Record<string, unknown> = {};
+
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    checks.db = true;
+  } catch (error: unknown) {
+    details.dbError = error instanceof Error ? error.message : "db_ping_failed";
+  }
+
+  try {
+    const bankLoader = getBankLoaderInstance();
+    const bankHealth = bankLoader.health();
+    checks.banks = Boolean(bankHealth.ok);
+    details.bankHealth = bankHealth;
+  } catch (error: unknown) {
+    details.bankError =
+      error instanceof Error ? error.message : "bank_health_failed";
+  }
+
+  try {
+    await prisma.$queryRaw`SELECT 1 FROM "document_chunks" LIMIT 1`;
+    checks.retrievalStorage = true;
+  } catch (error: unknown) {
+    details.retrievalStorageError =
+      error instanceof Error ? error.message : "retrieval_storage_unavailable";
+  }
+
+  try {
+    const container = getContainer();
+    checks.retrievalEngineLoaded = Boolean(container.getRetrievalEngine());
+    checks.answerEngineLoaded = Boolean(container.getAnswerEngine());
+  } catch (error: unknown) {
+    details.containerError =
+      error instanceof Error ? error.message : "container_not_ready";
+  }
+
+  const requiredChecks = strict
+    ? [
+        "server",
+        "db",
+        "banks",
+        "retrievalStorage",
+        "retrievalEngineLoaded",
+        "answerEngineLoaded",
+      ]
+    : ["server", "db", "banks"];
+
+  const ok = requiredChecks.every((key) => checks[key]);
 
   res.status(ok ? 200 : 503).json({
     ok,
     status: ok ? "ready" : "degraded",
+    env,
+    strict,
     checks,
+    details,
+    requiredChecks,
     ts: new Date().toISOString(),
   });
+});
+
+router.get("/health/retrieval", async (_req: Request, res: Response) => {
+  const payload: Record<string, unknown> = {
+    ok: true,
+    ts: new Date().toISOString(),
+  };
+
+  try {
+    const bankLoader = getBankLoaderInstance();
+    payload.bankHealth = bankLoader.health();
+  } catch (error: unknown) {
+    payload.ok = false;
+    payload.bankError =
+      error instanceof Error ? error.message : "bank_health_failed";
+  }
+
+  try {
+    await prisma.$queryRaw`SELECT COUNT(*)::int AS total FROM "document_chunks"`;
+    payload.retrievalStorage = "ok";
+  } catch (error: unknown) {
+    payload.ok = false;
+    payload.retrievalStorageError =
+      error instanceof Error ? error.message : "retrieval_storage_unavailable";
+  }
+
+  const status = payload.ok === true ? 200 : 503;
+  res.status(status).json(payload);
 });
 
 /**

@@ -18,6 +18,10 @@ const checks = [
     name: "entrypoint routes cannot import services/core directly",
     cmd: `rg -n "services/core" backend/src/entrypoints/http/routes`,
   },
+  {
+    name: "active runtime cannot import legacy chat runtime",
+    cmd: `rg -n "chatRuntime\\.legacy\\.service" backend/src/modules/chat/application/chat-runtime.service.ts backend/src/services/chatRuntime.service.ts`,
+  },
 ];
 
 let failed = false;

@@ -227,6 +227,7 @@ interface IntentConfigBank {
       conversationShieldOperators?: string[];
       maxSignals?: number;
     };
+    defaultOperatorByFamily?: Partial<Record<IntentFamily, string>>;
   };
 }
 
@@ -727,17 +728,70 @@ export class KodaIntentEngineV3Service {
   }
 
   private pickForcedLanguageFromTriggers(text: string): LanguageCode | null {
-    const lang = "en"; // just for selecting .any + .en patterns (we’ll inspect outputs)
-    const flags = "gi";
-    for (const r of this.languageTriggers!.rules ?? []) {
-      const patterns = pickLangPatterns(r.patterns, lang as any);
-      const m = matchAny(patterns, text, flags);
+    const bank = this.languageTriggers as unknown as {
+      config?: { caseInsensitive?: boolean; stripDiacritics?: boolean };
+      rules?: Array<Record<string, unknown>>;
+    };
+    const rules = Array.isArray(bank?.rules) ? bank.rules : [];
+    if (rules.length === 0) return null;
+
+    const normalized = normalizeText(text, {
+      stripDiacritics: bank?.config?.stripDiacritics ?? true,
+      collapseWhitespace: true,
+      lower: bank?.config?.caseInsensitive ?? true,
+    });
+    const flags = bank?.config?.caseInsensitive === false ? "g" : "gi";
+
+    const collectPatterns = (raw: unknown): string[] => {
+      if (!raw || typeof raw !== "object") return [];
+      const source = raw as Record<string, unknown>;
+      const locales = ["any", "en", "pt", "es"];
+      const out: string[] = [];
+      for (const locale of locales) {
+        const values = source[locale];
+        if (!Array.isArray(values)) continue;
+        for (const value of values) {
+          if (typeof value !== "string") continue;
+          const trimmed = value.trim();
+          if (trimmed) out.push(trimmed);
+        }
+      }
+      return out;
+    };
+
+    for (const rule of rules) {
+      const patterns = [
+        ...collectPatterns((rule as { patterns?: unknown }).patterns),
+        ...collectPatterns((rule as { triggerPatterns?: unknown }).triggerPatterns),
+      ];
+      const m = matchAny(patterns, normalized, flags);
       if (!m.matched) continue;
+
+      const legacyLang = String(
+        (rule as { setSignals?: { language?: unknown } }).setSignals?.language ||
+          "",
+      )
+        .trim()
+        .toLowerCase();
+      if (legacyLang === "en" || legacyLang === "pt" || legacyLang === "es") {
+        return legacyLang as LanguageCode;
+      }
+
+      const action = (rule as { action?: { type?: unknown; language?: unknown } })
+        .action;
+      const actionType = String(action?.type || "")
+        .trim()
+        .toLowerCase();
+      const actionLanguage = String(action?.language || "")
+        .trim()
+        .toLowerCase();
       if (
-        r.setSignals?.language &&
-        ["en", "pt", "es"].includes(r.setSignals.language)
+        actionType === "set_language" &&
+        (actionLanguage === "en" ||
+          actionLanguage === "pt" ||
+          actionLanguage === "es")
       ) {
-        return r.setSignals.language as LanguageCode;
+        return actionLanguage as LanguageCode;
       }
     }
     return null;
@@ -1285,36 +1339,35 @@ export class KodaIntentEngineV3Service {
   // -----------------------------
   private applyConversationShield(
     result: IntentResult,
-    text: string,
-    lang: LanguageCode,
+    _text: string,
+    _lang: LanguageCode,
   ): IntentResult {
-    // If intent triggers already flagged conversation-only, keep it.
     if (result.intentFamily === "conversation") return result;
 
-    // Use operator_negatives typically blocks this, but we add a final guard:
-    const convoRegexByLang: Record<LanguageCode, RegExp> = {
-      en: /^\s*(hi|hello|hey|thanks|thank you|ok|okay|got it)\s*[!?.]*\s*$/i,
-      pt: /^\s*(oi|ol[aá]|obrigado|obrigada|valeu|ok|t[aá]|entendi)\s*[!?.]*\s*$/i,
-      es: /^\s*(hola|gracias|ok|entendido|vale)\s*[!?.]*\s*$/i,
-    };
-    if (convoRegexByLang[lang].test(text)) {
-      return {
-        intentFamily: "conversation",
-        operator: "greeting",
-        confidence: Math.max(
+    const conversationSignal =
+      result.signals?.conversationOnly === true ||
+      result.signals?.isConversationOnly === true;
+    if (!conversationSignal) return result;
+
+    const configuredOperators =
+      this.intentConfig?.config?.safety?.conversationShieldOperators ?? [];
+    const operator =
+      configuredOperators.find((candidate) => candidate === result.operator) ||
+      configuredOperators[0] ||
+      this.intentConfig?.config?.defaultOperatorByFamily?.conversation ||
+      result.operator;
+
+    return {
+      ...result,
+      intentFamily: "conversation",
+      operator,
+      confidence: Math.max(
+        result.confidence,
+        this.intentConfig?.config?.thresholds?.conversationConfidenceFloor ??
           result.confidence,
-          this.intentConfig?.config?.thresholds?.conversationConfidenceFloor ??
-            0.55,
-        ),
-        signals: { conversationOnly: true },
-        constraints: {
-          outputShape: "paragraph",
-          userRequestedShort: true,
-          maxSentences: 2,
-        },
-      };
-    }
-    return result;
+      ),
+      signals: { ...result.signals, conversationOnly: true },
+    };
   }
 
   // -----------------------------

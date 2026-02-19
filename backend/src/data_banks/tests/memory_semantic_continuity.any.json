@@ -1,0 +1,439 @@
+{
+  "_meta": {
+    "id": "memory_semantic_continuity",
+    "version": "1.0.0",
+    "description": "End-to-end multi-turn continuity scenarios validating Allybi memory persistence, semantic retrieval gating, and anti-drift behavior across EN/PT/ES.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-19"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "minimumScenarios": 24,
+    "minimumTurnsPerScenario": 6,
+    "maxTurnsPerScenario": 30
+  },
+  "scenarios": [
+    {
+      "id": "MSC_EN_001_lock_followup_unlock",
+      "language": "en",
+      "turns": [
+        "Use report_q4_2024.pdf and summarize revenue drivers.",
+        "Now extract NOI from that file.",
+        "Give me the exact quote for net operating income.",
+        "Put this in a table with rows and columns.",
+        "Stop using this file and search all documents for churn.",
+        "Compare Q4 2024 versus Q4 2023 findings."
+      ],
+      "expect": {
+        "shouldSetDocLock": true,
+        "shouldReuseDocOnFollowup": true,
+        "shouldSetQuoteMode": true,
+        "shouldSetTableSignal": true,
+        "shouldUnlockOnExplicitRequest": true,
+        "shouldAllowGlobalAfterUnlock": true
+      }
+    },
+    {
+      "id": "MSC_EN_002_short_ack_continuity",
+      "language": "en",
+      "turns": [
+        "Open budget_2025.xlsx and summarize operating margin.",
+        "ok",
+        "and now break it down by quarter",
+        "show the exact line for Q3",
+        "thanks",
+        "also compare with Q2"
+      ],
+      "expect": {
+        "shortAcksKeepContext": true,
+        "noUnexpectedDocSwitch": true,
+        "quoteSignalDetected": true,
+        "timeComparisonDetected": true
+      }
+    },
+    {
+      "id": "MSC_EN_003_sheet_range_precision",
+      "language": "en",
+      "turns": [
+        "Use workbook_finance.xlsx.",
+        "Check sheet Revenue tab range B3:F20.",
+        "Summarize trends in that range.",
+        "Now quote the exact row with highest variance.",
+        "Put result in table.",
+        "Search all docs for matching variance patterns."
+      ],
+      "expect": {
+        "sheetHintPersisted": true,
+        "rangeHintPersisted": true,
+        "quoteModeOnDemand": true,
+        "tableModeOnDemand": true,
+        "globalSearchBlockedUntilUnlock": true
+      }
+    },
+    {
+      "id": "MSC_EN_004_min_chars_gate_global",
+      "language": "en",
+      "turns": [
+        "roi",
+        "search all docs",
+        "capex",
+        "search all documents for capex trend",
+        "q4 2024 vs q4 2023",
+        "exact quote please"
+      ],
+      "expect": {
+        "globalSearchMinCharsEnforced": true,
+        "comparisonSignalDetected": true,
+        "quoteSignalDetected": true
+      }
+    },
+
+    {
+      "id": "MSC_PT_001_bloqueio_followup_desbloqueio",
+      "language": "pt",
+      "turns": [
+        "Use o arquivo relatorio_q4_2024.pdf e resuma os drivers de receita.",
+        "Agora extraia o NOI desse arquivo.",
+        "Me dê a citação exata de lucro operacional.",
+        "Coloque em tabela com linhas e colunas.",
+        "Pare de usar esse arquivo e procure em todos os documentos.",
+        "Compare Q4 2024 versus Q4 2023."
+      ],
+      "expect": {
+        "shouldSetDocLock": true,
+        "followupKeepsScope": true,
+        "quoteSignalDetected": true,
+        "tableSignalDetected": true,
+        "unlockRequested": true,
+        "globalSearchAllowedAfterUnlock": true
+      }
+    },
+    {
+      "id": "MSC_PT_002_ack_curto_nao_reseta",
+      "language": "pt",
+      "turns": [
+        "Abra budget_2025.xlsx e resuma margem operacional.",
+        "ok",
+        "agora detalhe por trimestre",
+        "mostre a linha exata do Q3",
+        "valeu",
+        "compare com Q2"
+      ],
+      "expect": {
+        "shortAckKeepsContext": true,
+        "noScopeDrift": true,
+        "quoteSignalDetected": true,
+        "timeComparisonDetected": true
+      }
+    },
+    {
+      "id": "MSC_PT_003_aba_intervalo_preciso",
+      "language": "pt",
+      "turns": [
+        "Use planilha_financeira.xlsx.",
+        "Verifique a aba Receita no intervalo C3:H20.",
+        "Resuma tendências nesse intervalo.",
+        "Cite exatamente a linha com maior variância.",
+        "Coloque em tabela.",
+        "Busque em todos os documentos padrões parecidos."
+      ],
+      "expect": {
+        "sheetAndRangeSignalsDetected": true,
+        "quoteModeTriggered": true,
+        "tableModeTriggered": true,
+        "globalScopeRequiresUnlock": true
+      }
+    },
+    {
+      "id": "MSC_PT_004_gate_global_consulta_curta",
+      "language": "pt",
+      "turns": [
+        "roi",
+        "buscar em todos",
+        "capex",
+        "buscar em todos os documentos capex trimestral",
+        "q1 2024 vs q1 2023",
+        "citação exata"
+      ],
+      "expect": {
+        "globalSearchMinCharsEnforced": true,
+        "comparisonSignalDetected": true,
+        "quoteSignalDetected": true
+      }
+    },
+
+    {
+      "id": "MSC_ES_001_bloqueo_followup_desbloqueo",
+      "language": "es",
+      "turns": [
+        "Usa informe_q4_2024.pdf y resume los drivers de ingresos.",
+        "Ahora extrae NOI de ese archivo.",
+        "Dame la cita exacta de ingreso operativo neto.",
+        "Ponlo en tabla con filas y columnas.",
+        "Deja de usar este archivo y busca en todos los documentos.",
+        "Compara Q4 2024 versus Q4 2023."
+      ],
+      "expect": {
+        "docLockSet": true,
+        "followupKeepsScope": true,
+        "quoteSignalDetected": true,
+        "tableSignalDetected": true,
+        "unlockApplied": true,
+        "globalAllowedAfterUnlock": true
+      }
+    },
+    {
+      "id": "MSC_ES_002_ack_corto_continuidad",
+      "language": "es",
+      "turns": [
+        "Abre presupuesto_2025.xlsx y resume margen operativo.",
+        "ok",
+        "ahora desglósalo por trimestre",
+        "muestra la línea exacta de Q3",
+        "gracias",
+        "compáralo con Q2"
+      ],
+      "expect": {
+        "shortAckKeepsContext": true,
+        "noUnexpectedDocSwitch": true,
+        "quoteModeDetected": true,
+        "timeComparisonDetected": true
+      }
+    },
+    {
+      "id": "MSC_ES_003_hoja_rango_precision",
+      "language": "es",
+      "turns": [
+        "Usa libro_finanzas.xlsx.",
+        "Revisa la hoja Ingresos en el rango A5:E30.",
+        "Resume tendencias en ese rango.",
+        "Cita exactamente la fila con mayor desviación.",
+        "Pon el resultado en tabla.",
+        "Busca en todos los documentos patrones similares."
+      ],
+      "expect": {
+        "sheetRangeSignalsDetected": true,
+        "quoteModeTriggered": true,
+        "tableModeTriggered": true,
+        "globalRequiresUnlock": true
+      }
+    },
+    {
+      "id": "MSC_ES_004_gate_global_consulta_corta",
+      "language": "es",
+      "turns": [
+        "roi",
+        "buscar en todos",
+        "capex",
+        "buscar en todos los documentos capex trimestral",
+        "q2 2024 vs q2 2023",
+        "cita exacta"
+      ],
+      "expect": {
+        "globalSearchMinCharsEnforced": true,
+        "comparisonSignalDetected": true,
+        "quoteSignalDetected": true
+      }
+    },
+
+    {
+      "id": "MSC_ANY_001_attachment_scope_guard",
+      "language": "any",
+      "turns": [
+        "[attached: doc_A] summarize key risks",
+        "what about that metric",
+        "and quote the exact line",
+        "present in table",
+        "compare with previous quarter",
+        "search all docs"
+      ],
+      "expect": {
+        "attachedScopeEnforced": true,
+        "noCrossDocLeak": true,
+        "quoteAndTableSignalsDetected": true
+      }
+    },
+    {
+      "id": "MSC_ANY_002_memory_tail_bounded",
+      "language": "any",
+      "turns": [
+        "turn 1 long context",
+        "turn 2 long context",
+        "turn 3 long context",
+        "turn 4 long context",
+        "turn 5 long context",
+        "turn 6 long context",
+        "turn 7 long context",
+        "turn 8 long context"
+      ],
+      "expect": {
+        "memoryTailBoundedByPolicy": true,
+        "contextWindowNotUnbounded": true
+      }
+    },
+    {
+      "id": "MSC_ANY_003_state_summary_refresh",
+      "language": "any",
+      "turns": [
+        "Use quarterly_report.pdf",
+        "Summarize operating margin",
+        "Add capex analysis",
+        "Compare with prior year",
+        "Provide exact quote for margin note",
+        "Now continue with next section"
+      ],
+      "expect": {
+        "conversationSummaryRefreshed": true,
+        "turnsSinceLastSummaryResetOnAssistant": true
+      }
+    },
+    {
+      "id": "MSC_ANY_004_signal_bank_driven_not_hardcoded",
+      "language": "any",
+      "turns": [
+        "quote \"operating cash flow\"",
+        "in table",
+        "sheet Revenue tab B2:F12",
+        "q4 2024 vs q4 2023",
+        "use all docs",
+        "continue"
+      ],
+      "expect": {
+        "signalsLoadedFromMemoryPolicyPatterns": true,
+        "noInlineRegexHeuristicRequired": true
+      }
+    },
+    {
+      "id": "MSC_ANY_005_unlock_prevents_stale_lock",
+      "language": "any",
+      "turns": [
+        "Use contracts_2024.pdf",
+        "summarize liabilities",
+        "unlock and search all docs",
+        "find liabilities across docs",
+        "compare 2023 vs 2024",
+        "quote exact section"
+      ],
+      "expect": {
+        "unlockClearsHardLock": true,
+        "staleLockNotReapplied": true,
+        "globalSearchAllowed": true
+      }
+    },
+    {
+      "id": "MSC_ANY_006_followup_decay_without_lock",
+      "language": "any",
+      "turns": [
+        "Use plan_finance.pdf",
+        "summarize margin",
+        "ok",
+        "thanks",
+        "(simulate many idle turns)",
+        "and capex?"
+      ],
+      "expect": {
+        "followupContinuityExpiresAfterTTL": true,
+        "requiresFreshScopeWhenStale": true
+      }
+    },
+    {
+      "id": "MSC_ANY_007_filename_false_positive_shield",
+      "language": "any",
+      "turns": [
+        "hello",
+        "thanks",
+        "great",
+        "how are you",
+        "now summarize",
+        "use the same one"
+      ],
+      "expect": {
+        "noFalseFilenameSignal": true,
+        "noSpuriousDocLock": true
+      }
+    },
+    {
+      "id": "MSC_ANY_008_quote_mode_with_no_evidence_fallback_guard",
+      "language": "any",
+      "turns": [
+        "quote exact line from unknown source",
+        "search all docs",
+        "quote exact line",
+        "in table",
+        "compare q3 vs q2",
+        "continue"
+      ],
+      "expect": {
+        "quoteSignalDetected": true,
+        "fallbackReasonSetWhenNoEvidence": true,
+        "noFabricatedQuote": true
+      }
+    },
+    {
+      "id": "MSC_ANY_009_mixed_language_continuity",
+      "language": "any",
+      "turns": [
+        "Use report_q4_2024.pdf",
+        "agora extraia o NOI",
+        "ponlo en tabla",
+        "quote exact line",
+        "buscar en todos los documentos",
+        "compare q4 2024 versus q4 2023"
+      ],
+      "expect": {
+        "mixedLanguageSignalsStable": true,
+        "scopeContinuityStable": true,
+        "unlockIntentHonored": true
+      }
+    },
+    {
+      "id": "MSC_ANY_010_table_then_quote_precedence",
+      "language": "any",
+      "turns": [
+        "summarize in table",
+        "now exact quote",
+        "keep same doc",
+        "compare with prior year",
+        "show range A1:C10",
+        "continue"
+      ],
+      "expect": {
+        "quoteModeOverridesTableForAnswerMode": true,
+        "tableSignalRetainedForFormatting": true
+      }
+    },
+    {
+      "id": "MSC_ANY_011_range_signal_not_confused_with_filename",
+      "language": "any",
+      "turns": [
+        "check A1:B10",
+        "summarize",
+        "quote exact",
+        "table output",
+        "compare q1 vs q2",
+        "continue"
+      ],
+      "expect": {
+        "rangeSignalDetected": true,
+        "filenameSignalNotForced": true
+      }
+    },
+    {
+      "id": "MSC_ANY_012_source_buttons_consistency",
+      "language": "any",
+      "turns": [
+        "Use file_a.pdf",
+        "summarize",
+        "quote exact",
+        "use file_b.pdf",
+        "summarize",
+        "compare both"
+      ],
+      "expect": {
+        "sourceButtonsAttachedWhenEvidencePresent": true,
+        "sourcesDoNotDuplicateExcessively": true
+      }
+    }
+  ]
+}

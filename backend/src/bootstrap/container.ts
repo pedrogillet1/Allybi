@@ -7,8 +7,7 @@
  *
  * CRITICAL: Banks must be initialized BEFORE any bank-dependent services.
  *
- * Public API surface is kept identical so containerGuard, health routes,
- * and any other consumer that calls getContainer() / getOrchestrator() keeps working.
+ * Public API surface is kept stable for containerGuard and health routes.
  */
 
 import * as path from "path";
@@ -141,6 +140,7 @@ class KodaV3Container {
               missingEditingCapabilities: wiring.missingEditingCapabilities,
               unreachablePromptSelectionRules:
                 wiring.unreachablePromptSelectionRules,
+              legacyChatRuntimeImports: wiring.legacyChatRuntimeImports,
             };
             if (strict) {
               throw new Error(
@@ -225,18 +225,31 @@ class KodaV3Container {
         return new mod.LanguageDetectorService(bankLoader);
       });
 
-      // ====================================================================
-      // STEP 3: Load orchestrator (depends on banks + intent engine)
-      // ====================================================================
-      await this.tryLoad("orchestrator", async () => {
-        // Import via orchestration module entrypoint to keep the factory centralized.
-        const { createOrchestrator } = await import(
-          "../services/core/orchestration"
+      await this.tryLoad("retrievalEngine", async () => {
+        const { PrismaRetrievalAdapterFactory } = await import(
+          "../services/core/retrieval/prismaRetrievalAdapters.service"
         );
-        const orch = createOrchestrator();
-        console.log("[Container] Orchestrator wired with deps");
-        return orch;
+        const db = (await import("../config/database")).default;
+        return {
+          id: "centralized_retrieval_runtime",
+          centralized: true,
+          adapterFactory: new PrismaRetrievalAdapterFactory(),
+          health: async () => {
+            await db.$queryRaw`SELECT 1 FROM "document_chunks" LIMIT 1`;
+            return { ok: true };
+          },
+        };
       });
+
+      await this.tryLoad("answerEngine", async () => {
+        return {
+          id: "centralized_answer_gateway",
+          centralized: true,
+          promptGateway: "llm_request_builder",
+          health: async () => ({ ok: true }),
+        };
+      });
+
     } else {
       console.warn(
         "[Container] Skipping bank-dependent services (banks not initialized)",
@@ -276,10 +289,6 @@ class KodaV3Container {
 
   public isInitialized(): boolean {
     return this._isInitialized;
-  }
-
-  public getOrchestrator(): any {
-    return this._services.orchestrator ?? null;
   }
 
   public getIntentEngine(): any {
@@ -335,10 +344,6 @@ export async function initializeContainer(): Promise<void> {
 
 export function getContainer(): KodaV3Container {
   return container;
-}
-
-export function getOrchestrator(): any {
-  return container.getOrchestrator();
 }
 
 export { container };

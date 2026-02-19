@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import * as fs from "fs";
+import * as path from "path";
+
 import { getOptionalBank } from "./bankLoader.service";
 
 export interface RuntimeWiringIntegrityResult {
@@ -10,6 +13,7 @@ export interface RuntimeWiringIntegrityResult {
   missingEditingCatalogOperators: string[];
   missingEditingCapabilities: string[];
   unreachablePromptSelectionRules: string[];
+  legacyChatRuntimeImports: string[];
 }
 
 function asTrimmedString(value: unknown): string {
@@ -131,6 +135,27 @@ function collectPromptRegistryUnreachableRules(promptRegistry: any): string[] {
   return unreachable;
 }
 
+function collectLegacyChatRuntimeImports(): string[] {
+  const candidatePaths = [
+    path.join(process.cwd(), "src/modules/chat/application/chat-runtime.service.ts"),
+    path.join(process.cwd(), "backend/src/modules/chat/application/chat-runtime.service.ts"),
+  ];
+
+  const failures: string[] = [];
+  for (const filePath of candidatePaths) {
+    if (!fs.existsSync(filePath)) continue;
+    try {
+      const src = fs.readFileSync(filePath, "utf8");
+      if (/\bchatRuntime\.legacy\.service\b/.test(src)) {
+        failures.push(filePath);
+      }
+    } catch {
+      failures.push(filePath);
+    }
+  }
+  return failures;
+}
+
 export class RuntimeWiringIntegrityService {
   validate(): RuntimeWiringIntegrityResult {
     const requiredBanks = [
@@ -204,6 +229,7 @@ export class RuntimeWiringIntegrityService {
 
     const unreachablePromptSelectionRules =
       collectPromptRegistryUnreachableRules(promptRegistry);
+    const legacyChatRuntimeImports = collectLegacyChatRuntimeImports();
 
     return {
       ok:
@@ -212,13 +238,15 @@ export class RuntimeWiringIntegrityService {
         missingOperatorOutputShapes.length === 0 &&
         missingEditingCatalogOperators.length === 0 &&
         missingEditingCapabilities.length === 0 &&
-        unreachablePromptSelectionRules.length === 0,
+        unreachablePromptSelectionRules.length === 0 &&
+        legacyChatRuntimeImports.length === 0,
       missingBanks,
       missingOperatorContracts,
       missingOperatorOutputShapes,
       missingEditingCatalogOperators,
       missingEditingCapabilities,
       unreachablePromptSelectionRules,
+      legacyChatRuntimeImports,
     };
   }
 }

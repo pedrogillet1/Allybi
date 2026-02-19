@@ -3,7 +3,9 @@
     "id": "policy_manifest",
     "version": "1.0.0",
     "description": "Registry + load contract for policy banks. Policies are behavioral constraints (NOT microcopy). They are evaluated by orchestrator/quality gates/rendering to enforce ChatGPT-like UX invariants across all domains and answer modes.",
-    "languages": ["any"],
+    "languages": [
+      "any"
+    ],
     "lastUpdated": "2026-01-26"
   },
   "config": {
@@ -24,32 +26,62 @@
     {
       "id": "core",
       "description": "Top-level system invariants (output contract, grounding rules, fallbacks, and anti-hardcoding).",
-      "requiredByEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "safety_privacy",
       "description": "Safety/privacy constraints and redaction rules for logs/debug output.",
-      "requiredByEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "formatting",
       "description": "Formatting invariants that must hold globally (paragraph/bullet/table rules, nav_pills constraints).",
-      "requiredByEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "retrieval_grounding",
       "description": "Hard/soft scope + evidence rules used to prevent wrong-doc answers.",
-      "requiredByEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "domain",
       "description": "Domain consistency policy: domain IDs, domain selection behavior, and domain-driven style preferences.",
-      "requiredByEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "observability",
       "description": "Logging/debug contracts (no user-visible debug, internal ids handling, trace suppression).",
-      "requiredByEnv": { "production": true, "staging": true, "dev": false, "local": false }
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": false,
+        "local": false
+      }
     }
   ],
   "policies": [
@@ -57,7 +89,12 @@
       "id": "global_system_policies",
       "category": "core",
       "filename": "global_system_policies.any.json",
-      "requiredByEnv": { "production": true, "staging": true, "dev": true, "local": true },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
       "dependsOnBanks": [
         "answer_style_policy",
         "render_policy",
@@ -78,7 +115,12 @@
       "id": "safety_policy",
       "category": "safety_privacy",
       "filename": "safety_policy.any.json",
-      "requiredByEnv": { "production": true, "staging": true, "dev": true, "local": true },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
       "dependsOnBanks": [
         "unsafe_patterns",
         "banned_phrases",
@@ -98,7 +140,12 @@
       "id": "doc_access_policy",
       "category": "retrieval_grounding",
       "filename": "doc_access_policy.any.json",
-      "requiredByEnv": { "production": true, "staging": true, "dev": true, "local": true },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
       "dependsOnBanks": [
         "scope_hints",
         "followup_indicators",
@@ -122,6 +169,30 @@
       "notes": [
         "Enforces explicit filename/docId precedence, activeDoc hard-lock behavior, discovery overrides.",
         "Prevents wrong-document answers, scope drift, and cross-doc leakage."
+      ]
+    },
+    {
+      "id": "memory_policy",
+      "category": "retrieval_grounding",
+      "filename": "memory_policy.any.json",
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOnBanks": [
+        "conversation_state_schema",
+        "state_update_rules",
+        "memory_decay_rules",
+        "followup_detection",
+        "scope_resolution",
+        "retrieval_ranker_config",
+        "semantic_search_config"
+      ],
+      "notes": [
+        "Defines durable memory and semantic continuity guarantees for centralized chat runtime.",
+        "Memory policy runtime tuning is treated as required configuration."
       ]
     }
   ],

@@ -142,6 +142,7 @@ export interface ChatResult {
   indexingInProgress?: boolean;
   scopeRelaxed?: boolean;
   scopeRelaxReason?: string;
+  scopeEnforced?: boolean;
   fallbackReasonCode?: string;
 
   // v2 strict envelope (compatible: optional for old producers)

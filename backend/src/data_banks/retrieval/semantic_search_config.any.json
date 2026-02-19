@@ -1,10 +1,15 @@
 {
   "_meta": {
     "id": "semantic_search_config",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Deterministic semantic retrieval configuration for Koda. Defines embedding/search behavior, hybrid retrieval phases, query expansion gating, scope handling, and evidence candidate assembly without guessing. Prevents wrong-doc drift, over-broad semantic expansion, and unstable retrieval results across environments.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-02-19",
     "owner": "koda-retrieval",
     "compat": ">=1.0.0",
     "changeLog": [
@@ -83,7 +88,11 @@
       "cache": {
         "enabled": true,
         "ttlSeconds": 3600,
-        "keyFields": ["normalizedQuery", "scopeKey", "corpusVersion"]
+        "keyFields": [
+          "normalizedQuery",
+          "scopeKey",
+          "corpusVersion"
+        ]
       }
     },
     "hybridPhases": [
@@ -112,7 +121,12 @@
         "type": "structural",
         "enabled": true,
         "k": 60,
-        "anchors": ["headings", "captions", "toc_signal", "table_headers"],
+        "anchors": [
+          "headings",
+          "captions",
+          "toc_signal",
+          "table_headers"
+        ],
         "reasonCode": "structural_anchor_boost"
       }
     ],
@@ -124,7 +138,12 @@
         "hardLockWinsOverExpansion": true
       },
       "docSelection": {
-        "candidateDocSourceOrder": ["explicit_doc_ref", "active_doc_lock", "doc_aliases", "corpus_wide"],
+        "candidateDocSourceOrder": [
+          "explicit_doc_ref",
+          "active_doc_lock",
+          "doc_aliases",
+          "corpus_wide"
+        ],
         "maxCandidateDocsSoft": 8,
         "maxCandidateDocsHard": 16
       },
@@ -140,7 +159,11 @@
       "neverExpandQuotedText": true,
       "neverExpandFilenames": true,
       "neverExpandExplicitMetrics": true,
-      "expansionStyles": ["synonyms", "abbreviations", "metric_aliases"],
+      "expansionStyles": [
+        "synonyms",
+        "abbreviations",
+        "metric_aliases"
+      ],
       "gatingSignals": {
         "allowExpansionSignal": "signals.allowExpansion",
         "explicitPhraseSignal": "signals.hasQuotedText",
@@ -149,9 +172,21 @@
     },
     "dedupePolicy": {
       "enabled": true,
-      "dedupeBy": ["docId", "locationKey", "normalizedSnippetHash"],
+      "dedupeBy": [
+        "docId",
+        "locationKey",
+        "normalizedSnippetHash"
+      ],
       "maxNearDuplicatePerDoc": 3,
       "nearDuplicateWindowChars": 280
+    },
+    "memoryContinuity": {
+      "enabled": true,
+      "preferActiveDocOnFollowup": true,
+      "enforceAttachedScopeBeforeGlobal": true,
+      "globalScopeRequiresUnlockSignal": true,
+      "staleContextPenalty": 0.18,
+      "continuityBoost": 0.12
     }
   },
   "rules": [
@@ -159,15 +194,27 @@
       "id": "semantic_phase_order_enforced",
       "scope": "global",
       "description": "Run retrieval phases in the configured order and merge candidates deterministically.",
-      "appliesTo": ["retrieval_pipeline"],
+      "appliesTo": [
+        "retrieval_pipeline"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "action": {
         "type": "enforce_phase_order",
-        "order": ["phase_semantic_primary", "phase_lexical_rescue", "phase_structural_anchors"]
+        "order": [
+          "phase_semantic_primary",
+          "phase_lexical_rescue",
+          "phase_structural_anchors"
+        ]
       },
       "reasonCode": "phase_order_enforced",
       "severity": "high"
@@ -176,16 +223,32 @@
       "id": "scope_hard_lock_blocks_corpus_search",
       "scope": "global",
       "description": "When explicit doc lock is active, block corpus-wide retrieval and restrict candidates to locked scope.",
-      "appliesTo": ["retrieval_pipeline"],
+      "appliesTo": [
+        "retrieval_pipeline"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.explicitDocLock", "op": "eq", "value": true },
-          { "path": "signals.intentFamily", "op": "neq", "value": "doc_discovery" }
+          {
+            "path": "signals.explicitDocLock",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.intentFamily",
+            "op": "neq",
+            "value": "doc_discovery"
+          }
         ]
       },
       "action": {
@@ -198,16 +261,32 @@
       "id": "disallow_expansion_for_quoted_or_filename",
       "scope": "global",
       "description": "Disable query expansion when quoted text or filenames are present to prevent semantic drift.",
-      "appliesTo": ["retrieval_pipeline"],
+      "appliesTo": [
+        "retrieval_pipeline"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "any": [
-          { "path": "signals.hasQuotedText", "op": "eq", "value": true },
-          { "path": "signals.hasFilename", "op": "eq", "value": true }
+          {
+            "path": "signals.hasQuotedText",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.hasFilename",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -220,22 +299,46 @@
       "id": "expansion_allowed_only_when_confident",
       "scope": "global",
       "description": "Allow query expansion only when intent is clear and confidence is high; otherwise keep query tight.",
-      "appliesTo": ["retrieval_pipeline"],
+      "appliesTo": [
+        "retrieval_pipeline"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.allowExpansion", "op": "eq", "value": true },
-          { "path": "metrics.intentConfidence", "op": "gte", "value": 0.8 },
-          { "path": "metrics.queryAmbiguity", "op": "lt", "value": 0.6 }
+          {
+            "path": "signals.allowExpansion",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "metrics.intentConfidence",
+            "op": "gte",
+            "value": 0.8
+          },
+          {
+            "path": "metrics.queryAmbiguity",
+            "op": "lt",
+            "value": 0.6
+          }
         ]
       },
       "action": {
         "type": "enable_query_expansion",
-        "styles": ["synonyms", "abbreviations", "metric_aliases"]
+        "styles": [
+          "synonyms",
+          "abbreviations",
+          "metric_aliases"
+        ]
       },
       "reasonCode": "expansion_enabled_confident",
       "severity": "medium"
@@ -244,11 +347,19 @@
       "id": "candidate_limits_enforced",
       "scope": "global",
       "description": "Enforce candidate doc/chunk caps and apply dedupe before packaging evidence.",
-      "appliesTo": ["retrieval_pipeline"],
+      "appliesTo": [
+        "retrieval_pipeline"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "action": {
         "type": "enforce_candidate_limits_and_dedupe",
@@ -265,51 +376,163 @@
     "cases": [
       {
         "id": "SSC_001_phase_order_and_merge",
-        "context": { "signals": { "intentFamily": "documents" } },
+        "context": {
+          "signals": {
+            "intentFamily": "documents"
+          }
+        },
         "input": "Find NOI in the report",
-        "expect": { "phasesRunInOrder": ["phase_semantic_primary", "phase_lexical_rescue", "phase_structural_anchors"] }
+        "expect": {
+          "phasesRunInOrder": [
+            "phase_semantic_primary",
+            "phase_lexical_rescue",
+            "phase_structural_anchors"
+          ]
+        }
       },
       {
         "id": "SSC_002_doc_lock_blocks_corpus",
-        "context": { "signals": { "explicitDocLock": true, "intentFamily": "documents" } },
+        "context": {
+          "signals": {
+            "explicitDocLock": true,
+            "intentFamily": "documents"
+          }
+        },
         "input": "What does it say about capex?",
-        "expect": { "scopeRestrictedToLockedDoc": true }
+        "expect": {
+          "scopeRestrictedToLockedDoc": true
+        }
       },
       {
         "id": "SSC_003_discovery_can_ignore_lock",
-        "context": { "signals": { "explicitDocLock": true, "intentFamily": "doc_discovery" } },
+        "context": {
+          "signals": {
+            "explicitDocLock": true,
+            "intentFamily": "doc_discovery"
+          }
+        },
         "input": "Which files mention ROI?",
-        "expect": { "corpusSearchAllowed": true }
+        "expect": {
+          "corpusSearchAllowed": true
+        }
       },
       {
         "id": "SSC_004_no_expansion_for_quoted",
-        "context": { "signals": { "hasQuotedText": true, "allowExpansion": true } },
+        "context": {
+          "signals": {
+            "hasQuotedText": true,
+            "allowExpansion": true
+          }
+        },
         "input": "Find \"net operating income\"",
-        "expect": { "queryExpansionEnabled": false }
+        "expect": {
+          "queryExpansionEnabled": false
+        }
       },
       {
         "id": "SSC_005_no_expansion_for_filename",
-        "context": { "signals": { "hasFilename": true, "allowExpansion": true } },
+        "context": {
+          "signals": {
+            "hasFilename": true,
+            "allowExpansion": true
+          }
+        },
         "input": "Open report_Q4_2023.pdf and find NOI",
-        "expect": { "queryExpansionEnabled": false }
+        "expect": {
+          "queryExpansionEnabled": false
+        }
       },
       {
         "id": "SSC_006_expansion_only_when_confident",
-        "context": { "signals": { "allowExpansion": true }, "metrics": { "intentConfidence": 0.9, "queryAmbiguity": 0.2 } },
+        "context": {
+          "signals": {
+            "allowExpansion": true
+          },
+          "metrics": {
+            "intentConfidence": 0.9,
+            "queryAmbiguity": 0.2
+          }
+        },
         "input": "Find NOI",
-        "expect": { "queryExpansionEnabled": true }
+        "expect": {
+          "queryExpansionEnabled": true
+        }
       },
       {
         "id": "SSC_007_multilingual_pt_semantic",
-        "context": { "signals": { "allowExpansion": true }, "metrics": { "intentConfidence": 0.9, "queryAmbiguity": 0.2 } },
+        "context": {
+          "signals": {
+            "allowExpansion": true
+          },
+          "metrics": {
+            "intentConfidence": 0.9,
+            "queryAmbiguity": 0.2
+          }
+        },
         "input": "Encontre NOI no relatório",
-        "expect": { "phasesRunInOrder": ["phase_semantic_primary", "phase_lexical_rescue", "phase_structural_anchors"] }
+        "expect": {
+          "phasesRunInOrder": [
+            "phase_semantic_primary",
+            "phase_lexical_rescue",
+            "phase_structural_anchors"
+          ]
+        }
       },
       {
         "id": "SSC_008_regression_no_wrong_doc_drift_after_lock",
-        "context": { "signals": { "explicitDocLock": true, "intentFamily": "documents" }, "metrics": { "candidateDocCountOutsideLock": 1 } },
+        "context": {
+          "signals": {
+            "explicitDocLock": true,
+            "intentFamily": "documents"
+          },
+          "metrics": {
+            "candidateDocCountOutsideLock": 1
+          }
+        },
         "input": "Summarize it",
-        "expect": { "outsideLockCandidatesExcluded": true }
+        "expect": {
+          "outsideLockCandidatesExcluded": true
+        }
+      },
+      {
+        "id": "SSC_009_followup_prefers_active_doc",
+        "context": {
+          "signals": {
+            "isFollowup": true,
+            "explicitDocLock": false,
+            "activeDocId": "doc_A"
+          }
+        },
+        "input": "and now capex",
+        "expect": {
+          "activeDocBoostApplied": true
+        }
+      },
+      {
+        "id": "SSC_010_attached_scope_blocks_global",
+        "context": {
+          "signals": {
+            "attachedDocIdsPresent": true,
+            "corpusSearchAllowed": true
+          }
+        },
+        "input": "search everywhere",
+        "expect": {
+          "attachedScopeWins": true
+        }
+      },
+      {
+        "id": "SSC_011_unlock_required_for_global_scope",
+        "context": {
+          "signals": {
+            "searchAllDocsRequested": false,
+            "corpusSearchAllowed": false
+          }
+        },
+        "input": "find across all files",
+        "expect": {
+          "globalScopeDenied": true
+        }
       }
     ]
   }

@@ -16,6 +16,7 @@ export class EvidenceValidator {
     const next: ChatResult = {
       ...result,
       sources: scopedSources,
+      scopeEnforced: true,
       evidence: {
         required: evidenceRequired,
         provided: scopedSources.length > 0,

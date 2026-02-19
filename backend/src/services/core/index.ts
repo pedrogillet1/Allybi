@@ -7,12 +7,9 @@
  * directly from the specific service file that defines them.
  *
  * Usage:
- *   import { KodaOrchestratorV3Service } from '../services/core';
- *   import type { ChatTurnRequest } from '../services/core/orchestration/kodaOrchestrator.service';
+ *   import { KodaIntentEngineV3Service } from '../services/core';
+ *   import { getBank } from '../services/core';
  */
-
-// orchestration/
-export { KodaOrchestratorV3Service } from "./orchestration";
 
 // banks/
 export {

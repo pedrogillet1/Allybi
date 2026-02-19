@@ -189,6 +189,7 @@ export class GeminiClientService implements LLMClient {
         turnId: req.turnId,
         model: req.model,
         content: parsed.text,
+        finishReason: normalizeFinishReason(parsed.finishReason),
         toolCallRequest: parsed.toolCalls?.length
           ? { toolCalls: parsed.toolCalls }
           : undefined,
@@ -292,6 +293,7 @@ export class GeminiClientService implements LLMClient {
       let buffer = "";
       let firstTokenEmitted = false;
       let usageMetadata: GeminiUsageMetadata | undefined;
+      let finishReason = "unknown";
 
       while (sink.isOpen()) {
         const { value, done } = await reader.read();
@@ -324,6 +326,9 @@ export class GeminiClientService implements LLMClient {
           if (!chunkResp) continue;
 
           const parsed = this.parseGeminiResponse(chunkResp);
+          if (parsed.finishReason) {
+            finishReason = normalizeFinishReason(parsed.finishReason);
+          }
 
           // Capture usage from the last chunk that has it
           if (chunkResp.usageMetadata) {
@@ -399,7 +404,8 @@ export class GeminiClientService implements LLMClient {
               completionTokens: usageMetadata.candidatesTokenCount,
               totalTokens: usageMetadata.totalTokenCount,
             }
-          : undefined,
+            : undefined,
+        finishReason,
         requestId,
       };
     } catch (e) {
@@ -597,6 +603,7 @@ export class GeminiClientService implements LLMClient {
   private parseGeminiResponse(resp: GeminiGenerateResponse): {
     text: string;
     toolCalls?: ProviderToolCall[];
+    finishReason?: string;
   } {
     const candidates = resp.candidates ?? [];
     if (candidates.length === 0) return { text: "" };
@@ -604,7 +611,7 @@ export class GeminiClientService implements LLMClient {
     // Deterministic: use first candidate only
     const c0 = candidates[0];
     const content = c0.content;
-    if (!content?.parts?.length) return { text: "" };
+    if (!content?.parts?.length) return { text: "", finishReason: c0.finishReason };
 
     let text = "";
     const toolCalls: ProviderToolCall[] = [];
@@ -628,7 +635,9 @@ export class GeminiClientService implements LLMClient {
       }
     }
 
-    return toolCalls.length ? { text, toolCalls } : { text };
+    return toolCalls.length
+      ? { text, toolCalls, finishReason: c0.finishReason }
+      : { text, finishReason: c0.finishReason };
   }
 
   private emit(sink: StreamSink, event: StreamEvent): void {
@@ -664,6 +673,20 @@ function truncate(s: string, n: number): string {
 function sanitizeErrMessage(e: unknown): string {
   if (e instanceof Error) return truncate(e.message, 800);
   return "unknown_error";
+}
+
+function normalizeFinishReason(raw: unknown): string {
+  const value = String(raw || "").toLowerCase();
+  if (!value) return "unknown";
+  if (value.includes("stop")) return "stop";
+  if (value.includes("max_token") || value.includes("length"))
+    return "length";
+  if (value.includes("safety") || value.includes("content_filter"))
+    return "content_filter";
+  if (value.includes("tool")) return "tool_calls";
+  if (value.includes("cancel")) return "cancelled";
+  if (value.includes("error")) return "error";
+  return value;
 }
 
 function chunkText(text: string, maxChars: number): string[] {

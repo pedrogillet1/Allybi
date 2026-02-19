@@ -38,18 +38,8 @@
 import { getBank } from "../banks/bankLoader.service";
 import type { LanguageCode } from "../../../types/intents.types";
 
-// Optional dependencies (if you have them)
-import queryRewriterModule from "./queryRewriter.service";
-const getQueryRewriter = (): any => ({
-  rewrite: (input: any) => ({
-    rewrittenText: input?.text ?? "",
-    hints: {},
-  }),
-  ...queryRewriterModule,
-});
 import { getOperatorResolver } from "./operatorResolver.service";
 import { AnswerModeRouterService } from "./answerModeRouter.service";
-const getAnswerModeRouter = (): any => new AnswerModeRouterService();
 
 // -----------------------------------------------------------------------------
 // Types
@@ -87,8 +77,8 @@ export interface RouterInput {
 
 export interface QueryRewriteOutput {
   rewrittenText: string;
-  hints: any; // keep flexible; you already have a bank-driven contract
-  debug?: any;
+  hints: Record<string, unknown>;
+  debug?: Record<string, unknown>;
 }
 
 export interface RoutingDecision {
@@ -231,6 +221,9 @@ export class RouterService {
   private routingPriority?: RoutingPriorityBank;
   private operatorPriority?: OperatorPriorityBank;
   private toolRouter?: ToolRouterBank;
+  private intentConfig?: {
+    config?: { defaults?: { fallbackIntentFamily?: string; fallbackOperator?: string } };
+  };
 
   private triggersIntent?: TriggerBank;
   private triggersOperator?: TriggerBank;
@@ -250,6 +243,7 @@ export class RouterService {
     this.routingPriority = getBank<RoutingPriorityBank>("routing_priority");
     this.operatorPriority = getBank<OperatorPriorityBank>("operator_priority");
     this.toolRouter = getBank<ToolRouterBank>("tool_router");
+    this.intentConfig = getBank("intent_config");
 
     this.triggersIntent = getBank<TriggerBank>("intent_triggers");
     this.triggersOperator = getBank<TriggerBank>("operator_triggers");
@@ -329,21 +323,7 @@ export class RouterService {
     signals.followupConfidence = signals.isFollowup ? 0.7 : 0;
 
     // 3) Query rewrite (extract doc refs, time, numeric, format hints)
-    const queryRewriter = getQueryRewriter?.();
-    let query: QueryRewriteOutput = { rewrittenText: raw, hints: {} };
-    if (queryRewriter?.rewrite) {
-      const q = queryRewriter.rewrite({
-        text: raw,
-        language,
-        signals,
-        state: input.state,
-      });
-      query = {
-        rewrittenText: q?.rewrittenText ?? raw,
-        hints: q?.hints ?? {},
-        debug: q?.debug,
-      };
-    }
+    const query: QueryRewriteOutput = { rewrittenText: raw, hints: {} };
 
     // Convenience signals from hints
     signals.hasExplicitDocRef = !!(
@@ -355,59 +335,36 @@ export class RouterService {
     const intentFamily = this.detectIntentFamily(normalized, language, signals);
 
     // 5) Operator resolution (bank-driven, with negatives + priority)
-    const operatorResolver = getOperatorResolver?.();
-    let operator = "qa";
+    const operatorResolver = getOperatorResolver();
+    let operator =
+      this.intentConfig?.config?.defaults?.fallbackOperator || "extract";
     let operatorTrace:
       | Array<{ operator: string; score: number; reasons: string[] }>
       | undefined;
 
-    if (operatorResolver?.resolve) {
-      const resolved = operatorResolver.resolve(query.rewrittenText, language);
-
-      operator = resolved?.operator || operator;
-      operatorTrace = (resolved as any)?.trace;
-      // merge in resolver signals if provided
-      if ((resolved as any)?.signals)
-        Object.assign(signals, (resolved as any).signals);
-    } else {
-      // minimal fallback if resolver service missing
-      operator = this.minimalOperatorHeuristic(intentFamily, signals);
-    }
+    const resolved = operatorResolver.resolve(query.rewrittenText, language);
+    operator = resolved?.operator || operator;
+    operatorTrace = (resolved as any)?.trace;
+    if ((resolved as any)?.signals) Object.assign(signals, (resolved as any).signals);
 
     // 6) Constraints (format/UX), derived from signals + query
     const constraints = this.buildConstraints(raw, signals, query, operator);
 
     // 7) Answer mode router (bank-driven)
-    const answerModeRouter = getAnswerModeRouter?.();
+    const answerModeRouter = new AnswerModeRouterService();
     let answerMode = "general_answer";
-    let answerModeReason = "fallback";
-
-    if (answerModeRouter?.route) {
-      const routed = answerModeRouter.route({
-        operator,
-        intentFamily,
-        signals,
-        scope: undefined,
-        docContext: input.docContext || { docCount: 0 },
-        state: input.state,
-        constraints,
-      });
-      answerMode = routed?.mode || answerMode;
-      answerModeReason = routed?.reason || answerModeReason;
-      if (routed?.signals) Object.assign(signals, routed.signals);
-    } else {
-      // Minimal fallback: nav signals -> nav_pills; docs available -> doc_grounded_single
-      if (this.isNavOperator(operator) || signals.navQuery) {
-        answerMode = "nav_pills";
-        answerModeReason = "nav_fallback";
-      } else if (
-        (input.docContext?.docCount || 0) > 0 &&
-        intentFamily === "documents"
-      ) {
-        answerMode = "doc_grounded_single";
-        answerModeReason = "docs_available";
-      }
-    }
+    let answerModeReason = "router_default";
+    const routed = answerModeRouter.route({
+      operator,
+      intentFamily,
+      signals,
+      scope: undefined,
+      docContext: input.docContext || { docCount: 0 },
+      state: input.state,
+      constraints,
+    });
+    answerMode = routed?.mode || answerMode;
+    answerModeReason = routed?.reason || answerModeReason;
 
     // 8) Tool routing hint (optional)
     // Router does not execute tools. It can set signals.toolHint / operator override if your system supports.
@@ -469,11 +426,10 @@ export class RouterService {
     }
 
     const bank = this.intentPatterns;
+    const fallbackIntentFamily =
+      this.intentConfig?.config?.defaults?.fallbackIntentFamily || "documents";
     if (!bank?.families?.length) {
-      // minimal fallback
-      if (signals.navQuery) return "file_actions";
-      if (signals.isConversationOnly) return "conversation";
-      return "documents";
+      return fallbackIntentFamily;
     }
 
     const caseInsensitive = bank.config?.caseInsensitive !== false;
@@ -512,7 +468,7 @@ export class RouterService {
       return matches[0].family;
     }
 
-    return "documents";
+    return fallbackIntentFamily;
   }
 
   // ---------------------------------------------------------------------------
@@ -614,22 +570,6 @@ export class RouterService {
     const n = parseInt(m[1], 10);
     if (!Number.isFinite(n) || n <= 0 || n > 20) return undefined;
     return n;
-  }
-
-  // ---------------------------------------------------------------------------
-  // Minimal fallbacks
-  // ---------------------------------------------------------------------------
-
-  private minimalOperatorHeuristic(
-    intentFamily: string,
-    signals: Record<string, any>,
-  ): string {
-    if (signals.isConversationOnly) return "conversation";
-    if (signals.discoveryQuery) return "locate_docs";
-    if (signals.navQuery) return "open";
-    if (intentFamily === "help") return "how_to";
-    if (intentFamily === "file_actions") return "list";
-    return "qa";
   }
 
   private isNavOperator(operator: string): boolean {
