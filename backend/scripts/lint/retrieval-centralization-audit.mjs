@@ -3,11 +3,14 @@ import fs from "node:fs";
 import path from "node:path";
 
 const STRICT = process.argv.includes("--strict");
-const ROOT = process.cwd();
-const SRC = path.resolve(ROOT, "src");
+const CWD = process.cwd();
+const BACKEND_ROOT = fs.existsSync(path.resolve(CWD, "backend/src"))
+  ? path.resolve(CWD, "backend")
+  : CWD;
+const SRC = path.resolve(BACKEND_ROOT, "src");
 
 function rel(filePath) {
-  return path.relative(ROOT, filePath).replace(/\\/g, "/");
+  return path.relative(BACKEND_ROOT, filePath).replace(/\\/g, "/");
 }
 
 function listSourceFiles(dir) {

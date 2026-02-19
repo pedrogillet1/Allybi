@@ -951,8 +951,7 @@ function normalizeFinishReason(raw: unknown): string {
   const value = String(raw || "").toLowerCase();
   if (!value) return "unknown";
   if (value.includes("stop")) return "stop";
-  if (value.includes("length") || value.includes("max_tokens"))
-    return "length";
+  if (value.includes("length") || value.includes("max_tokens")) return "length";
   if (value.includes("content_filter") || value.includes("safety"))
     return "content_filter";
   if (value.includes("tool")) return "tool_calls";

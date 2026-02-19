@@ -65,6 +65,8 @@ export class ScopeService {
   }
 
   attachedScope(req: ChatRequest): string[] {
-    return normalizeDocIds(Array.isArray(req.attachedDocumentIds) ? req.attachedDocumentIds : []);
+    return normalizeDocIds(
+      Array.isArray(req.attachedDocumentIds) ? req.attachedDocumentIds : [],
+    );
   }
 }

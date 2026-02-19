@@ -51,13 +51,15 @@ function createDelegate() {
     deleteConversation: jest.fn(async () => ({ ok: true })),
     deleteAllConversations: jest.fn(async () => ({ ok: true, deleted: 0 })),
     listMessages: jest.fn(async (): Promise<ChatMessageDTO[]> => []),
-    createMessage: jest.fn(async (): Promise<ChatMessageDTO> => ({
-      id: "m1",
-      role: "assistant",
-      content: "ok",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    })),
+    createMessage: jest.fn(
+      async (): Promise<ChatMessageDTO> => ({
+        id: "m1",
+        role: "assistant",
+        content: "ok",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }),
+    ),
   };
 }
 

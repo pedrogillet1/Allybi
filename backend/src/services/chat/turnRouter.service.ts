@@ -3,19 +3,26 @@ import { EditorModeGuard } from "./guardrails/editorMode.guard";
 import { TurnRoutePolicyService } from "./turnRoutePolicy.service";
 
 export class TurnRouterService {
-  private readonly editorGuard = new EditorModeGuard();
-  private readonly routePolicy = new TurnRoutePolicyService();
+  constructor(
+    private readonly routePolicy: Pick<
+      TurnRoutePolicyService,
+      "isConnectorTurn"
+    > = new TurnRoutePolicyService(),
+    private readonly editorGuard: Pick<
+      EditorModeGuard,
+      "enforce"
+    > = new EditorModeGuard(routePolicy),
+  ) {}
 
   decide(ctx: TurnContext): TurnRouteDecision {
     const guard = this.editorGuard.enforce(ctx);
     if (guard.routeForcedToEditor) return "EDITOR";
-    const connectorIntent = this.routePolicy.isConnectorTurn(
-      ctx.messageText || "",
-      ctx.locale,
-    );
+    const connectorIntent = ctx.viewer?.mode
+      ? guard.allowConnectorEscape
+      : this.routePolicy.isConnectorTurn(ctx.messageText || "", ctx.locale);
 
     if (ctx.viewer?.mode) {
-      if (connectorIntent && guard.allowConnectorEscape) return "CONNECTOR";
+      if (connectorIntent) return "CONNECTOR";
       return "EDITOR";
     }
 

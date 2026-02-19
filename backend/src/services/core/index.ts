@@ -7,7 +7,6 @@
  * directly from the specific service file that defines them.
  *
  * Usage:
- *   import { KodaIntentEngineV3Service } from '../services/core';
  *   import { getBank } from '../services/core';
  */
 
@@ -47,30 +46,6 @@ export {
   getFormatConstraintParser,
 } from "./inputs/formatConstraintParser.service";
 export { runtimePatterns } from "./inputs/runtimePatterns.service";
-
-// routing/
-export { RouterService, getRouter } from "./routing/router.service";
-export { KodaIntentEngineV3Service } from "./routing/intentEngine.service";
-export {
-  rewriteQueryForRegeneration,
-  shouldRewriteQuery,
-} from "./routing/queryRewriter.service";
-export {
-  OperatorResolver,
-  OperatorResolverWithPolicy,
-  getOperatorResolver,
-  getOperatorResolverWithPolicy,
-} from "./routing/operatorResolver.service";
-export {
-  OperatorTiebreakersService,
-  operatorTiebreakers,
-} from "./routing/operatorTiebreakers.service";
-export { AnswerModeRouterService } from "./routing/answerModeRouter.service";
-export {
-  DomainEnforcementService,
-  getDomainEnforcement,
-} from "./routing/domainEnforcement.service";
-export { createDefaultRoutingSignals } from "./routing/routingSignals";
 
 // scope/
 export { ScopeGateService } from "./scope/scopeGate.service";

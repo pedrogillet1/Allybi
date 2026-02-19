@@ -3,12 +3,16 @@ import type { ChatResult } from "../domain/chat.contracts";
 export class EvidenceValidator {
   enforceScope(result: ChatResult, allowedDocumentIds: string[]): ChatResult {
     const allowed = new Set(
-      (allowedDocumentIds || []).map((id) => String(id || "").trim()).filter(Boolean),
+      (allowedDocumentIds || [])
+        .map((id) => String(id || "").trim())
+        .filter(Boolean),
     );
     if (allowed.size === 0) return result;
 
     const currentSources = Array.isArray(result.sources) ? result.sources : [];
-    const scopedSources = currentSources.filter((s) => allowed.has(String(s.documentId || "").trim()));
+    const scopedSources = currentSources.filter((s) =>
+      allowed.has(String(s.documentId || "").trim()),
+    );
 
     const evidenceRequired = Boolean(result.evidence?.required);
     const hadAnySources = currentSources.length > 0;

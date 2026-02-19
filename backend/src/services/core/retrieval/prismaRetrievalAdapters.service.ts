@@ -93,7 +93,13 @@ function scoreChunkText(
   const lexicalBoost = mode === "lexical" ? 0.04 : 0;
   const semanticBoost = mode === "semantic" ? 0.08 : 0;
 
-  return clamp01(tokenScore + fullQueryBoost + structuralBoost + lexicalBoost + semanticBoost);
+  return clamp01(
+    tokenScore +
+      fullQueryBoost +
+      structuralBoost +
+      lexicalBoost +
+      semanticBoost,
+  );
 }
 
 function toLocationKey(
@@ -105,7 +111,9 @@ function toLocationKey(
 }
 
 function toSnippet(text: string | null): string {
-  const clean = String(text ?? "").replace(/\s+/g, " ").trim();
+  const clean = String(text ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
   if (!clean) return "";
   return clean.length > 1200 ? `${clean.slice(0, 1199)}…` : clean;
 }
@@ -170,11 +178,7 @@ class PrismaRetrievalUserAdapter
     };
   }
 
-  async search(opts: {
-    query: string;
-    docIds?: string[];
-    k: number;
-  }): Promise<
+  async search(opts: { query: string; docIds?: string[]; k: number }): Promise<
     Array<{
       docId: string;
       location: ChunkLocation;
@@ -322,7 +326,11 @@ class PrismaRetrievalUserAdapter
         location: {
           page: row.page ?? null,
         } as ChunkLocation,
-        locationKey: toLocationKey(row.documentId, row.page ?? null, row.chunkIndex),
+        locationKey: toLocationKey(
+          row.documentId,
+          row.page ?? null,
+          row.chunkIndex,
+        ),
         snippet,
         score,
         chunkId: row.id,
@@ -338,11 +346,7 @@ class PrismaRetrievalUserAdapter
 class LexicalIndexAdapter implements LexicalIndex {
   constructor(private readonly delegate: PrismaRetrievalUserAdapter) {}
 
-  async search(opts: {
-    query: string;
-    docIds?: string[];
-    k: number;
-  }): Promise<
+  async search(opts: { query: string; docIds?: string[]; k: number }): Promise<
     Array<{
       docId: string;
       location: ChunkLocation;

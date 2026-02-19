@@ -1,7 +1,5 @@
 import type { TurnContext } from "../chat.types";
-
-const EXPLICIT_CONNECTOR_PATTERN =
-  /\b(email|gmail|outlook|calendar|slack|inbox|send|message\s+[\w.-]+)\b/i;
+import { TurnRoutePolicyService } from "../turnRoutePolicy.service";
 
 export type EditorGuardResult = {
   routeForcedToEditor: boolean;
@@ -11,13 +9,21 @@ export type EditorGuardResult = {
 };
 
 export class EditorModeGuard {
+  constructor(
+    private readonly routePolicy: Pick<
+      TurnRoutePolicyService,
+      "isConnectorTurn"
+    > = new TurnRoutePolicyService(),
+  ) {}
+
   enforce(ctx: TurnContext): EditorGuardResult {
     if (!ctx.viewer?.mode) {
       return { routeForcedToEditor: false, allowConnectorEscape: true };
     }
 
-    const allowConnectorEscape = EXPLICIT_CONNECTOR_PATTERN.test(
+    const allowConnectorEscape = this.routePolicy.isConnectorTurn(
       ctx.messageText || "",
+      ctx.locale,
     );
     if (allowConnectorEscape) {
       return { routeForcedToEditor: false, allowConnectorEscape: true };

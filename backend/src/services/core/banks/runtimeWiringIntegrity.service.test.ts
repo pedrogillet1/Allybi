@@ -73,6 +73,8 @@ describe("RuntimeWiringIntegrityService", () => {
     expect(result.missingEditingCapabilities).toEqual([]);
     expect(result.unreachablePromptSelectionRules).toEqual([]);
     expect(result.legacyChatRuntimeImports).toEqual([]);
+    expect(result.dormantCoreRoutingImports).toEqual([]);
+    expect(result.turnRoutePolicyDynamicFallback).toEqual([]);
   });
 
   it("flags missing contracts, shapes, and unreachable prompt rules", () => {
@@ -123,5 +125,7 @@ describe("RuntimeWiringIntegrityService", () => {
     );
     expect(result.unreachablePromptSelectionRules).toContain("never_reached");
     expect(Array.isArray(result.legacyChatRuntimeImports)).toBe(true);
+    expect(Array.isArray(result.dormantCoreRoutingImports)).toBe(true);
+    expect(Array.isArray(result.turnRoutePolicyDynamicFallback)).toBe(true);
   });
 });

@@ -1,6 +1,12 @@
-import { describe, expect, test } from "@jest/globals";
+import { beforeEach, describe, expect, test } from "@jest/globals";
 import { TurnRouterService } from "./turnRouter.service";
 import type { TurnContext } from "./chat.types";
+
+const mockGetOptionalBank = jest.fn();
+
+jest.mock("../core/banks/bankLoader.service", () => ({
+  getOptionalBank: (bankId: string) => mockGetOptionalBank(bankId),
+}));
 
 function baseContext(overrides: Partial<TurnContext> = {}): TurnContext {
   return {
@@ -21,6 +27,39 @@ function baseContext(overrides: Partial<TurnContext> = {}): TurnContext {
 }
 
 describe("TurnRouterService", () => {
+  beforeEach(() => {
+    mockGetOptionalBank.mockImplementation((bankId: string) => {
+      const routingBank = {
+        config: {
+          enabled: true,
+          matching: {
+            caseSensitive: false,
+            stripDiacriticsForMatching: true,
+            collapseWhitespace: true,
+          },
+        },
+        rules: [
+          {
+            when: {
+              any: [
+                {
+                  type: "regex",
+                  locale: "en",
+                  patterns: [
+                    "\\b(send|draft|compose|write)\\b.{0,12}\\b(email|message)\\b",
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      };
+      if (bankId === "email_routing") return routingBank;
+      if (bankId === "connectors_routing") return routingBank;
+      return null;
+    });
+  });
+
   test("forces editor route in viewer mode by default", () => {
     const router = new TurnRouterService();
     const ctx = baseContext({

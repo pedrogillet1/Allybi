@@ -30,7 +30,9 @@ function context(messageText: string, ranges: any[]): TurnContext {
 
 describe("EditorModeGuard", () => {
   test("selection in viewer mode forces editor route", () => {
-    const guard = new EditorModeGuard();
+    const guard = new EditorModeGuard({
+      isConnectorTurn: () => false,
+    });
     const result = guard.enforce(
       context("make this red", [{ paragraphId: "p1" }]),
     );
@@ -39,7 +41,9 @@ describe("EditorModeGuard", () => {
   });
 
   test("explicit connector intent allows connector escape", () => {
-    const guard = new EditorModeGuard();
+    const guard = new EditorModeGuard({
+      isConnectorTurn: () => true,
+    });
     const result = guard.enforce(
       context("email pedro", [{ paragraphId: "p1" }]),
     );
@@ -48,7 +52,9 @@ describe("EditorModeGuard", () => {
   });
 
   test("missing selection returns deterministic clarification code", () => {
-    const guard = new EditorModeGuard();
+    const guard = new EditorModeGuard({
+      isConnectorTurn: () => false,
+    });
     const result = guard.enforce(context("make this red", []));
     expect(result.routeForcedToEditor).toBe(true);
     expect(result.errorCode).toBe("DOCX_TARGET_REQUIRED");

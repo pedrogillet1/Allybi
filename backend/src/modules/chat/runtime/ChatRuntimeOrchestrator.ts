@@ -51,9 +51,23 @@ function tokenOverlap(aTokens: string[], bTokens: string[]): number {
 }
 
 const DOC_STOPWORDS = new Set([
-  "file", "document", "doc", "report", "spreadsheet", "sheet",
-  "arquivo", "documento", "relatório", "relatorio", "planilha",
-  "usando", "using", "from", "about", "the", "no",
+  "file",
+  "document",
+  "doc",
+  "report",
+  "spreadsheet",
+  "sheet",
+  "arquivo",
+  "documento",
+  "relatório",
+  "relatorio",
+  "planilha",
+  "usando",
+  "using",
+  "from",
+  "about",
+  "the",
+  "no",
 ]);
 
 function docnameTokens(s: string): string[] {
@@ -156,7 +170,11 @@ export class ChatRuntimeOrchestrator {
     conversationId: string,
     opts?: ConversationMessagesOptions,
   ): Promise<ConversationWithMessagesDTO | null> {
-    return this.delegate.getConversationWithMessages(userId, conversationId, opts);
+    return this.delegate.getConversationWithMessages(
+      userId,
+      conversationId,
+      opts,
+    );
   }
 
   async updateTitle(
@@ -204,7 +222,10 @@ export class ChatRuntimeOrchestrator {
     // before a conversationId exists. This prevents cross-document retrieval on
     // opening queries like "using document X...".
     if ((next.attachedDocumentIds || []).length === 0) {
-      const detected = await this.detectDocumentMentions(req.userId, req.message);
+      const detected = await this.detectDocumentMentions(
+        req.userId,
+        req.message,
+      );
       if (detected.length > 0) {
         console.log("[Scope] detected document mentions:", detected);
         next.attachedDocumentIds = detected;
@@ -216,7 +237,10 @@ export class ChatRuntimeOrchestrator {
 
     // 1. Clear scope if requested
     if (this.scopeService.shouldClearScope(req)) {
-      await this.scopeService.clearConversationScope(req.userId, conversationId);
+      await this.scopeService.clearConversationScope(
+        req.userId,
+        conversationId,
+      );
       next.attachedDocumentIds = [];
       return next;
     }
@@ -268,7 +292,9 @@ export class ChatRuntimeOrchestrator {
     const docs = await prisma.document.findMany({
       where: {
         userId,
-        status: { in: ["ready", "indexed", "available", "enriching", "completed"] },
+        status: {
+          in: ["ready", "indexed", "available", "enriching", "completed"],
+        },
       },
       select: { id: true, filename: true },
     });
@@ -284,7 +310,11 @@ export class ChatRuntimeOrchestrator {
         if (!fn) continue;
 
         // Exact or substring match
-        if (fn === candidate || fn.includes(candidate) || candidate.includes(fn)) {
+        if (
+          fn === candidate ||
+          fn.includes(candidate) ||
+          candidate.includes(fn)
+        ) {
           matched.add(doc.id);
           continue;
         }
@@ -301,18 +331,28 @@ export class ChatRuntimeOrchestrator {
     return Array.from(matched);
   }
 
-  private async postProcess(req: ChatRequest, result: ChatResult): Promise<ChatResult> {
+  private async postProcess(
+    req: ChatRequest,
+    result: ChatResult,
+  ): Promise<ChatResult> {
     const normalized = this.normalizer.normalize(result);
     const conversationId = String(result.conversationId || "").trim();
     if (!conversationId) return normalized;
 
     if (this.scopeService.shouldClearScope(req)) {
-      await this.scopeService.clearConversationScope(req.userId, conversationId);
+      await this.scopeService.clearConversationScope(
+        req.userId,
+        conversationId,
+      );
     }
 
     const attachedScope = this.scopeService.attachedScope(req);
     if (attachedScope.length > 0) {
-      await this.scopeService.setConversationScope(req.userId, conversationId, attachedScope);
+      await this.scopeService.setConversationScope(
+        req.userId,
+        conversationId,
+        attachedScope,
+      );
     }
 
     const persistedScope = await this.scopeService.getConversationScope(
@@ -320,14 +360,22 @@ export class ChatRuntimeOrchestrator {
       conversationId,
     );
 
-    const scopeForValidation = attachedScope.length > 0 ? attachedScope : persistedScope;
+    const scopeForValidation =
+      attachedScope.length > 0 ? attachedScope : persistedScope;
     if (scopeForValidation.length > 0) {
       console.log("[Scope] persisted scope:", scopeForValidation);
     }
-    const scoped = this.evidenceValidator.enforceScope(normalized, scopeForValidation);
+    const scoped = this.evidenceValidator.enforceScope(
+      normalized,
+      scopeForValidation,
+    );
 
     // Keep compatibility flags coherent.
-    if (scoped.status !== "success" && !scoped.fallbackReasonCode && scoped.failureCode) {
+    if (
+      scoped.status !== "success" &&
+      !scoped.fallbackReasonCode &&
+      scoped.failureCode
+    ) {
       scoped.fallbackReasonCode = scoped.failureCode;
     }
 

@@ -16,13 +16,29 @@
 
 import type { IntentFamily, Operator } from "../types/handlerResult.types";
 import type { FormatConstraints } from "../services/core/inputs/formatConstraintParser.service";
-import type { RoutingDecision as RoutingResult } from "../services/core/routing/router.service";
 
 // Local type aliases for types no longer exported from old router
 type DocScope = string;
 type DocScopeMode = "single" | "multi" | "all" | "none";
 type RoutingRequest = Record<string, any>;
 type SupportedLanguage = "en" | "pt" | "es";
+type RoutingResult = {
+  intentFamily?: string;
+  operator?: string;
+  confidence?: number;
+  subIntent?: string | null;
+  docScope?: {
+    mode?: DocScopeMode;
+    docIds?: string[];
+    docNames?: string[];
+  };
+  flags?: Record<string, unknown>;
+  signals?: Record<string, unknown>;
+  languageLocked?: Language;
+  language?: Language;
+  _debug?: Record<string, any>;
+  trace?: Record<string, any>;
+};
 
 function parseFormatConstraints(
   _text: string,

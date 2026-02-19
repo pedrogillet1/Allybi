@@ -1,5 +1,4 @@
 import { getOptionalBank } from "../core/banks/bankLoader.service";
-import path from "path";
 
 type Locale = "en" | "pt" | "es";
 
@@ -25,6 +24,11 @@ type RoutingBank = {
   rules?: RoutingRule[];
 };
 
+function isStrictEnv(): boolean {
+  const env = String(process.env.NODE_ENV || "").toLowerCase();
+  return env === "production" || env === "staging";
+}
+
 function normalizeText(
   input: string,
   opts?: { stripDiacritics?: boolean; collapseWhitespace?: boolean },
@@ -42,14 +46,24 @@ function normalizeText(
 export class TurnRoutePolicyService {
   private readonly connectorsRouting: RoutingBank | null;
   private readonly emailRouting: RoutingBank | null;
+  private readonly strict: boolean;
 
-  constructor() {
-    this.connectorsRouting =
-      getOptionalBank<RoutingBank>("connectors_routing") ||
-      this.loadRoutingBankFallback("routing/connectors_routing.any.json");
-    this.emailRouting =
-      getOptionalBank<RoutingBank>("email_routing") ||
-      this.loadRoutingBankFallback("routing/email_routing.any.json");
+  constructor(opts?: { strict?: boolean }) {
+    this.strict = opts?.strict ?? isStrictEnv();
+    this.connectorsRouting = getOptionalBank<RoutingBank>("connectors_routing");
+    this.emailRouting = getOptionalBank<RoutingBank>("email_routing");
+
+    const missingBanks: string[] = [];
+    if (!this.connectorsRouting) missingBanks.push("connectors_routing");
+    if (!this.emailRouting) missingBanks.push("email_routing");
+    if (this.strict && missingBanks.length > 0) {
+      throw new Error(
+        `[TurnRoutePolicy] Missing required routing banks in strict mode: ${missingBanks.join(", ")}`,
+      );
+    }
+
+    this.validateRegexPatterns("connectors_routing", this.connectorsRouting);
+    this.validateRegexPatterns("email_routing", this.emailRouting);
   }
 
   isConnectorTurn(message: string, locale: Locale): boolean {
@@ -71,7 +85,9 @@ export class TurnRoutePolicyService {
     const stripDiacritics = Boolean(
       bank.config.matching?.stripDiacriticsForMatching,
     );
-    const collapseWhitespace = Boolean(bank.config.matching?.collapseWhitespace);
+    const collapseWhitespace = Boolean(
+      bank.config.matching?.collapseWhitespace,
+    );
     const normalized = normalizeText(message, {
       stripDiacritics,
       collapseWhitespace,
@@ -96,20 +112,27 @@ export class TurnRoutePolicyService {
     return false;
   }
 
-  private loadRoutingBankFallback(relativeBankPath: string): RoutingBank | null {
-    const basePaths = [
-      path.resolve(process.cwd(), "src/data_banks", relativeBankPath),
-      path.resolve(process.cwd(), "backend/src/data_banks", relativeBankPath),
-    ];
-    for (const candidate of basePaths) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require, import/no-dynamic-require
-        const bank = require(candidate) as RoutingBank;
-        if (bank && typeof bank === "object") return bank;
-      } catch {
-        // Keep trying next path.
+  private validateRegexPatterns(
+    bankId: string,
+    bank: RoutingBank | null,
+  ): void {
+    if (!bank) return;
+    const caseSensitive = Boolean(bank.config?.matching?.caseSensitive);
+    for (const rule of bank.rules || []) {
+      for (const clause of rule.when?.any || []) {
+        if (clause.type !== "regex") continue;
+        for (const pattern of clause.patterns || []) {
+          try {
+            void new RegExp(pattern, caseSensitive ? "g" : "gi");
+          } catch {
+            if (this.strict) {
+              throw new Error(
+                `[TurnRoutePolicy] Invalid regex in ${bankId}: ${pattern}`,
+              );
+            }
+          }
+        }
       }
     }
-    return null;
   }
 }

@@ -406,6 +406,15 @@ export class RetrievalEngineService {
 
     // 3) Determine scope docIds (strict on explicit doc locks/refs)
     const scope = await this.resolveScope(req, signals, semanticCfg);
+    if (scope.hardScopeActive && scope.candidateDocIds.length === 0) {
+      const reasonCode = signals.explicitDocRef
+        ? "explicit_doc_not_found"
+        : "scope_hard_constraints_empty";
+      return this.emptyPack(req, {
+        reasonCodes: [reasonCode],
+        note: "Hard scope active but no candidate documents resolved.",
+      });
+    }
 
     // 4) Expansion gating (never expand literals; only when allowed)
     const expansion = this.computeExpansionPolicy(req, signals, semanticCfg);
@@ -462,6 +471,18 @@ export class RetrievalEngineService {
     });
 
     // 12) Final safety: never include raw debug in production (still keep internal stats)
+    if (pack.evidence.length === 0 && scope.hardScopeActive) {
+      const reasonCode =
+        signals.explicitDocRef && !signals.resolvedDocId
+          ? "explicit_doc_not_found"
+          : "scope_hard_constraints_empty";
+      if (!pack.debug) {
+        pack.debug = { phases: [], reasonCodes: [reasonCode] };
+      } else if (!pack.debug.reasonCodes.includes(reasonCode)) {
+        pack.debug.reasonCodes.push(reasonCode);
+      }
+    }
+
     if (isProduction(req.env)) {
       delete pack.debug;
     }
@@ -522,7 +543,15 @@ export class RetrievalEngineService {
     const corpusAllowed = signals.corpusSearchAllowed ?? isDiscovery;
 
     // Explicit doc ref always wins (hard lock candidate)
-    if (signals.explicitDocRef && explicitDocId) {
+    if (signals.explicitDocRef) {
+      if (!explicitDocId) {
+        return {
+          candidateDocIds: [],
+          hardScopeActive: true,
+          sheetName: signals.resolvedSheetName ?? null,
+          rangeA1: signals.resolvedRangeA1 ?? null,
+        };
+      }
       return {
         candidateDocIds: [explicitDocId],
         hardScopeActive: true,

@@ -628,7 +628,9 @@ function runExtractor(
       }
       if (viewerContext.frozenSelection) {
         const frozen = viewerContext.frozenSelection as any;
-        return { value: frozen?.rangeA1 || frozen?.a1 || frozen?.range || null };
+        return {
+          value: frozen?.rangeA1 || frozen?.a1 || frozen?.range || null,
+        };
       }
       return { value: null };
     }

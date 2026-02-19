@@ -32,6 +32,11 @@ import {
 import { EvidenceGateService } from "../../../services/core/retrieval/evidenceGate.service";
 import { getSourceButtonsService } from "../../../services/core/retrieval/sourceButtons.service";
 import { PrismaRetrievalAdapterFactory } from "../../../services/core/retrieval/prismaRetrievalAdapters.service";
+import {
+  RuntimePolicyError,
+  isRuntimePolicyError,
+  toRuntimePolicyErrorCode,
+} from "./runtimePolicyError";
 
 function mkTraceId(): string {
   return `tr_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
@@ -43,11 +48,7 @@ function clampLimit(input: unknown, fallback: number): number {
   return Math.min(Math.max(value, 1), 500);
 }
 
-function normalizeEnv():
-  | "production"
-  | "staging"
-  | "dev"
-  | "local" {
+function normalizeEnv(): "production" | "staging" | "dev" | "local" {
   const raw = String(process.env.NODE_ENV || "").toLowerCase();
   if (raw === "production") return "production";
   if (raw === "staging") return "staging";
@@ -74,7 +75,9 @@ function coerceRetrievalAnswerMode(
     "rank_disambiguate",
     "rank_autopick",
   ]);
-  return allowed.has(normalized as NonNullable<RetrievalRequest["signals"]["answerMode"]>)
+  return allowed.has(
+    normalized as NonNullable<RetrievalRequest["signals"]["answerMode"]>,
+  )
     ? (normalized as NonNullable<RetrievalRequest["signals"]["answerMode"]>)
     : null;
 }
@@ -156,7 +159,9 @@ function textForRoleHistory(messages: ChatMessageDTO[]): Array<{
 }
 
 function sanitizeSnippet(value: string, maxChars: number): string {
-  const text = String(value || "").replace(/\s+/g, " ").trim();
+  const text = String(value || "")
+    .replace(/\s+/g, " ")
+    .trim();
   if (!text) return "";
   return text.length > maxChars ? `${text.slice(0, maxChars - 1)}…` : text;
 }
@@ -281,6 +286,15 @@ function buildTruncationFromTelemetry(
   };
 }
 
+function isRuntimePolicyFailure(error: unknown): boolean {
+  if (isRuntimePolicyError(error)) return true;
+  const message = String((error as any)?.message || "");
+  return (
+    message.includes("memory_policy.config.runtimeTuning") ||
+    message.includes("Required bank missing: memory_policy")
+  );
+}
+
 export class CentralizedChatRuntimeDelegate {
   private encryptedRepo?: EncryptedChatRepo;
   private encryptedContext?: EncryptedChatContextService;
@@ -311,103 +325,124 @@ export class CentralizedChatRuntimeDelegate {
 
   async chat(req: ChatRequest): Promise<ChatResult> {
     const traceId = mkTraceId();
-    const conversationId = await this.ensureConversation(
-      req.userId,
-      req.conversationId,
-    );
+    let conversationId = "";
+    let userMessage: ChatMessageDTO | null = null;
+    try {
+      conversationId = await this.ensureConversation(
+        req.userId,
+        req.conversationId,
+      );
 
-    const userMessage = await this.createMessage({
-      conversationId,
-      role: "user",
-      content: req.message,
-      userId: req.userId,
-    });
+      userMessage = await this.createMessage({
+        conversationId,
+        role: "user",
+        content: req.message,
+        userId: req.userId,
+      });
 
-    const history = await this.loadRecentForEngine(
-      conversationId,
-      this.resolveRecentContextLimit(),
-      req.userId,
-      req.message,
-    );
-    const retrievalPack = await this.retrieveEvidence(req);
-    const answerMode = this.resolveAnswerMode(req, retrievalPack);
-    const answerClass: AnswerClass =
-      answerMode === "general_answer" ? "GENERAL" : "DOCUMENT";
-    const navType: NavType = null;
+      const history = await this.loadRecentForEngine(
+        conversationId,
+        this.resolveRecentContextLimit(),
+        req.userId,
+        req.message,
+      );
+      const retrievalPack = await this.retrieveEvidence(req);
+      const answerMode = this.resolveAnswerMode(req, retrievalPack);
+      const answerClass: AnswerClass =
+        answerMode === "general_answer" ? "GENERAL" : "DOCUMENT";
+      const navType: NavType = null;
 
-    const messages = this.buildEngineMessages(history, req.message, retrievalPack);
-    const sourceButtonsAttachment = this.buildSourceButtonsAttachment(retrievalPack);
+      const messages = this.buildEngineMessages(
+        history,
+        req.message,
+        retrievalPack,
+      );
+      const sourceButtonsAttachment =
+        this.buildSourceButtonsAttachment(retrievalPack);
 
-    const generated = await this.engine.generate({
-      traceId,
-      userId: req.userId,
-      conversationId,
-      messages,
-      context: this.buildRuntimeContext(req, retrievalPack),
-      meta: this.buildRuntimeMeta(req, retrievalPack, answerMode),
-    });
+      const generated = await this.engine.generate({
+        traceId,
+        userId: req.userId,
+        conversationId,
+        messages,
+        context: this.buildRuntimeContext(req, retrievalPack),
+        meta: this.buildRuntimeMeta(req, retrievalPack, answerMode),
+      });
 
-    const assistantTextRaw = String(generated.text || "").trim();
-    const assistantText =
-      assistantTextRaw || buildEmptyAssistantText(req.preferredLanguage);
-    const sources: ChatSourceEntry[] = buildSourcesFromEvidence(
-      retrievalPack?.evidence ?? [],
-    );
-    const attachmentsPayload = mergeAttachments(
-      generated.attachmentsPayload,
-      sourceButtonsAttachment,
-    );
-    const fallbackReasonCode = this.resolveFallbackReasonCode(req, retrievalPack);
+      const assistantTextRaw = String(generated.text || "").trim();
+      const assistantText =
+        assistantTextRaw || buildEmptyAssistantText(req.preferredLanguage);
+      const sources: ChatSourceEntry[] = buildSourcesFromEvidence(
+        retrievalPack?.evidence ?? [],
+      );
+      const attachmentsPayload = mergeAttachments(
+        generated.attachmentsPayload,
+        sourceButtonsAttachment,
+      );
+      const fallbackReasonCode = this.resolveFallbackReasonCode(
+        req,
+        retrievalPack,
+      );
 
-    const assistantMessage = await this.createMessage({
-      conversationId,
-      role: "assistant",
-      content: assistantText,
-      userId: req.userId,
-      attachments: attachmentsPayload,
-      telemetry: generated.telemetry ?? null,
-      metadata: {
-        sources,
+      const assistantMessage = await this.createMessage({
+        conversationId,
+        role: "assistant",
+        content: assistantText,
+        userId: req.userId,
+        attachments: attachmentsPayload,
+        telemetry: generated.telemetry ?? null,
+        metadata: {
+          sources,
+          answerMode,
+          answerClass,
+          navType,
+          fallbackReasonCode,
+        },
+      });
+
+      const truncation = buildTruncationFromTelemetry(
+        (generated.telemetry as Record<string, unknown>) ?? null,
+      );
+      const status = assistantTextRaw ? "success" : "partial";
+      const failureCode = assistantTextRaw ? null : "EMPTY_MODEL_RESPONSE";
+
+      return {
+        conversationId,
+        userMessageId: userMessage.id,
+        assistantMessageId: assistantMessage.id,
+        assistantText,
+        attachmentsPayload,
+        assistantTelemetry:
+          (generated.telemetry as Record<string, unknown>) ?? undefined,
+        sources: [...sources],
+        followups: [],
         answerMode,
         answerClass,
         navType,
         fallbackReasonCode,
-      },
-    });
-
-    const truncation = buildTruncationFromTelemetry(
-      (generated.telemetry as Record<string, unknown>) ?? null,
-    );
-    const status = assistantTextRaw ? "success" : "partial";
-    const failureCode = assistantTextRaw ? null : "EMPTY_MODEL_RESPONSE";
-
-    return {
-      conversationId,
-      userMessageId: userMessage.id,
-      assistantMessageId: assistantMessage.id,
-      assistantText,
-      attachmentsPayload,
-      assistantTelemetry: (generated.telemetry as Record<string, unknown>) ?? null,
-      sources: [...sources],
-      followups: [],
-      answerMode,
-      answerClass,
-      navType,
-      fallbackReasonCode,
-      status,
-      failureCode,
-      completion: {
-        answered: assistantTextRaw.length > 0,
-        missingSlots: [],
-        nextAction: null,
-      },
-      truncation,
-      evidence: {
-        required: (req.attachedDocumentIds || []).length > 0,
-        provided: sources.length > 0,
-        sourceIds: sources.map((s) => s.documentId),
-      },
-    };
+        status,
+        failureCode,
+        completion: {
+          answered: assistantTextRaw.length > 0,
+          missingSlots: [],
+          nextAction: null,
+        },
+        truncation,
+        evidence: {
+          required: (req.attachedDocumentIds || []).length > 0,
+          provided: sources.length > 0,
+          sourceIds: sources.map((s) => s.documentId),
+        },
+      };
+    } catch (error) {
+      if (!isRuntimePolicyFailure(error)) throw error;
+      return this.buildRuntimePolicyFailureResult({
+        req,
+        conversationId,
+        userMessage,
+        code: toRuntimePolicyErrorCode(error),
+      });
+    }
   }
 
   async streamChat(params: {
@@ -417,135 +452,166 @@ export class CentralizedChatRuntimeDelegate {
   }): Promise<ChatResult> {
     const { req, sink, streamingConfig } = params;
     const traceId = mkTraceId();
-    const conversationId = await this.ensureConversation(
-      req.userId,
-      req.conversationId,
-    );
+    let conversationId = "";
+    let userMessage: ChatMessageDTO | null = null;
+    try {
+      conversationId = await this.ensureConversation(
+        req.userId,
+        req.conversationId,
+      );
 
-    const userMessage = await this.createMessage({
-      conversationId,
-      role: "user",
-      content: req.message,
-      userId: req.userId,
-    });
+      userMessage = await this.createMessage({
+        conversationId,
+        role: "user",
+        content: req.message,
+        userId: req.userId,
+      });
 
-    if (sink.isOpen()) {
-      sink.write({
-        event: "progress",
-        data: {
-          stage: "retrieval",
-          message: "Retrieving evidence",
-          t: Date.now(),
+      if (sink.isOpen()) {
+        sink.write({
+          event: "progress",
+          data: {
+            stage: "retrieval",
+            message: "Retrieving evidence",
+            t: Date.now(),
+          },
+        });
+      }
+
+      const history = await this.loadRecentForEngine(
+        conversationId,
+        this.resolveRecentContextLimit(),
+        req.userId,
+        req.message,
+      );
+      const retrievalPack = await this.retrieveEvidence(req);
+      const answerMode = this.resolveAnswerMode(req, retrievalPack);
+      const answerClass: AnswerClass =
+        answerMode === "general_answer" ? "GENERAL" : "DOCUMENT";
+      const navType: NavType = null;
+
+      const messages = this.buildEngineMessages(
+        history,
+        req.message,
+        retrievalPack,
+      );
+      const sourceButtonsAttachment =
+        this.buildSourceButtonsAttachment(retrievalPack);
+      const sources: ChatSourceEntry[] = buildSourcesFromEvidence(
+        retrievalPack?.evidence ?? [],
+      );
+
+      if (sink.isOpen() && sources.length > 0) {
+        sink.write({
+          event: "progress",
+          data: {
+            stage: "compose",
+            message: "Composing answer with grounded sources",
+            t: Date.now(),
+          },
+        });
+        sink.write({
+          event: "worklog",
+          data: {
+            eventType: "STEP_ADD",
+            label: `Grounded in ${sources.length} source${sources.length === 1 ? "" : "s"}`,
+            t: Date.now(),
+          },
+        } as any);
+      }
+
+      const streamed = await this.engine.stream({
+        traceId,
+        userId: req.userId,
+        conversationId,
+        messages,
+        context: this.buildRuntimeContext(req, retrievalPack),
+        meta: this.buildRuntimeMeta(req, retrievalPack, answerMode),
+        sink,
+        streamingConfig,
+      });
+
+      const assistantTextRaw = String(streamed.finalText || "").trim();
+      const assistantText =
+        assistantTextRaw || buildEmptyAssistantText(req.preferredLanguage);
+      const attachmentsPayload = mergeAttachments(
+        streamed.attachmentsPayload,
+        sourceButtonsAttachment,
+      );
+      const fallbackReasonCode = this.resolveFallbackReasonCode(
+        req,
+        retrievalPack,
+      );
+
+      const assistantMessage = await this.createMessage({
+        conversationId,
+        role: "assistant",
+        content: assistantText,
+        userId: req.userId,
+        attachments: attachmentsPayload,
+        telemetry: streamed.telemetry ?? null,
+        metadata: {
+          sources,
+          answerMode,
+          answerClass,
+          navType,
+          fallbackReasonCode,
         },
       });
-    }
 
-    const history = await this.loadRecentForEngine(
-      conversationId,
-      this.resolveRecentContextLimit(),
-      req.userId,
-      req.message,
-    );
-    const retrievalPack = await this.retrieveEvidence(req);
-    const answerMode = this.resolveAnswerMode(req, retrievalPack);
-    const answerClass: AnswerClass =
-      answerMode === "general_answer" ? "GENERAL" : "DOCUMENT";
-    const navType: NavType = null;
+      const truncation = buildTruncationFromTelemetry(
+        (streamed.telemetry as Record<string, unknown>) ?? null,
+      );
+      const status = assistantTextRaw ? "success" : "partial";
+      const failureCode = assistantTextRaw ? null : "EMPTY_MODEL_RESPONSE";
 
-    const messages = this.buildEngineMessages(history, req.message, retrievalPack);
-    const sourceButtonsAttachment = this.buildSourceButtonsAttachment(retrievalPack);
-    const sources: ChatSourceEntry[] = buildSourcesFromEvidence(
-      retrievalPack?.evidence ?? [],
-    );
-
-    if (sink.isOpen() && sources.length > 0) {
-      sink.write({
-        event: "progress",
-        data: {
-          stage: "compose",
-          message: "Composing answer with grounded sources",
-          t: Date.now(),
-        },
-      });
-      sink.write({
-        event: "worklog",
-        data: {
-          eventType: "STEP_ADD",
-          label: `Grounded in ${sources.length} source${sources.length === 1 ? "" : "s"}`,
-          t: Date.now(),
-        },
-      } as any);
-    }
-
-    const streamed = await this.engine.stream({
-      traceId,
-      userId: req.userId,
-      conversationId,
-      messages,
-      context: this.buildRuntimeContext(req, retrievalPack),
-      meta: this.buildRuntimeMeta(req, retrievalPack, answerMode),
-      sink,
-      streamingConfig,
-    });
-
-    const assistantTextRaw = String(streamed.finalText || "").trim();
-    const assistantText =
-      assistantTextRaw || buildEmptyAssistantText(req.preferredLanguage);
-    const attachmentsPayload = mergeAttachments(
-      streamed.attachmentsPayload,
-      sourceButtonsAttachment,
-    );
-    const fallbackReasonCode = this.resolveFallbackReasonCode(req, retrievalPack);
-
-    const assistantMessage = await this.createMessage({
-      conversationId,
-      role: "assistant",
-      content: assistantText,
-      userId: req.userId,
-      attachments: attachmentsPayload,
-      telemetry: streamed.telemetry ?? null,
-      metadata: {
-        sources,
+      return {
+        conversationId,
+        userMessageId: userMessage.id,
+        assistantMessageId: assistantMessage.id,
+        assistantText,
+        attachmentsPayload,
+        assistantTelemetry:
+          (streamed.telemetry as Record<string, unknown>) ?? undefined,
+        sources: [...sources],
+        followups: [],
         answerMode,
         answerClass,
         navType,
         fallbackReasonCode,
-      },
-    });
-
-    const truncation = buildTruncationFromTelemetry(
-      (streamed.telemetry as Record<string, unknown>) ?? null,
-    );
-    const status = assistantTextRaw ? "success" : "partial";
-    const failureCode = assistantTextRaw ? null : "EMPTY_MODEL_RESPONSE";
-
-    return {
-      conversationId,
-      userMessageId: userMessage.id,
-      assistantMessageId: assistantMessage.id,
-      assistantText,
-      attachmentsPayload,
-      assistantTelemetry: (streamed.telemetry as Record<string, unknown>) ?? null,
-      sources: [...sources],
-      followups: [],
-      answerMode,
-      answerClass,
-      navType,
-      fallbackReasonCode,
-      status,
-      failureCode,
-      completion: {
-        answered: assistantTextRaw.length > 0,
-        missingSlots: [],
-        nextAction: null,
-      },
-      truncation,
-      evidence: {
-        required: (req.attachedDocumentIds || []).length > 0,
-        provided: sources.length > 0,
-        sourceIds: sources.map((s) => s.documentId),
-      },
-    };
+        status,
+        failureCode,
+        completion: {
+          answered: assistantTextRaw.length > 0,
+          missingSlots: [],
+          nextAction: null,
+        },
+        truncation,
+        evidence: {
+          required: (req.attachedDocumentIds || []).length > 0,
+          provided: sources.length > 0,
+          sourceIds: sources.map((s) => s.documentId),
+        },
+      };
+    } catch (error) {
+      if (!isRuntimePolicyFailure(error)) throw error;
+      if (sink.isOpen()) {
+        sink.write({
+          event: "worklog",
+          data: {
+            eventType: "RUN_ERROR",
+            summary: "Runtime policy configuration error",
+            t: Date.now(),
+          },
+        } as any);
+      }
+      return this.buildRuntimePolicyFailureResult({
+        req,
+        conversationId,
+        userMessage,
+        code: toRuntimePolicyErrorCode(error),
+      });
+    }
   }
 
   async createConversation(params: {
@@ -794,15 +860,19 @@ export class CentralizedChatRuntimeDelegate {
         data: { updatedAt: now },
       });
 
-      await this.recordConversationMemoryArtifacts({
-        messageId: saved.id,
-        conversationId: params.conversationId,
-        userId: params.userId,
-        role: params.role,
-        content: params.content ?? "",
-        metadata: mergedMetadata,
-        createdAt: now,
-      });
+      try {
+        await this.recordConversationMemoryArtifacts({
+          messageId: saved.id,
+          conversationId: params.conversationId,
+          userId: params.userId,
+          role: params.role,
+          content: params.content ?? "",
+          metadata: mergedMetadata,
+          createdAt: now,
+        });
+      } catch {
+        // Non-fatal: persistence succeeded even if memory artifact sync fails.
+      }
 
       return {
         id: saved.id,
@@ -811,7 +881,8 @@ export class CentralizedChatRuntimeDelegate {
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
         attachments: (mergedMetadata.attachments as unknown) ?? null,
-        telemetry: (mergedMetadata.telemetry as Record<string, unknown>) ?? null,
+        telemetry:
+          (mergedMetadata.telemetry as Record<string, unknown>) ?? null,
         metadata: mergedMetadata,
       };
     }
@@ -838,15 +909,19 @@ export class CentralizedChatRuntimeDelegate {
       data: { updatedAt: now },
     });
 
-    await this.recordConversationMemoryArtifacts({
-      messageId: created.id,
-      conversationId: params.conversationId,
-      userId: params.userId,
-      role: params.role,
-      content: params.content ?? "",
-      metadata: mergedMetadata,
-      createdAt: now,
-    });
+    try {
+      await this.recordConversationMemoryArtifacts({
+        messageId: created.id,
+        conversationId: params.conversationId,
+        userId: params.userId,
+        role: params.role,
+        content: params.content ?? "",
+        metadata: mergedMetadata,
+        createdAt: now,
+      });
+    } catch {
+      // Non-fatal: persistence succeeded even if memory artifact sync fails.
+    }
 
     return toMessageDTO(created);
   }
@@ -871,6 +946,78 @@ export class CentralizedChatRuntimeDelegate {
       title: "New Chat",
     });
     return created.id;
+  }
+
+  private async buildRuntimePolicyFailureResult(input: {
+    req: ChatRequest;
+    conversationId: string;
+    userMessage: ChatMessageDTO | null;
+    code: "RUNTIME_POLICY_MISSING" | "RUNTIME_POLICY_INVALID";
+  }): Promise<ChatResult> {
+    const req = input.req;
+    const conversationId =
+      input.conversationId ||
+      (await this.ensureConversation(req.userId, req.conversationId));
+    const userMessage =
+      input.userMessage ||
+      (await this.createMessage({
+        conversationId,
+        role: "user",
+        content: req.message,
+        userId: req.userId,
+      }));
+
+    const assistantText = buildEmptyAssistantText(req.preferredLanguage);
+    const answerMode: AnswerMode =
+      (req.attachedDocumentIds || []).length > 0
+        ? "fallback"
+        : "general_answer";
+    const answerClass: AnswerClass =
+      answerMode === "general_answer" ? "GENERAL" : "DOCUMENT";
+
+    const assistantMessage = await this.createMessage({
+      conversationId,
+      role: "assistant",
+      content: assistantText,
+      userId: req.userId,
+      metadata: {
+        failureCode: input.code,
+        answerMode,
+        answerClass,
+      },
+    });
+
+    return {
+      conversationId,
+      userMessageId: userMessage.id,
+      assistantMessageId: assistantMessage.id,
+      assistantText,
+      attachmentsPayload: [],
+      assistantTelemetry: undefined,
+      sources: [],
+      followups: [],
+      answerMode,
+      answerClass,
+      navType: null,
+      fallbackReasonCode: input.code,
+      status: "failed",
+      failureCode: input.code,
+      completion: {
+        answered: false,
+        missingSlots: ["runtime_policy"],
+        nextAction: null,
+      },
+      truncation: {
+        occurred: false,
+        reason: null,
+        resumeToken: null,
+      },
+      evidence: {
+        required: (req.attachedDocumentIds || []).length > 0,
+        provided: false,
+        sourceIds: [],
+      },
+    };
   }
 
   private async loadRecentForEngine(
@@ -919,10 +1066,21 @@ export class CentralizedChatRuntimeDelegate {
   }
 
   private getMemoryRuntimeTuning(): MemoryRuntimeTuning {
-    const policyBank = getBankLoaderInstance().getBank<any>("memory_policy");
+    let policyBank: any;
+    try {
+      policyBank = getBankLoaderInstance().getBank<any>("memory_policy");
+    } catch {
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_MISSING",
+        "Required bank missing: memory_policy",
+      );
+    }
     const tuning = policyBank?.config?.runtimeTuning;
     if (!tuning || typeof tuning !== "object") {
-      throw new Error("memory_policy.config.runtimeTuning is required");
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
+        "memory_policy.config.runtimeTuning is required",
+      );
     }
     return tuning as MemoryRuntimeTuning;
   }
@@ -932,7 +1090,8 @@ export class CentralizedChatRuntimeDelegate {
       this.getMemoryRuntimeTuning().semanticSignals?.regexFlags || "",
     ).trim();
     if (!flags) {
-      throw new Error(
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
         "memory_policy.config.runtimeTuning.semanticSignals.regexFlags is required",
       );
     }
@@ -943,14 +1102,18 @@ export class CentralizedChatRuntimeDelegate {
     const patterns =
       this.getMemoryRuntimeTuning().semanticSignals?.patterns?.[signal];
     if (!Array.isArray(patterns) || patterns.length === 0) {
-      throw new Error(
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
         `memory_policy.config.runtimeTuning.semanticSignals.patterns.${signal} is required`,
       );
     }
     return patterns;
   }
 
-  private detectSemanticSignal(signal: SemanticSignalKey, text: string): boolean {
+  private detectSemanticSignal(
+    signal: SemanticSignalKey,
+    text: string,
+  ): boolean {
     const input = String(text || "");
     if (!input.trim()) return false;
     const flags = this.resolveSemanticSignalRegexFlags();
@@ -959,7 +1122,8 @@ export class CentralizedChatRuntimeDelegate {
       try {
         return new RegExp(pattern, flags).test(input);
       } catch {
-        throw new Error(
+        throw new RuntimePolicyError(
+          "RUNTIME_POLICY_INVALID",
           `Invalid regex in memory_policy semanticSignals for ${signal}: ${pattern}`,
         );
       }
@@ -984,7 +1148,8 @@ export class CentralizedChatRuntimeDelegate {
     const out = {} as Record<SemanticSignalKey, boolean>;
     for (const key of keys) {
       out[key] =
-        contextSignals[key] === true || this.detectSemanticSignal(key, queryText);
+        contextSignals[key] === true ||
+        this.detectSemanticSignal(key, queryText);
     }
     return out;
   }
@@ -1093,7 +1258,9 @@ export class CentralizedChatRuntimeDelegate {
       createdAt: number;
     }> = [];
 
-    for (const entry of Array.isArray(memoryMeta.recall) ? memoryMeta.recall : []) {
+    for (const entry of Array.isArray(memoryMeta.recall)
+      ? memoryMeta.recall
+      : []) {
       const record = asObject(entry);
       const summary = String(record.summary || "").trim();
       const content = String(record.content || "").trim();
@@ -1207,9 +1374,7 @@ export class CentralizedChatRuntimeDelegate {
 
     const cfg = this.getMemoryRuntimeTuning();
     const memoryRole =
-      input.role === "user" || input.role === "assistant"
-        ? input.role
-        : null;
+      input.role === "user" || input.role === "assistant" ? input.role : null;
 
     const sourceDocumentIds = Array.isArray((input.metadata as any)?.sources)
       ? (input.metadata as any).sources
@@ -1271,14 +1436,20 @@ export class CentralizedChatRuntimeDelegate {
       const priorMemory = asObject(contextMeta.memory);
       const priorRecentMessageIds = toStringArray(priorMemory.recentMessageIds);
       const priorKeyTopics = toStringArray(priorMemory.keyTopics);
-      const priorSourceDocumentIds = toStringArray(priorMemory.sourceDocumentIds);
-      const priorRecall = Array.isArray(priorMemory.recall) ? priorMemory.recall : [];
-      const priorTurnsSinceLastSummary = Number(priorMemory.turnsSinceLastSummary);
-
-      const nextRecentMessageIds = [input.messageId, ...priorRecentMessageIds].slice(
-        0,
-        recentMessageIdMaxItems,
+      const priorSourceDocumentIds = toStringArray(
+        priorMemory.sourceDocumentIds,
       );
+      const priorRecall = Array.isArray(priorMemory.recall)
+        ? priorMemory.recall
+        : [];
+      const priorTurnsSinceLastSummary = Number(
+        priorMemory.turnsSinceLastSummary,
+      );
+
+      const nextRecentMessageIds = [
+        input.messageId,
+        ...priorRecentMessageIds,
+      ].slice(0, recentMessageIdMaxItems);
       const nextKeyTopics = Array.from(
         new Set([
           ...priorKeyTopics,
@@ -1350,10 +1521,14 @@ export class CentralizedChatRuntimeDelegate {
     }
   }
 
-  private async retrieveEvidence(req: ChatRequest): Promise<EvidencePack | null> {
+  private async retrieveEvidence(
+    req: ChatRequest,
+  ): Promise<EvidencePack | null> {
     const cfg = this.getMemoryRuntimeTuning();
     const attached = Array.isArray(req.attachedDocumentIds)
-      ? req.attachedDocumentIds.filter((id) => typeof id === "string" && id.trim())
+      ? req.attachedDocumentIds.filter(
+          (id) => typeof id === "string" && id.trim(),
+        )
       : [];
 
     const globalSearchEnabled = Boolean(
@@ -1363,7 +1538,8 @@ export class CentralizedChatRuntimeDelegate {
       cfg.semanticRetrieval?.globalSearchMinQueryChars,
     );
     if (!Number.isFinite(minGlobalChars) || minGlobalChars < 0) {
-      throw new Error(
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
         "memory_policy.config.runtimeTuning.semanticRetrieval.globalSearchMinQueryChars is required",
       );
     }
@@ -1383,7 +1559,10 @@ export class CentralizedChatRuntimeDelegate {
       dependencies.structuralIndex,
     );
     const contextSignals = asObject((req.context as any)?.signals || {});
-    const semanticSignals = this.collectSemanticSignals(req.message, contextSignals);
+    const semanticSignals = this.collectSemanticSignals(
+      req.message,
+      contextSignals,
+    );
 
     const retrievalReq: RetrievalRequest = {
       query: req.message,
@@ -1433,7 +1612,8 @@ export class CentralizedChatRuntimeDelegate {
       cfg.semanticRetrieval?.maxEvidenceItemsForAnswer,
     );
     if (!Number.isFinite(maxEvidence) || maxEvidence <= 0) {
-      throw new Error(
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
         "memory_policy.config.runtimeTuning.semanticRetrieval.maxEvidenceItemsForAnswer is required",
       );
     }
@@ -1469,9 +1649,7 @@ export class CentralizedChatRuntimeDelegate {
       .reverse()
       .findIndex((m) => m.role === "user");
     const resolvedLastUserIndex =
-      lastUserIndex === -1
-        ? -1
-        : cleanedHistory.length - 1 - lastUserIndex;
+      lastUserIndex === -1 ? -1 : cleanedHistory.length - 1 - lastUserIndex;
 
     const withEvidence: Array<{ role: ChatRole; content: string }> = [];
     if (resolvedLastUserIndex >= 0) {
@@ -1509,17 +1687,20 @@ export class CentralizedChatRuntimeDelegate {
     ];
 
     const configuredMaxEvidence = Number(
-      this.getMemoryRuntimeTuning().semanticRetrieval?.maxEvidenceItemsForAnswer,
+      this.getMemoryRuntimeTuning().semanticRetrieval
+        ?.maxEvidenceItemsForAnswer,
     );
     if (!Number.isFinite(configuredMaxEvidence) || configuredMaxEvidence <= 0) {
-      throw new Error(
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
         "memory_policy.config.runtimeTuning.semanticRetrieval.maxEvidenceItemsForAnswer is required",
       );
     }
     const maxEvidence = Math.min(pack.evidence.length, configuredMaxEvidence);
     for (let i = 0; i < maxEvidence; i += 1) {
       const item = pack.evidence[i];
-      const snippetMaxChars = this.getMemoryRuntimeTuning().evidenceSnippetMaxChars;
+      const snippetMaxChars =
+        this.getMemoryRuntimeTuning().evidenceSnippetMaxChars;
       const snippet = sanitizeSnippet(item.snippet || "", snippetMaxChars);
       if (!snippet) continue;
       const label = buildEvidenceLabel(item);
@@ -1575,7 +1756,10 @@ export class CentralizedChatRuntimeDelegate {
     const docsAttached = (req.attachedDocumentIds || []).length > 0;
     const evidenceCount = retrievalPack?.evidence.length ?? 0;
     const contextSignals = asObject((req.context as any)?.signals || {});
-    const semanticSignals = this.collectSemanticSignals(req.message, contextSignals);
+    const semanticSignals = this.collectSemanticSignals(
+      req.message,
+      contextSignals,
+    );
     const askForTable =
       semanticSignals.userAskedForTable || semanticSignals.tableExpected;
     const askForQuote = semanticSignals.userAskedForQuote;
@@ -1593,6 +1777,12 @@ export class CentralizedChatRuntimeDelegate {
   ): string | undefined {
     if (!retrievalPack) return undefined;
     if (retrievalPack.evidence.length > 0) return undefined;
+    if (retrievalPack.scope?.hardScopeActive) {
+      if ((retrievalPack.scope?.candidateDocIds || []).length === 0) {
+        return "explicit_doc_not_found";
+      }
+      return "scope_hard_constraints_empty";
+    }
     if ((req.attachedDocumentIds || []).length > 0) {
       return "no_relevant_chunks_in_scoped_docs";
     }

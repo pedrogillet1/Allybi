@@ -20,7 +20,19 @@ const checks = [
   },
   {
     name: "active runtime cannot import legacy chat runtime",
-    cmd: `rg -n "chatRuntime\\.legacy\\.service" backend/src/modules/chat/application/chat-runtime.service.ts backend/src/services/chatRuntime.service.ts`,
+    cmd: `rg -n "chatRuntime\\.legacy\\.service" backend/src/modules/chat/application/chat-runtime.service.ts backend/src/services/prismaChat.service.ts`,
+  },
+  {
+    name: "kernel runtime cannot import dormant core routing stack",
+    cmd: `rg -n "services/core/routing/" backend/src/services/chat backend/src/services/prismaChat.service.ts backend/src/modules/chat/application/chat-runtime.service.ts`,
+  },
+  {
+    name: "turn route policy cannot use dynamic fallback file loading",
+    cmd: `rg -n "loadRoutingBankFallback|\\brequire\\(|path\\.resolve\\(process\\.cwd\\(\\),\\s*\\\"(src|backend/src)/data_banks\\\"" backend/src/services/chat/turnRoutePolicy.service.ts`,
+  },
+  {
+    name: "container cannot load dormant intent engine",
+    cmd: `rg -n "services/core/routing/intentEngine\\.service" backend/src/bootstrap/container.ts`,
   },
 ];
 

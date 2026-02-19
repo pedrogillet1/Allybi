@@ -29,6 +29,10 @@ import {
 import { validate } from "../middleware/validate.middleware";
 import { logger } from "../utils/logger";
 import { ConversationNotFoundError } from "../services/prismaChat.service";
+import {
+  toChatFinalEvent,
+  toChatHttpEnvelope,
+} from "../modules/chat/api/chatResultEnvelope";
 
 import type {
   StreamSink,
@@ -426,62 +430,7 @@ router.post(
         res.write(
           `data: ${JSON.stringify({ type: "worklog", eventType: "RUN_COMPLETE", summary: "Completed" })}\n\n`,
         );
-        res.write(
-          `data: ${JSON.stringify({
-            type: "final",
-            conversationId: result.conversationId,
-            messageId: result.assistantMessageId,
-            content: result.assistantText,
-            answerMode: result.answerMode || "general_answer",
-            answerClass: result.answerClass || null,
-            navType: result.navType || null,
-            sources: result.sources || [],
-            attachments: result.attachmentsPayload || [],
-            answerProvisional: Boolean((result as any).answerProvisional),
-            answerSourceMode: (result as any).answerSourceMode || "chunk",
-            indexingInProgress: Boolean((result as any).indexingInProgress),
-            scopeRelaxed: Boolean((result as any).scopeRelaxed),
-            status: (result as any).status || "success",
-            failureCode: (result as any).failureCode || null,
-            completion: (result as any).completion || {
-              answered: Boolean(String((result as any).assistantText || "").trim()),
-              missingSlots: [],
-              nextAction: null,
-            },
-            truncation: (result as any).truncation || {
-              occurred: false,
-              reason: null,
-              resumeToken: null,
-            },
-            evidence: (result as any).evidence || {
-              required: false,
-              provided: Array.isArray((result as any).sources)
-                ? (result as any).sources.length > 0
-                : false,
-              sourceIds: Array.isArray((result as any).sources)
-                ? (result as any).sources
-                    .map((s: any) => String(s?.documentId || "").trim())
-                    .filter(Boolean)
-                : [],
-            },
-            ...(String((result as any).scopeRelaxReason || "").trim()
-              ? { scopeRelaxReason: (result as any).scopeRelaxReason }
-              : {}),
-            ...(String((result as any).fallbackReasonCode || "").trim()
-              ? { fallbackReasonCode: (result as any).fallbackReasonCode }
-              : {}),
-            ...(result.listing?.length ? { listing: result.listing } : {}),
-            ...(result.breadcrumb?.length
-              ? { breadcrumb: result.breadcrumb }
-              : {}),
-            ...(result.followups?.length
-              ? { followups: result.followups }
-              : {}),
-            ...(result.generatedTitle
-              ? { generatedTitle: result.generatedTitle }
-              : {}),
-          })}\n\n`,
-        );
+        res.write(`data: ${JSON.stringify(toChatFinalEvent(result))}\n\n`);
       }
     } catch (e: any) {
       if (isConversationNotFoundError(e)) {
@@ -606,59 +555,7 @@ router.post(
         res.write(
           `data: ${JSON.stringify({ type: "worklog", eventType: "RUN_COMPLETE", summary: "Completed" })}\n\n`,
         );
-        res.write(
-          `data: ${JSON.stringify({
-            type: "final",
-            conversationId: result.conversationId,
-            messageId: result.assistantMessageId,
-            content: result.assistantText,
-            answerMode: result.answerMode || "general_answer",
-            answerClass: result.answerClass || null,
-            navType: result.navType || null,
-            sources: result.sources || [],
-            attachments: result.attachmentsPayload || [],
-            answerProvisional: Boolean((result as any).answerProvisional),
-            answerSourceMode: (result as any).answerSourceMode || "chunk",
-            indexingInProgress: Boolean((result as any).indexingInProgress),
-            scopeRelaxed: Boolean((result as any).scopeRelaxed),
-            status: (result as any).status || "success",
-            failureCode: (result as any).failureCode || null,
-            completion: (result as any).completion || {
-              answered: Boolean(String((result as any).assistantText || "").trim()),
-              missingSlots: [],
-              nextAction: null,
-            },
-            truncation: (result as any).truncation || {
-              occurred: false,
-              reason: null,
-              resumeToken: null,
-            },
-            evidence: (result as any).evidence || {
-              required: false,
-              provided: Array.isArray((result as any).sources)
-                ? (result as any).sources.length > 0
-                : false,
-              sourceIds: Array.isArray((result as any).sources)
-                ? (result as any).sources
-                    .map((s: any) => String(s?.documentId || "").trim())
-                    .filter(Boolean)
-                : [],
-            },
-            ...(String((result as any).scopeRelaxReason || "").trim()
-              ? { scopeRelaxReason: (result as any).scopeRelaxReason }
-              : {}),
-            ...(String((result as any).fallbackReasonCode || "").trim()
-              ? { fallbackReasonCode: (result as any).fallbackReasonCode }
-              : {}),
-            ...(result.listing?.length ? { listing: result.listing } : {}),
-            ...(result.breadcrumb?.length
-              ? { breadcrumb: result.breadcrumb }
-              : {}),
-            ...(result.followups?.length
-              ? { followups: result.followups }
-              : {}),
-          })}\n\n`,
-        );
+        res.write(`data: ${JSON.stringify(toChatFinalEvent(result))}\n\n`);
       }
 
       // Hard-isolate viewer/editor turns from chat history:
@@ -762,7 +659,7 @@ router.post(
         meta,
         context,
       });
-      res.json({ ok: true, data: result });
+      res.json(toChatHttpEnvelope(result));
     } catch (e: any) {
       if (isConversationNotFoundError(e)) {
         res.status(404).json({
@@ -991,7 +888,9 @@ router.post(
         ),
       });
 
+      const envelope = toChatHttpEnvelope(result);
       res.json({
+        ...envelope,
         userMessage: {
           id: result.userMessageId,
           role: "user",
@@ -1054,7 +953,9 @@ router.post(
         ),
       });
 
+      const envelope = toChatHttpEnvelope(result);
       res.json({
+        ...envelope,
         id: result.assistantMessageId,
         role: "assistant",
         content: result.assistantText,
@@ -1138,55 +1039,8 @@ router.post(
       }
 
       if (!res.writableEnded) {
-        res.write(
-          `data: ${JSON.stringify({
-            type: "done",
-            messageId: result.assistantMessageId,
-            content: result.assistantText,
-            conversationId: result.conversationId,
-            answerMode: result.answerMode || "general_answer",
-            answerClass: result.answerClass || null,
-            navType: result.navType || null,
-            sources: result.sources || [],
-            attachments: result.attachmentsPayload || [],
-            answerProvisional: Boolean((result as any).answerProvisional),
-            answerSourceMode: (result as any).answerSourceMode || "chunk",
-            indexingInProgress: Boolean((result as any).indexingInProgress),
-            scopeRelaxed: Boolean((result as any).scopeRelaxed),
-            status: (result as any).status || "success",
-            failureCode: (result as any).failureCode || null,
-            completion: (result as any).completion || {
-              answered: Boolean(String((result as any).assistantText || "").trim()),
-              missingSlots: [],
-              nextAction: null,
-            },
-            truncation: (result as any).truncation || {
-              occurred: false,
-              reason: null,
-              resumeToken: null,
-            },
-            evidence: (result as any).evidence || {
-              required: false,
-              provided: Array.isArray((result as any).sources)
-                ? (result as any).sources.length > 0
-                : false,
-              sourceIds: Array.isArray((result as any).sources)
-                ? (result as any).sources
-                    .map((s: any) => String(s?.documentId || "").trim())
-                    .filter(Boolean)
-                : [],
-            },
-            ...(String((result as any).scopeRelaxReason || "").trim()
-              ? { scopeRelaxReason: (result as any).scopeRelaxReason }
-              : {}),
-            ...(String((result as any).fallbackReasonCode || "").trim()
-              ? { fallbackReasonCode: (result as any).fallbackReasonCode }
-              : {}),
-            ...(result.generatedTitle
-              ? { generatedTitle: result.generatedTitle }
-              : {}),
-          })}\n\n`,
-        );
+        res.write(`data: ${JSON.stringify(toChatFinalEvent(result))}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
       }
 
       res.end();

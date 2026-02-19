@@ -39,6 +39,9 @@ No runtime prompt assembly is allowed outside this path.
 - Retrieval centralization audit:
   - `scripts/lint/retrieval-centralization-audit.mjs`
   - strict mode (`npm run audit:retrieval:strict`) enforces runtime retrieval centralization and readiness wiring
+- Intent centralization audit:
+  - `scripts/lint/intent-centralization-audit.mjs`
+  - strict mode (`npm run audit:intent:strict`) enforces kernel-first runtime and removal of dormant core routing stack
 
 ## Readiness Requirements
 

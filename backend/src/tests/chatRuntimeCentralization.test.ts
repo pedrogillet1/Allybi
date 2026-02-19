@@ -24,9 +24,10 @@ describe("chat runtime centralization guard", () => {
 
   test("source buttons policy loads source_engine from bank loader", () => {
     const src = read("src/services/core/retrieval/sourceButtons.service.ts");
-    expect(src).toMatch(/getOptionalBank<SourceEngineDataBank>\("source_engine"\)/);
+    expect(src).toMatch(
+      /getOptionalBank<SourceEngineDataBank>\("source_engine"\)/,
+    );
     expect(src).not.toMatch(/readFileSync/);
     expect(src).not.toMatch(/data_banks\/retrieval\/source_engine\.any\.json/);
   });
 });
-

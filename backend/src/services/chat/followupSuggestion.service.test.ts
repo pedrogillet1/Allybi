@@ -177,6 +177,8 @@ describe("FollowupSuggestionService", () => {
         ],
       }),
     );
-    expect(out).toEqual([{ label: "Slide recap", query: "Summarize each slide" }]);
+    expect(out).toEqual([
+      { label: "Slide recap", query: "Summarize each slide" },
+    ]);
   });
 });

@@ -7,6 +7,7 @@ import type { LLMStreamingConfig, StreamSink } from "./llmStreaming.types";
 import type { LangCode } from "../prompts/promptRegistry.service";
 import { LlmRouterService } from "./llmRouter.service";
 import { getOptionalBank } from "../../core/banks/bankLoader.service";
+import { RuntimePolicyError } from "../../../modules/chat/runtime/runtimePolicyError";
 import {
   LlmRequestBuilderService,
   type BuildRequestInput,
@@ -425,7 +426,8 @@ export class LlmGatewayService {
       this.getMemoryPolicyRuntimeTuning().gateway?.dialogueTurnLimit,
     );
     if (!Number.isFinite(raw) || raw <= 0) {
-      throw new Error(
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
         "memory_policy.config.runtimeTuning.gateway.dialogueTurnLimit is required",
       );
     }
@@ -437,7 +439,8 @@ export class LlmGatewayService {
       this.getMemoryPolicyRuntimeTuning().gateway?.userTextCharCap,
     );
     if (!Number.isFinite(raw) || raw <= 0) {
-      throw new Error(
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
         "memory_policy.config.runtimeTuning.gateway.userTextCharCap is required",
       );
     }
@@ -449,7 +452,8 @@ export class LlmGatewayService {
       this.getMemoryPolicyRuntimeTuning().gateway?.systemBlockCharCap,
     );
     if (!Number.isFinite(raw) || raw <= 0) {
-      throw new Error(
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
         "memory_policy.config.runtimeTuning.gateway.systemBlockCharCap is required",
       );
     }
@@ -461,7 +465,8 @@ export class LlmGatewayService {
       this.getMemoryPolicyRuntimeTuning().gateway?.dialogueMessageCharCap,
     );
     if (!Number.isFinite(raw) || raw <= 0) {
-      throw new Error(
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
         "memory_policy.config.runtimeTuning.gateway.dialogueMessageCharCap is required",
       );
     }
@@ -473,7 +478,8 @@ export class LlmGatewayService {
       this.getMemoryPolicyRuntimeTuning().gateway?.dialogueCharBudget,
     );
     if (!Number.isFinite(raw) || raw <= 0) {
-      throw new Error(
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
         "memory_policy.config.runtimeTuning.gateway.dialogueCharBudget is required",
       );
     }
@@ -485,7 +491,8 @@ export class LlmGatewayService {
       this.getMemoryPolicyRuntimeTuning().gateway?.memoryPackCharCap,
     );
     if (!Number.isFinite(raw) || raw <= 0) {
-      throw new Error(
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
         "memory_policy.config.runtimeTuning.gateway.memoryPackCharCap is required",
       );
     }
@@ -495,7 +502,10 @@ export class LlmGatewayService {
   private getMemoryPolicyRuntimeTuning(): MemoryPolicyRuntimeTuning {
     const bank = getOptionalBank<any>("memory_policy");
     if (!bank) {
-      throw new Error("Required bank missing: memory_policy");
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_MISSING",
+        "Required bank missing: memory_policy",
+      );
     }
     return (bank.config?.runtimeTuning || {}) as MemoryPolicyRuntimeTuning;
   }

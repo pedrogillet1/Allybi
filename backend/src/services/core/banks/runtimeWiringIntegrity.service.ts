@@ -14,6 +14,8 @@ export interface RuntimeWiringIntegrityResult {
   missingEditingCapabilities: string[];
   unreachablePromptSelectionRules: string[];
   legacyChatRuntimeImports: string[];
+  dormantCoreRoutingImports: string[];
+  turnRoutePolicyDynamicFallback: string[];
 }
 
 function asTrimmedString(value: unknown): string {
@@ -137,8 +139,14 @@ function collectPromptRegistryUnreachableRules(promptRegistry: any): string[] {
 
 function collectLegacyChatRuntimeImports(): string[] {
   const candidatePaths = [
-    path.join(process.cwd(), "src/modules/chat/application/chat-runtime.service.ts"),
-    path.join(process.cwd(), "backend/src/modules/chat/application/chat-runtime.service.ts"),
+    path.join(
+      process.cwd(),
+      "src/modules/chat/application/chat-runtime.service.ts",
+    ),
+    path.join(
+      process.cwd(),
+      "backend/src/modules/chat/application/chat-runtime.service.ts",
+    ),
   ];
 
   const failures: string[] = [];
@@ -147,6 +155,67 @@ function collectLegacyChatRuntimeImports(): string[] {
     try {
       const src = fs.readFileSync(filePath, "utf8");
       if (/\bchatRuntime\.legacy\.service\b/.test(src)) {
+        failures.push(filePath);
+      }
+    } catch {
+      failures.push(filePath);
+    }
+  }
+  return failures;
+}
+
+function collectDormantCoreRoutingImports(): string[] {
+  const candidatePaths = [
+    path.join(process.cwd(), "src/services/prismaChat.service.ts"),
+    path.join(process.cwd(), "backend/src/services/prismaChat.service.ts"),
+    path.join(process.cwd(), "src/services/chat/chatKernel.service.ts"),
+    path.join(process.cwd(), "backend/src/services/chat/chatKernel.service.ts"),
+    path.join(
+      process.cwd(),
+      "src/modules/chat/application/chat-runtime.service.ts",
+    ),
+    path.join(
+      process.cwd(),
+      "backend/src/modules/chat/application/chat-runtime.service.ts",
+    ),
+    path.join(process.cwd(), "src/services/chat/turnRouter.service.ts"),
+    path.join(process.cwd(), "backend/src/services/chat/turnRouter.service.ts"),
+  ];
+
+  const failures: string[] = [];
+  for (const filePath of candidatePaths) {
+    if (!fs.existsSync(filePath)) continue;
+    try {
+      const src = fs.readFileSync(filePath, "utf8");
+      if (/\bservices\/core\/routing\//.test(src)) {
+        failures.push(filePath);
+      }
+    } catch {
+      failures.push(filePath);
+    }
+  }
+  return failures;
+}
+
+function collectTurnRoutePolicyDynamicFallback(): string[] {
+  const candidatePaths = [
+    path.join(process.cwd(), "src/services/chat/turnRoutePolicy.service.ts"),
+    path.join(
+      process.cwd(),
+      "backend/src/services/chat/turnRoutePolicy.service.ts",
+    ),
+  ];
+
+  const failures: string[] = [];
+  for (const filePath of candidatePaths) {
+    if (!fs.existsSync(filePath)) continue;
+    try {
+      const src = fs.readFileSync(filePath, "utf8");
+      if (
+        /\bloadRoutingBankFallback\b|\brequire\(|path\.resolve\(process\.cwd\(\),\s*["'](?:src|backend\/src)\/data_banks/.test(
+          src,
+        )
+      ) {
         failures.push(filePath);
       }
     } catch {
@@ -230,6 +299,9 @@ export class RuntimeWiringIntegrityService {
     const unreachablePromptSelectionRules =
       collectPromptRegistryUnreachableRules(promptRegistry);
     const legacyChatRuntimeImports = collectLegacyChatRuntimeImports();
+    const dormantCoreRoutingImports = collectDormantCoreRoutingImports();
+    const turnRoutePolicyDynamicFallback =
+      collectTurnRoutePolicyDynamicFallback();
 
     return {
       ok:
@@ -239,7 +311,9 @@ export class RuntimeWiringIntegrityService {
         missingEditingCatalogOperators.length === 0 &&
         missingEditingCapabilities.length === 0 &&
         unreachablePromptSelectionRules.length === 0 &&
-        legacyChatRuntimeImports.length === 0,
+        legacyChatRuntimeImports.length === 0 &&
+        dormantCoreRoutingImports.length === 0 &&
+        turnRoutePolicyDynamicFallback.length === 0,
       missingBanks,
       missingOperatorContracts,
       missingOperatorOutputShapes,
@@ -247,6 +321,8 @@ export class RuntimeWiringIntegrityService {
       missingEditingCapabilities,
       unreachablePromptSelectionRules,
       legacyChatRuntimeImports,
+      dormantCoreRoutingImports,
+      turnRoutePolicyDynamicFallback,
     };
   }
 }

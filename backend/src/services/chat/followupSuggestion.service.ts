@@ -74,7 +74,9 @@ function normalizeLower(value: unknown): string {
   return normalizeText(value).toLowerCase();
 }
 
-function inferDocType(source: SourceRef | null | undefined): RuntimeSignals["docType"] {
+function inferDocType(
+  source: SourceRef | null | undefined,
+): RuntimeSignals["docType"] {
   if (!source) return "other";
   const mime = normalizeLower(source.mimeType);
   const name = normalizeLower(source.filename);
@@ -162,7 +164,8 @@ export class FollowupSuggestionService {
 
     for (const rule of rules) {
       if (!this.matchRule(rule, signals)) continue;
-      const suggestions = rule.suggestions?.[langKey] ?? rule.suggestions?.en ?? [];
+      const suggestions =
+        rule.suggestions?.[langKey] ?? rule.suggestions?.en ?? [];
       if (!Array.isArray(suggestions)) continue;
 
       for (const s of suggestions) {
@@ -201,10 +204,16 @@ export class FollowupSuggestionService {
   ): FollowupSuggestion | null {
     const fallbackDoc = documentTitle || "this document";
     const label = compactSpaces(
-      normalizeText(suggestion.label).replace(/\{\{\s*document\s*\}\}/gi, fallbackDoc),
+      normalizeText(suggestion.label).replace(
+        /\{\{\s*document\s*\}\}/gi,
+        fallbackDoc,
+      ),
     );
     const query = compactSpaces(
-      normalizeText(suggestion.query).replace(/\{\{\s*document\s*\}\}/gi, fallbackDoc),
+      normalizeText(suggestion.query).replace(
+        /\{\{\s*document\s*\}\}/gi,
+        fallbackDoc,
+      ),
     );
     if (!label || !query) return null;
     return { label, query };
@@ -262,13 +271,17 @@ export class FollowupSuggestionService {
     const sources = Array.isArray(input.sources) ? input.sources : [];
     const topSource = sources[0] || null;
     const docType = inferDocType(topSource);
-    const primaryDocumentTitle = topSource ? cleanDocumentTitle(topSource.filename) : "this document";
+    const primaryDocumentTitle = topSource
+      ? cleanDocumentTitle(topSource.filename)
+      : "this document";
     const query = normalizeLower(input.query);
     const answer = normalizeLower(input.answerText);
     const combined = `${query}\n${answer}`;
 
     const hasNumbers =
-      /(?:\b\d[\d,.]*\b|%|(?:\$|€|£)\s*\d|usd\b|eur\b|brl\b|r\$)/i.test(combined);
+      /(?:\b\d[\d,.]*\b|%|(?:\$|€|£)\s*\d|usd\b|eur\b|brl\b|r\$)/i.test(
+        combined,
+      );
     const hasLocation =
       /\b(where|page|section|line|paragraph|clause|article|onde|p[aá]gina|se[cç][aã]o|linha|cl[aá]usula|artigo|d[oó]nde|secci[oó]n|l[ií]nea|art[ií]culo)\b/i.test(
         combined,
@@ -285,7 +298,9 @@ export class FollowupSuggestionService {
       /\b(date|timeline|deadline|milestone|schedule|when|prazo|cronograma|data|marco|fecha|plazo)\b/i.test(
         combined,
       ) ||
-      /\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/i.test(combined) ||
+      /\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/i.test(
+        combined,
+      ) ||
       /\b\d{1,2}[\/\-]\d{1,2}(?:[\/\-]\d{2,4})?\b/.test(combined);
     const hasSummary =
       /\b(summary|summari[sz]e|key points|takeaways|overview|resumo|resumir|resumen|resumir|explica|explain)\b/i.test(
@@ -309,7 +324,9 @@ export class FollowupSuggestionService {
       answerClass: normalizeText(input.answerClass),
       intent: normalizeText(input.intent || ""),
       operator: input.operator ? normalizeText(input.operator) : null,
-      intentFamily: input.intentFamily ? normalizeText(input.intentFamily) : null,
+      intentFamily: input.intentFamily
+        ? normalizeText(input.intentFamily)
+        : null,
       isViewerVariant: Boolean(input.isViewerVariant),
       hasSources: sources.length > 0,
       hasMultiSources: uniqueSourceIds.size > 1,

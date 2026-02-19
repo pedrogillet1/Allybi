@@ -141,6 +141,9 @@ class KodaV3Container {
               unreachablePromptSelectionRules:
                 wiring.unreachablePromptSelectionRules,
               legacyChatRuntimeImports: wiring.legacyChatRuntimeImports,
+              dormantCoreRoutingImports: wiring.dormantCoreRoutingImports,
+              turnRoutePolicyDynamicFallback:
+                wiring.turnRoutePolicyDynamicFallback,
             };
             if (strict) {
               throw new Error(
@@ -207,13 +210,6 @@ class KodaV3Container {
     // STEP 2: Load services that DO depend on banks (after banks are loaded)
     // ========================================================================
     if (this._banksInitialized) {
-      await this.tryLoad("intentEngine", async () => {
-        const mod = await import(
-          "../services/core/routing/intentEngine.service"
-        );
-        return new mod.KodaIntentEngineV3Service();
-      });
-
       await this.tryLoad("languageDetector", async () => {
         const { getBankLoaderInstance } = await import(
           "../services/core/banks/bankLoader.service"
@@ -249,7 +245,6 @@ class KodaV3Container {
           health: async () => ({ ok: true }),
         };
       });
-
     } else {
       console.warn(
         "[Container] Skipping bank-dependent services (banks not initialized)",
@@ -292,7 +287,7 @@ class KodaV3Container {
   }
 
   public getIntentEngine(): any {
-    return this._services.intentEngine ?? null;
+    return null;
   }
 
   public getRetrievalEngine(): any {

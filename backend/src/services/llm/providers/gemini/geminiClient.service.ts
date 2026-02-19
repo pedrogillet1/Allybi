@@ -404,7 +404,7 @@ export class GeminiClientService implements LLMClient {
               completionTokens: usageMetadata.candidatesTokenCount,
               totalTokens: usageMetadata.totalTokenCount,
             }
-            : undefined,
+          : undefined,
         finishReason,
         requestId,
       };
@@ -611,7 +611,8 @@ export class GeminiClientService implements LLMClient {
     // Deterministic: use first candidate only
     const c0 = candidates[0];
     const content = c0.content;
-    if (!content?.parts?.length) return { text: "", finishReason: c0.finishReason };
+    if (!content?.parts?.length)
+      return { text: "", finishReason: c0.finishReason };
 
     let text = "";
     const toolCalls: ProviderToolCall[] = [];
@@ -679,8 +680,7 @@ function normalizeFinishReason(raw: unknown): string {
   const value = String(raw || "").toLowerCase();
   if (!value) return "unknown";
   if (value.includes("stop")) return "stop";
-  if (value.includes("max_token") || value.includes("length"))
-    return "length";
+  if (value.includes("max_token") || value.includes("length")) return "length";
   if (value.includes("safety") || value.includes("content_filter"))
     return "content_filter";
   if (value.includes("tool")) return "tool_calls";

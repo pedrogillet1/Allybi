@@ -13,11 +13,13 @@ import { ConnectorTurnHandler } from "./handlers/connectorTurn.handler";
 import { KnowledgeTurnHandler } from "./handlers/knowledgeTurn.handler";
 import { GeneralTurnHandler } from "./handlers/generalTurn.handler";
 import { EditorModeGuard } from "./guardrails/editorMode.guard";
+import { TurnRoutePolicyService } from "./turnRoutePolicy.service";
 
 export class ChatKernelService {
   private readonly contextBuilder = new TurnContextBuilder();
-  private readonly router = new TurnRouterService();
-  private readonly guard = new EditorModeGuard();
+  private readonly routePolicy = new TurnRoutePolicyService();
+  private readonly guard = new EditorModeGuard(this.routePolicy);
+  private readonly router = new TurnRouterService(this.routePolicy, this.guard);
   private readonly editorHandler: EditorTurnHandler;
   private readonly connectorHandler: ConnectorTurnHandler;
   private readonly knowledgeHandler: KnowledgeTurnHandler;
