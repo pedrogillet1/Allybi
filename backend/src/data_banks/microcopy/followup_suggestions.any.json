@@ -1,119 +1,240 @@
 {
   "_meta": {
     "id": "followup_suggestions",
-    "version": "1.0.0",
-    "description": "Follow-up suggestion chips for Allybi. Provides deterministic, bank-driven next queries for the user to continue in the next turn.",
+    "version": "2.0.0",
+    "description": "Adaptive follow-up chips for document-grounded turns only. Uses query/answer/source facets and document type to select context-specific followups.",
     "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-02-10",
+    "lastUpdated": "2026-02-19",
     "owner": "allybi-microcopy",
     "compat": ">=1.0.0"
   },
   "config": {
     "enabled": true,
     "maxFollowups": 3,
-    "suppressInAnswerModes": ["nav_pills", "rank_disambiguate"],
-    "dedupeWindowTurns": 3
+    "suppressInAnswerModes": [
+      "nav_pills",
+      "rank_disambiguate",
+      "general_answer",
+      "help_steps",
+      "action_confirmation",
+      "action_receipt",
+      "fallback"
+    ],
+    "requireDocumentEvidence": true,
+    "allowGenericFallback": false
   },
   "rules": [
     {
-      "id": "docs_qa_default",
-      "description": "Default followups for document-grounded answers.",
-      "when": {
-        "any": [
-          { "path": "answerMode", "op": "startsWith", "value": "doc_grounded" },
-          { "path": "answerClass", "op": "eq", "value": "DOCUMENT" }
-        ]
-      },
-      "suggestions": {
-        "en": [
-          { "label": "Quote the exact lines", "query": "Quote the exact lines that support the key point." },
-          { "label": "Where does this appear?", "query": "Where in the document does this appear (page/section)?" },
-          { "label": "Pull key numbers", "query": "Extract the key numbers and put them in a table." }
-        ],
-        "pt": [
-          { "label": "Citar trechos exatos", "query": "Cite os trechos exatos que sustentam o ponto principal." },
-          { "label": "Onde aparece?", "query": "Onde isso aparece no documento (página/seção)?" },
-          { "label": "Números principais", "query": "Extraia os números principais e coloque em uma tabela." }
-        ],
-        "es": [
-          { "label": "Citar líneas exactas", "query": "Cita las líneas exactas que sustentan el punto clave." },
-          { "label": "¿Dónde aparece?", "query": "¿Dónde aparece esto en el documento (página/sección)?" },
-          { "label": "Números clave", "query": "Extrae los números clave y ponlos en una tabla." }
-        ]
-      }
-    },
-    {
-      "id": "editing_viewer_default",
-      "description": "Viewer/editor-oriented next steps when the user is in a document preview flow.",
+      "id": "doc_numbers_xlsx",
+      "description": "Spreadsheet-specific numeric followups.",
       "when": {
         "all": [
-          { "path": "isViewerVariant", "op": "eq", "value": true }
+          { "path": "answerMode", "op": "startsWith", "value": "doc_grounded" },
+          { "path": "answerClass", "op": "eq", "value": "DOCUMENT" },
+          { "path": "intent", "op": "eq", "value": "RAG_QUERY" },
+          { "path": "hasSources", "op": "eq", "value": true },
+          { "path": "docType", "op": "eq", "value": "xlsx" },
+          { "path": "facet.hasNumbers", "op": "eq", "value": true }
         ]
       },
       "suggestions": {
         "en": [
-          { "label": "Make it concise", "query": "Rewrite the selected text to be more concise and professional." },
-          { "label": "Fix grammar", "query": "Fix grammar and spelling in the selected text. Preserve meaning." },
-          { "label": "Apply across doc", "query": "Make the same style change throughout this document (keep meaning)." }
+          { "label": "Extract line items", "query": "Extract the key line items and amounts from {{document}} into a table." },
+          { "label": "Verify totals", "query": "Recalculate totals in {{document}} and flag any mismatches." },
+          { "label": "Find outliers", "query": "Identify numeric outliers and unusual values in {{document}}." }
         ],
         "pt": [
-          { "label": "Deixar conciso", "query": "Reescreva o texto selecionado para ficar mais conciso e profissional." },
-          { "label": "Corrigir gramática", "query": "Corrija gramática e ortografia no texto selecionado. Preserve o sentido." },
-          { "label": "Aplicar no doc", "query": "Aplique a mesma mudança de estilo no documento inteiro (sem mudar o sentido)." }
+          { "label": "Extrair itens", "query": "Extraia os principais itens e valores de {{document}} em uma tabela." },
+          { "label": "Validar totais", "query": "Recalcule os totais em {{document}} e sinalize divergências." },
+          { "label": "Encontrar outliers", "query": "Identifique outliers e valores incomuns em {{document}}." }
         ],
         "es": [
-          { "label": "Hacer conciso", "query": "Reescribe el texto seleccionado para que sea más conciso y profesional." },
-          { "label": "Corregir gramática", "query": "Corrige gramática y ortografía en el texto seleccionado. Conserva el sentido." },
-          { "label": "Aplicar al doc", "query": "Aplica el mismo cambio de estilo en todo el documento (sin cambiar el sentido)." }
+          { "label": "Extraer partidas", "query": "Extrae las partidas y montos clave de {{document}} en una tabla." },
+          { "label": "Validar totales", "query": "Recalcula los totales en {{document}} y marca discrepancias." },
+          { "label": "Detectar atipicos", "query": "Identifica valores atipicos y outliers en {{document}}." }
         ]
       }
     },
     {
-      "id": "help_capabilities_default",
-      "description": "Next steps after capabilities/help answers.",
+      "id": "doc_comparison_multi_source",
+      "description": "Comparison-oriented followups when multiple documents are in play.",
       "when": {
-        "any": [
-          { "path": "operator", "op": "eq", "value": "capabilities" },
-          { "path": "intentFamily", "op": "eq", "value": "help" }
+        "all": [
+          { "path": "answerMode", "op": "startsWith", "value": "doc_grounded" },
+          { "path": "answerClass", "op": "eq", "value": "DOCUMENT" },
+          { "path": "intent", "op": "eq", "value": "RAG_QUERY" },
+          { "path": "hasSources", "op": "eq", "value": true },
+          { "path": "hasMultiSources", "op": "eq", "value": true },
+          { "path": "facet.hasComparison", "op": "eq", "value": true }
         ]
       },
       "suggestions": {
         "en": [
-          { "label": "Summarize a document", "query": "Summarize the document in 5 bullets." },
-          { "label": "Find something", "query": "Find where this is mentioned: <paste phrase>." },
-          { "label": "Extract a table", "query": "Extract the table(s) related to <topic> and compare them." }
+          { "label": "Build a comparison table", "query": "Create a side-by-side comparison table with the key differences." },
+          { "label": "What changed most?", "query": "List the biggest changes and explain their impact." },
+          { "label": "Highlight contradictions", "query": "Point out any contradictions across the referenced documents." }
         ],
         "pt": [
-          { "label": "Resumir um documento", "query": "Resuma o documento em 5 bullets." },
-          { "label": "Encontrar algo", "query": "Encontre onde isso é mencionado: <cole a frase>." },
-          { "label": "Extrair uma tabela", "query": "Extraia a(s) tabela(s) sobre <tema> e compare." }
+          { "label": "Tabela comparativa", "query": "Crie uma tabela lado a lado com as principais diferencas." },
+          { "label": "O que mais mudou?", "query": "Liste as maiores mudancas e explique o impacto." },
+          { "label": "Mostrar contradicoes", "query": "Aponte contradicoes entre os documentos citados." }
         ],
         "es": [
-          { "label": "Resumir un documento", "query": "Resume el documento en 5 bullets." },
-          { "label": "Encontrar algo", "query": "Encuentra dónde se menciona esto: <pega la frase>." },
-          { "label": "Extraer una tabla", "query": "Extrae la(s) tabla(s) sobre <tema> y compáralas." }
+          { "label": "Tabla comparativa", "query": "Crea una tabla lado a lado con las diferencias clave." },
+          { "label": "Que cambio mas?", "query": "Enumera los cambios mas importantes y su impacto." },
+          { "label": "Mostrar contradicciones", "query": "Senala contradicciones entre los documentos citados." }
         ]
       }
     },
     {
-      "id": "general_default",
-      "description": "Fallback followups for general answers.",
-      "when": { "all": [{ "path": "answerMode", "op": "eq", "value": "general_answer" }] },
+      "id": "doc_location_with_pages",
+      "description": "Followups for location/page oriented requests and quoted evidence.",
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "startsWith", "value": "doc_grounded" },
+          { "path": "answerClass", "op": "eq", "value": "DOCUMENT" },
+          { "path": "intent", "op": "eq", "value": "RAG_QUERY" },
+          { "path": "hasSources", "op": "eq", "value": true },
+          { "path": "facet.hasLocation", "op": "eq", "value": true }
+        ]
+      },
       "suggestions": {
         "en": [
-          { "label": "Shorten it", "query": "Give me a shorter answer (2-3 sentences)." },
-          { "label": "Show as a table", "query": "Rewrite the answer as a table." }
+          { "label": "Pinpoint exact section", "query": "Show the exact section and page where this appears in {{document}}." },
+          { "label": "Quote supporting lines", "query": "Quote the exact supporting lines from {{document}}." },
+          { "label": "Show nearby context", "query": "Show the surrounding paragraph before and after the cited passage." }
         ],
         "pt": [
-          { "label": "Encurtar", "query": "Dê uma resposta mais curta (2-3 frases)." },
-          { "label": "Mostrar em tabela", "query": "Reescreva a resposta em uma tabela." }
+          { "label": "Localizar secao exata", "query": "Mostre a secao e pagina exatas onde isso aparece em {{document}}." },
+          { "label": "Citar linhas de apoio", "query": "Cite as linhas exatas que sustentam isso em {{document}}." },
+          { "label": "Mostrar contexto", "query": "Mostre o paragrafo anterior e posterior ao trecho citado." }
         ],
         "es": [
-          { "label": "Acortarlo", "query": "Dame una respuesta más corta (2-3 frases)." },
-          { "label": "Mostrar en tabla", "query": "Reescribe la respuesta como una tabla." }
+          { "label": "Ubicar seccion exacta", "query": "Muestra la seccion y pagina exactas donde aparece esto en {{document}}." },
+          { "label": "Citar lineas de apoyo", "query": "Cita las lineas exactas que respaldan esto en {{document}}." },
+          { "label": "Mostrar contexto cercano", "query": "Muestra el parrafo anterior y posterior al pasaje citado." }
+        ]
+      }
+    },
+    {
+      "id": "doc_definitions_legal",
+      "description": "Definition and clause extraction followups.",
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "startsWith", "value": "doc_grounded" },
+          { "path": "answerClass", "op": "eq", "value": "DOCUMENT" },
+          { "path": "intent", "op": "eq", "value": "RAG_QUERY" },
+          { "path": "hasSources", "op": "eq", "value": true },
+          { "path": "facet.hasDefinitions", "op": "eq", "value": true }
+        ]
+      },
+      "suggestions": {
+        "en": [
+          { "label": "Extract all clauses", "query": "Extract all related clauses and definitions from {{document}}." },
+          { "label": "List obligations", "query": "List obligations, conditions, and exceptions mentioned in {{document}}." },
+          { "label": "Simplify legal wording", "query": "Rewrite the key clause in plain language without changing meaning." }
+        ],
+        "pt": [
+          { "label": "Extrair clausulas", "query": "Extraia todas as clausulas e definicoes relacionadas de {{document}}." },
+          { "label": "Listar obrigacoes", "query": "Liste obrigacoes, condicoes e excecoes mencionadas em {{document}}." },
+          { "label": "Simplificar juridiquês", "query": "Reescreva a clausula principal em linguagem simples sem alterar o sentido." }
+        ],
+        "es": [
+          { "label": "Extraer clausulas", "query": "Extrae todas las clausulas y definiciones relacionadas de {{document}}." },
+          { "label": "Listar obligaciones", "query": "Enumera obligaciones, condiciones y excepciones de {{document}}." },
+          { "label": "Simplificar lenguaje legal", "query": "Reescribe la clausula clave en lenguaje simple sin cambiar el sentido." }
+        ]
+      }
+    },
+    {
+      "id": "doc_timeline_dates",
+      "description": "Timeline/date followups.",
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "startsWith", "value": "doc_grounded" },
+          { "path": "answerClass", "op": "eq", "value": "DOCUMENT" },
+          { "path": "intent", "op": "eq", "value": "RAG_QUERY" },
+          { "path": "hasSources", "op": "eq", "value": true },
+          { "path": "facet.hasTimeline", "op": "eq", "value": true }
+        ]
+      },
+      "suggestions": {
+        "en": [
+          { "label": "Build a timeline", "query": "Create a chronological timeline of dates and milestones." },
+          { "label": "List deadlines", "query": "Extract all deadlines and who is responsible for each one." },
+          { "label": "Flag date conflicts", "query": "Identify any conflicting dates or sequencing issues." }
+        ],
+        "pt": [
+          { "label": "Montar linha do tempo", "query": "Crie uma linha do tempo cronologica com datas e marcos." },
+          { "label": "Listar prazos", "query": "Extraia todos os prazos e os responsaveis por cada um." },
+          { "label": "Sinalizar conflitos", "query": "Identifique conflitos de datas ou problemas de sequencia." }
+        ],
+        "es": [
+          { "label": "Crear linea de tiempo", "query": "Crea una linea de tiempo cronologica con fechas e hitos." },
+          { "label": "Listar plazos", "query": "Extrae todos los plazos y los responsables de cada uno." },
+          { "label": "Marcar conflictos", "query": "Identifica conflictos de fechas o problemas de secuencia." }
+        ]
+      }
+    },
+    {
+      "id": "doc_summary",
+      "description": "Summary-oriented followups when user asks for synthesis.",
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "startsWith", "value": "doc_grounded" },
+          { "path": "answerClass", "op": "eq", "value": "DOCUMENT" },
+          { "path": "intent", "op": "eq", "value": "RAG_QUERY" },
+          { "path": "hasSources", "op": "eq", "value": true },
+          { "path": "facet.hasSummary", "op": "eq", "value": true }
+        ]
+      },
+      "suggestions": {
+        "en": [
+          { "label": "Executive bullets", "query": "Turn this into a 5-bullet executive summary." },
+          { "label": "Action items", "query": "Extract concrete action items with owners and deadlines." },
+          { "label": "Open questions", "query": "List the key unresolved questions in the document." }
+        ],
+        "pt": [
+          { "label": "Bullets executivos", "query": "Transforme isso em um resumo executivo com 5 bullets." },
+          { "label": "Itens de acao", "query": "Extraia itens de acao com responsaveis e prazos." },
+          { "label": "Perguntas em aberto", "query": "Liste as principais perguntas ainda em aberto no documento." }
+        ],
+        "es": [
+          { "label": "Bullets ejecutivos", "query": "Convierte esto en un resumen ejecutivo de 5 bullets." },
+          { "label": "Acciones", "query": "Extrae acciones concretas con responsables y plazos." },
+          { "label": "Preguntas abiertas", "query": "Enumera las preguntas clave aun no resueltas." }
+        ]
+      }
+    },
+    {
+      "id": "doc_risk_followups",
+      "description": "Risk-oriented followups when answer indicates concerns.",
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "startsWith", "value": "doc_grounded" },
+          { "path": "answerClass", "op": "eq", "value": "DOCUMENT" },
+          { "path": "intent", "op": "eq", "value": "RAG_QUERY" },
+          { "path": "hasSources", "op": "eq", "value": true },
+          { "path": "facet.hasRisk", "op": "eq", "value": true }
+        ]
+      },
+      "suggestions": {
+        "en": [
+          { "label": "Top risks", "query": "List the top risks and severity levels from the document." },
+          { "label": "Mitigation plan", "query": "Suggest mitigation actions based only on what the document states." },
+          { "label": "What is missing?", "query": "Identify risk controls that seem missing or weak." }
+        ],
+        "pt": [
+          { "label": "Principais riscos", "query": "Liste os principais riscos e niveis de severidade do documento." },
+          { "label": "Plano de mitigacao", "query": "Sugira acoes de mitigacao com base apenas no que o documento diz." },
+          { "label": "O que falta?", "query": "Identifique controles de risco que parecem fracos ou ausentes." }
+        ],
+        "es": [
+          { "label": "Riesgos principales", "query": "Enumera los riesgos principales y su severidad del documento." },
+          { "label": "Plan de mitigacion", "query": "Sugiere acciones de mitigacion basadas solo en el documento." },
+          { "label": "Que falta?", "query": "Identifica controles de riesgo ausentes o debiles." }
         ]
       }
     }
   ]
 }
-

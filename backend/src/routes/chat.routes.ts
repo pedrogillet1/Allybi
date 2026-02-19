@@ -441,6 +441,29 @@ router.post(
             answerSourceMode: (result as any).answerSourceMode || "chunk",
             indexingInProgress: Boolean((result as any).indexingInProgress),
             scopeRelaxed: Boolean((result as any).scopeRelaxed),
+            status: (result as any).status || "success",
+            failureCode: (result as any).failureCode || null,
+            completion: (result as any).completion || {
+              answered: Boolean(String((result as any).assistantText || "").trim()),
+              missingSlots: [],
+              nextAction: null,
+            },
+            truncation: (result as any).truncation || {
+              occurred: false,
+              reason: null,
+              resumeToken: null,
+            },
+            evidence: (result as any).evidence || {
+              required: false,
+              provided: Array.isArray((result as any).sources)
+                ? (result as any).sources.length > 0
+                : false,
+              sourceIds: Array.isArray((result as any).sources)
+                ? (result as any).sources
+                    .map((s: any) => String(s?.documentId || "").trim())
+                    .filter(Boolean)
+                : [],
+            },
             ...(String((result as any).scopeRelaxReason || "").trim()
               ? { scopeRelaxReason: (result as any).scopeRelaxReason }
               : {}),
@@ -450,6 +473,9 @@ router.post(
             ...(result.listing?.length ? { listing: result.listing } : {}),
             ...(result.breadcrumb?.length
               ? { breadcrumb: result.breadcrumb }
+              : {}),
+            ...(result.followups?.length
+              ? { followups: result.followups }
               : {}),
             ...(result.generatedTitle
               ? { generatedTitle: result.generatedTitle }
@@ -595,6 +621,29 @@ router.post(
             answerSourceMode: (result as any).answerSourceMode || "chunk",
             indexingInProgress: Boolean((result as any).indexingInProgress),
             scopeRelaxed: Boolean((result as any).scopeRelaxed),
+            status: (result as any).status || "success",
+            failureCode: (result as any).failureCode || null,
+            completion: (result as any).completion || {
+              answered: Boolean(String((result as any).assistantText || "").trim()),
+              missingSlots: [],
+              nextAction: null,
+            },
+            truncation: (result as any).truncation || {
+              occurred: false,
+              reason: null,
+              resumeToken: null,
+            },
+            evidence: (result as any).evidence || {
+              required: false,
+              provided: Array.isArray((result as any).sources)
+                ? (result as any).sources.length > 0
+                : false,
+              sourceIds: Array.isArray((result as any).sources)
+                ? (result as any).sources
+                    .map((s: any) => String(s?.documentId || "").trim())
+                    .filter(Boolean)
+                : [],
+            },
             ...(String((result as any).scopeRelaxReason || "").trim()
               ? { scopeRelaxReason: (result as any).scopeRelaxReason }
               : {}),
@@ -604,6 +653,9 @@ router.post(
             ...(result.listing?.length ? { listing: result.listing } : {}),
             ...(result.breadcrumb?.length
               ? { breadcrumb: result.breadcrumb }
+              : {}),
+            ...(result.followups?.length
+              ? { followups: result.followups }
               : {}),
           })}\n\n`,
         );
@@ -1101,6 +1153,29 @@ router.post(
             answerSourceMode: (result as any).answerSourceMode || "chunk",
             indexingInProgress: Boolean((result as any).indexingInProgress),
             scopeRelaxed: Boolean((result as any).scopeRelaxed),
+            status: (result as any).status || "success",
+            failureCode: (result as any).failureCode || null,
+            completion: (result as any).completion || {
+              answered: Boolean(String((result as any).assistantText || "").trim()),
+              missingSlots: [],
+              nextAction: null,
+            },
+            truncation: (result as any).truncation || {
+              occurred: false,
+              reason: null,
+              resumeToken: null,
+            },
+            evidence: (result as any).evidence || {
+              required: false,
+              provided: Array.isArray((result as any).sources)
+                ? (result as any).sources.length > 0
+                : false,
+              sourceIds: Array.isArray((result as any).sources)
+                ? (result as any).sources
+                    .map((s: any) => String(s?.documentId || "").trim())
+                    .filter(Boolean)
+                : [],
+            },
             ...(String((result as any).scopeRelaxReason || "").trim()
               ? { scopeRelaxReason: (result as any).scopeRelaxReason }
               : {}),

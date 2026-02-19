@@ -76,6 +76,20 @@ export class PrismaChatService implements PrismaChatServicePort {
     });
   }
 
+  /**
+   * Late-wire encryption services into the inner runtime.
+   * Called after construction when encryption keys are available.
+   */
+  wireEncryption(
+    encryptedRepo: EncryptedChatRepo,
+    encryptedContext?: EncryptedChatContextService,
+  ): void {
+    (this.runtime as any).encryptedRepo = encryptedRepo;
+    if (encryptedContext) {
+      (this.runtime as any).encryptedContext = encryptedContext;
+    }
+  }
+
   async chat(req: ChatRequest): Promise<ChatResult> {
     if (!this.useKernel) return this.runtime.chat(req);
     return this.kernel.handleTurn(req);

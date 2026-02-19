@@ -42,10 +42,10 @@ export type DocExtension =
  * Conversation State Types (ChatGPT-parity, stable runtime contract)
  * -----------------------------------------------------------------
  * Centralizes the canonical in-memory/state-persistence shape used across:
- *  - scopeGate.service.ts / documentScope.service.ts
+ *  - scopeGate.service.ts
  *  - retrievalEngine.service.ts / evidenceGate.service.ts
  *  - trustGate.service.ts / qualityGateRunner.service.ts
- *  - microcopyPicker.service.ts / outputContract.service.ts
+ *  - microcopyPicker.service.ts / response contracts
  *  - conversationMemory.service.ts (optional integration)
  *
  * Design principles:

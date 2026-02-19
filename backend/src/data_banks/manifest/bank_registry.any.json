@@ -4866,7 +4866,7 @@
       "category": "microcopy",
       "path": "microcopy/followup_suggestions.any.json",
       "filename": "followup_suggestions.any.json",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "contentType": "microcopy",
       "schemaId": "bank_schema",
       "dependsOn": [
@@ -4884,8 +4884,8 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "36b2a9a38197542b0989c03d1b1f4139c79ae81a81cbf2ded0a572bc0394a3bd",
-      "lastUpdated": "2026-02-10"
+      "checksumSha256": "046e25ec9fea2c6f0d3269e466443b8d8f790ab291ee94fec11f1a70835813ea",
+      "lastUpdated": "2026-02-19"
     }
   ],
   "tests": [

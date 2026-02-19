@@ -203,8 +203,7 @@ async function startServer() {
     // Wire encryption into chat service (if KODA_MASTER_KEY_BASE64 is set)
     const hasEncryptionKey = !!process.env.KODA_MASTER_KEY_BASE64;
     if (hasEncryptionKey) {
-      (chatService as any).encryptedRepo = encryptedChatRepo;
-      (chatService as any).encryptedContext = encryptedChatContext;
+      chatService.wireEncryption(encryptedChatRepo, encryptedChatContext);
       console.log("[Server] Chat encryption enabled");
     } else {
       console.warn(

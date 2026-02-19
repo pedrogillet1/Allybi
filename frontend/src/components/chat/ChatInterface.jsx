@@ -458,6 +458,62 @@ function fixCurrencyArtifacts(text) {
   return t;
 }
 
+function isDocumentGroundedMode(mode) {
+  const value = String(mode || "").trim();
+  return value.startsWith("doc_grounded");
+}
+
+function shouldRenderFollowupsForMessage(message) {
+  const answerClass = String(message?.answerClass || "")
+    .trim()
+    .toUpperCase();
+  const answerMode = String(message?.answerMode || "").trim();
+  const hasSources =
+    Array.isArray(message?.sources) && message.sources.length > 0;
+  const isDocumentAnswer =
+    answerClass === "DOCUMENT" || isDocumentGroundedMode(answerMode);
+  return isDocumentAnswer && hasSources;
+}
+
+function normalizeFollowupChips(chips, max = 3) {
+  if (!Array.isArray(chips)) return [];
+  const out = [];
+  const seen = new Set();
+  const limit = Math.max(0, Math.min(6, Number(max) || 3));
+  const genericPatterns = [
+    /^quote\s+the\s+exact\s+lines\??$/i,
+    /^where\s+does\s+this\s+appear\??$/i,
+    /^pull\s+key\s+numbers\??$/i,
+  ];
+  for (const chip of chips) {
+    const label =
+      typeof chip === "string"
+        ? String(chip || "").trim()
+        : String(chip?.label || chip?.query || "").trim();
+    const query =
+      typeof chip === "string"
+        ? String(chip || "").trim()
+        : String(chip?.query || chip?.label || "").trim();
+    if (!label || !query) continue;
+    if (genericPatterns.some((re) => re.test(label) || re.test(query))) continue;
+    const key = query.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ label, query });
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+function deriveRenderableFollowups(message, fallbackChips = []) {
+  if (!shouldRenderFollowupsForMessage(message)) return [];
+  const raw =
+    Array.isArray(message?.followups) && message.followups.length > 0
+      ? message.followups
+      : fallbackChips;
+  return normalizeFollowupChips(raw);
+}
+
 function shouldSuppressPlainFileMatchAnswer({ isViewerVariant, userPrompt, sources, answerText }) {
   if (isViewerVariant) return false;
   const prompt = String(userPrompt || "").toLowerCase();
@@ -2236,7 +2292,20 @@ export default function ChatInterface({
             answerClass: m.answerClass || meta.answerClass || null,
             navType: m.navType || meta.navType || null,
             sources: existingSources,
-            followups: m.followups || m.followUpSuggestions || meta.followups || [],
+            followups: deriveRenderableFollowups(
+              {
+                answerMode: m.answerMode || meta.answerMode || "general_answer",
+                answerClass: m.answerClass || meta.answerClass || null,
+                sources: existingSources,
+                followups:
+                  m.followups ||
+                  m.followUpSuggestions ||
+                  meta.followups ||
+                  meta.followUpSuggestions ||
+                  [],
+              },
+              [],
+            ),
             attachments,
             listing: Array.isArray(meta.listing) ? meta.listing : undefined,
             breadcrumb: m.breadcrumb || meta.breadcrumb || [],
@@ -3203,7 +3272,7 @@ export default function ChatInterface({
         }
 
         if (type === "followups") {
-          const followups = Array.isArray(evt.followups) ? evt.followups : [];
+          const followups = normalizeFollowupChips(evt.followups);
           setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, followups } : m)));
         }
 
@@ -3238,7 +3307,9 @@ export default function ChatInterface({
           const finalSources = Array.isArray(msg.sources)
             ? msg.sources
             : (Array.isArray(evt.sources) ? evt.sources : null);
-          const finalFollowups = Array.isArray(msg.followups) ? msg.followups : (Array.isArray(evt.followups) ? evt.followups : []);
+          const rawFinalFollowups = Array.isArray(msg.followups)
+            ? msg.followups
+            : (Array.isArray(evt.followups) ? evt.followups : []);
 
           const buffered = streamBufRef.current;
           streamBufRef.current = "";
@@ -3253,6 +3324,29 @@ export default function ChatInterface({
               const finalMode = msg.answerMode || evt.answerMode || m.answerMode || "general_answer";
               const finalAnswerClass = msg.answerClass || evt.answerClass || m.answerClass || null;
               const finalNavType = msg.navType || evt.navType || m.navType || null;
+              const finalResponseStatus = msg.status || evt.status || "success";
+              const finalFailureCode = msg.failureCode || evt.failureCode || null;
+              const finalCompletion = msg.completion || evt.completion || null;
+              const finalTruncation = msg.truncation || evt.truncation || null;
+              const finalEvidence = msg.evidence || evt.evidence || null;
+              const resolvedSources =
+                finalSources != null
+                  ? finalSources
+                  : Array.isArray(m.sources)
+                    ? m.sources
+                    : [];
+              const finalFollowups = deriveRenderableFollowups(
+                {
+                  answerMode: finalMode,
+                  answerClass: finalAnswerClass,
+                  sources: resolvedSources,
+                  followups:
+                    rawFinalFollowups.length > 0
+                      ? rawFinalFollowups
+                      : m.followups,
+                },
+                [],
+              );
               const finalAttachments = Array.isArray(msg.attachments)
                 ? msg.attachments
                 : (Array.isArray(evt.attachments) ? evt.attachments : (Array.isArray(m.attachments) ? m.attachments : null));
@@ -3299,8 +3393,13 @@ export default function ChatInterface({
                 answerMode: finalMode,
                 answerClass: finalAnswerClass,
                 navType: finalNavType,
-                sources: finalSources != null ? finalSources : (m.sources || []),
-                followups: finalFollowups.length > 0 ? finalFollowups : (m.followups || []),
+                responseStatus: finalResponseStatus,
+                failureCode: finalFailureCode,
+                completion: finalCompletion,
+                truncation: finalTruncation,
+                evidence: finalEvidence,
+                sources: resolvedSources,
+                followups: finalFollowups,
                 ...(finalAttachments ? { attachments: finalAttachments } : {}),
                 ...(finalListing && !m.listing?.length ? { listing: finalListing } : {}),
                 ...(finalBreadcrumb && !m.breadcrumb?.length ? { breadcrumb: finalBreadcrumb } : {}),
@@ -5260,19 +5359,23 @@ export default function ChatInterface({
                                 />
                                 {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded')) || m.answerMode === 'action_receipt') ? renderSources(m) : null}
                               </div>
-                              {Array.isArray(m.followups) && m.followups.length > 0 && (
-                                <div className="koda-followup-chips" style={{ marginTop: 4 }}>
-                                  <FollowUpChips
-                                    chips={m.followups}
-                                    onSelect={(chip) => {
-                                      const q = typeof chip === "string" ? chip : chip?.query || chip?.label || "";
-                                      if (!q) return;
-                                      setInput(q);
-                                      setTimeout(() => inputRef.current?.focus(), 10);
-                                    }}
-                                  />
-                                </div>
-                              )}
+                              {(() => {
+                                const renderableFollowups = deriveRenderableFollowups(m);
+                                if (!renderableFollowups.length) return null;
+                                return (
+                                  <div className="koda-followup-chips" style={{ marginTop: 4 }}>
+                                    <FollowUpChips
+                                      chips={renderableFollowups}
+                                      onSelect={(chip) => {
+                                        const q = typeof chip === "string" ? chip : chip?.query || chip?.label || "";
+                                        if (!q) return;
+                                        setInput(q);
+                                        setTimeout(() => inputRef.current?.focus(), 10);
+                                      }}
+                                    />
+                                  </div>
+                                );
+                              })()}
                             </div>
                           ) : null}
                         </div>
