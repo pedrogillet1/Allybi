@@ -237,7 +237,7 @@ export class GoogleVisionOcrService {
       totalPages = Math.max(1, fromInfo, fromMarkers, formFeeds);
     } catch {
       try {
-        const { PDFDocument } = require('pdf-lib');
+        const { PDFDocument } = require('@cantoo/pdf-lib');
         const pdfDoc = await PDFDocument.load(buffer);
         totalPages = Math.max(1, pdfDoc.getPageCount());
       } catch {
@@ -315,7 +315,7 @@ export class GoogleVisionOcrService {
   }> {
     const warnings: string[] = [];
     const out: OcrPdfPageResult[] = [];
-    const { PDFDocument } = require('pdf-lib');
+    const { PDFDocument } = require('@cantoo/pdf-lib');
     const sourcePdf = await PDFDocument.load(buffer);
 
     const queue = this.splitIntoBatches(targetPages, OCR_PDF_BATCH_SIZE);
