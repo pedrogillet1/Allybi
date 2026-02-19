@@ -44,7 +44,11 @@ class StubGeminiClient {
     async function* gen() {
       yield { candidates: [{ content: { parts: [{ text: "Hello" }] } }] };
       yield { candidates: [{ content: { parts: [{ text: " from" }] } }] };
-      yield { candidates: [{ content: { parts: [{ text: " Gemini" }] }, finishReason: "STOP" }] };
+      yield {
+        candidates: [
+          { content: { parts: [{ text: " Gemini" }] }, finishReason: "STOP" },
+        ],
+      };
     }
     return { stream: gen() };
   }
@@ -74,15 +78,26 @@ describe("Gemini Adapter (Allybi)", () => {
 
   it("stream adapter emits meta -> delta(s) -> final for Gemini-shaped chunks", async () => {
     const parser = new LlmResponseParserService();
-    const adapter = new LlmStreamAdapterService(new StubGeminiClient() as any, parser);
+    const adapter = new LlmStreamAdapterService(
+      new StubGeminiClient() as any,
+      parser,
+    );
 
     const req: LlmRequest = {
-      route: { provider: "gemini", model: "gemini-3-flash", reason: "fast_path", stage: "draft" } as any,
+      route: {
+        provider: "gemini",
+        model: "gemini-3-flash",
+        reason: "fast_path",
+        stage: "draft",
+      } as any,
       messages: [{ role: "user", content: "hi" }],
       options: { stream: true },
     };
 
-    const stream = await adapter.stream(req, undefined, { maxDeltaChars: 8, flushOnNewline: false });
+    const stream = await adapter.stream(req, undefined, {
+      maxDeltaChars: 8,
+      flushOnNewline: false,
+    });
 
     const events: LlmStreamEvent[] = [];
     for await (const e of stream) events.push(e);
@@ -102,17 +117,31 @@ describe("Gemini Adapter (Allybi)", () => {
       async stream(_req: LlmRequest) {
         async function* gen() {
           // unknown tool-ish chunk (should be ignored safely)
-          yield { tool_calls: [{ id: "t1", name: "open", arguments: { docId: "x" } }] };
-          yield { candidates: [{ content: { parts: [{ text: "Done" }] }, finishReason: "STOP" }] };
+          yield {
+            tool_calls: [{ id: "t1", name: "open", arguments: { docId: "x" } }],
+          };
+          yield {
+            candidates: [
+              { content: { parts: [{ text: "Done" }] }, finishReason: "STOP" },
+            ],
+          };
         }
         return { stream: gen() };
       }
     }
 
-    const adapter = new LlmStreamAdapterService(new ToolishGeminiClient() as any, parser);
+    const adapter = new LlmStreamAdapterService(
+      new ToolishGeminiClient() as any,
+      parser,
+    );
 
     const req: LlmRequest = {
-      route: { provider: "gemini", model: "gemini-3-flash", reason: "fast_path", stage: "draft" } as any,
+      route: {
+        provider: "gemini",
+        model: "gemini-3-flash",
+        reason: "fast_path",
+        stage: "draft",
+      } as any,
       messages: [{ role: "user", content: "open something" }],
       options: { stream: true },
     };

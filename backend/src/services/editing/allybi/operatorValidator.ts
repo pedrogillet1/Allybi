@@ -1,6 +1,9 @@
 import { loadAllybiBanks } from "./loadBanks";
 import { operatorClassFromCanonical } from "./operatorPlanner";
-import type { AllybiOperatorClass, AllybiOperatorPlan } from "./operatorPlanner";
+import type {
+  AllybiOperatorClass,
+  AllybiOperatorPlan,
+} from "./operatorPlanner";
 
 export interface AllybiValidationResult {
   ok: boolean;
@@ -19,7 +22,10 @@ function isRewriteOperator(canonicalOperator: string): boolean {
   return op.includes("REWRITE") || op === "DOCX_REPLACE_SPAN";
 }
 
-function classesCompatible(expected: AllybiOperatorClass | undefined, actual: AllybiOperatorClass): boolean {
+function classesCompatible(
+  expected: AllybiOperatorClass | undefined,
+  actual: AllybiOperatorClass,
+): boolean {
   if (!expected || expected === "unknown") return true;
   if (expected === actual) return true;
   if (expected === "rewrite" && actual === "find_replace") return true;
@@ -27,11 +33,18 @@ function classesCompatible(expected: AllybiOperatorClass | undefined, actual: Al
   return false;
 }
 
-function supportsScope(canonicalOperator: string, scopeKind: string | undefined): boolean {
+function supportsScope(
+  canonicalOperator: string,
+  scopeKind: string | undefined,
+): boolean {
   if (!scopeKind) return true;
   const op = String(canonicalOperator || "");
   if (scopeKind === "word" || scopeKind === "sentence") {
-    return op === "DOCX_REPLACE_SPAN" || op === "DOCX_SET_RUN_STYLE" || op === "DOCX_CLEAR_RUN_STYLE";
+    return (
+      op === "DOCX_REPLACE_SPAN" ||
+      op === "DOCX_SET_RUN_STYLE" ||
+      op === "DOCX_CLEAR_RUN_STYLE"
+    );
   }
   if (scopeKind === "paragraph") {
     return !op.includes("SECTION") && !op.includes("DOCUMENT");
@@ -45,14 +58,21 @@ function supportsScope(canonicalOperator: string, scopeKind: string | undefined)
   return true;
 }
 
-function getOperatorEntry(domain: "docx" | "sheets", canonicalOperator: string): any | null {
+function getOperatorEntry(
+  domain: "docx" | "sheets",
+  canonicalOperator: string,
+): any | null {
   const banks = loadAllybiBanks();
-  const catalog = banks.operatorCatalog?.operators && typeof banks.operatorCatalog.operators === "object"
-    ? (banks.operatorCatalog.operators as Record<string, any>)
-    : {};
+  const catalog =
+    banks.operatorCatalog?.operators &&
+    typeof banks.operatorCatalog.operators === "object"
+      ? (banks.operatorCatalog.operators as Record<string, any>)
+      : {};
   const op = catalog?.[canonicalOperator];
   if (!op || typeof op !== "object") return null;
-  const opDomain = String((op as any).domain || "").trim().toLowerCase();
+  const opDomain = String((op as any).domain || "")
+    .trim()
+    .toLowerCase();
   if (domain === "docx" && opDomain && opDomain !== "docx") return null;
   if (domain === "sheets" && opDomain && opDomain !== "excel") return null;
   return op;
@@ -68,7 +88,9 @@ export function validateAllybiOperatorPayload(
     return {
       ok: false,
       code: "ALLYBI_FONT_AMBIGUOUS",
-      message: plan.clarificationMessage || "I found an ambiguous font name. Please clarify the font family.",
+      message:
+        plan.clarificationMessage ||
+        "I found an ambiguous font name. Please clarify the font family.",
     };
   }
 
@@ -76,7 +98,8 @@ export function validateAllybiOperatorPayload(
     return {
       ok: false,
       code: "ALLYBI_FORMATTING_REWRITE_BLOCKED",
-      message: "Formatting request cannot be routed to a text rewrite operator.",
+      message:
+        "Formatting request cannot be routed to a text rewrite operator.",
     };
   }
 
@@ -88,7 +111,10 @@ export function validateAllybiOperatorPayload(
     };
   }
 
-  const actualClass = operatorClassFromCanonical(plan.domain, plan.canonicalOperator);
+  const actualClass = operatorClassFromCanonical(
+    plan.domain,
+    plan.canonicalOperator,
+  );
   if (!classesCompatible(plan.operatorClass, actualClass)) {
     return {
       ok: false,
@@ -125,27 +151,34 @@ export function validateAllybiOperatorPayload(
     }
   }
 
-  const style = payload.style && typeof payload.style === "object"
-    ? (payload.style as Record<string, unknown>)
-    : {};
-  const format = payload.format && typeof payload.format === "object"
-    ? (payload.format as Record<string, unknown>)
-    : {};
+  const style =
+    payload.style && typeof payload.style === "object"
+      ? (payload.style as Record<string, unknown>)
+      : {};
+  const format =
+    payload.format && typeof payload.format === "object"
+      ? (payload.format as Record<string, unknown>)
+      : {};
   const fontFamily = String(
-    style.fontFamily ||
-    format.fontFamily ||
-    (plan.fontFamily || ""),
+    style.fontFamily || format.fontFamily || plan.fontFamily || "",
   ).trim();
   if (fontFamily) {
     const banks = loadAllybiBanks();
-    const familyMap = banks.fontAliases?.families && typeof banks.fontAliases.families === "object"
-      ? (banks.fontAliases.families as Record<string, any>)
-      : {};
+    const familyMap =
+      banks.fontAliases?.families &&
+      typeof banks.fontAliases.families === "object"
+        ? (banks.fontAliases.families as Record<string, any>)
+        : {};
     const supported = Object.keys(familyMap);
-    const exact = supported.some((family) => family.toLowerCase() === fontFamily.toLowerCase());
+    const exact = supported.some(
+      (family) => family.toLowerCase() === fontFamily.toLowerCase(),
+    );
     if (!exact) {
       const lang = languageFromInput(options?.language || plan.language);
-      const template = String(banks.fontAliases?.errors?.FONT_UNSUPPORTED?.[lang] || "").trim() ||
+      const template =
+        String(
+          banks.fontAliases?.errors?.FONT_UNSUPPORTED?.[lang] || "",
+        ).trim() ||
         (lang === "pt"
           ? "Fonte não disponível neste mecanismo. Escolha uma destas: {supported}."
           : "Font not available in this document engine. Choose one of: {supported}.");

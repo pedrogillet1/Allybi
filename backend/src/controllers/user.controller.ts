@@ -1,19 +1,22 @@
-import { Request, Response } from 'express';
-import prisma from '../config/database';
-import crypto from 'crypto';
-import bcrypt from 'bcrypt';
+import { Request, Response } from "express";
+import prisma from "../config/database";
+import crypto from "crypto";
+import bcrypt from "bcrypt";
 
 function sha256(input: string): string {
-  return crypto.createHash('sha256').update(input).digest('hex');
+  return crypto.createHash("sha256").update(input).digest("hex");
 }
 
 /**
  * Update user profile
  */
-export const updateProfile = async (req: Request, res: Response): Promise<void> => {
+export const updateProfile = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
@@ -26,7 +29,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     });
 
     if (!currentUser) {
-      res.status(404).json({ error: 'User not found' });
+      res.status(404).json({ error: "User not found" });
       return;
     }
 
@@ -42,8 +45,8 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
 
       if (existingUserWithPhone && existingUserWithPhone.id !== req.user.id) {
         res.status(400).json({
-          error: 'Phone number already in use',
-          field: 'phoneNumber'
+          error: "Phone number already in use",
+          field: "phoneNumber",
         });
         return;
       }
@@ -78,36 +81,39 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
 
     // Send magic link for phone verification if needed
     if (needsPhoneVerification) {
-      const authService = await import('../services/auth.service');
+      const authService = await import("../services/auth.service");
       await authService.sendPhoneVerificationCode(req.user.id, phoneNumber);
     }
 
     res.status(200).json({
-      message: 'Profile updated successfully',
+      message: "Profile updated successfully",
       user: updatedUser,
       needsPhoneVerification,
     });
   } catch (error) {
     const err = error as Error;
-    console.error('Error updating profile:', error);
-    res.status(500).json({ error: 'Failed to update profile' });
+    console.error("Error updating profile:", error);
+    res.status(500).json({ error: "Failed to update profile" });
   }
 };
 
 /**
  * Change user password
  */
-export const changePassword = async (req: Request, res: Response): Promise<void> => {
+export const changePassword = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
     const { currentPassword, newPassword } = req.body;
 
     if (!newPassword) {
-      res.status(400).json({ error: 'New password is required' });
+      res.status(400).json({ error: "New password is required" });
       return;
     }
 
@@ -127,7 +133,7 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
     });
 
     if (!user) {
-      res.status(404).json({ error: 'User not found' });
+      res.status(404).json({ error: "User not found" });
       return;
     }
 
@@ -136,12 +142,12 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
     // If user has a password, verify current password
     if (!isOAuthUser) {
       if (!currentPassword) {
-        res.status(400).json({ error: 'Current password is required' });
+        res.status(400).json({ error: "Current password is required" });
         return;
       }
 
       if (!user.salt || !user.passwordHash) {
-        res.status(400).json({ error: 'User account has no password set' });
+        res.status(400).json({ error: "User account has no password set" });
         return;
       }
 
@@ -152,39 +158,45 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
       // Verify current password using bcrypt (plain bcrypt, no custom salt appended)
       const isPasswordValid = await bcrypt.compare(
         currentPassword,
-        passwordHash
+        passwordHash,
       );
 
       if (!isPasswordValid) {
-        res.status(401).json({ error: 'Current password is incorrect' });
+        res.status(401).json({ error: "Current password is incorrect" });
         return;
       }
     }
 
     // Validate new password
     if (newPassword.length < 8) {
-      res.status(400).json({ error: 'New password must be at least 8 characters' });
+      res
+        .status(400)
+        .json({ error: "New password must be at least 8 characters" });
       return;
     }
 
     if (!/[!@#$%^&*(),.?":{}|<>0-9]/.test(newPassword)) {
-      res.status(400).json({ error: 'New password must contain a symbol or number' });
+      res
+        .status(400)
+        .json({ error: "New password must contain a symbol or number" });
       return;
     }
 
     // Check if password contains name or email
     const email = user.email.toLowerCase();
-    const firstName = user.firstName?.toLowerCase() || '';
-    const lastName = user.lastName?.toLowerCase() || '';
+    const firstName = user.firstName?.toLowerCase() || "";
+    const lastName = user.lastName?.toLowerCase() || "";
     const passwordLower = newPassword.toLowerCase();
 
     if (
       email.includes(passwordLower) ||
-      passwordLower.includes(email.split('@')[0]) ||
+      passwordLower.includes(email.split("@")[0]) ||
       (firstName && passwordLower.includes(firstName)) ||
       (lastName && passwordLower.includes(lastName))
     ) {
-      res.status(400).json({ error: 'Password must not contain your name or email' });
+      res
+        .status(400)
+        .json({ error: "Password must not contain your name or email" });
       return;
     }
 
@@ -202,31 +214,34 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
     });
 
     const message = isOAuthUser
-      ? 'Password set successfully! You can now login with email and password.'
-      : 'Password changed successfully';
+      ? "Password set successfully! You can now login with email and password."
+      : "Password changed successfully";
 
     res.status(200).json({ message });
   } catch (error) {
     const err = error as Error;
-    console.error('Error changing password:', error);
-    res.status(500).json({ error: 'Failed to change password' });
+    console.error("Error changing password:", error);
+    res.status(500).json({ error: "Failed to change password" });
   }
 };
 
 /**
  * Verify phone number with verification code
  */
-export const verifyProfilePhone = async (req: Request, res: Response): Promise<void> => {
+export const verifyProfilePhone = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
     const { code } = req.body;
 
     if (!code) {
-      res.status(400).json({ error: 'Verification code is required' });
+      res.status(400).json({ error: "Verification code is required" });
       return;
     }
 
@@ -235,23 +250,23 @@ export const verifyProfilePhone = async (req: Request, res: Response): Promise<v
     const verificationRecord = await prisma.verificationCode.findFirst({
       where: {
         userId: req.user.id,
-        type: 'phone',
+        type: "phone",
         code: codeHash,
         isUsed: false,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 
     if (!verificationRecord) {
-      res.status(400).json({ error: 'Invalid verification code' });
+      res.status(400).json({ error: "Invalid verification code" });
       return;
     }
 
     // Check if code expired
     if (verificationRecord.expiresAt < new Date()) {
-      res.status(400).json({ error: 'Verification code has expired' });
+      res.status(400).json({ error: "Verification code has expired" });
       return;
     }
 
@@ -280,11 +295,11 @@ export const verifyProfilePhone = async (req: Request, res: Response): Promise<v
     });
 
     res.status(200).json({
-      message: 'Phone number verified successfully',
+      message: "Phone number verified successfully",
       user: updatedUser,
     });
   } catch (error) {
-    console.error('Error verifying phone:', error);
-    res.status(500).json({ error: 'Failed to verify phone number' });
+    console.error("Error verifying phone:", error);
+    res.status(500).json({ error: "Failed to verify phone number" });
   }
 };

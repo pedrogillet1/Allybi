@@ -1,6 +1,6 @@
 // backend/src/services/app/documentsApp.service.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { normalizeWhitespace } from '../../utils';
+import { normalizeWhitespace } from "../../utils";
 
 /**
  * DocumentAppService (ChatGPT-parity, backend)
@@ -29,7 +29,13 @@ import * as fs from "fs/promises";
 
 export type EnvName = "production" | "staging" | "dev" | "local";
 
-export type DocTypeCategory = "pdf" | "spreadsheet" | "slides" | "image" | "text" | "unknown";
+export type DocTypeCategory =
+  | "pdf"
+  | "spreadsheet"
+  | "slides"
+  | "image"
+  | "text"
+  | "unknown";
 
 export type DocumentIndexRecord = {
   docId: string;
@@ -43,9 +49,9 @@ export type DocumentIndexRecord = {
   updatedAt?: number | string | null;
 
   // Storage pointers (server-side only)
-  storageKey?: string | null;     // e.g., "uploads/abc.pdf"
-  relativePath?: string | null;   // e.g., "uploads/abc.pdf"
-  folderPath?: string | null;     // UI folder label (client-safe)
+  storageKey?: string | null; // e.g., "uploads/abc.pdf"
+  relativePath?: string | null; // e.g., "uploads/abc.pdf"
+  folderPath?: string | null; // UI folder label (client-safe)
 
   // Optional containers
   sheets?: string[] | null;
@@ -123,11 +129,11 @@ type DocumentAppServiceConfig = {
   env: EnvName;
 
   // Index and storage locations
-  docIndexPath: string;   // e.g., storage/doc-index.json
-  storageDir: string;     // e.g., storage/uploads
+  docIndexPath: string; // e.g., storage/doc-index.json
+  storageDir: string; // e.g., storage/uploads
 
   // Base API paths for source pills (must match your routers)
-  openRouteBase: string;  // e.g., "/api/storage/open"
+  openRouteBase: string; // e.g., "/api/storage/open"
   whereRouteBase: string; // e.g., "/api/storage/where"
 
   // Safety controls
@@ -201,16 +207,27 @@ function docTypeCategory(mimeType: string | null): DocTypeCategory {
     m.includes("sheet") ||
     m.includes("csv") ||
     m.includes("application/vnd.ms-excel") ||
-    m.includes("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-  ) return "spreadsheet";
+    m.includes(
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+  )
+    return "spreadsheet";
   if (
     m.includes("presentation") ||
     m.includes("powerpoint") ||
     m.includes("application/vnd.ms-powerpoint") ||
-    m.includes("application/vnd.openxmlformats-officedocument.presentationml.presentation")
-  ) return "slides";
+    m.includes(
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    )
+  )
+    return "slides";
   if (m.startsWith("image/")) return "image";
-  if (m.startsWith("text/") || m.includes("wordprocessingml") || m.includes("markdown")) return "text";
+  if (
+    m.startsWith("text/") ||
+    m.includes("wordprocessingml") ||
+    m.includes("markdown")
+  )
+    return "text";
   return "unknown";
 }
 
@@ -236,7 +253,9 @@ function safeJoinUnder(baseDir: string, relativeOrKey: string): string {
   const base = path.resolve(baseDir);
   const full = path.resolve(baseDir, relativeOrKey);
   if (!full.startsWith(base)) {
-    throw new DocumentAppError("invalid_path", "Invalid document path", 400, { relativeOrKey });
+    throw new DocumentAppError("invalid_path", "Invalid document path", 400, {
+      relativeOrKey,
+    });
   }
   return full;
 }
@@ -265,7 +284,8 @@ export class DocumentAppService {
       const raw = await fs.readFile(this.cfg.docIndexPath, "utf8");
       const parsed = JSON.parse(raw);
       const docs = Array.isArray(parsed?.docs) ? parsed.docs : [];
-      const version = typeof parsed?.version === "string" ? parsed.version : "1.0.0";
+      const version =
+        typeof parsed?.version === "string" ? parsed.version : "1.0.0";
 
       // Hard cap guard: prevent runaway memory if index file is corrupted/huge
       if (docs.length > this.cfg.maxDocsHard) {
@@ -273,7 +293,7 @@ export class DocumentAppService {
           "doc_index_too_large",
           "Document index too large",
           500,
-          { docs: docs.length, maxDocsHard: this.cfg.maxDocsHard }
+          { docs: docs.length, maxDocsHard: this.cfg.maxDocsHard },
         );
       }
 
@@ -330,13 +350,19 @@ export class DocumentAppService {
     // Filter: mimeTypes
     if (opts.mimeTypes?.length) {
       const set = new Set(opts.mimeTypes.map((m) => String(m).toLowerCase()));
-      docs = docs.filter((d) => (d.mimeType ?? "").toLowerCase() && set.has((d.mimeType ?? "").toLowerCase()));
+      docs = docs.filter(
+        (d) =>
+          (d.mimeType ?? "").toLowerCase() &&
+          set.has((d.mimeType ?? "").toLowerCase()),
+      );
     }
 
     // Filter: docTypes
     if (opts.docTypes?.length) {
       const set = new Set(opts.docTypes);
-      docs = docs.filter((d) => set.has(docTypeCategory(safeString(d.mimeType, 120))));
+      docs = docs.filter((d) =>
+        set.has(docTypeCategory(safeString(d.mimeType, 120))),
+      );
     }
 
     // Filter: free text query against title/filename
@@ -357,8 +383,10 @@ export class DocumentAppService {
     docs = stableSort(docs, (a, b) => {
       switch (sortBy) {
         case "updatedAt": {
-          const au = parseDateAny(a.updatedAt) ?? parseDateAny(a.createdAt) ?? 0;
-          const bu = parseDateAny(b.updatedAt) ?? parseDateAny(b.createdAt) ?? 0;
+          const au =
+            parseDateAny(a.updatedAt) ?? parseDateAny(a.createdAt) ?? 0;
+          const bu =
+            parseDateAny(b.updatedAt) ?? parseDateAny(b.createdAt) ?? 0;
           return (au - bu) * mult;
         }
         case "createdAt": {
@@ -387,7 +415,10 @@ export class DocumentAppService {
     });
 
     // Soft limit to prevent UI overload
-    const limit = typeof opts.limit === "number" ? Math.max(1, opts.limit) : this.cfg.maxDocsSoft;
+    const limit =
+      typeof opts.limit === "number"
+        ? Math.max(1, opts.limit)
+        : this.cfg.maxDocsSoft;
     docs = docs.slice(0, limit);
 
     return docs.map((d) => this.toClientDoc(d));
@@ -406,7 +437,8 @@ export class DocumentAppService {
 
   async where(docId: string): Promise<WhereInfo> {
     const doc = await this.getDocRecord(docId);
-    if (!doc) throw new DocumentAppError("not_found", "Document not found", 404);
+    if (!doc)
+      throw new DocumentAppError("not_found", "Document not found", 404);
 
     return {
       docId: doc.docId,
@@ -422,14 +454,22 @@ export class DocumentAppService {
    */
   async openInfo(docId: string): Promise<OpenInfo> {
     const doc = await this.getDocRecord(docId);
-    if (!doc) throw new DocumentAppError("not_found", "Document not found", 404);
+    if (!doc)
+      throw new DocumentAppError("not_found", "Document not found", 404);
 
-    const rel = safeString(doc.relativePath, 500) || safeString(doc.storageKey, 500);
-    if (!rel) throw new DocumentAppError("missing_storage_pointer", "Storage pointer missing", 500);
+    const rel =
+      safeString(doc.relativePath, 500) || safeString(doc.storageKey, 500);
+    if (!rel)
+      throw new DocumentAppError(
+        "missing_storage_pointer",
+        "Storage pointer missing",
+        500,
+      );
 
     const absolutePath = safeJoinUnder(this.cfg.storageDir, rel);
 
-    const mimeType = safeString(doc.mimeType, 120) || "application/octet-stream";
+    const mimeType =
+      safeString(doc.mimeType, 120) || "application/octet-stream";
     const downloadName = guessDownloadName(doc);
 
     return { docId: doc.docId, absolutePath, mimeType, downloadName };
@@ -438,7 +478,10 @@ export class DocumentAppService {
   /**
    * Remove a document from index; optionally hard delete file.
    */
-  async deleteDoc(docId: string, opts: { hardDelete?: boolean } = {}): Promise<{ deleted: ClientDoc; hardDeleted: boolean }> {
+  async deleteDoc(
+    docId: string,
+    opts: { hardDelete?: boolean } = {},
+  ): Promise<{ deleted: ClientDoc; hardDeleted: boolean }> {
     const hardDelete = Boolean(opts.hardDelete);
 
     const deleted = await withDocIndexWriteLock(async () => {
@@ -452,10 +495,13 @@ export class DocumentAppService {
       return doc;
     });
 
-    if (!deleted) throw new DocumentAppError("not_found", "Document not found", 404);
+    if (!deleted)
+      throw new DocumentAppError("not_found", "Document not found", 404);
 
     if (hardDelete) {
-      const rel = safeString(deleted.relativePath, 500) || safeString(deleted.storageKey, 500);
+      const rel =
+        safeString(deleted.relativePath, 500) ||
+        safeString(deleted.storageKey, 500);
       if (rel) {
         try {
           const abs = safeJoinUnder(this.cfg.storageDir, rel);
@@ -473,7 +519,10 @@ export class DocumentAppService {
    * Convenience helper for chat: generate pill-ready source attachment.
    * (Never includes absolute paths.)
    */
-  async toSourceAttachment(docId: string, extra?: Partial<Omit<SourceAttachment, "docId">>): Promise<SourceAttachment | null> {
+  async toSourceAttachment(
+    docId: string,
+    extra?: Partial<Omit<SourceAttachment, "docId">>,
+  ): Promise<SourceAttachment | null> {
     const doc = await this.getDocRecord(docId);
     if (!doc) return null;
 

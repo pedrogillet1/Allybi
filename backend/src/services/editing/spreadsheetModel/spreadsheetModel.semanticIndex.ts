@@ -1,4 +1,8 @@
-import type { SemanticIndex, SheetModel, SpreadsheetModel } from "./spreadsheetModel.types";
+import type {
+  SemanticIndex,
+  SheetModel,
+  SpreadsheetModel,
+} from "./spreadsheetModel.types";
 import { cellKey } from "./spreadsheetModel.range";
 
 function toText(value: unknown): string {
@@ -26,34 +30,60 @@ function detectHeaderRow(sheet: SheetModel): number | undefined {
   return bestRow > 0 ? bestRow : undefined;
 }
 
-function detectColumnKind(header: string): "currency" | "percent" | "text" | "date" {
+function detectColumnKind(
+  header: string,
+): "currency" | "percent" | "text" | "date" {
   const h = header.toLowerCase();
-  if (h.includes("%") || h.includes("percent") || h.includes("margin")) return "percent";
-  if (h.includes("date") || h.includes("month") || h.includes("year")) return "date";
-  if (h.includes("cost") || h.includes("capex") || h.includes("revenue") || h.includes("price") || h.includes("noi")) {
+  if (h.includes("%") || h.includes("percent") || h.includes("margin"))
+    return "percent";
+  if (h.includes("date") || h.includes("month") || h.includes("year"))
+    return "date";
+  if (
+    h.includes("cost") ||
+    h.includes("capex") ||
+    h.includes("revenue") ||
+    h.includes("price") ||
+    h.includes("noi")
+  ) {
     return "currency";
   }
   return "text";
 }
 
-function detectRowGroups(sheet: SheetModel): Array<{ label: string; startRow: number; endRow: number }> {
+function detectRowGroups(
+  sheet: SheetModel,
+): Array<{ label: string; startRow: number; endRow: number }> {
   const out: Array<{ label: string; startRow: number; endRow: number }> = [];
   let open: { label: string; startRow: number } | null = null;
 
   for (let r = 1; r <= sheet.grid.maxRow; r += 1) {
-    const lead = toText(sheet.cells[cellKey(r, 1)]?.v) || toText(sheet.cells[cellKey(r, 2)]?.v);
+    const lead =
+      toText(sheet.cells[cellKey(r, 1)]?.v) ||
+      toText(sheet.cells[cellKey(r, 2)]?.v);
     if (!lead) continue;
-    if (/^phase\s+\d+/i.test(lead) || /^section\s+/i.test(lead) || /^group\s+/i.test(lead)) {
-      if (open) out.push({ label: open.label, startRow: open.startRow, endRow: r - 1 });
+    if (
+      /^phase\s+\d+/i.test(lead) ||
+      /^section\s+/i.test(lead) ||
+      /^group\s+/i.test(lead)
+    ) {
+      if (open)
+        out.push({ label: open.label, startRow: open.startRow, endRow: r - 1 });
       open = { label: lead, startRow: r };
     }
   }
 
-  if (open) out.push({ label: open.label, startRow: open.startRow, endRow: sheet.grid.maxRow });
+  if (open)
+    out.push({
+      label: open.label,
+      startRow: open.startRow,
+      endRow: sheet.grid.maxRow,
+    });
   return out;
 }
 
-export function buildSemanticIndex(model: SpreadsheetModel): Record<string, SemanticIndex> {
+export function buildSemanticIndex(
+  model: SpreadsheetModel,
+): Record<string, SemanticIndex> {
   const out: Record<string, SemanticIndex> = {};
 
   for (const sheet of model.sheets) {
@@ -77,7 +107,11 @@ export function buildSemanticIndex(model: SpreadsheetModel): Record<string, Sema
         const value = toText(sheet.cells[cellKey(r, c)]?.v);
         if (!value) continue;
         const lower = value.toLowerCase();
-        if (lower === "capex" || lower === "noi" || lower.includes("return on cost")) {
+        if (
+          lower === "capex" ||
+          lower === "noi" ||
+          lower.includes("return on cost")
+        ) {
           keyCells[value] = { role: "metric", row: r, col: c };
         }
       }

@@ -6,7 +6,12 @@ import type { LLMStreamingConfig, StreamSink } from "./llmStreaming.types";
 
 import type { LangCode } from "../prompts/promptRegistry.service";
 import { LlmRouterService } from "./llmRouter.service";
-import { LlmRequestBuilderService, type BuildRequestInput, type EvidencePackLike, type MemoryPackLike } from "./llmRequestBuilder.service";
+import {
+  LlmRequestBuilderService,
+  type BuildRequestInput,
+  type EvidencePackLike,
+  type MemoryPackLike,
+} from "./llmRequestBuilder.service";
 
 export type GatewayChatRole = "system" | "user" | "assistant";
 
@@ -29,7 +34,11 @@ export interface LlmGatewayRequest {
   traceId: string;
   userId: string;
   conversationId: string;
-  messages: Array<{ role: GatewayChatRole; content: string; attachments?: unknown | null }>;
+  messages: Array<{
+    role: GatewayChatRole;
+    content: string;
+    attachments?: unknown | null;
+  }>;
   context?: Record<string, unknown>;
   meta?: Record<string, unknown>;
 }
@@ -95,7 +104,12 @@ export class LlmGatewayService {
     };
   }
 
-  async stream(params: LlmGatewayRequest & { sink: StreamSink; streamingConfig: LLMStreamingConfig }): Promise<{
+  async stream(
+    params: LlmGatewayRequest & {
+      sink: StreamSink;
+      streamingConfig: LLMStreamingConfig;
+    },
+  ): Promise<{
     finalText: string;
     telemetry?: Record<string, unknown>;
     promptTrace: GatewayPromptTrace;
@@ -120,7 +134,10 @@ export class LlmGatewayService {
     };
   }
 
-  private prepareProviderRequest(params: LlmGatewayRequest, streaming: boolean): PreparedGatewayRequest {
+  private prepareProviderRequest(
+    params: LlmGatewayRequest,
+    streaming: boolean,
+  ): PreparedGatewayRequest {
     const parsed = this.parseIncomingMessages(params);
 
     const route = this.router.route({
@@ -134,7 +151,10 @@ export class LlmGatewayService {
       allowTools: false,
     });
 
-    const promptTask = typeof params.meta?.promptTask === 'string' ? String(params.meta.promptTask) : null;
+    const promptTask =
+      typeof params.meta?.promptTask === "string"
+        ? String(params.meta.promptTask)
+        : null;
 
     const buildInput: BuildRequestInput = {
       env: this.cfg.env,
@@ -168,17 +188,28 @@ export class LlmGatewayService {
     };
 
     const built = this.builder.build(buildInput);
-    const promptTraceRaw = (built.kodaMeta as any)?.promptTrace?.orderedPrompts ?? [];
+    const promptTraceRaw =
+      (built.kodaMeta as any)?.promptTrace?.orderedPrompts ?? [];
     const promptTrace: GatewayPromptTrace = {
-      promptIds: promptTraceRaw.map((p: any) => String(p?.bankId || "")).filter(Boolean),
-      promptVersions: promptTraceRaw.map((p: any) => String(p?.version || "")).filter(Boolean),
-      promptHashes: promptTraceRaw.map((p: any) => String(p?.hash || "")).filter(Boolean),
-      promptTemplateIds: promptTraceRaw.map((p: any) => String(p?.templateId || "")).filter(Boolean),
+      promptIds: promptTraceRaw
+        .map((p: any) => String(p?.bankId || ""))
+        .filter(Boolean),
+      promptVersions: promptTraceRaw
+        .map((p: any) => String(p?.version || ""))
+        .filter(Boolean),
+      promptHashes: promptTraceRaw
+        .map((p: any) => String(p?.hash || ""))
+        .filter(Boolean),
+      promptTemplateIds: promptTraceRaw
+        .map((p: any) => String(p?.templateId || ""))
+        .filter(Boolean),
     };
 
     // Guardrail: all runtime LLM requests must include prompt-trace metadata.
     if (!promptTrace.promptIds.length) {
-      throw new Error("LlmGateway: missing prompt trace metadata (prompt bank path not used)");
+      throw new Error(
+        "LlmGateway: missing prompt trace metadata (prompt bank path not used)",
+      );
     }
 
     const providerMessages: LLMMessage[] = built.messages.map((m) => ({
@@ -199,7 +230,9 @@ export class LlmGatewayService {
         topP: built.options?.topP,
         maxOutputTokens: built.options?.maxOutputTokens,
       },
-      purpose: mapPurpose(String((built.kodaMeta as any)?.promptType || "compose_answer")),
+      purpose: mapPurpose(
+        String((built.kodaMeta as any)?.promptType || "compose_answer"),
+      ),
       meta: {
         ...(params.meta || {}),
         userId: params.userId,
@@ -212,7 +245,9 @@ export class LlmGatewayService {
 
     return {
       request,
-      promptType: String((built.kodaMeta as any)?.promptType || "compose_answer"),
+      promptType: String(
+        (built.kodaMeta as any)?.promptType || "compose_answer",
+      ),
       promptTrace,
     };
   }
@@ -232,13 +267,23 @@ export class LlmGatewayService {
   } {
     const messages = params.messages || [];
 
-    const lastUserIdx = [...messages].reverse().findIndex((m) => m.role === "user");
-    const resolvedIdx = lastUserIdx >= 0 ? messages.length - 1 - lastUserIdx : messages.length - 1;
+    const lastUserIdx = [...messages]
+      .reverse()
+      .findIndex((m) => m.role === "user");
+    const resolvedIdx =
+      lastUserIdx >= 0
+        ? messages.length - 1 - lastUserIdx
+        : messages.length - 1;
     const userText = clampText(messages[resolvedIdx]?.content || "", 12000);
 
     const history = messages.slice(0, Math.max(0, resolvedIdx));
-    const promptTask = typeof params.meta?.promptTask === 'string' ? String(params.meta.promptTask) : null;
-    const systemBlocks = history.filter((m) => m.role === "system").map((m) => clampText(m.content, 5000));
+    const promptTask =
+      typeof params.meta?.promptTask === "string"
+        ? String(params.meta.promptTask)
+        : null;
+    const systemBlocks = history
+      .filter((m) => m.role === "system")
+      .map((m) => clampText(m.content, 5000));
     const dialogue = history
       .filter((m) => m.role !== "system")
       .slice(-12)
@@ -253,9 +298,7 @@ export class LlmGatewayService {
     if (!promptTask && systemBlocks.length) {
       memoryParts.push(
         "### Runtime Context Data\n" +
-          systemBlocks
-            .map((s, i) => `[ctx_${i + 1}]\n${s}`)
-            .join("\n\n")
+          systemBlocks.map((s, i) => `[ctx_${i + 1}]\n${s}`).join("\n\n"),
       );
     }
 
@@ -285,13 +328,31 @@ export class LlmGatewayService {
     const rawMeta = params.meta || {};
     const rawContext = params.context || {};
 
-    const outputLanguage = this.detectOutputLanguage(rawMeta, rawContext, systemBlocks);
-    const answerMode = this.detectAnswerMode(rawMeta, systemBlocks, evidencePack);
-    const disambiguation = this.detectDisambiguation(rawMeta, rawContext, answerMode);
+    const outputLanguage = this.detectOutputLanguage(
+      rawMeta,
+      rawContext,
+      systemBlocks,
+    );
+    const answerMode = this.detectAnswerMode(
+      rawMeta,
+      systemBlocks,
+      evidencePack,
+      rawContext,
+    );
+    const disambiguation = this.detectDisambiguation(
+      rawMeta,
+      rawContext,
+      answerMode,
+    );
     const operatorFamily = answerMode === "nav_pills" ? "file_actions" : null;
-    const navType = (rawMeta.navType as any) ?? (answerMode === "nav_pills" ? "discover" : null);
+    const navType =
+      (rawMeta.navType as any) ??
+      (answerMode === "nav_pills" ? "discover" : null);
 
-    const reasonCode = typeof rawMeta.fallbackReasonCode === "string" ? rawMeta.fallbackReasonCode : null;
+    const reasonCode =
+      typeof rawMeta.fallbackReasonCode === "string"
+        ? rawMeta.fallbackReasonCode
+        : null;
 
     return {
       userText,
@@ -299,9 +360,11 @@ export class LlmGatewayService {
       answerMode,
       intentFamily: (rawMeta.intentFamily as string) || null,
       operator: promptTask || (rawMeta.operator as string) || null,
-      operatorFamily: promptTask ? 'file_actions' : operatorFamily,
+      operatorFamily: promptTask ? "file_actions" : operatorFamily,
       navType,
-      fallback: reasonCode ? { triggered: true, reasonCode } : { triggered: false },
+      fallback: reasonCode
+        ? { triggered: true, reasonCode }
+        : { triggered: false },
       disambiguation,
       evidencePack,
       memoryPack,
@@ -313,8 +376,11 @@ export class LlmGatewayService {
     context: Record<string, unknown>,
     systemBlocks: string[],
   ): LangCode {
-    const explicit = (meta.preferredLanguage as string) || (context.preferredLanguage as string);
-    if (explicit === "en" || explicit === "pt" || explicit === "es") return explicit;
+    const explicit =
+      (meta.preferredLanguage as string) ||
+      (context.preferredLanguage as string);
+    if (explicit === "en" || explicit === "pt" || explicit === "es")
+      return explicit;
 
     const joined = systemBlocks.join("\n");
     if (/respond entirely in Portuguese/i.test(joined)) return "pt";
@@ -326,14 +392,27 @@ export class LlmGatewayService {
     meta: Record<string, unknown>,
     systemBlocks: string[],
     evidencePack?: EvidencePackLike,
+    context?: Record<string, unknown>,
   ): string {
-    if (typeof meta.promptTask === 'string' && meta.promptTask.trim()) {
-      return 'action_receipt';
+    if (typeof meta.promptTask === "string" && meta.promptTask.trim()) {
+      return "action_receipt";
     }
     if (typeof meta.answerMode === "string" && meta.answerMode.trim()) {
       return meta.answerMode;
     }
-    if (meta.needsClarification === true || (meta.disambiguation as any)?.active === true) {
+    const contextSignals = (context?.signals as any) || {};
+    const metaSignals = (meta?.signals as any) || {};
+    const needsClarification =
+      meta.needsClarification === true ||
+      (context as any)?.needsClarification === true ||
+      contextSignals.needsClarification === true ||
+      metaSignals.needsClarification === true;
+    const disambiguationActive =
+      (meta.disambiguation as any)?.active === true ||
+      (context as any)?.disambiguation?.active === true ||
+      contextSignals?.disambiguation?.active === true ||
+      metaSignals?.disambiguation?.active === true;
+    if (needsClarification || disambiguationActive) {
       return "rank_disambiguate";
     }
 
@@ -352,10 +431,22 @@ export class LlmGatewayService {
     context: Record<string, unknown>,
     answerMode: string,
   ): GatewayDisambiguation | null {
-    const dm = (meta.disambiguation as any) || (context.disambiguation as any) || null;
+    const contextSignals = (context?.signals as any) || {};
+    const metaSignals = (meta?.signals as any) || {};
+    const dm =
+      (meta.disambiguation as any) ||
+      (context.disambiguation as any) ||
+      contextSignals.disambiguation ||
+      metaSignals.disambiguation ||
+      null;
+    const needsClarification =
+      meta.needsClarification === true ||
+      (context as any)?.needsClarification === true ||
+      contextSignals.needsClarification === true ||
+      metaSignals.needsClarification === true;
     const active =
       answerMode === "rank_disambiguate" ||
-      meta.needsClarification === true ||
+      needsClarification ||
       dm?.active === true;
 
     if (!active) return null;
@@ -369,12 +460,20 @@ export class LlmGatewayService {
       }))
       .filter((o: { label: string }) => o.label.length > 0);
 
-    const candidateType = ["document", "sheet", "operator"].includes(String(dm?.candidateType))
+    const candidateType = ["document", "sheet", "operator"].includes(
+      String(dm?.candidateType),
+    )
       ? (dm.candidateType as "document" | "sheet" | "operator")
       : "document";
 
-    const maxOptions = Math.max(2, Math.min(6, Number(dm?.maxOptions ?? 4) || 4));
-    const maxQuestions = Math.max(1, Math.min(2, Number(dm?.maxQuestions ?? 1) || 1));
+    const maxOptions = Math.max(
+      2,
+      Math.min(6, Number(dm?.maxOptions ?? 4) || 4),
+    );
+    const maxQuestions = Math.max(
+      1,
+      Math.min(2, Number(dm?.maxQuestions ?? 1) || 1),
+    );
 
     return {
       active: true,
@@ -385,16 +484,21 @@ export class LlmGatewayService {
     };
   }
 
-  private extractEvidenceFromSystemBlocks(systemBlocks: string[]): EvidencePackLike["evidence"] {
+  private extractEvidenceFromSystemBlocks(
+    systemBlocks: string[],
+  ): EvidencePackLike["evidence"] {
     const out: EvidencePackLike["evidence"] = [];
     const joined = systemBlocks.join("\n\n");
 
-    const excerptRegex = /\[([^\]\n]+)\](?:\s*\{docId=([^,}\s]+)[^}]*\})?:\s*\n([\s\S]*?)(?=\n\n---\n\n|$)/g;
+    const excerptRegex =
+      /\[([^\]\n]+)\](?:\s*\{docId=([^,}\s]+)[^}]*\})?:\s*\n([\s\S]*?)(?=\n\n---\n\n|$)/g;
     let match: RegExpExecArray | null;
 
     while ((match = excerptRegex.exec(joined))) {
       const label = String(match[1] || "").trim();
-      const docId = String(match[2] || "").trim() || `doc:${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+      const docId =
+        String(match[2] || "").trim() ||
+        `doc:${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
       const snippet = clampText(String(match[3] || "").trim(), 750);
 
       if (!snippet) continue;

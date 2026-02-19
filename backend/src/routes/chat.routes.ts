@@ -22,7 +22,10 @@ import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { rateLimitMiddleware } from "../middleware/rateLimit.middleware";
-import { chatRequestSchema, titleUpdateSchema } from "../schemas/request.schemas";
+import {
+  chatRequestSchema,
+  titleUpdateSchema,
+} from "../schemas/request.schemas";
 import { validate } from "../middleware/validate.middleware";
 import { logger } from "../utils/logger";
 import { ConversationNotFoundError } from "../services/prismaChat.service";
@@ -102,9 +105,17 @@ function detectMessageLanguage(message: string): ChatLanguage {
     "voce",
   ];
   const hits = (markers: string[]) =>
-    markers.reduce((count, marker) => (
-      count + (new RegExp(`\\b${marker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(text) ? 1 : 0)
-    ), 0);
+    markers.reduce(
+      (count, marker) =>
+        count +
+        (new RegExp(
+          `\\b${marker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+          "i",
+        ).test(text)
+          ? 1
+          : 0),
+      0,
+    );
 
   let esScore = hits(esMarkers);
   let ptScore = hits(ptMarkers);
@@ -126,7 +137,10 @@ function resolvePreferredLanguage(
 ): ChatLanguage {
   const inferred = detectMessageLanguage(message);
   if (String(message || "").trim()) return inferred;
-  if (typeof language === "string" && SUPPORTED_CHAT_LANGUAGES.has(language as ChatLanguage)) {
+  if (
+    typeof language === "string" &&
+    SUPPORTED_CHAT_LANGUAGES.has(language as ChatLanguage)
+  ) {
     return language as ChatLanguage;
   }
   return inferred;
@@ -150,18 +164,22 @@ function extractAttachedDocumentIdsFromBody(body: any): string[] {
     if (id) ids.add(id);
   }
 
-  const single = typeof body.attachedDocumentId === "string"
-    ? body.attachedDocumentId.trim()
-    : "";
+  const single =
+    typeof body.attachedDocumentId === "string"
+      ? body.attachedDocumentId.trim()
+      : "";
   if (single) ids.add(single);
 
   return [...ids];
 }
 
 function readRouteMessage(body: any): string {
-  const raw = typeof body?.content === "string"
-    ? body.content
-    : (typeof body?.message === "string" ? body.message : "");
+  const raw =
+    typeof body?.content === "string"
+      ? body.content
+      : typeof body?.message === "string"
+        ? body.message
+        : "";
   return raw.trim();
 }
 
@@ -215,54 +233,73 @@ class SseStreamSink implements StreamSink {
     } else if (ev === "meta") {
       // Forward meta event (answerMode, navType) → frontend meta event
       const data = event.data as any;
-      this.res.write(`data: ${JSON.stringify({ type: "meta", answerMode: data.answerMode, answerClass: data.answerClass ?? null, navType: data.navType ?? null })}\n\n`);
+      this.res.write(
+        `data: ${JSON.stringify({ type: "meta", answerMode: data.answerMode, answerClass: data.answerClass ?? null, navType: data.navType ?? null })}\n\n`,
+      );
     } else if (ev === "progress") {
       // Map LLM progress events → frontend "stage" events
       const data = event.data as any;
-      this.res.write(`data: ${JSON.stringify({
-        type: "stage",
-        stage: this.normalizeStage(data.stage) || "processing",
-        message: data.message || "",
-        key: data.key || null,
-        params: data.params || null,
-        phase: data.phase || null,
-        step: data.step || null,
-        status: data.status || null,
-        vars: data.vars || null,
-        summary: data.summary || null,
-        scope: data.scope || null,
-        documentKind: data.documentKind || null,
-        documentLabel: data.documentLabel || null,
-      })}\n\n`);
+      this.res.write(
+        `data: ${JSON.stringify({
+          type: "stage",
+          stage: this.normalizeStage(data.stage) || "processing",
+          message: data.message || "",
+          key: data.key || null,
+          params: data.params || null,
+          phase: data.phase || null,
+          step: data.step || null,
+          status: data.status || null,
+          vars: data.vars || null,
+          summary: data.summary || null,
+          scope: data.scope || null,
+          documentKind: data.documentKind || null,
+          documentLabel: data.documentLabel || null,
+        })}\n\n`,
+      );
     } else if (ev === "worklog") {
       const data = event.data as any;
-      this.res.write(`data: ${JSON.stringify({ type: "worklog", ...(data || {}) })}\n\n`);
+      this.res.write(
+        `data: ${JSON.stringify({ type: "worklog", ...(data || {}) })}\n\n`,
+      );
     } else if (ev === "sources") {
       // Forward sources (from RAG integration) → frontend sources event
       const data = event.data as any;
-      this.res.write(`data: ${JSON.stringify({ type: "sources", sources: data.sources || data })}\n\n`);
+      this.res.write(
+        `data: ${JSON.stringify({ type: "sources", sources: data.sources || data })}\n\n`,
+      );
     } else if (ev === "followups") {
       // Forward follow-up suggestions → frontend followups event
       const data = event.data as any;
-      this.res.write(`data: ${JSON.stringify({ type: "followups", followups: data.followups || data })}\n\n`);
+      this.res.write(
+        `data: ${JSON.stringify({ type: "followups", followups: data.followups || data })}\n\n`,
+      );
     } else if (ev === "action") {
       // Forward file action events (create/rename/delete folder, move/delete document)
       const data = event.data as any;
-      this.res.write(`data: ${JSON.stringify({ type: "action", ...data })}\n\n`);
+      this.res.write(
+        `data: ${JSON.stringify({ type: "action", ...data })}\n\n`,
+      );
     } else if (ev === "listing") {
       // Forward structured file/folder listing → frontend listing event (with optional breadcrumb)
       const data = event.data as any;
-      this.res.write(`data: ${JSON.stringify({ type: "listing", items: data.items || [], ...(data.breadcrumb?.length ? { breadcrumb: data.breadcrumb } : {}) })}\n\n`);
+      this.res.write(
+        `data: ${JSON.stringify({ type: "listing", items: data.items || [], ...(data.breadcrumb?.length ? { breadcrumb: data.breadcrumb } : {}) })}\n\n`,
+      );
     } else if (ev === "error") {
       const data = event.data as any;
-      const safeMessage = (process.env.NODE_ENV === 'production')
-        ? "Something went wrong. Please try again."
-        : (data.message || "Error");
-      this.res.write(`data: ${JSON.stringify({ type: "error", message: safeMessage })}\n\n`);
+      const safeMessage =
+        process.env.NODE_ENV === "production"
+          ? "Something went wrong. Please try again."
+          : data.message || "Error";
+      this.res.write(
+        `data: ${JSON.stringify({ type: "error", message: safeMessage })}\n\n`,
+      );
     }
   }
 
-  flush(): void { /* noop for HTTP response */ }
+  flush(): void {
+    /* noop for HTTP response */
+  }
 
   close(): void {
     this._open = false;
@@ -289,23 +326,32 @@ router.post(
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const parsed = chatRequestSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid request" });
+      res
+        .status(400)
+        .json({ error: parsed.error.issues[0]?.message || "Invalid request" });
       return;
     }
 
     const { message, conversationId, language, isRegenerate } = parsed.data;
-    const confirmationToken = (parsed.data as any).confirmationToken as string | undefined;
+    const confirmationToken = (parsed.data as any).confirmationToken as
+      | string
+      | undefined;
 
     const attachedDocumentIds = extractAttachedDocumentIdsFromBody(parsed.data);
 
     // Server-side language resolution: infer from user query text (language is query-driven).
     const preferredLanguage = resolvePreferredLanguage(language, message);
 
-    const rawMeta = (parsed.data as any).meta as Record<string, unknown> | undefined;
+    const rawMeta = (parsed.data as any).meta as
+      | Record<string, unknown>
+      | undefined;
     const meta: Record<string, unknown> = {
       ...(rawMeta || {}),
       viewerMode: false,
@@ -319,7 +365,7 @@ router.post(
     res.writeHead(200, {
       "Content-Type": "text/event-stream; charset=utf-8",
       "Cache-Control": "no-cache, no-transform",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
       "X-Accel-Buffering": "no",
     });
     res.flushHeaders();
@@ -329,7 +375,9 @@ router.post(
       // Always emit an initial stage frame for regular chat; viewer/edit mode has
       // task-specific progress events and should not flash generic retrieval labels.
       if (!isViewerMode) {
-        res.write(`data: ${JSON.stringify({ type: "stage", stage: "retrieving", key: "allybi.stage.search.scanning_library", params: null, message: "" })}\n\n`);
+        res.write(
+          `data: ${JSON.stringify({ type: "stage", stage: "retrieving", key: "allybi.stage.search.scanning_library", params: null, message: "" })}\n\n`,
+        );
       }
 
       const chat = getChatService(req);
@@ -344,8 +392,12 @@ router.post(
       }, 15_000);
 
       // Stream chat (persists user + assistant messages internally)
-      const connectorContext = (parsed.data as any).connectorContext as Record<string, unknown> | undefined;
-      const context = (parsed.data as any).context as Record<string, unknown> | undefined;
+      const connectorContext = (parsed.data as any).connectorContext as
+        | Record<string, unknown>
+        | undefined;
+      const context = (parsed.data as any).context as
+        | Record<string, unknown>
+        | undefined;
 
       let result;
       try {
@@ -371,39 +423,61 @@ router.post(
 
       // Send final event with message IDs, sources, and dynamic answerMode
       if (!res.writableEnded) {
-        res.write(`data: ${JSON.stringify({ type: "worklog", eventType: "RUN_COMPLETE", summary: "Completed" })}\n\n`);
-        res.write(`data: ${JSON.stringify({
-          type: "final",
-          conversationId: result.conversationId,
-          messageId: result.assistantMessageId,
-          content: result.assistantText,
-          answerMode: result.answerMode || "general_answer",
-          answerClass: result.answerClass || null,
-          navType: result.navType || null,
-          sources: result.sources || [],
-          attachments: result.attachmentsPayload || [],
-          answerProvisional: Boolean((result as any).answerProvisional),
-          answerSourceMode: (result as any).answerSourceMode || "chunk",
-          indexingInProgress: Boolean((result as any).indexingInProgress),
-          scopeRelaxed: Boolean((result as any).scopeRelaxed),
-          ...(String((result as any).scopeRelaxReason || "").trim() ? { scopeRelaxReason: (result as any).scopeRelaxReason } : {}),
-          ...(String((result as any).fallbackReasonCode || "").trim() ? { fallbackReasonCode: (result as any).fallbackReasonCode } : {}),
-          ...(result.listing?.length ? { listing: result.listing } : {}),
-          ...(result.breadcrumb?.length ? { breadcrumb: result.breadcrumb } : {}),
-          ...(result.generatedTitle ? { generatedTitle: result.generatedTitle } : {}),
-        })}\n\n`);
+        res.write(
+          `data: ${JSON.stringify({ type: "worklog", eventType: "RUN_COMPLETE", summary: "Completed" })}\n\n`,
+        );
+        res.write(
+          `data: ${JSON.stringify({
+            type: "final",
+            conversationId: result.conversationId,
+            messageId: result.assistantMessageId,
+            content: result.assistantText,
+            answerMode: result.answerMode || "general_answer",
+            answerClass: result.answerClass || null,
+            navType: result.navType || null,
+            sources: result.sources || [],
+            attachments: result.attachmentsPayload || [],
+            answerProvisional: Boolean((result as any).answerProvisional),
+            answerSourceMode: (result as any).answerSourceMode || "chunk",
+            indexingInProgress: Boolean((result as any).indexingInProgress),
+            scopeRelaxed: Boolean((result as any).scopeRelaxed),
+            ...(String((result as any).scopeRelaxReason || "").trim()
+              ? { scopeRelaxReason: (result as any).scopeRelaxReason }
+              : {}),
+            ...(String((result as any).fallbackReasonCode || "").trim()
+              ? { fallbackReasonCode: (result as any).fallbackReasonCode }
+              : {}),
+            ...(result.listing?.length ? { listing: result.listing } : {}),
+            ...(result.breadcrumb?.length
+              ? { breadcrumb: result.breadcrumb }
+              : {}),
+            ...(result.generatedTitle
+              ? { generatedTitle: result.generatedTitle }
+              : {}),
+          })}\n\n`,
+        );
       }
     } catch (e: any) {
       if (isConversationNotFoundError(e)) {
         if (!res.writableEnded) {
-          res.write(`data: ${JSON.stringify({ type: "error", message: "Conversation not found" })}\n\n`);
+          res.write(
+            `data: ${JSON.stringify({ type: "error", message: "Conversation not found" })}\n\n`,
+          );
         }
         return;
       }
-      logger.error("[Chat] stream error", { path: req.path, error: e?.message, stack: e?.stack });
+      logger.error("[Chat] stream error", {
+        path: req.path,
+        error: e?.message,
+        stack: e?.stack,
+      });
       if (!res.writableEnded) {
-        res.write(`data: ${JSON.stringify({ type: "worklog", eventType: "RUN_ERROR", summary: "Request failed" })}\n\n`);
-        res.write(`data: ${JSON.stringify({ type: "error", message: "An error occurred while streaming the response" })}\n\n`);
+        res.write(
+          `data: ${JSON.stringify({ type: "worklog", eventType: "RUN_ERROR", summary: "Request failed" })}\n\n`,
+        );
+        res.write(
+          `data: ${JSON.stringify({ type: "error", message: "An error occurred while streaming the response" })}\n\n`,
+        );
       }
     } finally {
       if (!res.writableEnded) {
@@ -411,7 +485,7 @@ router.post(
         res.end();
       }
     }
-  }
+  },
 );
 
 /**
@@ -425,16 +499,23 @@ router.post(
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const parsed = chatRequestSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid request" });
+      res
+        .status(400)
+        .json({ error: parsed.error.issues[0]?.message || "Invalid request" });
       return;
     }
 
     const { message, language, isRegenerate } = parsed.data;
-    const confirmationToken = (parsed.data as any).confirmationToken as string | undefined;
+    const confirmationToken = (parsed.data as any).confirmationToken as
+      | string
+      | undefined;
 
     const attachedDocumentIds = extractAttachedDocumentIdsFromBody(parsed.data);
 
@@ -443,7 +524,7 @@ router.post(
     res.writeHead(200, {
       "Content-Type": "text/event-stream; charset=utf-8",
       "Cache-Control": "no-cache, no-transform",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
       "X-Accel-Buffering": "no",
     });
     res.flushHeaders();
@@ -458,13 +539,19 @@ router.post(
         if (!res.writableEnded) res.write(`: heartbeat\n\n`);
       }, 15_000);
 
-      const connectorContext = (parsed.data as any).connectorContext as Record<string, unknown> | undefined;
-      const rawMeta = (parsed.data as any).meta as Record<string, unknown> | undefined;
+      const connectorContext = (parsed.data as any).connectorContext as
+        | Record<string, unknown>
+        | undefined;
+      const rawMeta = (parsed.data as any).meta as
+        | Record<string, unknown>
+        | undefined;
       const meta: Record<string, unknown> = {
         ...(rawMeta || {}),
         viewerMode: true,
       };
-      const context = (parsed.data as any).context as Record<string, unknown> | undefined;
+      const context = (parsed.data as any).context as
+        | Record<string, unknown>
+        | undefined;
 
       let result;
       try {
@@ -490,26 +577,36 @@ router.post(
       }
 
       if (!res.writableEnded) {
-        res.write(`data: ${JSON.stringify({ type: "worklog", eventType: "RUN_COMPLETE", summary: "Completed" })}\n\n`);
-        res.write(`data: ${JSON.stringify({
-          type: "final",
-          conversationId: result.conversationId,
-          messageId: result.assistantMessageId,
-          content: result.assistantText,
-          answerMode: result.answerMode || "general_answer",
-          answerClass: result.answerClass || null,
-          navType: result.navType || null,
-          sources: result.sources || [],
-          attachments: result.attachmentsPayload || [],
-          answerProvisional: Boolean((result as any).answerProvisional),
-          answerSourceMode: (result as any).answerSourceMode || "chunk",
-          indexingInProgress: Boolean((result as any).indexingInProgress),
-          scopeRelaxed: Boolean((result as any).scopeRelaxed),
-          ...(String((result as any).scopeRelaxReason || "").trim() ? { scopeRelaxReason: (result as any).scopeRelaxReason } : {}),
-          ...(String((result as any).fallbackReasonCode || "").trim() ? { fallbackReasonCode: (result as any).fallbackReasonCode } : {}),
-          ...(result.listing?.length ? { listing: result.listing } : {}),
-          ...(result.breadcrumb?.length ? { breadcrumb: result.breadcrumb } : {}),
-        })}\n\n`);
+        res.write(
+          `data: ${JSON.stringify({ type: "worklog", eventType: "RUN_COMPLETE", summary: "Completed" })}\n\n`,
+        );
+        res.write(
+          `data: ${JSON.stringify({
+            type: "final",
+            conversationId: result.conversationId,
+            messageId: result.assistantMessageId,
+            content: result.assistantText,
+            answerMode: result.answerMode || "general_answer",
+            answerClass: result.answerClass || null,
+            navType: result.navType || null,
+            sources: result.sources || [],
+            attachments: result.attachmentsPayload || [],
+            answerProvisional: Boolean((result as any).answerProvisional),
+            answerSourceMode: (result as any).answerSourceMode || "chunk",
+            indexingInProgress: Boolean((result as any).indexingInProgress),
+            scopeRelaxed: Boolean((result as any).scopeRelaxed),
+            ...(String((result as any).scopeRelaxReason || "").trim()
+              ? { scopeRelaxReason: (result as any).scopeRelaxReason }
+              : {}),
+            ...(String((result as any).fallbackReasonCode || "").trim()
+              ? { fallbackReasonCode: (result as any).fallbackReasonCode }
+              : {}),
+            ...(result.listing?.length ? { listing: result.listing } : {}),
+            ...(result.breadcrumb?.length
+              ? { breadcrumb: result.breadcrumb }
+              : {}),
+          })}\n\n`,
+        );
       }
 
       // Hard-isolate viewer/editor turns from chat history:
@@ -519,19 +616,32 @@ router.post(
           await chat.deleteConversation(userId, String(result.conversationId));
         }
       } catch (cleanupErr: any) {
-        logger.warn("[Chat] viewer stream cleanup failed", { path: req.path, error: cleanupErr?.message });
+        logger.warn("[Chat] viewer stream cleanup failed", {
+          path: req.path,
+          error: cleanupErr?.message,
+        });
       }
     } catch (e: any) {
       if (isConversationNotFoundError(e)) {
         if (!res.writableEnded) {
-          res.write(`data: ${JSON.stringify({ type: "error", message: "Conversation not found" })}\n\n`);
+          res.write(
+            `data: ${JSON.stringify({ type: "error", message: "Conversation not found" })}\n\n`,
+          );
         }
         return;
       }
-      logger.error("[Chat] viewer stream error", { path: req.path, error: e?.message, stack: e?.stack });
+      logger.error("[Chat] viewer stream error", {
+        path: req.path,
+        error: e?.message,
+        stack: e?.stack,
+      });
       if (!res.writableEnded) {
-        res.write(`data: ${JSON.stringify({ type: "worklog", eventType: "RUN_ERROR", summary: "Request failed" })}\n\n`);
-        res.write(`data: ${JSON.stringify({ type: "error", message: "An error occurred while streaming the response" })}\n\n`);
+        res.write(
+          `data: ${JSON.stringify({ type: "worklog", eventType: "RUN_ERROR", summary: "Request failed" })}\n\n`,
+        );
+        res.write(
+          `data: ${JSON.stringify({ type: "error", message: "An error occurred while streaming the response" })}\n\n`,
+        );
       }
     } finally {
       if (!res.writableEnded) {
@@ -539,7 +649,7 @@ router.post(
         res.end();
       }
     }
-  }
+  },
 );
 
 /**
@@ -552,21 +662,32 @@ router.post(
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const parsed = chatRequestSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid request" });
+      res
+        .status(400)
+        .json({ error: parsed.error.issues[0]?.message || "Invalid request" });
       return;
     }
 
     const { message, conversationId, language } = parsed.data;
-    const confirmationToken = (parsed.data as any).confirmationToken as string | undefined;
+    const confirmationToken = (parsed.data as any).confirmationToken as
+      | string
+      | undefined;
     const chatAttDocIds = extractAttachedDocumentIdsFromBody(parsed.data);
 
     try {
-      const connectorContext = (parsed.data as any).connectorContext as Record<string, unknown> | undefined;
-      const rawMeta = (parsed.data as any).meta as Record<string, unknown> | undefined;
+      const connectorContext = (parsed.data as any).connectorContext as
+        | Record<string, unknown>
+        | undefined;
+      const rawMeta = (parsed.data as any).meta as
+        | Record<string, unknown>
+        | undefined;
       const meta: Record<string, unknown> = {
         ...(rawMeta || {}),
         viewerMode: false,
@@ -574,7 +695,9 @@ router.post(
       delete (meta as any).viewerContext;
       delete (meta as any).viewerSelection;
       delete (meta as any).viewerHistory;
-      const context = (parsed.data as any).context as Record<string, unknown> | undefined;
+      const context = (parsed.data as any).context as
+        | Record<string, unknown>
+        | undefined;
       const chat = getChatService(req);
       const result = await chat.chat({
         userId,
@@ -590,13 +713,20 @@ router.post(
       res.json({ ok: true, data: result });
     } catch (e: any) {
       if (isConversationNotFoundError(e)) {
-        res.status(404).json({ error: "Conversation not found", code: "CONVERSATION_NOT_FOUND" });
+        res.status(404).json({
+          error: "Conversation not found",
+          code: "CONVERSATION_NOT_FOUND",
+        });
         return;
       }
-      logger.error("[Chat] chat error", { path: req.path, error: e?.message, stack: e?.stack });
+      logger.error("[Chat] chat error", {
+        path: req.path,
+        error: e?.message,
+        stack: e?.stack,
+      });
       res.status(500).json({ error: "Failed to process chat" });
     }
-  }
+  },
 );
 
 // ---------------------------------------------------------------------------
@@ -612,20 +742,26 @@ router.get(
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     try {
       const chat = getChatService(req);
       const limit = req.query.limit ? Number(req.query.limit) : undefined;
       const cursor = req.query.cursor ? String(req.query.cursor) : undefined;
 
-      const conversations = await chat.listConversations(userId, { limit, cursor });
-      res.json({ conversations });
+      const conversations = await chat.listConversations(userId, {
+        limit,
+        cursor,
+      });
+      res.json({ ok: true, data: { conversations } });
     } catch (e) {
       logger.error("[Chat] list conversations error", { path: req.path });
       res.status(500).json({ error: "Failed to list conversations" });
     }
-  }
+  },
 );
 
 /**
@@ -637,19 +773,22 @@ router.post(
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const title = req.body?.title || "New Chat";
 
     try {
       const chat = getChatService(req);
       const conv = await chat.createConversation({ userId, title });
-      res.status(201).json(conv);
+      res.status(201).json({ ok: true, data: conv });
     } catch (e) {
       logger.error("[Chat] create conversation error", { path: req.path });
       res.status(500).json({ error: "Failed to create conversation" });
     }
-  }
+  },
 );
 
 /**
@@ -661,19 +800,22 @@ router.post(
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const title = req.body?.title || "New Chat";
 
     try {
       const chat = getChatService(req);
       const conv = await chat.createConversation({ userId, title });
-      res.status(201).json(conv);
+      res.status(201).json({ ok: true, data: conv });
     } catch (e) {
       logger.error("[Chat] create conversation error", { path: req.path });
       res.status(500).json({ error: "Failed to create conversation" });
     }
-  }
+  },
 );
 
 /**
@@ -685,34 +827,47 @@ router.get(
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const conversationId = req.params.conversationId;
 
     try {
       const chat = getChatService(req);
-      const data = await chat.getConversationWithMessages(userId, conversationId, { order: "asc" });
-      if (!data) { res.status(404).json({ error: "Conversation not found" }); return; }
+      const data = await chat.getConversationWithMessages(
+        userId,
+        conversationId,
+        { order: "asc" },
+      );
+      if (!data) {
+        res.status(404).json({ error: "Conversation not found" });
+        return;
+      }
 
       // Shape response to match frontend expectations
       res.json({
-        id: data.id,
-        title: data.title,
-        createdAt: data.createdAt,
-        updatedAt: data.updatedAt,
-        messages: data.messages.map((m: any) => ({
-          id: m.id,
-          role: m.role,
-          content: m.content,
-          createdAt: m.createdAt,
-          metadata: m.metadata || null,
-        })),
+        ok: true,
+        data: {
+          id: data.id,
+          title: data.title,
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt,
+          messages: data.messages.map((m: any) => ({
+            id: m.id,
+            role: m.role,
+            content: m.content,
+            createdAt: m.createdAt,
+            metadata: m.metadata || null,
+          })),
+        },
       });
     } catch (e) {
       logger.error("[Chat] get conversation error", { path: req.path });
       res.status(500).json({ error: "Failed to get conversation" });
     }
-  }
+  },
 );
 
 /**
@@ -724,22 +879,29 @@ router.get(
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const conversationId = req.params.conversationId;
 
     try {
       const chat = getChatService(req);
       const limit = req.query.limit ? Number(req.query.limit) : undefined;
-      const order = req.query.order === "desc" ? "desc" as const : "asc" as const;
+      const order =
+        req.query.order === "desc" ? ("desc" as const) : ("asc" as const);
 
-      const messages = await chat.listMessages(userId, conversationId, { limit, order });
+      const messages = await chat.listMessages(userId, conversationId, {
+        limit,
+        order,
+      });
       res.json({ ok: true, data: { items: messages } });
     } catch (e) {
       logger.error("[Chat] list messages error", { path: req.path });
       res.status(500).json({ error: "Failed to list messages" });
     }
-  }
+  },
 );
 
 /**
@@ -752,11 +914,17 @@ router.post(
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const conversationId = req.params.conversationId;
     const message = readRouteMessage(req.body);
-    if (!message) { res.status(400).json({ error: "content is required" }); return; }
+    if (!message) {
+      res.status(400).json({ error: "content is required" });
+      return;
+    }
 
     try {
       const chat = getChatService(req);
@@ -765,7 +933,10 @@ router.post(
         conversationId,
         message,
         attachedDocumentIds: extractAttachedDocumentIdsFromBody(req.body),
-        preferredLanguage: resolvePreferredLanguage(req.body?.language, message),
+        preferredLanguage: resolvePreferredLanguage(
+          req.body?.language,
+          message,
+        ),
       });
 
       res.json({
@@ -784,13 +955,16 @@ router.post(
       });
     } catch (e) {
       if (isConversationNotFoundError(e)) {
-        res.status(404).json({ error: "Conversation not found", code: "CONVERSATION_NOT_FOUND" });
+        res.status(404).json({
+          error: "Conversation not found",
+          code: "CONVERSATION_NOT_FOUND",
+        });
         return;
       }
       logger.error("[Chat] send message error", { path: req.path });
       res.status(500).json({ error: "Failed to send message" });
     }
-  }
+  },
 );
 
 /**
@@ -803,11 +977,17 @@ router.post(
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const conversationId = req.params.conversationId;
     const message = readRouteMessage(req.body);
-    if (!message) { res.status(400).json({ error: "content is required" }); return; }
+    if (!message) {
+      res.status(400).json({ error: "content is required" });
+      return;
+    }
 
     try {
       const chat = getChatService(req);
@@ -816,7 +996,10 @@ router.post(
         conversationId,
         message,
         attachedDocumentIds: extractAttachedDocumentIdsFromBody(req.body),
-        preferredLanguage: resolvePreferredLanguage(req.body?.language, message),
+        preferredLanguage: resolvePreferredLanguage(
+          req.body?.language,
+          message,
+        ),
       });
 
       res.json({
@@ -829,13 +1012,16 @@ router.post(
       });
     } catch (e) {
       if (isConversationNotFoundError(e)) {
-        res.status(404).json({ error: "Conversation not found", code: "CONVERSATION_NOT_FOUND" });
+        res.status(404).json({
+          error: "Conversation not found",
+          code: "CONVERSATION_NOT_FOUND",
+        });
         return;
       }
       logger.error("[Chat] adaptive message error", { path: req.path });
       res.status(500).json({ error: "Failed to process adaptive message" });
     }
-  }
+  },
 );
 
 /**
@@ -848,11 +1034,17 @@ router.post(
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const conversationId = req.params.conversationId;
     const message = readRouteMessage(req.body);
-    if (!message) { res.status(400).json({ error: "content is required" }); return; }
+    if (!message) {
+      res.status(400).json({ error: "content is required" });
+      return;
+    }
 
     try {
       const chat = getChatService(req);
@@ -862,7 +1054,9 @@ router.post(
       res.setHeader("Connection", "keep-alive");
       res.setHeader("X-Accel-Buffering", "no");
 
-      res.write(`data: ${JSON.stringify({ type: "connected", conversationId })}\n\n`);
+      res.write(
+        `data: ${JSON.stringify({ type: "connected", conversationId })}\n\n`,
+      );
 
       const sink = new SseStreamSink(res);
 
@@ -879,7 +1073,10 @@ router.post(
             conversationId,
             message,
             attachedDocumentIds: extractAttachedDocumentIdsFromBody(req.body),
-            preferredLanguage: resolvePreferredLanguage(req.body?.language, message),
+            preferredLanguage: resolvePreferredLanguage(
+              req.body?.language,
+              message,
+            ),
           },
           sink,
           streamingConfig: DEFAULT_STREAMING_CONFIG,
@@ -889,33 +1086,46 @@ router.post(
       }
 
       if (!res.writableEnded) {
-        res.write(`data: ${JSON.stringify({
-          type: "done",
-          messageId: result.assistantMessageId,
-          content: result.assistantText,
-          conversationId: result.conversationId,
-          answerMode: result.answerMode || "general_answer",
-          answerClass: result.answerClass || null,
-          navType: result.navType || null,
-          sources: result.sources || [],
-          attachments: result.attachmentsPayload || [],
-          answerProvisional: Boolean((result as any).answerProvisional),
-          answerSourceMode: (result as any).answerSourceMode || "chunk",
-          indexingInProgress: Boolean((result as any).indexingInProgress),
-          scopeRelaxed: Boolean((result as any).scopeRelaxed),
-          ...(String((result as any).scopeRelaxReason || "").trim() ? { scopeRelaxReason: (result as any).scopeRelaxReason } : {}),
-          ...(String((result as any).fallbackReasonCode || "").trim() ? { fallbackReasonCode: (result as any).fallbackReasonCode } : {}),
-          ...(result.generatedTitle ? { generatedTitle: result.generatedTitle } : {}),
-        })}\n\n`);
+        res.write(
+          `data: ${JSON.stringify({
+            type: "done",
+            messageId: result.assistantMessageId,
+            content: result.assistantText,
+            conversationId: result.conversationId,
+            answerMode: result.answerMode || "general_answer",
+            answerClass: result.answerClass || null,
+            navType: result.navType || null,
+            sources: result.sources || [],
+            attachments: result.attachmentsPayload || [],
+            answerProvisional: Boolean((result as any).answerProvisional),
+            answerSourceMode: (result as any).answerSourceMode || "chunk",
+            indexingInProgress: Boolean((result as any).indexingInProgress),
+            scopeRelaxed: Boolean((result as any).scopeRelaxed),
+            ...(String((result as any).scopeRelaxReason || "").trim()
+              ? { scopeRelaxReason: (result as any).scopeRelaxReason }
+              : {}),
+            ...(String((result as any).fallbackReasonCode || "").trim()
+              ? { fallbackReasonCode: (result as any).fallbackReasonCode }
+              : {}),
+            ...(result.generatedTitle
+              ? { generatedTitle: result.generatedTitle }
+              : {}),
+          })}\n\n`,
+        );
       }
 
       res.end();
     } catch (e: any) {
       if (isConversationNotFoundError(e)) {
         if (!res.headersSent) {
-          res.status(404).json({ error: "Conversation not found", code: "CONVERSATION_NOT_FOUND" });
+          res.status(404).json({
+            error: "Conversation not found",
+            code: "CONVERSATION_NOT_FOUND",
+          });
         } else if (!res.writableEnded) {
-          res.write(`data: ${JSON.stringify({ type: "error", message: "Conversation not found" })}\n\n`);
+          res.write(
+            `data: ${JSON.stringify({ type: "error", message: "Conversation not found" })}\n\n`,
+          );
           res.end();
         }
         return;
@@ -924,11 +1134,13 @@ router.post(
       if (!res.headersSent) {
         res.status(500).json({ error: "Failed to stream" });
       } else if (!res.writableEnded) {
-        res.write(`data: ${JSON.stringify({ type: "error", message: "An error occurred while streaming the response" })}\n\n`);
+        res.write(
+          `data: ${JSON.stringify({ type: "error", message: "An error occurred while streaming the response" })}\n\n`,
+        );
         res.end();
       }
     }
-  }
+  },
 );
 
 /**
@@ -941,7 +1153,10 @@ router.patch(
   validate(titleUpdateSchema),
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const conversationId = req.params.conversationId;
     const { title } = req.body;
@@ -949,13 +1164,19 @@ router.patch(
     try {
       const chat = getChatService(req);
       const updated = await chat.updateTitle(userId, conversationId, title);
-      if (!updated) { res.status(404).json({ error: "Conversation not found" }); return; }
-      res.json({ ok: true, data: { conversationId: updated.id, title: updated.title } });
+      if (!updated) {
+        res.status(404).json({ error: "Conversation not found" });
+        return;
+      }
+      res.json({
+        ok: true,
+        data: { conversationId: updated.id, title: updated.title },
+      });
     } catch (e) {
       logger.error("[Chat] update title error", { path: req.path });
       res.status(500).json({ error: "Failed to update title" });
     }
-  }
+  },
 );
 
 /**
@@ -967,7 +1188,10 @@ router.delete(
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     try {
       // Grace period: never delete conversations created in the last 60 seconds.
@@ -975,24 +1199,35 @@ router.delete(
       // frontend just before the first message is streamed to it.
       const graceCutoff = new Date(Date.now() - 60_000);
 
-      const emptyConvos = await (await import("../config/database")).default.conversation.findMany({
-        where: { userId, isDeleted: false, messages: { none: {} }, createdAt: { lt: graceCutoff } },
+      const emptyConvos = await (
+        await import("../config/database")
+      ).default.conversation.findMany({
+        where: {
+          userId,
+          isDeleted: false,
+          messages: { none: {} },
+          createdAt: { lt: graceCutoff },
+        },
         select: { id: true },
       });
 
       if (emptyConvos.length > 0) {
-        await (await import("../config/database")).default.conversation.updateMany({
+        await (
+          await import("../config/database")
+        ).default.conversation.updateMany({
           where: { id: { in: emptyConvos.map((c: any) => c.id) } },
           data: { isDeleted: true, deletedAt: new Date() },
         });
       }
 
-      res.json({ ok: true, deleted: emptyConvos.length });
+      res.json({ ok: true, data: { deleted: emptyConvos.length } });
     } catch (e) {
-      logger.error("[Chat] delete empty conversations error", { path: req.path });
+      logger.error("[Chat] delete empty conversations error", {
+        path: req.path,
+      });
       res.status(500).json({ error: "Failed to delete empty conversations" });
     }
-  }
+  },
 );
 
 /**
@@ -1004,17 +1239,23 @@ router.delete(
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     try {
       const chat = getChatService(req);
-      const result = await chat.deleteConversation(userId, req.params.conversationId);
-      res.json({ ok: true, ...result });
+      const result = await chat.deleteConversation(
+        userId,
+        req.params.conversationId,
+      );
+      res.json({ ok: true, data: result });
     } catch (e) {
       logger.error("[Chat] delete conversation error", { path: req.path });
       res.status(500).json({ error: "Failed to delete conversation" });
     }
-  }
+  },
 );
 
 /**
@@ -1026,17 +1267,20 @@ router.delete(
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     try {
       const chat = getChatService(req);
       const result = await chat.deleteAllConversations(userId);
-      res.json({ ok: true, ...result });
+      res.json({ ok: true, data: result });
     } catch (e) {
       logger.error("[Chat] delete all conversations error", { path: req.path });
       res.status(500).json({ error: "Failed to delete conversations" });
     }
-  }
+  },
 );
 
 export default router;

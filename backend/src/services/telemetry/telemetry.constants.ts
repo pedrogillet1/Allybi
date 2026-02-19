@@ -5,7 +5,14 @@
 // - No user-facing microcopy.
 // - Domain taxonomy includes your 25+ list (normalized keys).
 
-import type { KodaDomain, KodaIntent, KodaOperator, LLMProviderKey, PipelineStage, RetrievalStrategy } from "./telemetry.types";
+import type {
+  KodaDomain,
+  KodaIntent,
+  KodaOperator,
+  LLMProviderKey,
+  PipelineStage,
+  RetrievalStrategy,
+} from "./telemetry.types";
 
 /* ----------------------------- Ranges ----------------------------- */
 
@@ -13,7 +20,12 @@ export const TELEMETRY_RANGES = ["24h", "7d", "30d", "90d"] as const;
 
 /* ----------------------------- Providers / stages ----------------------------- */
 
-export const LLM_PROVIDERS: LLMProviderKey[] = ["openai", "google", "local", "unknown"];
+export const LLM_PROVIDERS: LLMProviderKey[] = [
+  "openai",
+  "google",
+  "local",
+  "unknown",
+];
 
 export const PIPELINE_STAGES: PipelineStage[] = [
   "input_normalization",
@@ -28,7 +40,12 @@ export const PIPELINE_STAGES: PipelineStage[] = [
   "stream",
 ];
 
-export const RETRIEVAL_STRATEGIES: RetrievalStrategy[] = ["semantic", "lexical", "hybrid", "unknown"];
+export const RETRIEVAL_STRATEGIES: RetrievalStrategy[] = [
+  "semantic",
+  "lexical",
+  "hybrid",
+  "unknown",
+];
 
 /* ----------------------------- Intents / operators ----------------------------- */
 
@@ -65,6 +82,7 @@ export const USAGE_EVENT_TYPES = [
   "CONVERSATION_CREATED",
   "ALLYBI_VISIT_STARTED",
   "ALLYBI_PUBLIC_VISIT_STARTED",
+  "ALLYBI_AD_CLICKED",
   "ALLYBI_OPEN_CLICKED",
   "ALLYBI_SUGGESTION_CLICKED",
   "ALLYBI_MESSAGE_SENT",

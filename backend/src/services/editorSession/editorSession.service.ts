@@ -1,7 +1,14 @@
-import { EditorLockService, type EditorLockHandle } from './editorLock.service';
-import { EditorPatchQueueService, type EditorPatchJobData } from './editorPatchQueue.service';
-import { EditorStateService, type EditorPatch, type EditorSession } from './editorState.service';
-import { EditorStreamService } from './editorStream.service';
+import { EditorLockService, type EditorLockHandle } from "./editorLock.service";
+import {
+  EditorPatchQueueService,
+  type EditorPatchJobData,
+} from "./editorPatchQueue.service";
+import {
+  EditorStateService,
+  type EditorPatch,
+  type EditorSession,
+} from "./editorState.service";
+import { EditorStreamService } from "./editorStream.service";
 
 export interface EditorCtx {
   userId: string;
@@ -17,7 +24,7 @@ export interface StartEditorSessionInput {
 
 export interface ProposePatchInput {
   sessionId: string;
-  patch: Omit<EditorPatch, 'patchId'> & { patchId?: string };
+  patch: Omit<EditorPatch, "patchId"> & { patchId?: string };
 }
 
 export interface EnqueuePatchInput {
@@ -45,7 +52,10 @@ export class EditorSessionService {
     private readonly patchQueue: EditorPatchQueueService,
   ) {}
 
-  async start(ctx: EditorCtx, input: StartEditorSessionInput): Promise<{ session: EditorSession; lock: EditorLockHandle }> {
+  async start(
+    ctx: EditorCtx,
+    input: StartEditorSessionInput,
+  ): Promise<{ session: EditorSession; lock: EditorLockHandle }> {
     const session = this.state.createSession({
       userId: ctx.userId,
       documentId: input.documentId,
@@ -55,31 +65,45 @@ export class EditorSessionService {
       ttlMs: input.ttlMs,
     });
 
-    const lock = await this.locks.acquire({ userId: ctx.userId, documentId: input.documentId }, 45_000);
-    this.stream.setStage({ sessionId: session.sessionId, stage: 'init', message: 'Editor session started' });
+    const lock = await this.locks.acquire(
+      { userId: ctx.userId, documentId: input.documentId },
+      45_000,
+    );
+    this.stream.setStage({
+      sessionId: session.sessionId,
+      stage: "init",
+      message: "Editor session started",
+    });
     return { session, lock };
   }
 
   get(ctx: EditorCtx, sessionId: string): EditorSession {
     const s = this.state.assertSession(sessionId);
-    if (s.userId !== ctx.userId) throw new Error('FORBIDDEN');
+    if (s.userId !== ctx.userId) throw new Error("FORBIDDEN");
     return s;
   }
 
   proposePatch(ctx: EditorCtx, input: ProposePatchInput): EditorPatch {
     const s = this.get(ctx, input.sessionId);
-    if (s.status !== 'active') throw new Error('SESSION_NOT_ACTIVE');
+    if (s.status !== "active") throw new Error("SESSION_NOT_ACTIVE");
     const p = this.state.addPatch(input.sessionId, input.patch);
-    this.state.addEvent(input.sessionId, 'patch_proposed', { patchId: p.patchId, kind: p.kind, target: p.target });
+    this.state.addEvent(input.sessionId, "patch_proposed", {
+      patchId: p.patchId,
+      kind: p.kind,
+      target: p.target,
+    });
     return p;
   }
 
-  async enqueuePatch(ctx: EditorCtx, input: EnqueuePatchInput): Promise<{ jobId: string }> {
+  async enqueuePatch(
+    ctx: EditorCtx,
+    input: EnqueuePatchInput,
+  ): Promise<{ jobId: string }> {
     const s = this.get(ctx, input.sessionId);
-    if (!s.documentId) throw new Error('SESSION_HAS_NO_DOCUMENT');
+    if (!s.documentId) throw new Error("SESSION_HAS_NO_DOCUMENT");
 
-    const patch = s.patches.find(p => p.patchId === input.patchId);
-    if (!patch) throw new Error('PATCH_NOT_FOUND');
+    const patch = s.patches.find((p) => p.patchId === input.patchId);
+    if (!patch) throw new Error("PATCH_NOT_FOUND");
 
     const data: EditorPatchJobData = {
       sessionId: s.sessionId,
@@ -91,25 +115,43 @@ export class EditorSessionService {
       clientMessageId: s.clientMessageId ?? undefined,
     };
 
-    this.state.addEvent(s.sessionId, 'patch_enqueued', { patchId: patch.patchId });
+    this.state.addEvent(s.sessionId, "patch_enqueued", {
+      patchId: patch.patchId,
+    });
     return this.patchQueue.enqueue(data);
   }
 
-  async commit(ctx: EditorCtx, input: CommitSessionInput): Promise<EditorSession> {
+  async commit(
+    ctx: EditorCtx,
+    input: CommitSessionInput,
+  ): Promise<EditorSession> {
     const s = this.get(ctx, input.sessionId);
-    if (s.status !== 'active') return s;
+    if (s.status !== "active") return s;
 
-    this.state.updateSession(s.sessionId, { status: 'committing', stage: 'apply' });
-    this.stream.setStage({ sessionId: s.sessionId, stage: 'apply', message: input.reason ?? 'Committing changes' });
+    this.state.updateSession(s.sessionId, {
+      status: "committing",
+      stage: "apply",
+    });
+    this.stream.setStage({
+      sessionId: s.sessionId,
+      stage: "apply",
+      message: input.reason ?? "Committing changes",
+    });
 
     // Note: actual file mutation is done by editing services / patch worker.
     // Here we only flip state; callers should use enqueuePatch + downstream workers.
-    return this.state.updateSession(s.sessionId, { status: 'committed', stage: 'done' });
+    return this.state.updateSession(s.sessionId, {
+      status: "committed",
+      stage: "done",
+    });
   }
 
-  async cancel(ctx: EditorCtx, sessionId: string, reason?: string): Promise<void> {
+  async cancel(
+    ctx: EditorCtx,
+    sessionId: string,
+    reason?: string,
+  ): Promise<void> {
     const s = this.get(ctx, sessionId);
     this.state.cancelSession(s.sessionId, reason);
   }
 }
-

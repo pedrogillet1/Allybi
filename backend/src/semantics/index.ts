@@ -29,4 +29,4 @@ export {
 
   // Module export
   semanticQueryModule,
-} from './semanticQuery';
+} from "./semanticQuery";

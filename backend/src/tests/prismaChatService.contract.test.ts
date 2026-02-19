@@ -28,4 +28,3 @@ describe("PrismaChatService public contract", () => {
     }
   });
 });
-

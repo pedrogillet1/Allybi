@@ -25,10 +25,17 @@ export class ChunkCryptoService {
       select: { id: true, textEncrypted: true, documentId: true },
     });
 
-    if (!chunk || chunk.documentId !== documentId) throw new Error("Chunk not found");
+    if (!chunk || chunk.documentId !== documentId)
+      throw new Error("Chunk not found");
     if (!chunk.textEncrypted) return "";
 
-    return this.docCrypto.decryptChunkText(userId, documentId, chunk.id, chunk.textEncrypted, dk);
+    return this.docCrypto.decryptChunkText(
+      userId,
+      documentId,
+      chunk.id,
+      chunk.textEncrypted,
+      dk,
+    );
   }
 
   async decryptChunksBatch(
@@ -48,7 +55,13 @@ export class ChunkCryptoService {
       if (chunk.textEncrypted) {
         result.set(
           chunk.id,
-          this.docCrypto.decryptChunkText(userId, documentId, chunk.id, chunk.textEncrypted, dk),
+          this.docCrypto.decryptChunkText(
+            userId,
+            documentId,
+            chunk.id,
+            chunk.textEncrypted,
+            dk,
+          ),
         );
       } else {
         result.set(chunk.id, "");

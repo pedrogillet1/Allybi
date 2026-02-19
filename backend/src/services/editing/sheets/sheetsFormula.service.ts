@@ -2,12 +2,19 @@ import {
   SheetsClientError,
   SheetsClientService,
   type SheetsRequestContext,
-} from './sheetsClient.service';
-import { SheetsValidatorsService } from './sheetsValidators.service';
+} from "./sheetsClient.service";
+import { SheetsValidatorsService } from "./sheetsValidators.service";
 
 const ALLOWED_FORMULA_CHARS = /^[A-Z0-9_\s()+\-*/^&=,:.$!<>"'%;]+$/i;
-const REFERENCE_REGEX = /(?:'[^']+'|[A-Za-z0-9_\- ]+)!\$?[A-Z]+\$?\d+(?::\$?[A-Z]+\$?\d+)?|\$?[A-Z]+\$?\d+(?::\$?[A-Z]+\$?\d+)?/g;
-const FORBIDDEN_EXTERNAL_FUNCTIONS = ['IMPORTDATA', 'IMPORTXML', 'IMPORTHTML', 'IMPORTRANGE', 'GOOGLEFINANCE'];
+const REFERENCE_REGEX =
+  /(?:'[^']+'|[A-Za-z0-9_\- ]+)!\$?[A-Z]+\$?\d+(?::\$?[A-Z]+\$?\d+)?|\$?[A-Z]+\$?\d+(?::\$?[A-Z]+\$?\d+)?/g;
+const FORBIDDEN_EXTERNAL_FUNCTIONS = [
+  "IMPORTDATA",
+  "IMPORTXML",
+  "IMPORTHTML",
+  "IMPORTRANGE",
+  "GOOGLEFINANCE",
+];
 
 export interface FormulaValidationResult {
   valid: boolean;
@@ -27,7 +34,9 @@ export interface FormulaReferenceValidationResult {
 export class SheetsFormulaService {
   private readonly validators: SheetsValidatorsService;
 
-  constructor(private readonly sheetsClient: SheetsClientService = new SheetsClientService()) {
+  constructor(
+    private readonly sheetsClient: SheetsClientService = new SheetsClientService(),
+  ) {
     this.validators = new SheetsValidatorsService(this.sheetsClient);
   }
 
@@ -35,17 +44,17 @@ export class SheetsFormulaService {
     const reasons: string[] = [];
     const normalized = formula.trim();
 
-    if (!normalized.startsWith('=')) {
-      reasons.push('Formula must start with =.');
+    if (!normalized.startsWith("=")) {
+      reasons.push("Formula must start with =.");
       return { valid: false, reasons, references: [] };
     }
 
     if (!ALLOWED_FORMULA_CHARS.test(normalized)) {
-      reasons.push('Formula contains unsupported characters.');
+      reasons.push("Formula contains unsupported characters.");
     }
 
     if (!this.hasBalancedParentheses(normalized)) {
-      reasons.push('Formula has unbalanced parentheses.');
+      reasons.push("Formula has unbalanced parentheses.");
     }
 
     const upper = normalized.toUpperCase();
@@ -72,18 +81,25 @@ export class SheetsFormulaService {
   ): Promise<void> {
     const formulaValidation = this.validateFormula(formula);
     if (!formulaValidation.valid) {
-      throw new SheetsClientError(formulaValidation.reasons.join(' '), {
-        code: 'INVALID_FORMULA',
+      throw new SheetsClientError(formulaValidation.reasons.join(" "), {
+        code: "INVALID_FORMULA",
         retryable: false,
       });
     }
 
-    const refsValidation = await this.validateReferences(spreadsheetId, formulaValidation.references, ctx);
+    const refsValidation = await this.validateReferences(
+      spreadsheetId,
+      formulaValidation.references,
+      ctx,
+    );
     if (!refsValidation.valid) {
-      throw new SheetsClientError(`Formula references missing ranges: ${refsValidation.missingRanges.join(', ')}`, {
-        code: 'MISSING_FORMULA_REFERENCES',
-        retryable: false,
-      });
+      throw new SheetsClientError(
+        `Formula references missing ranges: ${refsValidation.missingRanges.join(", ")}`,
+        {
+          code: "MISSING_FORMULA_REFERENCES",
+          retryable: false,
+        },
+      );
     }
 
     await this.sheetsClient.setValues(spreadsheetId, a1, [[formula]], ctx);
@@ -95,7 +111,11 @@ export class SheetsFormulaService {
     ctx?: SheetsRequestContext,
   ): Promise<FormulaReferenceValidationResult> {
     const references = Array.isArray(referencesOrFormula)
-      ? Array.from(new Set(referencesOrFormula.map((entry) => entry.trim()).filter(Boolean)))
+      ? Array.from(
+          new Set(
+            referencesOrFormula.map((entry) => entry.trim()).filter(Boolean),
+          ),
+        )
       : this.extractReferences(referencesOrFormula);
 
     if (references.length === 0) {
@@ -106,7 +126,11 @@ export class SheetsFormulaService {
     const resolvedRanges: string[] = [];
 
     for (const reference of references) {
-      const isValid = await this.validateSingleReference(spreadsheetId, reference, ctx);
+      const isValid = await this.validateSingleReference(
+        spreadsheetId,
+        reference,
+        ctx,
+      );
       if (isValid) {
         resolvedRanges.push(reference);
       } else {
@@ -126,21 +150,32 @@ export class SheetsFormulaService {
     reference: string,
     ctx?: SheetsRequestContext,
   ): Promise<boolean> {
-    const normalized = reference.replace(/\$/g, '');
-    const withSheet = normalized.includes('!');
+    const normalized = reference.replace(/\$/g, "");
+    const withSheet = normalized.includes("!");
 
     if (withSheet) {
-      const bounds = await this.validators.validateRangeWithinBounds(spreadsheetId, normalized, ctx);
+      const bounds = await this.validators.validateRangeWithinBounds(
+        spreadsheetId,
+        normalized,
+        ctx,
+      );
       return bounds.valid;
     }
 
-    const spreadsheet = await this.sheetsClient.getSpreadsheet(spreadsheetId, ctx);
+    const spreadsheet = await this.sheetsClient.getSpreadsheet(
+      spreadsheetId,
+      ctx,
+    );
     const sheets = spreadsheet.sheets ?? [];
 
     for (const sheet of sheets) {
       const name = sheet.properties?.title;
       if (!name) continue;
-      const bounds = await this.validators.validateRangeWithinBounds(spreadsheetId, `${name}!${normalized}`, ctx);
+      const bounds = await this.validators.validateRangeWithinBounds(
+        spreadsheetId,
+        `${name}!${normalized}`,
+        ctx,
+      );
       if (bounds.valid) return true;
     }
 
@@ -162,8 +197,8 @@ export class SheetsFormulaService {
       if (char === '"') inString = !inString;
       if (inString) continue;
 
-      if (char === '(') depth += 1;
-      if (char === ')') {
+      if (char === "(") depth += 1;
+      if (char === ")") {
         depth -= 1;
         if (depth < 0) return false;
       }

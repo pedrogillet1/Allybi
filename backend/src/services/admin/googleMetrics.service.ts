@@ -84,7 +84,9 @@ function toNum(value: unknown): number {
   return 0;
 }
 
-async function getCloudSqlMetrics(prisma: PrismaClient): Promise<GoogleCloudSqlMetrics> {
+async function getCloudSqlMetrics(
+  prisma: PrismaClient,
+): Promise<GoogleCloudSqlMetrics> {
   const started = Date.now();
 
   try {
@@ -120,7 +122,10 @@ async function getCloudSqlMetrics(prisma: PrismaClient): Promise<GoogleCloudSqlM
   }
 }
 
-async function getCloudRunMetrics(prisma: PrismaClient, window: WindowParams): Promise<GoogleCloudRunMetrics> {
+async function getCloudRunMetrics(
+  prisma: PrismaClient,
+  window: WindowParams,
+): Promise<GoogleCloudRunMetrics> {
   try {
     const rows = await prisma.aPIPerformanceLog.findMany({
       where: {
@@ -148,7 +153,10 @@ async function getCloudRunMetrics(prisma: PrismaClient, window: WindowParams): P
       );
     });
 
-    const byService = new Map<string, { calls: number; errors: number; latencies: number[] }>();
+    const byService = new Map<
+      string,
+      { calls: number; errors: number; latencies: number[] }
+    >();
     for (const row of cloudRunRows) {
       const key = row.service || "cloud-run";
       if (!byService.has(key)) {
@@ -157,7 +165,8 @@ async function getCloudRunMetrics(prisma: PrismaClient, window: WindowParams): P
       const item = byService.get(key)!;
       item.calls += 1;
       if (!row.success) item.errors += 1;
-      if (typeof row.latency === "number" && row.latency > 0) item.latencies.push(row.latency);
+      if (typeof row.latency === "number" && row.latency > 0)
+        item.latencies.push(row.latency);
     }
 
     const services = Array.from(byService.entries())
@@ -165,7 +174,8 @@ async function getCloudRunMetrics(prisma: PrismaClient, window: WindowParams): P
         service,
         calls: item.calls,
         errors: item.errors,
-        errorRate: item.calls > 0 ? round2((item.errors / item.calls) * 100) : 0,
+        errorRate:
+          item.calls > 0 ? round2((item.errors / item.calls) * 100) : 0,
         p95LatencyMs: p95(item.latencies),
       }))
       .sort((a, b) => b.calls - a.calls);
@@ -195,7 +205,10 @@ async function getCloudRunMetrics(prisma: PrismaClient, window: WindowParams): P
   }
 }
 
-async function getGeminiMetrics(prisma: PrismaClient, window: WindowParams): Promise<GoogleGeminiMetrics> {
+async function getGeminiMetrics(
+  prisma: PrismaClient,
+  window: WindowParams,
+): Promise<GoogleGeminiMetrics> {
   try {
     const calls = await prisma.modelCall.findMany({
       where: {
@@ -215,7 +228,10 @@ async function getGeminiMetrics(prisma: PrismaClient, window: WindowParams): Pro
       take: 100000,
     });
 
-    const modelMap = new Map<string, { calls: number; errors: number; latencies: number[]; tokens: number }>();
+    const modelMap = new Map<
+      string,
+      { calls: number; errors: number; latencies: number[]; tokens: number }
+    >();
     for (const c of calls) {
       const key = c.model || "gemini";
       if (!modelMap.has(key)) {
@@ -224,7 +240,8 @@ async function getGeminiMetrics(prisma: PrismaClient, window: WindowParams): Pro
       const item = modelMap.get(key)!;
       item.calls += 1;
       if (c.status === "fail") item.errors += 1;
-      if (typeof c.durationMs === "number" && c.durationMs > 0) item.latencies.push(c.durationMs);
+      if (typeof c.durationMs === "number" && c.durationMs > 0)
+        item.latencies.push(c.durationMs);
       item.tokens += c.totalTokens ?? 0;
     }
 
@@ -233,7 +250,8 @@ async function getGeminiMetrics(prisma: PrismaClient, window: WindowParams): Pro
         model,
         calls: item.calls,
         errors: item.errors,
-        errorRate: item.calls > 0 ? round2((item.errors / item.calls) * 100) : 0,
+        errorRate:
+          item.calls > 0 ? round2((item.errors / item.calls) * 100) : 0,
         p95LatencyMs: p95(item.latencies),
         tokens: item.tokens,
       }))
@@ -245,7 +263,9 @@ async function getGeminiMetrics(prisma: PrismaClient, window: WindowParams): Pro
 
     // Conservative blended estimate for Gemini family.
     const estimatedCostUsd = round2((totalTokens / 1_000_000) * 0.3);
-    const allLatencies = calls.map((c) => c.durationMs ?? 0).filter((v) => v > 0);
+    const allLatencies = calls
+      .map((c) => c.durationMs ?? 0)
+      .filter((v) => v > 0);
 
     return {
       calls: totalCalls,
@@ -269,7 +289,10 @@ async function getGeminiMetrics(prisma: PrismaClient, window: WindowParams): Pro
   }
 }
 
-async function getOcrMetrics(prisma: PrismaClient, window: WindowParams): Promise<GoogleOcrMetrics> {
+async function getOcrMetrics(
+  prisma: PrismaClient,
+  window: WindowParams,
+): Promise<GoogleOcrMetrics> {
   try {
     const events = await prisma.ingestionEvent.findMany({
       where: {
@@ -293,13 +316,18 @@ async function getOcrMetrics(prisma: PrismaClient, window: WindowParams): Promis
 
     const avgConfidence =
       confidenceValues.length > 0
-        ? round2((confidenceValues.reduce((sum, c) => sum + c, 0) / confidenceValues.length) * 100)
+        ? round2(
+            (confidenceValues.reduce((sum, c) => sum + c, 0) /
+              confidenceValues.length) *
+              100,
+          )
         : 0;
 
     return {
       docsProcessed,
       ocrUsed,
-      ocrCoverageRate: docsProcessed > 0 ? round2((ocrUsed / docsProcessed) * 100) : 0,
+      ocrCoverageRate:
+        docsProcessed > 0 ? round2((ocrUsed / docsProcessed) * 100) : 0,
       avgConfidence,
       failures,
     };
@@ -316,7 +344,7 @@ async function getOcrMetrics(prisma: PrismaClient, window: WindowParams): Promis
 
 export async function getGoogleMetrics(
   prisma: PrismaClient,
-  window: WindowParams
+  window: WindowParams,
 ): Promise<GoogleMetricsBundle> {
   const [cloudSql, cloudRun, gemini, ocr] = await Promise.all([
     getCloudSqlMetrics(prisma),

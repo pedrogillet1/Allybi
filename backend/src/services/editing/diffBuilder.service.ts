@@ -48,9 +48,17 @@ function buildWordDeltaSummary(before: string, after: string): string {
   return `Reduced by ${Math.abs(delta)} word${Math.abs(delta) > 1 ? "s" : ""}.`;
 }
 
-function buildSummary(kind: EditDiffPayload["kind"], before: string, after: string, changes: EditDiffChange[]): string {
+function buildSummary(
+  kind: EditDiffPayload["kind"],
+  before: string,
+  after: string,
+  changes: EditDiffChange[],
+): string {
   if (before === after) return "No textual change.";
-  const changeLabel = changes.length === 1 ? "1 segment changed." : `${changes.length} segments changed.`;
+  const changeLabel =
+    changes.length === 1
+      ? "1 segment changed."
+      : `${changes.length} segments changed.`;
   if (kind === "structural") return `Structural update applied. ${changeLabel}`;
   return `${buildWordDeltaSummary(before, after)} ${changeLabel}`;
 }
@@ -73,7 +81,8 @@ export class DiffBuilderService {
   buildCellDiff(before: string, after: string): EditDiffPayload {
     const b = normalizeWhitespace(before);
     const a = normalizeWhitespace(after);
-    const change: EditDiffChange[] = b === a ? [] : [{ type: "replace", before: b, after: a }];
+    const change: EditDiffChange[] =
+      b === a ? [] : [{ type: "replace", before: b, after: a }];
     return {
       kind: "cell",
       before: b,
@@ -98,10 +107,14 @@ export class DiffBuilderService {
     };
   }
 
-  buildStructuralDiff(beforeLabel: string, afterLabel: string): EditDiffPayload {
+  buildStructuralDiff(
+    beforeLabel: string,
+    afterLabel: string,
+  ): EditDiffPayload {
     const b = normalizeWhitespace(beforeLabel);
     const a = normalizeWhitespace(afterLabel);
-    const changes: EditDiffChange[] = b === a ? [] : [{ type: "replace", before: b, after: a }];
+    const changes: EditDiffChange[] =
+      b === a ? [] : [{ type: "replace", before: b, after: a }];
     return {
       kind: "structural",
       before: b,
@@ -112,4 +125,3 @@ export class DiffBuilderService {
     };
   }
 }
-

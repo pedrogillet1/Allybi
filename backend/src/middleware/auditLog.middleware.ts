@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import prisma from '../config/database';
+import { Request, Response, NextFunction } from "express";
+import prisma from "../config/database";
 
 /**
  * Security Audit Logging Middleware
@@ -17,16 +17,20 @@ interface AuditLogEntry {
   resource: string | null;
   ipAddress: string | null;
   userAgent: string | null;
-  status: 'success' | 'failure';
+  status: "success" | "failure";
   details: string | null;
 }
 
 /**
  * Audit log middleware - logs all sensitive operations
  */
-export const auditLog = async (req: Request, res: Response, next: NextFunction) => {
+export const auditLog = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   // Skip audit logging for OPTIONS requests (CORS preflight)
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return next();
   }
 
@@ -39,48 +43,51 @@ export const auditLog = async (req: Request, res: Response, next: NextFunction) 
     const userId = req.user?.id || null;
     const action = `${req.method} ${req.path}`;
     const ipAddress = req.ip || req.socket.remoteAddress || null;
-    const userAgent = req.get('user-agent') || null;
+    const userAgent = req.get("user-agent") || null;
 
     // Determine if this is a sensitive operation
     const isSensitiveOperation =
-      req.path.includes('/documents') ||
-      req.path.includes('/folders') ||
-      req.path.includes('/chat') ||
-      req.path.includes('/users');
+      req.path.includes("/documents") ||
+      req.path.includes("/folders") ||
+      req.path.includes("/chat") ||
+      req.path.includes("/users");
 
     if (isSensitiveOperation) {
       // Extract resource ID from path or body
       let resourceId = null;
-      const pathSegments = req.path.split('/');
+      const pathSegments = req.path.split("/");
       const lastSegment = pathSegments[pathSegments.length - 1];
 
       // Check if last segment looks like a UUID
-      if (lastSegment && lastSegment.includes('-') && lastSegment.length > 20) {
+      if (lastSegment && lastSegment.includes("-") && lastSegment.length > 20) {
         resourceId = lastSegment;
       }
 
       // Log to audit_log table — NEVER include response body
-      prisma.auditLog.create({
-        data: {
-          userId,
-          action,
-          resource: resourceId,
-          ipAddress,
-          userAgent,
-          status: res.statusCode < 400 ? 'success' : 'failure',
-          // Store only status code metadata, never response bodies
-          details: res.statusCode >= 400
-            ? JSON.stringify({ statusCode: res.statusCode, duration })
-            : null,
-        },
-      }).catch(err => {
-        console.error('Failed to write audit log:', err.message);
-      });
+      prisma.auditLog
+        .create({
+          data: {
+            userId,
+            action,
+            resource: resourceId,
+            ipAddress,
+            userAgent,
+            status: res.statusCode < 400 ? "success" : "failure",
+            // Store only status code metadata, never response bodies
+            details:
+              res.statusCode >= 400
+                ? JSON.stringify({ statusCode: res.statusCode, duration })
+                : null,
+          },
+        })
+        .catch((err) => {
+          console.error("Failed to write audit log:", err.message);
+        });
 
       // Security violation detection — log only metadata, no body
       if (res.statusCode === 401 || res.statusCode === 403) {
         console.warn(
-          `[SECURITY] status=${res.statusCode} action="${action}" user=${userId || 'anonymous'} ip=${ipAddress}`
+          `[SECURITY] status=${res.statusCode} action="${action}" user=${userId || "anonymous"} ip=${ipAddress}`,
         );
       }
     }
@@ -102,7 +109,7 @@ export const auditLog = async (req: Request, res: Response, next: NextFunction) 
 export const getUserAuditLogs = async (userId: string, limit: number = 50) => {
   return await prisma.auditLog.findMany({
     where: { userId },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
     take: limit,
   });
 };
@@ -112,8 +119,8 @@ export const getUserAuditLogs = async (userId: string, limit: number = 50) => {
  */
 export const getSecurityViolations = async (limit: number = 100) => {
   return await prisma.auditLog.findMany({
-    where: { status: 'failure' },
-    orderBy: { createdAt: 'desc' },
+    where: { status: "failure" },
+    orderBy: { createdAt: "desc" },
     take: limit,
   });
 };
@@ -121,14 +128,17 @@ export const getSecurityViolations = async (limit: number = 100) => {
 /**
  * Detect suspicious activity patterns
  */
-export const detectSuspiciousActivity = async (userId: string, timeWindowMinutes: number = 60) => {
+export const detectSuspiciousActivity = async (
+  userId: string,
+  timeWindowMinutes: number = 60,
+) => {
   const timeThreshold = new Date(Date.now() - timeWindowMinutes * 60 * 1000);
 
   // Get recent failed attempts
   const failedAttempts = await prisma.auditLog.count({
     where: {
       userId,
-      status: 'failure',
+      status: "failure",
       createdAt: { gte: timeThreshold },
     },
   });
@@ -137,7 +147,7 @@ export const detectSuspiciousActivity = async (userId: string, timeWindowMinutes
   const successfulAccesses = await prisma.auditLog.count({
     where: {
       userId,
-      status: 'success',
+      status: "success",
       createdAt: { gte: timeThreshold },
     },
   });
@@ -151,7 +161,7 @@ export const detectSuspiciousActivity = async (userId: string, timeWindowMinutes
     failedAttempts,
     successfulAccesses,
     isSuspicious,
-    risk: isSuspicious ? 'HIGH' : failedAttempts > 5 ? 'MEDIUM' : 'LOW',
+    risk: isSuspicious ? "HIGH" : failedAttempts > 5 ? "MEDIUM" : "LOW",
   };
 };
 
@@ -161,12 +171,12 @@ export const detectSuspiciousActivity = async (userId: string, timeWindowMinutes
 export const detectCrossUserAccessAttempts = async (limit: number = 50) => {
   return await prisma.auditLog.findMany({
     where: {
-      status: 'failure',
+      status: "failure",
       details: {
-        contains: 'Unauthorized',
+        contains: "Unauthorized",
       },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
     take: limit,
   });
 };

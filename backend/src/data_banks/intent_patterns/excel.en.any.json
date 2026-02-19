@@ -132,8 +132,7 @@
           "wrap"
         ],
         "regex_any": [
-          "\\b(?:set|fill|change|replace|put)\\b.*\\b(?:every|all|each|cells?|selection|selected\\s+cells?)\\b.*\\b(?:to|=|with)\\b",
-          "\\bset\\b.*\\bto\\b\\s*\\d"
+          "\\b(?:set|fill|change|replace|put)\\b.*\\b(?:every|all|each|cells?|selection|selected\\s+cells?)\\b.*\\b(?:to|=|with)\\b"
         ]
       },
       "slotExtractors": [
@@ -2099,8 +2098,8 @@
           "add up"
         ],
         "regex_any": [
-          "\\b(?:sum|total|add up)\\b.*\\b(?:of|in|for|column|range)\\b",
-          "\\bcalculate\\b.*\\bsum\\b"
+          "^(?!.*\\bformula\\b)(?!.*=).*\\b(?:sum|total|add up)\\b.*\\b(?:of|in|for|column|range)\\b",
+          "^(?!.*\\bformula\\b)(?!.*=).*\\bcalculate\\b.*\\bsum\\b"
         ]
       },
       "slotExtractors": [

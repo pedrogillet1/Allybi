@@ -118,7 +118,7 @@ function normalizeText(input: string): string {
 }
 
 function anyMatch(text: string, patterns: Array<string | RegExp>): boolean {
-  return patterns.some(p => {
+  return patterns.some((p) => {
     if (p instanceof RegExp) return p.test(text);
     try {
       return new RegExp(p, "i").test(text);
@@ -139,19 +139,25 @@ function extractFirstInt(text: string): number | undefined {
 
 function extractRangeMaxSentences(text: string): number | undefined {
   // "2-3 sentences", "2–3 frases", "2 a 3 frases", "no more than 3 sentences"
-  const range = text.match(/\b(\d{1,2})\s*(?:-|a|to)\s*(\d{1,2})\s*(?:sentences|sentence|frases|frase|oracoes|oracao)\b/i);
+  const range = text.match(
+    /\b(\d{1,2})\s*(?:-|a|to)\s*(\d{1,2})\s*(?:sentences|sentence|frases|frase|oracoes|oracao)\b/i,
+  );
   if (range) {
     const hi = parseInt(range[2], 10);
     return Number.isFinite(hi) ? hi : undefined;
   }
 
-  const max = text.match(/\b(?:no more than|at most|up to|max(?:imum)?|no maximo|ate|no mas de)\s*(\d{1,2})\s*(?:sentences|sentence|frases|frase|oracoes|oracao)\b/i);
+  const max = text.match(
+    /\b(?:no more than|at most|up to|max(?:imum)?|no maximo|ate|no mas de)\s*(\d{1,2})\s*(?:sentences|sentence|frases|frase|oracoes|oracao)\b/i,
+  );
   if (max) {
     const n = parseInt(max[1], 10);
     return Number.isFinite(n) ? n : undefined;
   }
 
-  const exact = text.match(/\b(\d{1,2})\s*(?:sentences|sentence|frases|frase|oracoes|oracao)\b/i);
+  const exact = text.match(
+    /\b(\d{1,2})\s*(?:sentences|sentence|frases|frase|oracoes|oracao)\b/i,
+  );
   if (exact) {
     const n = parseInt(exact[1], 10);
     return Number.isFinite(n) ? n : undefined;
@@ -162,7 +168,9 @@ function extractRangeMaxSentences(text: string): number | undefined {
 
 function extractExactBullets(text: string): number | undefined {
   // "5 bullets", "exactly 5 bullet points", "5 pontos", "5 itens"
-  const m = text.match(/\b(?:exactly|exact|just|somente|apenas|exatamente)?\s*(\d{1,2})\s*(?:bullets?|bullet points?|points?|pontos?|itens?|items?)\b/i);
+  const m = text.match(
+    /\b(?:exactly|exact|just|somente|apenas|exatamente)?\s*(\d{1,2})\s*(?:bullets?|bullet points?|points?|pontos?|itens?|items?)\b/i,
+  );
   if (!m) return undefined;
   const n = parseInt(m[1], 10);
   if (!Number.isFinite(n)) return undefined;
@@ -171,7 +179,9 @@ function extractExactBullets(text: string): number | undefined {
 
 function extractExactSteps(text: string): number | undefined {
   // "3 steps", "in 4 steps", "4 passos"
-  const m = text.match(/\b(?:in|em)?\s*(\d{1,2})\s*(?:steps?|passos?|etapas?|pasos?)\b/i);
+  const m = text.match(
+    /\b(?:in|em)?\s*(\d{1,2})\s*(?:steps?|passos?|etapas?|pasos?)\b/i,
+  );
   if (!m) return undefined;
   const n = parseInt(m[1], 10);
   if (!Number.isFinite(n)) return undefined;
@@ -193,8 +203,7 @@ export class FormatConstraintParserService {
     const trace: string[] = [];
     const rp = getRuntimePatterns();
 
-    const detectedLang: LanguageCode =
-      languageHint || "en";
+    const detectedLang: LanguageCode = languageHint || "en";
 
     const q = normalizeText(queryRaw);
 
@@ -204,7 +213,9 @@ export class FormatConstraintParserService {
     const bankEnabled = this.semanticsBank?.config?.enabled !== false;
     const bankPatterns = this.semanticsBank?.patterns;
 
-    const bankList = (key: keyof NonNullable<FormatSemanticsBank["patterns"]>): string[] => {
+    const bankList = (
+      key: keyof NonNullable<FormatSemanticsBank["patterns"]>,
+    ): string[] => {
       if (!bankEnabled) return [];
       const perLang = (bankPatterns?.[key] || {}) as Record<string, string[]>;
       return perLang[detectedLang] || perLang["any"] || [];
@@ -441,7 +452,11 @@ export class FormatConstraintParserService {
 
     if (constraints.userAskedForJson && !constraints.outputShape) {
       // Heuristic mapping: if query mentions table-ish or numbers, map to table else bullets.
-      const numericCue = anyMatch(q, [/[\d$€]/, /\b(sum|total|percent|%|avg|average|media)\b/, /\bvalor|total|soma|porcentagem\b/]);
+      const numericCue = anyMatch(q, [
+        /[\d$€]/,
+        /\b(sum|total|percent|%|avg|average|media)\b/,
+        /\bvalor|total|soma|porcentagem\b/,
+      ]);
       constraints.outputShape = numericCue ? "table" : "bullets";
       trace.push(`jsonMappedOutputShape=${constraints.outputShape}`);
     }

@@ -1,21 +1,30 @@
-import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
-import prisma from '../config/database';
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import prisma from "../config/database";
 import {
   generateAdminAccessToken,
   generateAdminRefreshToken,
   verifyAdminRefreshToken,
-} from '../utils/adminJwt';
-import type { AdminJWTPayload } from '../utils/adminJwt';
+} from "../utils/adminJwt";
+import type { AdminJWTPayload } from "../utils/adminJwt";
 
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 function sha256(input: string): string {
-  return crypto.createHash('sha256').update(input).digest('hex');
+  return crypto.createHash("sha256").update(input).digest("hex");
 }
 
-function makePayload(admin: { id: string; username: string; role: string }): AdminJWTPayload {
-  return { adminId: admin.id, username: admin.username, role: admin.role, isAdmin: true };
+function makePayload(admin: {
+  id: string;
+  username: string;
+  role: string;
+}): AdminJWTPayload {
+  return {
+    adminId: admin.id,
+    username: admin.username,
+    role: admin.role,
+    isAdmin: true,
+  };
 }
 
 export interface AdminAuthService {
@@ -33,24 +42,24 @@ export function createAdminAuthService(): AdminAuthService {
   return {
     async login(input) {
       const username = input.username.trim().toLowerCase();
-      console.log('[AdminAuth] Login attempt for:', username);
+      console.log("[AdminAuth] Login attempt for:", username);
 
       const admin = await prisma.admin.findUnique({ where: { username } });
-      console.log('[AdminAuth] Admin found:', !!admin, admin?.id);
+      console.log("[AdminAuth] Admin found:", !!admin, admin?.id);
       if (!admin || !admin.passwordHash) {
-        console.log('[AdminAuth] No admin or no password hash');
-        throw new Error('Invalid credentials');
+        console.log("[AdminAuth] No admin or no password hash");
+        throw new Error("Invalid credentials");
       }
       if (!admin.isActive) {
-        console.log('[AdminAuth] Account disabled');
-        throw new Error('Account disabled');
+        console.log("[AdminAuth] Account disabled");
+        throw new Error("Account disabled");
       }
 
-      console.log('[AdminAuth] Comparing password...');
+      console.log("[AdminAuth] Comparing password...");
       const valid = await bcrypt.compare(input.password, admin.passwordHash);
-      console.log('[AdminAuth] Password valid:', valid);
+      console.log("[AdminAuth] Password valid:", valid);
       if (!valid) {
-        throw new Error('Invalid credentials');
+        throw new Error("Invalid credentials");
       }
 
       const payload = makePayload(admin);
@@ -88,7 +97,7 @@ export function createAdminAuthService(): AdminAuthService {
       try {
         payload = verifyAdminRefreshToken(input.refreshToken);
       } catch {
-        throw new Error('Refresh token invalid or expired');
+        throw new Error("Refresh token invalid or expired");
       }
 
       const tokenHash = sha256(input.refreshToken);
@@ -101,12 +110,14 @@ export function createAdminAuthService(): AdminAuthService {
       });
 
       if (!session) {
-        throw new Error('Refresh token invalid or expired');
+        throw new Error("Refresh token invalid or expired");
       }
 
-      const admin = await prisma.admin.findUnique({ where: { id: session.adminId } });
+      const admin = await prisma.admin.findUnique({
+        where: { id: session.adminId },
+      });
       if (!admin || !admin.isActive) {
-        throw new Error('Admin not found or disabled');
+        throw new Error("Admin not found or disabled");
       }
 
       const newPayload = makePayload(admin);

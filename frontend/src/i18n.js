@@ -196,7 +196,7 @@ const resources = {
           subtitle: 'Next time you need a number, clause or plan, just ask me here.',
           bullet1: 'Use the text bar to ask anything about your files.',
           bullet2: 'Click the paperclip to upload new documents.',
-          bullet3: 'Speak naturally — you don't need special commands.'
+          bullet3: "Speak naturally — you don't need special commands."
         },
         // Settings card
         settingsCard: {

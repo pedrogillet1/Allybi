@@ -1,1 +1,1 @@
-export * from './document.queue';
+export * from "./document.queue";

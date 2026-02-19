@@ -47,7 +47,8 @@ function normalizeFinishReason(raw: any): LlmFinishReason {
   if (s.includes("stop")) return "stop";
   if (s.includes("length") || s.includes("max_tokens")) return "length";
   if (s.includes("tool")) return "tool_calls";
-  if (s.includes("content_filter") || s.includes("safety")) return "content_filter";
+  if (s.includes("content_filter") || s.includes("safety"))
+    return "content_filter";
   if (s.includes("cancel")) return "cancelled";
   if (s.includes("error")) return "error";
 
@@ -73,9 +74,12 @@ function normalizeUsage(raw: any): LlmUsage | undefined {
   const totalTokens =
     clampInt(raw.total_tokens) ??
     clampInt(raw.totalTokens) ??
-    (inputTokens != null && outputTokens != null ? inputTokens + outputTokens : undefined);
+    (inputTokens != null && outputTokens != null
+      ? inputTokens + outputTokens
+      : undefined);
 
-  if (inputTokens == null && outputTokens == null && totalTokens == null) return undefined;
+  if (inputTokens == null && outputTokens == null && totalTokens == null)
+    return undefined;
 
   return {
     inputTokens,
@@ -94,7 +98,10 @@ function normalizeToolCalls(raw: any): LlmToolCall[] | undefined {
     return tc.map((t: any) => ({
       id: String(t.id ?? ""),
       name: String(t.function?.name ?? t.name ?? ""),
-      argumentsJson: typeof t.function?.arguments === "string" ? t.function.arguments : JSON.stringify(t.function?.arguments ?? t.arguments ?? {}),
+      argumentsJson:
+        typeof t.function?.arguments === "string"
+          ? t.function.arguments
+          : JSON.stringify(t.function?.arguments ?? t.arguments ?? {}),
     }));
   }
 
@@ -104,7 +111,10 @@ function normalizeToolCalls(raw: any): LlmToolCall[] | undefined {
     return alt.map((t: any) => ({
       id: String(t.id ?? ""),
       name: String(t.name ?? t.function?.name ?? ""),
-      argumentsJson: typeof t.argumentsJson === "string" ? t.argumentsJson : JSON.stringify(t.arguments ?? t.function?.arguments ?? {}),
+      argumentsJson:
+        typeof t.argumentsJson === "string"
+          ? t.argumentsJson
+          : JSON.stringify(t.arguments ?? t.function?.arguments ?? {}),
     }));
   }
 
@@ -120,13 +130,18 @@ function normalizeSafety(raw: any): LlmSafetyReport | undefined {
     Boolean(raw?.flagged) ||
     Boolean(raw?.safety?.flagged) ||
     Boolean(raw?.prompt_feedback?.block_reason) ||
-    Boolean(raw?.candidates?.some?.((c: any) => c?.safetyRatings?.some?.((r: any) => r?.blocked)));
+    Boolean(
+      raw?.candidates?.some?.((c: any) =>
+        c?.safetyRatings?.some?.((r: any) => r?.blocked),
+      ),
+    );
 
   if (!flagged) return undefined;
 
   return {
     flagged: true,
-    providerDetail: raw?.safety ?? raw?.prompt_feedback ?? raw?.candidates ?? raw,
+    providerDetail:
+      raw?.safety ?? raw?.prompt_feedback ?? raw?.candidates ?? raw,
   };
 }
 
@@ -143,7 +158,10 @@ function extractText(raw: any, provider: ProviderId): string {
   // - candidates[0].content.parts[].text
   const parts = raw?.candidates?.[0]?.content?.parts;
   if (Array.isArray(parts)) {
-    const t = parts.map((p: any) => p?.text).filter((x: any) => typeof x === "string").join("");
+    const t = parts
+      .map((p: any) => p?.text)
+      .filter((x: any) => typeof x === "string")
+      .join("");
     if (t) return t;
   }
 
@@ -170,8 +188,12 @@ export class LlmResponseParserService {
     const text = extractText(raw, provider) ?? "";
     const toolCalls = normalizeToolCalls(raw);
     const usage = normalizeUsage(raw?.usage ?? raw?.usageMetadata ?? raw);
-    const finishReason =
-      normalizeFinishReason(raw?.choices?.[0]?.finish_reason ?? raw?.candidates?.[0]?.finishReason ?? raw?.finish_reason ?? raw?.done_reason);
+    const finishReason = normalizeFinishReason(
+      raw?.choices?.[0]?.finish_reason ??
+        raw?.candidates?.[0]?.finishReason ??
+        raw?.finish_reason ??
+        raw?.done_reason,
+    );
 
     const safety = normalizeSafety(raw);
 
@@ -189,8 +211,16 @@ export class LlmResponseParserService {
    * Parse a streaming “final frame” (if your stream adapter provides one).
    * If your adapter already builds a LlmResponse, you can skip this.
    */
-  parseFinalFromStream(args: { provider: ProviderId; model: string; finalPayload: any }): LlmResponse {
-    return this.parse({ provider: args.provider, model: args.model, raw: args.finalPayload });
+  parseFinalFromStream(args: {
+    provider: ProviderId;
+    model: string;
+    finalPayload: any;
+  }): LlmResponse {
+    return this.parse({
+      provider: args.provider,
+      model: args.model,
+      raw: args.finalPayload,
+    });
   }
 }
 

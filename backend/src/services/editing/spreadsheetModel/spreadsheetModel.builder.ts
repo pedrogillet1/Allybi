@@ -2,7 +2,11 @@ import crypto from "crypto";
 import ExcelJS from "exceljs";
 import { cellKey, parseCellKey } from "./spreadsheetModel.range";
 import { registerStyle } from "./spreadsheetModel.style";
-import type { CellModel, SpreadsheetModel, StyleModel } from "./spreadsheetModel.types";
+import type {
+  CellModel,
+  SpreadsheetModel,
+  StyleModel,
+} from "./spreadsheetModel.types";
 
 function asHexColor(raw: unknown): string | undefined {
   const value = String(raw || "").trim();
@@ -17,32 +21,56 @@ function extractStyle(cell: ExcelJS.Cell): StyleModel | null {
     ? {
         ...(cell.font.name ? { name: String(cell.font.name) } : {}),
         ...(typeof cell.font.size === "number" ? { size: cell.font.size } : {}),
-        ...(typeof cell.font.bold === "boolean" ? { bold: cell.font.bold } : {}),
-        ...(typeof cell.font.italic === "boolean" ? { italic: cell.font.italic } : {}),
-        ...(typeof cell.font.underline === "boolean" ? { underline: cell.font.underline } : {}),
-        ...(cell.font.color?.argb ? { color: asHexColor(cell.font.color.argb) } : {}),
+        ...(typeof cell.font.bold === "boolean"
+          ? { bold: cell.font.bold }
+          : {}),
+        ...(typeof cell.font.italic === "boolean"
+          ? { italic: cell.font.italic }
+          : {}),
+        ...(typeof cell.font.underline === "boolean"
+          ? { underline: cell.font.underline }
+          : {}),
+        ...(cell.font.color?.argb
+          ? { color: asHexColor(cell.font.color.argb) }
+          : {}),
       }
     : undefined;
 
-  const fillColor = (cell.fill as any)?.fgColor?.argb || (cell.fill as any)?.bgColor?.argb;
+  const fillColor =
+    (cell.fill as any)?.fgColor?.argb || (cell.fill as any)?.bgColor?.argb;
   const fill = fillColor ? { color: asHexColor(fillColor) } : undefined;
 
   const align = cell.alignment
     ? {
-        ...(cell.alignment.horizontal ? { h: String(cell.alignment.horizontal) as "left" | "center" | "right" } : {}),
+        ...(cell.alignment.horizontal
+          ? {
+              h: String(cell.alignment.horizontal) as
+                | "left"
+                | "center"
+                | "right",
+            }
+          : {}),
         ...(cell.alignment.vertical
           ? {
               v:
                 String(cell.alignment.vertical) === "middle"
                   ? "middle"
-                  : (String(cell.alignment.vertical) as "top" | "bottom" | "middle"),
+                  : (String(cell.alignment.vertical) as
+                      | "top"
+                      | "bottom"
+                      | "middle"),
             }
           : {}),
-        ...(typeof cell.alignment.wrapText === "boolean" ? { wrap: cell.alignment.wrapText } : {}),
+        ...(typeof cell.alignment.wrapText === "boolean"
+          ? { wrap: cell.alignment.wrapText }
+          : {}),
       }
     : undefined;
 
-  const border = cell.border && Object.keys(cell.border).length ? { ...(cell.border as any) } : undefined;
+  const border =
+    cell.border && Object.keys(cell.border).length
+      ? { ...(cell.border as any) }
+      : undefined;
   const out: StyleModel = {
     ...(font && Object.keys(font).length ? { font } : {}),
     ...(fill && Object.keys(fill).length ? { fill } : {}),
@@ -53,7 +81,9 @@ function extractStyle(cell: ExcelJS.Cell): StyleModel | null {
   return Object.keys(out).length ? out : null;
 }
 
-function parseExcelCellValue(value: ExcelJS.CellValue): Pick<CellModel, "v" | "t" | "f"> {
+function parseExcelCellValue(
+  value: ExcelJS.CellValue,
+): Pick<CellModel, "v" | "t" | "f"> {
   if (value == null) return {};
 
   if (typeof value === "number") return { v: value, t: "n" };
@@ -66,20 +96,31 @@ function parseExcelCellValue(value: ExcelJS.CellValue): Pick<CellModel, "v" | "t
 
     if (typeof candidate.formula === "string" && candidate.formula.trim()) {
       const result = candidate.result;
-      if (typeof result === "number") return { f: candidate.formula.trim(), v: result, t: "n" };
-      if (typeof result === "string") return { f: candidate.formula.trim(), v: result, t: "s" };
-      if (typeof result === "boolean") return { f: candidate.formula.trim(), v: result, t: "b" };
-      if (result instanceof Date) return { f: candidate.formula.trim(), v: result.toISOString(), t: "d" };
+      if (typeof result === "number")
+        return { f: candidate.formula.trim(), v: result, t: "n" };
+      if (typeof result === "string")
+        return { f: candidate.formula.trim(), v: result, t: "s" };
+      if (typeof result === "boolean")
+        return { f: candidate.formula.trim(), v: result, t: "b" };
+      if (result instanceof Date)
+        return { f: candidate.formula.trim(), v: result.toISOString(), t: "d" };
       return { f: candidate.formula.trim() };
     }
 
     if (Array.isArray(candidate.richText)) {
-      const text = candidate.richText.map((item: any) => String(item?.text || "")).join("");
+      const text = candidate.richText
+        .map((item: any) => String(item?.text || ""))
+        .join("");
       return { v: text, t: "s" };
     }
 
-    if (typeof candidate.text === "string") return { v: candidate.text, t: "s" };
-    if (typeof candidate.hyperlink === "string" && typeof candidate.text === "string") return { v: candidate.text, t: "s" };
+    if (typeof candidate.text === "string")
+      return { v: candidate.text, t: "s" };
+    if (
+      typeof candidate.hyperlink === "string" &&
+      typeof candidate.text === "string"
+    )
+      return { v: candidate.text, t: "s" };
     if (candidate.error) return { v: String(candidate.error), t: "e" };
   }
 
@@ -91,11 +132,17 @@ function shouldKeepCell(cell: ExcelJS.Cell, modelCell: CellModel): boolean {
   if (modelCell.nf && modelCell.nf !== "General") return true;
   if (modelCell.s) return true;
   if (modelCell.note) return true;
-  if ((cell as any).dataValidation && Object.keys((cell as any).dataValidation || {}).length) return true;
+  if (
+    (cell as any).dataValidation &&
+    Object.keys((cell as any).dataValidation || {}).length
+  )
+    return true;
   return false;
 }
 
-export async function buildSpreadsheetModelFromXlsx(xlsxBytes: Buffer): Promise<SpreadsheetModel> {
+export async function buildSpreadsheetModelFromXlsx(
+  xlsxBytes: Buffer,
+): Promise<SpreadsheetModel> {
   const wb = new ExcelJS.Workbook();
   await wb.xlsx.load(xlsxBytes as any);
 
@@ -123,12 +170,14 @@ export async function buildSpreadsheetModelFromXlsx(xlsxBytes: Buffer): Promise<
 
     for (let r = 1; r <= ws.rowCount; r += 1) {
       const row = ws.getRow(r);
-      if (typeof row.height === "number" && Number.isFinite(row.height)) rowHeights[r] = row.height;
+      if (typeof row.height === "number" && Number.isFinite(row.height))
+        rowHeights[r] = row.height;
     }
 
     for (let c = 1; c <= ws.columnCount; c += 1) {
       const col = ws.getColumn(c);
-      if (typeof col.width === "number" && Number.isFinite(col.width)) colWidths[c] = col.width;
+      if (typeof col.width === "number" && Number.isFinite(col.width))
+        colWidths[c] = col.width;
     }
 
     const mergesRaw = ((ws as any).model?.merges || []) as string[];
@@ -148,10 +197,17 @@ export async function buildSpreadsheetModelFromXlsx(xlsxBytes: Buffer): Promise<
           return null;
         }
       })
-      .filter(Boolean) as Array<{ r1: number; c1: number; r2: number; c2: number }>;
+      .filter(Boolean) as Array<{
+      r1: number;
+      c1: number;
+      r2: number;
+      c2: number;
+    }>;
 
     const frozenView = Array.isArray(ws.views)
-      ? ws.views.find((view: any) => String(view?.state || "").toLowerCase() === "frozen")
+      ? ws.views.find(
+          (view: any) => String(view?.state || "").toLowerCase() === "frozen",
+        )
       : null;
 
     const cells: Record<string, CellModel> = {};
@@ -162,16 +218,25 @@ export async function buildSpreadsheetModelFromXlsx(xlsxBytes: Buffer): Promise<
       for (let c = 1; c <= ws.columnCount; c += 1) {
         const excelCell = ws.getCell(r, c);
         const parsed = parseExcelCellValue(excelCell.value);
-        const styleRef = registerStyle(model, extractStyle(excelCell) || undefined);
-        const note = (excelCell.note as any)?.texts?.map?.((item: any) => String(item?.text || "")).join("") ||
+        const styleRef = registerStyle(
+          model,
+          extractStyle(excelCell) || undefined,
+        );
+        const note =
+          (excelCell.note as any)?.texts
+            ?.map?.((item: any) => String(item?.text || ""))
+            .join("") ||
           (typeof excelCell.note === "string" ? excelCell.note : undefined);
 
         const modelCell: CellModel = {
           ...parsed,
-          ...(excelCell.numFmt && excelCell.numFmt !== "General" ? { nf: excelCell.numFmt } : {}),
+          ...(excelCell.numFmt && excelCell.numFmt !== "General"
+            ? { nf: excelCell.numFmt }
+            : {}),
           ...(styleRef ? { s: styleRef } : {}),
           ...(note ? { note } : {}),
-          ...((excelCell as any).dataValidation && Object.keys((excelCell as any).dataValidation || {}).length
+          ...((excelCell as any).dataValidation &&
+          Object.keys((excelCell as any).dataValidation || {}).length
             ? { validation: (excelCell as any).dataValidation }
             : {}),
         };
@@ -207,7 +272,9 @@ export async function buildSpreadsheetModelFromXlsx(xlsxBytes: Buffer): Promise<
               },
             }
           : {}),
-        ...((ws as any).autoFilter ? { autoFilterRange: String((ws as any).autoFilter) } : {}),
+        ...((ws as any).autoFilter
+          ? { autoFilterRange: String((ws as any).autoFilter) }
+          : {}),
       },
       cells,
       validations: [],
@@ -216,6 +283,9 @@ export async function buildSpreadsheetModelFromXlsx(xlsxBytes: Buffer): Promise<
   }
 
   const payload = JSON.stringify(model);
-  model.meta.buildHash = crypto.createHash("sha1").update(payload).digest("hex");
+  model.meta.buildHash = crypto
+    .createHash("sha1")
+    .update(payload)
+    .digest("hex");
   return model;
 }

@@ -20,8 +20,8 @@
  *   4. Return PDF buffer
  */
 
-import { google } from 'googleapis';
-import { Readable } from 'stream';
+import { google } from "googleapis";
+import { Readable } from "stream";
 
 export interface GoogleSlidesResult {
   success: boolean;
@@ -36,8 +36,8 @@ function getAuth() {
   if (!authInstance) {
     authInstance = new google.auth.GoogleAuth({
       scopes: [
-        'https://www.googleapis.com/auth/drive',
-        'https://www.googleapis.com/auth/presentations.readonly',
+        "https://www.googleapis.com/auth/drive",
+        "https://www.googleapis.com/auth/presentations.readonly",
       ],
     });
   }
@@ -66,11 +66,11 @@ export async function convertPptxViaSlidesApi(
 
   try {
     if (!isGoogleSlidesAvailable()) {
-      return { success: false, error: 'Google Slides API not configured' };
+      return { success: false, error: "Google Slides API not configured" };
     }
 
     const auth = getAuth();
-    const drive = google.drive({ version: 'v3', auth });
+    const drive = google.drive({ version: "v3", auth });
 
     console.log(`[GoogleSlides] Uploading "${filename}" to Google Drive...`);
 
@@ -78,14 +78,15 @@ export async function convertPptxViaSlidesApi(
     const uploaded = await drive.files.create({
       requestBody: {
         name: `preview-${Date.now()}-${filename}`,
-        mimeType: 'application/vnd.google-apps.presentation',
+        mimeType: "application/vnd.google-apps.presentation",
         parents: [process.env.GOOGLE_SLIDES_FOLDER_ID!],
       },
       media: {
-        mimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        mimeType:
+          "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         body: Readable.from(fileBuffer),
       },
-      fields: 'id',
+      fields: "id",
     });
 
     uploadedFileId = uploaded.data.id!;
@@ -94,8 +95,8 @@ export async function convertPptxViaSlidesApi(
     // 2. Export as PDF
     console.log(`[GoogleSlides] Exporting as PDF...`);
     const pdfResponse = await drive.files.export(
-      { fileId: uploadedFileId, mimeType: 'application/pdf' },
-      { responseType: 'arraybuffer' },
+      { fileId: uploadedFileId, mimeType: "application/pdf" },
+      { responseType: "arraybuffer" },
     );
 
     const pdfBuffer = Buffer.from(pdfResponse.data as ArrayBuffer);
@@ -103,13 +104,13 @@ export async function convertPptxViaSlidesApi(
 
     console.log(
       `[GoogleSlides] Conversion complete: "${filename}" → PDF ` +
-      `(${(pdfBuffer.length / 1024).toFixed(1)} KB) in ${duration}ms`
+        `(${(pdfBuffer.length / 1024).toFixed(1)} KB) in ${duration}ms`,
     );
 
     return { success: true, pdfBuffer };
   } catch (err: any) {
     const duration = Date.now() - startTime;
-    const error = err.message || 'Google Slides conversion failed';
+    const error = err.message || "Google Slides conversion failed";
     console.error(`[GoogleSlides] Failed after ${duration}ms: ${error}`);
     return { success: false, error };
   } finally {
@@ -117,11 +118,13 @@ export async function convertPptxViaSlidesApi(
     if (uploadedFileId) {
       try {
         const auth = getAuth();
-        const drive = google.drive({ version: 'v3', auth });
+        const drive = google.drive({ version: "v3", auth });
         await drive.files.delete({ fileId: uploadedFileId });
         console.log(`[GoogleSlides] Cleaned up temp file: ${uploadedFileId}`);
       } catch (cleanupErr: any) {
-        console.warn(`[GoogleSlides] Cleanup failed (non-fatal): ${cleanupErr.message}`);
+        console.warn(
+          `[GoogleSlides] Cleanup failed (non-fatal): ${cleanupErr.message}`,
+        );
       }
     }
   }

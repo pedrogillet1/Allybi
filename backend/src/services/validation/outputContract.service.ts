@@ -3,13 +3,13 @@
  * Validates that responses match expected structure and format
  */
 
-import { injectable } from 'tsyringe';
+import { injectable } from "tsyringe";
 
 export interface ContractViolation {
   field: string;
   expected: string;
   actual: string;
-  severity: 'error' | 'warning';
+  severity: "error" | "warning";
 }
 
 export interface ContractResult {
@@ -22,9 +22,12 @@ export class OutputContractService {
   /**
    * Validate response against output contract
    */
-  async validateContract(response: unknown, contractId: string): Promise<ContractResult> {
+  async validateContract(
+    response: unknown,
+    contractId: string,
+  ): Promise<ContractResult> {
     // TODO: Implement contract validation
-    throw new Error('OutputContractService.validateContract not implemented');
+    throw new Error("OutputContractService.validateContract not implemented");
   }
 
   /**
@@ -32,7 +35,7 @@ export class OutputContractService {
    */
   async getContract(contractId: string): Promise<unknown> {
     // TODO: Implement contract retrieval
-    throw new Error('OutputContractService.getContract not implemented');
+    throw new Error("OutputContractService.getContract not implemented");
   }
 
   /**
@@ -40,6 +43,6 @@ export class OutputContractService {
    */
   async listContracts(): Promise<string[]> {
     // TODO: Return list of contract IDs
-    throw new Error('OutputContractService.listContracts not implemented');
+    throw new Error("OutputContractService.listContracts not implemented");
   }
 }

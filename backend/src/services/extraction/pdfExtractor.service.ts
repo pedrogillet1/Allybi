@@ -14,11 +14,11 @@ import type {
   PdfExtractionResult,
   PdfExtractedPage,
   BaseExtractionResult,
-} from '../../types/extraction.types';
-import type { PdfPageAnchor } from '../../types/extraction.types';
-import { createPdfPageAnchor } from '../../types/extraction.types';
-import googleVisionOCR from './google-vision-ocr.service';
-import { extractPDFWithTables } from '../../utils/pdfTableExtractor';
+} from "../../types/extraction.types";
+import type { PdfPageAnchor } from "../../types/extraction.types";
+import { createPdfPageAnchor } from "../../types/extraction.types";
+import googleVisionOCR from "./google-vision-ocr.service";
+import { extractPDFWithTables } from "../../utils/pdfTableExtractor";
 
 // ============================================================================
 // Constants
@@ -32,7 +32,7 @@ const MIN_TOKEN_DIVERSITY = 0.22;
 const WATERMARK_HEAVY_RATIO_THRESHOLD = 0.5;
 
 /** Form feed character used as page separator in some PDFs */
-const FORM_FEED = '\f';
+const FORM_FEED = "\f";
 
 /** Page separator pattern injected by some PDF extractors */
 const PAGE_MARKER_REGEX = /\n*---\s*Page\s*(\d+)\s*---\n*/gi;
@@ -57,12 +57,12 @@ function postProcessText(text: string): string {
   let cleaned = text;
 
   // Fix spacing issues
-  cleaned = cleaned.replace(/\s+/g, ' ');
-  cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+  cleaned = cleaned.replace(/\s+/g, " ");
+  cleaned = cleaned.replace(/\n{3,}/g, "\n\n");
 
   // Fix punctuation spacing
-  cleaned = cleaned.replace(/\s+([.,!?;:])/g, '$1');
-  cleaned = cleaned.replace(/([.,!?;:])(\S)/g, '$1 $2');
+  cleaned = cleaned.replace(/\s+([.,!?;:])/g, "$1");
+  cleaned = cleaned.replace(/([.,!?;:])(\S)/g, "$1 $2");
 
   return cleaned.trim();
 }
@@ -73,9 +73,9 @@ function postProcessText(text: string): string {
 function fixUtf8Encoding(text: string): string {
   try {
     // Detect if text has encoding issues (e.g., "Ã³" instead of "ó")
-    if (text.includes('Ã') && /Ã[\x80-\xBF]/.test(text)) {
-      const buffer = Buffer.from(text, 'latin1');
-      return buffer.toString('utf-8');
+    if (text.includes("Ã") && /Ã[\x80-\xBF]/.test(text)) {
+      const buffer = Buffer.from(text, "latin1");
+      return buffer.toString("utf-8");
     }
   } catch {
     // Ignore encoding fix errors
@@ -84,23 +84,23 @@ function fixUtf8Encoding(text: string): string {
 }
 
 function stripStructuralMarkers(text: string): string {
-  return String(text || '')
-    .replace(/--\s*\d+\s*(?:of|de)\s*\d+\s*--/gi, ' ')
-    .replace(/---\s*Page\s*\d+\s*---/gi, ' ')
-    .replace(/\f/g, ' ');
+  return String(text || "")
+    .replace(/--\s*\d+\s*(?:of|de)\s*\d+\s*--/gi, " ")
+    .replace(/---\s*Page\s*\d+\s*---/gi, " ")
+    .replace(/\f/g, " ");
 }
 
 function stripKnownWatermarks(text: string): string {
-  let cleaned = String(text || '');
+  let cleaned = String(text || "");
   for (const pattern of KNOWN_WATERMARK_PATTERNS) {
-    cleaned = cleaned.replace(pattern, ' ');
+    cleaned = cleaned.replace(pattern, " ");
   }
   return cleaned;
 }
 
 function stripPageMarkers(text: string): string {
   return stripKnownWatermarks(stripStructuralMarkers(text))
-    .replace(/\s+/g, ' ')
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -116,7 +116,9 @@ function countWatermarkHits(text: string): number {
 function estimatePageCount(rawText: string, parserPageCount: number): number {
   let estimated = Math.max(1, parserPageCount || 1);
 
-  const markerMatches = [...rawText.matchAll(/--\s*\d+\s*(?:of|de)\s*(\d+)\s*--/gi)];
+  const markerMatches = [
+    ...rawText.matchAll(/--\s*\d+\s*(?:of|de)\s*(\d+)\s*--/gi),
+  ];
   for (const match of markerMatches) {
     const total = Number(match[1]);
     if (Number.isFinite(total) && total > estimated) estimated = total;
@@ -125,18 +127,25 @@ function estimatePageCount(rawText: string, parserPageCount: number): number {
   const formFeedPages = rawText.split(FORM_FEED).length;
   if (formFeedPages > estimated) estimated = formFeedPages;
 
-  const explicitPageMarkers = rawText.match(/---\s*Page\s*\d+\s*---/gi)?.length ?? 0;
+  const explicitPageMarkers =
+    rawText.match(/---\s*Page\s*\d+\s*---/gi)?.length ?? 0;
   if (explicitPageMarkers > estimated) estimated = explicitPageMarkers;
 
   return Math.max(1, estimated);
 }
 
-function evaluateNativeTextQuality(rawText: string, pageCount: number): { weak: boolean; reasons: string[]; score: number } {
+function evaluateNativeTextQuality(
+  rawText: string,
+  pageCount: number,
+): { weak: boolean; reasons: string[]; score: number } {
   const reasons: string[] = [];
-  const structuralText = stripStructuralMarkers(rawText).replace(/\s+/g, ' ').trim();
+  const structuralText = stripStructuralMarkers(rawText)
+    .replace(/\s+/g, " ")
+    .trim();
   const meaningful = stripPageMarkers(rawText);
   const watermarkHits = countWatermarkHits(structuralText);
-  const charsPerPageBeforeWatermark = structuralText.length / Math.max(1, pageCount);
+  const charsPerPageBeforeWatermark =
+    structuralText.length / Math.max(1, pageCount);
   const charsPerPage = meaningful.length / Math.max(1, pageCount);
   const words = meaningful
     .split(/\s+/)
@@ -145,20 +154,24 @@ function evaluateNativeTextQuality(rawText: string, pageCount: number): { weak: 
   const wordsPerPage = words.length / Math.max(1, pageCount);
 
   const lexicalWords = words
-    .map((w) => w.toLowerCase().replace(/[^a-z0-9\u00c0-\u024f]/gi, ''))
+    .map((w) => w.toLowerCase().replace(/[^a-z0-9\u00c0-\u024f]/gi, ""))
     .filter((w) => w.length >= 3);
   const uniqueWords = new Set(lexicalWords);
-  const tokenDiversity = lexicalWords.length > 0 ? uniqueWords.size / lexicalWords.length : 0;
+  const tokenDiversity =
+    lexicalWords.length > 0 ? uniqueWords.size / lexicalWords.length : 0;
 
-  if (charsPerPage < MIN_MEANINGFUL_CHARS_PER_PAGE) reasons.push('low_chars_per_page');
-  if (wordsPerPage < MIN_MEANINGFUL_WORDS_PER_PAGE) reasons.push('low_words_per_page');
-  if (lexicalWords.length >= 40 && tokenDiversity < MIN_TOKEN_DIVERSITY) reasons.push('low_token_diversity');
+  if (charsPerPage < MIN_MEANINGFUL_CHARS_PER_PAGE)
+    reasons.push("low_chars_per_page");
+  if (wordsPerPage < MIN_MEANINGFUL_WORDS_PER_PAGE)
+    reasons.push("low_words_per_page");
+  if (lexicalWords.length >= 40 && tokenDiversity < MIN_TOKEN_DIVERSITY)
+    reasons.push("low_token_diversity");
   if (
     watermarkHits > 0 &&
     charsPerPageBeforeWatermark >= MIN_MEANINGFUL_CHARS_PER_PAGE &&
     charsPerPage < MIN_MEANINGFUL_CHARS_PER_PAGE
   ) {
-    reasons.push('watermark_only_native_text');
+    reasons.push("watermark_only_native_text");
   }
 
   if (
@@ -166,12 +179,18 @@ function evaluateNativeTextQuality(rawText: string, pageCount: number): { weak: 
     structuralText.length > 0 &&
     meaningful.length / structuralText.length < WATERMARK_HEAVY_RATIO_THRESHOLD
   ) {
-    reasons.push('watermark_heavy_text');
+    reasons.push("watermark_heavy_text");
   }
 
-  const markerTokens = rawText.match(/--\s*\d+\s*(?:of|de)\s*\d+\s*--|---\s*Page\s*\d+\s*---/gi) || [];
-  const markerOnlyLength = markerTokens.reduce((sum, token) => sum + token.length, 0);
-  if (markerOnlyLength > 0 && meaningful.length < markerOnlyLength * 1.5) reasons.push('marker_heavy_text');
+  const markerTokens =
+    rawText.match(/--\s*\d+\s*(?:of|de)\s*\d+\s*--|---\s*Page\s*\d+\s*---/gi) ||
+    [];
+  const markerOnlyLength = markerTokens.reduce(
+    (sum, token) => sum + token.length,
+    0,
+  );
+  if (markerOnlyLength > 0 && meaningful.length < markerOnlyLength * 1.5)
+    reasons.push("marker_heavy_text");
 
   const score = Math.max(
     0,
@@ -179,8 +198,8 @@ function evaluateNativeTextQuality(rawText: string, pageCount: number): { weak: 
       1,
       (charsPerPage / (MIN_MEANINGFUL_CHARS_PER_PAGE * 2)) * 0.45 +
         (wordsPerPage / (MIN_MEANINGFUL_WORDS_PER_PAGE * 2)) * 0.35 +
-        tokenDiversity * 0.2
-    )
+        tokenDiversity * 0.2,
+    ),
   );
 
   return {
@@ -212,7 +231,7 @@ async function extractPagesNative(buffer: Buffer): Promise<{
   nativeQualityScore: number;
 }> {
   // Use require for pdf-parse v2 (CommonJS module)
-  const { PDFParse } = require('pdf-parse');
+  const { PDFParse } = require("pdf-parse");
   const parser = new PDFParse({ data: buffer });
 
   // Get page count from getInfo() - required in pdf-parse v2
@@ -223,7 +242,7 @@ async function extractPagesNative(buffer: Buffer): Promise<{
   const data = await parser.getText();
 
   // Fix UTF-8 encoding
-  const fullText = fixUtf8Encoding(data.text || '');
+  const fullText = fixUtf8Encoding(data.text || "");
   const pageCount = estimatePageCount(fullText, parserPageCount);
 
   // Check if PDF has meaningful text
@@ -233,7 +252,9 @@ async function extractPagesNative(buffer: Buffer): Promise<{
   // Guard: if text is almost entirely page markers (e.g. "-- 1 of 31 --"),
   // it's a scanned PDF with an overlay, not a real text layer.
   if (hasTextLayer) {
-    const withoutMarkers = fullText.replace(/--\s*\d+\s*(of|de)\s*\d+\s*--/gi, '').trim();
+    const withoutMarkers = fullText
+      .replace(/--\s*\d+\s*(of|de)\s*\d+\s*--/gi, "")
+      .trim();
     if (withoutMarkers.length < MIN_CHARS_PER_PAGE_THRESHOLD) {
       hasTextLayer = false;
     }
@@ -246,7 +267,7 @@ async function extractPagesNative(buffer: Buffer): Promise<{
       pageCount,
       hasTextLayer: false,
       forceOcrAll: true,
-      weakTextReasons: ['low_text_density'],
+      weakTextReasons: ["low_text_density"],
       nativeQualityScore: 0,
     };
   }
@@ -263,7 +284,9 @@ async function extractPagesNative(buffer: Buffer): Promise<{
     // Some extractors add "--- Page N ---" markers
     const markerMatch = fullText.match(PAGE_MARKER_REGEX);
     if (markerMatch && markerMatch.length > 1) {
-      pageTexts = fullText.split(PAGE_MARKER_REGEX).filter(t => t && t.trim());
+      pageTexts = fullText
+        .split(PAGE_MARKER_REGEX)
+        .filter((t) => t && t.trim());
     } else {
       // No clear page separators - treat as single page
       // This is less ideal but preserves functionality
@@ -277,7 +300,7 @@ async function extractPagesNative(buffer: Buffer): Promise<{
     return {
       page: index + 1,
       text: cleanedText,
-      wordCount: cleanedText.split(/\s+/).filter(w => w.length > 0).length,
+      wordCount: cleanedText.split(/\s+/).filter((w) => w.length > 0).length,
       ocrApplied: false,
     };
   });
@@ -287,7 +310,7 @@ async function extractPagesNative(buffer: Buffer): Promise<{
   while (pages.length < pageCount) {
     pages.push({
       page: pages.length + 1,
-      text: '',
+      text: "",
       wordCount: 0,
       ocrApplied: false,
     });
@@ -303,7 +326,7 @@ async function extractPagesNative(buffer: Buffer): Promise<{
   const quality = evaluateNativeTextQuality(fullText, pageCount);
   if (quality.weak) {
     console.log(
-      `⚠️ [PDF] Native text appears weak/boilerplate (score ${quality.score.toFixed(2)}): ${quality.reasons.join(', ')}`
+      `⚠️ [PDF] Native text appears weak/boilerplate (score ${quality.score.toFixed(2)}): ${quality.reasons.join(", ")}`,
     );
     return {
       pages,
@@ -337,17 +360,17 @@ async function extractPagesSelectiveOCR(
   buffer: Buffer,
   nativePages: PdfExtractedPage[],
   totalPageCount: number,
-  forceOcrAll = false
+  forceOcrAll = false,
 ): Promise<{
   pages: PdfExtractedPage[];
   pageCount: number;
   overallConfidence: number;
   ocrPageCount: number;
-  ocrMode: 'direct' | 'split' | 'none';
+  ocrMode: "direct" | "split" | "none";
   warnings: string[];
 }> {
   if (!googleVisionOCR.isAvailable()) {
-    throw new Error('Google Vision OCR not available');
+    throw new Error("Google Vision OCR not available");
   }
 
   // Identify which pages need OCR (low text density), or force all pages when native text quality is weak.
@@ -366,38 +389,50 @@ async function extractPagesSelectiveOCR(
 
   // If no pages need OCR, return native pages as-is
   if (pagesToOcr.length === 0) {
-    console.log('✅ [PDF] All pages have sufficient text, skipping OCR');
+    console.log("✅ [PDF] All pages have sufficient text, skipping OCR");
     return {
       pages: nativePages,
       pageCount: totalPageCount,
       overallConfidence: 1.0,
       ocrPageCount: 0,
-      ocrMode: 'none',
+      ocrMode: "none",
       warnings: [],
     };
   }
 
   // If ALL pages need OCR, use batch OCR (more efficient)
   if (pagesToOcr.length === totalPageCount) {
-    console.log(`🔍 [PDF] All ${totalPageCount} pages need OCR, using batch...`);
+    console.log(
+      `🔍 [PDF] All ${totalPageCount} pages need OCR, using batch...`,
+    );
     const fullOcr = await extractPagesOCR(buffer);
-    return { ...fullOcr, ocrPageCount: totalPageCount, ocrMode: fullOcr.ocrMode, warnings: fullOcr.warnings };
+    return {
+      ...fullOcr,
+      ocrPageCount: totalPageCount,
+      ocrMode: fullOcr.ocrMode,
+      warnings: fullOcr.warnings,
+    };
   }
 
   // SELECTIVE OCR: Only OCR the pages that need it
-  console.log(`🔍 [PDF] Selective OCR: ${pagesToOcr.length}/${totalPageCount} pages need OCR`);
-  const ocrPagesResult = await (googleVisionOCR as any).processPdfPages(buffer, {
-    pages: pagesToOcr,
-    maxPages: totalPageCount,
-  });
+  console.log(
+    `🔍 [PDF] Selective OCR: ${pagesToOcr.length}/${totalPageCount} pages need OCR`,
+  );
+  const ocrPagesResult = await (googleVisionOCR as any).processPdfPages(
+    buffer,
+    {
+      pages: pagesToOcr,
+      maxPages: totalPageCount,
+    },
+  );
   const ocrResults = new Map<number, { text: string; confidence: number }>(
     (ocrPagesResult.pages || []).map((page: any) => [
       page.page,
       {
-        text: postProcessText(String(page.text || '')),
+        text: postProcessText(String(page.text || "")),
         confidence: Number(page.confidence || 0.7),
       },
-    ])
+    ]),
   );
 
   // Merge native pages with OCR results
@@ -414,7 +449,8 @@ async function extractPagesSelectiveOCR(
       finalPages.push({
         page: pageNum,
         text: ocrResult.text,
-        wordCount: ocrResult.text.split(/\s+/).filter(w => w.length > 0).length,
+        wordCount: ocrResult.text.split(/\s+/).filter((w) => w.length > 0)
+          .length,
         ocrApplied: true,
         ocrConfidence: ocrResult.confidence,
       });
@@ -427,7 +463,7 @@ async function extractPagesSelectiveOCR(
       // Empty page
       finalPages.push({
         page: pageNum,
-        text: '',
+        text: "",
         wordCount: 0,
         ocrApplied: pagesToOcr.includes(pageNum),
       });
@@ -435,15 +471,19 @@ async function extractPagesSelectiveOCR(
   }
 
   const avgConfidence = confCount > 0 ? totalConfidence / confCount : 1.0;
-  console.log(`✅ [PDF] Selective OCR complete: ${ocrResults.size} pages OCR'd, confidence: ${(avgConfidence * 100).toFixed(0)}%`);
+  console.log(
+    `✅ [PDF] Selective OCR complete: ${ocrResults.size} pages OCR'd, confidence: ${(avgConfidence * 100).toFixed(0)}%`,
+  );
 
   return {
     pages: finalPages,
     pageCount: totalPageCount,
     overallConfidence: avgConfidence,
     ocrPageCount: ocrResults.size,
-    ocrMode: (ocrPagesResult.mode as 'direct' | 'split') || 'direct',
-    warnings: Array.isArray(ocrPagesResult.warnings) ? ocrPagesResult.warnings : [],
+    ocrMode: (ocrPagesResult.mode as "direct" | "split") || "direct",
+    warnings: Array.isArray(ocrPagesResult.warnings)
+      ? ocrPagesResult.warnings
+      : [],
   };
 }
 
@@ -455,29 +495,29 @@ async function extractPagesOCR(buffer: Buffer): Promise<{
   pages: PdfExtractedPage[];
   pageCount: number;
   overallConfidence: number;
-  ocrMode: 'direct' | 'split' | 'none';
+  ocrMode: "direct" | "split" | "none";
   warnings: string[];
 }> {
   if (!googleVisionOCR.isAvailable()) {
-    throw new Error('Google Vision OCR not available');
+    throw new Error("Google Vision OCR not available");
   }
 
-  console.log('🔍 [PDF] Using Google Vision OCR for full PDF extraction...');
+  console.log("🔍 [PDF] Using Google Vision OCR for full PDF extraction...");
 
   const ocrResult = await (googleVisionOCR as any).processPdfPages(buffer);
   const pageCount = ocrResult.pageCount || 1;
   const pagesByNumber = new Map<number, any>(
-    (ocrResult.pages || []).map((page: any) => [Number(page.page), page])
+    (ocrResult.pages || []).map((page: any) => [Number(page.page), page]),
   );
 
   const pages: PdfExtractedPage[] = [];
   for (let pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
     const page = pagesByNumber.get(pageNumber);
-    const cleanedText = postProcessText(String(page?.text || ''));
+    const cleanedText = postProcessText(String(page?.text || ""));
     pages.push({
       page: pageNumber,
       text: cleanedText,
-      wordCount: cleanedText.split(/\s+/).filter(w => w.length > 0).length,
+      wordCount: cleanedText.split(/\s+/).filter((w) => w.length > 0).length,
       ocrApplied: true,
       ocrConfidence: Number(page?.confidence || ocrResult.confidence || 0.7),
     });
@@ -486,7 +526,7 @@ async function extractPagesOCR(buffer: Buffer): Promise<{
   while (pages.length < pageCount) {
     pages.push({
       page: pages.length + 1,
-      text: '',
+      text: "",
       wordCount: 0,
       ocrApplied: true,
       ocrConfidence: Number(ocrResult.confidence || 0.7),
@@ -497,7 +537,7 @@ async function extractPagesOCR(buffer: Buffer): Promise<{
     pages,
     pageCount,
     overallConfidence: ocrResult.confidence,
-    ocrMode: (ocrResult.mode as 'direct' | 'split') || 'direct',
+    ocrMode: (ocrResult.mode as "direct" | "split") || "direct",
     warnings: Array.isArray(ocrResult.warnings) ? ocrResult.warnings : [],
   };
 }
@@ -525,9 +565,11 @@ async function extractPagesOCR(buffer: Buffer): Promise<{
  * ```
  */
 export async function extractPdfWithAnchors(
-  buffer: Buffer
+  buffer: Buffer,
 ): Promise<PdfExtractionResult> {
-  console.log(`📄 [PDF] Starting per-page extraction (${buffer.length} bytes)...`);
+  console.log(
+    `📄 [PDF] Starting per-page extraction (${buffer.length} bytes)...`,
+  );
 
   try {
     // Step 1: Try native text extraction first
@@ -535,7 +577,7 @@ export async function extractPdfWithAnchors(
 
     if (nativeResult.hasTextLayer && nativeResult.pages.length > 0) {
       // Native extraction succeeded - apply table preservation
-      const enhancedPages = nativeResult.pages.map(page => {
+      const enhancedPages = nativeResult.pages.map((page) => {
         try {
           const textWithTables = extractPDFWithTables(page.text);
           return { ...page, text: textWithTables };
@@ -544,15 +586,18 @@ export async function extractPdfWithAnchors(
         }
       });
 
-      const totalText = enhancedPages.map(p => p.text).join('\n\n');
-      const totalWordCount = enhancedPages.reduce((sum, p) => sum + p.wordCount, 0);
+      const totalText = enhancedPages.map((p) => p.text).join("\n\n");
+      const totalWordCount = enhancedPages.reduce(
+        (sum, p) => sum + p.wordCount,
+        0,
+      );
 
       console.log(
-        `✅ [PDF] Native extraction: ${nativeResult.pageCount} pages, ${totalWordCount} words`
+        `✅ [PDF] Native extraction: ${nativeResult.pageCount} pages, ${totalWordCount} words`,
       );
 
       return {
-        sourceType: 'pdf',
+        sourceType: "pdf",
         text: totalText,
         pageCount: nativeResult.pageCount,
         pages: enhancedPages,
@@ -560,18 +605,19 @@ export async function extractPdfWithAnchors(
         ocrApplied: false,
         wordCount: totalWordCount,
         confidence: 1.0,
-        textQuality: 'high',
+        textQuality: "high",
         textQualityScore: nativeResult.nativeQualityScore,
       };
     }
 
     // Step 2: PDF has low text density - use SELECTIVE OCR
     // This only OCRs pages that need it, cutting OCR time by 70-95%
-    const weakReasonText = nativeResult.weakTextReasons.length > 0
-      ? ` reasons=${nativeResult.weakTextReasons.join(',')}`
-      : '';
+    const weakReasonText =
+      nativeResult.weakTextReasons.length > 0
+        ? ` reasons=${nativeResult.weakTextReasons.join(",")}`
+        : "";
     console.log(
-      `📄 [PDF] Native extraction requires OCR (${nativeResult.pageCount} pages).${weakReasonText}`
+      `📄 [PDF] Native extraction requires OCR (${nativeResult.pageCount} pages).${weakReasonText}`,
     );
 
     if (googleVisionOCR.isAvailable()) {
@@ -581,7 +627,7 @@ export async function extractPdfWithAnchors(
         while (paddedNativePages.length < nativeResult.pageCount) {
           paddedNativePages.push({
             page: paddedNativePages.length + 1,
-            text: '',
+            text: "",
             wordCount: 0,
             ocrApplied: false,
           });
@@ -591,22 +637,24 @@ export async function extractPdfWithAnchors(
           buffer,
           paddedNativePages,
           nativeResult.pageCount,
-          nativeResult.forceOcrAll
+          nativeResult.forceOcrAll,
         );
 
-        const totalText = ocrResult.pages.map(p => p.text).join('\n\n');
+        const totalText = ocrResult.pages.map((p) => p.text).join("\n\n");
         const totalWordCount = ocrResult.pages.reduce(
           (sum, p) => sum + p.wordCount,
-          0
+          0,
         );
 
-        const ocrPct = Math.round((ocrResult.ocrPageCount / ocrResult.pageCount) * 100);
+        const ocrPct = Math.round(
+          (ocrResult.ocrPageCount / ocrResult.pageCount) * 100,
+        );
         console.log(
-          `✅ [PDF] Selective OCR: ${ocrResult.pageCount} pages, ${ocrResult.ocrPageCount} OCR'd (${ocrPct}%), ${totalWordCount} words`
+          `✅ [PDF] Selective OCR: ${ocrResult.pageCount} pages, ${ocrResult.ocrPageCount} OCR'd (${ocrPct}%), ${totalWordCount} words`,
         );
 
         return {
-          sourceType: 'pdf',
+          sourceType: "pdf",
           text: totalText,
           pageCount: ocrResult.pageCount,
           pages: ocrResult.pages,
@@ -617,33 +665,33 @@ export async function extractPdfWithAnchors(
           ocrMode: ocrResult.ocrMode,
           wordCount: totalWordCount,
           confidence: ocrResult.overallConfidence,
-          textQuality: 'ocr_enhanced',
+          textQuality: "ocr_enhanced",
           textQualityScore: ocrResult.overallConfidence,
           weakTextReasons: nativeResult.weakTextReasons,
           extractionWarnings: ocrResult.warnings,
         };
       } catch (ocrError: any) {
-        console.error('❌ [PDF] OCR failed:', ocrError.message);
+        console.error("❌ [PDF] OCR failed:", ocrError.message);
       }
     } else {
       console.warn(
-        '⚠️ [PDF] OCR not available:',
-        (googleVisionOCR as any).getInitializationError?.()
+        "⚠️ [PDF] OCR not available:",
+        (googleVisionOCR as any).getInitializationError?.(),
       );
     }
 
     // Step 3: Fallback - return whatever native extraction gave us
-    const fallbackText = nativeResult.pages.map(p => p.text).join('\n\n');
+    const fallbackText = nativeResult.pages.map((p) => p.text).join("\n\n");
     const fallbackWordCount = fallbackText
       .split(/\s+/)
-      .filter(w => w.length > 0).length;
+      .filter((w) => w.length > 0).length;
 
     console.log(
-      `⚠️ [PDF] Fallback extraction: ${nativeResult.pageCount} pages, ${fallbackWordCount} words (low confidence)`
+      `⚠️ [PDF] Fallback extraction: ${nativeResult.pageCount} pages, ${fallbackWordCount} words (low confidence)`,
     );
 
     return {
-      sourceType: 'pdf',
+      sourceType: "pdf",
       text: fallbackText,
       pageCount: nativeResult.pageCount,
       pages: nativeResult.pages,
@@ -651,12 +699,12 @@ export async function extractPdfWithAnchors(
       ocrApplied: false,
       wordCount: fallbackWordCount,
       confidence: 0.3,
-      textQuality: 'low',
+      textQuality: "low",
       textQualityScore: nativeResult.nativeQualityScore,
       weakTextReasons: nativeResult.weakTextReasons,
     };
   } catch (error: any) {
-    console.error('❌ [PDF] Extraction failed:', error.message);
+    console.error("❌ [PDF] Extraction failed:", error.message);
     throw new Error(`Failed to extract text from PDF: ${error.message}`);
   }
 }
@@ -670,7 +718,7 @@ export async function extractPdfWithAnchors(
  * Use extractPdfWithAnchors() for anchor support.
  */
 export async function extractTextFromPDF(
-  buffer: Buffer
+  buffer: Buffer,
 ): Promise<BaseExtractionResult> {
   const result = await extractPdfWithAnchors(buffer);
   return {
@@ -690,7 +738,7 @@ export async function extractTextFromPDF(
  */
 export function createPageAnchor(
   page: number,
-  sectionTitle?: string
+  sectionTitle?: string,
 ): PdfPageAnchor {
   return createPdfPageAnchor(page, sectionTitle ? { sectionTitle } : undefined);
 }

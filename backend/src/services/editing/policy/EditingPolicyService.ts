@@ -17,7 +17,9 @@ export class EditingPolicyService {
   resolvePolicy(override?: Partial<EditPolicy>): EditPolicy {
     const bank = safeEditingBank<Record<string, unknown>>("editing_policy");
     const fromBank = bank && typeof bank === "object" ? bank : {};
-    const alwaysRequireConfirmationRaw = Array.isArray(fromBank.alwaysRequireConfirmation)
+    const alwaysRequireConfirmationRaw = Array.isArray(
+      fromBank.alwaysRequireConfirmation,
+    )
       ? fromBank.alwaysRequireConfirmation
       : Array.isArray((fromBank as any)?.policy?.alwaysRequireConfirmation)
         ? (fromBank as any).policy.alwaysRequireConfirmation
@@ -25,22 +27,30 @@ export class EditingPolicyService {
 
     return {
       minConfidenceForAutoApply: toNumber(
-        (fromBank as any)?.minConfidenceForAutoApply ?? (fromBank as any)?.policy?.minConfidenceForAutoApply,
-        override?.minConfidenceForAutoApply ?? DEFAULT_EDIT_POLICY.minConfidenceForAutoApply,
+        (fromBank as any)?.minConfidenceForAutoApply ??
+          (fromBank as any)?.policy?.minConfidenceForAutoApply,
+        override?.minConfidenceForAutoApply ??
+          DEFAULT_EDIT_POLICY.minConfidenceForAutoApply,
       ),
       minDecisionMarginForAutoApply: toNumber(
-        (fromBank as any)?.minDecisionMarginForAutoApply ?? (fromBank as any)?.policy?.minDecisionMarginForAutoApply,
-        override?.minDecisionMarginForAutoApply ?? DEFAULT_EDIT_POLICY.minDecisionMarginForAutoApply,
+        (fromBank as any)?.minDecisionMarginForAutoApply ??
+          (fromBank as any)?.policy?.minDecisionMarginForAutoApply,
+        override?.minDecisionMarginForAutoApply ??
+          DEFAULT_EDIT_POLICY.minDecisionMarginForAutoApply,
       ),
       minSimilarityForAutoApply: toNumber(
-        (fromBank as any)?.minSimilarityForAutoApply ?? (fromBank as any)?.policy?.minSimilarityForAutoApply,
-        override?.minSimilarityForAutoApply ?? DEFAULT_EDIT_POLICY.minSimilarityForAutoApply,
+        (fromBank as any)?.minSimilarityForAutoApply ??
+          (fromBank as any)?.policy?.minSimilarityForAutoApply,
+        override?.minSimilarityForAutoApply ??
+          DEFAULT_EDIT_POLICY.minSimilarityForAutoApply,
       ),
       alwaysRequireConfirmation: (
-        override?.alwaysRequireConfirmation
-        || alwaysRequireConfirmationRaw
-        || DEFAULT_EDIT_POLICY.alwaysRequireConfirmation
-      ).map((v: unknown) => String(v || "").trim()).filter(Boolean) as EditPolicy["alwaysRequireConfirmation"],
+        override?.alwaysRequireConfirmation ||
+        alwaysRequireConfirmationRaw ||
+        DEFAULT_EDIT_POLICY.alwaysRequireConfirmation
+      )
+        .map((v: unknown) => String(v || "").trim())
+        .filter(Boolean) as EditPolicy["alwaysRequireConfirmation"],
     };
   }
 }

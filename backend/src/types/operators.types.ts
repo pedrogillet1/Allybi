@@ -14,70 +14,70 @@
 
 export type Operator =
   // Document-grounded
-  | 'summarize'
-  | 'extract'
-  | 'compute'
-  | 'compare'
-  | 'quote'
-  | 'locate_content'
-  | 'locate_docs'
+  | "summarize"
+  | "extract"
+  | "compute"
+  | "compare"
+  | "quote"
+  | "locate_content"
+  | "locate_docs"
 
   // File actions
-  | 'list'
-  | 'filter'
-  | 'sort'
-  | 'group'
-  | 'count'
-  | 'stats'
+  | "list"
+  | "filter"
+  | "sort"
+  | "group"
+  | "count"
+  | "stats"
 
   // Navigation/UI actions
-  | 'open'
-  | 'where'
+  | "open"
+  | "where"
 
   // Help / meta
-  | 'help'
-  | 'capabilities'
-  | 'how_to'
+  | "help"
+  | "capabilities"
+  | "how_to"
 
   // Conversation micro intents
-  | 'greeting'
-  | 'thanks'
-  | 'ack'
-  | 'goodbye'
+  | "greeting"
+  | "thanks"
+  | "ack"
+  | "goodbye"
 
   // Safety / refusal / fallback
-  | 'refusal'
-  | 'fallback';
+  | "refusal"
+  | "fallback";
 
 export type OperatorCategory =
-  | 'documents'
-  | 'file_actions'
-  | 'navigation'
-  | 'help'
-  | 'conversation'
-  | 'safety';
+  | "documents"
+  | "file_actions"
+  | "navigation"
+  | "help"
+  | "conversation"
+  | "safety";
 
 export type OutputShape =
-  | 'paragraph'
-  | 'bullets'
-  | 'numbered_list'
-  | 'table'
-  | 'file_list'
-  | 'button_only';
+  | "paragraph"
+  | "bullets"
+  | "numbered_list"
+  | "table"
+  | "file_list"
+  | "button_only";
 
 export type AnswerMode =
-  | 'no_docs'
-  | 'scoped_not_found'
-  | 'refusal'
-  | 'nav_pills'
-  | 'rank_disambiguate'
-  | 'rank_autopick'
-  | 'doc_grounded_single'
-  | 'doc_grounded_table'
-  | 'doc_grounded_quote'
-  | 'doc_grounded_multi'
-  | 'help_steps'
-  | 'general_answer';
+  | "no_docs"
+  | "scoped_not_found"
+  | "refusal"
+  | "nav_pills"
+  | "rank_disambiguate"
+  | "rank_autopick"
+  | "doc_grounded_single"
+  | "doc_grounded_table"
+  | "doc_grounded_quote"
+  | "doc_grounded_multi"
+  | "help_steps"
+  | "general_answer";
 
 export interface OperatorConstraints {
   outputShape?: OutputShape;
@@ -144,21 +144,40 @@ export interface OperatorDecision {
   confidence: {
     topScore: number;
     margin: number;
-    level: 'low' | 'medium' | 'high';
+    level: "low" | "medium" | "high";
   };
 }
 
 /** Helper: convenience mapping for core operator groups */
-export const NAV_OPERATORS: ReadonlySet<Operator> = new Set(['open', 'where', 'locate_docs']);
-export const FILE_ACTION_OPERATORS: ReadonlySet<Operator> = new Set(['list', 'filter', 'sort', 'group', 'count', 'stats']);
-export const DOC_OPERATORS: ReadonlySet<Operator> = new Set(['summarize', 'extract', 'compute', 'compare', 'quote', 'locate_content']);
+export const NAV_OPERATORS: ReadonlySet<Operator> = new Set([
+  "open",
+  "where",
+  "locate_docs",
+]);
+export const FILE_ACTION_OPERATORS: ReadonlySet<Operator> = new Set([
+  "list",
+  "filter",
+  "sort",
+  "group",
+  "count",
+  "stats",
+]);
+export const DOC_OPERATORS: ReadonlySet<Operator> = new Set([
+  "summarize",
+  "extract",
+  "compute",
+  "compare",
+  "quote",
+  "locate_content",
+]);
 
 /** Helper: determine category from operator */
 export function getOperatorCategory(op: Operator): OperatorCategory {
-  if (NAV_OPERATORS.has(op)) return 'navigation';
-  if (FILE_ACTION_OPERATORS.has(op)) return 'file_actions';
-  if (DOC_OPERATORS.has(op)) return 'documents';
-  if (op === 'help' || op === 'capabilities' || op === 'how_to') return 'help';
-  if (op === 'greeting' || op === 'thanks' || op === 'ack' || op === 'goodbye') return 'conversation';
-  return 'safety';
+  if (NAV_OPERATORS.has(op)) return "navigation";
+  if (FILE_ACTION_OPERATORS.has(op)) return "file_actions";
+  if (DOC_OPERATORS.has(op)) return "documents";
+  if (op === "help" || op === "capabilities" || op === "how_to") return "help";
+  if (op === "greeting" || op === "thanks" || op === "ack" || op === "goodbye")
+    return "conversation";
+  return "safety";
 }

@@ -14,9 +14,9 @@
  * - Chunk indexes are made deterministic and de-duped to avoid unique conflicts.
  */
 
-import prisma from '../../config/database';
-import embeddingService from './embedding.service';
-import pineconeService from './pinecone.service';
+import prisma from "../../config/database";
+import embeddingService from "./embedding.service";
+import pineconeService from "./pinecone.service";
 
 type JsonPrimitive = string | number | boolean | null;
 type PineconeMetaValue = JsonPrimitive | string[];
@@ -31,10 +31,10 @@ export interface InputChunk {
 }
 
 export interface StoreEmbeddingsOptions {
-  maxRetries?: number;          // default: 3
-  verifyAfterStore?: boolean;   // default: false (adds latency)
-  batchSize?: number;           // default: 100
-  minContentChars?: number;     // default: 8 (skip useless chunks)
+  maxRetries?: number; // default: 3
+  verifyAfterStore?: boolean; // default: false (adds latency)
+  batchSize?: number; // default: 100
+  minContentChars?: number; // default: 8 (skip useless chunks)
 }
 
 function sleep(ms: number) {
@@ -45,17 +45,23 @@ function sleep(ms: number) {
  * Pinecone only accepts: string | number | boolean | string[]
  * and rejects null/undefined and objects.
  */
-function sanitizePineconeMetadata(obj: Record<string, any>): Record<string, PineconeMetaValue> {
+function sanitizePineconeMetadata(
+  obj: Record<string, any>,
+): Record<string, PineconeMetaValue> {
   const out: Record<string, PineconeMetaValue> = {};
   for (const [k, v] of Object.entries(obj || {})) {
     if (v === undefined || v === null) continue;
 
-    if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+    if (
+      typeof v === "string" ||
+      typeof v === "number" ||
+      typeof v === "boolean"
+    ) {
       out[k] = v;
       continue;
     }
 
-    if (Array.isArray(v) && v.every((x) => typeof x === 'string')) {
+    if (Array.isArray(v) && v.every((x) => typeof x === "string")) {
       out[k] = v as string[];
       continue;
     }
@@ -65,11 +71,19 @@ function sanitizePineconeMetadata(obj: Record<string, any>): Record<string, Pine
   return out;
 }
 
-function normalizeChunk(raw: InputChunk, fallbackIndex: number, minContentChars: number) {
-  const chunkIndex = Number.isFinite(raw.chunkIndex) ? (raw.chunkIndex as number) : fallbackIndex;
-  const pageNumber = Number.isFinite(raw.pageNumber) ? (raw.pageNumber as number) : undefined;
+function normalizeChunk(
+  raw: InputChunk,
+  fallbackIndex: number,
+  minContentChars: number,
+) {
+  const chunkIndex = Number.isFinite(raw.chunkIndex)
+    ? (raw.chunkIndex as number)
+    : fallbackIndex;
+  const pageNumber = Number.isFinite(raw.pageNumber)
+    ? (raw.pageNumber as number)
+    : undefined;
 
-  const content = (raw.content ?? raw.text ?? '').trim();
+  const content = (raw.content ?? raw.text ?? "").trim();
   const embedding = Array.isArray(raw.embedding) ? raw.embedding : [];
   const metadata = raw.metadata ?? {};
 
@@ -100,7 +114,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 export async function storeDocumentEmbeddings(
   documentId: string,
   chunks: InputChunk[],
-  options: StoreEmbeddingsOptions = {}
+  options: StoreEmbeddingsOptions = {},
 ): Promise<void> {
   const {
     maxRetries = 3,
@@ -109,7 +123,7 @@ export async function storeDocumentEmbeddings(
     minContentChars = 8,
   } = options;
 
-  if (!documentId) throw new Error('documentId is required');
+  if (!documentId) throw new Error("documentId is required");
   if (!chunks || chunks.length === 0) {
     throw new Error(`CRITICAL: No chunks provided for document ${documentId}`);
   }
@@ -121,7 +135,7 @@ export async function storeDocumentEmbeddings(
 
   if (normalized.length === 0) {
     throw new Error(
-      `CRITICAL: All chunks were empty/too-short for document ${documentId}. Nothing to index.`
+      `CRITICAL: All chunks were empty/too-short for document ${documentId}. Nothing to index.`,
     );
   }
 
@@ -129,10 +143,12 @@ export async function storeDocumentEmbeddings(
   const usableChunks = dedupeByChunkIndex(normalized);
 
   // Generate embeddings for chunks that don't have them (true batch for efficiency)
-  const needsEmbedding = usableChunks.filter((c) => !c.embedding || c.embedding.length === 0);
+  const needsEmbedding = usableChunks.filter(
+    (c) => !c.embedding || c.embedding.length === 0,
+  );
   if (needsEmbedding.length > 0) {
     console.log(
-      `🔢 [vectorEmbedding] Generating embeddings for ${needsEmbedding.length}/${usableChunks.length} chunks (doc=${documentId})`
+      `🔢 [vectorEmbedding] Generating embeddings for ${needsEmbedding.length}/${usableChunks.length} chunks (doc=${documentId})`,
     );
     // Use true batch API — sends all texts in one OpenAI call (up to 256 per batch)
     const texts = needsEmbedding.map((c) => c.content);
@@ -142,7 +158,7 @@ export async function storeDocumentEmbeddings(
       needsEmbedding[j].embedding = emb?.embedding || [];
     }
     console.log(
-      `✅ [vectorEmbedding] Embeddings generated (${batchResult.totalProcessed} processed, ${batchResult.failedCount} failed, ${batchResult.processingTime}ms)`
+      `✅ [vectorEmbedding] Embeddings generated (${batchResult.totalProcessed} processed, ${batchResult.failedCount} failed, ${batchResult.processingTime}ms)`,
     );
   }
 
@@ -153,7 +169,7 @@ export async function storeDocumentEmbeddings(
 
     try {
       console.log(
-        `💾 [vectorEmbedding] Store ${usableChunks.length} chunks for doc=${documentId} (attempt ${attempt}/${maxRetries})`
+        `💾 [vectorEmbedding] Store ${usableChunks.length} chunks for doc=${documentId} (attempt ${attempt}/${maxRetries})`,
       );
 
       // 1) Fetch document metadata
@@ -167,13 +183,14 @@ export async function storeDocumentEmbeddings(
       }
 
       // 2) Prepare Pinecone vectors (optional)
-      const pineconeAvailable = typeof pineconeService.isAvailable === 'function'
-        ? pineconeService.isAvailable()
-        : true; // fallback if old service
+      const pineconeAvailable =
+        typeof pineconeService.isAvailable === "function"
+          ? pineconeService.isAvailable()
+          : true; // fallback if old service
 
       const documentMetadata = {
-        filename: document.filename ?? 'unknown',
-        originalName: document.filename ?? 'unknown',
+        filename: document.filename ?? "unknown",
+        originalName: document.filename ?? "unknown",
         mimeType: document.mimeType,
         createdAt: document.createdAt,
         status: document.status,
@@ -212,77 +229,96 @@ export async function storeDocumentEmbeddings(
 
       // 4) Run Pinecone upsert and Postgres write IN PARALLEL
       const pineconePromise = pineconeAvailable
-        ? pineconeService.upsertDocumentEmbeddings(
-            documentId,
-            document.userId,
-            documentMetadata,
-            pineconeChunks.map((c) => ({
-              chunkIndex: c.chunkIndex,
-              content: c.content,
-              embedding: c.embedding,
-              metadata: sanitizePineconeMetadata(c.metadata || {}),
-            }))
-          ).then(() => {
-            pineconeUpserted = true;
-            console.log(`✅ [vectorEmbedding] Pinecone upsert ok (${usableChunks.length} chunks)`);
-          })
+        ? pineconeService
+            .upsertDocumentEmbeddings(
+              documentId,
+              document.userId,
+              documentMetadata,
+              pineconeChunks.map((c) => ({
+                chunkIndex: c.chunkIndex,
+                content: c.content,
+                embedding: c.embedding,
+                metadata: sanitizePineconeMetadata(c.metadata || {}),
+              })),
+            )
+            .then(() => {
+              pineconeUpserted = true;
+              console.log(
+                `✅ [vectorEmbedding] Pinecone upsert ok (${usableChunks.length} chunks)`,
+              );
+            })
         : Promise.resolve().then(() => {
-            console.warn('⚠️ [vectorEmbedding] Pinecone not available — storing Postgres only');
+            console.warn(
+              "⚠️ [vectorEmbedding] Pinecone not available — storing Postgres only",
+            );
           });
 
       // Transaction timeout configurable via env for VPS deployments (default 2 minutes for large docs)
-      const txTimeout = parseInt(process.env.PRISMA_TRANSACTION_TIMEOUT || '120000', 10);
-      const postgresPromise = prisma.$transaction(async (tx) => {
-        // Clear old — parallel deletes (different tables, no lock contention)
-        await Promise.all([
-          tx.documentEmbedding.deleteMany({ where: { documentId } }),
-          tx.documentChunk.deleteMany({ where: { documentId } }),
-        ]);
+      const txTimeout = parseInt(
+        process.env.PRISMA_TRANSACTION_TIMEOUT || "120000",
+        10,
+      );
+      const postgresPromise = prisma.$transaction(
+        async (tx) => {
+          // Clear old — parallel deletes (different tables, no lock contention)
+          await Promise.all([
+            tx.documentEmbedding.deleteMany({ where: { documentId } }),
+            tx.documentChunk.deleteMany({ where: { documentId } }),
+          ]);
 
-        // Insert new — parallel streams for embeddings and chunks
-        const embeddingInserts = [];
-        for (let i = 0; i < embeddingRecords.length; i += batchSize) {
-          embeddingInserts.push(
-            tx.documentEmbedding.createMany({
-              data: embeddingRecords.slice(i, i + batchSize),
-              skipDuplicates: true,
-            })
-          );
-        }
-        const chunkInserts = [];
-        for (let i = 0; i < chunkRecords.length; i += batchSize) {
-          chunkInserts.push(
-            tx.documentChunk.createMany({
-              data: chunkRecords.slice(i, i + batchSize),
-              skipDuplicates: true,
-            })
-          );
-        }
-        await Promise.all([...embeddingInserts, ...chunkInserts]);
-      }, { maxWait: 10000, timeout: txTimeout });
+          // Insert new — parallel streams for embeddings and chunks
+          const embeddingInserts = [];
+          for (let i = 0; i < embeddingRecords.length; i += batchSize) {
+            embeddingInserts.push(
+              tx.documentEmbedding.createMany({
+                data: embeddingRecords.slice(i, i + batchSize),
+                skipDuplicates: true,
+              }),
+            );
+          }
+          const chunkInserts = [];
+          for (let i = 0; i < chunkRecords.length; i += batchSize) {
+            chunkInserts.push(
+              tx.documentChunk.createMany({
+                data: chunkRecords.slice(i, i + batchSize),
+                skipDuplicates: true,
+              }),
+            );
+          }
+          await Promise.all([...embeddingInserts, ...chunkInserts]);
+        },
+        { maxWait: 10000, timeout: txTimeout },
+      );
 
       await Promise.all([pineconePromise, postgresPromise]);
 
       console.log(
-        `✅ [vectorEmbedding] Postgres ok: embeddings=${embeddingRecords.length}, chunks=${chunkRecords.length}`
+        `✅ [vectorEmbedding] Postgres ok: embeddings=${embeddingRecords.length}, chunks=${chunkRecords.length}`,
       );
 
       // Success
       return;
     } catch (err: any) {
       lastErr = err;
-      console.error(`❌ [vectorEmbedding] Attempt ${attempt} failed: ${err?.message || err}`);
+      console.error(
+        `❌ [vectorEmbedding] Attempt ${attempt} failed: ${err?.message || err}`,
+      );
 
       // Compensating rollback: if Pinecone succeeded but Postgres failed, delete Pinecone vectors.
       // (This prevents “search finds doc but DB says missing” drift.)
       try {
-        if (pineconeUpserted && typeof pineconeService.deleteDocumentEmbeddings === 'function') {
-          console.warn(`🔄 [vectorEmbedding] Rolling back Pinecone vectors for doc=${documentId}`);
+        if (
+          pineconeUpserted &&
+          typeof pineconeService.deleteDocumentEmbeddings === "function"
+        ) {
+          console.warn(
+            `🔄 [vectorEmbedding] Rolling back Pinecone vectors for doc=${documentId}`,
+          );
           await pineconeService.deleteDocumentEmbeddings(documentId);
         }
       } catch (rollbackErr: any) {
         console.error(
-          `❌ [vectorEmbedding] Rollback failed (doc may be inconsistent): ${rollbackErr?.message || rollbackErr}`
+          `❌ [vectorEmbedding] Rollback failed (doc may be inconsistent): ${rollbackErr?.message || rollbackErr}`,
         );
       }
 
@@ -295,42 +331,56 @@ export async function storeDocumentEmbeddings(
   }
 
   throw new Error(
-    `Failed to store embeddings for document ${documentId} after ${maxRetries} attempts: ${lastErr?.message || lastErr}`
+    `Failed to store embeddings for document ${documentId} after ${maxRetries} attempts: ${lastErr?.message || lastErr}`,
   );
 }
 
 /**
  * Delete embeddings for a document from Pinecone + Postgres.
  */
-export async function deleteDocumentEmbeddings(documentId: string): Promise<void> {
+export async function deleteDocumentEmbeddings(
+  documentId: string,
+): Promise<void> {
   if (!documentId) return;
 
   console.log(`🗑️ [vectorEmbedding] Deleting embeddings for doc=${documentId}`);
 
   // Best-effort Pinecone delete (don’t block doc deletion if it fails)
   try {
-    if (typeof pineconeService.deleteDocumentEmbeddings === 'function') {
+    if (typeof pineconeService.deleteDocumentEmbeddings === "function") {
       await pineconeService.deleteDocumentEmbeddings(documentId);
     }
   } catch (e: any) {
-    console.warn(`⚠️ [vectorEmbedding] Pinecone delete failed: ${e?.message || e}`);
+    console.warn(
+      `⚠️ [vectorEmbedding] Pinecone delete failed: ${e?.message || e}`,
+    );
   }
 
   // Postgres delete with configurable timeout for VPS (default 2 minutes)
-  const txTimeout = parseInt(process.env.PRISMA_TRANSACTION_TIMEOUT || '120000', 10);
-  await prisma.$transaction(async (tx) => {
-    await tx.documentEmbedding.deleteMany({ where: { documentId } });
-    await tx.documentChunk.deleteMany({ where: { documentId } });
-  }, { maxWait: 10000, timeout: txTimeout });
+  const txTimeout = parseInt(
+    process.env.PRISMA_TRANSACTION_TIMEOUT || "120000",
+    10,
+  );
+  await prisma.$transaction(
+    async (tx) => {
+      await tx.documentEmbedding.deleteMany({ where: { documentId } });
+      await tx.documentChunk.deleteMany({ where: { documentId } });
+    },
+    { maxWait: 10000, timeout: txTimeout },
+  );
 
-  console.log(`✅ [vectorEmbedding] Deleted Pinecone + Postgres rows for doc=${documentId}`);
+  console.log(
+    `✅ [vectorEmbedding] Deleted Pinecone + Postgres rows for doc=${documentId}`,
+  );
 }
 
 /**
  * Optional chunk-level deletion (only meaningful if your DB schema supports chunk IDs and Pinecone IDs).
  * Keep as noop unless you implement per-chunk IDs.
  */
-export async function deleteChunkEmbeddings(_chunkIds: string[]): Promise<void> {
+export async function deleteChunkEmbeddings(
+  _chunkIds: string[],
+): Promise<void> {
   // Implement if you add stable per-chunk vector IDs and chunkId metadata in Pinecone.
   return;
 }

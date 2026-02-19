@@ -31,6 +31,10 @@ let updated = 0;
 
 for (const entry of banks) {
   const relPath = String(entry.path || "").trim();
+  // Registry is self-referential; skip its own checksum in normal checks.
+  if (!args.has("--include-registry") && relPath === "manifest/bank_registry.any.json") {
+    continue;
+  }
   const fullPath = path.join(banksRoot, relPath);
   if (!relPath || !fs.existsSync(fullPath)) {
     missingFile += 1;

@@ -22,15 +22,25 @@ export class FolderKeyService {
   async getFolderKey(userId: string, folderId: string): Promise<Buffer> {
     const folder = await this.prisma.folder.findUnique({
       where: { id: folderId },
-      select: { id: true, userId: true, dataKeyEncrypted: true, dataKeyMeta: true },
+      select: {
+        id: true,
+        userId: true,
+        dataKeyEncrypted: true,
+        dataKeyMeta: true,
+      },
     });
-    if (!folder || folder.userId !== userId) throw new Error("Folder not found");
+    if (!folder || folder.userId !== userId)
+      throw new Error("Folder not found");
 
     const tk = await this.tenantKeys.getTenantKey(userId);
 
     if (!folder.dataKeyEncrypted) {
       const fk = this.enc.randomKey32();
-      const wrapped = this.envelopes.wrapRecordKey(fk, tk, `wrap:folder:${folderId}`);
+      const wrapped = this.envelopes.wrapRecordKey(
+        fk,
+        tk,
+        `wrap:folder:${folderId}`,
+      );
 
       await this.prisma.folder.update({
         where: { id: folderId },

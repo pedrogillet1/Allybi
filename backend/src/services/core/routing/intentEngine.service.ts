@@ -2,7 +2,7 @@
 //
 // KODA INTENT ENGINE V3 (CLEAN + MAX DETAIL, DATA-BANK DRIVEN)
 //
-import { clamp } from '../../../utils';
+import { clamp } from "../../../utils";
 // Purpose (ChatGPT-like):
 // - Decide "what the user is trying to do" (intentFamily + operator) with high reliability.
 // - Extract "signals" (quote/table/short/nav/discovery/etc.) and "constraints" (outputShape, exactBulletCount, maxSentences).
@@ -44,7 +44,16 @@ import { getBank, getOptionalBank } from "../banks/bankLoader.service";
 // Types
 // -----------------------------
 export type LanguageCode = "en" | "pt" | "es";
-export type IntentFamily = "documents" | "file_actions" | "help" | "conversation" | "doc_stats" | "editing" | "connectors" | "email" | "error";
+export type IntentFamily =
+  | "documents"
+  | "file_actions"
+  | "help"
+  | "conversation"
+  | "doc_stats"
+  | "editing"
+  | "connectors"
+  | "email"
+  | "error";
 
 export type OutputShape =
   | "paragraph"
@@ -57,7 +66,11 @@ export type OutputShape =
   | "breadcrumbs";
 
 export interface ConversationState {
-  activeDocRef?: { docId?: string; filename?: string; lockType?: "hard" | "soft" };
+  activeDocRef?: {
+    docId?: string;
+    filename?: string;
+    lockType?: "hard" | "soft";
+  };
 }
 
 export interface IntentResult {
@@ -100,7 +113,11 @@ interface TriggerRule {
 
 interface TriggersBank {
   _meta: any;
-  config?: { enabled?: boolean; caseInsensitive?: boolean; stripDiacritics?: boolean };
+  config?: {
+    enabled?: boolean;
+    caseInsensitive?: boolean;
+    stripDiacritics?: boolean;
+  };
   rules: TriggerRule[];
 }
 
@@ -234,7 +251,12 @@ interface OperatorNegativesBank {
     triggerPatterns: RegexByLang;
     action:
       | { type: "confidence_penalty"; value: number; reasonCode?: string }
-      | { type: "redirect_preference"; preferredOperator: string; confidencePenalty?: number; reasonCode?: string }
+      | {
+          type: "redirect_preference";
+          preferredOperator: string;
+          confidencePenalty?: number;
+          reasonCode?: string;
+        }
       | { type: "hard_block"; reasonCode?: string };
   }>;
   tests?: any;
@@ -242,7 +264,10 @@ interface OperatorNegativesBank {
 
 interface LanguageIndicatorsBank {
   _meta: any;
-  indicators: Record<LanguageCode, { strong: string[]; medium: string[]; weak: string[] }>;
+  indicators: Record<
+    LanguageCode,
+    { strong: string[]; medium: string[]; weak: string[] }
+  >;
 }
 
 // -----------------------------
@@ -259,7 +284,13 @@ interface EditingRoutingRule {
   priority: number;
   supportedLocales: EditingLocale[];
   when: { any: EditingWhenClause[] };
-  then: { intent: "EDITING"; operator: string; domain: string; scope: string; defaultEntities?: Record<string, any> };
+  then: {
+    intent: "EDITING";
+    operator: string;
+    domain: string;
+    scope: string;
+    defaultEntities?: Record<string, any>;
+  };
   confidenceBoost?: number;
   reasonCode?: string;
 }
@@ -298,7 +329,13 @@ interface EmailRoutingRule {
   priority: number;
   supportedLocales: EmailLocale[];
   when: { any: EmailWhenClause[] };
-  then: { intent: "EMAIL"; operator: string; domain: string; scope: string; defaultEntities?: Record<string, any> };
+  then: {
+    intent: "EMAIL";
+    operator: string;
+    domain: string;
+    scope: string;
+    defaultEntities?: Record<string, any>;
+  };
   confidenceBoost?: number;
   reasonCode?: string;
 }
@@ -347,7 +384,13 @@ interface ConnectorsRoutingRule {
   priority: number;
   supportedLocales: ConnectorsLocale[];
   when: { any: ConnectorsWhenClause[] };
-  then: { intent: "CONNECTORS"; operator: string; domain: string; scope: string; defaultEntities?: Record<string, any> };
+  then: {
+    intent: "CONNECTORS";
+    operator: string;
+    domain: string;
+    scope: string;
+    defaultEntities?: Record<string, any>;
+  };
   confidenceBoost?: number;
   reasonCode?: string;
 }
@@ -395,7 +438,14 @@ function collapseWhitespace(input: string): string {
   return input.replace(/\s+/g, " ").trim();
 }
 
-function normalizeText(input: string, opts: { stripDiacritics?: boolean; collapseWhitespace?: boolean; lower?: boolean }) {
+function normalizeText(
+  input: string,
+  opts: {
+    stripDiacritics?: boolean;
+    collapseWhitespace?: boolean;
+    lower?: boolean;
+  },
+) {
   let t = input ?? "";
   if (opts.stripDiacritics) t = stripDiacritics(t);
   if (opts.collapseWhitespace) t = collapseWhitespace(t);
@@ -412,8 +462,13 @@ function compileRegex(pattern: string, flags: string) {
   }
 }
 
-function matchAny(patterns: string[] | undefined, text: string, flags: string): { matched: boolean; count: number; matches: string[] } {
-  if (!patterns || patterns.length === 0) return { matched: false, count: 0, matches: [] };
+function matchAny(
+  patterns: string[] | undefined,
+  text: string,
+  flags: string,
+): { matched: boolean; count: number; matches: string[] } {
+  if (!patterns || patterns.length === 0)
+    return { matched: false, count: 0, matches: [] };
   const matches: string[] = [];
   let count = 0;
   for (const p of patterns) {
@@ -427,7 +482,10 @@ function matchAny(patterns: string[] | undefined, text: string, flags: string): 
   return { matched: count > 0, count, matches };
 }
 
-function pickLangPatterns(rule: RegexByLang | undefined, lang: LanguageCode): string[] {
+function pickLangPatterns(
+  rule: RegexByLang | undefined,
+  lang: LanguageCode,
+): string[] {
   if (!rule) return [];
   return [...(rule.any ?? []), ...(rule[lang] ?? [])];
 }
@@ -452,6 +510,18 @@ export class KodaIntentEngineV3Service {
   private readonly operatorOutputShapes: OperatorOutputShapesBank;
   private readonly operatorContracts: OperatorContractsBank;
   private readonly operatorNegatives: OperatorNegativesBank;
+  private readonly operatorOutputShapesById: ReadonlyMap<
+    string,
+    OperatorOutputShapeEntry
+  >;
+  private readonly operatorContractsById: ReadonlyMap<
+    string,
+    OperatorContractEntry
+  >;
+  private readonly intentDefinitionsById: ReadonlyMap<
+    string,
+    IntentPatternsBank["patterns"][number]
+  >;
 
   private readonly languageIndicators?: LanguageIndicatorsBank;
   private readonly editingRouting?: EditingRoutingBank;
@@ -467,30 +537,61 @@ export class KodaIntentEngineV3Service {
     this.operatorAliases = getBank<OperatorAliasesBank>("operator_aliases")!;
     this.operatorFamilies = getBank<OperatorFamiliesBank>("operator_families")!;
     this.operatorPriority = getBank<OperatorPriorityBank>("operator_priority")!;
-    this.operatorOutputShapes = getBank<OperatorOutputShapesBank>("operator_output_shapes")!;
-    this.operatorContracts = getBank<OperatorContractsBank>("operator_contracts")!;
-    this.operatorNegatives = getBank<OperatorNegativesBank>("operator_negatives")!;
+    this.operatorOutputShapes = getBank<OperatorOutputShapesBank>(
+      "operator_output_shapes",
+    )!;
+    this.operatorContracts =
+      getBank<OperatorContractsBank>("operator_contracts")!;
+    this.operatorNegatives =
+      getBank<OperatorNegativesBank>("operator_negatives")!;
+    this.operatorOutputShapesById = this.buildOperatorOutputShapeIndex(
+      this.operatorOutputShapes,
+    );
+    this.operatorContractsById = this.buildOperatorContractIndex(
+      this.operatorContracts,
+    );
+    this.intentDefinitionsById = this.buildIntentDefinitionIndex(
+      this.intentPatterns,
+    );
 
     // Optional
-    this.intentTriggers = getOptionalBank<TriggersBank>("intent_triggers") ?? undefined;
-    this.operatorTriggers = getOptionalBank<TriggersBank>("operator_triggers") ?? undefined;
-    this.formatTriggers = getOptionalBank<TriggersBank>("format_triggers") ?? undefined;
-    this.navTriggers = getOptionalBank<TriggersBank>("nav_triggers") ?? undefined;
-    this.domainTriggers = getOptionalBank<TriggersBank>("domain_triggers") ?? undefined;
-    this.languageTriggers = getOptionalBank<TriggersBank>("language_triggers") ?? undefined;
-    this.languageIndicators = getOptionalBank<LanguageIndicatorsBank>("language_indicators") ?? undefined;
-    this.editingRouting = getOptionalBank<EditingRoutingBank>("editing_routing") ?? undefined;
-    this.docxEditingRoutingExt = getOptionalBank<EditingRoutingBank>("docx_editing_routing_ext") ?? undefined;
-    this.sheetsEditingRoutingExt = getOptionalBank<EditingRoutingBank>("sheets_editing_routing_ext") ?? undefined;
-    this.connectorsRouting = getOptionalBank<ConnectorsRoutingBank>("connectors_routing") ?? undefined;
-    this.emailRouting = getOptionalBank<EmailRoutingBank>("email_routing") ?? undefined;
+    this.intentTriggers =
+      getOptionalBank<TriggersBank>("intent_triggers") ?? undefined;
+    this.operatorTriggers =
+      getOptionalBank<TriggersBank>("operator_triggers") ?? undefined;
+    this.formatTriggers =
+      getOptionalBank<TriggersBank>("format_triggers") ?? undefined;
+    this.navTriggers =
+      getOptionalBank<TriggersBank>("nav_triggers") ?? undefined;
+    this.domainTriggers =
+      getOptionalBank<TriggersBank>("domain_triggers") ?? undefined;
+    this.languageTriggers =
+      getOptionalBank<TriggersBank>("language_triggers") ?? undefined;
+    this.languageIndicators =
+      getOptionalBank<LanguageIndicatorsBank>("language_indicators") ??
+      undefined;
+    this.editingRouting =
+      getOptionalBank<EditingRoutingBank>("editing_routing") ?? undefined;
+    this.docxEditingRoutingExt =
+      getOptionalBank<EditingRoutingBank>("docx_editing_routing_ext") ??
+      undefined;
+    this.sheetsEditingRoutingExt =
+      getOptionalBank<EditingRoutingBank>("sheets_editing_routing_ext") ??
+      undefined;
+    this.connectorsRouting =
+      getOptionalBank<ConnectorsRoutingBank>("connectors_routing") ?? undefined;
+    this.emailRouting =
+      getOptionalBank<EmailRoutingBank>("email_routing") ?? undefined;
   }
 
   async resolve(input: IntentEngineInput): Promise<IntentResult> {
     const cfg = this.intentConfig?.config;
 
     const fallback: IntentResult = {
-      intentFamily: cfg?.defaults?.fallbackIntentFamily ?? (cfg as any)?.defaultIntentFamily ?? "documents",
+      intentFamily:
+        cfg?.defaults?.fallbackIntentFamily ??
+        (cfg as any)?.defaultIntentFamily ??
+        "documents",
       operator: cfg?.defaults?.fallbackOperator ?? "extract",
       confidence: 0.01,
       signals: {},
@@ -515,8 +616,10 @@ export class KodaIntentEngineV3Service {
     if (editingDecision) return editingDecision;
 
     // 2) Normalize for matching
-    const bankCaseInsensitive = this.intentPatterns.config?.caseInsensitive ?? true;
-    const bankStripDiacritics = this.intentPatterns.config?.stripDiacritics ?? true;
+    const bankCaseInsensitive =
+      this.intentPatterns.config?.caseInsensitive ?? true;
+    const bankStripDiacritics =
+      this.intentPatterns.config?.stripDiacritics ?? true;
     const bankCollapse = this.intentPatterns.config?.collapseWhitespace ?? true;
 
     const normalized = normalizeText(input.text, {
@@ -532,10 +635,18 @@ export class KodaIntentEngineV3Service {
     //    - intent_patterns (strong/medium/weak matches)
     //    - operator_aliases (direct operator phrases)
     //    - operator_triggers (operator-specific)
-    const candidates = this.buildOperatorCandidates(normalized, language, triggerContext);
+    const candidates = this.buildOperatorCandidates(
+      normalized,
+      language,
+      triggerContext,
+    );
 
     // 5) Apply negatives (hard blocks, penalties, operator redirects)
-    const afterNegatives = this.applyNegatives(normalized, language, candidates);
+    const afterNegatives = this.applyNegatives(
+      normalized,
+      language,
+      candidates,
+    );
 
     // 6) Apply operator priority boosts
     const afterPriority = this.applyOperatorPriority(afterNegatives);
@@ -548,14 +659,21 @@ export class KodaIntentEngineV3Service {
     //    - intent_patterns constraints
     //    - operator_output_shapes defaults
     //    - operator_contracts (requiresDocs, requireSourceButtons)
-    const constraints = this.deriveConstraints(chosen, triggerContext, normalized);
+    const constraints = this.deriveConstraints(
+      chosen,
+      triggerContext,
+      normalized,
+    );
 
     // 9) Build final IntentResult
     const result: IntentResult = {
       intentFamily: chosen.intentFamily,
       operator: chosen.operator,
       confidence: clamp(chosen.confidence, 0, 0.99),
-      signals: limitSignals({ ...triggerContext.signals, ...chosen.signals }, cfg.safety.maxSignals ?? 40),
+      signals: limitSignals(
+        { ...triggerContext.signals, ...chosen.signals },
+        cfg.safety.maxSignals ?? 40,
+      ),
       constraints,
     };
 
@@ -577,7 +695,11 @@ export class KodaIntentEngineV3Service {
 
     // lightweight indicators bank (next)
     if (this.languageIndicators?.indicators) {
-      const t = normalizeText(text, { stripDiacritics: true, collapseWhitespace: true, lower: true });
+      const t = normalizeText(text, {
+        stripDiacritics: true,
+        collapseWhitespace: true,
+        lower: true,
+      });
       const words = t.split(/\s+/);
       const scores: Record<LanguageCode, number> = { en: 0, pt: 0, es: 0 };
 
@@ -591,11 +713,17 @@ export class KodaIntentEngineV3Service {
         }
       }
 
-      const best = (Object.keys(scores) as LanguageCode[]).sort((a, b) => scores[b] - scores[a])[0];
+      const best = (Object.keys(scores) as LanguageCode[]).sort(
+        (a, b) => scores[b] - scores[a],
+      )[0];
       if (scores[best] >= 6) return best;
     }
 
-    return this.intentConfig?.config?.defaults?.fallbackLanguage ?? (this.intentConfig?.config as any)?.defaultLanguage ?? "en";
+    return (
+      this.intentConfig?.config?.defaults?.fallbackLanguage ??
+      (this.intentConfig?.config as any)?.defaultLanguage ??
+      "en"
+    );
   }
 
   private pickForcedLanguageFromTriggers(text: string): LanguageCode | null {
@@ -605,7 +733,10 @@ export class KodaIntentEngineV3Service {
       const patterns = pickLangPatterns(r.patterns, lang as any);
       const m = matchAny(patterns, text, flags);
       if (!m.matched) continue;
-      if (r.setSignals?.language && ["en", "pt", "es"].includes(r.setSignals.language)) {
+      if (
+        r.setSignals?.language &&
+        ["en", "pt", "es"].includes(r.setSignals.language)
+      ) {
         return r.setSignals.language as LanguageCode;
       }
     }
@@ -615,7 +746,14 @@ export class KodaIntentEngineV3Service {
   // -----------------------------
   // Trigger processing
   // -----------------------------
-  private runAllTriggers(text: string, lang: LanguageCode): { signals: Record<string, any>; constraints: Partial<IntentResult["constraints"]>; forced?: { intentFamily?: IntentFamily; operator?: string } } {
+  private runAllTriggers(
+    text: string,
+    lang: LanguageCode,
+  ): {
+    signals: Record<string, any>;
+    constraints: Partial<IntentResult["constraints"]>;
+    forced?: { intentFamily?: IntentFamily; operator?: string };
+  } {
     const signals: Record<string, any> = {};
     const constraints: Partial<IntentResult["constraints"]> = {};
     const forced: any = {};
@@ -643,9 +781,11 @@ export class KodaIntentEngineV3Service {
         if (!m.matched) continue;
 
         if (rule.setSignals) Object.assign(signals, rule.setSignals);
-        if (rule.setConstraints) Object.assign(constraints, rule.setConstraints);
+        if (rule.setConstraints)
+          Object.assign(constraints, rule.setConstraints);
 
-        if (rule.forceIntentFamily) forced.intentFamily = rule.forceIntentFamily;
+        if (rule.forceIntentFamily)
+          forced.intentFamily = rule.forceIntentFamily;
         if (rule.forceOperator) forced.operator = rule.forceOperator;
       }
     }
@@ -657,7 +797,11 @@ export class KodaIntentEngineV3Service {
     Object.assign(signals, derived.signals);
     Object.assign(constraints, derived.constraints);
 
-    return { signals, constraints, forced: Object.keys(forced).length ? forced : undefined };
+    return {
+      signals,
+      constraints,
+      forced: Object.keys(forced).length ? forced : undefined,
+    };
   }
 
   // -----------------------------
@@ -666,7 +810,11 @@ export class KodaIntentEngineV3Service {
   private buildOperatorCandidates(
     text: string,
     lang: LanguageCode,
-    triggerContext: { signals: any; constraints: any; forced?: { intentFamily?: IntentFamily; operator?: string } }
+    triggerContext: {
+      signals: any;
+      constraints: any;
+      forced?: { intentFamily?: IntentFamily; operator?: string };
+    },
   ): Array<{
     operator: string;
     intentFamily: IntentFamily;
@@ -679,7 +827,10 @@ export class KodaIntentEngineV3Service {
     const candidates: Array<any> = [];
 
     // Forced operator from triggers (rare, but useful)
-    if (triggerContext.forced?.operator && triggerContext.forced?.intentFamily) {
+    if (
+      triggerContext.forced?.operator &&
+      triggerContext.forced?.intentFamily
+    ) {
       candidates.push({
         operator: triggerContext.forced.operator,
         intentFamily: triggerContext.forced.intentFamily,
@@ -707,7 +858,10 @@ export class KodaIntentEngineV3Service {
       const weight = p.weight ?? 1;
       const score =
         baseW +
-        weight * (strong.count * strongW + medium.count * mediumW + weak.count * weakW);
+        weight *
+          (strong.count * strongW +
+            medium.count * mediumW +
+            weak.count * weakW);
 
       candidates.push({
         operator: p.operator,
@@ -720,7 +874,10 @@ export class KodaIntentEngineV3Service {
           ...(weak.matched ? ["weak"] : []),
         ],
         signals: { ...(p.setSignals ?? {}), ...triggerContext.signals },
-        constraints: { ...(p.setConstraints ?? {}), ...triggerContext.constraints },
+        constraints: {
+          ...(p.setConstraints ?? {}),
+          ...triggerContext.constraints,
+        },
       });
     }
 
@@ -750,14 +907,20 @@ export class KodaIntentEngineV3Service {
         const patterns = pickLangPatterns(r.patterns, lang);
         const m = matchAny(patterns, text, flags);
         if (!m.matched) continue;
-        const family = r.forceIntentFamily ?? this.operatorToFamily(r.forceOperator) ?? "documents";
+        const family =
+          r.forceIntentFamily ??
+          this.operatorToFamily(r.forceOperator) ??
+          "documents";
         candidates.push({
           operator: r.forceOperator,
           intentFamily: family,
-          confidence: clamp(0.55 + (r.weight ?? 0.20), 0, 0.95),
+          confidence: clamp(0.55 + (r.weight ?? 0.2), 0, 0.95),
           reason: ["operator_trigger_match"],
           signals: { ...(r.setSignals ?? {}), ...triggerContext.signals },
-          constraints: { ...(r.setConstraints ?? {}), ...triggerContext.constraints },
+          constraints: {
+            ...(r.setConstraints ?? {}),
+            ...triggerContext.constraints,
+          },
         });
       }
     }
@@ -782,7 +945,11 @@ export class KodaIntentEngineV3Service {
   // -----------------------------
   // Negatives (collision avoidance)
   // -----------------------------
-  private applyNegatives(text: string, lang: LanguageCode, candidates: Array<any>) {
+  private applyNegatives(
+    text: string,
+    lang: LanguageCode,
+    candidates: Array<any>,
+  ) {
     const neg = this.operatorNegatives;
     if (!neg?.config?.enabled) return candidates;
 
@@ -830,14 +997,17 @@ export class KodaIntentEngineV3Service {
 
     // If a redirect preference exists and that operator is present or can be added, boost it
     if (redirectedPreferredOperator) {
-      const has = remaining.find((c) => c.operator === redirectedPreferredOperator);
+      const has = remaining.find(
+        (c) => c.operator === redirectedPreferredOperator,
+      );
       if (has) {
         has.confidence = clamp(has.confidence + 0.18, 0, 0.98);
         has.reason.push("neg_redirect_boost");
       } else {
         remaining.push({
           operator: redirectedPreferredOperator,
-          intentFamily: this.operatorToFamily(redirectedPreferredOperator) ?? "documents",
+          intentFamily:
+            this.operatorToFamily(redirectedPreferredOperator) ?? "documents",
           confidence: 0.55,
           reason: ["neg_redirect_insert"],
           signals: {},
@@ -875,7 +1045,7 @@ export class KodaIntentEngineV3Service {
   private chooseBest(
     candidates: Array<any>,
     triggerContext: { signals: any; constraints: any; forced?: any },
-    state?: ConversationState
+    state?: ConversationState,
   ) {
     // If triggers explicitly set intentFamily/operator in signals, honor it cautiously
     // (already handled earlier via forced)
@@ -885,7 +1055,8 @@ export class KodaIntentEngineV3Service {
 
     const followupBias = state?.activeDocRef?.docId ? 0.03 : 0;
     for (const c of candidates) {
-      if (c.intentFamily === "documents" && followupBias > 0) c.confidence = clamp(c.confidence + followupBias, 0, 0.99);
+      if (c.intentFamily === "documents" && followupBias > 0)
+        c.confidence = clamp(c.confidence + followupBias, 0, 0.99);
     }
 
     candidates.sort((a, b) => b.confidence - a.confidence);
@@ -894,24 +1065,52 @@ export class KodaIntentEngineV3Service {
     // Determine intentFamily if unclear: use the candidate’s family (already set)
     // but allow signals to force file_actions if a clear file action signal exists.
     const signals = triggerContext.signals ?? {};
-    const fileActionHint = !!(signals.fileListRequest || signals.fileFilterRequest || signals.fileCountRequest || signals.discoveryQuery);
+    const fileActionHint = !!(
+      signals.fileListRequest ||
+      signals.fileFilterRequest ||
+      signals.fileCountRequest ||
+      signals.discoveryQuery
+    );
 
     let chosen = { ...top };
     if (fileActionHint && top.intentFamily !== "file_actions") {
-      const alt = candidates.find((c) => c.intentFamily === "file_actions" && c.confidence >= top.confidence - 0.05);
-      if (alt) chosen = { ...alt, confidence: clamp(alt.confidence + 0.03, 0, 0.99), reason: [...alt.reason, "file_action_hint_switch"] };
+      const alt = candidates.find(
+        (c) =>
+          c.intentFamily === "file_actions" &&
+          c.confidence >= top.confidence - 0.05,
+      );
+      if (alt)
+        chosen = {
+          ...alt,
+          confidence: clamp(alt.confidence + 0.03, 0, 0.99),
+          reason: [...alt.reason, "file_action_hint_switch"],
+        };
     }
 
     // If navQuery exists, prefer open/locate ops if close
     if (signals.navQuery) {
       const navOps = new Set(["open", "locate_file", "locate_docs", "where"]);
-      const navAlt = candidates.find((c) => navOps.has(c.operator) && c.confidence >= chosen.confidence - 0.06);
-      if (navAlt) chosen = { ...navAlt, confidence: clamp(navAlt.confidence + 0.05, 0, 0.99), reason: [...navAlt.reason, "nav_hint_switch"] };
+      const navAlt = candidates.find(
+        (c) =>
+          navOps.has(c.operator) && c.confidence >= chosen.confidence - 0.06,
+      );
+      if (navAlt)
+        chosen = {
+          ...navAlt,
+          confidence: clamp(navAlt.confidence + 0.05, 0, 0.99),
+          reason: [...navAlt.reason, "nav_hint_switch"],
+        };
     }
 
     // Clamp confidence and ensure operator exists
-    chosen.operator = chosen.operator || this.intentConfig?.config?.defaults?.fallbackOperator || "extract";
-    chosen.intentFamily = chosen.intentFamily || this.intentConfig?.config?.defaults?.fallbackIntentFamily || "documents";
+    chosen.operator =
+      chosen.operator ||
+      this.intentConfig?.config?.defaults?.fallbackOperator ||
+      "extract";
+    chosen.intentFamily =
+      chosen.intentFamily ||
+      this.intentConfig?.config?.defaults?.fallbackIntentFamily ||
+      "documents";
     chosen.confidence = clamp(chosen.confidence, 0, 0.99);
 
     return chosen;
@@ -920,24 +1119,39 @@ export class KodaIntentEngineV3Service {
   // -----------------------------
   // Constraints derivation
   // -----------------------------
-  private deriveConstraints(chosen: any, triggerContext: any, normalized: string): IntentResult["constraints"] {
-    const constraints: IntentResult["constraints"] = { ...(triggerContext.constraints ?? {}), ...(chosen.constraints ?? {}) };
+  private deriveConstraints(
+    chosen: any,
+    triggerContext: any,
+    normalized: string,
+  ): IntentResult["constraints"] {
+    const constraints: IntentResult["constraints"] = {
+      ...(triggerContext.constraints ?? {}),
+      ...(chosen.constraints ?? {}),
+    };
 
     // Apply operator_output_shapes defaults
     const opShape = this.getOperatorOutputShapeEntry(chosen.operator);
     if (opShape?.defaultShape && !constraints.outputShape) {
-      constraints.outputShape = mapOutputShapeToConstraint(opShape.defaultShape);
+      constraints.outputShape = mapOutputShapeToConstraint(
+        opShape.defaultShape,
+      );
     }
 
     // Apply operator contract requirements
     const contract = this.getOperatorContractEntry(chosen.operator);
-    if (contract?.produces?.requireSourceButtons) constraints.requireSourceButtons = true;
-    if (contract?.outputs?.sources?.required) constraints.requireSourceButtons = true;
+    if (contract?.produces?.requireSourceButtons)
+      constraints.requireSourceButtons = true;
+    if (contract?.outputs?.sources?.required)
+      constraints.requireSourceButtons = true;
     if (contract?.produces?.outputShape && !constraints.outputShape) {
-      constraints.outputShape = mapOutputShapeToConstraint(contract.produces.outputShape);
+      constraints.outputShape = mapOutputShapeToConstraint(
+        contract.produces.outputShape,
+      );
     }
     if (contract?.outputs?.primaryShape && !constraints.outputShape) {
-      constraints.outputShape = mapOutputShapeToConstraint(contract.outputs.primaryShape);
+      constraints.outputShape = mapOutputShapeToConstraint(
+        contract.outputs.primaryShape,
+      );
     }
 
     // If operator is nav_pills operator → button_only outputShape
@@ -949,9 +1163,12 @@ export class KodaIntentEngineV3Service {
     // Additional derived constraints from query: exact bullets, max sentences, table request, etc.
     // (Already partly derived in triggerContext, but ensure consistency)
     const derived = deriveStructuralConstraints(normalized);
-    if (derived.constraints.exactBulletCount && !constraints.exactBulletCount) constraints.exactBulletCount = derived.constraints.exactBulletCount;
-    if (derived.constraints.maxSentences && !constraints.maxSentences) constraints.maxSentences = derived.constraints.maxSentences;
-    if (derived.constraints.userRequestedShort) constraints.userRequestedShort = true;
+    if (derived.constraints.exactBulletCount && !constraints.exactBulletCount)
+      constraints.exactBulletCount = derived.constraints.exactBulletCount;
+    if (derived.constraints.maxSentences && !constraints.maxSentences)
+      constraints.maxSentences = derived.constraints.maxSentences;
+    if (derived.constraints.userRequestedShort)
+      constraints.userRequestedShort = true;
     if (derived.constraints.requireTable) constraints.requireTable = true;
 
     // If requireTable requested, set output shape to table unless operator forbids it
@@ -962,34 +1179,115 @@ export class KodaIntentEngineV3Service {
     return constraints;
   }
 
-  private getOperatorOutputShapeEntry(operatorId: string): OperatorOutputShapeEntry | null {
-    const fromOperators = this.operatorOutputShapes?.operators?.[operatorId] ?? null;
-    const fromMapping = this.operatorOutputShapes?.mapping?.[operatorId] ?? null;
-    if (!fromOperators && !fromMapping) return null;
-
-    const merged: OperatorOutputShapeEntry = {
-      ...(fromOperators ?? {}),
-      ...(fromMapping ?? {}),
-    };
+  private getOperatorOutputShapeEntry(
+    operatorId: string,
+  ): OperatorOutputShapeEntry | null {
+    const id = String(operatorId || "").trim();
+    if (!id) return null;
+    const merged =
+      this.operatorOutputShapesById.get(id) ||
+      this.operatorOutputShapesById.get(id.toLowerCase()) ||
+      null;
+    if (!merged) return null;
 
     // Canonical nav behavior in new banks is encoded as defaultShape=button_only.
-    if (merged.navPills == null && merged.defaultShape === "button_only") merged.navPills = true;
+    if (merged.navPills == null && merged.defaultShape === "button_only")
+      merged.navPills = true;
     return merged;
   }
 
-  private getOperatorContractEntry(operatorId: string): OperatorContractEntry | null {
-    const operators = this.operatorContracts?.operators;
-    if (!operators) return null;
+  private getOperatorContractEntry(
+    operatorId: string,
+  ): OperatorContractEntry | null {
+    const id = String(operatorId || "").trim();
+    if (!id) return null;
+    return (
+      this.operatorContractsById.get(id) ||
+      this.operatorContractsById.get(id.toLowerCase()) ||
+      null
+    );
+  }
+
+  private buildOperatorContractIndex(
+    bank: OperatorContractsBank,
+  ): ReadonlyMap<string, OperatorContractEntry> {
+    const out = new Map<string, OperatorContractEntry>();
+    const operators = bank?.operators;
+    if (!operators) return out;
+
     if (Array.isArray(operators)) {
-      return operators.find((op) => String(op?.id || "").trim() === operatorId) ?? null;
+      for (const entry of operators) {
+        const id = String(entry?.id || "").trim();
+        if (!id) continue;
+        out.set(id, entry);
+        out.set(id.toLowerCase(), entry);
+      }
+      return out;
     }
-    return (operators as Record<string, OperatorContractEntry>)[operatorId] ?? null;
+
+    for (const [id, entry] of Object.entries(
+      operators as Record<string, OperatorContractEntry>,
+    )) {
+      const key = String(id || "").trim();
+      if (!key) continue;
+      out.set(key, entry);
+      out.set(key.toLowerCase(), entry);
+    }
+    return out;
+  }
+
+  private buildOperatorOutputShapeIndex(
+    bank: OperatorOutputShapesBank,
+  ): ReadonlyMap<string, OperatorOutputShapeEntry> {
+    const out = new Map<string, OperatorOutputShapeEntry>();
+    const add = (
+      id: string,
+      entry: OperatorOutputShapeEntry | null | undefined,
+    ) => {
+      const key = String(id || "").trim();
+      if (!key || !entry || typeof entry !== "object") return;
+      const prev = out.get(key) || out.get(key.toLowerCase()) || {};
+      const merged: OperatorOutputShapeEntry = { ...prev, ...entry };
+      out.set(key, merged);
+      out.set(key.toLowerCase(), merged);
+    };
+
+    const fromOperators =
+      bank?.operators && typeof bank.operators === "object"
+        ? bank.operators
+        : {};
+    for (const [id, entry] of Object.entries(fromOperators))
+      add(id, entry as OperatorOutputShapeEntry);
+
+    const fromMapping =
+      bank?.mapping && typeof bank.mapping === "object" ? bank.mapping : {};
+    for (const [id, entry] of Object.entries(fromMapping))
+      add(id, entry as OperatorOutputShapeEntry);
+
+    return out;
+  }
+
+  private buildIntentDefinitionIndex(
+    bank: IntentPatternsBank,
+  ): ReadonlyMap<string, IntentPatternsBank["patterns"][number]> {
+    const out = new Map<string, IntentPatternsBank["patterns"][number]>();
+    const patterns = Array.isArray(bank?.patterns) ? bank.patterns : [];
+    for (const pattern of patterns) {
+      const id = String(pattern?.id || "").trim();
+      if (!id) continue;
+      out.set(id, pattern);
+    }
+    return out;
   }
 
   // -----------------------------
   // Conversation shield
   // -----------------------------
-  private applyConversationShield(result: IntentResult, text: string, lang: LanguageCode): IntentResult {
+  private applyConversationShield(
+    result: IntentResult,
+    text: string,
+    lang: LanguageCode,
+  ): IntentResult {
     // If intent triggers already flagged conversation-only, keep it.
     if (result.intentFamily === "conversation") return result;
 
@@ -1003,9 +1301,17 @@ export class KodaIntentEngineV3Service {
       return {
         intentFamily: "conversation",
         operator: "greeting",
-        confidence: Math.max(result.confidence, this.intentConfig?.config?.thresholds?.conversationConfidenceFloor ?? 0.55),
+        confidence: Math.max(
+          result.confidence,
+          this.intentConfig?.config?.thresholds?.conversationConfidenceFloor ??
+            0.55,
+        ),
         signals: { conversationOnly: true },
-        constraints: { outputShape: "paragraph", userRequestedShort: true, maxSentences: 2 },
+        constraints: {
+          outputShape: "paragraph",
+          userRequestedShort: true,
+          maxSentences: 2,
+        },
       };
     }
     return result;
@@ -1021,9 +1327,20 @@ export class KodaIntentEngineV3Service {
     return null;
   }
 
-  private tryResolveEditing(text: string, language: LanguageCode): IntentResult | null {
-    const banks = [this.editingRouting, this.docxEditingRoutingExt, this.sheetsEditingRoutingExt]
-      .filter((b): b is EditingRoutingBank => Boolean(b?.config?.enabled) && Array.isArray(b?.rules) && b.rules.length > 0);
+  private tryResolveEditing(
+    text: string,
+    language: LanguageCode,
+  ): IntentResult | null {
+    const banks = [
+      this.editingRouting,
+      this.docxEditingRoutingExt,
+      this.sheetsEditingRoutingExt,
+    ].filter(
+      (b): b is EditingRoutingBank =>
+        Boolean(b?.config?.enabled) &&
+        Array.isArray(b?.rules) &&
+        b.rules.length > 0,
+    );
     if (!banks.length) return null;
 
     const lang: EditingLocale = language === "pt" ? "pt" : "en";
@@ -1036,7 +1353,12 @@ export class KodaIntentEngineV3Service {
       lower: !baseCfg.matching.caseSensitive,
     });
 
-    let best: { bank: EditingRoutingBank; rule: EditingRoutingRule; confidence: number; matchedBy: string[] } | null = null;
+    let best: {
+      bank: EditingRoutingBank;
+      rule: EditingRoutingRule;
+      confidence: number;
+      matchedBy: string[];
+    } | null = null;
 
     for (const bank of banks) {
       for (const rule of bank.rules) {
@@ -1051,7 +1373,9 @@ export class KodaIntentEngineV3Service {
         for (const clause of clauses) {
           if (!clause || clause.locale !== lang) continue;
           if (clause.type === "regex") {
-            const patterns = Array.isArray(clause.patterns) ? clause.patterns : [];
+            const patterns = Array.isArray(clause.patterns)
+              ? clause.patterns
+              : [];
             const m = matchAny(patterns, normalized, "i");
             if (m.matched) {
               hitRegex = true;
@@ -1060,7 +1384,9 @@ export class KodaIntentEngineV3Service {
           }
           if (clause.type === "keyword") {
             const kws = Array.isArray(clause.keywords) ? clause.keywords : [];
-            const any = kws.some((k) => k && normalized.includes(String(k).toLowerCase()));
+            const any = kws.some(
+              (k) => k && normalized.includes(String(k).toLowerCase()),
+            );
             if (any) {
               hitKeyword = true;
               matchedBy.push("keyword");
@@ -1074,19 +1400,28 @@ export class KodaIntentEngineV3Service {
         let confidence = hitRegex && hitKeyword ? 0.86 : hitRegex ? 0.74 : 0.62;
         confidence = clamp(confidence + (rule.confidenceBoost ?? 0), 0, 1);
 
-        const candidate = { bank, rule, confidence, matchedBy: Array.from(new Set(matchedBy)) };
+        const candidate = {
+          bank,
+          rule,
+          confidence,
+          matchedBy: Array.from(new Set(matchedBy)),
+        };
         if (!best) {
           best = candidate;
         } else if (candidate.rule.priority > best.rule.priority) {
           best = candidate;
-        } else if (candidate.rule.priority === best.rule.priority && candidate.confidence > best.confidence) {
+        } else if (
+          candidate.rule.priority === best.rule.priority &&
+          candidate.confidence > best.confidence
+        ) {
           best = candidate;
         }
       }
     }
 
     if (!best) return null;
-    if (best.confidence < (best.bank.config.thresholds?.minConfidence ?? 0.58)) return null;
+    if (best.confidence < (best.bank.config.thresholds?.minConfidence ?? 0.58))
+      return null;
 
     return {
       intentFamily: "editing",
@@ -1107,33 +1442,54 @@ export class KodaIntentEngineV3Service {
 
   private resolveEmailProvider(text: string): string | null {
     const bank = this.emailRouting;
-    const allowed = (bank?.providers?.allowed || []).map((s) => String(s || "").toLowerCase()).filter(Boolean);
+    const allowed = (bank?.providers?.allowed || [])
+      .map((s) => String(s || "").toLowerCase())
+      .filter(Boolean);
     const aliases = bank?.providers?.aliases || {};
 
-    const normalized = normalizeText(text, { stripDiacritics: true, collapseWhitespace: true, lower: true });
+    const normalized = normalizeText(text, {
+      stripDiacritics: true,
+      collapseWhitespace: true,
+      lower: true,
+    });
 
     const aliasKeys = Object.keys(aliases).sort((a, b) => b.length - a.length);
     for (const k of aliasKeys) {
-      const key = String(k || "").toLowerCase().trim();
+      const key = String(k || "")
+        .toLowerCase()
+        .trim();
       if (!key) continue;
       if (normalized.includes(key)) {
-        const mapped = String((aliases as any)[k] || "").toLowerCase().trim();
+        const mapped = String((aliases as any)[k] || "")
+          .toLowerCase()
+          .trim();
         if (mapped) return mapped;
       }
     }
 
     for (const p of allowed) {
       if (!p) continue;
-      const rx = new RegExp(`\\b${p.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\b`, "i");
+      const rx = new RegExp(
+        `\\b${p.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\b`,
+        "i",
+      );
       if (rx.test(normalized)) return p;
     }
 
     return null;
   }
 
-  private tryResolveEmail(text: string, language: LanguageCode): IntentResult | null {
+  private tryResolveEmail(
+    text: string,
+    language: LanguageCode,
+  ): IntentResult | null {
     const bank = this.emailRouting;
-    if (!bank?.config?.enabled || !Array.isArray(bank.rules) || bank.rules.length === 0) return null;
+    if (
+      !bank?.config?.enabled ||
+      !Array.isArray(bank.rules) ||
+      bank.rules.length === 0
+    )
+      return null;
 
     const lang: EmailLocale = language === "pt" ? "pt" : "en";
 
@@ -1143,7 +1499,11 @@ export class KodaIntentEngineV3Service {
       lower: !bank.config.matching.caseSensitive,
     });
 
-    let best: { rule: EmailRoutingRule; confidence: number; matchedBy: string[] } | null = null;
+    let best: {
+      rule: EmailRoutingRule;
+      confidence: number;
+      matchedBy: string[];
+    } | null = null;
 
     for (const rule of bank.rules) {
       if (!rule?.supportedLocales?.includes(lang)) continue;
@@ -1157,7 +1517,9 @@ export class KodaIntentEngineV3Service {
       for (const clause of clauses) {
         if (!clause || clause.locale !== lang) continue;
         if (clause.type === "regex") {
-          const patterns = Array.isArray((clause as any).patterns) ? (clause as any).patterns : [];
+          const patterns = Array.isArray((clause as any).patterns)
+            ? (clause as any).patterns
+            : [];
           const m = matchAny(patterns, normalized, "i");
           if (m.matched) {
             hitRegex = true;
@@ -1165,8 +1527,12 @@ export class KodaIntentEngineV3Service {
           }
         }
         if (clause.type === "keyword") {
-          const kwsRaw = Array.isArray((clause as any).keywords) ? (clause as any).keywords : [];
-          const kws = (kwsRaw as unknown[]).filter((x): x is string => typeof x === "string" && x.trim().length > 0);
+          const kwsRaw = Array.isArray((clause as any).keywords)
+            ? (clause as any).keywords
+            : [];
+          const kws = (kwsRaw as unknown[]).filter(
+            (x): x is string => typeof x === "string" && x.trim().length > 0,
+          );
           const any = kws.some((k) => normalized.includes(k.toLowerCase()));
           if (any) {
             hitKeyword = true;
@@ -1180,18 +1546,26 @@ export class KodaIntentEngineV3Service {
       let confidence = hitRegex && hitKeyword ? 0.86 : hitRegex ? 0.74 : 0.62;
       confidence = clamp(confidence + (rule.confidenceBoost ?? 0), 0, 1);
 
-      const candidate = { rule, confidence, matchedBy: Array.from(new Set(matchedBy)) };
+      const candidate = {
+        rule,
+        confidence,
+        matchedBy: Array.from(new Set(matchedBy)),
+      };
       if (!best) {
         best = candidate;
       } else if (candidate.rule.priority > best.rule.priority) {
         best = candidate;
-      } else if (candidate.rule.priority === best.rule.priority && candidate.confidence > best.confidence) {
+      } else if (
+        candidate.rule.priority === best.rule.priority &&
+        candidate.confidence > best.confidence
+      ) {
         best = candidate;
       }
     }
 
     if (!best) return null;
-    if (best.confidence < (bank.config.thresholds?.minConfidence ?? 0.58)) return null;
+    if (best.confidence < (bank.config.thresholds?.minConfidence ?? 0.58))
+      return null;
 
     const provider = this.resolveEmailProvider(text);
 
@@ -1215,34 +1589,55 @@ export class KodaIntentEngineV3Service {
 
   private resolveConnectorProvider(text: string): string | null {
     const bank = this.connectorsRouting;
-    const allowed = (bank?.providers?.allowed || []).map((s) => String(s || "").toLowerCase()).filter(Boolean);
+    const allowed = (bank?.providers?.allowed || [])
+      .map((s) => String(s || "").toLowerCase())
+      .filter(Boolean);
     const aliases = bank?.providers?.aliases || {};
 
-    const normalized = normalizeText(text, { stripDiacritics: true, collapseWhitespace: true, lower: true });
+    const normalized = normalizeText(text, {
+      stripDiacritics: true,
+      collapseWhitespace: true,
+      lower: true,
+    });
 
     // aliases first (longer phrases)
     const aliasKeys = Object.keys(aliases).sort((a, b) => b.length - a.length);
     for (const k of aliasKeys) {
-      const key = String(k || "").toLowerCase().trim();
+      const key = String(k || "")
+        .toLowerCase()
+        .trim();
       if (!key) continue;
       if (normalized.includes(key)) {
-        const mapped = String((aliases as any)[k] || "").toLowerCase().trim();
+        const mapped = String((aliases as any)[k] || "")
+          .toLowerCase()
+          .trim();
         if (mapped) return mapped;
       }
     }
 
     for (const p of allowed) {
       if (!p) continue;
-      const rx = new RegExp(`\\b${p.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\b`, "i");
+      const rx = new RegExp(
+        `\\b${p.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\b`,
+        "i",
+      );
       if (rx.test(normalized)) return p;
     }
 
     return null;
   }
 
-  private tryResolveConnectors(text: string, language: LanguageCode): IntentResult | null {
+  private tryResolveConnectors(
+    text: string,
+    language: LanguageCode,
+  ): IntentResult | null {
     const bank = this.connectorsRouting;
-    if (!bank?.config?.enabled || !Array.isArray(bank.rules) || bank.rules.length === 0) return null;
+    if (
+      !bank?.config?.enabled ||
+      !Array.isArray(bank.rules) ||
+      bank.rules.length === 0
+    )
+      return null;
 
     const lang: ConnectorsLocale = language === "pt" ? "pt" : "en";
 
@@ -1252,7 +1647,11 @@ export class KodaIntentEngineV3Service {
       lower: !bank.config.matching.caseSensitive,
     });
 
-    let best: { rule: ConnectorsRoutingRule; confidence: number; matchedBy: string[] } | null = null;
+    let best: {
+      rule: ConnectorsRoutingRule;
+      confidence: number;
+      matchedBy: string[];
+    } | null = null;
 
     for (const rule of bank.rules) {
       if (!rule?.supportedLocales?.includes(lang)) continue;
@@ -1266,7 +1665,9 @@ export class KodaIntentEngineV3Service {
       for (const clause of clauses) {
         if (!clause || clause.locale !== lang) continue;
         if (clause.type === "regex") {
-          const patterns = Array.isArray((clause as any).patterns) ? (clause as any).patterns : [];
+          const patterns = Array.isArray((clause as any).patterns)
+            ? (clause as any).patterns
+            : [];
           const m = matchAny(patterns, normalized, "i");
           if (m.matched) {
             hitRegex = true;
@@ -1274,8 +1675,12 @@ export class KodaIntentEngineV3Service {
           }
         }
         if (clause.type === "keyword") {
-          const kwsRaw = Array.isArray((clause as any).keywords) ? (clause as any).keywords : [];
-          const kws = (kwsRaw as unknown[]).filter((x): x is string => typeof x === "string" && x.trim().length > 0);
+          const kwsRaw = Array.isArray((clause as any).keywords)
+            ? (clause as any).keywords
+            : [];
+          const kws = (kwsRaw as unknown[]).filter(
+            (x): x is string => typeof x === "string" && x.trim().length > 0,
+          );
           const any = kws.some((k) => normalized.includes(k.toLowerCase()));
           if (any) {
             hitKeyword = true;
@@ -1289,18 +1694,26 @@ export class KodaIntentEngineV3Service {
       let confidence = hitRegex && hitKeyword ? 0.86 : hitRegex ? 0.74 : 0.62;
       confidence = clamp(confidence + (rule.confidenceBoost ?? 0), 0, 1);
 
-      const candidate = { rule, confidence, matchedBy: Array.from(new Set(matchedBy)) };
+      const candidate = {
+        rule,
+        confidence,
+        matchedBy: Array.from(new Set(matchedBy)),
+      };
       if (!best) {
         best = candidate;
       } else if (candidate.rule.priority > best.rule.priority) {
         best = candidate;
-      } else if (candidate.rule.priority === best.rule.priority && candidate.confidence > best.confidence) {
+      } else if (
+        candidate.rule.priority === best.rule.priority &&
+        candidate.confidence > best.confidence
+      ) {
         best = candidate;
       }
     }
 
     if (!best) return null;
-    if (best.confidence < (bank.config.thresholds?.minConfidence ?? 0.57)) return null;
+    if (best.confidence < (bank.config.thresholds?.minConfidence ?? 0.57))
+      return null;
 
     const provider = this.resolveConnectorProvider(text);
 
@@ -1339,9 +1752,14 @@ function mergeCandidates(cands: Array<any>) {
     }
     // Merge: keep max confidence, union reasons/signals/constraints
     existing.confidence = Math.max(existing.confidence, c.confidence);
-    existing.reason = Array.from(new Set([...(existing.reason ?? []), ...(c.reason ?? [])]));
+    existing.reason = Array.from(
+      new Set([...(existing.reason ?? []), ...(c.reason ?? [])]),
+    );
     existing.signals = { ...(existing.signals ?? {}), ...(c.signals ?? {}) };
-    existing.constraints = { ...(existing.constraints ?? {}), ...(c.constraints ?? {}) };
+    existing.constraints = {
+      ...(existing.constraints ?? {}),
+      ...(c.constraints ?? {}),
+    };
   }
   return Array.from(byOp.values());
 }
@@ -1363,7 +1781,10 @@ function limitSignals(signals: Record<string, any>, max: number) {
 // -----------------------------
 // Structural constraints extraction (minimal, non-answer)
 // -----------------------------
-function deriveStructuralConstraints(rawText: string): { signals: Record<string, any>; constraints: Partial<IntentResult["constraints"]> } {
+function deriveStructuralConstraints(rawText: string): {
+  signals: Record<string, any>;
+  constraints: Partial<IntentResult["constraints"]>;
+} {
   const text = rawText.toLowerCase();
   const signals: Record<string, any> = {};
   const constraints: Partial<IntentResult["constraints"]> = {};
@@ -1371,8 +1792,10 @@ function deriveStructuralConstraints(rawText: string): { signals: Record<string,
   // Exact bullet count (human ways)
   // ex: "give me 5 bullets", "top 3 points", "3 takeaways"
   const bulletCount =
-    matchNumber(text, /\b(\d{1,2})\s*(bullets?|points?|takeaways?|itens?|pontos?|t[oó]picos?)\b/) ??
-    matchNumber(text, /\btop\s+(\d{1,2})\b/);
+    matchNumber(
+      text,
+      /\b(\d{1,2})\s*(bullets?|points?|takeaways?|itens?|pontos?|t[oó]picos?)\b/,
+    ) ?? matchNumber(text, /\btop\s+(\d{1,2})\b/);
   if (bulletCount) {
     constraints.outputShape = "bullets";
     constraints.exactBulletCount = bulletCount;
@@ -1387,12 +1810,17 @@ function deriveStructuralConstraints(rawText: string): { signals: Record<string,
   }
 
   // Quote request
-  if (/\b(quote|verbatim|exact words|citar|textualmente|linha exata)\b/.test(text)) {
+  if (
+    /\b(quote|verbatim|exact words|citar|textualmente|linha exata)\b/.test(text)
+  ) {
     signals.userAskedForQuote = true;
   }
 
   // Short overview / 2-3 sentences request
-  if (/\b(2|two)\s*[-–—]?\s*(3|three)\s*(sentences?|frases?)\b/.test(text) || /\b(short overview|quick overview|resumo curto|bem curto|tldr)\b/.test(text)) {
+  if (
+    /\b(2|two)\s*[-–—]?\s*(3|three)\s*(sentences?|frases?)\b/.test(text) ||
+    /\b(short overview|quick overview|resumo curto|bem curto|tldr)\b/.test(text)
+  ) {
     constraints.userRequestedShort = true;
     constraints.maxSentences = 3;
     signals.shortOverview = true;
@@ -1404,7 +1832,11 @@ function deriveStructuralConstraints(rawText: string): { signals: Record<string,
   }
 
   // Discovery queries (which file contains…)
-  if (/\b(which file|which document|what file|em qual arquivo|qual arquivo|em qual documento)\b/.test(text)) {
+  if (
+    /\b(which file|which document|what file|em qual arquivo|qual arquivo|em qual documento)\b/.test(
+      text,
+    )
+  ) {
     signals.discoveryQuery = true;
   }
 

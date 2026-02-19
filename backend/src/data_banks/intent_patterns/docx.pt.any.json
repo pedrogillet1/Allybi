@@ -2467,8 +2467,8 @@
           "maiusculas"
         ],
         "regex_any": [
-          "\\b(?:mai[uú]sculas?|caixa\\s+alta|tudo\\s+em\\s+mai[uú]sculas?)\\b",
-          "\\b(?:colocar|deixar|converter|transformar)\\b.{0,30}\\b(?:mai[uú]sculas?|caixa\\s+alta)\\b"
+          "\\b(?:colocar|deixar|converter|transformar|mudar|alterar)\\b.{0,30}\\b(?:mai[uú]sculas?|caixa\\s+alta)\\b",
+          "\\btudo\\s+em\\s+mai[uú]sculas?\\b"
         ]
       },
       "slotExtractors": [
@@ -2515,8 +2515,8 @@
           "minusculas"
         ],
         "regex_any": [
-          "\\b(?:min[uú]sculas?|caixa\\s+baixa)\\b",
-          "\\b(?:colocar|deixar|converter|transformar)\\b.{0,30}\\b(?:min[uú]sculas?|caixa\\s+baixa)\\b"
+          "\\b(?:colocar|deixar|converter|transformar|mudar|alterar)\\b.{0,30}\\b(?:min[uú]sculas?|caixa\\s+baixa)\\b",
+          "\\btudo\\s+em\\s+min[uú]sculas?\\b"
         ]
       },
       "slotExtractors": [

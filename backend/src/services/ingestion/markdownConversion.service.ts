@@ -4,8 +4,8 @@
  * with structure preservation for deep linking
  */
 
-import * as XLSX from 'xlsx';
-import mammoth from 'mammoth';
+import * as XLSX from "xlsx";
+import mammoth from "mammoth";
 // pdf-parse v2 will be required when needed
 // Note: Storage operations handled by S3 via storage.ts
 
@@ -62,27 +62,27 @@ class MarkdownConversionService {
     buffer: Buffer,
     mimeType: string,
     filename: string,
-    documentId: string
+    documentId: string,
   ): Promise<MarkdownConversionResult> {
     console.log(`🔄 Converting ${filename} to markdown (${mimeType})`);
 
     switch (mimeType) {
-      case 'application/pdf':
+      case "application/pdf":
         return await this.pdfToMarkdown(buffer, documentId);
 
-      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-      case 'application/msword':
+      case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+      case "application/msword":
         return await this.docxToMarkdown(buffer, documentId);
 
-      case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-      case 'application/vnd.ms-excel':
+      case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+      case "application/vnd.ms-excel":
         return await this.excelToMarkdown(buffer, documentId);
 
-      case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
-      case 'application/vnd.ms-powerpoint':
+      case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+      case "application/vnd.ms-powerpoint":
         return await this.pptxToMarkdown(buffer, documentId);
 
-      case 'text/plain':
+      case "text/plain":
         return await this.textToMarkdown(buffer);
 
       default:
@@ -95,21 +95,23 @@ class MarkdownConversionService {
    */
   private async pdfToMarkdown(
     buffer: Buffer,
-    documentId: string
+    documentId: string,
   ): Promise<MarkdownConversionResult> {
     try {
-      const { PDFParse } = require('pdf-parse');
+      const { PDFParse } = require("pdf-parse");
       const parser = new PDFParse({ data: buffer });
       const data = await parser.getText();
       const markdownParts: string[] = [];
       const images: string[] = [];
 
       if (!data.text || data.text.trim().length === 0) {
-        markdownParts.push('<!-- Scanned PDF - OCR required -->\n');
-        markdownParts.push('[This appears to be a scanned PDF. OCR processing is needed.]\n');
+        markdownParts.push("<!-- Scanned PDF - OCR required -->\n");
+        markdownParts.push(
+          "[This appears to be a scanned PDF. OCR processing is needed.]\n",
+        );
       } else {
         // Add document header
-        markdownParts.push('# Document Content\n\n');
+        markdownParts.push("# Document Content\n\n");
 
         // Split text by pages (if available) or by paragraphs
         const pageCount = data.numpages || 1;
@@ -125,19 +127,21 @@ class MarkdownConversionService {
           const pageText = data.text.substring(startIdx, endIdx);
 
           // Split into paragraphs and add to markdown
-          const paragraphs = pageText.split(/\n\n+/).filter((p: string) => p.trim().length > 0);
+          const paragraphs = pageText
+            .split(/\n\n+/)
+            .filter((p: string) => p.trim().length > 0);
           paragraphs.forEach((paragraph: string) => {
             markdownParts.push(`${paragraph.trim()}\n\n`);
           });
 
           // Add page break
           if (pageNum < pageCount) {
-            markdownParts.push('\n---\n\n');
+            markdownParts.push("\n---\n\n");
           }
         }
       }
 
-      const markdownContent = markdownParts.join('');
+      const markdownContent = markdownParts.join("");
       const structure = this.parseMarkdownStructure(markdownContent);
 
       return {
@@ -150,7 +154,7 @@ class MarkdownConversionService {
         },
       };
     } catch (error) {
-      console.error('Error converting PDF to markdown:', error);
+      console.error("Error converting PDF to markdown:", error);
       throw error;
     }
   }
@@ -160,22 +164,28 @@ class MarkdownConversionService {
    */
   private async docxToMarkdown(
     buffer: Buffer,
-    documentId: string
+    documentId: string,
   ): Promise<MarkdownConversionResult> {
     try {
       const result = await mammoth.convertToHtml({ buffer });
       // Convert HTML to markdown (basic conversion)
       let markdownContent = result.value;
-      markdownContent = markdownContent.replace(/<h([1-6])>(.*?)<\/h\1>/g, (_, level, text) => `${'#'.repeat(parseInt(level))} ${text}\n\n`);
-      markdownContent = markdownContent.replace(/<p>(.*?)<\/p>/g, '$1\n\n');
-      markdownContent = markdownContent.replace(/<strong>(.*?)<\/strong>/g, '**$1**');
-      markdownContent = markdownContent.replace(/<em>(.*?)<\/em>/g, '*$1*');
-      markdownContent = markdownContent.replace(/<[^>]*>/g, ''); // Remove remaining HTML tags
+      markdownContent = markdownContent.replace(
+        /<h([1-6])>(.*?)<\/h\1>/g,
+        (_, level, text) => `${"#".repeat(parseInt(level))} ${text}\n\n`,
+      );
+      markdownContent = markdownContent.replace(/<p>(.*?)<\/p>/g, "$1\n\n");
+      markdownContent = markdownContent.replace(
+        /<strong>(.*?)<\/strong>/g,
+        "**$1**",
+      );
+      markdownContent = markdownContent.replace(/<em>(.*?)<\/em>/g, "*$1*");
+      markdownContent = markdownContent.replace(/<[^>]*>/g, ""); // Remove remaining HTML tags
       const images: string[] = [];
 
       // Clean up the markdown
       markdownContent = markdownContent
-        .replace(/\n{3,}/g, '\n\n') // Remove excessive newlines
+        .replace(/\n{3,}/g, "\n\n") // Remove excessive newlines
         .trim();
 
       const structure = this.parseMarkdownStructure(markdownContent);
@@ -189,7 +199,7 @@ class MarkdownConversionService {
         },
       };
     } catch (error) {
-      console.error('Error converting DOCX to markdown:', error);
+      console.error("Error converting DOCX to markdown:", error);
       throw error;
     }
   }
@@ -199,17 +209,17 @@ class MarkdownConversionService {
    */
   private async excelToMarkdown(
     buffer: Buffer,
-    documentId: string
+    documentId: string,
   ): Promise<MarkdownConversionResult> {
     try {
       const workbook = XLSX.read(buffer, {
-        type: 'buffer',
+        type: "buffer",
         cellFormula: true,
         cellDates: true,
       });
 
       const markdownParts: string[] = [];
-      markdownParts.push('# Excel Workbook\n\n');
+      markdownParts.push("# Excel Workbook\n\n");
 
       workbook.SheetNames.forEach((sheetName, sheetIndex) => {
         const sheet = workbook.Sheets[sheetName];
@@ -223,7 +233,7 @@ class MarkdownConversionService {
         // Convert to JSON to get cell data
         const jsonData = XLSX.utils.sheet_to_json(sheet, {
           header: 1,
-          defval: '',
+          defval: "",
           blankrows: false,
           raw: false,
         });
@@ -235,33 +245,35 @@ class MarkdownConversionService {
           if (rows.length > 0) {
             // Header row
             const headerRow = rows[0].map((cell: any) =>
-              String(cell || '').replace(/\|/g, '\\|')
+              String(cell || "").replace(/\|/g, "\\|"),
             );
-            markdownParts.push('| ' + headerRow.join(' | ') + ' |\n');
+            markdownParts.push("| " + headerRow.join(" | ") + " |\n");
 
             // Separator row
-            markdownParts.push('| ' + headerRow.map(() => '---').join(' | ') + ' |\n');
+            markdownParts.push(
+              "| " + headerRow.map(() => "---").join(" | ") + " |\n",
+            );
 
             // Data rows
             for (let i = 1; i < rows.length; i++) {
               const row = rows[i].map((cell: any) =>
-                String(cell || '').replace(/\|/g, '\\|')
+                String(cell || "").replace(/\|/g, "\\|"),
               );
               // Pad row to match header length
               while (row.length < headerRow.length) {
-                row.push('');
+                row.push("");
               }
-              markdownParts.push('| ' + row.join(' | ') + ' |\n');
+              markdownParts.push("| " + row.join(" | ") + " |\n");
             }
           }
         } else {
-          markdownParts.push('*Empty sheet*\n');
+          markdownParts.push("*Empty sheet*\n");
         }
 
-        markdownParts.push('\n---\n\n');
+        markdownParts.push("\n---\n\n");
       });
 
-      const markdownContent = markdownParts.join('');
+      const markdownContent = markdownParts.join("");
       const structure = this.parseMarkdownStructure(markdownContent);
 
       return {
@@ -274,7 +286,7 @@ class MarkdownConversionService {
         },
       };
     } catch (error) {
-      console.error('Error converting Excel to markdown:', error);
+      console.error("Error converting Excel to markdown:", error);
       throw error;
     }
   }
@@ -284,20 +296,22 @@ class MarkdownConversionService {
    */
   private async pptxToMarkdown(
     buffer: Buffer,
-    documentId: string
+    documentId: string,
   ): Promise<MarkdownConversionResult> {
     try {
       // Note: Full PPTX parsing requires additional libraries like `pptx-parser` or `officegen`
       // For now, create a basic structure with placeholders
 
       const markdownParts: string[] = [];
-      markdownParts.push('# PowerPoint Presentation\n\n');
-      markdownParts.push('<!-- SLIDE 1 -->\n\n');
-      markdownParts.push('## Slide 1: Title Slide\n\n');
-      markdownParts.push('[PowerPoint content - Full PPTX parsing to be implemented]\n\n');
-      markdownParts.push('---\n\n');
+      markdownParts.push("# PowerPoint Presentation\n\n");
+      markdownParts.push("<!-- SLIDE 1 -->\n\n");
+      markdownParts.push("## Slide 1: Title Slide\n\n");
+      markdownParts.push(
+        "[PowerPoint content - Full PPTX parsing to be implemented]\n\n",
+      );
+      markdownParts.push("---\n\n");
 
-      const markdownContent = markdownParts.join('');
+      const markdownContent = markdownParts.join("");
       const structure = this.parseMarkdownStructure(markdownContent);
 
       return {
@@ -310,7 +324,7 @@ class MarkdownConversionService {
         },
       };
     } catch (error) {
-      console.error('Error converting PPTX to markdown:', error);
+      console.error("Error converting PPTX to markdown:", error);
       throw error;
     }
   }
@@ -318,8 +332,10 @@ class MarkdownConversionService {
   /**
    * Convert plain text to Markdown
    */
-  private async textToMarkdown(buffer: Buffer): Promise<MarkdownConversionResult> {
-    const text = buffer.toString('utf-8');
+  private async textToMarkdown(
+    buffer: Buffer,
+  ): Promise<MarkdownConversionResult> {
+    const text = buffer.toString("utf-8");
 
     // Wrap plain text in markdown
     const markdownContent = `# Document Content\n\n${text}`;
@@ -339,7 +355,7 @@ class MarkdownConversionService {
    * Parse markdown structure for navigation and deep linking
    */
   private parseMarkdownStructure(markdownContent: string): DocumentStructure {
-    const lines = markdownContent.split('\n');
+    const lines = markdownContent.split("\n");
     const headings: Heading[] = [];
     const sections: Section[] = [];
     let currentSection = null as Section | null;
@@ -388,7 +404,7 @@ class MarkdownConversionService {
     }
 
     // Generate table of contents
-    const toc: TOCItem[] = headings.map(h => ({
+    const toc: TOCItem[] = headings.map((h) => ({
       text: h.text,
       level: h.level,
       sectionId: h.sectionId,
@@ -408,8 +424,8 @@ class MarkdownConversionService {
   private createSectionId(text: string, lineNum: number): string {
     // Convert to lowercase, replace spaces with hyphens
     let sectionId = text.toLowerCase();
-    sectionId = sectionId.replace(/[^\w\s-]/g, ''); // Remove special chars
-    sectionId = sectionId.replace(/[\s_]+/g, '-'); // Replace spaces with hyphens
+    sectionId = sectionId.replace(/[^\w\s-]/g, ""); // Remove special chars
+    sectionId = sectionId.replace(/[\s_]+/g, "-"); // Replace spaces with hyphens
     sectionId = sectionId.substring(0, 50); // Limit length
 
     // Add line number to ensure uniqueness
@@ -422,7 +438,7 @@ class MarkdownConversionService {
   createChunksWithPositions(
     markdownContent: string,
     structure: DocumentStructure,
-    chunkSize: number = 500
+    chunkSize: number = 500,
   ): Array<{
     chunkText: string;
     chunkIndex: number;
@@ -432,26 +448,26 @@ class MarkdownConversionService {
     heading: string;
     headingLevel: number;
   }> {
-    const lines = markdownContent.split('\n');
+    const lines = markdownContent.split("\n");
     const chunks: any[] = [];
     let chunkIndex = 0;
 
-    structure.sections.forEach(section => {
+    structure.sections.forEach((section) => {
       const sectionLines = lines.slice(section.startLine - 1, section.endLine);
-      const sectionText = sectionLines.join('\n');
+      const sectionText = sectionLines.join("\n");
 
       // Split section into chunks
       const words = sectionText.split(/\s+/);
       let currentChunk: string[] = [];
       let currentLine = section.startLine;
 
-      words.forEach(word => {
+      words.forEach((word) => {
         currentChunk.push(word);
 
-        if (currentChunk.join(' ').length >= chunkSize) {
+        if (currentChunk.join(" ").length >= chunkSize) {
           // Save chunk
-          const chunkText = currentChunk.join(' ');
-          const chunkLineCount = chunkText.split('\n').length;
+          const chunkText = currentChunk.join(" ");
+          const chunkLineCount = chunkText.split("\n").length;
 
           chunks.push({
             chunkText,
@@ -471,8 +487,8 @@ class MarkdownConversionService {
 
       // Save remaining chunk
       if (currentChunk.length > 0) {
-        const chunkText = currentChunk.join(' ');
-        const chunkLineCount = chunkText.split('\n').length;
+        const chunkText = currentChunk.join(" ");
+        const chunkLineCount = chunkText.split("\n").length;
 
         chunks.push({
           chunkText,

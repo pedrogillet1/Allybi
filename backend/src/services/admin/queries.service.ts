@@ -5,11 +5,11 @@
  * Falls back to Message table if RetrievalEvent is empty
  */
 
-import type { PrismaClient } from '@prisma/client';
-import { parseRange, normalizeRange } from './_shared/rangeWindow';
-import { clampLimit } from './_shared/clamp';
-import { processPage, buildCursorClause } from './_shared/pagination';
-import { supportsModel } from './_shared/prismaAdapter';
+import type { PrismaClient } from "@prisma/client";
+import { parseRange, normalizeRange } from "./_shared/rangeWindow";
+import { clampLimit } from "./_shared/clamp";
+import { processPage, buildCursorClause } from "./_shared/pagination";
+import { supportsModel } from "./_shared/prismaAdapter";
 
 export interface QueryRow {
   at: string;
@@ -59,9 +59,9 @@ export interface ListQueriesParams {
  */
 export async function listQueries(
   prisma: PrismaClient,
-  params: ListQueriesParams
+  params: ListQueriesParams,
 ): Promise<QueryListResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
   const limit = clampLimit(params.limit, 50);
   const cursorClause = buildCursorClause(params.cursor);
@@ -69,29 +69,50 @@ export async function listQueries(
   const { from, to } = window;
 
   // Try QueryTelemetry first (new telemetry from orchestrator)
-  if (supportsModel(prisma, 'queryTelemetry')) {
+  if (supportsModel(prisma, "queryTelemetry")) {
     const telemetryCount = await prisma.queryTelemetry.count({
       where: { timestamp: { gte: from, lt: to } },
     });
 
     if (telemetryCount > 0) {
-      return listFromQueryTelemetry(prisma, params, rangeKey, window, limit, cursorClause);
+      return listFromQueryTelemetry(
+        prisma,
+        params,
+        rangeKey,
+        window,
+        limit,
+        cursorClause,
+      );
     }
   }
 
   // Try RetrievalEvent next (detailed telemetry)
-  if (supportsModel(prisma, 'retrievalEvent')) {
+  if (supportsModel(prisma, "retrievalEvent")) {
     const eventCount = await prisma.retrievalEvent.count({
       where: { at: { gte: from, lt: to } },
     });
 
     if (eventCount > 0) {
-      return listFromRetrievalEvents(prisma, params, rangeKey, window, limit, cursorClause);
+      return listFromRetrievalEvents(
+        prisma,
+        params,
+        rangeKey,
+        window,
+        limit,
+        cursorClause,
+      );
     }
   }
 
   // Fallback to Message table (user queries)
-  return listFromMessages(prisma, params, rangeKey, window, limit, cursorClause);
+  return listFromMessages(
+    prisma,
+    params,
+    rangeKey,
+    window,
+    limit,
+    cursorClause,
+  );
 }
 
 /**
@@ -103,7 +124,7 @@ async function listFromQueryTelemetry(
   rangeKey: string,
   window: { from: Date; to: Date },
   limit: number,
-  cursorClause: Record<string, unknown>
+  cursorClause: Record<string, unknown>,
 ): Promise<QueryListResult> {
   const { from, to } = window;
 
@@ -112,14 +133,15 @@ async function listFromQueryTelemetry(
     timestamp: { gte: from, lt: to },
   };
 
-  if (params.domain && params.domain !== 'general') where.domain = params.domain;
+  if (params.domain && params.domain !== "general")
+    where.domain = params.domain;
   if (params.intent) where.intent = params.intent;
 
   // Get query telemetry records
   const telemetry = await prisma.queryTelemetry.findMany({
     where,
     take: limit + 1,
-    orderBy: { timestamp: 'desc' },
+    orderBy: { timestamp: "desc" },
     select: {
       id: true,
       queryId: true,
@@ -145,24 +167,26 @@ async function listFromQueryTelemetry(
   let filteredPage = page;
   if (params.keyword) {
     const keywordLower = params.keyword.toLowerCase();
-    filteredPage = page.filter(t => {
+    filteredPage = page.filter((t) => {
       const keywords = t.matchedKeywords ?? [];
-      return keywords.some((k: string) => k.toLowerCase().includes(keywordLower));
+      return keywords.some((k: string) =>
+        k.toLowerCase().includes(keywordLower),
+      );
     });
   }
 
   // Build query rows
-  const items: QueryRow[] = filteredPage.map(t => ({
+  const items: QueryRow[] = filteredPage.map((t) => ({
     at: t.timestamp.toISOString(),
     userId: t.userId,
-    intent: t.intent ?? 'chat',
-    operator: t.family ?? 'user',
-    domain: t.domain ?? 'general',
+    intent: t.intent ?? "chat",
+    operator: t.family ?? "user",
+    domain: t.domain ?? "general",
     docLockEnabled: false,
-    strategy: 'rag',
+    strategy: "rag",
     evidenceStrength: t.topRelevanceScore,
     refined: null,
-    fallbackReasonCode: t.hadFallback ? 'fallback' : null,
+    fallbackReasonCode: t.hadFallback ? "fallback" : null,
     sourcesCount: t.chunksReturned ?? 0,
     navPillsUsed: null,
     traceId: t.queryId,
@@ -190,7 +214,7 @@ async function listFromRetrievalEvents(
   rangeKey: string,
   window: { from: Date; to: Date },
   limit: number,
-  cursorClause: Record<string, unknown>
+  cursorClause: Record<string, unknown>,
 ): Promise<QueryListResult> {
   const { from, to } = window;
 
@@ -208,7 +232,7 @@ async function listFromRetrievalEvents(
     where,
     take: limit + 1,
     ...cursorClause,
-    orderBy: { at: 'desc' },
+    orderBy: { at: "desc" },
     select: {
       id: true,
       at: true,
@@ -234,29 +258,31 @@ async function listFromRetrievalEvents(
 
   // Get token totals from ModelCall if available
   let tokenMap = new Map<string, number>();
-  if (supportsModel(prisma, 'modelCall') && page.length > 0) {
-    const traceIds = page.map(e => e.traceId);
+  if (supportsModel(prisma, "modelCall") && page.length > 0) {
+    const traceIds = page.map((e) => e.traceId);
     const tokenData = await prisma.modelCall.groupBy({
-      by: ['traceId'],
+      by: ["traceId"],
       where: { traceId: { in: traceIds } },
       _sum: { totalTokens: true },
     });
-    tokenMap = new Map(tokenData.map(t => [t.traceId, t._sum?.totalTokens ?? 0]));
+    tokenMap = new Map(
+      tokenData.map((t) => [t.traceId, t._sum?.totalTokens ?? 0]),
+    );
   }
 
   // Filter by keyword if provided
   let filteredPage = page;
   if (params.keyword) {
     const keywordLower = params.keyword.toLowerCase();
-    filteredPage = page.filter(e => {
+    filteredPage = page.filter((e) => {
       const meta = e.meta as Record<string, unknown> | null;
       const keywords = (meta?.keywords as string[]) ?? [];
-      return keywords.some(k => k.toLowerCase().includes(keywordLower));
+      return keywords.some((k) => k.toLowerCase().includes(keywordLower));
     });
   }
 
   // Build query rows
-  const items: QueryRow[] = filteredPage.map(e => {
+  const items: QueryRow[] = filteredPage.map((e) => {
     const meta = e.meta as Record<string, unknown> | null;
     return {
       at: e.at.toISOString(),
@@ -298,18 +324,18 @@ async function listFromMessages(
   rangeKey: string,
   window: { from: Date; to: Date },
   limit: number,
-  cursorClause: Record<string, unknown>
+  cursorClause: Record<string, unknown>,
 ): Promise<QueryListResult> {
   const { from, to } = window;
 
   // Get user messages (role = 'user')
   const messages = await prisma.message.findMany({
     where: {
-      role: 'user',
+      role: "user",
       createdAt: { gte: from, lt: to },
     },
     take: limit + 1,
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
     select: {
       id: true,
       createdAt: true,
@@ -336,32 +362,33 @@ async function listFromMessages(
   const { page, nextCursor } = processPage(messages, limit);
 
   // Build query rows from messages
-  const items: QueryRow[] = page.map(m => {
+  const items: QueryRow[] = page.map((m) => {
     const user = m.conversation?.user;
     const userEmail = user?.email || undefined;
-    const userName = user?.firstName && user?.lastName
-      ? `${user.firstName} ${user.lastName}`
-      : user?.email || undefined;
+    const userName =
+      user?.firstName && user?.lastName
+        ? `${user.firstName} ${user.lastName}`
+        : user?.email || undefined;
 
     // Content is encrypted - show placeholder or conversation title
     const isEncrypted = !m.content && m.contentEncrypted;
     const displayContent = m.content
       ? m.content.substring(0, 200)
       : isEncrypted
-        ? `[Encrypted message in "${m.conversation?.title || 'conversation'}"]`
-        : '[No content]';
+        ? `[Encrypted message in "${m.conversation?.title || "conversation"}"]`
+        : "[No content]";
 
     return {
       at: m.createdAt.toISOString(),
-      userId: m.conversation?.userId || 'unknown',
+      userId: m.conversation?.userId || "unknown",
       userName,
       userEmail,
       content: displayContent,
-      intent: 'chat',
-      operator: 'user',
-      domain: 'general',
+      intent: "chat",
+      operator: "user",
+      domain: "general",
       docLockEnabled: false,
-      strategy: 'rag',
+      strategy: "rag",
       evidenceStrength: null, // Not tracked yet
       refined: null,
       fallbackReasonCode: null,

@@ -10,14 +10,14 @@
  * These are defaults; your env/banks can override at runtime.
  */
 
-export type GeminiModelTier = 'flash' | 'standard';
+export type GeminiModelTier = "flash" | "standard";
 
 export type GeminiModelKey =
-  | 'GEMINI_3_FLASH'
-  | 'GEMINI_3'
-  | 'GEMINI_2_5_FLASH'
-  | 'GEMINI_2_5_PRO'
-  | 'UNKNOWN';
+  | "GEMINI_3_FLASH"
+  | "GEMINI_3"
+  | "GEMINI_2_5_FLASH"
+  | "GEMINI_2_5_PRO"
+  | "UNKNOWN";
 
 export interface GeminiModelSpec {
   key: GeminiModelKey;
@@ -34,29 +34,29 @@ export interface GeminiModelSpec {
  */
 export const GEMINI_MODELS: Record<GeminiModelKey, GeminiModelSpec> = {
   GEMINI_3_FLASH: {
-    key: 'GEMINI_3_FLASH',
-    tier: 'flash',
-    modelId: 'gemini-2.5-flash',
+    key: "GEMINI_3_FLASH",
+    tier: "flash",
+    modelId: "gemini-2.5-flash",
   },
   GEMINI_3: {
-    key: 'GEMINI_3',
-    tier: 'flash',
-    modelId: 'gemini-2.5-flash',
+    key: "GEMINI_3",
+    tier: "flash",
+    modelId: "gemini-2.5-flash",
   },
   GEMINI_2_5_FLASH: {
-    key: 'GEMINI_2_5_FLASH',
-    tier: 'flash',
-    modelId: 'gemini-2.5-flash',
+    key: "GEMINI_2_5_FLASH",
+    tier: "flash",
+    modelId: "gemini-2.5-flash",
   },
   GEMINI_2_5_PRO: {
-    key: 'GEMINI_2_5_PRO',
-    tier: 'flash',
-    modelId: 'gemini-2.5-flash',
+    key: "GEMINI_2_5_PRO",
+    tier: "flash",
+    modelId: "gemini-2.5-flash",
   },
   UNKNOWN: {
-    key: 'UNKNOWN',
-    tier: 'flash',
-    modelId: 'gemini-2.5-flash',
+    key: "UNKNOWN",
+    tier: "flash",
+    modelId: "gemini-2.5-flash",
   },
 };
 

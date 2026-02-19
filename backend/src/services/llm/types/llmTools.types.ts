@@ -9,29 +9,29 @@
  * - Supports: tool registry, calls, results, tracing, and policies
  */
 
-import type { LLMProvider } from './llmErrors.types';
+import type { LLMProvider } from "./llmErrors.types";
 
 /** Stable tool ids used across the system (banks + routing + telemetry). */
 export type ToolId =
-  | 'DOC_SEARCH'
-  | 'DOC_OPEN'
-  | 'DOC_LOCATE'
-  | 'DOC_LIST'
-  | 'DOC_GET_CHUNK'
-  | 'DOC_EXTRACT_TABLE'
-  | 'DOC_EXTRACT_IMAGE_TEXT'
-  | 'SECURITY_MASK'
-  | 'MATH_EVAL'
-  | 'UNKNOWN_TOOL';
+  | "DOC_SEARCH"
+  | "DOC_OPEN"
+  | "DOC_LOCATE"
+  | "DOC_LIST"
+  | "DOC_GET_CHUNK"
+  | "DOC_EXTRACT_TABLE"
+  | "DOC_EXTRACT_IMAGE_TEXT"
+  | "SECURITY_MASK"
+  | "MATH_EVAL"
+  | "UNKNOWN_TOOL";
 
 /** High-level tool categories for routing and logging. */
 export type ToolCategory =
-  | 'documents'
-  | 'retrieval'
-  | 'extraction'
-  | 'security'
-  | 'utilities'
-  | 'unknown';
+  | "documents"
+  | "retrieval"
+  | "extraction"
+  | "security"
+  | "utilities"
+  | "unknown";
 
 /**
  * Tool execution policy knobs (bank-driven elsewhere; types are stable).
@@ -66,7 +66,7 @@ export interface ToolPolicy {
 }
 
 /** Tool I/O content types (simple but extensible). */
-export type ToolIOType = 'json' | 'text' | 'binary' | 'unknown';
+export type ToolIOType = "json" | "text" | "binary" | "unknown";
 
 /** JSON Schema (kept lightweight to avoid extra deps; use your schema banks in implementation). */
 export type JsonSchema = Record<string, unknown>;
@@ -159,13 +159,13 @@ export interface ToolResult<TOutput = unknown> {
    */
   error?: {
     code:
-      | 'TOOL_TIMEOUT'
-      | 'TOOL_DISABLED'
-      | 'TOOL_POLICY_BLOCK'
-      | 'TOOL_BAD_ARGS'
-      | 'TOOL_EXECUTION_FAILED'
-      | 'TOOL_NOT_FOUND'
-      | 'TOOL_UNKNOWN_ERROR';
+      | "TOOL_TIMEOUT"
+      | "TOOL_DISABLED"
+      | "TOOL_POLICY_BLOCK"
+      | "TOOL_BAD_ARGS"
+      | "TOOL_EXECUTION_FAILED"
+      | "TOOL_NOT_FOUND"
+      | "TOOL_UNKNOWN_ERROR";
     message: string;
     /** Underlying cause (never serialize to client directly). */
     cause?: unknown;
@@ -218,7 +218,10 @@ export interface ToolExecutor {
   execute(call: ToolCall, ctx: ToolExecutionContext): Promise<ToolResult>;
 
   /** Execute a batch (ordered) */
-  executeBatch?(batch: ToolCallBatch, ctx: ToolExecutionContext): Promise<ToolResultBatch>;
+  executeBatch?(
+    batch: ToolCallBatch,
+    ctx: ToolExecutionContext,
+  ): Promise<ToolResultBatch>;
 }
 
 /**
@@ -254,23 +257,23 @@ export interface ToolExecutionContext {
  */
 export type ProviderToolCall =
   | {
-      provider: 'openai';
+      provider: "openai";
       toolCallId: string;
       name: string;
       argumentsJson: string; // provider expects JSON-string arguments
     }
   | {
-      provider: 'google';
+      provider: "google";
       name: string;
       args: unknown;
     }
   | {
-      provider: 'anthropic';
+      provider: "anthropic";
       name: string;
       args: unknown;
     }
   | {
-      provider: 'unknown';
+      provider: "unknown";
       name: string;
       args: unknown;
     };
@@ -279,25 +282,25 @@ export type ProviderToolCall =
  * Optional: helpers for narrowing / sanity checking (kept lightweight).
  */
 export function isToolCall(x: unknown): x is ToolCall {
-  if (!x || typeof x !== 'object') return false;
+  if (!x || typeof x !== "object") return false;
   const o = x as Record<string, unknown>;
   return (
-    typeof o.callId === 'string' &&
-    typeof o.toolId === 'string' &&
-    typeof o.toolName === 'string' &&
-    typeof o.index === 'number' &&
-    'args' in o
+    typeof o.callId === "string" &&
+    typeof o.toolId === "string" &&
+    typeof o.toolName === "string" &&
+    typeof o.index === "number" &&
+    "args" in o
   );
 }
 
 export function isToolResult(x: unknown): x is ToolResult {
-  if (!x || typeof x !== 'object') return false;
+  if (!x || typeof x !== "object") return false;
   const o = x as Record<string, unknown>;
   return (
-    typeof o.callId === 'string' &&
-    typeof o.toolId === 'string' &&
-    typeof o.toolName === 'string' &&
-    typeof o.index === 'number' &&
-    typeof o.ok === 'boolean'
+    typeof o.callId === "string" &&
+    typeof o.toolId === "string" &&
+    typeof o.toolName === "string" &&
+    typeof o.index === "number" &&
+    typeof o.ok === "boolean"
   );
 }

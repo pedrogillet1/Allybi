@@ -23,7 +23,7 @@ export type DAUResult = {
  */
 function toUTCDay(ts: string): string {
   const d = new Date(ts);
-  if (isNaN(d.getTime())) return '';
+  if (isNaN(d.getTime())) return "";
   return d.toISOString().slice(0, 10);
 }
 
@@ -37,7 +37,10 @@ function toUTCDay(ts: string): string {
  * @param opts - Optional start/end timestamps to restrict series
  * @returns DAU series by day and total distinct users
  */
-export function calculateDAU(events: ActivityEvent[], opts?: DAUOptions): DAUResult {
+export function calculateDAU(
+  events: ActivityEvent[],
+  opts?: DAUOptions,
+): DAUResult {
   if (!events || events.length === 0) {
     return { series: [], totalDistinctUsers: 0 };
   }
@@ -68,7 +71,7 @@ export function calculateDAU(events: ActivityEvent[], opts?: DAUOptions): DAURes
 
   // Build sorted series
   const days = Array.from(dayUsers.keys()).sort();
-  const series = days.map(day => ({
+  const series = days.map((day) => ({
     day,
     dau: dayUsers.get(day)!.size,
   }));

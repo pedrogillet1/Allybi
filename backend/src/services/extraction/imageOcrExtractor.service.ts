@@ -3,7 +3,7 @@
  * Handles image-based document text extraction
  */
 
-import { injectable } from 'tsyringe';
+import { injectable } from "tsyringe";
 
 export interface OcrResult {
   text: string;
@@ -20,9 +20,12 @@ export class ImageOcrExtractorService {
   /**
    * Extract text from an image buffer
    */
-  async extractText(imageBuffer: Buffer, language?: string): Promise<OcrResult> {
+  async extractText(
+    imageBuffer: Buffer,
+    language?: string,
+  ): Promise<OcrResult> {
     // TODO: Implement OCR extraction
-    throw new Error('ImageOcrExtractorService.extractText not implemented');
+    throw new Error("ImageOcrExtractorService.extractText not implemented");
   }
 
   /**
@@ -30,7 +33,9 @@ export class ImageOcrExtractorService {
    */
   async extractTextFromMultiple(images: Buffer[]): Promise<OcrResult[]> {
     // TODO: Implement batch OCR
-    throw new Error('ImageOcrExtractorService.extractTextFromMultiple not implemented');
+    throw new Error(
+      "ImageOcrExtractorService.extractTextFromMultiple not implemented",
+    );
   }
 
   /**
@@ -38,6 +43,6 @@ export class ImageOcrExtractorService {
    */
   async detectLanguage(imageBuffer: Buffer): Promise<string> {
     // TODO: Implement language detection from image
-    throw new Error('ImageOcrExtractorService.detectLanguage not implemented');
+    throw new Error("ImageOcrExtractorService.detectLanguage not implemented");
   }
 }

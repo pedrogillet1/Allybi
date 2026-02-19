@@ -7,7 +7,7 @@
  */
 
 // Ensure env vars are loaded before reading config
-import './env';
+import "./env";
 
 export const UPLOAD_CONFIG = {
   // Storage Provider: "gcs" for Google Cloud Storage, "local" for local filesystem (fast dev)
@@ -20,10 +20,12 @@ export const UPLOAD_CONFIG = {
 
   // Max File Size (500MB) - SINGLE SOURCE OF TRUTH
   // Used by: multer middleware, presigned URL validation, multipart upload init
-  MAX_FILE_SIZE_BYTES: parseInt(process.env.MAX_FILE_SIZE_MB || "500") * 1024 * 1024,
+  MAX_FILE_SIZE_BYTES:
+    parseInt(process.env.MAX_FILE_SIZE_MB || "500") * 1024 * 1024,
 
   // Max Audio File Size (25MB) - smaller limit for audio transcription
-  MAX_AUDIO_FILE_SIZE_BYTES: parseInt(process.env.MAX_AUDIO_FILE_SIZE_MB || "25") * 1024 * 1024,
+  MAX_AUDIO_FILE_SIZE_BYTES:
+    parseInt(process.env.MAX_AUDIO_FILE_SIZE_MB || "25") * 1024 * 1024,
 
   // Max batch files per request (prevents memory exhaustion)
   MAX_BATCH_FILES: parseInt(process.env.MAX_BATCH_FILES || "1000"),
@@ -33,10 +35,12 @@ export const UPLOAD_CONFIG = {
   // ═══════════════════════════════════════════════════════════════════════════
 
   // Resumable Upload Threshold (20MB) - files larger than this use multipart upload
-  RESUMABLE_UPLOAD_THRESHOLD_BYTES: parseInt(process.env.RESUMABLE_UPLOAD_THRESHOLD_MB || "20") * 1024 * 1024,
+  RESUMABLE_UPLOAD_THRESHOLD_BYTES:
+    parseInt(process.env.RESUMABLE_UPLOAD_THRESHOLD_MB || "20") * 1024 * 1024,
 
   // Resumable upload chunk size (10MB default - larger chunks = fewer requests)
-  CHUNK_SIZE_BYTES: parseInt(process.env.UPLOAD_CHUNK_SIZE_MB || "10") * 1024 * 1024,
+  CHUNK_SIZE_BYTES:
+    parseInt(process.env.UPLOAD_CHUNK_SIZE_MB || "10") * 1024 * 1024,
 
   // ═══════════════════════════════════════════════════════════════════════════
   // RETRY AND TIMEOUT SETTINGS
@@ -49,10 +53,14 @@ export const UPLOAD_CONFIG = {
   RETRY_BASE_DELAY_MS: parseInt(process.env.RETRY_BASE_DELAY_MS || "1000"),
 
   // Presigned URL Expiration (30 minutes - longer for slow VPS connections)
-  PRESIGNED_URL_EXPIRATION_SECONDS: parseInt(process.env.PRESIGNED_URL_EXPIRATION_SECONDS || "1800"),
+  PRESIGNED_URL_EXPIRATION_SECONDS: parseInt(
+    process.env.PRESIGNED_URL_EXPIRATION_SECONDS || "1800",
+  ),
 
   // Upload session expiration (24 hours) - for orphan cleanup
-  UPLOAD_SESSION_EXPIRATION_HOURS: parseInt(process.env.UPLOAD_SESSION_EXPIRATION_HOURS || "24"),
+  UPLOAD_SESSION_EXPIRATION_HOURS: parseInt(
+    process.env.UPLOAD_SESSION_EXPIRATION_HOURS || "24",
+  ),
 
   // ═══════════════════════════════════════════════════════════════════════════
   // CONCURRENCY SETTINGS
@@ -71,4 +79,6 @@ export const UPLOAD_CONFIG = {
 // Type export for TypeScript
 export type UploadConfig = typeof UPLOAD_CONFIG;
 
-console.log(`✅ Upload config loaded: Multipart threshold ${UPLOAD_CONFIG.RESUMABLE_UPLOAD_THRESHOLD_BYTES / 1024 / 1024}MB, Chunk size ${UPLOAD_CONFIG.CHUNK_SIZE_BYTES / 1024 / 1024}MB`);
+console.log(
+  `✅ Upload config loaded: Multipart threshold ${UPLOAD_CONFIG.RESUMABLE_UPLOAD_THRESHOLD_BYTES / 1024 / 1024}MB, Chunk size ${UPLOAD_CONFIG.CHUNK_SIZE_BYTES / 1024 / 1024}MB`,
+);

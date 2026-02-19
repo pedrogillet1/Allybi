@@ -71,7 +71,12 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           prisma.document.count({ where: { createdAt: { gte: since } } }),
           prisma.tokenUsage.aggregate({
             where: { createdAt: { gte: since } },
-            _sum: { totalTokens: true, totalCost: true, inputTokens: true, outputTokens: true },
+            _sum: {
+              totalTokens: true,
+              totalCost: true,
+              inputTokens: true,
+              outputTokens: true,
+            },
             _avg: { latencyMs: true },
           }),
           prisma.errorLog.count({ where: { createdAt: { gte: since } } }),
@@ -102,11 +107,20 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
       } catch (err) {
         console.error("[adminTelemetryAdapter] overview error:", err);
         return {
-          totalUsers: 0, activeUsers: 0, totalConversations: 0,
-          totalMessages: 0, totalDocuments: 0, totalTokens: 0,
-          totalInputTokens: 0, totalOutputTokens: 0,
-          totalCost: 0, avgLatencyMs: 0, errorCount: 0,
-          weakEvidenceRate: 0, ttftP50: 0, errorRate: 0,
+          totalUsers: 0,
+          activeUsers: 0,
+          totalConversations: 0,
+          totalMessages: 0,
+          totalDocuments: 0,
+          totalTokens: 0,
+          totalInputTokens: 0,
+          totalOutputTokens: 0,
+          totalCost: 0,
+          avgLatencyMs: 0,
+          errorCount: 0,
+          weakEvidenceRate: 0,
+          ttftP50: 0,
+          errorRate: 0,
         };
       }
     },
@@ -122,7 +136,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           orderBy: { date: "asc" },
         });
 
-        const keyMap: Record<string, (r: typeof rows[number]) => number> = {
+        const keyMap: Record<string, (r: (typeof rows)[number]) => number> = {
           dau: (r) => r.activeUsers,
           newUsers: (r) => r.newUsers,
           messages: (r) => r.totalMessages,
@@ -156,7 +170,15 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
     // ========================================================================
     // USERS
     // ========================================================================
-    async users({ range, limit, cursor }: { range: string; limit: number; cursor?: string }) {
+    async users({
+      range,
+      limit,
+      cursor,
+    }: {
+      range: string;
+      limit: number;
+      cursor?: string;
+    }) {
       const since = rangeToDate(range);
       try {
         const users = await prisma.user.findMany({
@@ -186,22 +208,26 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         const nextCursor = hasNext ? page[page.length - 1]?.id : null;
 
         // Get token usage for these users
-        const userIds = page.map(u => u.id);
+        const userIds = page.map((u) => u.id);
         const tokenUsage = await prisma.tokenUsage.groupBy({
           by: ["userId"],
           where: { userId: { in: userIds }, createdAt: { gte: since } },
           _sum: { totalTokens: true, totalCost: true },
           _avg: { latencyMs: true },
         });
-        const tokenMap = new Map(tokenUsage.map(t => [t.userId, t]));
+        const tokenMap = new Map(tokenUsage.map((t) => [t.userId, t]));
 
         const items = page.map((u) => {
           const tok = tokenMap.get(u.id);
           return {
             id: u.id,
             email: u.email,
-            name: [u.firstName, u.lastName].filter(Boolean).join(" ") || u.email,
-            status: new Date(u.updatedAt) > addDays(new Date(), -7) ? "active" : "inactive",
+            name:
+              [u.firstName, u.lastName].filter(Boolean).join(" ") || u.email,
+            status:
+              new Date(u.updatedAt) > addDays(new Date(), -7)
+                ? "active"
+                : "inactive",
             lastActiveAt: u.updatedAt.toISOString(),
             totalQueries: u._count.conversations,
             totalTokens: tok?._sum?.totalTokens || 0,
@@ -224,7 +250,9 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         const user = await prisma.user.findUnique({
           where: { id: userId },
           include: {
-            _count: { select: { documents: true, conversations: true, sessions: true } },
+            _count: {
+              select: { documents: true, conversations: true, sessions: true },
+            },
           },
         });
         if (!user) return null;
@@ -236,7 +264,12 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           }),
           prisma.queryTelemetry.findMany({
             where: { userId, timestamp: { gte: since } },
-            select: { intent: true, domain: true, isUseful: true, hadFallback: true },
+            select: {
+              intent: true,
+              domain: true,
+              isUseful: true,
+              hadFallback: true,
+            },
           }),
         ]);
 
@@ -247,8 +280,10 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         let fallbackCount = 0;
 
         queryTelemetry.forEach((q) => {
-          if (q.intent) intentCounts[q.intent] = (intentCounts[q.intent] || 0) + 1;
-          if (q.domain) domainCounts[q.domain] = (domainCounts[q.domain] || 0) + 1;
+          if (q.intent)
+            intentCounts[q.intent] = (intentCounts[q.intent] || 0) + 1;
+          if (q.domain)
+            domainCounts[q.domain] = (domainCounts[q.domain] || 0) + 1;
           if (!q.isUseful) weakCount++;
           if (q.hadFallback) fallbackCount++;
         });
@@ -257,11 +292,19 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         const topIntents = Object.entries(intentCounts)
           .sort((a, b) => b[1] - a[1])
           .slice(0, 10)
-          .map(([intent, count]) => ({ intent, count, percentage: total > 0 ? (count / total) * 100 : 0 }));
+          .map(([intent, count]) => ({
+            intent,
+            count,
+            percentage: total > 0 ? (count / total) * 100 : 0,
+          }));
         const topDomains = Object.entries(domainCounts)
           .sort((a, b) => b[1] - a[1])
           .slice(0, 10)
-          .map(([domain, count]) => ({ domain, count, percentage: total > 0 ? (count / total) * 100 : 0 }));
+          .map(([domain, count]) => ({
+            domain,
+            count,
+            percentage: total > 0 ? (count / total) * 100 : 0,
+          }));
 
         // Get cost breakdown by provider
         const costBreakdown = await prisma.tokenUsage.groupBy({
@@ -274,7 +317,9 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         return {
           id: user.id,
           email: user.email,
-          name: [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email,
+          name:
+            [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+            user.email,
           workspaceName: null,
           status: "active",
           createdAt: user.createdAt.toISOString(),
@@ -285,7 +330,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           totalTokens: tokenAgg._sum?.totalTokens || 0,
           totalCost: tokenAgg._sum?.totalCost || 0,
           activityTimeline: [],
-          costBreakdown: costBreakdown.map(c => ({
+          costBreakdown: costBreakdown.map((c) => ({
             provider: c.provider,
             model: c.model,
             tokens: c._sum?.totalTokens || 0,
@@ -312,7 +357,15 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
     // ========================================================================
     // FILES
     // ========================================================================
-    async files({ range, limit, cursor }: { range: string; limit: number; cursor?: string }) {
+    async files({
+      range,
+      limit,
+      cursor,
+    }: {
+      range: string;
+      limit: number;
+      cursor?: string;
+    }) {
       const since = rangeToDate(range);
       try {
         const docs = await prisma.document.findMany({
@@ -380,7 +433,8 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           chunksCount: doc.chunksCount || 0,
           tokensCount: 0,
           queriesCount: doc.processingMetrics?.timesQueried || 0,
-          lastAccessedAt: doc.processingMetrics?.lastQueriedAt?.toISOString() || null,
+          lastAccessedAt:
+            doc.processingMetrics?.lastQueriedAt?.toISOString() || null,
           extractionMethod: doc.processingMetrics?.textExtractionMethod || null,
           extractionDuration: doc.processingMetrics?.textExtractionTime || null,
           indexingDuration: doc.processingMetrics?.embeddingDuration || null,
@@ -393,7 +447,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
             retrievalCount: 0,
           })),
           usageHistory: [],
-          topQueries: recentQueries.map(q => ({
+          topQueries: recentQueries.map((q) => ({
             query: q.queryText || "",
             userName: q.userId,
             createdAt: q.timestamp.toISOString(),
@@ -408,7 +462,19 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
     // ========================================================================
     // QUERIES
     // ========================================================================
-    async queries({ range, limit, cursor, domain, intent }: { range: string; limit: number; cursor?: string; domain?: string; intent?: string }) {
+    async queries({
+      range,
+      limit,
+      cursor,
+      domain,
+      intent,
+    }: {
+      range: string;
+      limit: number;
+      cursor?: string;
+      domain?: string;
+      intent?: string;
+    }) {
       const since = rangeToDate(range);
       try {
         const where: any = { timestamp: { gte: since } };
@@ -439,7 +505,11 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           totalLatencyMs: r.totalMs || 0,
           totalTokens: r.totalTokens,
           totalCost: r.estimatedCostUsd,
-          qualityOutcome: r.isUseful ? "adequate" : r.hadFallback ? "weak" : "blocked",
+          qualityOutcome: r.isUseful
+            ? "adequate"
+            : r.hadFallback
+              ? "weak"
+              : "blocked",
           evidenceStrength: r.retrievalAdequate ? 0.85 : 0.4,
           sourcesCount: r.distinctDocs,
           providers: [r.model?.split("-")[0] || "unknown"],
@@ -498,19 +568,39 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         });
 
         const domainCounts: Record<string, number> = {};
-        queries.forEach(q => { if (q.domain) domainCounts[q.domain] = (domainCounts[q.domain] || 0) + 1; });
+        queries.forEach((q) => {
+          if (q.domain)
+            domainCounts[q.domain] = (domainCounts[q.domain] || 0) + 1;
+        });
 
         return {
           intent,
           count: queries.length,
-          avgLatency: queries.reduce((sum, q) => sum + (q.totalMs || 0), 0) / queries.length || 0,
-          avgCost: queries.reduce((sum, q) => sum + q.estimatedCostUsd, 0) / queries.length || 0,
-          domains: Object.entries(domainCounts).map(([domain, count]) => ({ domain, count })),
-          recentQueries: queries.slice(0, 20).map(q => ({ query: q.queryText || "", timestamp: q.timestamp.toISOString() })),
+          avgLatency:
+            queries.reduce((sum, q) => sum + (q.totalMs || 0), 0) /
+              queries.length || 0,
+          avgCost:
+            queries.reduce((sum, q) => sum + q.estimatedCostUsd, 0) /
+              queries.length || 0,
+          domains: Object.entries(domainCounts).map(([domain, count]) => ({
+            domain,
+            count,
+          })),
+          recentQueries: queries.slice(0, 20).map((q) => ({
+            query: q.queryText || "",
+            timestamp: q.timestamp.toISOString(),
+          })),
         };
       } catch (err) {
         console.error("[adminTelemetryAdapter] intentDetail error:", err);
-        return { intent, count: 0, avgLatency: 0, avgCost: 0, domains: [], recentQueries: [] };
+        return {
+          intent,
+          count: 0,
+          avgLatency: 0,
+          avgCost: 0,
+          domains: [],
+          recentQueries: [],
+        };
       }
     },
 
@@ -558,19 +648,39 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         });
 
         const intentCounts: Record<string, number> = {};
-        queries.forEach(q => { if (q.intent) intentCounts[q.intent] = (intentCounts[q.intent] || 0) + 1; });
+        queries.forEach((q) => {
+          if (q.intent)
+            intentCounts[q.intent] = (intentCounts[q.intent] || 0) + 1;
+        });
 
         return {
           domain,
           count: queries.length,
-          avgLatency: queries.reduce((sum, q) => sum + (q.totalMs || 0), 0) / queries.length || 0,
-          avgCost: queries.reduce((sum, q) => sum + q.estimatedCostUsd, 0) / queries.length || 0,
-          intents: Object.entries(intentCounts).map(([intent, count]) => ({ intent, count })),
-          recentQueries: queries.slice(0, 20).map(q => ({ query: q.queryText || "", timestamp: q.timestamp.toISOString() })),
+          avgLatency:
+            queries.reduce((sum, q) => sum + (q.totalMs || 0), 0) /
+              queries.length || 0,
+          avgCost:
+            queries.reduce((sum, q) => sum + q.estimatedCostUsd, 0) /
+              queries.length || 0,
+          intents: Object.entries(intentCounts).map(([intent, count]) => ({
+            intent,
+            count,
+          })),
+          recentQueries: queries.slice(0, 20).map((q) => ({
+            query: q.queryText || "",
+            timestamp: q.timestamp.toISOString(),
+          })),
         };
       } catch (err) {
         console.error("[adminTelemetryAdapter] domainDetail error:", err);
-        return { domain, count: 0, avgLatency: 0, avgCost: 0, intents: [], recentQueries: [] };
+        return {
+          domain,
+          count: 0,
+          avgLatency: 0,
+          avgCost: 0,
+          intents: [],
+          recentQueries: [],
+        };
       }
     },
 
@@ -586,7 +696,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         const domains = new Set<string>();
         const intents = new Set<string>();
 
-        queries.forEach(q => {
+        queries.forEach((q) => {
           const domain = q.domain || "unknown";
           const intent = q.intent || "unknown";
           domains.add(domain);
@@ -595,7 +705,11 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           matrix[domain][intent] = (matrix[domain][intent] || 0) + 1;
         });
 
-        return { domains: Array.from(domains), intents: Array.from(intents), matrix };
+        return {
+          domains: Array.from(domains),
+          intents: Array.from(intents),
+          matrix,
+        };
       } catch (err) {
         console.error("[adminTelemetryAdapter] domainMatrix error:", err);
         return { domains: [], intents: [], matrix: {} };
@@ -605,7 +719,17 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
     // ========================================================================
     // KEYWORDS
     // ========================================================================
-    async keywords({ range, limit, domain, search }: { range: string; limit: number; domain?: string; search?: string }) {
+    async keywords({
+      range,
+      limit,
+      domain,
+      search,
+    }: {
+      range: string;
+      limit: number;
+      domain?: string;
+      search?: string;
+    }) {
       const since = rangeToDate(range);
       try {
         const where: any = { timestamp: { gte: since } };
@@ -616,12 +740,17 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           select: { matchedKeywords: true, domain: true },
         });
 
-        const keywordCounts: Record<string, { count: number; domains: Set<string> }> = {};
+        const keywordCounts: Record<
+          string,
+          { count: number; domains: Set<string> }
+        > = {};
 
-        queries.forEach(q => {
-          (q.matchedKeywords || []).forEach(kw => {
-            if (search && !kw.toLowerCase().includes(search.toLowerCase())) return;
-            if (!keywordCounts[kw]) keywordCounts[kw] = { count: 0, domains: new Set() };
+        queries.forEach((q) => {
+          (q.matchedKeywords || []).forEach((kw) => {
+            if (search && !kw.toLowerCase().includes(search.toLowerCase()))
+              return;
+            if (!keywordCounts[kw])
+              keywordCounts[kw] = { count: 0, domains: new Set() };
             keywordCounts[kw].count++;
             if (q.domain) keywordCounts[kw].domains.add(q.domain);
           });
@@ -664,11 +793,19 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           select: { matchedPatterns: true, intent: true, isUseful: true },
         });
 
-        const patternCounts: Record<string, { count: number; intents: Set<string>; successful: number }> = {};
+        const patternCounts: Record<
+          string,
+          { count: number; intents: Set<string>; successful: number }
+        > = {};
 
-        queries.forEach(q => {
-          (q.matchedPatterns || []).forEach(p => {
-            if (!patternCounts[p]) patternCounts[p] = { count: 0, intents: new Set(), successful: 0 };
+        queries.forEach((q) => {
+          (q.matchedPatterns || []).forEach((p) => {
+            if (!patternCounts[p])
+              patternCounts[p] = {
+                count: 0,
+                intents: new Set(),
+                successful: 0,
+              };
             patternCounts[p].count++;
             if (q.intent) patternCounts[p].intents.add(q.intent);
             if (q.isUseful) patternCounts[p].successful++;
@@ -683,7 +820,8 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
             pattern,
             count: data.count,
             intents: Array.from(data.intents),
-            successRate: data.count > 0 ? (data.successful / data.count) * 100 : 0,
+            successRate:
+              data.count > 0 ? (data.successful / data.count) * 100 : 0,
             category: "general",
           }));
 
@@ -694,28 +832,80 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
       }
     },
 
-    async patternDetail({ patternId, range }: { patternId: string; range: string }) {
+    async patternDetail({
+      patternId,
+      range,
+    }: {
+      patternId: string;
+      range: string;
+    }) {
       const patterns = await this.patterns({ range, limit: 100 });
-      return patterns.items.find(p => p.id === patternId) || { id: patternId, pattern: "Unknown", count: 0, intents: [], successRate: 0 };
+      return (
+        patterns.items.find((p) => p.id === patternId) || {
+          id: patternId,
+          pattern: "Unknown",
+          count: 0,
+          intents: [],
+          successRate: 0,
+        }
+      );
     },
 
     // ========================================================================
     // INTERACTIONS
     // ========================================================================
-    async interactions({ range, limit, cursor }: { range: string; limit: number; cursor?: string }) {
+    async interactions({
+      range,
+      limit,
+      cursor,
+    }: {
+      range: string;
+      limit: number;
+      cursor?: string;
+    }) {
       return this.queries({ range, limit, cursor });
     },
 
     async interactionDetail({ traceId }: { traceId: string }) {
       try {
-        const query = await prisma.queryTelemetry.findFirst({ where: { queryId: traceId } });
+        const query = await prisma.queryTelemetry.findFirst({
+          where: { queryId: traceId },
+        });
         if (!query) return null;
 
         const stages = [];
-        if (query.embeddingMs) stages.push({ stage: "embedding", durationMs: query.embeddingMs, success: true, tokens: 0, cost: 0 });
-        if (query.retrievalMs) stages.push({ stage: "retrieval", durationMs: query.retrievalMs, success: query.retrievalAdequate, tokens: 0, cost: 0 });
-        if (query.llmMs) stages.push({ stage: "llm", durationMs: query.llmMs, success: true, tokens: query.totalTokens, cost: query.estimatedCostUsd });
-        if (query.formattingMs) stages.push({ stage: "formatting", durationMs: query.formattingMs, success: query.formattingPassed, tokens: 0, cost: 0 });
+        if (query.embeddingMs)
+          stages.push({
+            stage: "embedding",
+            durationMs: query.embeddingMs,
+            success: true,
+            tokens: 0,
+            cost: 0,
+          });
+        if (query.retrievalMs)
+          stages.push({
+            stage: "retrieval",
+            durationMs: query.retrievalMs,
+            success: query.retrievalAdequate,
+            tokens: 0,
+            cost: 0,
+          });
+        if (query.llmMs)
+          stages.push({
+            stage: "llm",
+            durationMs: query.llmMs,
+            success: true,
+            tokens: query.totalTokens,
+            cost: query.estimatedCostUsd,
+          });
+        if (query.formattingMs)
+          stages.push({
+            stage: "formatting",
+            durationMs: query.formattingMs,
+            success: query.formattingPassed,
+            tokens: 0,
+            cost: 0,
+          });
 
         return {
           traceId: query.queryId,
@@ -738,7 +928,15 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
     // ========================================================================
     // QUALITY
     // ========================================================================
-    async quality({ range, limit, cursor }: { range: string; limit: number; cursor?: string }) {
+    async quality({
+      range,
+      limit,
+      cursor,
+    }: {
+      range: string;
+      limit: number;
+      cursor?: string;
+    }) {
       const since = rangeToDate(range);
       try {
         const rows = await prisma.queryTelemetry.findMany({
@@ -747,9 +945,17 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
           orderBy: { timestamp: "desc" },
           select: {
-            id: true, queryId: true, queryText: true, userId: true, timestamp: true,
-            isUseful: true, hadFallback: true, failureCategory: true, citationCount: true,
-            answerLength: true, retrievalAdequate: true,
+            id: true,
+            queryId: true,
+            queryText: true,
+            userId: true,
+            timestamp: true,
+            isUseful: true,
+            hadFallback: true,
+            failureCategory: true,
+            citationCount: true,
+            answerLength: true,
+            retrievalAdequate: true,
           },
         });
 
@@ -757,7 +963,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         const page = hasNext ? rows.slice(0, limit) : rows;
         const nextCursor = hasNext ? page[page.length - 1]?.id : null;
 
-        const items = page.map(q => ({
+        const items = page.map((q) => ({
           id: q.id,
           traceId: q.queryId,
           query: q.queryText || "",
@@ -782,30 +988,60 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
       try {
         const queries = await prisma.queryTelemetry.findMany({
           where: { timestamp: { gte: since } },
-          select: { domain: true, intent: true, isUseful: true, hadFallback: true },
+          select: {
+            domain: true,
+            intent: true,
+            isUseful: true,
+            hadFallback: true,
+          },
         });
 
-        const byDomain: Record<string, { total: number; adequate: number; weak: number; blocked: number }> = {};
-        const byIntent: Record<string, { total: number; adequate: number; weak: number; blocked: number }> = {};
+        const byDomain: Record<
+          string,
+          { total: number; adequate: number; weak: number; blocked: number }
+        > = {};
+        const byIntent: Record<
+          string,
+          { total: number; adequate: number; weak: number; blocked: number }
+        > = {};
 
-        queries.forEach(q => {
+        queries.forEach((q) => {
           const domain = q.domain || "unknown";
           const intent = q.intent || "unknown";
 
-          if (!byDomain[domain]) byDomain[domain] = { total: 0, adequate: 0, weak: 0, blocked: 0 };
-          if (!byIntent[intent]) byIntent[intent] = { total: 0, adequate: 0, weak: 0, blocked: 0 };
+          if (!byDomain[domain])
+            byDomain[domain] = { total: 0, adequate: 0, weak: 0, blocked: 0 };
+          if (!byIntent[intent])
+            byIntent[intent] = { total: 0, adequate: 0, weak: 0, blocked: 0 };
 
           byDomain[domain].total++;
           byIntent[intent].total++;
 
-          if (q.isUseful) { byDomain[domain].adequate++; byIntent[intent].adequate++; }
-          else if (q.hadFallback) { byDomain[domain].weak++; byIntent[intent].weak++; }
-          else { byDomain[domain].blocked++; byIntent[intent].blocked++; }
+          if (q.isUseful) {
+            byDomain[domain].adequate++;
+            byIntent[intent].adequate++;
+          } else if (q.hadFallback) {
+            byDomain[domain].weak++;
+            byIntent[intent].weak++;
+          } else {
+            byDomain[domain].blocked++;
+            byIntent[intent].blocked++;
+          }
         });
 
         return {
-          byDomain: Object.entries(byDomain).map(([domain, data]) => ({ domain, ...data, adequateRate: data.total > 0 ? (data.adequate / data.total) * 100 : 0 })),
-          byIntent: Object.entries(byIntent).map(([intent, data]) => ({ intent, ...data, adequateRate: data.total > 0 ? (data.adequate / data.total) * 100 : 0 })),
+          byDomain: Object.entries(byDomain).map(([domain, data]) => ({
+            domain,
+            ...data,
+            adequateRate:
+              data.total > 0 ? (data.adequate / data.total) * 100 : 0,
+          })),
+          byIntent: Object.entries(byIntent).map(([intent, data]) => ({
+            intent,
+            ...data,
+            adequateRate:
+              data.total > 0 ? (data.adequate / data.total) * 100 : 0,
+          })),
         };
       } catch (err) {
         console.error("[adminTelemetryAdapter] qualityBreakdown error:", err);
@@ -818,20 +1054,34 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
       try {
         const conversations = await prisma.conversation.findMany({
           where: { updatedAt: { gte: since }, isDeleted: false },
-          include: { messages: { where: { role: "user" }, orderBy: { createdAt: "asc" } } },
+          include: {
+            messages: {
+              where: { role: "user" },
+              orderBy: { createdAt: "asc" },
+            },
+          },
         });
 
         let reaskCount = 0;
         const total = conversations.length;
 
-        conversations.forEach(conv => {
+        conversations.forEach((conv) => {
           for (let i = 1; i < conv.messages.length; i++) {
-            const diff = conv.messages[i].createdAt.getTime() - conv.messages[i - 1].createdAt.getTime();
-            if (diff < 30000) { reaskCount++; break; }
+            const diff =
+              conv.messages[i].createdAt.getTime() -
+              conv.messages[i - 1].createdAt.getTime();
+            if (diff < 30000) {
+              reaskCount++;
+              break;
+            }
           }
         });
 
-        return { reaskRate: total > 0 ? (reaskCount / total) * 100 : 0, reaskCount, totalConversations: total };
+        return {
+          reaskRate: total > 0 ? (reaskCount / total) * 100 : 0,
+          reaskCount,
+          totalConversations: total,
+        };
       } catch (err) {
         console.error("[adminTelemetryAdapter] reaskRate error:", err);
         return { reaskRate: 0, reaskCount: 0, totalConversations: 0 };
@@ -841,7 +1091,19 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
     // ========================================================================
     // LLM / COST
     // ========================================================================
-    async llm({ range, limit, cursor, provider, model }: { range: string; limit: number; cursor?: string; provider?: string; model?: string }) {
+    async llm({
+      range,
+      limit,
+      cursor,
+      provider,
+      model,
+    }: {
+      range: string;
+      limit: number;
+      cursor?: string;
+      provider?: string;
+      model?: string;
+    }) {
       const since = rangeToDate(range);
       try {
         const where: any = { createdAt: { gte: since } };
@@ -859,7 +1121,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         const page = hasNext ? rows.slice(0, limit) : rows;
         const nextCursor = hasNext ? page[page.length - 1]?.id : null;
 
-        const items = page.map(c => ({
+        const items = page.map((c) => ({
           id: c.id,
           provider: c.provider,
           model: c.model,
@@ -890,7 +1152,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           _avg: { latencyMs: true },
         });
 
-        const items = providers.map(p => ({
+        const items = providers.map((p) => ({
           provider: p.provider,
           totalTokens: p._sum?.totalTokens || 0,
           totalCost: p._sum?.totalCost || 0,
@@ -916,7 +1178,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           _count: { _all: true },
         });
 
-        const items = calls.map(m => ({
+        const items = calls.map((m) => ({
           stage: m.stage,
           totalTokens: m._sum?.totalTokens || 0,
           totalDurationMs: m._sum?.durationMs || 0,
@@ -947,14 +1209,27 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         };
       } catch (err) {
         console.error("[adminTelemetryAdapter] tokensPerQuery error:", err);
-        return { avgInputTokens: 0, avgOutputTokens: 0, avgTotalTokens: 0, totalQueries: 0 };
+        return {
+          avgInputTokens: 0,
+          avgOutputTokens: 0,
+          avgTotalTokens: 0,
+          totalQueries: 0,
+        };
       }
     },
 
     // ========================================================================
     // ERRORS
     // ========================================================================
-    async errors({ range, limit, cursor }: { range: string; limit: number; cursor?: string }) {
+    async errors({
+      range,
+      limit,
+      cursor,
+    }: {
+      range: string;
+      limit: number;
+      cursor?: string;
+    }) {
       const since = rangeToDate(range);
       try {
         const rows = await prisma.errorLog.findMany({
@@ -968,7 +1243,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         const page = hasNext ? rows.slice(0, limit) : rows;
         const nextCursor = hasNext ? page[page.length - 1]?.id : null;
 
-        const items = page.map(e => ({
+        const items = page.map((e) => ({
           id: e.id,
           type: e.errorType,
           message: e.errorMessage,
@@ -994,15 +1269,36 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
       const since = rangeToDate(range);
       try {
         const [byType, byService, bySeverity] = await Promise.all([
-          prisma.errorLog.groupBy({ by: ["errorType"], where: { createdAt: { gte: since } }, _count: { _all: true } }),
-          prisma.errorLog.groupBy({ by: ["service"], where: { createdAt: { gte: since } }, _count: { _all: true } }),
-          prisma.errorLog.groupBy({ by: ["severity"], where: { createdAt: { gte: since } }, _count: { _all: true } }),
+          prisma.errorLog.groupBy({
+            by: ["errorType"],
+            where: { createdAt: { gte: since } },
+            _count: { _all: true },
+          }),
+          prisma.errorLog.groupBy({
+            by: ["service"],
+            where: { createdAt: { gte: since } },
+            _count: { _all: true },
+          }),
+          prisma.errorLog.groupBy({
+            by: ["severity"],
+            where: { createdAt: { gte: since } },
+            _count: { _all: true },
+          }),
         ]);
 
         return {
-          byType: byType.map(t => ({ type: t.errorType, count: t._count._all })),
-          byService: byService.map(s => ({ service: s.service, count: s._count._all })),
-          bySeverity: bySeverity.map(s => ({ severity: s.severity, count: s._count._all })),
+          byType: byType.map((t) => ({
+            type: t.errorType,
+            count: t._count._all,
+          })),
+          byService: byService.map((s) => ({
+            service: s.service,
+            count: s._count._all,
+          })),
+          bySeverity: bySeverity.map((s) => ({
+            severity: s.severity,
+            count: s._count._all,
+          })),
           total: byType.reduce((sum, t) => sum + t._count._all, 0),
         };
       } catch (err) {
@@ -1031,7 +1327,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           }),
         ]);
 
-        const sorted = latencies.map(l => l.totalMs || 0);
+        const sorted = latencies.map((l) => l.totalMs || 0);
         const total = latencyStats._count._all || 1;
         const errorRate = (errorCount / total) * 100;
 
@@ -1047,7 +1343,16 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         };
       } catch (err) {
         console.error("[adminTelemetryAdapter] reliability error:", err);
-        return { uptime: 0, p50Latency: 0, p95Latency: 0, p99Latency: 0, avgResponseTime: 0, errorRate: 0, successRate: 0, totalRequests: 0 };
+        return {
+          uptime: 0,
+          p50Latency: 0,
+          p95Latency: 0,
+          p99Latency: 0,
+          avgResponseTime: 0,
+          errorRate: 0,
+          successRate: 0,
+          totalRequests: 0,
+        };
       }
     },
 
@@ -1063,31 +1368,58 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
             select: { isSuspicious: true, isActive: true },
           }),
           prisma.auditLog.count({
-            where: { createdAt: { gte: since }, action: { in: ["login", "login_failed", "LOGIN", "LOGIN_FAILED"] } },
+            where: {
+              createdAt: { gte: since },
+              action: {
+                in: ["login", "login_failed", "LOGIN", "LOGIN_FAILED"],
+              },
+            },
           }),
           prisma.auditLog.count({
-            where: { createdAt: { gte: since }, action: { in: ["login_failed", "LOGIN_FAILED"] } },
+            where: {
+              createdAt: { gte: since },
+              action: { in: ["login_failed", "LOGIN_FAILED"] },
+            },
           }),
         ]);
 
         return {
           totalSessions: sessions.length,
-          activeSessions: sessions.filter(s => s.isActive).length,
-          suspiciousSessions: sessions.filter(s => s.isSuspicious).length,
+          activeSessions: sessions.filter((s) => s.isActive).length,
+          suspiciousSessions: sessions.filter((s) => s.isSuspicious).length,
           loginAttempts,
           failedLogins,
           successfulLogins: loginAttempts - failedLogins,
-          failedLoginRate: loginAttempts > 0 ? (failedLogins / loginAttempts) * 100 : 0,
+          failedLoginRate:
+            loginAttempts > 0 ? (failedLogins / loginAttempts) * 100 : 0,
           mfaAdoption: 0,
           blockedIPs: 0,
         };
       } catch (err) {
         console.error("[adminTelemetryAdapter] security error:", err);
-        return { totalSessions: 0, activeSessions: 0, suspiciousSessions: 0, loginAttempts: 0, failedLogins: 0, successfulLogins: 0, failedLoginRate: 0, mfaAdoption: 0, blockedIPs: 0 };
+        return {
+          totalSessions: 0,
+          activeSessions: 0,
+          suspiciousSessions: 0,
+          loginAttempts: 0,
+          failedLogins: 0,
+          successfulLogins: 0,
+          failedLoginRate: 0,
+          mfaAdoption: 0,
+          blockedIPs: 0,
+        };
       }
     },
 
-    async securityEvents({ range, limit, cursor }: { range: string; limit: number; cursor?: string }) {
+    async securityEvents({
+      range,
+      limit,
+      cursor,
+    }: {
+      range: string;
+      limit: number;
+      cursor?: string;
+    }) {
       const since = rangeToDate(range);
       try {
         const sessions = await prisma.session.findMany({
@@ -1097,7 +1429,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           include: { user: { select: { email: true } } },
         });
 
-        const items = sessions.map(s => ({
+        const items = sessions.map((s) => ({
           id: s.id,
           type: "suspicious_session",
           severity: "warning",
@@ -1114,7 +1446,15 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
       }
     },
 
-    async auditLog({ range, limit, cursor }: { range: string; limit: number; cursor?: string }) {
+    async auditLog({
+      range,
+      limit,
+      cursor,
+    }: {
+      range: string;
+      limit: number;
+      cursor?: string;
+    }) {
       const since = rangeToDate(range);
       try {
         const logs = await prisma.auditLog.findMany({
@@ -1129,7 +1469,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         const page = hasNext ? logs.slice(0, limit) : logs;
         const nextCursor = hasNext ? page[page.length - 1]?.id : null;
 
-        const items = page.map(l => ({
+        const items = page.map((l) => ({
           id: l.id,
           timestamp: l.createdAt.toISOString(),
           action: l.action,
@@ -1161,7 +1501,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           _sum: { tokensUsed: true, estimatedCost: true },
         });
 
-        const endpoints = metrics.map(m => ({
+        const endpoints = metrics.map((m) => ({
           service: m.service,
           endpoint: m.endpoint,
           callCount: m._count._all,
@@ -1171,7 +1511,9 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         }));
 
         const totalCalls = endpoints.reduce((sum, e) => sum + e.callCount, 0);
-        const avgLatency = endpoints.reduce((sum, e) => sum + e.avgLatency * e.callCount, 0) / totalCalls || 0;
+        const avgLatency =
+          endpoints.reduce((sum, e) => sum + e.avgLatency * e.callCount, 0) /
+            totalCalls || 0;
 
         return {
           endpoints,
@@ -1184,14 +1526,29 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         };
       } catch (err) {
         console.error("[adminTelemetryAdapter] apiMetrics error:", err);
-        return { endpoints: [], totals: { totalCalls: 0, avgLatency: 0, totalTokens: 0, totalCost: 0 } };
+        return {
+          endpoints: [],
+          totals: {
+            totalCalls: 0,
+            avgLatency: 0,
+            totalTokens: 0,
+            totalCost: 0,
+          },
+        };
       }
     },
 
     async externalProviders({ range }: { range: string }) {
       const since = rangeToDate(range);
       try {
-        const extServices = ["gemini", "openai", "pinecone", "s3", "google", "anthropic"];
+        const extServices = [
+          "gemini",
+          "openai",
+          "pinecone",
+          "s3",
+          "google",
+          "anthropic",
+        ];
         const [providers, errorCounts] = await Promise.all([
           prisma.aPIPerformanceLog.groupBy({
             by: ["service"],
@@ -1202,21 +1559,30 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           }),
           prisma.aPIPerformanceLog.groupBy({
             by: ["service"],
-            where: { startedAt: { gte: since }, success: false, service: { in: extServices } },
+            where: {
+              startedAt: { gte: since },
+              success: false,
+              service: { in: extServices },
+            },
             _count: { _all: true },
           }),
         ]);
 
-        const errorMap = new Map(errorCounts.map(e => [e.service, e._count._all]));
+        const errorMap = new Map(
+          errorCounts.map((e) => [e.service, e._count._all]),
+        );
 
-        const items = providers.map(p => ({
+        const items = providers.map((p) => ({
           provider: p.service,
           callCount: p._count._all,
           avgLatency: Math.round(p._avg?.latency || 0),
           totalTokens: p._sum?.tokensUsed || 0,
           totalCost: p._sum?.estimatedCost || 0,
           errorCount: errorMap.get(p.service) || 0,
-          errorRate: p._count._all > 0 ? ((errorMap.get(p.service) || 0) / p._count._all) * 100 : 0,
+          errorRate:
+            p._count._all > 0
+              ? ((errorMap.get(p.service) || 0) / p._count._all) * 100
+              : 0,
           status: "operational",
         }));
 

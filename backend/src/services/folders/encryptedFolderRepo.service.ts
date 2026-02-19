@@ -16,7 +16,11 @@ export class EncryptedFolderRepo {
     private folderCrypto: FolderCryptoService,
   ) {}
 
-  async setEncryptedName(userId: string, folderId: string, namePlain: string): Promise<void> {
+  async setEncryptedName(
+    userId: string,
+    folderId: string,
+    namePlain: string,
+  ): Promise<void> {
     const fk = await this.folderKeys.getFolderKey(userId, folderId);
     const enc = this.folderCrypto.encryptName(userId, folderId, namePlain, fk);
 
@@ -29,7 +33,10 @@ export class EncryptedFolderRepo {
     });
   }
 
-  async getDecryptedName(userId: string, folderId: string): Promise<string | null> {
+  async getDecryptedName(
+    userId: string,
+    folderId: string,
+  ): Promise<string | null> {
     const folder = await this.prisma.folder.findUnique({
       where: { id: folderId },
       select: { name: true, nameEncrypted: true, userId: true },
@@ -38,7 +45,12 @@ export class EncryptedFolderRepo {
 
     if (folder.nameEncrypted) {
       const fk = await this.folderKeys.getFolderKey(userId, folderId);
-      return this.folderCrypto.decryptName(userId, folderId, folder.nameEncrypted, fk);
+      return this.folderCrypto.decryptName(
+        userId,
+        folderId,
+        folder.nameEncrypted,
+        fk,
+      );
     }
     return folder.name ?? null;
   }
@@ -77,7 +89,11 @@ export class EncryptedFolderRepo {
   /**
    * Rename folder with encrypted name
    */
-  async renameEncrypted(userId: string, folderId: string, namePlain: string): Promise<void> {
+  async renameEncrypted(
+    userId: string,
+    folderId: string,
+    namePlain: string,
+  ): Promise<void> {
     const fk = await this.folderKeys.getFolderKey(userId, folderId);
     const enc = this.folderCrypto.encryptName(userId, folderId, namePlain, fk);
 

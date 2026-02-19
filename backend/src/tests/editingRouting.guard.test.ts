@@ -20,9 +20,15 @@ describe("editing routing guardrails", () => {
 
   test("chat routing paths avoid legacy connector fallback detectors", () => {
     const src = readRepoFile("src/services/prismaChat.service.ts");
-    expect(src).not.toContain("const composeQuery = await this.detectComposeQuery");
-    expect(src).not.toContain("const latestConnector = await this.detectLatestConnectorQuery");
-    expect(src).not.toContain("connectorAction = await this.detectConnectorActionQuery");
+    expect(src).not.toContain(
+      "const composeQuery = await this.detectComposeQuery",
+    );
+    expect(src).not.toContain(
+      "const latestConnector = await this.detectLatestConnectorQuery",
+    );
+    expect(src).not.toContain(
+      "connectorAction = await this.detectConnectorActionQuery",
+    );
     expect(src).not.toContain("this.isEmailDocFusionRequest(req.message)");
     expect(src).not.toContain("private async detectComposeQuery(");
     expect(src).not.toContain("private async detectLatestConnectorQuery(");
@@ -35,7 +41,9 @@ describe("editing routing guardrails", () => {
   });
 
   test("operator alias normalization is domain-deterministic (no phrase heuristics)", () => {
-    const src = readRepoFile("src/services/editing/editOperatorAliases.service.ts");
+    const src = readRepoFile(
+      "src/services/editing/editOperatorAliases.service.ts",
+    );
     expect(src).not.toContain("looksLikeChartRequest");
     expect(src).not.toContain("looksLikeTableOrComputeRequest");
   });

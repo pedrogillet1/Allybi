@@ -44,7 +44,10 @@ class StubClient {
     async function* gen() {
       yield { choices: [{ delta: { content: "Hello" } }] };
       yield { choices: [{ delta: { content: " world" } }] };
-      yield { choices: [{ finish_reason: "stop", delta: {} }], usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 } };
+      yield {
+        choices: [{ finish_reason: "stop", delta: {} }],
+        usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
+      };
     }
     return { stream: gen() };
   }
@@ -75,15 +78,26 @@ describe("LLM Contract (Allybi)", () => {
 
   it("stream adapter emits meta -> delta(s) -> final", async () => {
     const parser = new LlmResponseParserService();
-    const adapter = new LlmStreamAdapterService(new StubClient() as any, parser);
+    const adapter = new LlmStreamAdapterService(
+      new StubClient() as any,
+      parser,
+    );
 
     const req: LlmRequest = {
-      route: { provider: "openai", model: "gpt-5.2", reason: "quality_finish", stage: "final" } as any,
+      route: {
+        provider: "openai",
+        model: "gpt-5.2",
+        reason: "quality_finish",
+        stage: "final",
+      } as any,
       messages: [{ role: "user", content: "hi" }],
       options: { stream: true },
     };
 
-    const result = await adapter.stream(req, undefined, { maxDeltaChars: 8, flushOnNewline: false });
+    const result = await adapter.stream(req, undefined, {
+      maxDeltaChars: 8,
+      flushOnNewline: false,
+    });
 
     const events: LlmStreamEvent[] = [];
     for await (const e of result) events.push(e);
@@ -102,7 +116,9 @@ describe("LLM Contract (Allybi)", () => {
     class BadClient extends StubClient {
       async stream(_req: LlmRequest) {
         async function* gen() {
-          yield { choices: [{ delta: { content: "No relevant information found." } }] };
+          yield {
+            choices: [{ delta: { content: "No relevant information found." } }],
+          };
           yield { choices: [{ finish_reason: "stop", delta: {} }] };
         }
         return { stream: gen() };
@@ -111,7 +127,12 @@ describe("LLM Contract (Allybi)", () => {
 
     const adapter = new LlmStreamAdapterService(new BadClient() as any, parser);
     const req: LlmRequest = {
-      route: { provider: "openai", model: "gpt-5.2", reason: "quality_finish", stage: "final" } as any,
+      route: {
+        provider: "openai",
+        model: "gpt-5.2",
+        reason: "quality_finish",
+        stage: "final",
+      } as any,
       messages: [{ role: "user", content: "hi" }],
       options: { stream: true },
     };

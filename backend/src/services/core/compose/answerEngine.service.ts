@@ -2,7 +2,7 @@
 //
 // KODA ANSWER ENGINE V3 (CLEAN + MAX DETAIL, DATA-BANK DRIVEN)
 //
-import { clamp } from '../../../utils';
+import { clamp } from "../../../utils";
 // Goal (ChatGPT-like):
 // - Turn (operator + scope + evidence) into a high-quality, doc-grounded answer.
 // - Keep answers natural + varied (regenCount + variationSeed) WITHOUT hardcoded templates.
@@ -56,7 +56,11 @@ export type OutputShape =
 export interface ConversationState {
   conversationId: string;
   turnId: string;
-  activeDocRef?: { docId?: string; filename?: string; lockType?: "hard" | "soft" };
+  activeDocRef?: {
+    docId?: string;
+    filename?: string;
+    lockType?: "hard" | "soft";
+  };
 }
 
 export interface ScopeConstraints {
@@ -225,7 +229,10 @@ export interface LLMCompletionOptions {
 }
 
 export interface LLMClient {
-  complete(messages: LLMMessage[], opts: LLMCompletionOptions): Promise<{ text: string }>;
+  complete(
+    messages: LLMMessage[],
+    opts: LLMCompletionOptions,
+  ): Promise<{ text: string }>;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -255,7 +262,11 @@ interface ComposeAnswerPromptBank {
     defaultTemperature: number;
     defaultMaxTokens: number;
     // how much evidence to include in prompt
-    evidence: { maxCharsPerChunk: number; maxChunks: number; includeLocations: boolean };
+    evidence: {
+      maxCharsPerChunk: number;
+      maxChunks: number;
+      includeLocations: boolean;
+    };
     // style hooks
     styleHooks: {
       requireShortParagraphs: boolean;
@@ -281,7 +292,12 @@ interface DomainOntologyBank {
     formattingProfile?: string;
     tone?: {
       // not “templates”, just style knobs
-      preference?: "neutral" | "formal" | "careful" | "clinical" | "numbers_first";
+      preference?:
+        | "neutral"
+        | "formal"
+        | "careful"
+        | "clinical"
+        | "numbers_first";
       avoidHype?: boolean;
       avoidLegalAdviceTone?: boolean;
     };
@@ -292,7 +308,11 @@ interface DomainOntologyBank {
 // Helpers: deterministic variation (regen) without hardcoded outputs
 // -------------------------------------------------------------------------------------------------
 
-function makeVariationSeed(conversationId: string, turnId: string, regenCount: number): string {
+function makeVariationSeed(
+  conversationId: string,
+  turnId: string,
+  regenCount: number,
+): string {
   return crypto
     .createHash("sha256")
     .update(`${conversationId}:${turnId}:${regenCount}`)
@@ -310,7 +330,11 @@ function seededRand(seed: string): () => number {
 
 // “ChatGPT-like” variation: small temperature modulation + optional phrasing variants inside prompt,
 // but ALWAYS same facts because facts come from evidence.
-function computeTemperature(base: number, variationSeed: string, regenCount: number): number {
+function computeTemperature(
+  base: number,
+  variationSeed: string,
+  regenCount: number,
+): number {
   const r = seededRand(variationSeed)();
   const regenBoost = Math.min(0.08, regenCount * 0.03);
   const jitter = (r - 0.5) * 0.06; // [-0.03..+0.03]
@@ -331,26 +355,46 @@ export class KodaAnswerEngineV3Service {
   // Inject your LLM + other services (or use DI container)
   constructor(
     private readonly llm: LLMClient,
-    private readonly retrievalEngine: { retrieve(req: AnswerRequest): Promise<RetrievalResult> },
+    private readonly retrievalEngine: {
+      retrieve(req: AnswerRequest): Promise<RetrievalResult>;
+    },
     private readonly composer: {
-      composeWithContext: (raw: string, ctx: any, sourceButtons?: SourceButtonsAttachment) => Promise<ComposedResponse> | ComposedResponse;
+      composeWithContext: (
+        raw: string,
+        ctx: any,
+        sourceButtons?: SourceButtonsAttachment,
+      ) => Promise<ComposedResponse> | ComposedResponse;
     },
     private readonly finalAnswerGate?: {
-      run: (resp: ComposedResponse, req: AnswerRequest, retrieval: RetrievalResult) => Promise<ComposedResponse>;
+      run: (
+        resp: ComposedResponse,
+        req: AnswerRequest,
+        retrieval: RetrievalResult,
+      ) => Promise<ComposedResponse>;
     },
     private readonly sourceButtonsService?: {
-      buildFromEvidence: (evidence: EvidenceChunk[], language: LanguageCode, maxDocs: number) => SourceButtonsAttachment | undefined;
-    }
+      buildFromEvidence: (
+        evidence: EvidenceChunk[],
+        language: LanguageCode,
+        maxDocs: number,
+      ) => SourceButtonsAttachment | undefined;
+    },
   ) {
     this.promptRegistry = getBank<PromptRegistryBank>("prompt_registry")!;
-    this.composePrompt = getBank<ComposeAnswerPromptBank>("compose_answer_prompt")!;
+    this.composePrompt = getBank<ComposeAnswerPromptBank>(
+      "compose_answer_prompt",
+    )!;
     this.domainOntology = getBank<DomainOntologyBank>("domain_ontology");
   }
 
   // Main entry
   async answer(req: AnswerRequest): Promise<ComposedResponse> {
     const regenCount = req.regenCount ?? 0;
-    const variationSeed = makeVariationSeed(req.state.conversationId, req.state.turnId, regenCount);
+    const variationSeed = makeVariationSeed(
+      req.state.conversationId,
+      req.state.turnId,
+      regenCount,
+    );
 
     // 1) Retrieve evidence (scoped!)
     const retrieval = await this.retrievalEngine.retrieve(req);
@@ -362,11 +406,20 @@ export class KodaAnswerEngineV3Service {
     }
 
     // 2) Build LLM prompt messages (bank-driven)
-    const messages = this.buildComposeMessages(req, retrieval.evidence, { variationSeed });
+    const messages = this.buildComposeMessages(req, retrieval.evidence, {
+      variationSeed,
+    });
 
     // 3) Run LLM
-    const { temperature, maxTokens } = this.pickLLMParams(req, { variationSeed, regenCount });
-    const llmOut = await this.llm.complete(messages, { temperature, maxTokens, seed: variationSeed });
+    const { temperature, maxTokens } = this.pickLLMParams(req, {
+      variationSeed,
+      regenCount,
+    });
+    const llmOut = await this.llm.complete(messages, {
+      temperature,
+      maxTokens,
+      seed: variationSeed,
+    });
 
     const draft = (llmOut.text || "").trim();
 
@@ -374,10 +427,13 @@ export class KodaAnswerEngineV3Service {
     const sourceButtons = this.buildSourceButtons(req, retrieval.evidence);
 
     // 5) Compose (format + bold + paragraphization) using composer context
-    const composerCtx = this.buildComposerContext(req, { variationSeed, regenCount });
+    const composerCtx = this.buildComposerContext(req, {
+      variationSeed,
+      regenCount,
+    });
 
     const composed = await this.ensurePromise(
-      this.composer.composeWithContext(draft, composerCtx, sourceButtons)
+      this.composer.composeWithContext(draft, composerCtx, sourceButtons),
     );
 
     // 6) Run Quality Gates / Final Answer Gate (optional but recommended)
@@ -391,7 +447,11 @@ export class KodaAnswerEngineV3Service {
   // -------------------------------------------------------------------------------------------------
   // Fallback handoff (never show "no relevant info")
   // -------------------------------------------------------------------------------------------------
-  private emitEmptyForFallback(req: AnswerRequest, retrieval: RetrievalResult, meta: { variationSeed: string }): ComposedResponse {
+  private emitEmptyForFallback(
+    req: AnswerRequest,
+    retrieval: RetrievalResult,
+    meta: { variationSeed: string },
+  ): ComposedResponse {
     // IMPORTANT: Keep content minimal; quality_gates + fallback banks should generate the user-facing text.
     // We provide machine-usable reason codes so the router can pick the correct adaptive UX.
     return {
@@ -402,7 +462,8 @@ export class KodaAnswerEngineV3Service {
         composedBy: "KodaAnswerEngineV3",
         variationSeed: meta.variationSeed,
         // Critical for fallback selection
-        retrievalReasonCode: retrieval.reasonCode ?? "no_relevant_chunks_in_scoped_docs",
+        retrievalReasonCode:
+          retrieval.reasonCode ?? "no_relevant_chunks_in_scoped_docs",
         answerMode: req.answerMode,
         operator: req.operator,
         intentFamily: req.intentFamily,
@@ -414,18 +475,33 @@ export class KodaAnswerEngineV3Service {
   // -------------------------------------------------------------------------------------------------
   // Prompt building
   // -------------------------------------------------------------------------------------------------
-  private buildComposeMessages(req: AnswerRequest, evidence: EvidenceChunk[], meta: { variationSeed: string }): LLMMessage[] {
+  private buildComposeMessages(
+    req: AnswerRequest,
+    evidence: EvidenceChunk[],
+    meta: { variationSeed: string },
+  ): LLMMessage[] {
     if (!this.composePrompt?.config?.enabled) {
       // If prompt banks are missing, still avoid hardcoding a “voice”.
       // Return a minimal system+user prompt.
       return [
-        { role: "system", content: "You are a document-grounded assistant. Answer only using provided evidence." },
-        { role: "user", content: `Question: ${req.query}\n\nEvidence:\n${this.renderEvidenceForPrompt(evidence, req.language, 6, 800)}` },
+        {
+          role: "system",
+          content:
+            "You are a document-grounded assistant. Answer only using provided evidence.",
+        },
+        {
+          role: "user",
+          content: `Question: ${req.query}\n\nEvidence:\n${this.renderEvidenceForPrompt(evidence, req.language, 6, 800)}`,
+        },
       ];
     }
 
-    const sysT = this.composePrompt.templates.system[req.language] ?? this.composePrompt.templates.system.en;
-    const userT = this.composePrompt.templates.user[req.language] ?? this.composePrompt.templates.user.en;
+    const sysT =
+      this.composePrompt.templates.system[req.language] ??
+      this.composePrompt.templates.system.en;
+    const userT =
+      this.composePrompt.templates.user[req.language] ??
+      this.composePrompt.templates.user.en;
 
     const domainStyle = this.resolveDomainStyle(req);
 
@@ -436,7 +512,7 @@ export class KodaAnswerEngineV3Service {
       req.language,
       eCfg.maxChunks,
       eCfg.maxCharsPerChunk,
-      eCfg.includeLocations
+      eCfg.includeLocations,
     );
 
     // Insert variables into templates (simple placeholders)
@@ -447,11 +523,21 @@ export class KodaAnswerEngineV3Service {
       domain: domainStyle.domainId,
       domainTone: domainStyle.tone,
       formattingProfile: domainStyle.formattingProfile,
-      requireShortParagraphs: String(this.composePrompt.config.styleHooks.requireShortParagraphs),
-      maxSentencesPerParagraph: String(this.composePrompt.config.styleHooks.maxSentencesPerParagraph),
-      maxCharsPerParagraph: String(this.composePrompt.config.styleHooks.maxCharsPerParagraph),
-      requireIntroConclusion: String(this.composePrompt.config.styleHooks.requireIntroConclusion),
-      bulletMaxSentences: String(this.composePrompt.config.styleHooks.bulletMaxSentences),
+      requireShortParagraphs: String(
+        this.composePrompt.config.styleHooks.requireShortParagraphs,
+      ),
+      maxSentencesPerParagraph: String(
+        this.composePrompt.config.styleHooks.maxSentencesPerParagraph,
+      ),
+      maxCharsPerParagraph: String(
+        this.composePrompt.config.styleHooks.maxCharsPerParagraph,
+      ),
+      requireIntroConclusion: String(
+        this.composePrompt.config.styleHooks.requireIntroConclusion,
+      ),
+      bulletMaxSentences: String(
+        this.composePrompt.config.styleHooks.bulletMaxSentences,
+      ),
       forbidJson: String(this.composePrompt.config.styleHooks.forbidJson),
     });
 
@@ -475,7 +561,7 @@ export class KodaAnswerEngineV3Service {
     lang: LanguageCode,
     maxChunks: number,
     maxCharsPerChunk: number,
-    includeLocations: boolean = true
+    includeLocations: boolean = true,
   ): string {
     const chunks = evidence.slice(0, maxChunks);
 
@@ -497,9 +583,18 @@ export class KodaAnswerEngineV3Service {
     if (typeof c.pageStart === "number") {
       parts.push(lang === "pt" ? `p. ${c.pageStart}` : `p. ${c.pageStart}`);
     }
-    if (c.sheetName) parts.push(lang === "pt" ? `aba: ${c.sheetName}` : `sheet: ${c.sheetName}`);
-    if (typeof c.slideNumber === "number") parts.push(lang === "pt" ? `slide ${c.slideNumber}` : `slide ${c.slideNumber}`);
-    if (c.cellRange) parts.push(lang === "pt" ? `célula ${c.cellRange}` : `cell ${c.cellRange}`);
+    if (c.sheetName)
+      parts.push(
+        lang === "pt" ? `aba: ${c.sheetName}` : `sheet: ${c.sheetName}`,
+      );
+    if (typeof c.slideNumber === "number")
+      parts.push(
+        lang === "pt" ? `slide ${c.slideNumber}` : `slide ${c.slideNumber}`,
+      );
+    if (c.cellRange)
+      parts.push(
+        lang === "pt" ? `célula ${c.cellRange}` : `cell ${c.cellRange}`,
+      );
     return parts.join(", ");
   }
 
@@ -532,22 +627,29 @@ export class KodaAnswerEngineV3Service {
   // -------------------------------------------------------------------------------------------------
   // Domain style resolution (tone/format)
   // -------------------------------------------------------------------------------------------------
-  private resolveDomainStyle(req: AnswerRequest): { domainId: string; formattingProfile: string; tone: string } {
-    const defaultDomain = this.domainOntology?.config?.defaultDomain ?? "general";
+  private resolveDomainStyle(req: AnswerRequest): {
+    domainId: string;
+    formattingProfile: string;
+    tone: string;
+  } {
+    const defaultDomain =
+      this.domainOntology?.config?.defaultDomain ?? "general";
     const domainId = req.domain?.topDomain ?? defaultDomain;
 
     const found = this.domainOntology?.domains?.find((d) => d.id === domainId);
 
     // formattingProfile influences prompt instructions (NOT templates)
     const formattingProfile =
-      req.domain?.formattingProfile ??
-      found?.formattingProfile ??
-      "default";
+      req.domain?.formattingProfile ?? found?.formattingProfile ?? "default";
 
     // tone is a guidance label; composer/render_policy enforce the *structure*
     const tone =
       found?.tone?.preference ??
-      (domainId.startsWith("medical") ? "clinical" : domainId.startsWith("finance") ? "numbers_first" : "neutral");
+      (domainId.startsWith("medical")
+        ? "clinical"
+        : domainId.startsWith("finance")
+          ? "numbers_first"
+          : "neutral");
 
     return { domainId, formattingProfile, tone };
   }
@@ -555,15 +657,25 @@ export class KodaAnswerEngineV3Service {
   // -------------------------------------------------------------------------------------------------
   // LLM params
   // -------------------------------------------------------------------------------------------------
-  private pickLLMParams(req: AnswerRequest, meta: { variationSeed: string; regenCount: number }) {
+  private pickLLMParams(
+    req: AnswerRequest,
+    meta: { variationSeed: string; regenCount: number },
+  ) {
     const baseTemp = this.composePrompt?.config?.defaultTemperature ?? 0.35;
     const baseMax = this.composePrompt?.config?.defaultMaxTokens ?? 900;
 
     // Short answers: lower tokens
-    const short = !!req.constraints.userRequestedShort || !!req.signals.shortOverview || (req.constraints.maxSentences && req.constraints.maxSentences <= 3);
+    const short =
+      !!req.constraints.userRequestedShort ||
+      !!req.signals.shortOverview ||
+      (req.constraints.maxSentences && req.constraints.maxSentences <= 3);
     const maxTokens = short ? Math.min(baseMax, 360) : baseMax;
 
-    const temperature = computeTemperature(baseTemp, meta.variationSeed, meta.regenCount);
+    const temperature = computeTemperature(
+      baseTemp,
+      meta.variationSeed,
+      meta.regenCount,
+    );
 
     return { temperature, maxTokens };
   }
@@ -571,12 +683,19 @@ export class KodaAnswerEngineV3Service {
   // -------------------------------------------------------------------------------------------------
   // Source buttons / attachments
   // -------------------------------------------------------------------------------------------------
-  private buildSourceButtons(req: AnswerRequest, evidence: EvidenceChunk[]): SourceButtonsAttachment | undefined {
+  private buildSourceButtons(
+    req: AnswerRequest,
+    evidence: EvidenceChunk[],
+  ): SourceButtonsAttachment | undefined {
     // Nav pills are handled elsewhere; but doc-grounded answers still show up to N sources.
     const maxDocs = 3;
 
     if (this.sourceButtonsService) {
-      return this.sourceButtonsService.buildFromEvidence(evidence, req.language, maxDocs);
+      return this.sourceButtonsService.buildFromEvidence(
+        evidence,
+        req.language,
+        maxDocs,
+      );
     }
 
     // Minimal fallback implementation if SourceButtonsService is missing
@@ -597,15 +716,16 @@ export class KodaAnswerEngineV3Service {
       });
     }
 
-    return buttons.length
-      ? { type: "source_buttons", buttons }
-      : undefined;
+    return buttons.length ? { type: "source_buttons", buttons } : undefined;
   }
 
   // -------------------------------------------------------------------------------------------------
   // Composer context (bank-driven formatting happens there)
   // -------------------------------------------------------------------------------------------------
-  private buildComposerContext(req: AnswerRequest, meta: { variationSeed: string; regenCount: number }) {
+  private buildComposerContext(
+    req: AnswerRequest,
+    meta: { variationSeed: string; regenCount: number },
+  ) {
     return {
       operator: req.operator,
       intentFamily: req.intentFamily,
@@ -653,7 +773,10 @@ function truncate(s: string, max: number) {
 function fillTemplate(tpl: string, vars: Record<string, string>) {
   let out = tpl;
   for (const [k, v] of Object.entries(vars)) {
-    out = out.replace(new RegExp(`\\{\\{\\s*${escapeRegExp(k)}\\s*\\}\\}`, "g"), v);
+    out = out.replace(
+      new RegExp(`\\{\\{\\s*${escapeRegExp(k)}\\s*\\}\\}`, "g"),
+      v,
+    );
   }
   return out;
 }
@@ -662,18 +785,38 @@ function escapeRegExp(s: string) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function bestLocation(e: EvidenceChunk, lang: LanguageCode): SourceButton["location"] | undefined {
+function bestLocation(
+  e: EvidenceChunk,
+  lang: LanguageCode,
+): SourceButton["location"] | undefined {
   if (typeof e.pageStart === "number") {
-    return { type: "page", value: e.pageStart, label: lang === "pt" ? `Página ${e.pageStart}` : `Page ${e.pageStart}` };
+    return {
+      type: "page",
+      value: e.pageStart,
+      label: lang === "pt" ? `Página ${e.pageStart}` : `Page ${e.pageStart}`,
+    };
   }
   if (e.sheetName && e.cellRange) {
     return {
       type: "cell",
       value: `${e.sheetName}!${e.cellRange}`,
-      label: lang === "pt" ? `${e.sheetName} ${e.cellRange}` : `${e.sheetName} ${e.cellRange}`,
+      label:
+        lang === "pt"
+          ? `${e.sheetName} ${e.cellRange}`
+          : `${e.sheetName} ${e.cellRange}`,
     };
   }
-  if (e.sheetName) return { type: "sheet", value: e.sheetName, label: lang === "pt" ? `Aba ${e.sheetName}` : `Sheet ${e.sheetName}` };
-  if (typeof e.slideNumber === "number") return { type: "slide", value: e.slideNumber, label: `Slide ${e.slideNumber}` };
+  if (e.sheetName)
+    return {
+      type: "sheet",
+      value: e.sheetName,
+      label: lang === "pt" ? `Aba ${e.sheetName}` : `Sheet ${e.sheetName}`,
+    };
+  if (typeof e.slideNumber === "number")
+    return {
+      type: "slide",
+      value: e.slideNumber,
+      label: `Slide ${e.slideNumber}`,
+    };
   return undefined;
 }

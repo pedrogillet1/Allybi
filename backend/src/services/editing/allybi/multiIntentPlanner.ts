@@ -1,6 +1,9 @@
 import type { EditDomain } from "../editing.types";
 import { classifyAllybiIntent } from "./intentClassifier";
-import { planAllybiOperatorSteps, type AllybiOperatorStep } from "./operatorPlanner";
+import {
+  planAllybiOperatorSteps,
+  type AllybiOperatorStep,
+} from "./operatorPlanner";
 import { resolveAllybiScope } from "./scopeResolver";
 
 export interface MultiIntentConflict {
@@ -25,16 +28,17 @@ function detectLanguage(message: string): "en" | "pt" {
 function splitDirectives(message: string, language: "en" | "pt"): string[] {
   const text = String(message || "").trim();
   if (!text) return [];
-  const separators = language === "pt"
-    ? /^(?:,\s*|\s+\be\b\s+|\s+\btamb[eé]m\b\s+|\s+\bem seguida\b\s+|\s+\bdepois\b\s+|\s+\bal[eé]m disso\b\s+)/i
-    : /^(?:,\s*|\s+\band\b\s+|\s+\bthen\b\s+|\s+\balso\b\s+|\s+\bafter that\b\s+|\s+\bplus\b\s+)/i;
+  const separators =
+    language === "pt"
+      ? /^(?:,\s*|\s+\be\b\s+|\s+\btamb[eé]m\b\s+|\s+\bem seguida\b\s+|\s+\bdepois\b\s+|\s+\bal[eé]m disso\b\s+)/i
+      : /^(?:,\s*|\s+\band\b\s+|\s+\bthen\b\s+|\s+\balso\b\s+|\s+\bafter that\b\s+|\s+\bplus\b\s+)/i;
 
   const out: string[] = [];
   let current = "";
   let quote: '"' | "'" | null = null;
   for (let i = 0; i < text.length; i += 1) {
     const ch = text[i];
-    if (ch === "'" || ch === "\"") {
+    if (ch === "'" || ch === '"') {
       if (!quote) quote = ch as "'" | '"';
       else if (quote === ch) quote = null;
       current += ch;
@@ -77,7 +81,9 @@ function rankStep(domain: EditDomain, canonicalOperator: string): number {
 
 function hasTranslateFirstCue(message: string): boolean {
   const low = String(message || "").toLowerCase();
-  const hasTranslate = /\b(translate|traduza|traduzir|tradu[çc][aã]o)\b/.test(low);
+  const hasTranslate = /\b(translate|traduza|traduzir|tradu[çc][aã]o)\b/.test(
+    low,
+  );
   const hasFirst = /\b(first|firstly|primeiro|primeiramente)\b/.test(low);
   return hasTranslate && hasFirst;
 }
@@ -110,7 +116,9 @@ function detectConflicts(steps: AllybiOperatorStep[]): MultiIntentConflict[] {
   }
 
   for (const [target, ops] of byTarget.entries()) {
-    const hasRewrite = ops.some((x) => /REWRITE|REPLACE/.test(x.canonicalOperator));
+    const hasRewrite = ops.some((x) =>
+      /REWRITE|REPLACE/.test(x.canonicalOperator),
+    );
     const hasTranslate = ops.some((x) => /TRANSLATE/.test(x.canonicalOperator));
     if (hasRewrite && hasTranslate) {
       conflicts.push({
@@ -157,16 +165,17 @@ export function buildMultiIntentPlan(input: {
   }
 
   const preferTranslateFirst = hasTranslateFirstCue(input.message);
-  const ordered = allSteps
-    .slice()
-    .sort((a, b) => {
-      if (preferTranslateFirst) {
-        const aTrans = /TRANSLATE/.test(a.canonicalOperator);
-        const bTrans = /TRANSLATE/.test(b.canonicalOperator);
-        if (aTrans !== bTrans) return aTrans ? -1 : 1;
-      }
-      return rankStep(input.domain, a.canonicalOperator) - rankStep(input.domain, b.canonicalOperator);
-    });
+  const ordered = allSteps.slice().sort((a, b) => {
+    if (preferTranslateFirst) {
+      const aTrans = /TRANSLATE/.test(a.canonicalOperator);
+      const bTrans = /TRANSLATE/.test(b.canonicalOperator);
+      if (aTrans !== bTrans) return aTrans ? -1 : 1;
+    }
+    return (
+      rankStep(input.domain, a.canonicalOperator) -
+      rankStep(input.domain, b.canonicalOperator)
+    );
+  });
   const merged = mergeCompatible(ordered);
   const conflicts = detectConflicts(merged);
 

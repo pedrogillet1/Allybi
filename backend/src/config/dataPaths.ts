@@ -9,35 +9,35 @@
  *   const config = loadJsonFile<MyConfigType>('answer_styles.json');
  */
 
-import path from 'path';
-import fs from 'fs';
+import path from "path";
+import fs from "fs";
 
 /**
  * Known data file names - prevents typos and enables autocomplete
  */
 export type DataFileName =
-  | 'answer_styles.json'
-  | 'markdown_components.json'
-  | 'table_presets.json'
-  | 'answer_examples.json'
-  | 'retrieval_policies.json'
-  | 'doc_query_synonyms.json'
-  | 'doc_aliases.json'
-  | 'analytics_phrases.json'
-  | 'language_profiles.json'
-  | 'validation_policies.json'
-  | 'error_localization.json'
-  | 'capabilities_catalog.json'
-  | 'debug_labels.json'
-  | 'fallbacks.json'
-  | 'koda_product_help.json'
-  | 'intent_patterns.json';
+  | "answer_styles.json"
+  | "markdown_components.json"
+  | "table_presets.json"
+  | "answer_examples.json"
+  | "retrieval_policies.json"
+  | "doc_query_synonyms.json"
+  | "doc_aliases.json"
+  | "analytics_phrases.json"
+  | "language_profiles.json"
+  | "validation_policies.json"
+  | "error_localization.json"
+  | "capabilities_catalog.json"
+  | "debug_labels.json"
+  | "fallbacks.json"
+  | "koda_product_help.json"
+  | "intent_patterns.json";
 
 /**
  * Base directory for data files
  * Allow override by env, but default to <project-root>/src/data
  */
-const DEFAULT_DATA_DIR = path.resolve(__dirname, '../data');
+const DEFAULT_DATA_DIR = path.resolve(__dirname, "../data");
 
 export const DATA_DIR = process.env.KODA_DATA_DIR
   ? path.resolve(process.env.KODA_DATA_DIR)
@@ -67,7 +67,7 @@ export function loadJsonFile<T = unknown>(fileName: DataFileName): T {
     );
   }
 
-  const raw = fs.readFileSync(filePath, 'utf-8');
+  const raw = fs.readFileSync(filePath, "utf-8");
 
   try {
     return JSON.parse(raw) as T;
@@ -89,22 +89,22 @@ export function dataFileExists(fileName: DataFileName): boolean {
  * List of all required data files for startup verification
  */
 export const REQUIRED_DATA_FILES: DataFileName[] = [
-  'answer_styles.json',
-  'markdown_components.json',
-  'table_presets.json',
-  'answer_examples.json',
-  'retrieval_policies.json',
-  'doc_query_synonyms.json',
-  'doc_aliases.json',
-  'analytics_phrases.json',
-  'language_profiles.json',
-  'validation_policies.json',
-  'error_localization.json',
-  'capabilities_catalog.json',
-  'debug_labels.json',
-  'fallbacks.json',
-  'koda_product_help.json',
-  'intent_patterns.json',
+  "answer_styles.json",
+  "markdown_components.json",
+  "table_presets.json",
+  "answer_examples.json",
+  "retrieval_policies.json",
+  "doc_query_synonyms.json",
+  "doc_aliases.json",
+  "analytics_phrases.json",
+  "language_profiles.json",
+  "validation_policies.json",
+  "error_localization.json",
+  "capabilities_catalog.json",
+  "debug_labels.json",
+  "fallbacks.json",
+  "koda_product_help.json",
+  "intent_patterns.json",
 ];
 
 /**

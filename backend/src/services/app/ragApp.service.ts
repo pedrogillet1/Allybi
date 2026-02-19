@@ -1,9 +1,9 @@
 // src/services/app/ragApp.service.ts
-import type { Request } from 'express';
-import type { Attachment } from '../../types/handlerResult.types';
+import type { Request } from "express";
+import type { Attachment } from "../../types/handlerResult.types";
 
-import { KodaOrchestratorV3Service } from '../core/orchestration/kodaOrchestrator.service';
-import { FileInventoryService } from '../files/fileInventory.service';
+import { KodaOrchestratorV3Service } from "../core/orchestration/kodaOrchestrator.service";
+import { FileInventoryService } from "../files/fileInventory.service";
 
 /**
  * RagAppService
@@ -32,7 +32,7 @@ export interface RagSearchParams {
     dateFrom?: string;
     dateTo?: string;
   };
-  mode?: 'hybrid' | 'lexical' | 'semantic';
+  mode?: "hybrid" | "lexical" | "semantic";
 }
 
 export interface RagChunk {
@@ -89,16 +89,26 @@ function getActor(req: Request): { userId: string } {
     anyReq.user?.userId ||
     anyReq.auth?.userId ||
     anyReq.session?.userId ||
-    'guest';
+    "guest";
   return { userId: String(userId) };
 }
 
 function sanitizeQuery(q: unknown, max = 800): string {
-  return String(q ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
+  return String(q ?? "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, max);
 }
 
-function clampInt(value: number | undefined, min: number, max: number, fallback: number): number {
-  const v = Number.isFinite(Number(value)) ? Math.trunc(Number(value)) : fallback;
+function clampInt(
+  value: number | undefined,
+  min: number,
+  max: number,
+  fallback: number,
+): number {
+  const v = Number.isFinite(Number(value))
+    ? Math.trunc(Number(value))
+    : fallback;
   return Math.max(min, Math.min(max, v));
 }
 
@@ -110,7 +120,10 @@ export class RagAppService {
    * Search documents/chunks. This is “retrieval only” and should not generate an answer.
    * Returns: docs + chunks, plus reasonCode when empty in scope.
    */
-  async search(req: Request, params: RagSearchParams): Promise<RagSearchResult> {
+  async search(
+    req: Request,
+    params: RagSearchParams,
+  ): Promise<RagSearchResult> {
     const actor = getActor(req);
 
     const query = sanitizeQuery(params.query);
@@ -119,13 +132,18 @@ export class RagAppService {
         query,
         docs: [],
         chunks: [],
-        meta: { requestId: this.makeRequestId(), usedMode: params.mode || 'hybrid', scoped: false, reasonCode: 'empty_query' },
+        meta: {
+          requestId: this.makeRequestId(),
+          usedMode: params.mode || "hybrid",
+          scoped: false,
+          reasonCode: "empty_query",
+        },
       };
     }
 
     const limitDocs = clampInt(params.limitDocs, 1, 100, 20);
     const limitChunks = clampInt(params.limitChunks, 1, 200, 40);
-    const mode = params.mode || 'hybrid';
+    const mode = params.mode || "hybrid";
 
     // Resolve filters into a stable doc scope (docIds/docTypes/folders).
     const resolvedScope = await this.inventory.resolveScope({
@@ -187,14 +205,17 @@ export class RagAppService {
    * Non-streaming “answer with sources” endpoint (if you still want it).
    * For streaming chat: controller should call orchestrator.stream().
    */
-  async answer(req: Request, input: {
-    query: string;
-    conversationId?: string | null;
-    attachedDocumentId?: string | null;
-    regenCount?: number;
-    regenerateMessageId?: string | null;
-    filters?: RagSearchParams['filters'];
-  }): Promise<RagAnswerResult> {
+  async answer(
+    req: Request,
+    input: {
+      query: string;
+      conversationId?: string | null;
+      attachedDocumentId?: string | null;
+      regenCount?: number;
+      regenerateMessageId?: string | null;
+      filters?: RagSearchParams["filters"];
+    },
+  ): Promise<RagAnswerResult> {
     const actor = getActor(req);
 
     const query = sanitizeQuery(input.query);
@@ -228,7 +249,8 @@ export class RagAppService {
       attachments: result.attachments || [],
       meta: {
         requestId,
-        answerMode: result.meta?.answerMode || result.meta?.context?.answerMode || null,
+        answerMode:
+          result.meta?.answerMode || result.meta?.context?.answerMode || null,
         followUpSuggestions: result.meta?.followupSuggestions,
         timings: result.meta?.timings,
         confidence: result.meta?.confidence,

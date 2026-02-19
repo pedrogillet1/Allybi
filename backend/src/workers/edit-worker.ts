@@ -1,12 +1,12 @@
-import type { Job } from 'bullmq';
+import type { Job } from "bullmq";
 
-import prisma from '../config/database';
-import { addDocumentJob } from '../queues/document.queue';
+import prisma from "../config/database";
+import { addDocumentJob } from "../queues/document.queue";
 import {
   startEditWorker,
   stopEditWorker,
   type ReindexRevisionJobData,
-} from '../queues/edit.queue';
+} from "../queues/edit.queue";
 
 async function runJob(job: Job<ReindexRevisionJobData>): Promise<void> {
   const targetId = job.data.revisionId || job.data.documentId;
@@ -27,14 +27,16 @@ async function runJob(job: Job<ReindexRevisionJobData>): Promise<void> {
   }
 
   if (!doc.encryptedFilename) {
-    throw new Error(`Document ${doc.id} has no encryptedFilename; cannot reindex.`);
+    throw new Error(
+      `Document ${doc.id} has no encryptedFilename; cannot reindex.`,
+    );
   }
 
   await addDocumentJob({
     documentId: doc.id,
     encryptedFilename: doc.encryptedFilename,
-    filename: doc.filename ?? 'document',
-    mimeType: doc.mimeType ?? 'application/octet-stream',
+    filename: doc.filename ?? "document",
+    mimeType: doc.mimeType ?? "application/octet-stream",
     userId: doc.userId,
     thumbnailUrl: null,
   });
@@ -56,6 +58,6 @@ if (require.main === module) {
     process.exit(0);
   };
 
-  process.on('SIGINT', shutdown);
-  process.on('SIGTERM', shutdown);
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
 }

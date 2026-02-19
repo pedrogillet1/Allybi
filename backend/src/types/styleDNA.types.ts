@@ -1,5 +1,5 @@
 export interface StyleDNAProfile {
-  version: '1.0';
+  version: "1.0";
   documentId: string;
   presentationId: string;
 
@@ -13,10 +13,10 @@ export interface StyleDNAProfile {
 
   dominantLayouts: Array<{ layout: string; count: number }>;
 
-  preferredImageStyle: 'photo' | 'illustration' | 'mixed';
-  titleTone: 'formal' | 'neutral' | 'bold';
-  visualDensity: 'low' | 'medium' | 'high';
-  spacingPreference: 'airy' | 'balanced' | 'compact';
+  preferredImageStyle: "photo" | "illustration" | "mixed";
+  titleTone: "formal" | "neutral" | "bold";
+  visualDensity: "low" | "medium" | "high";
+  spacingPreference: "airy" | "balanced" | "compact";
 
   confidence: number;
   extractedAt: string;
@@ -31,6 +31,9 @@ export interface ExtractStyleDNAInput {
 }
 
 export interface StyleDNARepository {
-  getByDocument(userId: string, documentId: string): Promise<StyleDNAProfile | null>;
+  getByDocument(
+    userId: string,
+    documentId: string,
+  ): Promise<StyleDNAProfile | null>;
   save(userId: string, documentId: string, dna: StyleDNAProfile): Promise<void>;
 }

@@ -7,8 +7,8 @@
  * Pipeline: file buffer → base64 import → convert (X→pdf) → export URL → download PDF
  */
 
-import CloudConvert from 'cloudconvert';
-import { config } from '../../config/env';
+import CloudConvert from "cloudconvert";
+import { config } from "../../config/env";
 
 export interface CloudConvertResult {
   success: boolean;
@@ -22,7 +22,7 @@ let clientInstance: CloudConvert | null = null;
 function getClient(): CloudConvert {
   if (!clientInstance) {
     if (!config.CLOUDCONVERT_API_KEY) {
-      throw new Error('CLOUDCONVERT_API_KEY is not set');
+      throw new Error("CLOUDCONVERT_API_KEY is not set");
     }
     clientInstance = new CloudConvert(config.CLOUDCONVERT_API_KEY);
   }
@@ -33,29 +33,34 @@ function getClient(): CloudConvert {
  * Map MIME type to CloudConvert input_format string.
  */
 const MIME_TO_FORMAT: Record<string, string> = {
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
-  'application/vnd.ms-powerpoint': 'ppt',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
-  'application/msword': 'doc',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
-  'application/vnd.ms-excel': 'xls',
-  'application/pdf': 'pdf',
-  'application/rtf': 'rtf',
-  'application/vnd.oasis.opendocument.text': 'odt',
-  'application/vnd.oasis.opendocument.spreadsheet': 'ods',
-  'application/vnd.oasis.opendocument.presentation': 'odp',
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+    "pptx",
+  "application/vnd.ms-powerpoint": "ppt",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    "docx",
+  "application/msword": "doc",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+  "application/vnd.ms-excel": "xls",
+  "application/pdf": "pdf",
+  "application/rtf": "rtf",
+  "application/vnd.oasis.opendocument.text": "odt",
+  "application/vnd.oasis.opendocument.spreadsheet": "ods",
+  "application/vnd.oasis.opendocument.presentation": "odp",
 };
 
 /**
  * Derive the CloudConvert input format from filename extension or MIME type.
  */
-function resolveInputFormat(filename: string, mimeType?: string): string | null {
+function resolveInputFormat(
+  filename: string,
+  mimeType?: string,
+): string | null {
   // Try MIME type first
   if (mimeType && MIME_TO_FORMAT[mimeType]) {
     return MIME_TO_FORMAT[mimeType];
   }
   // Fallback to extension
-  const ext = filename.split('.').pop()?.toLowerCase();
+  const ext = filename.split(".").pop()?.toLowerCase();
   if (ext && Object.values(MIME_TO_FORMAT).includes(ext)) {
     return ext;
   }
@@ -84,42 +89,49 @@ export async function convertToPdf(
     const inputFormat = resolveInputFormat(filename, mimeType);
 
     if (!inputFormat) {
-      return { success: false, error: `Unsupported format for CloudConvert: ${mimeType || filename}` };
+      return {
+        success: false,
+        error: `Unsupported format for CloudConvert: ${mimeType || filename}`,
+      };
     }
 
-    console.log(`[CloudConvert] Starting ${inputFormat}→PDF conversion for "${filename}" (${(fileBuffer.length / 1024).toFixed(1)} KB)`);
+    console.log(
+      `[CloudConvert] Starting ${inputFormat}→PDF conversion for "${filename}" (${(fileBuffer.length / 1024).toFixed(1)} KB)`,
+    );
 
     // Create a job: import → convert → export
     const job = await client.jobs.create({
       tasks: {
-        'import-file': {
-          operation: 'import/base64' as const,
-          file: fileBuffer.toString('base64'),
+        "import-file": {
+          operation: "import/base64" as const,
+          file: fileBuffer.toString("base64"),
           filename,
         },
-        'convert-to-pdf': {
-          operation: 'convert' as const,
-          input: 'import-file',
+        "convert-to-pdf": {
+          operation: "convert" as const,
+          input: "import-file",
           input_format: inputFormat,
-          output_format: 'pdf',
-          engine: 'office',
+          output_format: "pdf",
+          engine: "office",
         },
-        'export-pdf': {
-          operation: 'export/url' as const,
-          input: 'convert-to-pdf',
+        "export-pdf": {
+          operation: "export/url" as const,
+          input: "convert-to-pdf",
         },
       },
     });
 
-    console.log(`[CloudConvert] Job created: ${job.id}, waiting for completion...`);
+    console.log(
+      `[CloudConvert] Job created: ${job.id}, waiting for completion...`,
+    );
 
     // Wait for the job to finish (polling)
     const finishedJob = await client.jobs.wait(job.id);
 
     // Check job status
-    if (finishedJob.status === 'error') {
-      const failedTask = finishedJob.tasks.find(t => t.status === 'error');
-      const errorMsg = failedTask?.message || 'Unknown CloudConvert error';
+    if (finishedJob.status === "error") {
+      const failedTask = finishedJob.tasks.find((t) => t.status === "error");
+      const errorMsg = failedTask?.message || "Unknown CloudConvert error";
       console.error(`[CloudConvert] Job failed: ${errorMsg}`);
       return { success: false, error: errorMsg };
     }
@@ -128,8 +140,11 @@ export async function convertToPdf(
     const exportUrls = client.jobs.getExportUrls(finishedJob);
 
     if (!exportUrls.length || !exportUrls[0].url) {
-      console.error('[CloudConvert] No export URL returned');
-      return { success: false, error: 'No export URL in CloudConvert response' };
+      console.error("[CloudConvert] No export URL returned");
+      return {
+        success: false,
+        error: "No export URL in CloudConvert response",
+      };
     }
 
     const downloadUrl = exportUrls[0].url;
@@ -148,14 +163,16 @@ export async function convertToPdf(
 
     console.log(
       `[CloudConvert] Conversion complete: "${filename}" (${inputFormat}) → PDF ` +
-      `(${(pdfBuffer.length / 1024).toFixed(1)} KB) in ${duration}ms`
+        `(${(pdfBuffer.length / 1024).toFixed(1)} KB) in ${duration}ms`,
     );
 
     return { success: true, pdfBuffer };
   } catch (err: any) {
     const duration = Date.now() - startTime;
-    const error = err.message || 'Unknown CloudConvert error';
-    console.error(`[CloudConvert] Conversion failed after ${duration}ms: ${error}`);
+    const error = err.message || "Unknown CloudConvert error";
+    console.error(
+      `[CloudConvert] Conversion failed after ${duration}ms: ${error}`,
+    );
     return { success: false, error };
   }
 }
@@ -176,7 +193,10 @@ export async function convertToDocx(
     const inputFormat = resolveInputFormat(filename, mimeType);
 
     if (!inputFormat) {
-      return { success: false, error: `Unsupported format for CloudConvert: ${mimeType || filename}` };
+      return {
+        success: false,
+        error: `Unsupported format for CloudConvert: ${mimeType || filename}`,
+      };
     }
 
     console.log(
@@ -184,45 +204,48 @@ export async function convertToDocx(
     );
 
     const convertTask: Record<string, unknown> = {
-      operation: 'convert',
-      input: 'import-file',
+      operation: "convert",
+      input: "import-file",
       input_format: inputFormat,
-      output_format: 'docx',
+      output_format: "docx",
     };
 
     // CloudConvert "office" engine is appropriate for office inputs; for pdf, omit engine to let CC choose.
-    if (inputFormat !== 'pdf') {
-      convertTask.engine = 'office';
+    if (inputFormat !== "pdf") {
+      convertTask.engine = "office";
     }
 
     const job = await client.jobs.create({
       tasks: {
-        'import-file': {
-          operation: 'import/base64' as const,
-          file: fileBuffer.toString('base64'),
+        "import-file": {
+          operation: "import/base64" as const,
+          file: fileBuffer.toString("base64"),
           filename,
         },
-        'convert-to-docx': convertTask as any,
-        'export-docx': {
-          operation: 'export/url' as const,
-          input: 'convert-to-docx',
+        "convert-to-docx": convertTask as any,
+        "export-docx": {
+          operation: "export/url" as const,
+          input: "convert-to-docx",
         },
       },
     });
 
     const finishedJob = await client.jobs.wait(job.id);
 
-    if (finishedJob.status === 'error') {
-      const failedTask = finishedJob.tasks.find(t => t.status === 'error');
-      const errorMsg = failedTask?.message || 'Unknown CloudConvert error';
+    if (finishedJob.status === "error") {
+      const failedTask = finishedJob.tasks.find((t) => t.status === "error");
+      const errorMsg = failedTask?.message || "Unknown CloudConvert error";
       console.error(`[CloudConvert] DOCX job failed: ${errorMsg}`);
       return { success: false, error: errorMsg };
     }
 
     const exportUrls = client.jobs.getExportUrls(finishedJob);
     if (!exportUrls.length || !exportUrls[0].url) {
-      console.error('[CloudConvert] No export URL returned for DOCX');
-      return { success: false, error: 'No export URL in CloudConvert response' };
+      console.error("[CloudConvert] No export URL returned for DOCX");
+      return {
+        success: false,
+        error: "No export URL in CloudConvert response",
+      };
     }
 
     const downloadUrl = exportUrls[0].url;
@@ -238,14 +261,16 @@ export async function convertToDocx(
 
     console.log(
       `[CloudConvert] Conversion complete: "${filename}" (${inputFormat}) → DOCX ` +
-      `(${(docxBuffer.length / 1024).toFixed(1)} KB) in ${duration}ms`
+        `(${(docxBuffer.length / 1024).toFixed(1)} KB) in ${duration}ms`,
     );
 
     return { success: true, docxBuffer };
   } catch (err: any) {
     const duration = Date.now() - startTime;
-    const error = err.message || 'Unknown CloudConvert error';
-    console.error(`[CloudConvert] DOCX conversion failed after ${duration}ms: ${error}`);
+    const error = err.message || "Unknown CloudConvert error";
+    console.error(
+      `[CloudConvert] DOCX conversion failed after ${duration}ms: ${error}`,
+    );
     return { success: false, error };
   }
 }

@@ -11,17 +11,17 @@
  * and any other consumer that calls getContainer() / getOrchestrator() keeps working.
  */
 
-import * as path from 'path';
-import * as fs from 'fs';
+import * as path from "path";
+import * as fs from "fs";
 
-type EnvName = 'production' | 'staging' | 'dev' | 'local';
+type EnvName = "production" | "staging" | "dev" | "local";
 
 function coerceEnvName(nodeEnv: string | undefined): EnvName {
-  const v = (nodeEnv ?? '').toLowerCase().trim();
-  if (v === 'production') return 'production';
-  if (v === 'staging') return 'staging';
-  if (v === 'development' || v === 'dev') return 'dev';
-  return 'local';
+  const v = (nodeEnv ?? "").toLowerCase().trim();
+  if (v === "production") return "production";
+  if (v === "staging") return "staging";
+  if (v === "development" || v === "dev") return "dev";
+  return "local";
 }
 
 function resolveDataBanksRootDir(): string {
@@ -30,15 +30,15 @@ function resolveDataBanksRootDir(): string {
   // - running from repo root (cwd=repo)
   // - running compiled JS from backend/dist (dirname=backend/dist/bootstrap)
   const candidates = [
-    path.join(process.cwd(), 'src/data_banks'),
-    path.join(process.cwd(), 'backend/src/data_banks'),
-    path.resolve(__dirname, '../data_banks'),
-    path.resolve(__dirname, '../../src/data_banks'),
+    path.join(process.cwd(), "src/data_banks"),
+    path.join(process.cwd(), "backend/src/data_banks"),
+    path.resolve(__dirname, "../data_banks"),
+    path.resolve(__dirname, "../../src/data_banks"),
   ];
 
   for (const c of candidates) {
     try {
-      const probe = path.join(c, 'manifest/bank_registry.any.json');
+      const probe = path.join(c, "manifest/bank_registry.any.json");
       if (fs.existsSync(probe)) return c;
     } catch {
       // ignore
@@ -60,24 +60,28 @@ class KodaV3Container {
 
   public async initialize(): Promise<void> {
     if (this._isInitialized) {
-      console.log('[Container] Already initialized, skipping');
+      console.log("[Container] Already initialized, skipping");
       return;
     }
 
-    console.log('[Container] Initializing services...');
+    console.log("[Container] Initializing services...");
 
     // ========================================================================
     // STEP 0: Initialize banks FIRST (before any bank-dependent services)
     // ========================================================================
     if (!this._banksInitialized) {
       try {
-        const { initializeBanks } = await import('../services/core/banks/bankLoader.service');
+        const { initializeBanks } = await import(
+          "../services/core/banks/bankLoader.service"
+        );
 
         const env = coerceEnvName(process.env.NODE_ENV);
         const rootDir = resolveDataBanksRootDir();
-        const strict = env === 'production' || env === 'staging';
-        const override = (process.env.BANK_VALIDATE_SCHEMAS ?? '').toLowerCase().trim();
-        const validateSchemas = override ? override === 'true' : strict;
+        const strict = env === "production" || env === "staging";
+        const override = (process.env.BANK_VALIDATE_SCHEMAS ?? "")
+          .toLowerCase()
+          .trim();
+        const validateSchemas = override ? override === "true" : strict;
 
         await initializeBanks({
           env,
@@ -88,43 +92,114 @@ class KodaV3Container {
         });
 
         try {
-          const { BankIntegrityService } = await import('../services/editing/banks/bankIntegrity.service');
+          const { BankIntegrityService } = await import(
+            "../services/editing/banks/bankIntegrity.service"
+          );
           const integrity = new BankIntegrityService().validateEditingBanks();
           if (!integrity.ok) {
-            console.warn('[Container] Editing bank integrity warnings', {
+            const env = coerceEnvName(process.env.NODE_ENV);
+            const strict = env === "production" || env === "staging";
+            const details = {
               missingBanks: integrity.missingBanks,
               missingOperators: integrity.missingOperators,
-            });
+            };
+            if (strict) {
+              throw new Error(
+                `[Container] Editing bank integrity failed in strict mode: ${JSON.stringify(details)}`,
+              );
+            }
+            console.warn(
+              "[Container] Editing bank integrity warnings",
+              details,
+            );
           }
         } catch (integrityErr: any) {
-          console.warn(`[Container] Editing bank integrity check failed (non-fatal): ${integrityErr?.message || integrityErr}`);
+          const env = coerceEnvName(process.env.NODE_ENV);
+          const strict = env === "production" || env === "staging";
+          if (strict) {
+            throw integrityErr;
+          }
+          console.warn(
+            `[Container] Editing bank integrity check failed (non-fatal): ${integrityErr?.message || integrityErr}`,
+          );
+        }
+
+        try {
+          const { RuntimeWiringIntegrityService } = await import(
+            "../services/core/banks/runtimeWiringIntegrity.service"
+          );
+          const wiring = new RuntimeWiringIntegrityService().validate();
+          if (!wiring.ok) {
+            const env = coerceEnvName(process.env.NODE_ENV);
+            const strict = env === "production" || env === "staging";
+            const details = {
+              missingBanks: wiring.missingBanks,
+              missingOperatorContracts: wiring.missingOperatorContracts,
+              missingOperatorOutputShapes: wiring.missingOperatorOutputShapes,
+              missingEditingCatalogOperators:
+                wiring.missingEditingCatalogOperators,
+              missingEditingCapabilities: wiring.missingEditingCapabilities,
+              unreachablePromptSelectionRules:
+                wiring.unreachablePromptSelectionRules,
+            };
+            if (strict) {
+              throw new Error(
+                `[Container] Runtime wiring integrity failed in strict mode: ${JSON.stringify(details)}`,
+              );
+            }
+            console.warn(
+              "[Container] Runtime wiring integrity warnings",
+              details,
+            );
+          }
+        } catch (wiringErr: any) {
+          const env = coerceEnvName(process.env.NODE_ENV);
+          const strict = env === "production" || env === "staging";
+          if (strict) throw wiringErr;
+          console.warn(
+            `[Container] Runtime wiring integrity check failed (non-fatal): ${wiringErr?.message || wiringErr}`,
+          );
         }
 
         this._banksInitialized = true;
-        console.log('[Container] Banks initialized successfully');
+        console.log("[Container] Banks initialized successfully");
       } catch (e: any) {
-        console.warn(`[Container] Banks initialization failed (non-fatal): ${e.message}`);
-        // Continue without banks - services that need them will fail gracefully
+        const env = coerceEnvName(process.env.NODE_ENV);
+        const strict = env === "production" || env === "staging";
+        if (strict) {
+          console.error(
+            "[Container] Banks initialization failed in strict mode",
+            {
+              env,
+              error: e?.message || e,
+            },
+          );
+          throw e;
+        }
+        console.warn(
+          `[Container] Banks initialization failed (non-fatal): ${e.message}`,
+        );
+        // Continue in non-strict environments so local recovery remains possible.
       }
     }
 
     // ========================================================================
     // STEP 1: Load services that DON'T depend on banks
     // ========================================================================
-    await this.tryLoad('fallbackConfig', async () => {
-      const mod = await import('../services/config/fallbackConfig.service');
+    await this.tryLoad("fallbackConfig", async () => {
+      const mod = await import("../services/config/fallbackConfig.service");
       const svc = mod.fallbackConfigService ?? new mod.default();
       if (svc.loadFallbacks) await svc.loadFallbacks();
       return svc;
     });
 
-    await this.tryLoad('intentConfig', async () => {
-      const mod = await import('../services/config/intentConfig.service');
+    await this.tryLoad("intentConfig", async () => {
+      const mod = await import("../services/config/intentConfig.service");
       return new mod.IntentConfigService();
     });
 
-    await this.tryLoad('conversationMemory', async () => {
-      const mod = await import('../services/memory/conversationMemory.service');
+    await this.tryLoad("conversationMemory", async () => {
+      const mod = await import("../services/memory/conversationMemory.service");
       return new mod.ConversationMemoryService();
     });
 
@@ -132,37 +207,51 @@ class KodaV3Container {
     // STEP 2: Load services that DO depend on banks (after banks are loaded)
     // ========================================================================
     if (this._banksInitialized) {
-      await this.tryLoad('intentEngine', async () => {
-        const mod = await import('../services/core/routing/intentEngine.service');
+      await this.tryLoad("intentEngine", async () => {
+        const mod = await import(
+          "../services/core/routing/intentEngine.service"
+        );
         return new mod.KodaIntentEngineV3Service();
       });
 
-      await this.tryLoad('languageDetector', async () => {
-        const { getBankLoaderInstance } = await import('../services/core/banks/bankLoader.service');
+      await this.tryLoad("languageDetector", async () => {
+        const { getBankLoaderInstance } = await import(
+          "../services/core/banks/bankLoader.service"
+        );
         const bankLoader = getBankLoaderInstance();
-        const mod = await import('../services/core/inputs/languageDetector.service');
+        const mod = await import(
+          "../services/core/inputs/languageDetector.service"
+        );
         return new mod.LanguageDetectorService(bankLoader);
       });
 
       // ====================================================================
       // STEP 3: Load orchestrator (depends on banks + intent engine)
       // ====================================================================
-      await this.tryLoad('orchestrator', async () => {
+      await this.tryLoad("orchestrator", async () => {
         // Import via orchestration module entrypoint to keep the factory centralized.
-        const { createOrchestrator } = await import('../services/core/orchestration');
+        const { createOrchestrator } = await import(
+          "../services/core/orchestration"
+        );
         const orch = createOrchestrator();
-        console.log('[Container] Orchestrator wired with deps');
+        console.log("[Container] Orchestrator wired with deps");
         return orch;
       });
     } else {
-      console.warn('[Container] Skipping bank-dependent services (banks not initialized)');
+      console.warn(
+        "[Container] Skipping bank-dependent services (banks not initialized)",
+      );
     }
 
     // Mark initialized regardless — let the app boot
     this._isInitialized = true;
 
-    const loaded = Object.keys(this._services).filter(k => this._services[k] != null);
-    console.log(`[Container] Initialized — ${loaded.length} services loaded: ${loaded.join(', ')}`);
+    const loaded = Object.keys(this._services).filter(
+      (k) => this._services[k] != null,
+    );
+    console.log(
+      `[Container] Initialized — ${loaded.length} services loaded: ${loaded.join(", ")}`,
+    );
   }
 
   public areBanksInitialized(): boolean {
@@ -170,7 +259,10 @@ class KodaV3Container {
   }
 
   /** Try to load a service, log warning on failure */
-  private async tryLoad(name: string, loader: () => Promise<any>): Promise<void> {
+  private async tryLoad(
+    name: string,
+    loader: () => Promise<any>,
+  ): Promise<void> {
     try {
       const svc = await loader();
       if (svc) this._services[name] = svc;

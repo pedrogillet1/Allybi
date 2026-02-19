@@ -8,7 +8,7 @@
  * @version 1.0.0
  */
 
-import prisma from '../../config/database';
+import prisma from "../../config/database";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Path Computation
@@ -28,11 +28,11 @@ async function computeFolderPath(folderId: string): Promise<string> {
   });
 
   if (!folder) {
-    return '/';
+    return "/";
   }
 
   // Build path by traversing up the hierarchy
-  const pathParts: string[] = [folder.name ?? 'Unnamed'];
+  const pathParts: string[] = [folder.name ?? "Unnamed"];
   let currentParentId = folder.parentFolderId;
 
   while (currentParentId) {
@@ -47,11 +47,11 @@ async function computeFolderPath(folderId: string): Promise<string> {
 
     if (!parent) break;
 
-    pathParts.unshift(parent.name ?? 'Unnamed');
+    pathParts.unshift(parent.name ?? "Unnamed");
     currentParentId = parent.parentFolderId;
   }
 
-  return '/' + pathParts.join('/');
+  return "/" + pathParts.join("/");
 }
 
 /**
@@ -99,7 +99,10 @@ export async function onFolderCreated(folderId: string): Promise<void> {
     });
     console.log(`[FOLDER-PATH] Set path for new folder: ${path}`);
   } catch (error) {
-    console.error(`[FOLDER-PATH] Error setting path for folder ${folderId}:`, error);
+    console.error(
+      `[FOLDER-PATH] Error setting path for folder ${folderId}:`,
+      error,
+    );
   }
 }
 
@@ -112,7 +115,10 @@ export async function onFolderRenamed(folderId: string): Promise<void> {
     const updatedCount = await updateFolderAndDescendants(folderId);
     console.log(`[FOLDER-PATH] Updated ${updatedCount} folder(s) after rename`);
   } catch (error) {
-    console.error(`[FOLDER-PATH] Error updating paths after rename for ${folderId}:`, error);
+    console.error(
+      `[FOLDER-PATH] Error updating paths after rename for ${folderId}:`,
+      error,
+    );
   }
 }
 
@@ -125,7 +131,10 @@ export async function onFolderMoved(folderId: string): Promise<void> {
     const updatedCount = await updateFolderAndDescendants(folderId);
     console.log(`[FOLDER-PATH] Updated ${updatedCount} folder(s) after move`);
   } catch (error) {
-    console.error(`[FOLDER-PATH] Error updating paths after move for ${folderId}:`, error);
+    console.error(
+      `[FOLDER-PATH] Error updating paths after move for ${folderId}:`,
+      error,
+    );
   }
 }
 
@@ -138,7 +147,7 @@ export async function onFolderMoved(folderId: string): Promise<void> {
  * Used for one-time migration
  */
 export async function initializeAllFolderPaths(): Promise<number> {
-  console.log('[FOLDER-PATH] Initializing all folder paths...');
+  console.log("[FOLDER-PATH] Initializing all folder paths...");
 
   // Get all root folders (no parent)
   const rootFolders = await prisma.folder.findMany({
@@ -159,7 +168,9 @@ export async function initializeAllFolderPaths(): Promise<number> {
 /**
  * Initialize paths for all folders belonging to a specific user
  */
-export async function initializeUserFolderPaths(userId: string): Promise<number> {
+export async function initializeUserFolderPaths(
+  userId: string,
+): Promise<number> {
   console.log(`[FOLDER-PATH] Initializing folder paths for user ${userId}...`);
 
   // Get user's root folders
@@ -177,7 +188,9 @@ export async function initializeUserFolderPaths(userId: string): Promise<number>
     totalUpdated += await updateFolderAndDescendants(folder.id);
   }
 
-  console.log(`[FOLDER-PATH] Initialized ${totalUpdated} folder paths for user ${userId}`);
+  console.log(
+    `[FOLDER-PATH] Initialized ${totalUpdated} folder paths for user ${userId}`,
+  );
   return totalUpdated;
 }
 

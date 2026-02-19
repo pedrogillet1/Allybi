@@ -8,7 +8,11 @@ export class EnvelopeService {
   constructor(private enc: EncryptionService) {}
 
   wrapRecordKey(recordKey: Buffer, tenantKey: Buffer, aad: string): string {
-    return this.enc.encryptStringToJson(recordKey.toString("base64"), tenantKey, aad);
+    return this.enc.encryptStringToJson(
+      recordKey.toString("base64"),
+      tenantKey,
+      aad,
+    );
   }
 
   unwrapRecordKey(wrappedJson: string, tenantKey: Buffer, aad: string): Buffer {

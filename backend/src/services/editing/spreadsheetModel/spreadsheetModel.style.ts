@@ -15,7 +15,9 @@ function deepSort(input: unknown): unknown {
 
 function stripEmpty(input: unknown): unknown {
   if (Array.isArray(input)) {
-    const values = input.map((item) => stripEmpty(item)).filter((v) => v !== undefined);
+    const values = input
+      .map((item) => stripEmpty(item))
+      .filter((v) => v !== undefined);
     return values.length ? values : undefined;
   }
   if (!isObject(input)) return input;
@@ -29,13 +31,18 @@ function stripEmpty(input: unknown): unknown {
   return Object.keys(out).length ? out : undefined;
 }
 
-export function normalizeStyle(style: Partial<StyleModel> | null | undefined): StyleModel | null {
+export function normalizeStyle(
+  style: Partial<StyleModel> | null | undefined,
+): StyleModel | null {
   const clean = stripEmpty(style) as StyleModel | undefined;
   if (!clean) return null;
   return deepSort(clean) as StyleModel;
 }
 
-export function mergeStyleModels(base: StyleModel | null | undefined, patch: Partial<StyleModel>): StyleModel {
+export function mergeStyleModels(
+  base: StyleModel | null | undefined,
+  patch: Partial<StyleModel>,
+): StyleModel {
   const source = (base || {}) as Record<string, unknown>;
   const delta = (patch || {}) as Record<string, unknown>;
   const out: Record<string, unknown> = { ...source };
@@ -59,7 +66,10 @@ export function styleFingerprint(style: Partial<StyleModel>): string {
   return crypto.createHash("sha1").update(payload).digest("hex");
 }
 
-export function registerStyle(model: SpreadsheetModel, style?: Partial<StyleModel> | null): string | undefined {
+export function registerStyle(
+  model: SpreadsheetModel,
+  style?: Partial<StyleModel> | null,
+): string | undefined {
   const normalized = normalizeStyle(style);
   if (!normalized) return undefined;
   const hash = styleFingerprint(normalized);

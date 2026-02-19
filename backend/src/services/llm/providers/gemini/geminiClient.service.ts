@@ -16,17 +16,17 @@
  * - Deterministic behaviors where possible (stable chunking, stable parsing).
  */
 
-import crypto from 'crypto';
+import crypto from "crypto";
 
 import type {
   LLMClient,
   LLMRequest,
   LLMCompletionResponse,
   LLMStreamResponse,
-} from './llmClient.interface';
+} from "./llmClient.interface";
 
-import type { LLMProvider } from './llmErrors.types';
-import type { ProviderToolCall } from './llmTools.types';
+import type { LLMProvider } from "./llmErrors.types";
+import type { ProviderToolCall } from "./llmTools.types";
 
 import type {
   LLMStreamingConfig,
@@ -35,9 +35,9 @@ import type {
   StreamEvent,
   StreamDelta,
   StreamingHooks,
-} from './llmStreaming.types';
+} from "./llmStreaming.types";
 
-type GeminiRole = 'user' | 'model';
+type GeminiRole = "user" | "model";
 
 /**
  * Gemini REST payload (Generative Language API).
@@ -61,7 +61,10 @@ interface GeminiPartFunctionResponse {
   };
 }
 
-type GeminiPart = GeminiPartText | GeminiPartFunctionCall | GeminiPartFunctionResponse;
+type GeminiPart =
+  | GeminiPartText
+  | GeminiPartFunctionCall
+  | GeminiPartFunctionResponse;
 
 interface GeminiContent {
   role: GeminiRole;
@@ -134,7 +137,7 @@ export interface GeminiClientConfig {
 }
 
 export class GeminiClientService implements LLMClient {
-  public readonly provider: LLMProvider = 'google';
+  public readonly provider: LLMProvider = "google";
 
   constructor(private readonly cfg: GeminiClientConfig) {}
 
@@ -144,9 +147,9 @@ export class GeminiClientService implements LLMClient {
     const t = Date.now();
     try {
       // We do not call the provider here to avoid cost.
-      return { ok: true, provider: 'google', t };
+      return { ok: true, provider: "google", t };
     } catch {
-      return { ok: false, provider: 'google', t };
+      return { ok: false, provider: "google", t };
     }
   }
 
@@ -159,22 +162,22 @@ export class GeminiClientService implements LLMClient {
       const body = this.buildGeminiRequest(req);
 
       const res = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers: this.headers(),
         body: JSON.stringify(body),
         signal: ac.signal,
       });
 
-      const requestId = res.headers.get('x-request-id') ?? undefined;
+      const requestId = res.headers.get("x-request-id") ?? undefined;
 
       if (!res.ok) {
         const errText = await safeReadText(res);
         throw new Error(
           JSON.stringify({
-            code: 'GEMINI_HTTP_ERROR',
+            code: "GEMINI_HTTP_ERROR",
             status: res.status,
             body: truncate(errText, 2000),
-          })
+          }),
         );
       }
 
@@ -212,11 +215,11 @@ export class GeminiClientService implements LLMClient {
     const { req, sink, config, hooks, initialState } = params;
 
     const state: StreamState = {
-      phase: 'init',
+      phase: "init",
       kind: this.inferKind(req),
       traceId: req.traceId,
       startedAtMs: Date.now(),
-      accumulatedText: '',
+      accumulatedText: "",
       markers: [],
       heldMarkers: [],
       abortRequested: false,
@@ -225,7 +228,7 @@ export class GeminiClientService implements LLMClient {
 
     // Emit start
     this.emit(sink, {
-      event: 'start',
+      event: "start",
       data: { kind: state.kind, t: Date.now(), traceId: state.traceId },
     });
     hooks?.onStart?.(state);
@@ -239,20 +242,20 @@ export class GeminiClientService implements LLMClient {
 
       // Gemini streaming endpoint returns a stream of JSON objects (often NDJSON-ish).
       const res = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers: this.headers(),
         body: JSON.stringify(body),
         signal: ac.signal,
       });
 
-      const requestId = res.headers.get('x-request-id') ?? undefined;
+      const requestId = res.headers.get("x-request-id") ?? undefined;
 
       if (!res.ok || !res.body) {
         const errText = await safeReadText(res);
         this.emit(sink, {
-          event: 'error',
+          event: "error",
           data: {
-            code: 'LLM_PROVIDER_BAD_REQUEST',
+            code: "LLM_PROVIDER_BAD_REQUEST",
             message: JSON.stringify({
               status: res.status,
               body: truncate(errText, 2000),
@@ -263,12 +266,12 @@ export class GeminiClientService implements LLMClient {
         });
         hooks?.onError?.(
           {
-            code: 'LLM_PROVIDER_BAD_REQUEST',
-            message: 'provider_bad_request',
+            code: "LLM_PROVIDER_BAD_REQUEST",
+            message: "provider_bad_request",
             traceId: state.traceId,
             t: Date.now(),
           },
-          state
+          state,
         );
         sink.close();
         return {
@@ -280,13 +283,13 @@ export class GeminiClientService implements LLMClient {
         };
       }
 
-      state.phase = 'preamble';
+      state.phase = "preamble";
 
       // Stream parse — SSE (alt=sse) returns "data: {json}\n\n" events incrementally
       const reader = res.body.getReader();
-      const decoder = new TextDecoder('utf-8');
+      const decoder = new TextDecoder("utf-8");
 
-      let buffer = '';
+      let buffer = "";
       let firstTokenEmitted = false;
       let usageMetadata: GeminiUsageMetadata | undefined;
 
@@ -295,24 +298,29 @@ export class GeminiClientService implements LLMClient {
         if (done) break;
 
         // Normalize \r\n → \n (Gemini API sometimes returns \r\n line endings)
-        buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, '\n');
+        buffer += decoder
+          .decode(value, { stream: true })
+          .replace(/\r\n/g, "\n");
 
         // Process complete SSE events as they arrive
         let boundary: number;
-        while ((boundary = buffer.indexOf('\n\n')) >= 0) {
+        while ((boundary = buffer.indexOf("\n\n")) >= 0) {
           const eventBlock = buffer.slice(0, boundary).trim();
           buffer = buffer.slice(boundary + 2);
 
           if (!eventBlock) continue;
 
           // Extract JSON from "data: {...}" line(s)
-          const dataLines = eventBlock.split('\n')
-            .filter((line) => line.startsWith('data: '))
+          const dataLines = eventBlock
+            .split("\n")
+            .filter((line) => line.startsWith("data: "))
             .map((line) => line.slice(6));
-          const jsonStr = dataLines.join('');
+          const jsonStr = dataLines.join("");
           if (!jsonStr) continue;
 
-          const chunkResp = safeJsonParse(jsonStr) as GeminiGenerateResponse | null;
+          const chunkResp = safeJsonParse(
+            jsonStr,
+          ) as GeminiGenerateResponse | null;
           if (!chunkResp) continue;
 
           const parsed = this.parseGeminiResponse(chunkResp);
@@ -326,21 +334,27 @@ export class GeminiClientService implements LLMClient {
             if (!firstTokenEmitted) {
               firstTokenEmitted = true;
               state.firstTokenAtMs = Date.now();
-              this.emit(sink, { event: 'progress', data: { stage: 'generation', t: Date.now() } });
+              this.emit(sink, {
+                event: "progress",
+                data: { stage: "generation", t: Date.now() },
+              });
               hooks?.onFirstToken?.(state);
             }
 
             // Chunking for smooth output
-            const deltas = chunkText(parsed.text, config.chunking?.maxCharsPerDelta ?? 64);
+            const deltas = chunkText(
+              parsed.text,
+              config.chunking?.maxCharsPerDelta ?? 64,
+            );
 
             for (const dText of deltas) {
               if (!sink.isOpen()) break;
 
               const delta: StreamDelta = { text: dText };
-              state.phase = 'delta';
+              state.phase = "delta";
               state.accumulatedText += dText;
 
-              this.emit(sink, { event: 'delta', data: delta });
+              this.emit(sink, { event: "delta", data: delta });
               hooks?.onDelta?.(delta, state);
             }
           }
@@ -348,15 +362,15 @@ export class GeminiClientService implements LLMClient {
       }
 
       // Final event
-      state.phase = 'finalizing';
+      state.phase = "finalizing";
 
       const finalEvent: StreamEvent = {
-        event: 'final',
+        event: "final",
         data: {
           text: state.accumulatedText,
           kind: state.kind,
           llm: {
-            provider: 'google',
+            provider: "google",
             model: req.model.model,
           },
           markers: state.markers,
@@ -379,11 +393,13 @@ export class GeminiClientService implements LLMClient {
         turnId: req.turnId,
         model: req.model,
         finalText: state.accumulatedText,
-        usage: usageMetadata ? {
-          promptTokens: usageMetadata.promptTokenCount,
-          completionTokens: usageMetadata.candidatesTokenCount,
-          totalTokens: usageMetadata.totalTokenCount,
-        } : undefined,
+        usage: usageMetadata
+          ? {
+              promptTokens: usageMetadata.promptTokenCount,
+              completionTokens: usageMetadata.candidatesTokenCount,
+              totalTokens: usageMetadata.totalTokenCount,
+            }
+          : undefined,
         requestId,
       };
     } catch (e) {
@@ -398,21 +414,23 @@ export class GeminiClientService implements LLMClient {
         };
       }
 
-      const isAbort = e instanceof Error && (e.name === 'AbortError' || /abort/i.test(e.message));
+      const isAbort =
+        e instanceof Error &&
+        (e.name === "AbortError" || /abort/i.test(e.message));
       if (isAbort) {
-        state.phase = 'aborted';
+        state.phase = "aborted";
         const abortEvent: StreamEvent = {
-          event: 'abort',
-          data: { reason: 'timeout', t: Date.now(), traceId: state.traceId },
+          event: "abort",
+          data: { reason: "timeout", t: Date.now(), traceId: state.traceId },
         };
         this.emit(sink, abortEvent);
         hooks?.onAbort?.(abortEvent.data, state);
       } else {
-        state.phase = 'error';
+        state.phase = "error";
         const errEvent: StreamEvent = {
-          event: 'error',
+          event: "error",
           data: {
-            code: 'LLM_GENERATION_FAILED',
+            code: "LLM_GENERATION_FAILED",
             message: sanitizeErrMessage(e),
             traceId: state.traceId,
             t: Date.now(),
@@ -445,29 +463,33 @@ export class GeminiClientService implements LLMClient {
 
   private headers(): Record<string, string> {
     return {
-      'Content-Type': 'application/json',
-      'X-Goog-Api-Key': this.cfg.apiKey,
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": this.cfg.apiKey,
     };
   }
 
   private buildGenerateUrl(model: string): string {
     // v1beta/models/{model}:generateContent
-    const base = this.cfg.baseUrl.replace(/\/$/, '');
+    const base = this.cfg.baseUrl.replace(/\/$/, "");
     return `${base}/models/${encodeURIComponent(model)}:generateContent`;
   }
 
   private buildStreamUrl(model: string): string {
     // v1beta/models/{model}:streamGenerateContent?alt=sse
     // alt=sse enables Server-Sent Events for true incremental streaming
-    const base = this.cfg.baseUrl.replace(/\/$/, '');
+    const base = this.cfg.baseUrl.replace(/\/$/, "");
     return `${base}/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`;
   }
 
-  private inferKind(req: LLMRequest): 'answer' | 'nav_pills' | 'system' {
+  private inferKind(req: LLMRequest): "answer" | "nav_pills" | "system" {
     // Keep simple and deterministic: upstream routing should set this in a bank signal.
     // If you have a purpose hint you can map it; otherwise default to answer.
-    if (req.purpose === 'intent_routing' || req.purpose === 'retrieval_planning') return 'system';
-    return 'answer';
+    if (
+      req.purpose === "intent_routing" ||
+      req.purpose === "retrieval_planning"
+    )
+      return "system";
+    return "answer";
   }
 
   private buildGeminiRequest(req: LLMRequest): GeminiGenerateRequest {
@@ -479,21 +501,21 @@ export class GeminiClientService implements LLMClient {
       // - system/developer -> top-level systemInstruction
       // - assistant -> model
       // - tool -> user (functionResponse part)
-      if (m.role === 'system' || m.role === 'developer') {
-        const text = (m.content ?? '').trim();
+      if (m.role === "system" || m.role === "developer") {
+        const text = (m.content ?? "").trim();
         if (text) systemParts.push(text);
         continue;
       }
 
-      if (m.role === 'user') {
+      if (m.role === "user") {
         contents.push({
-          role: 'user',
-          parts: [{ text: m.content ?? '' }],
+          role: "user",
+          parts: [{ text: m.content ?? "" }],
         });
         continue;
       }
 
-      if (m.role === 'assistant') {
+      if (m.role === "assistant") {
         // If toolCalls exist, represent as functionCall parts (Gemini format)
         const parts: GeminiPart[] = [];
         if (m.content) parts.push({ text: m.content });
@@ -504,21 +526,24 @@ export class GeminiClientService implements LLMClient {
             parts.push({
               functionCall: {
                 name: tc.name,
-                args: 'args' in tc ? (tc.args as Record<string, unknown>) : safeJsonParse(tc.argumentsJson) ?? {},
+                args:
+                  "args" in tc
+                    ? (tc.args as Record<string, unknown>)
+                    : (safeJsonParse(tc.argumentsJson) ?? {}),
               },
             } as GeminiPartFunctionCall);
           }
         }
 
-        contents.push({ role: 'model', parts });
+        contents.push({ role: "model", parts });
         continue;
       }
 
-      if (m.role === 'tool') {
+      if (m.role === "tool") {
         // Function response part
         if (m.toolResult) {
           contents.push({
-            role: 'user',
+            role: "user",
             parts: [
               {
                 functionResponse: {
@@ -557,7 +582,7 @@ export class GeminiClientService implements LLMClient {
     if (req.tools?.enabled && req.tools.registry?.tools?.length) {
       out.tools = [
         {
-          functionDeclarations: req.tools.registry.tools.map(t => ({
+          functionDeclarations: req.tools.registry.tools.map((t) => ({
             name: t.name,
             description: t.description,
             parameters: t.inputSchema ?? {},
@@ -569,26 +594,32 @@ export class GeminiClientService implements LLMClient {
     return out;
   }
 
-  private parseGeminiResponse(resp: GeminiGenerateResponse): { text: string; toolCalls?: ProviderToolCall[] } {
+  private parseGeminiResponse(resp: GeminiGenerateResponse): {
+    text: string;
+    toolCalls?: ProviderToolCall[];
+  } {
     const candidates = resp.candidates ?? [];
-    if (candidates.length === 0) return { text: '' };
+    if (candidates.length === 0) return { text: "" };
 
     // Deterministic: use first candidate only
     const c0 = candidates[0];
     const content = c0.content;
-    if (!content?.parts?.length) return { text: '' };
+    if (!content?.parts?.length) return { text: "" };
 
-    let text = '';
+    let text = "";
     const toolCalls: ProviderToolCall[] = [];
 
     for (const p of content.parts) {
-      if ('text' in p && typeof p.text === 'string') {
+      if ("text" in p && typeof p.text === "string") {
         text += p.text;
-      } else if ('functionCall' in p && p.functionCall?.name) {
+      } else if ("functionCall" in p && p.functionCall?.name) {
         // Normalize Gemini functionCall into ProviderToolCall
-        const callId = makeDeterministicCallId(p.functionCall.name, p.functionCall.args);
+        const callId = makeDeterministicCallId(
+          p.functionCall.name,
+          p.functionCall.args,
+        );
         toolCalls.push({
-          provider: 'google',
+          provider: "google",
           name: p.functionCall.name,
           args: p.functionCall.args ?? {},
         });
@@ -621,18 +652,18 @@ async function safeReadText(res: Response): Promise<string> {
   try {
     return await res.text();
   } catch {
-    return '';
+    return "";
   }
 }
 
 function truncate(s: string, n: number): string {
   if (s.length <= n) return s;
-  return s.slice(0, n) + '…';
+  return s.slice(0, n) + "…";
 }
 
 function sanitizeErrMessage(e: unknown): string {
   if (e instanceof Error) return truncate(e.message, 800);
-  return 'unknown_error';
+  return "unknown_error";
 }
 
 function chunkText(text: string, maxChars: number): string[] {
@@ -649,19 +680,19 @@ function chunkText(text: string, maxChars: number): string[] {
 }
 
 function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function makeDeterministicCallId(name: string, args: unknown): string {
-  const h = crypto.createHash('sha256');
+  const h = crypto.createHash("sha256");
   h.update(String(name));
-  h.update('|');
+  h.update("|");
   h.update(JSON.stringify(sortKeysDeep(args ?? {})));
-  return h.digest('hex').slice(0, 24);
+  return h.digest("hex").slice(0, 24);
 }
 
 function sortKeysDeep<T>(x: T): T {
-  if (x === null || typeof x !== 'object') return x;
+  if (x === null || typeof x !== "object") return x;
   if (Array.isArray(x)) return x.map(sortKeysDeep) as unknown as T;
 
   const obj = x as Record<string, unknown>;

@@ -11,7 +11,7 @@
  * 3. LLM paraphrase (optional, slower but better variation)
  */
 
-import type { LanguageCode } from '../../../types/intents.types';
+import type { LanguageCode } from "../../../types/intents.types";
 
 // ============================================================================
 // TYPES
@@ -20,7 +20,7 @@ import type { LanguageCode } from '../../../types/intents.types';
 interface RewriteResult {
   original: string;
   rewritten: string;
-  strategy: 'synonym' | 'reorder' | 'llm' | 'none';
+  strategy: "synonym" | "reorder" | "llm" | "none";
   confidence: number;
 }
 
@@ -38,66 +38,109 @@ interface RewriteConfig {
 const SYNONYM_MAPS: Record<string, Record<string, string[]>> = {
   en: {
     // Question words
-    'what': ['which', 'what'],
-    'how': ['in what way', 'how'],
-    'show': ['display', 'present', 'show'],
-    'list': ['enumerate', 'show', 'list'],
-    'find': ['locate', 'search for', 'find'],
-    'get': ['retrieve', 'fetch', 'get'],
-    'tell': ['explain', 'describe', 'tell'],
+    what: ["which", "what"],
+    how: ["in what way", "how"],
+    show: ["display", "present", "show"],
+    list: ["enumerate", "show", "list"],
+    find: ["locate", "search for", "find"],
+    get: ["retrieve", "fetch", "get"],
+    tell: ["explain", "describe", "tell"],
     // Domain terms
-    'total': ['sum', 'aggregate', 'total'],
-    'revenue': ['income', 'sales', 'revenue'],
-    'cost': ['expense', 'expenditure', 'cost'],
-    'profit': ['earnings', 'net income', 'profit'],
-    'change': ['difference', 'variation', 'change'],
-    'increase': ['growth', 'rise', 'increase'],
-    'decrease': ['decline', 'drop', 'decrease'],
+    total: ["sum", "aggregate", "total"],
+    revenue: ["income", "sales", "revenue"],
+    cost: ["expense", "expenditure", "cost"],
+    profit: ["earnings", "net income", "profit"],
+    change: ["difference", "variation", "change"],
+    increase: ["growth", "rise", "increase"],
+    decrease: ["decline", "drop", "decrease"],
     // Document terms
-    'document': ['file', 'doc', 'document'],
-    'spreadsheet': ['excel file', 'worksheet', 'spreadsheet'],
-    'report': ['analysis', 'summary', 'report'],
+    document: ["file", "doc", "document"],
+    spreadsheet: ["excel file", "worksheet", "spreadsheet"],
+    report: ["analysis", "summary", "report"],
   },
   pt: {
     // Question words
-    'qual': ['que', 'qual'],
-    'como': ['de que forma', 'como'],
-    'mostre': ['apresente', 'exiba', 'mostre'],
-    'liste': ['enumere', 'mostre', 'liste'],
-    'encontre': ['localize', 'busque', 'encontre'],
+    qual: ["que", "qual"],
+    como: ["de que forma", "como"],
+    mostre: ["apresente", "exiba", "mostre"],
+    liste: ["enumere", "mostre", "liste"],
+    encontre: ["localize", "busque", "encontre"],
     // Domain terms
-    'total': ['soma', 'agregado', 'total'],
-    'receita': ['faturamento', 'vendas', 'receita'],
-    'custo': ['despesa', 'gasto', 'custo'],
-    'lucro': ['ganho', 'resultado', 'lucro'],
+    total: ["soma", "agregado", "total"],
+    receita: ["faturamento", "vendas", "receita"],
+    custo: ["despesa", "gasto", "custo"],
+    lucro: ["ganho", "resultado", "lucro"],
   },
   es: {
     // Question words
-    'cual': ['qué', 'cual'],
-    'como': ['de qué manera', 'como'],
-    'muestra': ['presenta', 'exhibe', 'muestra'],
-    'lista': ['enumera', 'muestra', 'lista'],
+    cual: ["qué", "cual"],
+    como: ["de qué manera", "como"],
+    muestra: ["presenta", "exhibe", "muestra"],
+    lista: ["enumera", "muestra", "lista"],
     // Domain terms
-    'total': ['suma', 'agregado', 'total'],
-    'ingresos': ['ventas', 'facturación', 'ingresos'],
-    'costo': ['gasto', 'egreso', 'costo'],
-    'ganancia': ['beneficio', 'utilidad', 'ganancia'],
+    total: ["suma", "agregado", "total"],
+    ingresos: ["ventas", "facturación", "ingresos"],
+    costo: ["gasto", "egreso", "costo"],
+    ganancia: ["beneficio", "utilidad", "ganancia"],
   },
 };
 
 // Words to never substitute (preserve exact meaning)
 const PROTECTED_WORDS = new Set([
   // Numbers
-  'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
-  '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+  "ten",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
   // Specific terms that should stay exact
-  'january', 'february', 'march', 'april', 'may', 'june',
-  'july', 'august', 'september', 'october', 'november', 'december',
-  'q1', 'q2', 'q3', 'q4',
-  '2024', '2025', '2026',
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
+  "q1",
+  "q2",
+  "q3",
+  "q4",
+  "2024",
+  "2025",
+  "2026",
   // Portuguese months
-  'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
-  'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
+  "janeiro",
+  "fevereiro",
+  "março",
+  "abril",
+  "maio",
+  "junho",
+  "julho",
+  "agosto",
+  "setembro",
+  "outubro",
+  "novembro",
+  "dezembro",
 ]);
 
 // ============================================================================
@@ -111,7 +154,7 @@ function applySynonymSubstitution(
   query: string,
   language: LanguageCode,
   regenCount: number,
-  maxSubstitutions: number = 2
+  maxSubstitutions: number = 2,
 ): { text: string; substitutions: number } {
   const synonymMap = SYNONYM_MAPS[language] || SYNONYM_MAPS.en;
   const words = query.split(/\s+/);
@@ -145,7 +188,7 @@ function applySynonymSubstitution(
   });
 
   return {
-    text: rewritten.join(' '),
+    text: rewritten.join(" "),
     substitutions,
   };
 }
@@ -156,7 +199,7 @@ function applySynonymSubstitution(
  */
 function applyWordReorder(
   query: string,
-  regenCount: number
+  regenCount: number,
 ): { text: string; reordered: boolean } {
   // Only apply on even regenCounts to alternate
   if (regenCount % 2 === 0) {
@@ -169,7 +212,10 @@ function applyWordReorder(
 
   const text = query.replace(andPattern, (match, word1, connector, word2) => {
     // Don't reorder if it would change meaning significantly
-    if (PROTECTED_WORDS.has(word1.toLowerCase()) || PROTECTED_WORDS.has(word2.toLowerCase())) {
+    if (
+      PROTECTED_WORDS.has(word1.toLowerCase()) ||
+      PROTECTED_WORDS.has(word2.toLowerCase())
+    ) {
       return match;
     }
     reordered = true;
@@ -185,7 +231,7 @@ function applyWordReorder(
  */
 function applyContractionVariation(
   query: string,
-  regenCount: number
+  regenCount: number,
 ): { text: string; varied: boolean } {
   let varied = false;
 
@@ -193,25 +239,25 @@ function applyContractionVariation(
   if (regenCount % 2 === 1) {
     // Expand contractions
     const expansions: Record<string, string> = {
-      "what's": 'what is',
-      "how's": 'how is',
-      "where's": 'where is',
-      "who's": 'who is',
-      "it's": 'it is',
-      "that's": 'that is',
-      "there's": 'there is',
-      "don't": 'do not',
-      "doesn't": 'does not',
-      "didn't": 'did not',
-      "can't": 'cannot',
-      "won't": 'will not',
-      "isn't": 'is not',
-      "aren't": 'are not',
+      "what's": "what is",
+      "how's": "how is",
+      "where's": "where is",
+      "who's": "who is",
+      "it's": "it is",
+      "that's": "that is",
+      "there's": "there is",
+      "don't": "do not",
+      "doesn't": "does not",
+      "didn't": "did not",
+      "can't": "cannot",
+      "won't": "will not",
+      "isn't": "is not",
+      "aren't": "are not",
     };
 
     let text = query;
     for (const [contraction, expansion] of Object.entries(expansions)) {
-      const regex = new RegExp(`\\b${contraction}\\b`, 'gi');
+      const regex = new RegExp(`\\b${contraction}\\b`, "gi");
       if (regex.test(text)) {
         text = text.replace(regex, expansion);
         varied = true;
@@ -221,25 +267,25 @@ function applyContractionVariation(
   } else {
     // Contract expanded forms
     const contractions: Record<string, string> = {
-      'what is': "what's",
-      'how is': "how's",
-      'where is': "where's",
-      'it is': "it's",
-      'that is': "that's",
-      'there is': "there's",
-      'do not': "don't",
-      'does not': "doesn't",
-      'did not': "didn't",
-      'can not': "can't",
-      'cannot': "can't",
-      'will not': "won't",
-      'is not': "isn't",
-      'are not': "aren't",
+      "what is": "what's",
+      "how is": "how's",
+      "where is": "where's",
+      "it is": "it's",
+      "that is": "that's",
+      "there is": "there's",
+      "do not": "don't",
+      "does not": "doesn't",
+      "did not": "didn't",
+      "can not": "can't",
+      cannot: "can't",
+      "will not": "won't",
+      "is not": "isn't",
+      "are not": "aren't",
     };
 
     let text = query;
     for (const [expanded, contraction] of Object.entries(contractions)) {
-      const regex = new RegExp(`\\b${expanded}\\b`, 'gi');
+      const regex = new RegExp(`\\b${expanded}\\b`, "gi");
       if (regex.test(text)) {
         text = text.replace(regex, contraction);
         varied = true;
@@ -264,16 +310,16 @@ function applyContractionVariation(
  */
 export function rewriteQueryForRegeneration(
   query: string,
-  language: LanguageCode = 'en',
+  language: LanguageCode = "en",
   regenCount: number,
-  config?: Partial<RewriteConfig>
+  config?: Partial<RewriteConfig>,
 ): RewriteResult {
   // Don't rewrite on first generation
   if (regenCount < 1) {
     return {
       original: query,
       rewritten: query,
-      strategy: 'none',
+      strategy: "none",
       confidence: 1.0,
     };
   }
@@ -287,7 +333,7 @@ export function rewriteQueryForRegeneration(
   };
 
   let rewritten = query;
-  let strategy: RewriteResult['strategy'] = 'none';
+  let strategy: RewriteResult["strategy"] = "none";
   let totalChanges = 0;
 
   // Apply strategies in order
@@ -298,11 +344,11 @@ export function rewriteQueryForRegeneration(
       rewritten,
       language,
       regenCount,
-      effectiveConfig.maxSubstitutions
+      effectiveConfig.maxSubstitutions,
     );
     if (synonymResult.substitutions > 0) {
       rewritten = synonymResult.text;
-      strategy = 'synonym';
+      strategy = "synonym";
       totalChanges += synonymResult.substitutions;
     }
   }
@@ -312,7 +358,7 @@ export function rewriteQueryForRegeneration(
     const reorderResult = applyWordReorder(rewritten, regenCount);
     if (reorderResult.reordered) {
       rewritten = reorderResult.text;
-      strategy = 'reorder';
+      strategy = "reorder";
       totalChanges += 1;
     }
   }
@@ -321,7 +367,7 @@ export function rewriteQueryForRegeneration(
   const contractionResult = applyContractionVariation(rewritten, regenCount);
   if (contractionResult.varied) {
     rewritten = contractionResult.text;
-    if (strategy === 'none') strategy = 'synonym'; // Group with synonym
+    if (strategy === "none") strategy = "synonym"; // Group with synonym
     totalChanges += 1;
   }
 
@@ -330,7 +376,7 @@ export function rewriteQueryForRegeneration(
     return {
       original: query,
       rewritten: query,
-      strategy: 'none',
+      strategy: "none",
       confidence: 1.0,
     };
   }

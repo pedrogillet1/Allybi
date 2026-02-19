@@ -6,24 +6,24 @@
  */
 
 export type AttachmentType =
-  | 'source_buttons'
-  | 'file_list'
-  | 'grouped_files'
-  | 'select_file'
-  | 'slides_deck'
-  | 'options'
-  | 'debug'
+  | "source_buttons"
+  | "file_list"
+  | "grouped_files"
+  | "select_file"
+  | "slides_deck"
+  | "options"
+  | "debug"
   | string;
 
 /**
  * Location inside a document for evidence/sources UX.
  */
 export type SourceLocation =
-  | { type: 'page'; value: number; label?: string }
-  | { type: 'slide'; value: number; label?: string }
-  | { type: 'sheet'; value: string; label?: string }
-  | { type: 'cell'; value: string; label?: string }
-  | { type: 'section'; value: string; label?: string };
+  | { type: "page"; value: number; label?: string }
+  | { type: "slide"; value: number; label?: string }
+  | { type: "sheet"; value: string; label?: string }
+  | { type: "cell"; value: string; label?: string }
+  | { type: "section"; value: string; label?: string };
 
 export type SourceButton = {
   documentId: string;
@@ -47,14 +47,14 @@ export type SeeAllMeta = {
 };
 
 export type SourceButtonsAttachment = {
-  type: 'source_buttons';
+  type: "source_buttons";
 
   /**
    * If set to nav_pill(s), frontend should:
    * - hide “Sources:” label + divider
    * - hide message actions
    */
-  answerMode?: 'nav_pill' | 'nav_pills' | string;
+  answerMode?: "nav_pill" | "nav_pills" | string;
 
   buttons: SourceButton[];
   seeAll?: SeeAllMeta;
@@ -78,7 +78,7 @@ export type FileItem = {
 };
 
 export type FileListAttachment = {
-  type: 'file_list';
+  type: "file_list";
   items: FileItem[];
   totalCount: number;
 
@@ -90,7 +90,7 @@ export type FileListAttachment = {
 };
 
 export type GroupedFilesAttachment = {
-  type: 'grouped_files';
+  type: "grouped_files";
   totalCount: number;
   groups: Array<{
     groupKey: string; // e.g. "pdf", "finance", "/Receipts"
@@ -102,17 +102,22 @@ export type GroupedFilesAttachment = {
 };
 
 export type SelectFileAttachment = {
-  type: 'select_file';
+  type: "select_file";
   prompt?: string;
   options: FileItem[];
 };
 
 export type SlidesDeckAttachment = {
-  type: 'slides_deck';
+  type: "slides_deck";
   title?: string;
   presentationId: string;
   url: string;
-  slides?: Array<{ slideObjectId: string; thumbnailUrl: string; width?: number; height?: number }>;
+  slides?: Array<{
+    slideObjectId: string;
+    thumbnailUrl: string;
+    width?: number;
+    height?: number;
+  }>;
 };
 
 export type Attachment =
@@ -126,18 +131,20 @@ export type Attachment =
       [k: string]: any;
     };
 
-export function isSourceButtonsAttachment(a: any): a is SourceButtonsAttachment {
-  return !!a && a.type === 'source_buttons' && Array.isArray(a.buttons);
+export function isSourceButtonsAttachment(
+  a: any,
+): a is SourceButtonsAttachment {
+  return !!a && a.type === "source_buttons" && Array.isArray(a.buttons);
 }
 
 export function isFileListAttachment(a: any): a is FileListAttachment {
-  return !!a && a.type === 'file_list' && Array.isArray(a.items);
+  return !!a && a.type === "file_list" && Array.isArray(a.items);
 }
 
 export function isGroupedFilesAttachment(a: any): a is GroupedFilesAttachment {
-  return !!a && a.type === 'grouped_files' && Array.isArray(a.groups);
+  return !!a && a.type === "grouped_files" && Array.isArray(a.groups);
 }
 
 export function isSelectFileAttachment(a: any): a is SelectFileAttachment {
-  return !!a && a.type === 'select_file' && Array.isArray(a.options);
+  return !!a && a.type === "select_file" && Array.isArray(a.options);
 }

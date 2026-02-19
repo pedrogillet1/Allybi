@@ -1,10 +1,10 @@
-import { Queue, Worker, type Job } from 'bullmq';
+import { Queue, Worker, type Job } from "bullmq";
 
-import { config } from '../config/env';
+import { config } from "../config/env";
 
 export interface ConnectorSyncJobData {
   userId: string;
-  provider: 'gmail' | 'outlook' | 'slack';
+  provider: "gmail" | "outlook" | "slack";
   cursor: string | null;
   forceResync?: boolean;
 }
@@ -19,7 +19,7 @@ function buildConnection() {
         host: url.hostname,
         port: Number(url.port || 6379),
         password: url.password || undefined,
-        tls: url.protocol === 'rediss:' ? {} : undefined,
+        tls: url.protocol === "rediss:" ? {} : undefined,
         maxRetriesPerRequest: null,
       };
     } catch {
@@ -36,22 +36,27 @@ function buildConnection() {
 }
 
 const connection = buildConnection();
-const prefix = process.env.QUEUE_PREFIX || (process.env.NODE_ENV === 'production' ? '' : 'dev-');
+const prefix =
+  process.env.QUEUE_PREFIX ||
+  (process.env.NODE_ENV === "production" ? "" : "dev-");
 
-export const connectorQueue = new Queue<ConnectorSyncJobData>(`${prefix}connector-sync`, {
-  connection,
-  defaultJobOptions: {
-    attempts: 3,
-    backoff: { type: 'exponential', delay: 1000 },
-    removeOnComplete: { count: 1000, age: 24 * 3600 },
-    removeOnFail: { count: 200, age: 7 * 24 * 3600 },
+export const connectorQueue = new Queue<ConnectorSyncJobData>(
+  `${prefix}connector-sync`,
+  {
+    connection,
+    defaultJobOptions: {
+      attempts: 3,
+      backoff: { type: "exponential", delay: 1000 },
+      removeOnComplete: { count: 1000, age: 24 * 3600 },
+      removeOnFail: { count: 200, age: 7 * 24 * 3600 },
+    },
   },
-});
+);
 
 let connectorWorker: Worker<ConnectorSyncJobData> | null = null;
 
 export async function addConnectorSyncJob(data: ConnectorSyncJobData) {
-  return connectorQueue.add('connector-sync', data, {
+  return connectorQueue.add("connector-sync", data, {
     jobId: `connector:${data.provider}:${data.userId}:${Date.now()}`,
   });
 }
@@ -60,7 +65,9 @@ export async function enqueueConnectorSync(data: ConnectorSyncJobData) {
   return addConnectorSyncJob(data);
 }
 
-export function startConnectorWorker(handler: (job: Job<ConnectorSyncJobData>) => Promise<void>): void {
+export function startConnectorWorker(
+  handler: (job: Job<ConnectorSyncJobData>) => Promise<void>,
+): void {
   if (connectorWorker) return;
 
   connectorWorker = new Worker<ConnectorSyncJobData>(
@@ -75,16 +82,16 @@ export function startConnectorWorker(handler: (job: Job<ConnectorSyncJobData>) =
     },
   );
 
-  connectorWorker.on('ready', () => {
-    console.log('[ConnectorWorker] Worker READY and listening for jobs');
+  connectorWorker.on("ready", () => {
+    console.log("[ConnectorWorker] Worker READY and listening for jobs");
   });
-  connectorWorker.on('completed', (job) => {
+  connectorWorker.on("completed", (job) => {
     console.log(`[ConnectorWorker] Job ${job.id} COMPLETED`);
   });
-  connectorWorker.on('failed', (job, err) => {
+  connectorWorker.on("failed", (job, err) => {
     console.error(`[ConnectorWorker] Job ${job?.id} FAILED: ${err.message}`);
   });
-  connectorWorker.on('error', (err) => {
+  connectorWorker.on("error", (err) => {
     console.error(`[ConnectorWorker] Worker ERROR: ${String(err)}`);
   });
 }

@@ -19,19 +19,19 @@ export function encodeCursor(id: string, timestamp?: Date): string {
   if (timestamp) {
     data.ts = timestamp.getTime();
   }
-  return Buffer.from(JSON.stringify(data)).toString('base64url');
+  return Buffer.from(JSON.stringify(data)).toString("base64url");
 }
 
 /**
  * Decode cursor to id (returns null if invalid)
  */
 export function decodeCursor(cursor: unknown): string | null {
-  if (typeof cursor !== 'string' || !cursor) return null;
+  if (typeof cursor !== "string" || !cursor) return null;
 
   try {
-    const json = Buffer.from(cursor, 'base64url').toString('utf8');
+    const json = Buffer.from(cursor, "base64url").toString("utf8");
     const data: CursorData = JSON.parse(json);
-    if (typeof data.id === 'string' && data.id) {
+    if (typeof data.id === "string" && data.id) {
       return data.id;
     }
     return null;
@@ -44,13 +44,15 @@ export function decodeCursor(cursor: unknown): string | null {
 /**
  * Decode cursor with timestamp
  */
-export function decodeCursorWithTimestamp(cursor: unknown): { id: string; timestamp?: Date } | null {
-  if (typeof cursor !== 'string' || !cursor) return null;
+export function decodeCursorWithTimestamp(
+  cursor: unknown,
+): { id: string; timestamp?: Date } | null {
+  if (typeof cursor !== "string" || !cursor) return null;
 
   try {
-    const json = Buffer.from(cursor, 'base64url').toString('utf8');
+    const json = Buffer.from(cursor, "base64url").toString("utf8");
     const data: CursorData = JSON.parse(json);
-    if (typeof data.id === 'string' && data.id) {
+    if (typeof data.id === "string" && data.id) {
       return {
         id: data.id,
         timestamp: data.ts ? new Date(data.ts) : undefined,
@@ -66,7 +68,9 @@ export function decodeCursorWithTimestamp(cursor: unknown): { id: string; timest
 /**
  * Build Prisma cursor clause from decoded cursor
  */
-export function buildCursorClause(cursor: unknown): { cursor: { id: string }; skip: 1 } | Record<string, never> {
+export function buildCursorClause(
+  cursor: unknown,
+): { cursor: { id: string }; skip: 1 } | Record<string, never> {
   const id = decodeCursor(cursor);
   if (!id) return {};
   return { cursor: { id }, skip: 1 };
@@ -77,7 +81,7 @@ export function buildCursorClause(cursor: unknown): { cursor: { id: string }; sk
  */
 export function processPage<T extends { id: string }>(
   items: T[],
-  limit: number
+  limit: number,
 ): { page: T[]; nextCursor: string | null } {
   const hasNext = items.length > limit;
   const page = hasNext ? items.slice(0, limit) : items;
@@ -93,14 +97,15 @@ export function processPage<T extends { id: string }>(
 export function processPageWithTimestamp<T extends { id: string }>(
   items: T[],
   limit: number,
-  getTimestamp: (item: T) => Date
+  getTimestamp: (item: T) => Date,
 ): { page: T[]; nextCursor: string | null } {
   const hasNext = items.length > limit;
   const page = hasNext ? items.slice(0, limit) : items;
   const lastItem = page[page.length - 1];
-  const nextCursor = hasNext && lastItem
-    ? encodeCursor(lastItem.id, getTimestamp(lastItem))
-    : null;
+  const nextCursor =
+    hasNext && lastItem
+      ? encodeCursor(lastItem.id, getTimestamp(lastItem))
+      : null;
 
   return { page, nextCursor };
 }

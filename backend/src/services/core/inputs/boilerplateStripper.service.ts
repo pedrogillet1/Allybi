@@ -11,8 +11,8 @@
  * ```
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 // ============================================================================
 // Types
@@ -67,18 +67,18 @@ export class BoilerplateStripperService {
     try {
       const blocklistPath = path.join(
         __dirname,
-        '../../data_banks/formatting/boilerplate_blocklist.json'
+        "../../data_banks/formatting/boilerplate_blocklist.json",
       );
 
       if (fs.existsSync(blocklistPath)) {
-        this.blocklist = JSON.parse(fs.readFileSync(blocklistPath, 'utf-8'));
+        this.blocklist = JSON.parse(fs.readFileSync(blocklistPath, "utf-8"));
         this.compilePatterns();
-        console.log('✅ [BoilerplateStripper] Blocklist loaded');
+        console.log("✅ [BoilerplateStripper] Blocklist loaded");
       } else {
-        console.warn('⚠️ [BoilerplateStripper] Blocklist not found');
+        console.warn("⚠️ [BoilerplateStripper] Blocklist not found");
       }
     } catch (error: any) {
-      console.error('❌ [BoilerplateStripper] Load failed:', error.message);
+      console.error("❌ [BoilerplateStripper] Load failed:", error.message);
     }
   }
 
@@ -86,21 +86,25 @@ export class BoilerplateStripperService {
     if (!this.blocklist) return;
 
     // Compile start patterns
-    for (const [lang, patterns] of Object.entries(this.blocklist.strip_at_start)) {
-      const compiled = patterns.map((p) => new RegExp(p, 'i'));
+    for (const [lang, patterns] of Object.entries(
+      this.blocklist.strip_at_start,
+    )) {
+      const compiled = patterns.map((p) => new RegExp(p, "i"));
       this.compiledStartPatterns.set(lang, compiled);
     }
 
     // Compile end patterns
-    for (const [lang, patterns] of Object.entries(this.blocklist.strip_at_end)) {
-      const compiled = patterns.map((p) => new RegExp(p, 'i'));
+    for (const [lang, patterns] of Object.entries(
+      this.blocklist.strip_at_end,
+    )) {
+      const compiled = patterns.map((p) => new RegExp(p, "i"));
       this.compiledEndPatterns.set(lang, compiled);
     }
 
     // Compile preserve patterns
     if (this.blocklist.preserve?.patterns) {
       this.preservePatterns = this.blocklist.preserve.patterns.map(
-        (p) => new RegExp(p, 'i')
+        (p) => new RegExp(p, "i"),
       );
     }
   }
@@ -117,8 +121,8 @@ export class BoilerplateStripperService {
    */
   public strip(
     text: string,
-    language: 'en' | 'pt' = 'en',
-    context?: StripContext
+    language: "en" | "pt" = "en",
+    context?: StripContext,
   ): StripResult {
     if (!this.blocklist) {
       return { text, strippedCount: 0, strippedPhrases: [], modified: false };
@@ -136,7 +140,7 @@ export class BoilerplateStripperService {
     const alwaysStrip = this.blocklist.always_strip[language] || [];
     for (const phrase of alwaysStrip) {
       if (result.includes(phrase)) {
-        result = result.replace(phrase, '');
+        result = result.replace(phrase, "");
         strippedPhrases.push(phrase);
       }
     }
@@ -146,7 +150,7 @@ export class BoilerplateStripperService {
       const headers = this.blocklist.strip_headers[language] || [];
       for (const header of headers) {
         if (result.includes(header)) {
-          result = result.replace(header, '');
+          result = result.replace(header, "");
           strippedPhrases.push(header);
         }
       }
@@ -157,7 +161,7 @@ export class BoilerplateStripperService {
     for (const pattern of startPatterns) {
       const match = result.match(pattern);
       if (match) {
-        result = result.replace(pattern, '');
+        result = result.replace(pattern, "");
         strippedPhrases.push(match[0]);
       }
     }
@@ -167,7 +171,7 @@ export class BoilerplateStripperService {
     for (const pattern of endPatterns) {
       const match = result.match(pattern);
       if (match) {
-        result = result.replace(pattern, '');
+        result = result.replace(pattern, "");
         strippedPhrases.push(match[0]);
       }
     }
@@ -186,7 +190,7 @@ export class BoilerplateStripperService {
   /**
    * Strip only from the start of text
    */
-  public stripStart(text: string, language: 'en' | 'pt' = 'en'): StripResult {
+  public stripStart(text: string, language: "en" | "pt" = "en"): StripResult {
     if (!this.blocklist) {
       return { text, strippedCount: 0, strippedPhrases: [], modified: false };
     }
@@ -204,7 +208,7 @@ export class BoilerplateStripperService {
     for (const pattern of startPatterns) {
       const match = result.match(pattern);
       if (match) {
-        result = result.replace(pattern, '');
+        result = result.replace(pattern, "");
         strippedPhrases.push(match[0]);
       }
     }
@@ -232,7 +236,7 @@ export class BoilerplateStripperService {
   /**
    * Strip only from the end of text
    */
-  public stripEnd(text: string, language: 'en' | 'pt' = 'en'): StripResult {
+  public stripEnd(text: string, language: "en" | "pt" = "en"): StripResult {
     if (!this.blocklist) {
       return { text, strippedCount: 0, strippedPhrases: [], modified: false };
     }
@@ -245,7 +249,7 @@ export class BoilerplateStripperService {
     for (const pattern of endPatterns) {
       const match = result.match(pattern);
       if (match) {
-        result = result.replace(pattern, '');
+        result = result.replace(pattern, "");
         strippedPhrases.push(match[0]);
       }
     }
@@ -264,7 +268,10 @@ export class BoilerplateStripperService {
   /**
    * Check if text starts with boilerplate
    */
-  public startsWithBoilerplate(text: string, language: 'en' | 'pt' = 'en'): boolean {
+  public startsWithBoilerplate(
+    text: string,
+    language: "en" | "pt" = "en",
+  ): boolean {
     if (!this.blocklist) return false;
 
     // Check exact phrases
@@ -285,7 +292,10 @@ export class BoilerplateStripperService {
   /**
    * Check if text ends with boilerplate
    */
-  public endsWithBoilerplate(text: string, language: 'en' | 'pt' = 'en'): boolean {
+  public endsWithBoilerplate(
+    text: string,
+    language: "en" | "pt" = "en",
+  ): boolean {
     if (!this.blocklist) return false;
 
     const endPatterns = this.compiledEndPatterns.get(language) || [];
@@ -299,7 +309,10 @@ export class BoilerplateStripperService {
   /**
    * Detect boilerplate in text
    */
-  public detectBoilerplate(text: string, language: 'en' | 'pt' = 'en'): string[] {
+  public detectBoilerplate(
+    text: string,
+    language: "en" | "pt" = "en",
+  ): string[] {
     if (!this.blocklist) return [];
 
     const detected: string[] = [];
@@ -333,13 +346,13 @@ export class BoilerplateStripperService {
     result = result.trim();
 
     // Remove multiple consecutive newlines
-    result = result.replace(/\n{3,}/g, '\n\n');
+    result = result.replace(/\n{3,}/g, "\n\n");
 
     // Remove multiple consecutive spaces
-    result = result.replace(/  +/g, ' ');
+    result = result.replace(/  +/g, " ");
 
     // Remove orphaned bullet points
-    result = result.replace(/^[•\-\*]\s*$/gm, '');
+    result = result.replace(/^[•\-\*]\s*$/gm, "");
 
     // Capitalize first letter if needed
     if (result.length > 0 && /^[a-z]/.test(result)) {
@@ -352,7 +365,7 @@ export class BoilerplateStripperService {
   /**
    * Get all blocklist phrases for a language
    */
-  public getBlocklistPhrases(language: 'en' | 'pt' = 'en'): string[] {
+  public getBlocklistPhrases(language: "en" | "pt" = "en"): string[] {
     if (!this.blocklist) return [];
 
     const phrases: string[] = [];
@@ -383,11 +396,11 @@ export class BoilerplateStripperService {
         (this.blocklist?.always_strip.en?.length || 0) +
         (this.blocklist?.always_strip.pt?.length || 0),
       startPatternCount:
-        (this.compiledStartPatterns.get('en')?.length || 0) +
-        (this.compiledStartPatterns.get('pt')?.length || 0),
+        (this.compiledStartPatterns.get("en")?.length || 0) +
+        (this.compiledStartPatterns.get("pt")?.length || 0),
       endPatternCount:
-        (this.compiledEndPatterns.get('en')?.length || 0) +
-        (this.compiledEndPatterns.get('pt')?.length || 0),
+        (this.compiledEndPatterns.get("en")?.length || 0) +
+        (this.compiledEndPatterns.get("pt")?.length || 0),
       headerCount:
         (this.blocklist?.strip_headers.en?.length || 0) +
         (this.blocklist?.strip_headers.pt?.length || 0),

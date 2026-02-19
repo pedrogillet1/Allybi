@@ -37,28 +37,36 @@ function baseModel(): SpreadsheetModel {
 describe("spreadsheetModel patch apply", () => {
   test("SET_VALUE preserves existing style", () => {
     const model = baseModel();
-    const result = applyPatchOpsToSpreadsheetModel(model, [{ op: "SET_VALUE", range: "Sheet1!A1", value: 10 }]);
+    const result = applyPatchOpsToSpreadsheetModel(model, [
+      { op: "SET_VALUE", range: "Sheet1!A1", value: 10 },
+    ]);
     expect(result.model.sheets[0].cells[cellKey(1, 1)]?.s).toBe("s_font");
     expect(result.model.sheets[0].cells[cellKey(1, 1)]?.v).toBe(10);
   });
 
   test("SET_NUMBER_FORMAT does not mutate value", () => {
     const model = baseModel();
-    const result = applyPatchOpsToSpreadsheetModel(model, [{ op: "SET_NUMBER_FORMAT", range: "Sheet1!A1", format: "0.000" }]);
+    const result = applyPatchOpsToSpreadsheetModel(model, [
+      { op: "SET_NUMBER_FORMAT", range: "Sheet1!A1", format: "0.000" },
+    ]);
     expect(result.model.sheets[0].cells[cellKey(1, 1)]?.v).toBe(5);
     expect(result.model.sheets[0].cells[cellKey(1, 1)]?.nf).toBe("0.000");
   });
 
   test("SET_VALUE coercion stores numeric 0", () => {
     const model = baseModel();
-    const result = applyPatchOpsToSpreadsheetModel(model, [{ op: "SET_VALUE", range: "Sheet1!B2", value: "0" }]);
+    const result = applyPatchOpsToSpreadsheetModel(model, [
+      { op: "SET_VALUE", range: "Sheet1!B2", value: "0" },
+    ]);
     expect(result.model.sheets[0].cells[cellKey(2, 2)]?.v).toBe(0);
     expect(result.model.sheets[0].cells[cellKey(2, 2)]?.t).toBe("n");
   });
 
   test("NOOP diff has zero changed cells", () => {
     const model = baseModel();
-    const applied = applyPatchOpsToSpreadsheetModel(model, [{ op: "SET_VALUE", range: "Sheet1!A1", value: 5 }]);
+    const applied = applyPatchOpsToSpreadsheetModel(model, [
+      { op: "SET_VALUE", range: "Sheet1!A1", value: 5 },
+    ]);
     const diff = diffSpreadsheetModels(model, applied.model);
     expect(diff.changedCellsCount).toBe(0);
     expect(diff.changed).toBe(false);
@@ -124,7 +132,12 @@ describe("spreadsheetModel style preservation", () => {
   test("SET_STYLE (font size change) preserves existing fill and border", () => {
     const model = styledModel();
     const result = applyPatchOpsToSpreadsheetModel(model, [
-      { op: "SET_STYLE", range: "Sheet1!A1", stylePatch: { font: { size: 18 } }, merge: "preserve" },
+      {
+        op: "SET_STYLE",
+        range: "Sheet1!A1",
+        stylePatch: { font: { size: 18 } },
+        merge: "preserve",
+      },
     ]);
     const cell = result.model.sheets[0].cells[cellKey(1, 1)];
     expect(cell?.v).toBe("Hello");
@@ -144,7 +157,12 @@ describe("spreadsheetModel style preservation", () => {
   test("SET_STYLE (color change) preserves existing font properties", () => {
     const model = styledModel();
     const result = applyPatchOpsToSpreadsheetModel(model, [
-      { op: "SET_STYLE", range: "Sheet1!A1", stylePatch: { font: { color: "#0000FF" } }, merge: "preserve" },
+      {
+        op: "SET_STYLE",
+        range: "Sheet1!A1",
+        stylePatch: { font: { color: "#0000FF" } },
+        merge: "preserve",
+      },
     ]);
     const cell = result.model.sheets[0].cells[cellKey(1, 1)];
     expect(cell?.s).toBeTruthy();

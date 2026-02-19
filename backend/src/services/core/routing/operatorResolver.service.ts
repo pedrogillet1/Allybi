@@ -32,25 +32,25 @@
  * 14. clarify (ambiguity or missing evidence)
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 export type OperatorType =
-  | 'open'
-  | 'locate_file'
-  | 'list'
-  | 'filter'
-  | 'sort'
-  | 'summarize'
-  | 'extract'
-  | 'locate_content'
-  | 'compare'
-  | 'compute'
-  | 'explain'
-  | 'help'
-  | 'doc_stats'
-  | 'clarify'
-  | 'unknown';
+  | "open"
+  | "locate_file"
+  | "list"
+  | "filter"
+  | "sort"
+  | "summarize"
+  | "extract"
+  | "locate_content"
+  | "compare"
+  | "compute"
+  | "explain"
+  | "help"
+  | "doc_stats"
+  | "clarify"
+  | "unknown";
 
 /**
  * Match metadata for bank-driven routing
@@ -72,7 +72,7 @@ export interface OperatorResult {
   primaryMatch: OperatorMatch;
 }
 
-type LanguageCode = 'en' | 'pt' | 'es';
+type LanguageCode = "en" | "pt" | "es";
 
 // ============================================================================
 // BANK LOADING TYPES
@@ -80,18 +80,24 @@ type LanguageCode = 'en' | 'pt' | 'es';
 
 interface OperatorTriggerBank {
   _meta?: { version: string; language: string };
-  operators: Record<string, {
-    priority: number;
-    triggers: string[];
-  }>;
+  operators: Record<
+    string,
+    {
+      priority: number;
+      triggers: string[];
+    }
+  >;
 }
 
 interface OperatorNegativeBank {
   _meta?: { version: string; language: string };
-  blockers: Record<string, {
-    blocks: string[];
-    patterns: string[];
-  }>;
+  blockers: Record<
+    string,
+    {
+      blocks: string[];
+      patterns: string[];
+    }
+  >;
 }
 
 interface HelpSubintentBank {
@@ -137,20 +143,20 @@ interface GuardRule {
 // ============================================================================
 
 const DEFAULT_OPERATOR_PRIORITY: OperatorType[] = [
-  'open',           // 1 - explicit file action
-  'locate_file',    // 2 - where is file/folder
-  'locate_content', // 3 - where in document
-  'compare',        // 4 - comparison
-  'compute',        // 5 - math/calculation
-  'summarize',      // 6 - summarization
-  'extract',        // 7 - structured extraction
-  'filter',         // 8 - constrained list
-  'sort',           // 9 - ordered list
-  'list',           // 10 - generic inventory
-  'explain',        // 11 - reasoning
-  'help',           // 12 - product help
-  'doc_stats',      // 13 - document statistics
-  'clarify',        // 14 - disambiguation
+  "open", // 1 - explicit file action
+  "locate_file", // 2 - where is file/folder
+  "locate_content", // 3 - where in document
+  "compare", // 4 - comparison
+  "compute", // 5 - math/calculation
+  "summarize", // 6 - summarization
+  "extract", // 7 - structured extraction
+  "filter", // 8 - constrained list
+  "sort", // 9 - ordered list
+  "list", // 10 - generic inventory
+  "explain", // 11 - reasoning
+  "help", // 12 - product help
+  "doc_stats", // 13 - document statistics
+  "clarify", // 14 - disambiguation
 ];
 
 // ============================================================================
@@ -159,15 +165,17 @@ const DEFAULT_OPERATOR_PRIORITY: OperatorType[] = [
 
 export class OperatorResolver {
   private banksPath: string;
-  private operatorPatterns: Map<OperatorType, Map<LanguageCode, RegExp[]>> = new Map();
+  private operatorPatterns: Map<OperatorType, Map<LanguageCode, RegExp[]>> =
+    new Map();
   private operatorPriorities: Map<OperatorType, number> = new Map();
-  private negativeBlockers: Map<OperatorType, Map<LanguageCode, RegExp[]>> = new Map();
+  private negativeBlockers: Map<OperatorType, Map<LanguageCode, RegExp[]>> =
+    new Map();
   private followupPatterns: Map<LanguageCode, RegExp[]> = new Map();
   private guardRules: GuardRule[] = [];
   private initialized = false;
 
   constructor() {
-    this.banksPath = path.join(__dirname, '../../data_banks');
+    this.banksPath = path.join(__dirname, "../../data_banks");
     this.loadAllBanks();
   }
 
@@ -177,37 +185,37 @@ export class OperatorResolver {
   private loadAllBanks(): void {
     try {
       // Load operator triggers (primary patterns)
-      this.loadOperatorTriggers('en');
-      this.loadOperatorTriggers('pt');
+      this.loadOperatorTriggers("en");
+      this.loadOperatorTriggers("pt");
 
       // Load operator negatives (blockers)
-      this.loadOperatorNegatives('en');
-      this.loadOperatorNegatives('pt');
+      this.loadOperatorNegatives("en");
+      this.loadOperatorNegatives("pt");
 
       // Load help patterns
-      this.loadHelpPatterns('en');
-      this.loadHelpPatterns('pt');
+      this.loadHelpPatterns("en");
+      this.loadHelpPatterns("pt");
 
       // Load doc_stats patterns
-      this.loadDocStatsPatterns('en');
-      this.loadDocStatsPatterns('pt');
+      this.loadDocStatsPatterns("en");
+      this.loadDocStatsPatterns("pt");
 
       // Load file_actions patterns (for open/locate_file/list/filter/sort)
-      this.loadFileActionsPatterns('en');
-      this.loadFileActionsPatterns('pt');
+      this.loadFileActionsPatterns("en");
+      this.loadFileActionsPatterns("pt");
 
       // Load followup patterns
-      this.loadFollowupPatterns('en');
-      this.loadFollowupPatterns('pt');
+      this.loadFollowupPatterns("en");
+      this.loadFollowupPatterns("pt");
 
       // Load guard rules from banks
-      this.loadGuardRules('en');
-      this.loadGuardRules('pt');
+      this.loadGuardRules("en");
+      this.loadGuardRules("pt");
 
       this.initialized = true;
-      console.log('✅ [OperatorResolver] All banks loaded - 100% bank-driven');
+      console.log("✅ [OperatorResolver] All banks loaded - 100% bank-driven");
     } catch (error: any) {
-      console.warn('⚠️ [OperatorResolver] Bank loading failed:', error.message);
+      console.warn("⚠️ [OperatorResolver] Bank loading failed:", error.message);
     }
   }
 
@@ -215,14 +223,21 @@ export class OperatorResolver {
    * Load operator trigger patterns from bank
    */
   private loadOperatorTriggers(lang: LanguageCode): void {
-    const filePath = path.join(this.banksPath, `operators/operator_triggers.${lang}.json`);
+    const filePath = path.join(
+      this.banksPath,
+      `operators/operator_triggers.${lang}.json`,
+    );
     if (!fs.existsSync(filePath)) {
-      console.warn(`⚠️ [OperatorResolver] Missing: operator_triggers.${lang}.json`);
+      console.warn(
+        `⚠️ [OperatorResolver] Missing: operator_triggers.${lang}.json`,
+      );
       return;
     }
 
     try {
-      const bank: OperatorTriggerBank = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      const bank: OperatorTriggerBank = JSON.parse(
+        fs.readFileSync(filePath, "utf-8"),
+      );
 
       for (const [opName, config] of Object.entries(bank.operators || {})) {
         const operator = opName as OperatorType;
@@ -242,7 +257,10 @@ export class OperatorResolver {
         }
       }
     } catch (error: any) {
-      console.warn(`⚠️ [OperatorResolver] Failed to load operator_triggers.${lang}.json:`, error.message);
+      console.warn(
+        `⚠️ [OperatorResolver] Failed to load operator_triggers.${lang}.json:`,
+        error.message,
+      );
     }
   }
 
@@ -251,24 +269,38 @@ export class OperatorResolver {
    */
   private loadOperatorNegatives(lang: LanguageCode): void {
     // First try language-specific file
-    const langFilePath = path.join(this.banksPath, `operators/operator_negatives.${lang}.json`);
+    const langFilePath = path.join(
+      this.banksPath,
+      `operators/operator_negatives.${lang}.json`,
+    );
     if (fs.existsSync(langFilePath)) {
       try {
-        const bank: OperatorNegativeBank = JSON.parse(fs.readFileSync(langFilePath, 'utf-8'));
+        const bank: OperatorNegativeBank = JSON.parse(
+          fs.readFileSync(langFilePath, "utf-8"),
+        );
         this.processLegacyNegativeBank(bank, lang);
       } catch (error: any) {
-        console.warn(`⚠️ [OperatorResolver] Failed to load operator_negatives.${lang}.json:`, error.message);
+        console.warn(
+          `⚠️ [OperatorResolver] Failed to load operator_negatives.${lang}.json:`,
+          error.message,
+        );
       }
     }
 
     // Also load the universal .any.json format (multilingual patterns embedded)
-    const anyFilePath = path.join(this.banksPath, 'operators/operator_negatives.any.json');
+    const anyFilePath = path.join(
+      this.banksPath,
+      "operators/operator_negatives.any.json",
+    );
     if (fs.existsSync(anyFilePath)) {
       try {
-        const bank = JSON.parse(fs.readFileSync(anyFilePath, 'utf-8'));
+        const bank = JSON.parse(fs.readFileSync(anyFilePath, "utf-8"));
         this.processUniversalNegativeBank(bank, lang);
       } catch (error: any) {
-        console.warn(`⚠️ [OperatorResolver] Failed to load operator_negatives.any.json:`, error.message);
+        console.warn(
+          `⚠️ [OperatorResolver] Failed to load operator_negatives.any.json:`,
+          error.message,
+        );
       }
     }
   }
@@ -276,7 +308,10 @@ export class OperatorResolver {
   /**
    * Process legacy operator negatives format (blockers with patterns array)
    */
-  private processLegacyNegativeBank(bank: OperatorNegativeBank, lang: LanguageCode): void {
+  private processLegacyNegativeBank(
+    bank: OperatorNegativeBank,
+    lang: LanguageCode,
+  ): void {
     for (const [blockerName, config] of Object.entries(bank.blockers || {})) {
       const blockedOps = config.blocks || [];
       const patterns = this.compilePatterns(config.patterns || []);
@@ -287,7 +322,9 @@ export class OperatorResolver {
           this.negativeBlockers.set(operator, new Map());
         }
         const existing = this.negativeBlockers.get(operator)!.get(lang) || [];
-        this.negativeBlockers.get(operator)!.set(lang, [...existing, ...patterns]);
+        this.negativeBlockers
+          .get(operator)!
+          .set(lang, [...existing, ...patterns]);
       }
     }
   }
@@ -302,19 +339,21 @@ export class OperatorResolver {
 
       // Get patterns for this language (or fallback to 'en')
       const triggerPatterns = rule.triggerPatterns || {};
-      const patterns = triggerPatterns[lang] || triggerPatterns['en'] || [];
+      const patterns = triggerPatterns[lang] || triggerPatterns["en"] || [];
       const compiled = this.compilePatterns(patterns);
 
       // Handle action types
       const actionType = rule.action?.type;
-      if (actionType === 'hard_block' || actionType === 'confidence_penalty') {
+      if (actionType === "hard_block" || actionType === "confidence_penalty") {
         for (const opName of appliesToOperators) {
           const operator = opName as OperatorType;
           if (!this.negativeBlockers.has(operator)) {
             this.negativeBlockers.set(operator, new Map());
           }
           const existing = this.negativeBlockers.get(operator)!.get(lang) || [];
-          this.negativeBlockers.get(operator)!.set(lang, [...existing, ...compiled]);
+          this.negativeBlockers
+            .get(operator)!
+            .set(lang, [...existing, ...compiled]);
         }
       }
     }
@@ -324,48 +363,62 @@ export class OperatorResolver {
    * Load help patterns from help_subintents bank
    */
   private loadHelpPatterns(lang: LanguageCode): void {
-    const filePath = path.join(this.banksPath, `triggers/help_subintents.${lang}.json`);
+    const filePath = path.join(
+      this.banksPath,
+      `triggers/help_subintents.${lang}.json`,
+    );
     if (!fs.existsSync(filePath)) {
-      console.warn(`⚠️ [OperatorResolver] Missing: help_subintents.${lang}.json`);
+      console.warn(
+        `⚠️ [OperatorResolver] Missing: help_subintents.${lang}.json`,
+      );
       return;
     }
 
     try {
-      const bank: HelpSubintentBank = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      const bank: HelpSubintentBank = JSON.parse(
+        fs.readFileSync(filePath, "utf-8"),
+      );
 
       // Collect all help phrases
       const allPhrases: string[] = [];
       for (const [key, phrases] of Object.entries(bank)) {
-        if (key.startsWith('_')) continue; // Skip meta fields
+        if (key.startsWith("_")) continue; // Skip meta fields
         if (Array.isArray(phrases)) {
           allPhrases.push(...phrases);
         }
       }
 
       // Convert phrases to regex patterns (exact phrase match)
-      const patterns = allPhrases.map(phrase => {
-        const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        try {
-          return new RegExp(`\\b${escaped}\\b`, 'i');
-        } catch {
-          return null;
-        }
-      }).filter((r): r is RegExp => r !== null);
+      const patterns = allPhrases
+        .map((phrase) => {
+          const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          try {
+            return new RegExp(`\\b${escaped}\\b`, "i");
+          } catch {
+            return null;
+          }
+        })
+        .filter((r): r is RegExp => r !== null);
 
       if (patterns.length > 0) {
-        if (!this.operatorPatterns.has('help')) {
-          this.operatorPatterns.set('help', new Map());
+        if (!this.operatorPatterns.has("help")) {
+          this.operatorPatterns.set("help", new Map());
         }
         // MERGE with existing patterns from operator_triggers (don't overwrite)
-        const existing = this.operatorPatterns.get('help')!.get(lang) || [];
-        this.operatorPatterns.get('help')!.set(lang, [...existing, ...patterns]);
+        const existing = this.operatorPatterns.get("help")!.get(lang) || [];
+        this.operatorPatterns
+          .get("help")!
+          .set(lang, [...existing, ...patterns]);
         // Only set priority if not already set from operator_triggers
-        if (!this.operatorPriorities.has('help')) {
-          this.operatorPriorities.set('help', 40);
+        if (!this.operatorPriorities.has("help")) {
+          this.operatorPriorities.set("help", 40);
         }
       }
     } catch (error: any) {
-      console.warn(`⚠️ [OperatorResolver] Failed to load help_subintents.${lang}.json:`, error.message);
+      console.warn(
+        `⚠️ [OperatorResolver] Failed to load help_subintents.${lang}.json:`,
+        error.message,
+      );
     }
   }
 
@@ -373,48 +426,63 @@ export class OperatorResolver {
    * Load doc_stats patterns from doc_stats_subintents bank
    */
   private loadDocStatsPatterns(lang: LanguageCode): void {
-    const filePath = path.join(this.banksPath, `triggers/doc_stats_subintents.${lang}.json`);
+    const filePath = path.join(
+      this.banksPath,
+      `triggers/doc_stats_subintents.${lang}.json`,
+    );
     if (!fs.existsSync(filePath)) {
-      console.warn(`⚠️ [OperatorResolver] Missing: doc_stats_subintents.${lang}.json`);
+      console.warn(
+        `⚠️ [OperatorResolver] Missing: doc_stats_subintents.${lang}.json`,
+      );
       return;
     }
 
     try {
-      const bank: DocStatsSubintentBank = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      const bank: DocStatsSubintentBank = JSON.parse(
+        fs.readFileSync(filePath, "utf-8"),
+      );
 
       // Collect all doc_stats phrases
       const allPhrases: string[] = [];
       for (const [key, phrases] of Object.entries(bank)) {
-        if (key.startsWith('_')) continue;
+        if (key.startsWith("_")) continue;
         if (Array.isArray(phrases)) {
           allPhrases.push(...phrases);
         }
       }
 
       // Convert phrases to regex patterns
-      const patterns = allPhrases.map(phrase => {
-        const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        try {
-          return new RegExp(`\\b${escaped}\\b`, 'i');
-        } catch {
-          return null;
-        }
-      }).filter((r): r is RegExp => r !== null);
+      const patterns = allPhrases
+        .map((phrase) => {
+          const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          try {
+            return new RegExp(`\\b${escaped}\\b`, "i");
+          } catch {
+            return null;
+          }
+        })
+        .filter((r): r is RegExp => r !== null);
 
       if (patterns.length > 0) {
-        if (!this.operatorPatterns.has('doc_stats')) {
-          this.operatorPatterns.set('doc_stats', new Map());
+        if (!this.operatorPatterns.has("doc_stats")) {
+          this.operatorPatterns.set("doc_stats", new Map());
         }
         // MERGE with existing patterns from operator_triggers (don't overwrite)
-        const existing = this.operatorPatterns.get('doc_stats')!.get(lang) || [];
-        this.operatorPatterns.get('doc_stats')!.set(lang, [...existing, ...patterns]);
+        const existing =
+          this.operatorPatterns.get("doc_stats")!.get(lang) || [];
+        this.operatorPatterns
+          .get("doc_stats")!
+          .set(lang, [...existing, ...patterns]);
         // Only set priority if not already set from operator_triggers
-        if (!this.operatorPriorities.has('doc_stats')) {
-          this.operatorPriorities.set('doc_stats', 45);
+        if (!this.operatorPriorities.has("doc_stats")) {
+          this.operatorPriorities.set("doc_stats", 45);
         }
       }
     } catch (error: any) {
-      console.warn(`⚠️ [OperatorResolver] Failed to load doc_stats_subintents.${lang}.json:`, error.message);
+      console.warn(
+        `⚠️ [OperatorResolver] Failed to load doc_stats_subintents.${lang}.json:`,
+        error.message,
+      );
     }
   }
 
@@ -422,35 +490,38 @@ export class OperatorResolver {
    * Load file_actions patterns
    */
   private loadFileActionsPatterns(lang: LanguageCode): void {
-    const filePath = path.join(this.banksPath, `triggers/file_actions_subintents.${lang}.json`);
+    const filePath = path.join(
+      this.banksPath,
+      `triggers/file_actions_subintents.${lang}.json`,
+    );
     if (!fs.existsSync(filePath)) {
       return;
     }
 
     try {
-      const bank = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      const bank = JSON.parse(fs.readFileSync(filePath, "utf-8"));
 
       // Map bank keys to operators
       const keyToOperator: Record<string, OperatorType> = {
-        open: 'open',
-        locate_file: 'locate_file',
-        list: 'list',
-        filter: 'filter',
-        filter_type: 'filter',
-        filter_topic: 'filter',
-        sort: 'sort',
-        newest: 'sort',
-        largest: 'sort',
-        where_file: 'locate_file',
-        inventory: 'list',
-        group_by_folder: 'list',
+        open: "open",
+        locate_file: "locate_file",
+        list: "list",
+        filter: "filter",
+        filter_type: "filter",
+        filter_topic: "filter",
+        sort: "sort",
+        newest: "sort",
+        largest: "sort",
+        where_file: "locate_file",
+        inventory: "list",
+        group_by_folder: "list",
       };
 
       // Handle nested subintents structure: { subintents: { open: { triggers: [...] } } }
       const subintents = bank.subintents || bank;
 
       for (const [key, value] of Object.entries(subintents)) {
-        if (key.startsWith('_')) continue;
+        if (key.startsWith("_")) continue;
 
         const operator = keyToOperator[key];
         if (!operator) continue;
@@ -459,35 +530,43 @@ export class OperatorResolver {
         let phrases: string[] = [];
         if (Array.isArray(value)) {
           phrases = value;
-        } else if (value && typeof value === 'object' && 'triggers' in value) {
+        } else if (value && typeof value === "object" && "triggers" in value) {
           phrases = (value as { triggers: string[] }).triggers || [];
         }
 
         if (phrases.length === 0) continue;
 
-        const patterns = phrases.map(phrase => {
-          const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          try {
-            return new RegExp(`\\b${escaped}\\b`, 'i');
-          } catch {
-            return null;
-          }
-        }).filter((r): r is RegExp => r !== null);
+        const patterns = phrases
+          .map((phrase) => {
+            const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            try {
+              return new RegExp(`\\b${escaped}\\b`, "i");
+            } catch {
+              return null;
+            }
+          })
+          .filter((r): r is RegExp => r !== null);
 
         if (patterns.length > 0) {
           if (!this.operatorPatterns.has(operator)) {
             this.operatorPatterns.set(operator, new Map());
           }
           const existing = this.operatorPatterns.get(operator)!.get(lang) || [];
-          this.operatorPatterns.get(operator)!.set(lang, [...existing, ...patterns]);
+          this.operatorPatterns
+            .get(operator)!
+            .set(lang, [...existing, ...patterns]);
 
           // Set priorities for file actions
-          if (operator === 'open') this.operatorPriorities.set('open', 95);
-          if (operator === 'locate_file') this.operatorPriorities.set('locate_file', 93);
+          if (operator === "open") this.operatorPriorities.set("open", 95);
+          if (operator === "locate_file")
+            this.operatorPriorities.set("locate_file", 93);
         }
       }
     } catch (error: any) {
-      console.warn(`⚠️ [OperatorResolver] Failed to load file_actions_subintents.${lang}.json:`, error.message);
+      console.warn(
+        `⚠️ [OperatorResolver] Failed to load file_actions_subintents.${lang}.json:`,
+        error.message,
+      );
     }
   }
 
@@ -495,25 +574,35 @@ export class OperatorResolver {
    * Load followup patterns from bank
    */
   private loadFollowupPatterns(lang: LanguageCode): void {
-    const filePath = path.join(this.banksPath, `overlays/followup_inherit.${lang}.json`);
+    const filePath = path.join(
+      this.banksPath,
+      `overlays/followup_inherit.${lang}.json`,
+    );
     if (!fs.existsSync(filePath)) {
       // Try alternative path
-      const altPath = path.join(this.banksPath, `overlays/followup_patterns.${lang}.json`);
+      const altPath = path.join(
+        this.banksPath,
+        `overlays/followup_patterns.${lang}.json`,
+      );
       if (!fs.existsSync(altPath)) {
         return;
       }
     }
 
     try {
-      const actualPath = fs.existsSync(path.join(this.banksPath, `overlays/followup_inherit.${lang}.json`))
+      const actualPath = fs.existsSync(
+        path.join(this.banksPath, `overlays/followup_inherit.${lang}.json`),
+      )
         ? path.join(this.banksPath, `overlays/followup_inherit.${lang}.json`)
         : path.join(this.banksPath, `overlays/followup_patterns.${lang}.json`);
 
-      const bank: FollowupBank = JSON.parse(fs.readFileSync(actualPath, 'utf-8'));
+      const bank: FollowupBank = JSON.parse(
+        fs.readFileSync(actualPath, "utf-8"),
+      );
 
       const allPatterns: string[] = [];
       for (const [key, patterns] of Object.entries(bank)) {
-        if (key.startsWith('_')) continue;
+        if (key.startsWith("_")) continue;
         if (Array.isArray(patterns)) {
           allPatterns.push(...patterns);
         }
@@ -524,7 +613,10 @@ export class OperatorResolver {
         this.followupPatterns.set(lang, compiled);
       }
     } catch (error: any) {
-      console.warn(`⚠️ [OperatorResolver] Failed to load followup patterns for ${lang}:`, error.message);
+      console.warn(
+        `⚠️ [OperatorResolver] Failed to load followup patterns for ${lang}:`,
+        error.message,
+      );
     }
   }
 
@@ -533,13 +625,18 @@ export class OperatorResolver {
    */
   private loadGuardRules(lang: LanguageCode): void {
     // Try to load from formatting/operator_guards.json
-    const filePath = path.join(this.banksPath, 'formatting/operator_guards.json');
+    const filePath = path.join(
+      this.banksPath,
+      "formatting/operator_guards.json",
+    );
     if (fs.existsSync(filePath)) {
       try {
-        const bank = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        const bank = JSON.parse(fs.readFileSync(filePath, "utf-8"));
         if (bank.guard_rules && Array.isArray(bank.guard_rules)) {
           for (const rule of bank.guard_rules) {
-            const patterns = this.compilePatterns(rule.patterns?.[lang] || rule.patterns?.en || []);
+            const patterns = this.compilePatterns(
+              rule.patterns?.[lang] || rule.patterns?.en || [],
+            );
             if (patterns.length > 0) {
               this.guardRules.push({
                 name: rule.name,
@@ -551,14 +648,19 @@ export class OperatorResolver {
           }
         }
       } catch (error: any) {
-        console.warn('⚠️ [OperatorResolver] Failed to load operator_guards.json:', error.message);
+        console.warn(
+          "⚠️ [OperatorResolver] Failed to load operator_guards.json:",
+          error.message,
+        );
       }
     }
 
     // If no guards loaded, use minimal critical guards loaded from negative banks
     if (this.guardRules.length === 0) {
       // Guards will be inferred from negative patterns during resolution
-      console.log('ℹ️ [OperatorResolver] No explicit guard rules - using negative patterns as guards');
+      console.log(
+        "ℹ️ [OperatorResolver] No explicit guard rules - using negative patterns as guards",
+      );
     }
   }
 
@@ -566,19 +668,26 @@ export class OperatorResolver {
    * Compile string patterns to RegExp
    */
   private compilePatterns(patterns: string[]): RegExp[] {
-    return patterns.map(p => {
-      try {
-        // If it looks like a regex (starts with ^ or contains special chars), use as-is
-        if (p.startsWith('^') || p.includes('\\b') || p.includes('|') || p.includes('(')) {
-          return new RegExp(p, 'i');
+    return patterns
+      .map((p) => {
+        try {
+          // If it looks like a regex (starts with ^ or contains special chars), use as-is
+          if (
+            p.startsWith("^") ||
+            p.includes("\\b") ||
+            p.includes("|") ||
+            p.includes("(")
+          ) {
+            return new RegExp(p, "i");
+          }
+          // Otherwise, escape and create word-boundary pattern
+          const escaped = p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          return new RegExp(`\\b${escaped}\\b`, "i");
+        } catch {
+          return null;
         }
-        // Otherwise, escape and create word-boundary pattern
-        const escaped = p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return new RegExp(`\\b${escaped}\\b`, 'i');
-      } catch {
-        return null;
-      }
-    }).filter((r): r is RegExp => r !== null);
+      })
+      .filter((r): r is RegExp => r !== null);
   }
 
   /**
@@ -586,8 +695,8 @@ export class OperatorResolver {
    */
   resolve(
     query: string,
-    language: LanguageCode = 'en',
-    lastOperator?: OperatorType
+    language: LanguageCode = "en",
+    lastOperator?: OperatorType,
   ): OperatorResult {
     const normalizedQuery = this.normalizeQuery(query);
     const signalsMatched: string[] = [];
@@ -628,7 +737,8 @@ export class OperatorResolver {
     // Step 2: Check negative blockers first to build block list
     const blockedOperators = new Set<OperatorType>();
     for (const [operator, langPatterns] of this.negativeBlockers) {
-      const patterns = langPatterns.get(language) || langPatterns.get('en') || [];
+      const patterns =
+        langPatterns.get(language) || langPatterns.get("en") || [];
       for (const pattern of patterns) {
         if (pattern.test(normalizedQuery)) {
           blockedOperators.add(operator);
@@ -639,11 +749,16 @@ export class OperatorResolver {
     }
 
     // Step 3: Match patterns in priority order (from banks)
-    const matches: { operator: OperatorType; patterns: number; priority: number; patternIds: string[] }[] = [];
+    const matches: {
+      operator: OperatorType;
+      patterns: number;
+      priority: number;
+      patternIds: string[];
+    }[] = [];
 
     // Get sorted operators by priority
     const sortedOperators = Array.from(this.operatorPatterns.keys())
-      .filter(op => !blockedOperators.has(op))
+      .filter((op) => !blockedOperators.has(op))
       .sort((a, b) => {
         const prioA = this.operatorPriorities.get(a) ?? 50;
         const prioB = this.operatorPriorities.get(b) ?? 50;
@@ -654,7 +769,8 @@ export class OperatorResolver {
       const langPatterns = this.operatorPatterns.get(operator);
       if (!langPatterns) continue;
 
-      const patterns = langPatterns.get(language) || langPatterns.get('en') || [];
+      const patterns =
+        langPatterns.get(language) || langPatterns.get("en") || [];
       let matchCount = 0;
       const patternIds: string[] = [];
 
@@ -687,12 +803,12 @@ export class OperatorResolver {
       });
 
       const best = matches[0];
-      const confidence = Math.min(0.95, 0.6 + (best.patterns * 0.1));
+      const confidence = Math.min(0.95, 0.6 + best.patterns * 0.1);
 
       // Build topMatches for routing signals
-      const topMatches: OperatorMatch[] = matches.slice(0, 5).map(m => ({
+      const topMatches: OperatorMatch[] = matches.slice(0, 5).map((m) => ({
         name: m.operator,
-        score: Math.min(0.95, 0.6 + (m.patterns * 0.1)),
+        score: Math.min(0.95, 0.6 + m.patterns * 0.1),
         matchedPatternIds: m.patternIds,
       }));
 
@@ -715,12 +831,12 @@ export class OperatorResolver {
     }
 
     // Step 5: Fallback for followups
-    if (isFollowup && lastOperator && lastOperator !== 'unknown') {
-      signalsMatched.push('fallback:followup_inherit');
+    if (isFollowup && lastOperator && lastOperator !== "unknown") {
+      signalsMatched.push("fallback:followup_inherit");
       const primaryMatch: OperatorMatch = {
         name: lastOperator,
         score: 0.7,
-        matchedPatternIds: ['followup_inherit'],
+        matchedPatternIds: ["followup_inherit"],
       };
       return {
         operator: lastOperator,
@@ -736,12 +852,12 @@ export class OperatorResolver {
 
     // Step 6: Unknown
     const unknownMatch: OperatorMatch = {
-      name: 'unknown',
+      name: "unknown",
       score: 0.3,
       matchedPatternIds: [],
     };
     return {
-      operator: 'unknown',
+      operator: "unknown",
       confidence: 0.3,
       signalsMatched,
       isFollowup,
@@ -758,11 +874,11 @@ export class OperatorResolver {
   private normalizeQuery(query: string): string {
     return query
       .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
       .replace(/['']/g, "'")
       .replace(/[""]/g, '"')
-      .replace(/\s+/g, ' ')
+      .replace(/\s+/g, " ")
       .trim();
   }
 
@@ -770,8 +886,11 @@ export class OperatorResolver {
    * Detect if query is a followup - from banks
    */
   private detectFollowup(query: string, language: LanguageCode): boolean {
-    const patterns = this.followupPatterns.get(language) || this.followupPatterns.get('en') || [];
-    return patterns.some(p => p.test(query));
+    const patterns =
+      this.followupPatterns.get(language) ||
+      this.followupPatterns.get("en") ||
+      [];
+    return patterns.some((p) => p.test(query));
   }
 
   /**
@@ -784,7 +903,7 @@ export class OperatorResolver {
   /**
    * Get pattern count for a specific operator
    */
-  getPatternCount(operator: OperatorType, lang: LanguageCode = 'en'): number {
+  getPatternCount(operator: OperatorType, lang: LanguageCode = "en"): number {
     const langPatterns = this.operatorPatterns.get(operator);
     if (!langPatterns) return 0;
     return (langPatterns.get(lang) || []).length;
@@ -793,12 +912,16 @@ export class OperatorResolver {
   /**
    * Diagnostic: list all loaded operators with pattern counts
    */
-  getDiagnostics(): Record<string, { en: number; pt: number; priority: number }> {
-    const result: Record<string, { en: number; pt: number; priority: number }> = {};
+  getDiagnostics(): Record<
+    string,
+    { en: number; pt: number; priority: number }
+  > {
+    const result: Record<string, { en: number; pt: number; priority: number }> =
+      {};
     for (const [operator, langPatterns] of this.operatorPatterns) {
       result[operator] = {
-        en: (langPatterns.get('en') || []).length,
-        pt: (langPatterns.get('pt') || []).length,
+        en: (langPatterns.get("en") || []).length,
+        pt: (langPatterns.get("pt") || []).length,
         priority: this.operatorPriorities.get(operator) ?? 50,
       };
     }
@@ -811,12 +934,12 @@ export class OperatorResolver {
 // ============================================================================
 
 export type ActionType =
-  | 'execute'
-  | 'execute_with_caveat'
-  | 'execute_with_results'
-  | 'clarify'
-  | 'disambiguate'
-  | 'confirm';
+  | "execute"
+  | "execute_with_caveat"
+  | "execute_with_results"
+  | "clarify"
+  | "disambiguate"
+  | "confirm";
 
 interface ConfidencePolicy {
   confidence_thresholds: {
@@ -825,13 +948,16 @@ interface ConfidencePolicy {
     low: number;
     very_low: number;
   };
-  operator_rules: Record<string, {
-    min_confidence: number;
-    action_below_threshold: ActionType;
-    caveat_template?: string;
-    clarify_template?: string;
-    confirm_template?: string;
-  }>;
+  operator_rules: Record<
+    string,
+    {
+      min_confidence: number;
+      action_below_threshold: ActionType;
+      caveat_template?: string;
+      clarify_template?: string;
+      confirm_template?: string;
+    }
+  >;
   clarification_templates: Record<string, Record<string, string>>;
 }
 
@@ -877,25 +1003,30 @@ export class OperatorResolverWithPolicy extends OperatorResolver {
     try {
       const confidencePath = path.join(
         __dirname,
-        '../../data_banks/formatting/operator_confidence.json'
+        "../../data_banks/formatting/operator_confidence.json",
       );
       const guardPath = path.join(
         __dirname,
-        '../../data_banks/formatting/operator_guards.json'
+        "../../data_banks/formatting/operator_guards.json",
       );
 
       if (fs.existsSync(confidencePath)) {
-        this.confidencePolicy = JSON.parse(fs.readFileSync(confidencePath, 'utf-8'));
+        this.confidencePolicy = JSON.parse(
+          fs.readFileSync(confidencePath, "utf-8"),
+        );
       }
 
       if (fs.existsSync(guardPath)) {
-        this.guardPolicy = JSON.parse(fs.readFileSync(guardPath, 'utf-8'));
+        this.guardPolicy = JSON.parse(fs.readFileSync(guardPath, "utf-8"));
         this.compileSignalPatterns();
       }
 
-      console.log('✅ [OperatorResolverWithPolicy] Policies loaded');
+      console.log("✅ [OperatorResolverWithPolicy] Policies loaded");
     } catch (error: any) {
-      console.warn('⚠️ [OperatorResolverWithPolicy] Policy load failed:', error.message);
+      console.warn(
+        "⚠️ [OperatorResolverWithPolicy] Policy load failed:",
+        error.message,
+      );
     }
   }
 
@@ -903,18 +1034,34 @@ export class OperatorResolverWithPolicy extends OperatorResolver {
     if (!this.guardPolicy) return;
 
     // Compile boosters - ALL from banks
-    for (const [op, booster] of Object.entries(this.guardPolicy.signal_boosters || {})) {
-      const compiled = booster.patterns.map(p => {
-        try { return new RegExp(p, 'i'); } catch { return null; }
-      }).filter((r): r is RegExp => r !== null);
+    for (const [op, booster] of Object.entries(
+      this.guardPolicy.signal_boosters || {},
+    )) {
+      const compiled = booster.patterns
+        .map((p) => {
+          try {
+            return new RegExp(p, "i");
+          } catch {
+            return null;
+          }
+        })
+        .filter((r): r is RegExp => r !== null);
       this.compiledBoosters.set(op, compiled);
     }
 
     // Compile dampers - ALL from banks
-    for (const [op, damper] of Object.entries(this.guardPolicy.signal_dampers || {})) {
-      const compiled = damper.anti_patterns.map(p => {
-        try { return new RegExp(p, 'i'); } catch { return null; }
-      }).filter((r): r is RegExp => r !== null);
+    for (const [op, damper] of Object.entries(
+      this.guardPolicy.signal_dampers || {},
+    )) {
+      const compiled = damper.anti_patterns
+        .map((p) => {
+          try {
+            return new RegExp(p, "i");
+          } catch {
+            return null;
+          }
+        })
+        .filter((r): r is RegExp => r !== null);
       this.compiledDampers.set(op, compiled);
     }
   }
@@ -922,7 +1069,11 @@ export class OperatorResolverWithPolicy extends OperatorResolver {
   /**
    * Apply signal boosters to confidence
    */
-  applyBoosters(operator: OperatorType, query: string, baseConfidence: number): number {
+  applyBoosters(
+    operator: OperatorType,
+    query: string,
+    baseConfidence: number,
+  ): number {
     const patterns = this.compiledBoosters.get(operator);
     if (!patterns || patterns.length === 0) return baseConfidence;
 
@@ -940,7 +1091,11 @@ export class OperatorResolverWithPolicy extends OperatorResolver {
   /**
    * Apply signal dampers to confidence
    */
-  applyDampers(operator: OperatorType, query: string, baseConfidence: number): number {
+  applyDampers(
+    operator: OperatorType,
+    query: string,
+    baseConfidence: number,
+  ): number {
     const patterns = this.compiledDampers.get(operator);
     if (!patterns || patterns.length === 0) return baseConfidence;
 
@@ -958,7 +1113,11 @@ export class OperatorResolverWithPolicy extends OperatorResolver {
   /**
    * Adjust confidence with boosters and dampers
    */
-  adjustConfidence(operator: OperatorType, query: string, baseConfidence: number): number {
+  adjustConfidence(
+    operator: OperatorType,
+    query: string,
+    baseConfidence: number,
+  ): number {
     let adjusted = this.applyBoosters(operator, query, baseConfidence);
     adjusted = this.applyDampers(operator, query, adjusted);
     return adjusted;
@@ -967,36 +1126,42 @@ export class OperatorResolverWithPolicy extends OperatorResolver {
   /**
    * Determine action based on confidence
    */
-  determineAction(operator: OperatorType, confidence: number, language: 'en' | 'pt' = 'en'): ActionResult {
+  determineAction(
+    operator: OperatorType,
+    confidence: number,
+    language: "en" | "pt" = "en",
+  ): ActionResult {
     if (!this.confidencePolicy) {
-      return { action: confidence >= 0.70 ? 'execute' : 'clarify' };
+      return { action: confidence >= 0.7 ? "execute" : "clarify" };
     }
 
     const rule = this.confidencePolicy.operator_rules[operator];
     if (!rule) {
-      return { action: confidence >= 0.70 ? 'execute' : 'clarify' };
+      return { action: confidence >= 0.7 ? "execute" : "clarify" };
     }
 
     if (confidence >= rule.min_confidence) {
-      return { action: 'execute' };
+      return { action: "execute" };
     }
 
     const action = rule.action_below_threshold;
     let template: string | undefined;
 
     switch (action) {
-      case 'execute_with_caveat':
+      case "execute_with_caveat":
         template = rule.caveat_template;
         break;
-      case 'clarify':
+      case "clarify":
         template = rule.clarify_template;
         break;
-      case 'confirm':
+      case "confirm":
         template = rule.confirm_template;
         break;
     }
 
-    const fallbackChain = this.guardPolicy?.fallback_chain?.chains[operator] as OperatorType[] | undefined;
+    const fallbackChain = this.guardPolicy?.fallback_chain?.chains[operator] as
+      | OperatorType[]
+      | undefined;
 
     return { action, template, fallbackChain };
   }
@@ -1004,22 +1169,30 @@ export class OperatorResolverWithPolicy extends OperatorResolver {
   /**
    * Get confidence band
    */
-  getConfidenceBand(confidence: number): 'high' | 'medium' | 'low' | 'very_low' {
+  getConfidenceBand(
+    confidence: number,
+  ): "high" | "medium" | "low" | "very_low" {
     if (!this.confidencePolicy) {
-      return confidence >= 0.85 ? 'high' : confidence >= 0.65 ? 'medium' : confidence >= 0.45 ? 'low' : 'very_low';
+      return confidence >= 0.85
+        ? "high"
+        : confidence >= 0.65
+          ? "medium"
+          : confidence >= 0.45
+            ? "low"
+            : "very_low";
     }
     const { high, medium, low } = this.confidencePolicy.confidence_thresholds;
-    if (confidence >= high) return 'high';
-    if (confidence >= medium) return 'medium';
-    if (confidence >= low) return 'low';
-    return 'very_low';
+    if (confidence >= high) return "high";
+    if (confidence >= medium) return "medium";
+    if (confidence >= low) return "low";
+    return "very_low";
   }
 
   /**
    * Check if operator needs confirmation
    */
   needsConfirmation(operator: OperatorType): boolean {
-    const confirmOperators = ['delete', 'rename', 'move', 'create_folder'];
+    const confirmOperators = ["delete", "rename", "move", "create_folder"];
     return confirmOperators.includes(operator);
   }
 
@@ -1028,12 +1201,20 @@ export class OperatorResolverWithPolicy extends OperatorResolver {
    */
   resolveWithPolicy(
     query: string,
-    language: 'en' | 'pt' | 'es' = 'en',
-    lastOperator?: OperatorType
+    language: "en" | "pt" | "es" = "en",
+    lastOperator?: OperatorType,
   ): OperatorResult & { action: ActionResult } {
     const baseResult = this.resolve(query, language, lastOperator);
-    const adjustedConfidence = this.adjustConfidence(baseResult.operator, query, baseResult.confidence);
-    const action = this.determineAction(baseResult.operator, adjustedConfidence, language === 'es' ? 'en' : language);
+    const adjustedConfidence = this.adjustConfidence(
+      baseResult.operator,
+      query,
+      baseResult.confidence,
+    );
+    const action = this.determineAction(
+      baseResult.operator,
+      adjustedConfidence,
+      language === "es" ? "en" : language,
+    );
 
     return {
       ...baseResult,
@@ -1045,8 +1226,13 @@ export class OperatorResolverWithPolicy extends OperatorResolver {
   /**
    * Get clarification template
    */
-  getClarificationTemplate(templateKey: string, language: 'en' | 'pt' = 'en'): string | undefined {
-    return this.confidencePolicy?.clarification_templates[language]?.[templateKey];
+  getClarificationTemplate(
+    templateKey: string,
+    language: "en" | "pt" = "en",
+  ): string | undefined {
+    return this.confidencePolicy?.clarification_templates[language]?.[
+      templateKey
+    ];
   }
 }
 

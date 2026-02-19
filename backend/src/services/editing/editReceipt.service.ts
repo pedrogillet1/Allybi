@@ -50,25 +50,46 @@ export class EditReceiptService {
     operator?: string,
   ): string {
     const bank = getOptionalBank<any>("editing_microcopy");
-    const loc = String(language || "en").toLowerCase().startsWith("pt") ? "pt" : "en";
-    const fallbackLang = String(bank?.config?.fallbackLanguage || "en").toLowerCase().startsWith("pt") ? "pt" : "en";
-    const op = String(operator || "").trim().toUpperCase();
+    const loc = String(language || "en")
+      .toLowerCase()
+      .startsWith("pt")
+      ? "pt"
+      : "en";
+    const fallbackLang = String(bank?.config?.fallbackLanguage || "en")
+      .toLowerCase()
+      .startsWith("pt")
+      ? "pt"
+      : "en";
+    const op = String(operator || "")
+      .trim()
+      .toUpperCase();
     if (!op) return "";
     const fromOperator = String(
       bank?.copy?.byOperator?.[stage]?.[op]?.[loc]?.body ||
-      bank?.copy?.byOperator?.[stage]?.[op]?.[fallbackLang]?.body ||
-      bank?.copy?.byOperator?.[stage]?.["*"]?.[loc]?.body ||
-      bank?.copy?.byOperator?.[stage]?.["*"]?.[fallbackLang]?.body ||
-      "",
+        bank?.copy?.byOperator?.[stage]?.[op]?.[fallbackLang]?.body ||
+        bank?.copy?.byOperator?.[stage]?.["*"]?.[loc]?.body ||
+        bank?.copy?.byOperator?.[stage]?.["*"]?.[fallbackLang]?.body ||
+        "",
     ).trim();
     return fromOperator;
   }
 
-  private resolveStageNote(stage: "preview" | "applied" | "blocked", language: LanguageCode): string {
+  private resolveStageNote(
+    stage: "preview" | "applied" | "blocked",
+    language: LanguageCode,
+  ): string {
     const bank = getOptionalBank<any>("editing_microcopy");
     const copy = bank?.copy?.[stage];
-    const fallbackLang = String(bank?.config?.fallbackLanguage || "en").toLowerCase().startsWith("pt") ? "pt" : "en";
-    const loc = String(language || "en").toLowerCase().startsWith("pt") ? "pt" : "en";
+    const fallbackLang = String(bank?.config?.fallbackLanguage || "en")
+      .toLowerCase()
+      .startsWith("pt")
+      ? "pt"
+      : "en";
+    const loc = String(language || "en")
+      .toLowerCase()
+      .startsWith("pt")
+      ? "pt"
+      : "en";
     const fromLocalized = String(copy?.[loc]?.body || "").trim();
     if (fromLocalized) return fromLocalized;
     const fromFallback = String(copy?.[fallbackLang]?.body || "").trim();

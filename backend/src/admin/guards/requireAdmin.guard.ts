@@ -10,50 +10,55 @@
  * All strategies are read-only; this guard never mutates data.
  */
 
-import { Request, Response, NextFunction } from 'express';
-import crypto from 'crypto';
-import { verifyAdminAccessToken, AdminJWTPayload } from '../../utils/adminJwt';
-import prisma from '../../config/database';
+import { Request, Response, NextFunction } from "express";
+import crypto from "crypto";
+import { verifyAdminAccessToken, AdminJWTPayload } from "../../utils/adminJwt";
+import prisma from "../../config/database";
 
 /**
  * Log security event for admin access control (fire-and-forget).
  */
 function logAdminAccessEvent(action: string, req: Request): void {
   const ip = getClientIp(req);
-  const userAgent = req.headers['user-agent'] || null;
+  const userAgent = req.headers["user-agent"] || null;
   const path = req.originalUrl || req.path;
 
-  prisma.auditLog.create({
-    data: {
-      action,
-      userId: null,
-      ipAddress: ip,
-      userAgent,
-      status: 'denied',
-      details: JSON.stringify({ path, method: req.method, isAdmin: true }),
-      createdAt: new Date(),
-    },
-  }).catch(() => {}); // fire-and-forget
+  prisma.auditLog
+    .create({
+      data: {
+        action,
+        userId: null,
+        ipAddress: ip,
+        userAgent,
+        status: "denied",
+        details: JSON.stringify({ path, method: req.method, isAdmin: true }),
+        createdAt: new Date(),
+      },
+    })
+    .catch(() => {}); // fire-and-forget
 }
 
 // Environment configuration
 const OWNER_USER_ID = process.env.KODA_OWNER_USER_ID;
 const ADMIN_KEY = process.env.KODA_ADMIN_KEY;
-const IP_ALLOWLIST = process.env.KODA_ADMIN_IP_ALLOWLIST?.split(',').map(ip => ip.trim()).filter(Boolean) || [];
-const LOCKDOWN_MODE = process.env.KODA_LOCKDOWN === 'true';
+const IP_ALLOWLIST =
+  process.env.KODA_ADMIN_IP_ALLOWLIST?.split(",")
+    .map((ip) => ip.trim())
+    .filter(Boolean) || [];
+const LOCKDOWN_MODE = process.env.KODA_LOCKDOWN === "true";
 
 /**
  * Extract real client IP from request
  */
 function getClientIp(req: Request): string {
-  const forwarded = req.headers['x-forwarded-for'];
-  if (typeof forwarded === 'string') {
-    return forwarded.split(',')[0].trim();
+  const forwarded = req.headers["x-forwarded-for"];
+  if (typeof forwarded === "string") {
+    return forwarded.split(",")[0].trim();
   }
   if (Array.isArray(forwarded)) {
     return forwarded[0];
   }
-  return req.socket.remoteAddress || req.ip || 'unknown';
+  return req.socket.remoteAddress || req.ip || "unknown";
 }
 
 /**
@@ -81,8 +86,11 @@ function isOwnerUser(req: Request): boolean {
   }
 
   // Check X-User-ID header (for internal services)
-  const headerUserId = req.headers['x-user-id'];
-  if (typeof headerUserId === 'string' && safeCompare(headerUserId, OWNER_USER_ID)) {
+  const headerUserId = req.headers["x-user-id"];
+  if (
+    typeof headerUserId === "string" &&
+    safeCompare(headerUserId, OWNER_USER_ID)
+  ) {
     return true;
   }
 
@@ -95,7 +103,7 @@ function isOwnerUser(req: Request): boolean {
  */
 function getValidAdminJwt(req: Request): AdminJWTPayload | null {
   const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith('Bearer ')) {
+  if (!authHeader?.startsWith("Bearer ")) {
     return null;
   }
 
@@ -116,24 +124,27 @@ function hasValidAdminKey(req: Request): boolean {
 
   // Check Authorization header: Bearer <key> (for direct API key usage)
   const authHeader = req.headers.authorization;
-  if (authHeader?.startsWith('Bearer ')) {
+  if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.slice(7);
     // Only compare if it looks like a key (not a JWT)
-    if (!token.includes('.') && safeCompare(token, ADMIN_KEY)) {
+    if (!token.includes(".") && safeCompare(token, ADMIN_KEY)) {
       return true;
     }
   }
 
   // Check X-Admin-Key header
-  const adminKeyHeader = req.headers['x-admin-key'];
-  if (typeof adminKeyHeader === 'string' && safeCompare(adminKeyHeader, ADMIN_KEY)) {
+  const adminKeyHeader = req.headers["x-admin-key"];
+  if (
+    typeof adminKeyHeader === "string" &&
+    safeCompare(adminKeyHeader, ADMIN_KEY)
+  ) {
     return true;
   }
 
   // Check query parameter (less secure, for debugging only)
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     const queryKey = req.query.adminKey;
-    if (typeof queryKey === 'string' && safeCompare(queryKey, ADMIN_KEY)) {
+    if (typeof queryKey === "string" && safeCompare(queryKey, ADMIN_KEY)) {
       return true;
     }
   }
@@ -158,8 +169,8 @@ function isAllowedIp(req: Request): boolean {
   }
 
   // Check localhost variants
-  if (IP_ALLOWLIST.includes('localhost')) {
-    if (['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(clientIp)) {
+  if (IP_ALLOWLIST.includes("localhost")) {
+    if (["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(clientIp)) {
       return true;
     }
   }
@@ -177,15 +188,19 @@ function isAllowedIp(req: Request): boolean {
  * Plus (if IP allowlist is configured):
  * - Request from allowed IP
  */
-export function requireAdmin(req: Request, res: Response, next: NextFunction): void {
+export function requireAdmin(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   // Check IP allowlist first (if configured)
   if (IP_ALLOWLIST.length > 0 && !isAllowedIp(req)) {
     console.warn(`[Admin Guard] Blocked request from IP: ${getClientIp(req)}`);
-    logAdminAccessEvent('ACCESS_DENIED', req);
+    logAdminAccessEvent("ACCESS_DENIED", req);
     res.status(403).json({
       ok: false,
-      error: 'Access denied',
-      code: 'ADMIN_IP_BLOCKED',
+      error: "Access denied",
+      code: "ADMIN_IP_BLOCKED",
     });
     return;
   }
@@ -193,8 +208,10 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
   // Check owner user
   if (isOwnerUser(req)) {
     // Attach admin context to request
-    (req as Request & { adminAuth: { type: string; userId?: string } }).adminAuth = {
-      type: 'owner',
+    (
+      req as Request & { adminAuth: { type: string; userId?: string } }
+    ).adminAuth = {
+      type: "owner",
       userId: OWNER_USER_ID,
     };
     next();
@@ -204,8 +221,17 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
   // Check admin JWT token (from admin login)
   const adminJwt = getValidAdminJwt(req);
   if (adminJwt) {
-    (req as Request & { adminAuth: { type: string; adminId: string; username: string; role: string } }).adminAuth = {
-      type: 'jwt',
+    (
+      req as Request & {
+        adminAuth: {
+          type: string;
+          adminId: string;
+          username: string;
+          role: string;
+        };
+      }
+    ).adminAuth = {
+      type: "jwt",
       adminId: adminJwt.adminId,
       username: adminJwt.username,
       role: adminJwt.role,
@@ -217,7 +243,7 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
   // Check admin key
   if (hasValidAdminKey(req)) {
     (req as Request & { adminAuth: { type: string } }).adminAuth = {
-      type: 'api_key',
+      type: "api_key",
     };
     next();
     return;
@@ -225,32 +251,36 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
 
   // In lockdown mode, require explicit auth
   if (LOCKDOWN_MODE) {
-    console.warn(`[Admin Guard] Unauthorized request in lockdown mode from IP: ${getClientIp(req)}`);
-    logAdminAccessEvent('ACCESS_DENIED', req);
+    console.warn(
+      `[Admin Guard] Unauthorized request in lockdown mode from IP: ${getClientIp(req)}`,
+    );
+    logAdminAccessEvent("ACCESS_DENIED", req);
     res.status(401).json({
       ok: false,
-      error: 'Admin authentication required',
-      code: 'ADMIN_AUTH_REQUIRED',
+      error: "Admin authentication required",
+      code: "ADMIN_AUTH_REQUIRED",
     });
     return;
   }
 
   // Development fallback: allow if no auth configured
-  if (process.env.NODE_ENV === 'development' && !OWNER_USER_ID && !ADMIN_KEY) {
-    console.warn('[Admin Guard] WARNING: Running without admin auth in development mode');
+  if (process.env.NODE_ENV === "development" && !OWNER_USER_ID && !ADMIN_KEY) {
+    console.warn(
+      "[Admin Guard] WARNING: Running without admin auth in development mode",
+    );
     (req as Request & { adminAuth: { type: string } }).adminAuth = {
-      type: 'dev_bypass',
+      type: "dev_bypass",
     };
     next();
     return;
   }
 
   // Deny by default
-  logAdminAccessEvent('ACCESS_DENIED', req);
+  logAdminAccessEvent("ACCESS_DENIED", req);
   res.status(401).json({
     ok: false,
-    error: 'Admin authentication required',
-    code: 'ADMIN_AUTH_REQUIRED',
+    error: "Admin authentication required",
+    code: "ADMIN_AUTH_REQUIRED",
   });
 }
 

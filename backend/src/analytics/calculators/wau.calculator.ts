@@ -20,7 +20,7 @@ export type WAUResult = {
  */
 function toUTCDay(ts: string): string {
   const d = new Date(ts);
-  if (isNaN(d.getTime())) return '';
+  if (isNaN(d.getTime())) return "";
   return d.toISOString().slice(0, 10);
 }
 
@@ -28,7 +28,7 @@ function toUTCDay(ts: string): string {
  * Subtracts N days from a date string, returns YYYY-MM-DD
  */
 function subtractDays(dayStr: string, n: number): string {
-  const d = new Date(dayStr + 'T00:00:00Z');
+  const d = new Date(dayStr + "T00:00:00Z");
   d.setUTCDate(d.getUTCDate() - n);
   return d.toISOString().slice(0, 10);
 }
@@ -43,10 +43,13 @@ function subtractDays(dayStr: string, n: number): string {
  * @param endTs - End timestamp (the "current" day to measure from)
  * @returns WAU count and window details
  */
-export function calculateWAU(events: ActivityEvent[], endTs: string): WAUResult {
+export function calculateWAU(
+  events: ActivityEvent[],
+  endTs: string,
+): WAUResult {
   const endDay = toUTCDay(endTs);
   if (!endDay) {
-    return { wau: 0, windowDays: 7, startDay: '', endDay: '' };
+    return { wau: 0, windowDays: 7, startDay: "", endDay: "" };
   }
 
   // 7-day window: end day inclusive, going back 6 days

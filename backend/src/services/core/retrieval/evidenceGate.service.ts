@@ -13,16 +13,16 @@
 
 export interface EvidenceCheckResult {
   hasEvidence: boolean;
-  evidenceStrength: 'strong' | 'moderate' | 'weak' | 'none';
-  suggestedAction: 'answer' | 'hedge' | 'clarify' | 'apologize';
-  missingEvidence: string[];       // What facts are needed but missing
-  foundEvidence: string[];         // What facts were found
-  clarifyQuestion?: string;        // If action is 'clarify', what to ask
-  hedgePrefix?: string;            // If action is 'hedge', what prefix to use
+  evidenceStrength: "strong" | "moderate" | "weak" | "none";
+  suggestedAction: "answer" | "hedge" | "clarify" | "apologize";
+  missingEvidence: string[]; // What facts are needed but missing
+  foundEvidence: string[]; // What facts were found
+  clarifyQuestion?: string; // If action is 'clarify', what to ask
+  hedgePrefix?: string; // If action is 'hedge', what prefix to use
 }
 
 interface EvidenceGateConfig {
-  logger?: Pick<Console, 'info' | 'warn' | 'debug'>;
+  logger?: Pick<Console, "info" | "warn" | "debug">;
 }
 
 /**
@@ -65,15 +65,15 @@ const NARRATIVE_RISK_PATTERNS = [
  * Evidence keywords that indicate we found real content
  */
 const EVIDENCE_KEYWORDS = {
-  dates: /\b(19|20)\d{2}\b/,                           // Years like 2012, 2024
-  numbers: /\b\d+([.,]\d+)?(%|R\$|\$|€|£)?\b/,        // Numbers, currencies
-  names: /\b[A-Z][a-z]+\s+[A-Z][a-z]+\b/,             // Proper names
-  quotes: /[""][^""]+[""]/,                            // Quoted text
+  dates: /\b(19|20)\d{2}\b/, // Years like 2012, 2024
+  numbers: /\b\d+([.,]\d+)?(%|R\$|\$|€|£)?\b/, // Numbers, currencies
+  names: /\b[A-Z][a-z]+\s+[A-Z][a-z]+\b/, // Proper names
+  quotes: /[""][^""]+[""]/, // Quoted text
   specifics: /\b(artigo|cláusula|seção|slide|página|row|column|cell)\s+\d+/i,
 };
 
 export class EvidenceGateService {
-  private logger: Pick<Console, 'info' | 'warn' | 'debug'>;
+  private logger: Pick<Console, "info" | "warn" | "debug">;
 
   constructor(config: EvidenceGateConfig = {}) {
     this.logger = config.logger || console;
@@ -85,20 +85,26 @@ export class EvidenceGateService {
   checkEvidence(
     query: string,
     chunks: Array<{ text: string; metadata?: Record<string, unknown> }>,
-    language: string
+    language: string,
   ): EvidenceCheckResult {
     const queryLower = query.toLowerCase();
 
     // Step 1: Determine what kind of facts the query requires
     const requiredFactTypes = this.detectRequiredFacts(query);
-    const isNarrativeRisk = NARRATIVE_RISK_PATTERNS.some(p => p.test(queryLower));
+    const isNarrativeRisk = NARRATIVE_RISK_PATTERNS.some((p) =>
+      p.test(queryLower),
+    );
 
     // Step 2: Analyze chunks for evidence
-    const combinedText = chunks.map(c => c.text).join('\n');
+    const combinedText = chunks.map((c) => c.text).join("\n");
     const foundEvidence = this.findEvidence(combinedText, requiredFactTypes);
 
     // Step 3: Calculate evidence strength
-    const evidenceStrength = this.calculateStrength(requiredFactTypes, foundEvidence, chunks.length);
+    const evidenceStrength = this.calculateStrength(
+      requiredFactTypes,
+      foundEvidence,
+      chunks.length,
+    );
 
     // Step 4: Determine action
     const result = this.determineAction(
@@ -106,10 +112,10 @@ export class EvidenceGateService {
       requiredFactTypes,
       foundEvidence,
       isNarrativeRisk,
-      language
+      language,
     );
 
-    this.logger.debug('[EvidenceGate] Check result', {
+    this.logger.debug("[EvidenceGate] Check result", {
       query: query.substring(0, 50),
       requiredFactTypes,
       foundEvidence,
@@ -127,8 +133,10 @@ export class EvidenceGateService {
   private detectRequiredFacts(query: string): string[] {
     const required: string[] = [];
 
-    for (const [factType, patterns] of Object.entries(FACT_REQUIRING_PATTERNS)) {
-      if (patterns.some(p => p.test(query))) {
+    for (const [factType, patterns] of Object.entries(
+      FACT_REQUIRING_PATTERNS,
+    )) {
+      if (patterns.some((p) => p.test(query))) {
         required.push(factType);
       }
     }
@@ -151,7 +159,7 @@ export class EvidenceGateService {
     // Check for general content richness
     const wordCount = text.split(/\s+/).length;
     if (wordCount > 100) {
-      found.push('rich_content');
+      found.push("rich_content");
     }
 
     return found;
@@ -163,86 +171,96 @@ export class EvidenceGateService {
   private calculateStrength(
     required: string[],
     found: string[],
-    chunkCount: number
-  ): 'strong' | 'moderate' | 'weak' | 'none' {
+    chunkCount: number,
+  ): "strong" | "moderate" | "weak" | "none" {
     // If no specific facts required, any content is good
     if (required.length === 0 && chunkCount > 0) {
-      return found.includes('rich_content') ? 'strong' : 'moderate';
+      return found.includes("rich_content") ? "strong" : "moderate";
     }
 
     // Check how many required types we found evidence for
-    const matchedRequired = required.filter(r => {
+    const matchedRequired = required.filter((r) => {
       // Map required fact types to evidence types
-      if (r === 'dates' && found.includes('dates')) return true;
-      if (r === 'numbers' && found.includes('numbers')) return true;
-      if (r === 'names' && found.includes('names')) return true;
-      if (r === 'specifics' && (found.includes('quotes') || found.includes('specifics'))) return true;
+      if (r === "dates" && found.includes("dates")) return true;
+      if (r === "numbers" && found.includes("numbers")) return true;
+      if (r === "names" && found.includes("names")) return true;
+      if (
+        r === "specifics" &&
+        (found.includes("quotes") || found.includes("specifics"))
+      )
+        return true;
       return false;
     });
 
-    const matchRatio = required.length > 0 ? matchedRequired.length / required.length : 0;
+    const matchRatio =
+      required.length > 0 ? matchedRequired.length / required.length : 0;
 
-    if (matchRatio >= 0.8) return 'strong';
-    if (matchRatio >= 0.5) return 'moderate';
-    if (matchRatio > 0 || found.includes('rich_content')) return 'weak';
-    return 'none';
+    if (matchRatio >= 0.8) return "strong";
+    if (matchRatio >= 0.5) return "moderate";
+    if (matchRatio > 0 || found.includes("rich_content")) return "weak";
+    return "none";
   }
 
   /**
    * Determine what action to take based on evidence strength
    */
   private determineAction(
-    strength: 'strong' | 'moderate' | 'weak' | 'none',
+    strength: "strong" | "moderate" | "weak" | "none",
     requiredTypes: string[],
     foundEvidence: string[],
     isNarrativeRisk: boolean,
-    language: string
+    language: string,
   ): EvidenceCheckResult {
-    const missingEvidence = requiredTypes.filter(r => !foundEvidence.some(f => f.includes(r)));
+    const missingEvidence = requiredTypes.filter(
+      (r) => !foundEvidence.some((f) => f.includes(r)),
+    );
 
     // Base result
     const result: EvidenceCheckResult = {
-      hasEvidence: strength !== 'none',
+      hasEvidence: strength !== "none",
       evidenceStrength: strength,
-      suggestedAction: 'answer',
+      suggestedAction: "answer",
       missingEvidence,
       foundEvidence,
     };
 
     // Decision logic
-    if (strength === 'none') {
-      result.suggestedAction = 'apologize';
+    if (strength === "none") {
+      result.suggestedAction = "apologize";
       return result;
     }
 
-    if (strength === 'weak') {
+    if (strength === "weak") {
       if (isNarrativeRisk) {
         // High risk of hallucination - ask for clarification
-        result.suggestedAction = 'clarify';
-        result.clarifyQuestion = language === 'pt'
-          ? 'Não encontrei detalhes específicos sobre isso nos seus documentos. Você pode me dizer qual arquivo devo verificar?'
-          : 'I couldn\'t find specific details about this in your documents. Can you tell me which file I should check?';
+        result.suggestedAction = "clarify";
+        result.clarifyQuestion =
+          language === "pt"
+            ? "Não encontrei detalhes específicos sobre isso nos seus documentos. Você pode me dizer qual arquivo devo verificar?"
+            : "I couldn't find specific details about this in your documents. Can you tell me which file I should check?";
       } else {
         // Low narrative risk - hedge but answer
-        result.suggestedAction = 'hedge';
-        result.hedgePrefix = language === 'pt'
-          ? 'Com base nas informações limitadas disponíveis, '
-          : 'Based on the limited information available, ';
+        result.suggestedAction = "hedge";
+        result.hedgePrefix =
+          language === "pt"
+            ? "Com base nas informações limitadas disponíveis, "
+            : "Based on the limited information available, ";
       }
       return result;
     }
 
-    if (strength === 'moderate' && isNarrativeRisk) {
+    if (strength === "moderate" && isNarrativeRisk) {
       // Moderate evidence + narrative = hedge
-      result.suggestedAction = 'hedge';
-      result.hedgePrefix = language === 'pt'
-        ? 'De acordo com os documentos disponíveis, '
-        : 'According to the available documents, ';
+      result.suggestedAction = "hedge";
+      result.hedgePrefix =
+        language === "pt"
+          ? "De acordo com os documentos disponíveis, "
+          : "According to the available documents, ";
       return result;
     }
 
     // Strong evidence or moderate without narrative risk = answer normally
-    result.suggestedAction = 'answer';
+    result.suggestedAction = "answer";
     return result;
   }
 
@@ -252,24 +270,24 @@ export class EvidenceGateService {
    */
   getPromptModification(result: EvidenceCheckResult, language: string): string {
     switch (result.suggestedAction) {
-      case 'apologize':
-        return language === 'pt'
-          ? '\n\nIMPORTANTE: Não encontrei informações suficientes nos documentos para responder esta pergunta. Diga isso honestamente ao usuário sem inventar detalhes.'
-          : '\n\nIMPORTANT: I could not find sufficient information in the documents to answer this question. Tell the user this honestly without inventing details.';
+      case "apologize":
+        return language === "pt"
+          ? "\n\nIMPORTANTE: Não encontrei informações suficientes nos documentos para responder esta pergunta. Diga isso honestamente ao usuário sem inventar detalhes."
+          : "\n\nIMPORTANT: I could not find sufficient information in the documents to answer this question. Tell the user this honestly without inventing details.";
 
-      case 'clarify':
-        return language === 'pt'
+      case "clarify":
+        return language === "pt"
           ? `\n\nIMPORTANTE: A evidência é limitada. Pergunte: "${result.clarifyQuestion}" ao invés de inventar detalhes.`
           : `\n\nIMPORTANT: Evidence is limited. Ask: "${result.clarifyQuestion}" instead of inventing details.`;
 
-      case 'hedge':
-        return language === 'pt'
+      case "hedge":
+        return language === "pt"
           ? `\n\nIMPORTANTE: Comece a resposta com: "${result.hedgePrefix}" para indicar incerteza. NÃO invente detalhes como datas de fundação, história da empresa, ou missão a menos que estejam explicitamente citados.`
           : `\n\nIMPORTANT: Start the response with: "${result.hedgePrefix}" to indicate uncertainty. DO NOT invent details like founding dates, company history, or mission statements unless explicitly quoted.`;
 
-      case 'answer':
+      case "answer":
       default:
-        return ''; // No modification needed
+        return ""; // No modification needed
     }
   }
 }

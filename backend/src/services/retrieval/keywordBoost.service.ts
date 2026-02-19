@@ -21,7 +21,7 @@ export interface KeywordMatch {
 export interface KeywordBoostResult {
   hasMatch: boolean;
   matches: KeywordMatch[];
-  mimeTypeBoosts: Map<string, number>;  // mimeType → boost factor
+  mimeTypeBoosts: Map<string, number>; // mimeType → boost factor
   detectedKeywords: string[];
   shouldPrioritizeSpreadsheet: boolean;
   shouldPrioritizeSlides: boolean;
@@ -32,30 +32,63 @@ export interface KeywordBoostResult {
 // KEYWORD CATEGORIES - Comprehensive coverage for all query types
 // ═══════════════════════════════════════════════════════════════════════════
 
-const KEYWORD_CATEGORIES: Record<string, {
-  keywords: string[];
-  boostMimeTypes: string[];
-  boostFactor: number;
-}> = {
+const KEYWORD_CATEGORIES: Record<
+  string,
+  {
+    keywords: string[];
+    boostMimeTypes: string[];
+    boostFactor: number;
+  }
+> = {
   // ─────────────────────────────────────────────────────────────────────────
   // FINANCE & METRICS (→ Spreadsheets)
   // ─────────────────────────────────────────────────────────────────────────
   finance_metrics: {
     keywords: [
       // Core financial metrics
-      'ebitda', 'ebit', 'revenue', 'profit', 'loss', 'income', 'expense',
-      'margin', 'roi', 'roe', 'roa', 'roce', 'cagr', 'npv', 'irr',
+      "ebitda",
+      "ebit",
+      "revenue",
+      "profit",
+      "loss",
+      "income",
+      "expense",
+      "margin",
+      "roi",
+      "roe",
+      "roa",
+      "roce",
+      "cagr",
+      "npv",
+      "irr",
       // Portuguese
-      'receita', 'lucro', 'prejuízo', 'margem', 'despesa', 'custo',
-      'faturamento', 'rentabilidade', 'retorno',
+      "receita",
+      "lucro",
+      "prejuízo",
+      "margem",
+      "despesa",
+      "custo",
+      "faturamento",
+      "rentabilidade",
+      "retorno",
       // Budget/forecast
-      'budget', 'forecast', 'actual', 'variance', 'orçamento', 'previsão',
+      "budget",
+      "forecast",
+      "actual",
+      "variance",
+      "orçamento",
+      "previsão",
       // P&L specific
-      'p&l', 'pnl', 'balance', 'balanço', 'dre', 'demonstrativo',
+      "p&l",
+      "pnl",
+      "balance",
+      "balanço",
+      "dre",
+      "demonstrativo",
     ],
     boostMimeTypes: [
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-excel',
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel",
     ],
     boostFactor: 2.5,
   },
@@ -66,26 +99,86 @@ const KEYWORD_CATEGORIES: Record<string, {
   temporal: {
     keywords: [
       // Months EN
-      'january', 'february', 'march', 'april', 'may', 'june',
-      'july', 'august', 'september', 'october', 'november', 'december',
-      'jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
+      "january",
+      "february",
+      "march",
+      "april",
+      "may",
+      "june",
+      "july",
+      "august",
+      "september",
+      "october",
+      "november",
+      "december",
+      "jan",
+      "feb",
+      "mar",
+      "apr",
+      "jun",
+      "jul",
+      "aug",
+      "sep",
+      "oct",
+      "nov",
+      "dec",
       // Months PT
-      'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
-      'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
+      "janeiro",
+      "fevereiro",
+      "março",
+      "abril",
+      "maio",
+      "junho",
+      "julho",
+      "agosto",
+      "setembro",
+      "outubro",
+      "novembro",
+      "dezembro",
       // Quarters
-      'q1', 'q2', 'q3', 'q4', 'quarter', 'trimestre',
+      "q1",
+      "q2",
+      "q3",
+      "q4",
+      "quarter",
+      "trimestre",
       // Years
-      '2024', '2025', '2023', '2022',
+      "2024",
+      "2025",
+      "2023",
+      "2022",
       // Time comparisons
-      'ytd', 'mtd', 'yoy', 'mom', 'year-over-year', 'month-over-month',
-      'mensal', 'anual', 'trimestral', 'monthly', 'yearly', 'quarterly',
+      "ytd",
+      "mtd",
+      "yoy",
+      "mom",
+      "year-over-year",
+      "month-over-month",
+      "mensal",
+      "anual",
+      "trimestral",
+      "monthly",
+      "yearly",
+      "quarterly",
       // Generic temporal PT (for follow-ups like "qual mês", "ano passado")
-      'mês', 'mes', 'ano', 'semana', 'dia', 'virada', 'pico', 'outlier',
-      'crescimento', 'queda', 'aumento', 'redução', 'tendência', 'tendencia',
+      "mês",
+      "mes",
+      "ano",
+      "semana",
+      "dia",
+      "virada",
+      "pico",
+      "outlier",
+      "crescimento",
+      "queda",
+      "aumento",
+      "redução",
+      "tendência",
+      "tendencia",
     ],
     boostMimeTypes: [
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-excel',
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel",
     ],
     boostFactor: 2.0,
   },
@@ -96,20 +189,52 @@ const KEYWORD_CATEGORIES: Record<string, {
   spreadsheet_ops: {
     keywords: [
       // Operations
-      'sum', 'average', 'total', 'count', 'max', 'min', 'mean',
-      'soma', 'média', 'total', 'contagem', 'máximo', 'mínimo',
+      "sum",
+      "average",
+      "total",
+      "count",
+      "max",
+      "min",
+      "mean",
+      "soma",
+      "média",
+      "total",
+      "contagem",
+      "máximo",
+      "mínimo",
       // Structure
-      'column', 'row', 'cell', 'sheet', 'tab', 'table',
-      'coluna', 'linha', 'célula', 'aba', 'planilha', 'tabela',
+      "column",
+      "row",
+      "cell",
+      "sheet",
+      "tab",
+      "table",
+      "coluna",
+      "linha",
+      "célula",
+      "aba",
+      "planilha",
+      "tabela",
       // Comparisons
-      'highest', 'lowest', 'best', 'worst', 'top', 'bottom',
-      'maior', 'menor', 'melhor', 'pior',
+      "highest",
+      "lowest",
+      "best",
+      "worst",
+      "top",
+      "bottom",
+      "maior",
+      "menor",
+      "melhor",
+      "pior",
       // Spreadsheet file mentions
-      'spreadsheet', 'excel', 'xlsx', 'xls',
+      "spreadsheet",
+      "excel",
+      "xlsx",
+      "xls",
     ],
     boostMimeTypes: [
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-excel',
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel",
     ],
     boostFactor: 2.5,
   },
@@ -119,13 +244,22 @@ const KEYWORD_CATEGORIES: Record<string, {
   // ─────────────────────────────────────────────────────────────────────────
   presentation: {
     keywords: [
-      'slide', 'slides', 'presentation', 'powerpoint', 'pptx', 'ppt',
-      'apresentação', 'apresentacao', 'lâmina', 'lamina',
-      'deck', 'pitch',
+      "slide",
+      "slides",
+      "presentation",
+      "powerpoint",
+      "pptx",
+      "ppt",
+      "apresentação",
+      "apresentacao",
+      "lâmina",
+      "lamina",
+      "deck",
+      "pitch",
     ],
     boostMimeTypes: [
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      'application/vnd.ms-powerpoint',
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "application/vnd.ms-powerpoint",
     ],
     boostFactor: 2.5,
   },
@@ -135,14 +269,30 @@ const KEYWORD_CATEGORIES: Record<string, {
   // ─────────────────────────────────────────────────────────────────────────
   legal: {
     keywords: [
-      'contract', 'agreement', 'clause', 'term', 'liability', 'warranty',
-      'contrato', 'cláusula', 'termo', 'garantia', 'responsabilidade',
-      'nda', 'msa', 'sla', 'sow', 'amendment', 'addendum',
-      'legal', 'juridico', 'jurídico',
+      "contract",
+      "agreement",
+      "clause",
+      "term",
+      "liability",
+      "warranty",
+      "contrato",
+      "cláusula",
+      "termo",
+      "garantia",
+      "responsabilidade",
+      "nda",
+      "msa",
+      "sla",
+      "sow",
+      "amendment",
+      "addendum",
+      "legal",
+      "juridico",
+      "jurídico",
     ],
     boostMimeTypes: [
-      'application/pdf',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ],
     boostFactor: 1.8,
   },
@@ -152,13 +302,27 @@ const KEYWORD_CATEGORIES: Record<string, {
   // ─────────────────────────────────────────────────────────────────────────
   document_structure: {
     keywords: [
-      'page', 'chapter', 'section', 'paragraph', 'appendix', 'annex',
-      'página', 'capítulo', 'seção', 'parágrafo', 'apêndice', 'anexo',
-      'pdf', 'document', 'documento', 'report', 'relatório',
+      "page",
+      "chapter",
+      "section",
+      "paragraph",
+      "appendix",
+      "annex",
+      "página",
+      "capítulo",
+      "seção",
+      "parágrafo",
+      "apêndice",
+      "anexo",
+      "pdf",
+      "document",
+      "documento",
+      "report",
+      "relatório",
     ],
     boostMimeTypes: [
-      'application/pdf',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ],
     boostFactor: 1.5,
   },
@@ -168,14 +332,30 @@ const KEYWORD_CATEGORIES: Record<string, {
   // ─────────────────────────────────────────────────────────────────────────
   project: {
     keywords: [
-      'project', 'projeto', 'milestone', 'deadline', 'timeline', 'cronograma',
-      'stakeholder', 'risk', 'risco', 'scope', 'escopo',
-      'sprint', 'scrum', 'agile', 'kanban', 'backlog',
-      'deliverable', 'entrega', 'phase', 'fase',
+      "project",
+      "projeto",
+      "milestone",
+      "deadline",
+      "timeline",
+      "cronograma",
+      "stakeholder",
+      "risk",
+      "risco",
+      "scope",
+      "escopo",
+      "sprint",
+      "scrum",
+      "agile",
+      "kanban",
+      "backlog",
+      "deliverable",
+      "entrega",
+      "phase",
+      "fase",
     ],
     boostMimeTypes: [
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      'application/pdf',
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "application/pdf",
     ],
     boostFactor: 1.5,
   },
@@ -185,15 +365,29 @@ const KEYWORD_CATEGORIES: Record<string, {
   // ─────────────────────────────────────────────────────────────────────────
   technical: {
     keywords: [
-      'api', 'integration', 'integração', 'endpoint', 'webhook',
-      'authentication', 'autenticação', 'oauth', 'token',
-      'configuration', 'configuração', 'setup', 'install',
-      'guide', 'guia', 'documentation', 'documentação', 'manual',
+      "api",
+      "integration",
+      "integração",
+      "endpoint",
+      "webhook",
+      "authentication",
+      "autenticação",
+      "oauth",
+      "token",
+      "configuration",
+      "configuração",
+      "setup",
+      "install",
+      "guide",
+      "guia",
+      "documentation",
+      "documentação",
+      "manual",
     ],
     boostMimeTypes: [
-      'application/pdf',
-      'text/markdown',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      "application/pdf",
+      "text/markdown",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ],
     boostFactor: 1.5,
   },
@@ -203,14 +397,27 @@ const KEYWORD_CATEGORIES: Record<string, {
   // ─────────────────────────────────────────────────────────────────────────
   marketing: {
     keywords: [
-      'marketing', 'service', 'serviço', 'product', 'produto',
-      'customer', 'cliente', 'brand', 'marca',
-      'intangibility', 'intangibilidade', 'perishability', 'perecibilidade',
-      'campaign', 'campanha', 'strategy', 'estratégia',
+      "marketing",
+      "service",
+      "serviço",
+      "product",
+      "produto",
+      "customer",
+      "cliente",
+      "brand",
+      "marca",
+      "intangibility",
+      "intangibilidade",
+      "perishability",
+      "perecibilidade",
+      "campaign",
+      "campanha",
+      "strategy",
+      "estratégia",
     ],
     boostMimeTypes: [
-      'application/pdf',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     ],
     boostFactor: 1.5,
   },
@@ -220,15 +427,23 @@ const KEYWORD_CATEGORIES: Record<string, {
   // ─────────────────────────────────────────────────────────────────────────
   visual: {
     keywords: [
-      'image', 'imagem', 'photo', 'foto', 'picture', 'screenshot',
-      'diagram', 'diagrama', 'chart', 'gráfico', 'graph',
-      'png', 'jpg', 'jpeg', 'gif',
+      "image",
+      "imagem",
+      "photo",
+      "foto",
+      "picture",
+      "screenshot",
+      "diagram",
+      "diagrama",
+      "chart",
+      "gráfico",
+      "graph",
+      "png",
+      "jpg",
+      "jpeg",
+      "gif",
     ],
-    boostMimeTypes: [
-      'image/png',
-      'image/jpeg',
-      'image/gif',
-    ],
+    boostMimeTypes: ["image/png", "image/jpeg", "image/gif"],
     boostFactor: 2.0,
   },
 };
@@ -253,7 +468,7 @@ export class KeywordBoostService {
 
       for (const keyword of config.keywords) {
         // Use word boundary matching for accuracy
-        const regex = new RegExp(`\\b${this.escapeRegex(keyword)}\\b`, 'i');
+        const regex = new RegExp(`\\b${this.escapeRegex(keyword)}\\b`, "i");
         if (regex.test(queryLower)) {
           matchedKeywords.push(keyword);
           detectedKeywords.push(keyword);
@@ -271,15 +486,20 @@ export class KeywordBoostService {
         // Accumulate mimeType boosts (take max if multiple categories boost same type)
         for (const mimeType of config.boostMimeTypes) {
           const currentBoost = mimeTypeBoosts.get(mimeType) || 1.0;
-          mimeTypeBoosts.set(mimeType, Math.max(currentBoost, config.boostFactor));
+          mimeTypeBoosts.set(
+            mimeType,
+            Math.max(currentBoost, config.boostFactor),
+          );
         }
       }
     }
 
     // Determine priority flags
-    const xlsxMime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-    const pptxMime = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
-    const pdfMime = 'application/pdf';
+    const xlsxMime =
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    const pptxMime =
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+    const pdfMime = "application/pdf";
 
     return {
       hasMatch: matches.length > 0,
@@ -296,19 +516,31 @@ export class KeywordBoostService {
    * Apply keyword boosts to retrieved chunks based on their document mimeType
    */
   public applyBoosts(
-    chunks: Array<{ documentId: string; score: number; mimeType?: string; metadata?: any }>,
-    boostResult: KeywordBoostResult
-  ): Array<{ documentId: string; score: number; mimeType?: string; metadata?: any }> {
+    chunks: Array<{
+      documentId: string;
+      score: number;
+      mimeType?: string;
+      metadata?: any;
+    }>,
+    boostResult: KeywordBoostResult,
+  ): Array<{
+    documentId: string;
+    score: number;
+    mimeType?: string;
+    metadata?: any;
+  }> {
     if (!boostResult.hasMatch) {
       return chunks;
     }
 
-    return chunks.map(chunk => {
-      const mimeType = chunk.mimeType || chunk.metadata?.mimeType || '';
+    return chunks.map((chunk) => {
+      const mimeType = chunk.mimeType || chunk.metadata?.mimeType || "";
       const boost = boostResult.mimeTypeBoosts.get(mimeType) || 1.0;
 
       if (boost > 1.0) {
-        console.log(`[KeywordBoost] Boosting chunk from ${mimeType} by ${boost}x (keywords: ${boostResult.detectedKeywords.slice(0, 3).join(', ')})`);
+        console.log(
+          `[KeywordBoost] Boosting chunk from ${mimeType} by ${boost}x (keywords: ${boostResult.detectedKeywords.slice(0, 3).join(", ")})`,
+        );
       }
 
       return {
@@ -322,24 +554,27 @@ export class KeywordBoostService {
    * Get additional search terms based on detected keywords
    * This helps BM25 search find relevant documents
    */
-  public getExpandedSearchTerms(query: string, boostResult: KeywordBoostResult): string[] {
+  public getExpandedSearchTerms(
+    query: string,
+    boostResult: KeywordBoostResult,
+  ): string[] {
     const terms: string[] = [];
 
     // Add file type hints for spreadsheet queries
     if (boostResult.shouldPrioritizeSpreadsheet) {
-      terms.push('Sheet', 'Row', 'xlsx', 'spreadsheet');
+      terms.push("Sheet", "Row", "xlsx", "spreadsheet");
     }
 
     // Add slide hints for presentation queries
     if (boostResult.shouldPrioritizeSlides) {
-      terms.push('Slide', 'pptx', 'presentation');
+      terms.push("Slide", "pptx", "presentation");
     }
 
     return terms;
   }
 
   private escapeRegex(str: string): string {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 }
 

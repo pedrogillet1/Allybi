@@ -1,74 +1,38 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from "express";
+import type {
+  ChatResult,
+  PrismaChatServicePort,
+} from "../services/chatRuntime.contracts";
+import type {
+  LLMStreamingConfig,
+  StreamEvent,
+  StreamSink,
+} from "../services/llm/types/llmStreaming.types";
 
-type UUID = string;
+type ChatLanguage = "en" | "pt" | "es";
 
-export type Attachment =
-  | {
-      type: 'source_buttons';
-      answerMode?: string;
-      buttons: Array<{
-        documentId: string;
-        title: string;
-        filename?: string;
-        mimeType?: string;
-        location?: { type: 'page' | 'slide' | 'sheet' | 'cell' | 'section'; value: string | number; label?: string };
-      }>;
-      seeAll?: { label: string; totalCount: number; remainingCount: number };
-    }
-  | {
-      type: 'file_list';
-      items: Array<{ id: string; filename: string; mimeType?: string; folderPath?: string }>;
-      totalCount: number;
-      seeAll?: { label: string; totalCount: number; remainingCount: number };
-    }
-  | { type: 'select_file'; prompt: string; options: any[] }
-  | { type: 'grouped_files'; groups: any[]; totalCount: number }
-  | Record<string, any>;
+type Attachment = Record<string, unknown>;
 
-export interface ComposedResponse {
+interface ComposedResponse {
   content: string;
   attachments?: Attachment[];
-  language?: 'en' | 'pt' | 'es';
-  meta?: Record<string, any>;
+  language?: ChatLanguage;
+  meta?: Record<string, unknown>;
 }
 
-type RagStreamEvent =
-  | { type: 'delta'; delta: string }
-  | { type: 'meta'; meta: Record<string, any> }
-  | { type: 'attachments'; attachments: Attachment[] }
-  | { type: 'final'; response: ComposedResponse }
-  | { type: 'error'; error: string; code?: string };
+const DEFAULT_STREAMING_CONFIG: LLMStreamingConfig = {
+  chunking: { maxCharsPerDelta: 64 },
+  markerHold: { enabled: false, flushAt: "final", maxBufferedMarkers: 0 },
+};
 
-export interface KodaOrchestratorService {
-  ragQuery(args: {
-    userId: string;
-    conversationId?: UUID;
-    query: string;
-    locale?: string;
-    ui?: { client: 'web' | 'mobile'; timezone?: string };
-    options?: Record<string, any>;
-    abortSignal?: AbortSignal;
-  }): Promise<ComposedResponse>;
-
-  ragQueryStream?(args: {
-    userId: string;
-    conversationId?: UUID;
-    query: string;
-    locale?: string;
-    ui?: { client: 'web' | 'mobile'; timezone?: string };
-    options?: Record<string, any>;
-    abortSignal?: AbortSignal;
-  }): AsyncIterable<RagStreamEvent>;
-}
-
-function getOrchestrator(req: Request): KodaOrchestratorService {
-  const svc =
-    (req.app.locals?.services?.core?.kodaOrchestrator as KodaOrchestratorService | undefined) ||
-    (req.app.locals?.services?.core?.orchestrator as KodaOrchestratorService | undefined) ||
-    (req.app.locals?.kodaOrchestrator as KodaOrchestratorService | undefined);
-
+function getChatService(req: Request): PrismaChatServicePort {
+  const svc = req.app.locals?.services?.chat as
+    | PrismaChatServicePort
+    | undefined;
   if (!svc) {
-    const err = new Error('Koda orchestrator not available (container wiring missing).');
+    const err = new Error(
+      "Chat service not available (container wiring missing).",
+    );
     // @ts-expect-error
     err.statusCode = 503;
     throw err;
@@ -78,9 +42,13 @@ function getOrchestrator(req: Request): KodaOrchestratorService {
 
 function getUserId(req: Request): string {
   const anyReq = req as any;
-  const userId = anyReq.user?.id || anyReq.user?.userId || anyReq.auth?.userId || anyReq.userId;
-  if (!userId || typeof userId !== 'string') {
-    const err = new Error('Unauthorized (missing user id).');
+  const userId =
+    anyReq.user?.id ||
+    anyReq.user?.userId ||
+    anyReq.auth?.userId ||
+    anyReq.userId;
+  if (!userId || typeof userId !== "string") {
+    const err = new Error("Unauthorized (missing user id).");
     // @ts-expect-error
     err.statusCode = 401;
     throw err;
@@ -89,18 +57,53 @@ function getUserId(req: Request): string {
 }
 
 function readString(v: unknown, maxLen: number): string | undefined {
-  if (typeof v !== 'string') return undefined;
+  if (typeof v !== "string") return undefined;
   const s = v.trim();
   if (!s) return undefined;
   return s.length > maxLen ? s.slice(0, maxLen) : s;
 }
 
+function toLanguage(value: unknown): ChatLanguage | undefined {
+  if (value == null) return undefined;
+  const raw = String(value).toLowerCase().trim();
+  if (raw.startsWith("pt")) return "pt";
+  if (raw.startsWith("es")) return "es";
+  if (raw.startsWith("en")) return "en";
+  return undefined;
+}
+
+function toAttachments(value: unknown): Attachment[] {
+  if (Array.isArray(value)) return value as Attachment[];
+  return [];
+}
+
+function toComposedResponse(
+  result: ChatResult,
+  preferredLanguage?: ChatLanguage,
+): ComposedResponse {
+  return {
+    content: String(result.assistantText || ""),
+    attachments: toAttachments(result.attachmentsPayload),
+    language: preferredLanguage,
+    meta: {
+      conversationId: result.conversationId,
+      messageId: result.assistantMessageId,
+      answerMode: result.answerMode || "general_answer",
+      answerClass: result.answerClass || null,
+      navType: result.navType || null,
+      sources: Array.isArray(result.sources) ? result.sources : [],
+      fallbackReasonCode: result.fallbackReasonCode || null,
+      routeSource: "rag_wrapper",
+    },
+  };
+}
+
 function sseInit(res: Response) {
   res.status(200);
-  res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
-  res.setHeader('Cache-Control', 'no-cache, no-transform');
-  res.setHeader('Connection', 'keep-alive');
-  res.setHeader('X-Accel-Buffering', 'no');
+  res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
+  res.setHeader("Cache-Control", "no-cache, no-transform");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
 }
 
 function sseSend(res: Response, event: string, data: unknown) {
@@ -108,37 +111,108 @@ function sseSend(res: Response, event: string, data: unknown) {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
 }
 
+class RagCompatSink implements StreamSink {
+  readonly transport = "sse" as const;
+  private open = true;
+
+  constructor(private readonly res: Response) {}
+
+  write(event: StreamEvent): void {
+    if (!this.isOpen()) return;
+    const name = String((event as any)?.event || "");
+    const data = (event as any)?.data ?? {};
+
+    if (name === "delta") {
+      sseSend(this.res, "delta", { delta: String((data as any)?.text || "") });
+      return;
+    }
+    if (name === "meta") {
+      sseSend(this.res, "meta", data);
+      return;
+    }
+    if (name === "progress" || name === "worklog" || name === "stage") {
+      sseSend(this.res, "meta", { streamEvent: name, ...(data as any) });
+      return;
+    }
+    if (name === "error") {
+      sseSend(this.res, "error", {
+        error: String((data as any)?.message || "Stream failed."),
+        code: String((data as any)?.code || ""),
+      });
+      return;
+    }
+  }
+
+  flush(): void {
+    const anyRes = this.res as any;
+    if (typeof anyRes.flush === "function") anyRes.flush();
+  }
+
+  close(): void {
+    this.open = false;
+  }
+
+  isOpen(): boolean {
+    return this.open && !this.res.writableEnded;
+  }
+}
+
 export class RagController {
   query = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const orchestrator = getOrchestrator(req);
+      const chat = getChatService(req);
       const userId = getUserId(req);
 
-      const query = readString(req.body?.query ?? req.body?.q ?? req.body?.message, 4000);
+      const query = readString(
+        req.body?.query ?? req.body?.q ?? req.body?.message,
+        4000,
+      );
       if (!query) return res.status(400).json({ error: 'Missing "query".' });
 
-      const conversationId = readString(req.body?.conversationId ?? req.body?.conversation_id, 120);
-      const locale = readString(req.body?.locale, 12) ?? (req.headers['accept-language'] as string | undefined);
-
+      const conversationId = readString(
+        req.body?.conversationId ?? req.body?.conversation_id,
+        120,
+      );
+      const preferredLanguage =
+        toLanguage(req.body?.locale) ||
+        toLanguage(req.headers["accept-language"]);
       const options =
-        typeof req.body?.options === 'object' && req.body?.options
-          ? req.body.options
-          : ({} as Record<string, any>);
+        req.body?.options && typeof req.body.options === "object"
+          ? (req.body.options as Record<string, unknown>)
+          : {};
+      const documentIds = Array.isArray(req.body?.documentIds)
+        ? req.body.documentIds
+            .filter(
+              (id: unknown): id is string =>
+                typeof id === "string" && id.trim().length > 0,
+            )
+            .map((id: string) => id.trim())
+        : [];
+      const optionDocIds = Array.isArray(options.documentIds)
+        ? options.documentIds
+            .filter(
+              (id: unknown): id is string =>
+                typeof id === "string" && id.trim().length > 0,
+            )
+            .map((id: string) => id.trim())
+        : [];
+      const attachedDocumentIds = Array.from(
+        new Set([...documentIds, ...optionDocIds]),
+      );
 
-      const abort = new AbortController();
-      req.on('close', () => abort.abort());
-
-      const response = await orchestrator.ragQuery({
+      const result = await chat.chat({
         userId,
         conversationId,
-        query,
-        locale,
-        ui: { client: 'web' },
-        options,
-        abortSignal: abort.signal,
+        message: query,
+        attachedDocumentIds,
+        preferredLanguage,
+        context: Object.keys(options).length
+          ? { ragOptions: options }
+          : undefined,
+        meta: { routeSource: "rag_wrapper", ragCompat: true },
       });
 
-      return res.json(response);
+      return res.json(toComposedResponse(result, preferredLanguage));
     } catch (err) {
       return next(err);
     }
@@ -146,76 +220,79 @@ export class RagController {
 
   stream = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const orchestrator = getOrchestrator(req);
+      const chat = getChatService(req);
       const userId = getUserId(req);
 
-      const query = readString(req.body?.query ?? req.body?.q ?? req.body?.message, 4000);
+      const query = readString(
+        req.body?.query ?? req.body?.q ?? req.body?.message,
+        4000,
+      );
       if (!query) return res.status(400).json({ error: 'Missing "query".' });
 
-      const conversationId = readString(req.body?.conversationId ?? req.body?.conversation_id, 120);
-      const locale = readString(req.body?.locale, 12) ?? (req.headers['accept-language'] as string | undefined);
-
+      const conversationId = readString(
+        req.body?.conversationId ?? req.body?.conversation_id,
+        120,
+      );
+      const preferredLanguage =
+        toLanguage(req.body?.locale) ||
+        toLanguage(req.headers["accept-language"]);
       const options =
-        typeof req.body?.options === 'object' && req.body?.options
-          ? req.body.options
-          : ({} as Record<string, any>);
-
-      if (!orchestrator.ragQueryStream) {
-        const response = await orchestrator.ragQuery({
-          userId,
-          conversationId,
-          query,
-          locale,
-          ui: { client: 'web' },
-          options,
-        });
-        return res.json(response);
-      }
+        req.body?.options && typeof req.body.options === "object"
+          ? (req.body.options as Record<string, unknown>)
+          : {};
+      const documentIds = Array.isArray(req.body?.documentIds)
+        ? req.body.documentIds
+            .filter(
+              (id: unknown): id is string =>
+                typeof id === "string" && id.trim().length > 0,
+            )
+            .map((id: string) => id.trim())
+        : [];
+      const optionDocIds = Array.isArray(options.documentIds)
+        ? options.documentIds
+            .filter(
+              (id: unknown): id is string =>
+                typeof id === "string" && id.trim().length > 0,
+            )
+            .map((id: string) => id.trim())
+        : [];
+      const attachedDocumentIds = Array.from(
+        new Set([...documentIds, ...optionDocIds]),
+      );
 
       sseInit(res);
+      sseSend(res, "ready", { ok: true });
 
-      const abort = new AbortController();
-      const onClose = () => abort.abort();
-      req.on('close', onClose);
-
-      sseSend(res, 'ready', { ok: true });
+      const sink = new RagCompatSink(res);
+      const onClose = () => sink.close();
+      req.on("close", onClose);
 
       try {
-        for await (const ev of orchestrator.ragQueryStream({
-          userId,
-          conversationId,
-          query,
-          locale,
-          ui: { client: 'web' },
-          options,
-          abortSignal: abort.signal,
-        })) {
-          if (abort.signal.aborted) break;
-
-          switch (ev.type) {
-            case 'delta':
-              sseSend(res, 'delta', { delta: ev.delta });
-              break;
-            case 'meta':
-              sseSend(res, 'meta', ev.meta);
-              break;
-            case 'attachments':
-              sseSend(res, 'attachments', { attachments: ev.attachments });
-              break;
-            case 'final':
-              sseSend(res, 'final', ev.response);
-              break;
-            case 'error':
-              sseSend(res, 'error', { error: ev.error, code: ev.code });
-              break;
-            default:
-              break;
-          }
+        const result = await chat.streamChat({
+          req: {
+            userId,
+            conversationId,
+            message: query,
+            attachedDocumentIds,
+            preferredLanguage,
+            context: Object.keys(options).length
+              ? { ragOptions: options }
+              : undefined,
+            meta: { routeSource: "rag_wrapper", ragCompat: true },
+          },
+          sink,
+          streamingConfig: DEFAULT_STREAMING_CONFIG,
+        });
+        const response = toComposedResponse(result, preferredLanguage);
+        if (response.attachments?.length) {
+          sseSend(res, "attachments", { attachments: response.attachments });
         }
+        sseSend(res, "final", response);
       } catch (e: any) {
-        sseSend(res, 'error', { error: e?.message || 'Stream failed.' });
+        sseSend(res, "error", { error: e?.message || "Stream failed." });
       } finally {
-        req.off('close', onClose);
+        sink.close();
+        req.off("close", onClose);
         res.end();
       }
       return;

@@ -3,11 +3,11 @@
  * Determines which documents should be searched for a given query
  */
 
-import { injectable } from 'tsyringe';
+import { injectable } from "tsyringe";
 
 export interface ScopeDecision {
   documentIds: string[];
-  scopeType: 'explicit' | 'inferred' | 'all';
+  scopeType: "explicit" | "inferred" | "all";
   reason: string;
 }
 
@@ -20,10 +20,10 @@ export class DocumentScopeService {
     query: string,
     userId: string,
     explicitDocIds?: string[],
-    conversationContext?: unknown
+    conversationContext?: unknown,
   ): Promise<ScopeDecision> {
     // TODO: Implement scope determination logic
-    throw new Error('DocumentScopeService.determineScope not implemented');
+    throw new Error("DocumentScopeService.determineScope not implemented");
   }
 
   /**
@@ -31,7 +31,9 @@ export class DocumentScopeService {
    */
   async requiresExplicitScope(query: string): Promise<boolean> {
     // TODO: Analyze query for scope requirements
-    throw new Error('DocumentScopeService.requiresExplicitScope not implemented');
+    throw new Error(
+      "DocumentScopeService.requiresExplicitScope not implemented",
+    );
   }
 
   /**
@@ -39,6 +41,6 @@ export class DocumentScopeService {
    */
   async expandScope(documentIds: string[], userId: string): Promise<string[]> {
     // TODO: Find related documents to include
-    throw new Error('DocumentScopeService.expandScope not implemented');
+    throw new Error("DocumentScopeService.expandScope not implemented");
   }
 }

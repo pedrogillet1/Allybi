@@ -7,37 +7,37 @@
  * - No user-facing copy inside types
  */
 
-import type { LLMProvider } from './llmErrors.types';
+import type { LLMProvider } from "./llmErrors.types";
 
 /** Stream transport used by the server */
-export type StreamTransport = 'sse' | 'ws' | 'inproc';
+export type StreamTransport = "sse" | "ws" | "inproc";
 
 /** Allybi streaming phases */
 export type StreamPhase =
-  | 'init'
-  | 'preamble'
-  | 'delta'
-  | 'marker_hold'
-  | 'finalizing'
-  | 'done'
-  | 'aborted'
-  | 'error';
+  | "init"
+  | "preamble"
+  | "delta"
+  | "marker_hold"
+  | "finalizing"
+  | "done"
+  | "aborted"
+  | "error";
 
 /** High-level purpose of a streamed message */
 export type StreamMessageKind =
-  | 'answer' // normal doc-grounded answer
-  | 'nav_pills' // open/where/discover: one short line + pills only (frontend contract enforced elsewhere)
-  | 'system'; // internal/system messages (rare)
+  | "answer" // normal doc-grounded answer
+  | "nav_pills" // open/where/discover: one short line + pills only (frontend contract enforced elsewhere)
+  | "system"; // internal/system messages (rare)
 
 /**
  * "Marker" tokens are structural tokens (e.g., evidence markers, source markers)
  * that may arrive mid-stream but should be withheld until safe to show.
  */
 export type StreamMarkerType =
-  | 'doc_ref' // e.g. **Filename.pdf**
-  | 'source_ref' // attachment/source marker
-  | 'citation' // numeric/marker references
-  | 'other';
+  | "doc_ref" // e.g. **Filename.pdf**
+  | "source_ref" // attachment/source marker
+  | "citation" // numeric/marker references
+  | "other";
 
 /** A marker discovered during streaming. */
 export interface StreamMarker {
@@ -50,37 +50,37 @@ export interface StreamMarker {
 
 /** Server-to-client (SSE) event names */
 export type StreamEventName =
-  | 'start'
-  | 'delta'
-  | 'marker'
-  | 'progress'
-  | 'worklog'
-  | 'final'
-  | 'abort'
-  | 'error'
-  | 'ping';
+  | "start"
+  | "delta"
+  | "marker"
+  | "progress"
+  | "worklog"
+  | "final"
+  | "abort"
+  | "error"
+  | "ping";
 
 /** Progress signals (optional) to mimic ChatGPT-like responsiveness */
 export type StreamProgressStage =
-  | 'routing'
-  | 'scoping'
-  | 'retrieval'
-  | 'compose'
-  | 'generation'
-  | 'validation'
-  | 'render'
+  | "routing"
+  | "scoping"
+  | "retrieval"
+  | "compose"
+  | "generation"
+  | "validation"
+  | "render"
   // Frontend UI stages (chat.routes.ts normalizes provider stages into these)
-  | 'thinking'
-  | 'processing'
-  | 'retrieving'
-  | 'reading'
-  | 'composing'
-  | 'validating'
-  | 'finalizing'
-  | 'connecting'
-  | 'editing'
-  | 'exporting'
-  | 'stopped';
+  | "thinking"
+  | "processing"
+  | "retrieving"
+  | "reading"
+  | "composing"
+  | "validating"
+  | "finalizing"
+  | "connecting"
+  | "editing"
+  | "exporting"
+  | "stopped";
 
 /** Delta payload: the smallest unit of user-visible text streamed */
 export interface StreamDelta {
@@ -89,7 +89,7 @@ export interface StreamDelta {
   /** If true, delta must not be shown immediately (buffer/hold) */
   hold?: boolean;
   /** Optional reason for hold (debug/telemetry only) */
-  holdReason?: 'marker' | 'policy' | 'unknown';
+  holdReason?: "marker" | "policy" | "unknown";
 }
 
 /** Optional keep-alive ping */
@@ -118,13 +118,19 @@ export interface StreamProgress {
    * Optional structured edit-progress payload for task-specific working cards.
    * Used by frontend to render deterministic draft/apply steps.
    */
-  phase?: 'DRAFT' | 'APPLY';
+  phase?: "DRAFT" | "APPLY";
   step?: string;
-  status?: 'pending' | 'active' | 'done' | 'error';
+  status?: "pending" | "active" | "done" | "error";
   vars?: Record<string, unknown>;
   summary?: string;
-  scope?: 'selection' | 'paragraph' | 'section' | 'document' | 'range' | 'unknown';
-  documentKind?: 'docx' | 'sheets' | 'slides' | 'pdf' | 'unknown';
+  scope?:
+    | "selection"
+    | "paragraph"
+    | "section"
+    | "document"
+    | "range"
+    | "unknown";
+  documentKind?: "docx" | "sheets" | "slides" | "pdf" | "unknown";
   documentLabel?: string;
   /** Epoch ms */
   t: number;
@@ -134,17 +140,17 @@ export interface StreamProgress {
 export interface StreamWorklog {
   runId?: string;
   eventType:
-    | 'RUN_START'
-    | 'STEP_ADD'
-    | 'STEP_UPDATE'
-    | 'NARRATION_ADD'
-    | 'RUN_COMPLETE'
-    | 'RUN_ERROR';
+    | "RUN_START"
+    | "STEP_ADD"
+    | "STEP_UPDATE"
+    | "NARRATION_ADD"
+    | "RUN_COMPLETE"
+    | "RUN_ERROR";
   title?: string;
   summary?: string;
   stepId?: string;
   label?: string;
-  status?: 'queued' | 'running' | 'done' | 'error';
+  status?: "queued" | "running" | "done" | "error";
   text?: string;
   t: number;
 }
@@ -194,11 +200,11 @@ export interface StreamFinalPayload {
 /** Abort payload */
 export interface StreamAbortPayload {
   reason:
-    | 'user_stop'
-    | 'server_shutdown'
-    | 'timeout'
-    | 'upstream_cancel'
-    | 'unknown';
+    | "user_stop"
+    | "server_shutdown"
+    | "timeout"
+    | "upstream_cancel"
+    | "unknown";
   t: number;
   traceId?: string;
 }
@@ -213,15 +219,18 @@ export interface StreamErrorPayload {
 
 /** Stream events (server -> client) */
 export type StreamEvent =
-  | { event: 'start'; data: { kind: StreamMessageKind; t: number; traceId?: string } }
-  | { event: 'delta'; data: StreamDelta }
-  | { event: 'marker'; data: StreamMarker }
-  | { event: 'progress'; data: StreamProgress }
-  | { event: 'worklog'; data: StreamWorklog }
-  | { event: 'final'; data: StreamFinalPayload }
-  | { event: 'abort'; data: StreamAbortPayload }
-  | { event: 'error'; data: StreamErrorPayload }
-  | { event: 'ping'; data: StreamPing };
+  | {
+      event: "start";
+      data: { kind: StreamMessageKind; t: number; traceId?: string };
+    }
+  | { event: "delta"; data: StreamDelta }
+  | { event: "marker"; data: StreamMarker }
+  | { event: "progress"; data: StreamProgress }
+  | { event: "worklog"; data: StreamWorklog }
+  | { event: "final"; data: StreamFinalPayload }
+  | { event: "abort"; data: StreamAbortPayload }
+  | { event: "error"; data: StreamErrorPayload }
+  | { event: "ping"; data: StreamPing };
 
 /**
  * Stream sink: anything that can receive StreamEvents (SSE writer, WS sender, inproc collector).
@@ -251,7 +260,7 @@ export interface MarkerHoldPolicy {
    * Flush markers when we reach a safe boundary.
    * - 'final' is the safest default for ChatGPT-like UX.
    */
-  flushAt: 'final' | 'paragraph_boundary' | 'never';
+  flushAt: "final" | "paragraph_boundary" | "never";
 
   /** Hard cap to avoid unbounded growth */
   maxBufferedMarkers: number;

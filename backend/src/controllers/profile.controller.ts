@@ -60,9 +60,11 @@ async function readUsersFile(filePath: string): Promise<UsersFile> {
   try {
     const raw = await fs.readFile(filePath, "utf8");
     const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") throw new Error("Invalid users file");
+    if (!parsed || typeof parsed !== "object")
+      throw new Error("Invalid users file");
     if (!parsed.users || typeof parsed.users !== "object") parsed.users = {};
-    if (!parsed.version || typeof parsed.version !== "string") parsed.version = "1.0.0";
+    if (!parsed.version || typeof parsed.version !== "string")
+      parsed.version = "1.0.0";
     return parsed as UsersFile;
   } catch {
     return { version: "1.0.0", users: {} };
@@ -93,7 +95,10 @@ async function withUsersWriteLock<T>(fn: () => Promise<T>): Promise<T> {
 function requireAuth(req: AuthenticatedRequest, res: Response): string | null {
   const userId = req.user?.id;
   if (!userId) {
-    res.status(401).json({ ok: false, error: { code: "unauthorized", message: "Unauthorized" } });
+    res.status(401).json({
+      ok: false,
+      error: { code: "unauthorized", message: "Unauthorized" },
+    });
     return null;
   }
   return userId;
@@ -118,12 +123,16 @@ function publicProfile(u: UserRecord) {
   };
 }
 
-function validateProfilePatch(body: any): { patch: Partial<UserRecord["profile"]>; errors: string[] } {
+function validateProfilePatch(body: any): {
+  patch: Partial<UserRecord["profile"]>;
+  errors: string[];
+} {
   const errors: string[] = [];
   const patch: Partial<UserRecord["profile"]> = {};
 
   const displayName = clampString(body?.displayName, 60);
-  if (body?.displayName != null && !displayName) errors.push("displayName_invalid");
+  if (body?.displayName != null && !displayName)
+    errors.push("displayName_invalid");
   if (displayName) patch.displayName = displayName;
 
   const email = clampString(body?.email, 120);
@@ -156,15 +165,18 @@ function validateProfilePatch(body: any): { patch: Partial<UserRecord["profile"]
   }
 
   const preferConcise = safeBool(body?.preferConcise);
-  if (body?.preferConcise != null && preferConcise === undefined) errors.push("preferConcise_invalid");
+  if (body?.preferConcise != null && preferConcise === undefined)
+    errors.push("preferConcise_invalid");
   if (preferConcise !== undefined) patch.preferConcise = preferConcise;
 
   const preferBullets = safeBool(body?.preferBullets);
-  if (body?.preferBullets != null && preferBullets === undefined) errors.push("preferBullets_invalid");
+  if (body?.preferBullets != null && preferBullets === undefined)
+    errors.push("preferBullets_invalid");
   if (preferBullets !== undefined) patch.preferBullets = preferBullets;
 
   const preferTables = safeBool(body?.preferTables);
-  if (body?.preferTables != null && preferTables === undefined) errors.push("preferTables_invalid");
+  if (body?.preferTables != null && preferTables === undefined)
+    errors.push("preferTables_invalid");
   if (preferTables !== undefined) patch.preferTables = preferTables;
 
   return { patch, errors };
@@ -186,7 +198,10 @@ export function createProfileRouter(opts?: {
     const db = await readUsersFile(usersPath);
     const user = db.users[userId];
     if (!user) {
-      return res.status(401).json({ ok: false, error: { code: "unauthorized", message: "Unauthorized" } });
+      return res.status(401).json({
+        ok: false,
+        error: { code: "unauthorized", message: "Unauthorized" },
+      });
     }
 
     return res.json({ ok: true, profile: publicProfile(user) });
@@ -200,7 +215,11 @@ export function createProfileRouter(opts?: {
     if (errors.length) {
       return res.status(400).json({
         ok: false,
-        error: { code: "validation_error", message: "Invalid profile fields", details: errors },
+        error: {
+          code: "validation_error",
+          message: "Invalid profile fields",
+          details: errors,
+        },
       });
     }
 
@@ -221,49 +240,58 @@ export function createProfileRouter(opts?: {
     });
 
     if (!updated) {
-      return res.status(401).json({ ok: false, error: { code: "unauthorized", message: "Unauthorized" } });
+      return res.status(401).json({
+        ok: false,
+        error: { code: "unauthorized", message: "Unauthorized" },
+      });
     }
 
     return res.json({ ok: true, profile: publicProfile(updated) });
   });
 
-  router.post("/reset-preferences", async (req: AuthenticatedRequest, res: Response) => {
-    const userId = requireAuth(req, res);
-    if (!userId) return;
+  router.post(
+    "/reset-preferences",
+    async (req: AuthenticatedRequest, res: Response) => {
+      const userId = requireAuth(req, res);
+      if (!userId) return;
 
-    const updated = await withUsersWriteLock(async () => {
-      const db = await readUsersFile(usersPath);
-      const user = db.users[userId];
-      if (!user) return null;
+      const updated = await withUsersWriteLock(async () => {
+        const db = await readUsersFile(usersPath);
+        const user = db.users[userId];
+        if (!user) return null;
 
-      const p = user.profile ?? {};
-      const nextProfile = {
-        ...p,
-        language: "any" as LangCode,
-        timezone: p.timezone ?? undefined,
-        theme: "system" as const,
-        preferConcise: false,
-        preferBullets: false,
-        preferTables: false,
-      };
+        const p = user.profile ?? {};
+        const nextProfile = {
+          ...p,
+          language: "any" as LangCode,
+          timezone: p.timezone ?? undefined,
+          theme: "system" as const,
+          preferConcise: false,
+          preferBullets: false,
+          preferTables: false,
+        };
 
-      const next: UserRecord = {
-        ...user,
-        updatedAt: nowTs(),
-        profile: nextProfile,
-      };
+        const next: UserRecord = {
+          ...user,
+          updatedAt: nowTs(),
+          profile: nextProfile,
+        };
 
-      db.users[userId] = next;
-      await atomicWriteJson(usersPath, db);
-      return next;
-    });
+        db.users[userId] = next;
+        await atomicWriteJson(usersPath, db);
+        return next;
+      });
 
-    if (!updated) {
-      return res.status(401).json({ ok: false, error: { code: "unauthorized", message: "Unauthorized" } });
-    }
+      if (!updated) {
+        return res.status(401).json({
+          ok: false,
+          error: { code: "unauthorized", message: "Unauthorized" },
+        });
+      }
 
-    return res.json({ ok: true, profile: publicProfile(updated) });
-  });
+      return res.json({ ok: true, profile: publicProfile(updated) });
+    },
+  );
 
   return router;
 }

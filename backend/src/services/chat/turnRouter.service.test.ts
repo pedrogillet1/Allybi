@@ -60,4 +60,19 @@ describe("TurnRouterService", () => {
 
     expect(router.decide(ctx)).toBe("KNOWLEDGE");
   });
+
+  test("does not force editor route from edit keywords outside viewer mode", () => {
+    const router = new TurnRouterService();
+    const ctx = baseContext({
+      messageText: "make the heading blue",
+      attachedDocuments: [
+        {
+          id: "d1",
+          mime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        },
+      ],
+    });
+
+    expect(router.decide(ctx)).toBe("KNOWLEDGE");
+  });
 });

@@ -167,9 +167,15 @@ export class TelemetryAggregations {
     const [dau, messages, conversationsCreated, uploads] = await Promise.all([
       usage.countDistinct?.("userId", { at: { gte: from, lt: to } }) ??
         countDistinctFallback(usage, "userId", { at: { gte: from, lt: to } }),
-      usage.count({ where: { at: { gte: from, lt: to }, eventType: "CHAT_MESSAGE_SENT" } }),
-      usage.count({ where: { at: { gte: from, lt: to }, eventType: "CONVERSATION_CREATED" } }),
-      usage.count({ where: { at: { gte: from, lt: to }, eventType: "DOCUMENT_UPLOADED" } }),
+      usage.count({
+        where: { at: { gte: from, lt: to }, eventType: "CHAT_MESSAGE_SENT" },
+      }),
+      usage.count({
+        where: { at: { gte: from, lt: to }, eventType: "CONVERSATION_CREATED" },
+      }),
+      usage.count({
+        where: { at: { gte: from, lt: to }, eventType: "DOCUMENT_UPLOADED" },
+      }),
     ]);
 
     // Retrieval quality rates
@@ -214,7 +220,9 @@ export class TelemetryAggregations {
       orderBy: { at: "desc" },
     });
 
-    const latencyValues = durations.map((d: any) => Number(d.durationMs)).filter(Number.isFinite);
+    const latencyValues = durations
+      .map((d: any) => Number(d.durationMs))
+      .filter(Number.isFinite);
     const latencyMsP50 = percentile(latencyValues, 50);
     const latencyMsP95 = percentile(latencyValues, 95);
 
@@ -243,7 +251,11 @@ export class TelemetryAggregations {
 
   /* ----------------------------- Users ----------------------------- */
 
-  async users(params: { range: TelemetryRange; limit: number; cursor?: string }): Promise<PagedResult<AdminUserRow>> {
+  async users(params: {
+    range: TelemetryRange;
+    limit: number;
+    cursor?: string;
+  }): Promise<PagedResult<AdminUserRow>> {
     const { from, to } = rangeToWindow(params.range);
     const limit = clampLimit(params.limit, 50);
 
@@ -261,18 +273,24 @@ export class TelemetryAggregations {
     });
 
     const rows = await Promise.all(
-      userIds.items.map((userId) => this.userSummary(userId, { from, to }))
+      userIds.items.map((userId) => this.userSummary(userId, { from, to })),
     );
 
     return { items: rows, nextCursor: userIds.nextCursor };
   }
 
-  async userDetail(params: { userId: string; range: TelemetryRange }): Promise<AdminUserRow> {
+  async userDetail(params: {
+    userId: string;
+    range: TelemetryRange;
+  }): Promise<AdminUserRow> {
     const { from, to } = rangeToWindow(params.range);
     return this.userSummary(params.userId, { from, to });
   }
 
-  private async userSummary(userId: string, window: { from: Date; to: Date }): Promise<AdminUserRow> {
+  private async userSummary(
+    userId: string,
+    window: { from: Date; to: Date },
+  ): Promise<AdminUserRow> {
     const usage = (this.prisma as any).usageEvent;
     const model = (this.prisma as any).modelCall;
     const retrieval = (this.prisma as any).retrievalEvent;
@@ -292,26 +310,50 @@ export class TelemetryAggregations {
 
     const [messages, uploads] = await Promise.all([
       usage.count({
-        where: { userId, at: { gte: window.from, lt: window.to }, eventType: "CHAT_MESSAGE_SENT" },
+        where: {
+          userId,
+          at: { gte: window.from, lt: window.to },
+          eventType: "CHAT_MESSAGE_SENT",
+        },
       }),
       usage.count({
-        where: { userId, at: { gte: window.from, lt: window.to }, eventType: "DOCUMENT_UPLOADED" },
+        where: {
+          userId,
+          at: { gte: window.from, lt: window.to },
+          eventType: "DOCUMENT_UPLOADED",
+        },
       }),
     ]);
 
     const [llmCalls, llmFails, tokensTotal] = await Promise.all([
-      model.count({ where: { userId, at: { gte: window.from, lt: window.to } } }),
-      model.count({ where: { userId, at: { gte: window.from, lt: window.to }, status: "fail" } }),
-      sumNumberField(model, "totalTokens", { userId, at: { gte: window.from, lt: window.to } }),
+      model.count({
+        where: { userId, at: { gte: window.from, lt: window.to } },
+      }),
+      model.count({
+        where: {
+          userId,
+          at: { gte: window.from, lt: window.to },
+          status: "fail",
+        },
+      }),
+      sumNumberField(model, "totalTokens", {
+        userId,
+        at: { gte: window.from, lt: window.to },
+      }),
     ]);
 
     const [retrievalTotal, weakCount] = await Promise.all([
-      retrieval.count({ where: { userId, at: { gte: window.from, lt: window.to } } }),
+      retrieval.count({
+        where: { userId, at: { gte: window.from, lt: window.to } },
+      }),
       retrieval.count({
         where: {
           userId,
           at: { gte: window.from, lt: window.to },
-          OR: [{ fallbackReasonCode: "WEAK_EVIDENCE" }, { evidenceStrength: { lt: 0.35 } }],
+          OR: [
+            { fallbackReasonCode: "WEAK_EVIDENCE" },
+            { evidenceStrength: { lt: 0.35 } },
+          ],
         },
       }),
     ]);
@@ -331,7 +373,11 @@ export class TelemetryAggregations {
 
   /* ----------------------------- Files ----------------------------- */
 
-  async files(params: { range: TelemetryRange; limit: number; cursor?: string }): Promise<PagedResult<AdminFileRow>> {
+  async files(params: {
+    range: TelemetryRange;
+    limit: number;
+    cursor?: string;
+  }): Promise<PagedResult<AdminFileRow>> {
     const { from, to } = rangeToWindow(params.range);
     const limit = clampLimit(params.limit, 50);
 
@@ -381,7 +427,10 @@ export class TelemetryAggregations {
     };
   }
 
-  async fileDetail(params: { fileId: string; range: TelemetryRange }): Promise<any> {
+  async fileDetail(params: {
+    fileId: string;
+    range: TelemetryRange;
+  }): Promise<any> {
     const { from, to } = rangeToWindow(params.range);
     const ingestion = (this.prisma as any).ingestionEvent;
 
@@ -469,7 +518,11 @@ export class TelemetryAggregations {
 
   /* ----------------------------- Quality ----------------------------- */
 
-  async quality(params: { range: TelemetryRange; limit: number; cursor?: string }): Promise<any> {
+  async quality(params: {
+    range: TelemetryRange;
+    limit: number;
+    cursor?: string;
+  }): Promise<any> {
     // MVP: reuse queries() output + add aggregate rates
     const { from, to } = rangeToWindow(params.range);
     const retrieval = (this.prisma as any).retrievalEvent;
@@ -477,14 +530,30 @@ export class TelemetryAggregations {
     const [total, weak, none] = await Promise.all([
       retrieval.count({ where: { at: { gte: from, lt: to } } }),
       retrieval.count({
-        where: { at: { gte: from, lt: to }, OR: [{ fallbackReasonCode: "WEAK_EVIDENCE" }, { evidenceStrength: { lt: 0.35 } }] },
+        where: {
+          at: { gte: from, lt: to },
+          OR: [
+            { fallbackReasonCode: "WEAK_EVIDENCE" },
+            { evidenceStrength: { lt: 0.35 } },
+          ],
+        },
       }),
       retrieval.count({
-        where: { at: { gte: from, lt: to }, OR: [{ fallbackReasonCode: "NO_EVIDENCE" }, { evidenceStrength: { equals: null } }] },
+        where: {
+          at: { gte: from, lt: to },
+          OR: [
+            { fallbackReasonCode: "NO_EVIDENCE" },
+            { evidenceStrength: { equals: null } },
+          ],
+        },
       }),
     ]);
 
-    const page = await this.queries({ range: params.range, limit: params.limit, cursor: params.cursor });
+    const page = await this.queries({
+      range: params.range,
+      limit: params.limit,
+      cursor: params.cursor,
+    });
 
     return {
       totals: {
@@ -566,7 +635,11 @@ export class TelemetryAggregations {
     };
   }
 
-  async errors(params: { range: TelemetryRange; limit: number; cursor?: string }): Promise<PagedResult<AdminErrorRow>> {
+  async errors(params: {
+    range: TelemetryRange;
+    limit: number;
+    cursor?: string;
+  }): Promise<PagedResult<AdminErrorRow>> {
     const { from, to } = rangeToWindow(params.range);
     const limit = clampLimit(params.limit, 50);
 
@@ -616,23 +689,52 @@ export class TelemetryAggregations {
 
   /* ----------------------------- Timeseries ----------------------------- */
 
-  async timeseries(params: { metric: TimeseriesMetric; range: TelemetryRange }): Promise<TimeseriesPoint[]> {
+  async timeseries(params: {
+    metric: TimeseriesMetric;
+    range: TelemetryRange;
+  }): Promise<TimeseriesPoint[]> {
     const { from, to } = rangeToWindow(params.range);
     const bucketMs = bucketSizeMs(params.range);
 
     switch (params.metric) {
       case "dau":
-        return this.timeseriesCountDistinct("usageEvent", "userId", { at: { gte: from, lt: to } }, bucketMs);
+        return this.timeseriesCountDistinct(
+          "usageEvent",
+          "userId",
+          { at: { gte: from, lt: to } },
+          bucketMs,
+        );
       case "messages":
-        return this.timeseriesCount("usageEvent", { at: { gte: from, lt: to }, eventType: "CHAT_MESSAGE_SENT" }, bucketMs);
+        return this.timeseriesCount(
+          "usageEvent",
+          { at: { gte: from, lt: to }, eventType: "CHAT_MESSAGE_SENT" },
+          bucketMs,
+        );
       case "uploads":
-        return this.timeseriesCount("usageEvent", { at: { gte: from, lt: to }, eventType: "DOCUMENT_UPLOADED" }, bucketMs);
+        return this.timeseriesCount(
+          "usageEvent",
+          { at: { gte: from, lt: to }, eventType: "DOCUMENT_UPLOADED" },
+          bucketMs,
+        );
       case "tokens":
-        return this.timeseriesSum("modelCall", "totalTokens", { at: { gte: from, lt: to } }, bucketMs);
+        return this.timeseriesSum(
+          "modelCall",
+          "totalTokens",
+          { at: { gte: from, lt: to } },
+          bucketMs,
+        );
       case "llm_errors":
-        return this.timeseriesCount("modelCall", { at: { gte: from, lt: to }, status: "fail" }, bucketMs);
+        return this.timeseriesCount(
+          "modelCall",
+          { at: { gte: from, lt: to }, status: "fail" },
+          bucketMs,
+        );
       case "ingestion_failures":
-        return this.timeseriesCount("ingestionEvent", { at: { gte: from, lt: to }, status: "fail" }, bucketMs);
+        return this.timeseriesCount(
+          "ingestionEvent",
+          { at: { gte: from, lt: to }, status: "fail" },
+          bucketMs,
+        );
       case "weak_evidence_rate":
         return this.timeseriesWeakEvidenceRate({ from, to, bucketMs });
       default:
@@ -640,7 +742,11 @@ export class TelemetryAggregations {
     }
   }
 
-  private async timeseriesCount(modelName: string, where: any, bucketMs: number): Promise<TimeseriesPoint[]> {
+  private async timeseriesCount(
+    modelName: string,
+    where: any,
+    bucketMs: number,
+  ): Promise<TimeseriesPoint[]> {
     const model = (this.prisma as any)[modelName];
     const rows = await model.findMany({
       where,
@@ -648,10 +754,18 @@ export class TelemetryAggregations {
       take: 50000, // safety cap
       orderBy: { at: "asc" },
     });
-    return bucketCount(rows.map((r: any) => new Date(r.at).getTime()), bucketMs);
+    return bucketCount(
+      rows.map((r: any) => new Date(r.at).getTime()),
+      bucketMs,
+    );
   }
 
-  private async timeseriesCountDistinct(modelName: string, field: string, where: any, bucketMs: number): Promise<TimeseriesPoint[]> {
+  private async timeseriesCountDistinct(
+    modelName: string,
+    field: string,
+    where: any,
+    bucketMs: number,
+  ): Promise<TimeseriesPoint[]> {
     const model = (this.prisma as any)[modelName];
     const rows = await model.findMany({
       where,
@@ -676,7 +790,12 @@ export class TelemetryAggregations {
       .map(([b, set]) => ({ t: new Date(b).toISOString(), value: set.size }));
   }
 
-  private async timeseriesSum(modelName: string, field: string, where: any, bucketMs: number): Promise<TimeseriesPoint[]> {
+  private async timeseriesSum(
+    modelName: string,
+    field: string,
+    where: any,
+    bucketMs: number,
+  ): Promise<TimeseriesPoint[]> {
     const model = (this.prisma as any)[modelName];
     const rows = await model.findMany({
       where,
@@ -699,7 +818,11 @@ export class TelemetryAggregations {
       .map(([b, sum]) => ({ t: new Date(b).toISOString(), value: sum }));
   }
 
-  private async timeseriesWeakEvidenceRate(params: { from: Date; to: Date; bucketMs: number }): Promise<TimeseriesPoint[]> {
+  private async timeseriesWeakEvidenceRate(params: {
+    from: Date;
+    to: Date;
+    bucketMs: number;
+  }): Promise<TimeseriesPoint[]> {
     const retrieval = (this.prisma as any).retrievalEvent;
 
     const rows = await retrieval.findMany({
@@ -772,7 +895,11 @@ function percentile(values: number[], p: number): number | null {
   return sorted[idx] ?? null;
 }
 
-async function sumNumberField(model: any, field: string, where: any): Promise<number> {
+async function sumNumberField(
+  model: any,
+  field: string,
+  where: any,
+): Promise<number> {
   // Prisma aggregate might not exist for all setups; fallback to findMany sum.
   try {
     const agg = await model.aggregate({
@@ -796,7 +923,11 @@ async function sumNumberField(model: any, field: string, where: any): Promise<nu
   }
 }
 
-async function countDistinctFallback(model: any, field: string, where: any): Promise<number> {
+async function countDistinctFallback(
+  model: any,
+  field: string,
+  where: any,
+): Promise<number> {
   const rows = await model.findMany({
     where,
     select: { [field]: true },
@@ -823,7 +954,7 @@ function bucketCount(times: number[], bucketMs: number): TimeseriesPoint[] {
 
 async function distinctUserIdsPaged(
   usageModel: any,
-  params: { from: Date; to: Date; limit: number; cursor?: string }
+  params: { from: Date; to: Date; limit: number; cursor?: string },
 ): Promise<{ items: string[]; nextCursor?: string }> {
   // Deterministic approach:
   // - fetch distinct userIds by scanning events in window (MVP)
@@ -834,11 +965,17 @@ async function distinctUserIdsPaged(
     take: 200000,
   });
 
-  const all: string[] = Array.from(new Set(rows.map((r: any) => String(r.userId)))).sort() as string[];
-  const start = params.cursor ? all.findIndex((u) => u === params.cursor) + 1 : 0;
+  const all: string[] = Array.from(
+    new Set(rows.map((r: any) => String(r.userId))),
+  ).sort() as string[];
+  const start = params.cursor
+    ? all.findIndex((u) => u === params.cursor) + 1
+    : 0;
 
   const page: string[] = all.slice(start, start + params.limit);
-  const next: string | undefined = all[start + params.limit] ? all[start + params.limit - 1] : undefined;
+  const next: string | undefined = all[start + params.limit]
+    ? all[start + params.limit - 1]
+    : undefined;
 
   return { items: page, nextCursor: next };
 }

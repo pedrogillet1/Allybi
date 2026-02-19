@@ -17,11 +17,11 @@ export interface FileRecord {
   id: string;
   ownerUserId: string;
 
-  filename: string;     // full filename with extension
-  extension: string;    // normalized extension, e.g. "pdf"
+  filename: string; // full filename with extension
+  extension: string; // normalized extension, e.g. "pdf"
   mimeType: string;
 
-  storageKey: string;   // where file is stored
+  storageKey: string; // where file is stored
   folderPath?: string;
 
   sizeBytes?: number;
@@ -34,10 +34,10 @@ export interface FileRecord {
   isProcessing?: boolean;
 }
 
-export type ButtonPurpose = 'sources' | 'query_action';
-export type ButtonUiVariant = 'sources' | 'query';
+export type ButtonPurpose = "sources" | "query_action";
+export type ButtonUiVariant = "sources" | "query";
 
-export type NavType = 'open' | 'where' | 'discover' | 'not_found';
+export type NavType = "open" | "where" | "discover" | "not_found";
 
 export interface SourceButton {
   documentId: string;
@@ -47,7 +47,7 @@ export interface SourceButton {
 
   // Optional location hints (used by UI for subtitles/badges)
   location?: {
-    type: 'page' | 'slide' | 'sheet' | 'cell' | 'section';
+    type: "page" | "slide" | "sheet" | "cell" | "section";
     value: string | number;
     label?: string;
   };
@@ -58,7 +58,7 @@ export interface SourceButton {
 }
 
 export interface SourceButtonsAttachment {
-  type: 'source_buttons';
+  type: "source_buttons";
 
   /**
    * Distinguish styles:
@@ -71,7 +71,7 @@ export interface SourceButtonsAttachment {
   /**
    * How chat UI should treat this attachment (your render_policy contract).
    */
-  answerMode?: 'nav_pills' | 'inline';
+  answerMode?: "nav_pills" | "inline";
   navType?: NavType;
 
   buttons: SourceButton[];
@@ -91,29 +91,33 @@ export interface SourceButtonsAttachment {
 export interface FileRepository {
   listByUser(userId: string): Promise<FileRecord[]>;
   getByIds(userId: string, ids: string[]): Promise<FileRecord[]>;
-  searchByFilenameTokens(userId: string, tokens: string[], limit: number): Promise<FileRecord[]>;
+  searchByFilenameTokens(
+    userId: string,
+    tokens: string[],
+    limit: number,
+  ): Promise<FileRecord[]>;
 }
 
 const FILE_ICON_MAP: Record<string, string> = {
-  pdf: 'pdf',
-  doc: 'doc',
-  docx: 'doc',
-  xls: 'excel',
-  xlsx: 'excel',
-  csv: 'table',
-  ppt: 'ppt',
-  pptx: 'ppt',
-  txt: 'text',
-  png: 'image',
-  jpg: 'image',
-  jpeg: 'image',
-  default: 'file',
+  pdf: "pdf",
+  doc: "doc",
+  docx: "doc",
+  xls: "excel",
+  xlsx: "excel",
+  csv: "table",
+  ppt: "ppt",
+  pptx: "ppt",
+  txt: "text",
+  png: "image",
+  jpg: "image",
+  jpeg: "image",
+  default: "file",
 };
 
 export class FileInventoryService {
   constructor(
     private readonly repo: FileRepository,
-    private readonly logger: Pick<Console, 'info' | 'warn' | 'error'> = console
+    private readonly logger: Pick<Console, "info" | "warn" | "error"> = console,
   ) {}
 
   // -----------------------------
@@ -122,29 +126,33 @@ export class FileInventoryService {
 
   async listUserFiles(userId: string): Promise<FileRecord[]> {
     const all = await this.repo.listByUser(userId);
-    return this.sortStable(all.filter(f => !f.isDeleted));
+    return this.sortStable(all.filter((f) => !f.isDeleted));
   }
 
   async getFilesByIds(userId: string, ids: string[]): Promise<FileRecord[]> {
     if (!ids?.length) return [];
     const files = await this.repo.getByIds(userId, ids);
-    return this.sortStable(files.filter(f => !f.isDeleted));
+    return this.sortStable(files.filter((f) => !f.isDeleted));
   }
 
   /**
    * Used when the user says “open the mezanino document” (not exact filename).
    * You pass tokens extracted from query (after stopwords removal).
    */
-  async searchByFilename(userId: string, tokens: string[], limit = 8): Promise<FileRecord[]> {
+  async searchByFilename(
+    userId: string,
+    tokens: string[],
+    limit = 8,
+  ): Promise<FileRecord[]> {
     const clean = tokens
-      .map(t => this.normalizeToken(t))
+      .map((t) => this.normalizeToken(t))
       .filter(Boolean)
       .slice(0, 8);
 
     if (!clean.length) return [];
 
     const hits = await this.repo.searchByFilenameTokens(userId, clean, limit);
-    return this.sortStable(hits.filter(f => !f.isDeleted));
+    return this.sortStable(hits.filter((f) => !f.isDeleted));
   }
 
   // -----------------------------
@@ -170,25 +178,28 @@ export class FileInventoryService {
       files,
       maxButtons = 3, // sources usually 1–3 docs
       seeAllEnabled = false,
-      seeAllLabel = 'See all',
+      seeAllLabel = "See all",
       filterExtensions,
       filterDomainId,
       filterKeyword,
     } = params;
 
-    const visible = this.sortStable(files.filter(f => !f.isDeleted)).slice(0, maxButtons);
+    const visible = this.sortStable(files.filter((f) => !f.isDeleted)).slice(
+      0,
+      maxButtons,
+    );
     if (!visible.length) return null;
 
-    const buttons = visible.map(f => this.toSourceButton(f));
+    const buttons = visible.map((f) => this.toSourceButton(f));
 
-    const totalCount = files.filter(f => !f.isDeleted).length;
+    const totalCount = files.filter((f) => !f.isDeleted).length;
     const remaining = Math.max(0, totalCount - visible.length);
 
     return {
-      type: 'source_buttons',
-      purpose: 'sources',
-      uiVariant: 'sources',
-      answerMode: 'inline',
+      type: "source_buttons",
+      purpose: "sources",
+      uiVariant: "sources",
+      answerMode: "inline",
       buttons,
       ...(seeAllEnabled && totalCount > visible.length
         ? {
@@ -224,33 +235,36 @@ export class FileInventoryService {
     const {
       files,
       navType,
-      maxButtons = navType === 'discover' ? 5 : 1,
+      maxButtons = navType === "discover" ? 5 : 1,
       seeAllEnabled = true,
-      seeAllLabel = 'See all',
+      seeAllLabel = "See all",
       filterExtensions,
       filterDomainId,
       filterKeyword,
     } = params;
 
-    const visible = this.sortStable(files.filter(f => !f.isDeleted)).slice(0, maxButtons);
+    const visible = this.sortStable(files.filter((f) => !f.isDeleted)).slice(
+      0,
+      maxButtons,
+    );
 
     // For nav_pills, we can return null when empty (router/quality gate emits not_found microcopy)
     if (!visible.length) return null;
 
-    const buttons = visible.map(f => ({
+    const buttons = visible.map((f) => ({
       ...this.toSourceButton(f),
       // extra UI hint for query actions
       subtitle: f.folderPath ? this.shortFolderHint(f.folderPath) : undefined,
     }));
 
-    const totalCount = files.filter(f => !f.isDeleted).length;
+    const totalCount = files.filter((f) => !f.isDeleted).length;
     const remaining = Math.max(0, totalCount - visible.length);
 
     return {
-      type: 'source_buttons',
-      purpose: 'query_action',
-      uiVariant: 'query',
-      answerMode: 'nav_pills',
+      type: "source_buttons",
+      purpose: "query_action",
+      uiVariant: "query",
+      answerMode: "nav_pills",
       navType,
       buttons,
       ...(seeAllEnabled && totalCount > visible.length
@@ -289,42 +303,43 @@ export class FileInventoryService {
     // 2) createdAt desc
     // 3) filename asc
     return [...files].sort((a, b) => {
-      const ua = Date.parse(a.updatedAt || a.createdAt || '0');
-      const ub = Date.parse(b.updatedAt || b.createdAt || '0');
+      const ua = Date.parse(a.updatedAt || a.createdAt || "0");
+      const ub = Date.parse(b.updatedAt || b.createdAt || "0");
       if (ub !== ua) return ub - ua;
 
-      const ca = Date.parse(a.createdAt || '0');
-      const cb = Date.parse(b.createdAt || '0');
+      const ca = Date.parse(a.createdAt || "0");
+      const cb = Date.parse(b.createdAt || "0");
       if (cb !== ca) return cb - ca;
 
-      return (a.filename || '').localeCompare(b.filename || '');
+      return (a.filename || "").localeCompare(b.filename || "");
     });
   }
 
   private getExt(filename: string): string {
-    const m = (filename || '').toLowerCase().match(/\.([a-z0-9]{1,8})$/);
-    return m ? m[1] : '';
+    const m = (filename || "").toLowerCase().match(/\.([a-z0-9]{1,8})$/);
+    return m ? m[1] : "";
   }
 
   private humanizeFilename(filename: string): string {
     // Keep extension, but remove path + tidy whitespace
-    const base = (filename || '').split('/').pop()?.split('\\').pop() || filename;
-    return base.replace(/\s+/g, ' ').trim();
+    const base =
+      (filename || "").split("/").pop()?.split("\\").pop() || filename;
+    return base.replace(/\s+/g, " ").trim();
   }
 
   private normalizeToken(t: string): string {
-    return (t || '')
+    return (t || "")
       .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // strip diacritics
-      .replace(/[^a-z0-9]+/g, ' ')
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // strip diacritics
+      .replace(/[^a-z0-9]+/g, " ")
       .trim();
   }
 
   private shortFolderHint(folderPath: string): string {
     // Show last segment only (keeps UI clean)
-    const parts = folderPath.split('/').filter(Boolean);
-    if (!parts.length) return '';
+    const parts = folderPath.split("/").filter(Boolean);
+    if (!parts.length) return "";
     const last = parts[parts.length - 1];
     return `Folder: ${last}`;
   }

@@ -10,7 +10,10 @@ const DEFAULT_LIMIT = 50;
 /**
  * Clamp limit to valid range [1, 200]
  */
-export function clampLimit(value: unknown, fallback: number = DEFAULT_LIMIT): number {
+export function clampLimit(
+  value: unknown,
+  fallback: number = DEFAULT_LIMIT,
+): number {
   if (value === undefined || value === null) return fallback;
 
   const num = Number(value);
@@ -22,7 +25,12 @@ export function clampLimit(value: unknown, fallback: number = DEFAULT_LIMIT): nu
 /**
  * Clamp any number to a range
  */
-export function clampNumber(value: unknown, min: number, max: number, fallback: number): number {
+export function clampNumber(
+  value: unknown,
+  min: number,
+  max: number,
+  fallback: number,
+): number {
   if (value === undefined || value === null) return fallback;
 
   const num = Number(value);
@@ -34,15 +42,23 @@ export function clampNumber(value: unknown, min: number, max: number, fallback: 
 /**
  * Clamp integer to a range
  */
-export function clampInt(value: unknown, min: number, max: number, fallback: number): number {
+export function clampInt(
+  value: unknown,
+  min: number,
+  max: number,
+  fallback: number,
+): number {
   return Math.floor(clampNumber(value, min, max, fallback));
 }
 
 /**
  * Safe BigInt to number conversion with max cap
  */
-export function bigIntToNumber(value: unknown, max: number = Number.MAX_SAFE_INTEGER): number {
-  if (typeof value === 'bigint') {
+export function bigIntToNumber(
+  value: unknown,
+  max: number = Number.MAX_SAFE_INTEGER,
+): number {
+  if (typeof value === "bigint") {
     const capped = value > BigInt(max) ? max : Number(value);
     return capped;
   }
@@ -54,7 +70,10 @@ export function bigIntToNumber(value: unknown, max: number = Number.MAX_SAFE_INT
 /**
  * Ensure a value is a non-negative number
  */
-export function ensureNonNegative(value: unknown, fallback: number = 0): number {
+export function ensureNonNegative(
+  value: unknown,
+  fallback: number = 0,
+): number {
   const num = Number(value);
   if (!Number.isFinite(num) || num < 0) return fallback;
   return num;

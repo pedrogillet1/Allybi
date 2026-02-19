@@ -34,14 +34,13 @@ function normalizePath(p: string): string {
 }
 
 function normalizeSegment(seg: string): string {
-  return seg
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ");
+  return seg.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
 function stableSortNodes(nodes: FolderTreeNode[]): FolderTreeNode[] {
-  return [...nodes].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+  return [...nodes].sort((a, b) =>
+    a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+  );
 }
 
 /**
@@ -71,8 +70,7 @@ export function buildFolderTree(paths: string[]): FolderTreeNode {
 
     for (const segRaw of segments) {
       const segNorm = normalizeSegment(segRaw);
-      const displayName =
-        cursor.originalNames.get(segNorm) || segRaw.trim();
+      const displayName = cursor.originalNames.get(segNorm) || segRaw.trim();
 
       if (!cursor.originalNames.has(segNorm)) {
         cursor.originalNames.set(segNorm, displayName);
@@ -113,17 +111,26 @@ export function buildFolderTree(paths: string[]): FolderTreeNode {
  * Convert a FolderTreeNode to a readable text tree for chat responses.
  * Uses ASCII tree characters so it renders well in markdown.
  */
-export function renderFolderTreeText(tree: FolderTreeNode, opts?: { icon?: string; maxDepth?: number }): string {
+export function renderFolderTreeText(
+  tree: FolderTreeNode,
+  opts?: { icon?: string; maxDepth?: number },
+): string {
   const icon = opts?.icon ?? "\u{1F4C1}";
   const maxDepth = opts?.maxDepth ?? 10;
 
   const lines: string[] = [];
 
-  const walk = (node: FolderTreeNode, depth: number, prefix: string, isLast: boolean) => {
+  const walk = (
+    node: FolderTreeNode,
+    depth: number,
+    prefix: string,
+    isLast: boolean,
+  ) => {
     if (depth > maxDepth) return;
 
     if (node.name !== "__root__") {
-      const connector = depth === 0 ? "" : isLast ? "\u2514\u2500 " : "\u251C\u2500 ";
+      const connector =
+        depth === 0 ? "" : isLast ? "\u2514\u2500 " : "\u251C\u2500 ";
       lines.push(`${prefix}${connector}${icon} ${node.name}/`);
       prefix = depth === 0 ? "" : prefix + (isLast ? "   " : "\u2502  ");
     }
@@ -148,11 +155,15 @@ export function renderFolderTreeText(tree: FolderTreeNode, opts?: { icon?: strin
  * More reliable since it uses the actual parent-child relationships.
  */
 export function buildFolderTreeFromRecords(
-  folders: Array<{ id: string; name: string | null; parentFolderId: string | null }>,
+  folders: Array<{
+    id: string;
+    name: string | null;
+    parentFolderId: string | null;
+  }>,
   documents?: Array<{ filename: string | null; folderId: string | null }>,
 ): FolderTreeNode {
   // Build a map of folderId -> folder
-  const folderMap = new Map(folders.map(f => [f.id, f]));
+  const folderMap = new Map(folders.map((f) => [f.id, f]));
 
   // Build children map
   const childFolders = new Map<string | null, typeof folders>();
@@ -164,7 +175,11 @@ export function buildFolderTreeFromRecords(
 
   // Sort children alphabetically
   for (const [, children] of childFolders) {
-    children.sort((a, b) => (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" }));
+    children.sort((a, b) =>
+      (a.name || "").localeCompare(b.name || "", undefined, {
+        sensitivity: "base",
+      }),
+    );
   }
 
   // Group documents by folderId
@@ -178,13 +193,22 @@ export function buildFolderTreeFromRecords(
   }
 
   // Recursive builder
-  function buildNode(folderId: string | null, folderName: string, folderPath: string): FolderTreeNode {
+  function buildNode(
+    folderId: string | null,
+    folderName: string,
+    folderPath: string,
+  ): FolderTreeNode {
     const children: FolderTreeNode[] = [];
 
     // Add document leaf nodes
     const docs = docsByFolder.get(folderId) ?? [];
     for (const docName of docs.sort()) {
-      children.push({ name: docName, path: folderPath ? `${folderPath}/${docName}` : docName, isFolder: false, children: [] });
+      children.push({
+        name: docName,
+        path: folderPath ? `${folderPath}/${docName}` : docName,
+        isFolder: false,
+        children: [],
+      });
     }
 
     // Add child folders
@@ -205,17 +229,28 @@ export function buildFolderTreeFromRecords(
  * Render a tree that includes both folders and documents.
  * Folders get 📁 icon, documents get 📄 icon.
  */
-export function renderFolderTreeWithDocs(tree: FolderTreeNode, opts?: { maxDepth?: number }): string {
+export function renderFolderTreeWithDocs(
+  tree: FolderTreeNode,
+  opts?: { maxDepth?: number },
+): string {
   const maxDepth = opts?.maxDepth ?? 10;
   const lines: string[] = [];
 
-  const walk = (node: FolderTreeNode, depth: number, prefix: string, isLast: boolean) => {
+  const walk = (
+    node: FolderTreeNode,
+    depth: number,
+    prefix: string,
+    isLast: boolean,
+  ) => {
     if (depth > maxDepth) return;
 
     if (node.name !== "__root__") {
       const icon = node.isFolder ? "\u{1F4C1}" : "\u{1F4C4}";
-      const displayName = node.isFolder ? node.name.replace(/\/$/, "") + "/" : node.name;
-      const connector = depth === 0 ? "" : isLast ? "\u2514\u2500 " : "\u251C\u2500 ";
+      const displayName = node.isFolder
+        ? node.name.replace(/\/$/, "") + "/"
+        : node.name;
+      const connector =
+        depth === 0 ? "" : isLast ? "\u2514\u2500 " : "\u251C\u2500 ";
       lines.push(`${prefix}${connector}${icon} ${displayName}`);
       prefix = depth === 0 ? "" : prefix + (isLast ? "   " : "\u2502  ");
     }

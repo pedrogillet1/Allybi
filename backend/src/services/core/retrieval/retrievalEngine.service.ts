@@ -85,7 +85,12 @@ export interface RetrievalRequest {
 
   // Optional: if you store recent fallback history/anti-repetition
   history?: {
-    recentFallbacks?: Array<{ reasonCode: string; fallbackType: string; strategy: string; turnId: number }>;
+    recentFallbacks?: Array<{
+      reasonCode: string;
+      fallbackType: string;
+      strategy: string;
+      turnId: number;
+    }>;
   };
 
   // Optional: override retrieval preferences (rare; tests/diagnostics)
@@ -251,19 +256,29 @@ export interface BankLoader {
  * - StructuralIndex: headings/table headers/TOC anchor signals
  */
 export interface SemanticIndex {
-  search(opts: {
-    query: string;
-    docIds?: string[];
-    k: number;
-  }): Promise<Array<{ docId: string; location: ChunkLocation; snippet: string; score: number; locationKey?: string; chunkId?: string }>>;
+  search(opts: { query: string; docIds?: string[]; k: number }): Promise<
+    Array<{
+      docId: string;
+      location: ChunkLocation;
+      snippet: string;
+      score: number;
+      locationKey?: string;
+      chunkId?: string;
+    }>
+  >;
 }
 
 export interface LexicalIndex {
-  search(opts: {
-    query: string;
-    docIds?: string[];
-    k: number;
-  }): Promise<Array<{ docId: string; location: ChunkLocation; snippet: string; score: number; locationKey?: string; chunkId?: string }>>;
+  search(opts: { query: string; docIds?: string[]; k: number }): Promise<
+    Array<{
+      docId: string;
+      location: ChunkLocation;
+      snippet: string;
+      score: number;
+      locationKey?: string;
+      chunkId?: string;
+    }>
+  >;
 }
 
 export interface StructuralIndex {
@@ -272,7 +287,16 @@ export interface StructuralIndex {
     docIds?: string[];
     k: number;
     anchors: string[];
-  }): Promise<Array<{ docId: string; location: ChunkLocation; snippet: string; score: number; locationKey?: string; chunkId?: string }>>;
+  }): Promise<
+    Array<{
+      docId: string;
+      location: ChunkLocation;
+      snippet: string;
+      score: number;
+      locationKey?: string;
+      chunkId?: string;
+    }>
+  >;
 }
 
 export interface DocStore {
@@ -285,7 +309,14 @@ export interface DocStore {
  * If you don't have one, the engine will still run with basic normalization.
  */
 export interface QueryNormalizer {
-  normalize(query: string, langHint?: string): Promise<{ normalized: string; hasQuotedText: boolean; hasFilename: boolean }>;
+  normalize(
+    query: string,
+    langHint?: string,
+  ): Promise<{
+    normalized: string;
+    hasQuotedText: boolean;
+    hasFilename: boolean;
+  }>;
 }
 
 /**
@@ -305,13 +336,17 @@ function safeNumber(x: any, fallback = 0): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
-function stableLocationKey(docId: string, loc: ChunkLocation, fallbackId: string): string {
+function stableLocationKey(
+  docId: string,
+  loc: ChunkLocation,
+  fallbackId: string,
+): string {
   const parts = [
     `d:${docId}`,
     loc.page != null ? `p:${loc.page}` : "",
     loc.sheet ? `s:${loc.sheet}` : "",
     loc.slide != null ? `sl:${loc.slide}` : "",
-    loc.sectionKey ? `sec:${loc.sectionKey}` : ""
+    loc.sectionKey ? `sec:${loc.sectionKey}` : "",
   ].filter(Boolean);
   const base = parts.join("|");
   return base.length ? base : `d:${docId}|c:${fallbackId}`;
@@ -331,7 +366,7 @@ export class RetrievalEngineService {
     private readonly semanticIndex: SemanticIndex,
     private readonly lexicalIndex: LexicalIndex,
     private readonly structuralIndex: StructuralIndex,
-    private readonly queryNormalizer?: QueryNormalizer
+    private readonly queryNormalizer?: QueryNormalizer,
   ) {}
 
   /**
@@ -342,7 +377,7 @@ export class RetrievalEngineService {
     if (req.signals.unsafeGate) {
       return this.emptyPack(req, {
         reasonCodes: ["unsafe_gate"],
-        note: "Retrieval bypassed due to unsafeGate signal."
+        note: "Retrieval bypassed due to unsafeGate signal.",
       });
     }
 
@@ -366,7 +401,7 @@ export class RetrievalEngineService {
     const signals = {
       ...req.signals,
       hasQuotedText: req.signals.hasQuotedText ?? norm.hasQuotedText,
-      hasFilename: req.signals.hasFilename ?? norm.hasFilename
+      hasFilename: req.signals.hasFilename ?? norm.hasFilename,
     };
 
     // 3) Determine scope docIds (strict on explicit doc locks/refs)
@@ -374,42 +409,56 @@ export class RetrievalEngineService {
 
     // 4) Expansion gating (never expand literals; only when allowed)
     const expansion = this.computeExpansionPolicy(req, signals, semanticCfg);
-    const expandedQueries = expansion.enabled ? this.expandQuery(queryNormalized, signals) : [];
-    const queryForSearch = expandedQueries.length ? expandedQueries.join(" ") : queryNormalized;
+    const expandedQueries = expansion.enabled
+      ? this.expandQuery(queryNormalized, signals)
+      : [];
+    const queryForSearch = expandedQueries.length
+      ? expandedQueries.join(" ")
+      : queryNormalized;
 
     // 5) Execute hybrid retrieval phases (semantic + lexical rescue + structural anchors)
     const phaseResults = await this.runPhases({
       query: queryForSearch,
       scopeDocIds: scope.candidateDocIds,
-      semanticCfg
+      semanticCfg,
     });
 
     // 6) Merge into CandidateChunks with provenance + stable ids
     let candidates = this.mergePhaseCandidates(phaseResults, scope, req);
 
     // 7) Apply retrieval negatives (hard blocks + soft penalties) deterministically
-    candidates = this.applyRetrievalNegatives(candidates, req, signals, negatives);
+    candidates = this.applyRetrievalNegatives(
+      candidates,
+      req,
+      signals,
+      negatives,
+    );
 
     // 8) Apply boosts (keyword/title/type/recency), with caps and guards
     candidates = this.applyBoosts(candidates, req, signals, {
       boostsKeyword,
       boostsTitle,
       boostsType,
-      boostsRecency
+      boostsRecency,
     });
 
     // 9) Rank candidates using ranker config (weights + normalization + tie-breakers)
     candidates = this.rankCandidates(candidates, req, signals, rankerCfg);
 
     // 10) Diversify (doc/section spread + near-dup control) unless disabled by overrides/lock policy
-    candidates = this.applyDiversification(candidates, req, signals, diversification);
+    candidates = this.applyDiversification(
+      candidates,
+      req,
+      signals,
+      diversification,
+    );
 
     // 11) Package evidence (strict provenance + caps) into EvidencePack
     const pack = this.packageEvidence(candidates, req, signals, packaging, {
       queryOriginal,
       queryNormalized,
       expandedQueries,
-      scope
+      scope,
     });
 
     // 12) Final safety: never include raw debug in production (still keep internal stats)
@@ -424,15 +473,25 @@ export class RetrievalEngineService {
   // Normalization
   // -----------------------------
 
-  private async normalizeQuery(req: RetrievalRequest): Promise<{ normalized: string; hasQuotedText: boolean; hasFilename: boolean }> {
+  private async normalizeQuery(req: RetrievalRequest): Promise<{
+    normalized: string;
+    hasQuotedText: boolean;
+    hasFilename: boolean;
+  }> {
     if (this.queryNormalizer) {
-      return this.queryNormalizer.normalize(req.query, req.signals?.intentFamily ?? "any");
+      return this.queryNormalizer.normalize(
+        req.query,
+        req.signals?.intentFamily ?? "any",
+      );
     }
 
     // Fallback normalization (non-destructive)
     const q = (req.query ?? "").trim().replace(/\s+/g, " ");
     const hasQuotedText = /"[^"]{2,}"/.test(q);
-    const hasFilename = /\b\w[\w\-_. ]{0,160}\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g|webp)\b/i.test(q);
+    const hasFilename =
+      /\b\w[\w\-_. ]{0,160}\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g|webp)\b/i.test(
+        q,
+      );
 
     // Light casefold for matching; do not remove punctuation aggressively
     const normalized = q.toLowerCase();
@@ -446,10 +505,15 @@ export class RetrievalEngineService {
   private async resolveScope(
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
-    semanticCfg: any
-  ): Promise<{ candidateDocIds: string[]; hardScopeActive: boolean; sheetName?: string | null; rangeA1?: string | null }> {
+    semanticCfg: any,
+  ): Promise<{
+    candidateDocIds: string[];
+    hardScopeActive: boolean;
+    sheetName?: string | null;
+    rangeA1?: string | null;
+  }> {
     const docs = await this.docStore.listDocs();
-    const allDocIds = docs.map(d => d.docId);
+    const allDocIds = docs.map((d) => d.docId);
 
     const explicitDocId = signals.resolvedDocId ?? null;
     const activeDocId = signals.activeDocId ?? null;
@@ -463,7 +527,7 @@ export class RetrievalEngineService {
         candidateDocIds: [explicitDocId],
         hardScopeActive: true,
         sheetName: signals.resolvedSheetName ?? null,
-        rangeA1: signals.resolvedRangeA1 ?? null
+        rangeA1: signals.resolvedRangeA1 ?? null,
       };
     }
 
@@ -473,7 +537,7 @@ export class RetrievalEngineService {
         candidateDocIds: [activeDocId],
         hardScopeActive: true,
         sheetName: signals.resolvedSheetName ?? null,
-        rangeA1: signals.resolvedRangeA1 ?? null
+        rangeA1: signals.resolvedRangeA1 ?? null,
       };
     }
 
@@ -483,7 +547,7 @@ export class RetrievalEngineService {
         candidateDocIds: [activeDocId],
         hardScopeActive: true,
         sheetName: signals.resolvedSheetName ?? null,
-        rangeA1: signals.resolvedRangeA1 ?? null
+        rangeA1: signals.resolvedRangeA1 ?? null,
       };
     }
 
@@ -491,9 +555,11 @@ export class RetrievalEngineService {
     // Note: semantic_search_config may cap candidate docs; keep all here, cap later.
     return {
       candidateDocIds: allDocIds,
-      hardScopeActive: Boolean(activeDocId || explicitDocId || signals.hardScopeActive),
+      hardScopeActive: Boolean(
+        activeDocId || explicitDocId || signals.hardScopeActive,
+      ),
       sheetName: signals.resolvedSheetName ?? null,
-      rangeA1: signals.resolvedRangeA1 ?? null
+      rangeA1: signals.resolvedRangeA1 ?? null,
     };
   }
 
@@ -501,7 +567,11 @@ export class RetrievalEngineService {
   // Expansion
   // -----------------------------
 
-  private computeExpansionPolicy(req: RetrievalRequest, signals: RetrievalRequest["signals"], semanticCfg: any): { enabled: boolean } {
+  private computeExpansionPolicy(
+    req: RetrievalRequest,
+    signals: RetrievalRequest["signals"],
+    semanticCfg: any,
+  ): { enabled: boolean } {
     const policy = semanticCfg?.config?.queryExpansionPolicy;
     const enabledByBank = Boolean(policy?.enabled);
 
@@ -531,7 +601,10 @@ export class RetrievalEngineService {
    *
    * Do NOT add general translation terms here - embeddings handle that automatically.
    */
-  private expandQuery(normalizedQuery: string, signals: RetrievalRequest["signals"]): string[] {
+  private expandQuery(
+    normalizedQuery: string,
+    signals: RetrievalRequest["signals"],
+  ): string[] {
     const synonymBank = this.safeGetBank<any>("synonym_expansion");
     if (!synonymBank?.config?.enabled || !synonymBank?.groups) {
       return [normalizedQuery];
@@ -539,7 +612,10 @@ export class RetrievalEngineService {
 
     const cfg = synonymBank.config;
     const maxExpansionsTotal = safeNumber(cfg.policy?.maxExpansionsTotal, 12);
-    const maxExpansionsPerTerm = safeNumber(cfg.policy?.maxExpansionsPerTerm, 4);
+    const maxExpansionsPerTerm = safeNumber(
+      cfg.policy?.maxExpansionsPerTerm,
+      4,
+    );
 
     const queryTokens = this.simpleTokens(normalizedQuery);
     const expansions = new Set<string>([normalizedQuery]);
@@ -554,7 +630,9 @@ export class RetrievalEngineService {
         const canonical = (entry.canonical ?? "").toLowerCase().trim();
         if (!canonical) continue;
 
-        const variants = (entry.variants ?? []).map((v: string) => v.toLowerCase().trim()).filter(Boolean);
+        const variants = (entry.variants ?? [])
+          .map((v: string) => v.toLowerCase().trim())
+          .filter(Boolean);
 
         // Map canonical to all variants (for expansion)
         const existing = canonicalToVariants.get(canonical) || [];
@@ -579,7 +657,12 @@ export class RetrievalEngineService {
       if (canonical) {
         // Add canonical if different from token
         if (canonical !== token) {
-          expansions.add(normalizedQuery.replace(new RegExp(`\\b${this.escapeRegex(token)}\\b`, 'gi'), canonical));
+          expansions.add(
+            normalizedQuery.replace(
+              new RegExp(`\\b${this.escapeRegex(token)}\\b`, "gi"),
+              canonical,
+            ),
+          );
         }
 
         // Add other variants of the same concept
@@ -588,7 +671,12 @@ export class RetrievalEngineService {
         for (const variant of variants) {
           if (addedForTerm >= maxExpansionsPerTerm) break;
           if (variant !== token && expansions.size < maxExpansionsTotal) {
-            expansions.add(normalizedQuery.replace(new RegExp(`\\b${this.escapeRegex(token)}\\b`, 'gi'), variant));
+            expansions.add(
+              normalizedQuery.replace(
+                new RegExp(`\\b${this.escapeRegex(token)}\\b`, "gi"),
+                variant,
+              ),
+            );
             addedForTerm++;
           }
         }
@@ -599,7 +687,7 @@ export class RetrievalEngineService {
   }
 
   private escapeRegex(str: string): string {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
   // -----------------------------
@@ -610,26 +698,59 @@ export class RetrievalEngineService {
     query: string;
     scopeDocIds: string[];
     semanticCfg: any;
-  }): Promise<Array<{ phaseId: string; source: CandidateSource; hits: any[] }>> {
+  }): Promise<
+    Array<{ phaseId: string; source: CandidateSource; hits: any[] }>
+  > {
     const phases = opts.semanticCfg?.config?.hybridPhases ?? [];
-    const results: Array<{ phaseId: string; source: CandidateSource; hits: any[] }> = [];
+    const results: Array<{
+      phaseId: string;
+      source: CandidateSource;
+      hits: any[];
+    }> = [];
 
     for (const phase of phases) {
       if (!phase?.enabled) continue;
 
       if (phase.type === "semantic") {
         const k = safeNumber(phase.k, 80);
-        const hits = await this.semanticIndex.search({ query: opts.query, docIds: opts.scopeDocIds, k });
-        results.push({ phaseId: phase.id ?? "phase_semantic", source: "semantic", hits });
+        const hits = await this.semanticIndex.search({
+          query: opts.query,
+          docIds: opts.scopeDocIds,
+          k,
+        });
+        results.push({
+          phaseId: phase.id ?? "phase_semantic",
+          source: "semantic",
+          hits,
+        });
       } else if (phase.type === "lexical") {
         const k = safeNumber(phase.k, 120);
-        const hits = await this.lexicalIndex.search({ query: opts.query, docIds: opts.scopeDocIds, k });
-        results.push({ phaseId: phase.id ?? "phase_lexical", source: "lexical", hits });
+        const hits = await this.lexicalIndex.search({
+          query: opts.query,
+          docIds: opts.scopeDocIds,
+          k,
+        });
+        results.push({
+          phaseId: phase.id ?? "phase_lexical",
+          source: "lexical",
+          hits,
+        });
       } else if (phase.type === "structural") {
         const k = safeNumber(phase.k, 60);
-        const anchors = Array.isArray(phase.anchors) ? phase.anchors : ["headings", "table_headers"];
-        const hits = await this.structuralIndex.search({ query: opts.query, docIds: opts.scopeDocIds, k, anchors });
-        results.push({ phaseId: phase.id ?? "phase_structural", source: "structural", hits });
+        const anchors = Array.isArray(phase.anchors)
+          ? phase.anchors
+          : ["headings", "table_headers"];
+        const hits = await this.structuralIndex.search({
+          query: opts.query,
+          docIds: opts.scopeDocIds,
+          k,
+          anchors,
+        });
+        results.push({
+          phaseId: phase.id ?? "phase_structural",
+          source: "structural",
+          hits,
+        });
       }
     }
 
@@ -637,9 +758,18 @@ export class RetrievalEngineService {
   }
 
   private mergePhaseCandidates(
-    phaseResults: Array<{ phaseId: string; source: CandidateSource; hits: any[] }>,
-    scope: { candidateDocIds: string[]; hardScopeActive: boolean; sheetName?: string | null; rangeA1?: string | null },
-    req: RetrievalRequest
+    phaseResults: Array<{
+      phaseId: string;
+      source: CandidateSource;
+      hits: any[];
+    }>,
+    scope: {
+      candidateDocIds: string[];
+      hardScopeActive: boolean;
+      sheetName?: string | null;
+      rangeA1?: string | null;
+    },
+    req: RetrievalRequest,
   ): CandidateChunk[] {
     const out: CandidateChunk[] = [];
     const seen = new Set<string>();
@@ -650,8 +780,19 @@ export class RetrievalEngineService {
         const docId = String(hit.docId);
         const score = clamp01(safeNumber(hit.score, 0));
         const loc: ChunkLocation = hit.location ?? {};
-        const locationKey = hit.locationKey ?? stableLocationKey(docId, loc, String(hit.chunkId ?? `${phase.phaseId}:${i}`));
-        const candidateId = String(hit.chunkId ?? sha256(`${phase.source}|${docId}|${locationKey}|${hit.snippet ?? ""}`).slice(0, 16));
+        const locationKey =
+          hit.locationKey ??
+          stableLocationKey(
+            docId,
+            loc,
+            String(hit.chunkId ?? `${phase.phaseId}:${i}`),
+          );
+        const candidateId = String(
+          hit.chunkId ??
+            sha256(
+              `${phase.source}|${docId}|${locationKey}|${hit.snippet ?? ""}`,
+            ).slice(0, 16),
+        );
 
         const dedupeKey = `${docId}|${locationKey}|${candidateId}`;
         if (seen.has(dedupeKey)) continue;
@@ -682,15 +823,15 @@ export class RetrievalEngineService {
             lexical: phase.source === "lexical" ? score : 0,
             structural: phase.source === "structural" ? score : 0,
             penalties: 0,
-            final: 0
+            final: 0,
           },
 
           signals: {
             isScopedMatch: scope.hardScopeActive,
-            isAnchorMatch: phase.source === "structural"
+            isAnchorMatch: phase.source === "structural",
           },
 
-          provenanceOk
+          provenanceOk,
         });
       }
     }
@@ -706,26 +847,39 @@ export class RetrievalEngineService {
     candidates: CandidateChunk[],
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
-    negativesBank: any | null
+    negativesBank: any | null,
   ): CandidateChunk[] {
     if (!negativesBank?.config?.enabled) return candidates;
 
     const cfg = negativesBank.config;
-    const minRelevance = safeNumber(cfg?.actionsContract?.thresholds?.minRelevanceScore, 0.55);
+    const minRelevance = safeNumber(
+      cfg?.actionsContract?.thresholds?.minRelevanceScore,
+      0.55,
+    );
 
     // Hard lock enforcement (engine-side)
-    const lockedDocId = signals.explicitDocLock ? (signals.activeDocId ?? null) : null;
+    const lockedDocId = signals.explicitDocLock
+      ? (signals.activeDocId ?? null)
+      : null;
 
     const out: CandidateChunk[] = [];
     for (const c of candidates) {
       // Hard block: explicit doc lock violation (unless discovery)
-      if (lockedDocId && c.docId !== lockedDocId && signals.intentFamily !== "doc_discovery") {
+      if (
+        lockedDocId &&
+        c.docId !== lockedDocId &&
+        signals.intentFamily !== "doc_discovery"
+      ) {
         c.signals.scopeViolation = true;
         continue;
       }
 
       // Soft/Hard: low relevance chunk exclusion
-      const topScore = Math.max(c.scores.semantic ?? 0, c.scores.lexical ?? 0, c.scores.structural ?? 0);
+      const topScore = Math.max(
+        c.scores.semantic ?? 0,
+        c.scores.lexical ?? 0,
+        c.scores.structural ?? 0,
+      );
       if (topScore < minRelevance) {
         c.signals.lowRelevanceChunk = true;
         // Many systems exclude; your negatives bank shows exclude_chunk.
@@ -752,14 +906,20 @@ export class RetrievalEngineService {
       boostsTitle: any | null;
       boostsType: any | null;
       boostsRecency: any | null;
-    }
+    },
   ): CandidateChunk[] {
     // Apply boosts as additive components with caps (final ranker may re-cap).
     for (const c of candidates) {
       // Keyword boost (approximation): if query tokens appear in snippet, treat as body_text match.
       if (banks.boostsKeyword?.config?.enabled) {
-        const maxTotalBoost = safeNumber(banks.boostsKeyword.config.actionsContract?.thresholds?.maxTotalBoost, 0.22);
-        const wBody = safeNumber(banks.boostsKeyword.config.regionWeights?.body_text, 0.03);
+        const maxTotalBoost = safeNumber(
+          banks.boostsKeyword.config.actionsContract?.thresholds?.maxTotalBoost,
+          0.22,
+        );
+        const wBody = safeNumber(
+          banks.boostsKeyword.config.regionWeights?.body_text,
+          0.03,
+        );
         const q = (req.query ?? "").toLowerCase();
         const s = (c.snippet ?? "").toLowerCase();
         let hitCount = 0;
@@ -773,9 +933,18 @@ export class RetrievalEngineService {
 
       // Title boost (approx): if active doc matches / explicit filename, boost strongly
       if (banks.boostsTitle?.config?.enabled) {
-        const maxTotal = safeNumber(banks.boostsTitle.config.actionsContract?.thresholds?.maxTotalTitleBoost, 0.18);
+        const maxTotal = safeNumber(
+          banks.boostsTitle.config.actionsContract?.thresholds
+            ?.maxTotalTitleBoost,
+          0.18,
+        );
         let b = 0;
-        if (signals.explicitDocRef && signals.resolvedDocId && c.docId === signals.resolvedDocId) b += 0.12;
+        if (
+          signals.explicitDocRef &&
+          signals.resolvedDocId &&
+          c.docId === signals.resolvedDocId
+        )
+          b += 0.12;
         if (signals.activeDocId && c.docId === signals.activeDocId) b += 0.06;
         c.scores.titleBoost = clamp01(Math.min(maxTotal, b));
       }
@@ -802,17 +971,34 @@ export class RetrievalEngineService {
   // Ranking
   // -----------------------------
 
-  private rankCandidates(candidates: CandidateChunk[], req: RetrievalRequest, signals: RetrievalRequest["signals"], rankerCfg: any): CandidateChunk[] {
+  private rankCandidates(
+    candidates: CandidateChunk[],
+    req: RetrievalRequest,
+    signals: RetrievalRequest["signals"],
+    rankerCfg: any,
+  ): CandidateChunk[] {
     const cfg = rankerCfg?.config;
-    const weights = cfg?.weights ?? { semantic: 0.52, lexical: 0.22, structural: 0.14, titleBoost: 0.06, typeBoost: 0.03, recencyBoost: 0.03 };
-    const minFinal = safeNumber(cfg?.actionsContract?.thresholds?.minFinalScore, 0.58);
+    const weights = cfg?.weights ?? {
+      semantic: 0.52,
+      lexical: 0.22,
+      structural: 0.14,
+      titleBoost: 0.06,
+      typeBoost: 0.03,
+      recencyBoost: 0.03,
+    };
+    const minFinal = safeNumber(
+      cfg?.actionsContract?.thresholds?.minFinalScore,
+      0.58,
+    );
 
     for (const c of candidates) {
       const semantic = clamp01(c.scores.semantic ?? 0);
       const lexical = clamp01(c.scores.lexical ?? 0);
       const structural = clamp01(c.scores.structural ?? 0);
 
-      const titleBoost = clamp01((c.scores.titleBoost ?? 0) + (c.scores.keywordBoost ?? 0) * 0.5);
+      const titleBoost = clamp01(
+        (c.scores.titleBoost ?? 0) + (c.scores.keywordBoost ?? 0) * 0.5,
+      );
       const typeBoost = clamp01(c.scores.typeBoost ?? 0);
       const recencyBoost = clamp01(c.scores.recencyBoost ?? 0);
 
@@ -839,7 +1025,8 @@ export class RetrievalEngineService {
       const fb = b.scores.final ?? 0;
       if (fb !== fa) return fb - fa;
       if (a.docId !== b.docId) return a.docId.localeCompare(b.docId);
-      if (a.locationKey !== b.locationKey) return a.locationKey.localeCompare(b.locationKey);
+      if (a.locationKey !== b.locationKey)
+        return a.locationKey.localeCompare(b.locationKey);
       return a.candidateId.localeCompare(b.candidateId);
     });
 
@@ -850,7 +1037,12 @@ export class RetrievalEngineService {
   // Diversification
   // -----------------------------
 
-  private applyDiversification(candidates: CandidateChunk[], req: RetrievalRequest, signals: RetrievalRequest["signals"], diversificationBank: any | null): CandidateChunk[] {
+  private applyDiversification(
+    candidates: CandidateChunk[],
+    req: RetrievalRequest,
+    signals: RetrievalRequest["signals"],
+    diversificationBank: any | null,
+  ): CandidateChunk[] {
     if (!diversificationBank?.config?.enabled) return candidates;
 
     // Disable diversification when explicit lock or single doc intent (bank policy)
@@ -861,13 +1053,32 @@ export class RetrievalEngineService {
       return this.dedupeNearDuplicates(candidates, 3, 280);
     }
 
-    const maxPerDocHard = safeNumber(diversificationBank.config.actionsContract?.thresholds?.maxPerDocHard, 10);
-    const maxTotalHard = safeNumber(diversificationBank.config.actionsContract?.thresholds?.maxTotalChunksHard, 36);
-    const maxNearDupPerDoc = safeNumber(diversificationBank.config.actionsContract?.thresholds?.maxNearDuplicatesPerDoc, 3);
-    const windowChars = safeNumber(diversificationBank.config.actionsContract?.thresholds?.nearDuplicateWindowChars, 280);
+    const maxPerDocHard = safeNumber(
+      diversificationBank.config.actionsContract?.thresholds?.maxPerDocHard,
+      10,
+    );
+    const maxTotalHard = safeNumber(
+      diversificationBank.config.actionsContract?.thresholds
+        ?.maxTotalChunksHard,
+      36,
+    );
+    const maxNearDupPerDoc = safeNumber(
+      diversificationBank.config.actionsContract?.thresholds
+        ?.maxNearDuplicatesPerDoc,
+      3,
+    );
+    const windowChars = safeNumber(
+      diversificationBank.config.actionsContract?.thresholds
+        ?.nearDuplicateWindowChars,
+      280,
+    );
 
     // 1) Near-duplicate dedupe first
-    let filtered = this.dedupeNearDuplicates(candidates, maxNearDupPerDoc, windowChars);
+    let filtered = this.dedupeNearDuplicates(
+      candidates,
+      maxNearDupPerDoc,
+      windowChars,
+    );
 
     // 2) Doc spread cap
     const perDocCount = new Map<string, number>();
@@ -883,7 +1094,11 @@ export class RetrievalEngineService {
     return diversified;
   }
 
-  private dedupeNearDuplicates(candidates: CandidateChunk[], maxNearDupPerDoc: number, windowChars: number): CandidateChunk[] {
+  private dedupeNearDuplicates(
+    candidates: CandidateChunk[],
+    maxNearDupPerDoc: number,
+    windowChars: number,
+  ): CandidateChunk[] {
     const perDocHashes = new Map<string, Map<string, number>>();
     const out: CandidateChunk[] = [];
 
@@ -891,7 +1106,10 @@ export class RetrievalEngineService {
       const docMap = perDocHashes.get(c.docId) ?? new Map<string, number>();
       perDocHashes.set(c.docId, docMap);
 
-      const snippetNorm = this.normalizeForNearDup(c.snippet).slice(0, windowChars);
+      const snippetNorm = this.normalizeForNearDup(c.snippet).slice(
+        0,
+        windowChars,
+      );
       const h = sha256(snippetNorm).slice(0, 16);
 
       const count = docMap.get(h) ?? 0;
@@ -925,13 +1143,27 @@ export class RetrievalEngineService {
       queryOriginal: string;
       queryNormalized: string;
       expandedQueries: string[];
-      scope: { candidateDocIds: string[]; hardScopeActive: boolean; sheetName?: string | null; rangeA1?: string | null };
-    }
+      scope: {
+        candidateDocIds: string[];
+        hardScopeActive: boolean;
+        sheetName?: string | null;
+        rangeA1?: string | null;
+      };
+    },
   ): EvidencePack {
     const cfg = packagingBank?.config ?? {};
-    const maxEvidenceHard = safeNumber(cfg.actionsContract?.thresholds?.maxEvidenceItemsHard, 36);
-    const maxPerDocHard = safeNumber(cfg.actionsContract?.thresholds?.maxEvidencePerDocHard, 10);
-    const minFinalScore = safeNumber(cfg.actionsContract?.thresholds?.minFinalScore, 0.58);
+    const maxEvidenceHard = safeNumber(
+      cfg.actionsContract?.thresholds?.maxEvidenceItemsHard,
+      36,
+    );
+    const maxPerDocHard = safeNumber(
+      cfg.actionsContract?.thresholds?.maxEvidencePerDocHard,
+      10,
+    );
+    const minFinalScore = safeNumber(
+      cfg.actionsContract?.thresholds?.minFinalScore,
+      0.58,
+    );
 
     const evidence: EvidenceItem[] = [];
     const perDoc = new Map<string, number>();
@@ -954,7 +1186,7 @@ export class RetrievalEngineService {
         location: c.location,
         locationKey: c.locationKey,
         snippet: c.type === "text" ? c.snippet : undefined,
-        table: c.type === "table" ? c.table ?? undefined : undefined,
+        table: c.type === "table" ? (c.table ?? undefined) : undefined,
         imageRef: c.type === "image" ? null : undefined,
         score: {
           finalScore: clamp01(final),
@@ -965,28 +1197,33 @@ export class RetrievalEngineService {
             keywordBoost: c.scores.keywordBoost ?? 0,
             titleBoost: c.scores.titleBoost ?? 0,
             typeBoost: c.scores.typeBoost ?? 0,
-            recencyBoost: c.scores.recencyBoost ?? 0
+            recencyBoost: c.scores.recencyBoost ?? 0,
           },
           penalties: {
-            penalties: c.scores.penalties ?? 0
-          }
+            penalties: c.scores.penalties ?? 0,
+          },
         },
-        warnings: c.table?.warnings ?? undefined
+        warnings: c.table?.warnings ?? undefined,
       });
 
       if (evidence.length >= maxEvidenceHard) break;
     }
 
-    const uniqueDocs = new Set(evidence.map(e => e.docId));
+    const uniqueDocs = new Set(evidence.map((e) => e.docId));
     const topScore = evidence.length ? evidence[0].score.finalScore : null;
     const scoreGap =
-      evidence.length >= 2 ? clamp01((evidence[0].score.finalScore ?? 0) - (evidence[1].score.finalScore ?? 0)) : null;
+      evidence.length >= 2
+        ? clamp01(
+            (evidence[0].score.finalScore ?? 0) -
+              (evidence[1].score.finalScore ?? 0),
+          )
+        : null;
 
     const pack: EvidencePack = {
       query: {
         original: ctx.queryOriginal,
         normalized: ctx.queryNormalized,
-        expanded: ctx.expandedQueries.length ? ctx.expandedQueries : undefined
+        expanded: ctx.expandedQueries.length ? ctx.expandedQueries : undefined,
       },
       scope: {
         activeDocId: signals.activeDocId ?? null,
@@ -994,7 +1231,7 @@ export class RetrievalEngineService {
         candidateDocIds: ctx.scope.candidateDocIds,
         hardScopeActive: ctx.scope.hardScopeActive,
         sheetName: ctx.scope.sheetName ?? null,
-        rangeA1: ctx.scope.rangeA1 ?? null
+        rangeA1: ctx.scope.rangeA1 ?? null,
       },
       stats: {
         candidatesConsidered: candidates.length,
@@ -1004,13 +1241,13 @@ export class RetrievalEngineService {
         evidenceItems: evidence.length,
         uniqueDocsInEvidence: uniqueDocs.size,
         topScore,
-        scoreGap
+        scoreGap,
       },
       evidence,
       debug: {
         phases: [],
-        reasonCodes: []
-      }
+        reasonCodes: [],
+      },
     };
 
     return pack;
@@ -1033,11 +1270,14 @@ export class RetrievalEngineService {
       .toLowerCase()
       .replace(/["“”]/g, " ")
       .split(/[\s,;:.!?()]+/)
-      .map(t => t.trim())
+      .map((t) => t.trim())
       .filter(Boolean);
   }
 
-  private emptyPack(req: RetrievalRequest, dbg: { reasonCodes: string[]; note?: string }): EvidencePack {
+  private emptyPack(
+    req: RetrievalRequest,
+    dbg: { reasonCodes: string[]; note?: string },
+  ): EvidencePack {
     return {
       query: { original: req.query, normalized: (req.query ?? "").trim() },
       scope: {
@@ -1046,7 +1286,7 @@ export class RetrievalEngineService {
         candidateDocIds: [],
         hardScopeActive: Boolean(req.signals.hardScopeActive),
         sheetName: req.signals.resolvedSheetName ?? null,
-        rangeA1: req.signals.resolvedRangeA1 ?? null
+        rangeA1: req.signals.resolvedRangeA1 ?? null,
       },
       stats: {
         candidatesConsidered: 0,
@@ -1056,10 +1296,12 @@ export class RetrievalEngineService {
         evidenceItems: 0,
         uniqueDocsInEvidence: 0,
         topScore: null,
-        scoreGap: null
+        scoreGap: null,
       },
       evidence: [],
-      debug: isProduction(req.env) ? undefined : { phases: [], reasonCodes: dbg.reasonCodes }
+      debug: isProduction(req.env)
+        ? undefined
+        : { phases: [], reasonCodes: dbg.reasonCodes },
     };
   }
 }

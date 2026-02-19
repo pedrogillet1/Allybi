@@ -54,7 +54,12 @@ export type AnswerMode =
   | "help_steps"
   | "general_answer";
 
-export type NavType = "open" | "where" | "discover" | "disambiguate" | "not_found";
+export type NavType =
+  | "open"
+  | "where"
+  | "discover"
+  | "disambiguate"
+  | "not_found";
 
 export interface AnswerModeRouterInput {
   operator: string; // open, locate_file, locate_docs, summarize, extract, compute, compare...
@@ -103,7 +108,11 @@ export interface AnswerModeRouterResult {
   // optional extras
   navType?: NavType;
   // for discovery nav_pills behavior
-  pillCount?: { single: boolean; maxPills: number; introOverride?: Record<string, string> };
+  pillCount?: {
+    single: boolean;
+    maxPills: number;
+    introOverride?: Record<string, string>;
+  };
 
   // for disambiguation
   clarify?: {
@@ -154,7 +163,11 @@ export class AnswerModeRouterService {
 
   route(input: AnswerModeRouterInput): AnswerModeRouterResult {
     // If bank is available, try bank-driven routing first.
-    if (this.bank?.config?.enabled && Array.isArray(this.bank.rules) && this.bank.rules.length > 0) {
+    if (
+      this.bank?.config?.enabled &&
+      Array.isArray(this.bank.rules) &&
+      this.bank.rules.length > 0
+    ) {
       const bankResult = this.routeWithBank(input);
       if (bankResult) return bankResult;
     }
@@ -166,7 +179,9 @@ export class AnswerModeRouterService {
   // -----------------------------
   // Bank-driven routing
   // -----------------------------
-  private routeWithBank(input: AnswerModeRouterInput): AnswerModeRouterResult | null {
+  private routeWithBank(
+    input: AnswerModeRouterInput,
+  ): AnswerModeRouterResult | null {
     // Rules are evaluated by priority desc
     const rules = [...this.bank!.rules].sort((a, b) => b.priority - a.priority);
 
@@ -198,8 +213,16 @@ export class AnswerModeRouterService {
   private evalWhen(when: any, input: any): boolean {
     if (!when || Object.keys(when).length === 0) return true;
 
-    if (when.all) return Array.isArray(when.all) && when.all.every((c: any) => this.evalWhen(c, input));
-    if (when.any) return Array.isArray(when.any) && when.any.some((c: any) => this.evalWhen(c, input));
+    if (when.all)
+      return (
+        Array.isArray(when.all) &&
+        when.all.every((c: any) => this.evalWhen(c, input))
+      );
+    if (when.any)
+      return (
+        Array.isArray(when.any) &&
+        when.any.some((c: any) => this.evalWhen(c, input))
+      );
 
     // leaf
     const path = when.path;
@@ -223,11 +246,17 @@ export class AnswerModeRouterService {
       case "gt":
         return typeof actual === "number" && actual > value;
       case "exists":
-        return value === true ? actual !== undefined && actual !== null : actual === undefined || actual === null;
+        return value === true
+          ? actual !== undefined && actual !== null
+          : actual === undefined || actual === null;
       case "in":
         return Array.isArray(value) && value.includes(actual);
       case "startsWith":
-        return typeof actual === "string" && typeof value === "string" && actual.startsWith(value);
+        return (
+          typeof actual === "string" &&
+          typeof value === "string" &&
+          actual.startsWith(value)
+        );
       default:
         return false;
     }
@@ -236,7 +265,9 @@ export class AnswerModeRouterService {
   // -----------------------------
   // Default routing (deterministic)
   // -----------------------------
-  private routeWithDefaults(input: AnswerModeRouterInput): AnswerModeRouterResult {
+  private routeWithDefaults(
+    input: AnswerModeRouterInput,
+  ): AnswerModeRouterResult {
     // 1) Policy refusal
     if (input.policy?.refusalRequired) {
       return { mode: "refusal", reason: "policy_refusal_required" };
@@ -267,9 +298,16 @@ export class AnswerModeRouterService {
       return { mode: "nav_pills", reason: "open_operator", navType: "open" };
     }
     if (input.operator === "locate_file" || input.operator === "where") {
-      return { mode: "nav_pills", reason: "locate_file_operator", navType: "where" };
+      return {
+        mode: "nav_pills",
+        reason: "locate_file_operator",
+        navType: "where",
+      };
     }
-    if (input.operator === "locate_docs" || input.signals?.discoveryQuery === true) {
+    if (
+      input.operator === "locate_docs" ||
+      input.signals?.discoveryQuery === true
+    ) {
       const single = topScore >= 0.8 && margin >= 0.08;
       return {
         mode: "nav_pills",
@@ -290,29 +328,49 @@ export class AnswerModeRouterService {
     }
 
     // 5) Help
-    if (input.intentFamily === "help" || input.operator === "capabilities" || input.operator === "how_to") {
+    if (
+      input.intentFamily === "help" ||
+      input.operator === "capabilities" ||
+      input.operator === "how_to"
+    ) {
       return { mode: "help_steps", reason: "help_intent" };
     }
 
     // 6) Quote request
-    if (input.signals?.userAskedForQuote === true && input.userPrefs?.noQuotes !== true) {
+    if (
+      input.signals?.userAskedForQuote === true &&
+      input.userPrefs?.noQuotes !== true
+    ) {
       return { mode: "doc_grounded_quote", reason: "explicit_quote_request" };
     }
 
     // 7) Table request or JSON request -> table (never JSON)
-    if (input.signals?.userAskedForTable === true || input.signals?.userAskedForJson === true) {
-      return { mode: "doc_grounded_table", reason: "table_or_json_request_mapped" };
+    if (
+      input.signals?.userAskedForTable === true ||
+      input.signals?.userAskedForJson === true
+    ) {
+      return {
+        mode: "doc_grounded_table",
+        reason: "table_or_json_request_mapped",
+      };
     }
 
     // 8) Compare request
-    if (input.signals?.userAskedForComparison === true || input.operator === "compare") {
+    if (
+      input.signals?.userAskedForComparison === true ||
+      input.operator === "compare"
+    ) {
       return { mode: "doc_grounded_multi", reason: "comparison_request" };
     }
 
     // 9) Disambiguate if ambiguous
     if (candidateCount >= 2) {
       if (margin < 0.03 || topScore < 0.4) {
-        return { mode: "rank_disambiguate", reason: "ambiguous_doc_choice", clarify: { reasonCode: "needs_doc_choice" } };
+        return {
+          mode: "rank_disambiguate",
+          reason: "ambiguous_doc_choice",
+          clarify: { reasonCode: "needs_doc_choice" },
+        };
       }
     }
 
@@ -338,10 +396,17 @@ export class AnswerModeRouterService {
   // -----------------------------
   // Hard guardrails applied to any output
   // -----------------------------
-  private applyHardGuardrails(out: AnswerModeRouterResult, input: AnswerModeRouterInput): AnswerModeRouterResult {
+  private applyHardGuardrails(
+    out: AnswerModeRouterResult,
+    input: AnswerModeRouterInput,
+  ): AnswerModeRouterResult {
     // Never doc-grounded if no docs
     if ((input.docContext.docCount ?? 0) <= 0) {
-      if (out.mode.startsWith("doc_grounded") || out.mode === "rank_autopick" || out.mode === "rank_disambiguate") {
+      if (
+        out.mode.startsWith("doc_grounded") ||
+        out.mode === "rank_autopick" ||
+        out.mode === "rank_disambiguate"
+      ) {
         return { mode: "no_docs", reason: "no_docs_indexed", debug: out.debug };
       }
     }
@@ -353,7 +418,10 @@ export class AnswerModeRouterService {
     }
 
     // scoped_not_found should only happen when docs exist
-    if (out.mode === "scoped_not_found" && (input.docContext.docCount ?? 0) <= 0) {
+    if (
+      out.mode === "scoped_not_found" &&
+      (input.docContext.docCount ?? 0) <= 0
+    ) {
       return { mode: "no_docs", reason: "no_docs_indexed", debug: out.debug };
     }
 

@@ -11,16 +11,20 @@
  * - Hard-wired into AnswerEngine/Retrieval/Validation
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import { resolveDataDir, assertDataFilesExist, REQUIRED_PROMPT_CONFIG_FILES } from '../../utils/resolveDataDir';
-import { getDataFilePath, DataFileName } from '../../config/dataPaths';
+import * as fs from "fs";
+import * as path from "path";
+import {
+  resolveDataDir,
+  assertDataFilesExist,
+  REQUIRED_PROMPT_CONFIG_FILES,
+} from "../../utils/resolveDataDir";
+import { getDataFilePath, DataFileName } from "../../config/dataPaths";
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export type LanguageCode = 'en' | 'pt' | 'es';
+export type LanguageCode = "en" | "pt" | "es";
 
 export interface SystemPromptEntry {
   mode: string;
@@ -311,34 +315,34 @@ export interface IntentConfigsMap {
  * All 25 intent IDs
  */
 export const ALL_INTENT_IDS = [
-  'DOC_QA',
-  'DOC_ANALYTICS',
-  'DOC_MANAGEMENT',
-  'DOC_SEARCH',
-  'DOC_SUMMARIZE',
-  'PREFERENCE_UPDATE',
-  'MEMORY_STORE',
-  'MEMORY_RECALL',
-  'ANSWER_REWRITE',
-  'ANSWER_EXPAND',
-  'ANSWER_SIMPLIFY',
-  'FEEDBACK_POSITIVE',
-  'FEEDBACK_NEGATIVE',
-  'PRODUCT_HELP',
-  'ONBOARDING_HELP',
-  'FEATURE_REQUEST',
-  'GENERIC_KNOWLEDGE',
-  'REASONING_TASK',
-  'TEXT_TRANSFORM',
-  'CHITCHAT',
-  'META_AI',
-  'OUT_OF_SCOPE',
-  'AMBIGUOUS',
-  'SAFETY_CONCERN',
-  'MULTI_INTENT',
+  "DOC_QA",
+  "DOC_ANALYTICS",
+  "DOC_MANAGEMENT",
+  "DOC_SEARCH",
+  "DOC_SUMMARIZE",
+  "PREFERENCE_UPDATE",
+  "MEMORY_STORE",
+  "MEMORY_RECALL",
+  "ANSWER_REWRITE",
+  "ANSWER_EXPAND",
+  "ANSWER_SIMPLIFY",
+  "FEEDBACK_POSITIVE",
+  "FEEDBACK_NEGATIVE",
+  "PRODUCT_HELP",
+  "ONBOARDING_HELP",
+  "FEATURE_REQUEST",
+  "GENERIC_KNOWLEDGE",
+  "REASONING_TASK",
+  "TEXT_TRANSFORM",
+  "CHITCHAT",
+  "META_AI",
+  "OUT_OF_SCOPE",
+  "AMBIGUOUS",
+  "SAFETY_CONCERN",
+  "MULTI_INTENT",
 ] as const;
 
-export type IntentId = typeof ALL_INTENT_IDS[number];
+export type IntentId = (typeof ALL_INTENT_IDS)[number];
 
 /**
  * Complete bundle of all prompt configurations
@@ -450,16 +454,21 @@ export interface LoggerLike {
  */
 function transformModularToArrayFormat(config: any): SystemPromptsConfig {
   // Prompt-bank format: prompts/system_prompt.any.json
-  if (config?._meta?.id === 'system_prompt' && config?.templates && !config?.prompts) {
+  if (
+    config?._meta?.id === "system_prompt" &&
+    config?.templates &&
+    !config?.prompts
+  ) {
     const languages: any = {};
-    for (const lang of ['en', 'pt', 'es'] as LanguageCode[]) {
-      const sys = config?.templates?.[lang]?.system ?? config?.templates?.any?.system;
+    for (const lang of ["en", "pt", "es"] as LanguageCode[]) {
+      const sys =
+        config?.templates?.[lang]?.system ?? config?.templates?.any?.system;
       if (Array.isArray(sys) && sys.length) {
         languages[lang] = {
-          systemPrompt: sys.join('\n'),
+          systemPrompt: sys.join("\n"),
           constraints: [],
         };
-      } else if (typeof sys === 'string' && sys.trim()) {
+      } else if (typeof sys === "string" && sys.trim()) {
         languages[lang] = {
           systemPrompt: sys,
           constraints: [],
@@ -468,12 +477,14 @@ function transformModularToArrayFormat(config: any): SystemPromptsConfig {
     }
 
     return {
-      version: config?._meta?.version || '1.0.0',
-      lastUpdated: config?._meta?.lastUpdated || new Date().toISOString().split('T')[0],
+      version: config?._meta?.version || "1.0.0",
+      lastUpdated:
+        config?._meta?.lastUpdated || new Date().toISOString().split("T")[0],
       prompts: [
         {
-          mode: 'DEFAULT',
-          description: config?._meta?.description || 'Default bank-backed system prompt',
+          mode: "DEFAULT",
+          description:
+            config?._meta?.description || "Default bank-backed system prompt",
           languages,
         },
       ],
@@ -488,7 +499,7 @@ function transformModularToArrayFormat(config: any): SystemPromptsConfig {
     // Add global base as a special "GLOBAL" prompt
     if (modular.global?.base) {
       const languages: any = {};
-      for (const lang of ['en', 'pt', 'es'] as LanguageCode[]) {
+      for (const lang of ["en", "pt", "es"] as LanguageCode[]) {
         if (modular.global.base[lang]) {
           languages[lang] = {
             systemPrompt: modular.global.base[lang],
@@ -497,8 +508,8 @@ function transformModularToArrayFormat(config: any): SystemPromptsConfig {
         }
       }
       prompts.push({
-        mode: 'GLOBAL',
-        description: 'Global base prompt',
+        mode: "GLOBAL",
+        description: "Global base prompt",
         languages,
       });
     }
@@ -506,13 +517,13 @@ function transformModularToArrayFormat(config: any): SystemPromptsConfig {
     // Transform intentFamilies to prompts array
     for (const [family, langData] of Object.entries(modular.intentFamilies)) {
       const languages: any = {};
-      for (const lang of ['en', 'pt', 'es'] as LanguageCode[]) {
+      for (const lang of ["en", "pt", "es"] as LanguageCode[]) {
         const prompt = (langData as any)[lang];
         if (prompt) {
           // Combine global base + intent family prompt
-          const globalBase = modular.global?.base?.[lang] || '';
+          const globalBase = modular.global?.base?.[lang] || "";
           languages[lang] = {
-            systemPrompt: globalBase + '\n\n' + prompt,
+            systemPrompt: globalBase + "\n\n" + prompt,
             constraints: [],
           };
         }
@@ -528,7 +539,7 @@ function transformModularToArrayFormat(config: any): SystemPromptsConfig {
     if (modular.operators) {
       for (const [operator, langData] of Object.entries(modular.operators)) {
         const languages: any = {};
-        for (const lang of ['en', 'pt', 'es'] as LanguageCode[]) {
+        for (const lang of ["en", "pt", "es"] as LanguageCode[]) {
           const prompt = (langData as any)[lang];
           if (prompt) {
             languages[lang] = {
@@ -547,11 +558,14 @@ function transformModularToArrayFormat(config: any): SystemPromptsConfig {
       }
     }
 
-    console.log(`[PromptConfig] Transformed modular format to ${prompts.length} prompts`);
+    console.log(
+      `[PromptConfig] Transformed modular format to ${prompts.length} prompts`,
+    );
 
     return {
-      version: modular.version || '2.0.0',
-      lastUpdated: modular.lastUpdated || new Date().toISOString().split('T')[0],
+      version: modular.version || "2.0.0",
+      lastUpdated:
+        modular.lastUpdated || new Date().toISOString().split("T")[0],
       prompts,
     };
   }
@@ -567,14 +581,18 @@ function transformModularToArrayFormat(config: any): SystemPromptsConfig {
 export class PromptConfigService {
   private bundle: PromptConfigBundle | null = null;
   private dataDir: string;
-  private env: 'dev' | 'prod' | 'test';
+  private env: "dev" | "prod" | "test";
   private logger: LoggerLike;
   private loadedAt: number = 0;
-  private fileMetadata: Array<{ name: string; bytes: number; sha256?: string }> = [];
+  private fileMetadata: Array<{
+    name: string;
+    bytes: number;
+    sha256?: string;
+  }> = [];
 
   constructor(opts: {
     dataDir?: string;
-    env: 'dev' | 'prod' | 'test';
+    env: "dev" | "prod" | "test";
     logger?: LoggerLike;
     enableHotReload?: boolean;
   }) {
@@ -583,7 +601,9 @@ export class PromptConfigService {
     this.logger = opts.logger || console;
 
     if (opts.enableHotReload) {
-      this.logger.warn('[PromptConfig] Hot reload requested but not implemented in MVP');
+      this.logger.warn(
+        "[PromptConfig] Hot reload requested but not implemented in MVP",
+      );
     }
   }
 
@@ -601,43 +621,75 @@ export class PromptConfigService {
 
       // Step 2: Load all JSON files
       // Transform modular format (v2.0.0) to array format if needed
-      const rawSystemPrompts = this.loadJSON<any>('prompts/system_prompt.any.json');
+      const rawSystemPrompts = this.loadJSON<any>(
+        "prompts/system_prompt.any.json",
+      );
       const systemPrompts = transformModularToArrayFormat(rawSystemPrompts);
-      const answerStyles = this.loadJSON<AnswerStylesConfig>('answer_styles.json');
-      const answerExamples = this.loadJSON<AnswerExamplesConfig>('answer_examples.json');
-      const markdownComponents = this.loadJSON<MarkdownComponentsConfig>('markdown_components.json');
-      const tablePresets = this.loadJSON<TablePresetsConfig>('table_presets.json');
-      const validationPolicies = this.loadJSON<ValidationPoliciesConfig>('validation_policies.json');
-      const retrievalPolicies = this.loadJSON<RetrievalPoliciesConfig>('retrieval_policies.json');
-      const errorLocalization = this.loadJSON<ErrorLocalizationConfig>('error_localization.json');
+      const answerStyles =
+        this.loadJSON<AnswerStylesConfig>("answer_styles.json");
+      const answerExamples = this.loadJSON<AnswerExamplesConfig>(
+        "answer_examples.json",
+      );
+      const markdownComponents = this.loadJSON<MarkdownComponentsConfig>(
+        "markdown_components.json",
+      );
+      const tablePresets =
+        this.loadJSON<TablePresetsConfig>("table_presets.json");
+      const validationPolicies = this.loadJSON<ValidationPoliciesConfig>(
+        "validation_policies.json",
+      );
+      const retrievalPolicies = this.loadJSON<RetrievalPoliciesConfig>(
+        "retrieval_policies.json",
+      );
+      const errorLocalization = this.loadJSON<ErrorLocalizationConfig>(
+        "error_localization.json",
+      );
 
       // Optional files (basic)
-      const languageProfiles = this.loadJSONOptional<LanguageProfilesConfig>('language_profiles.json');
-      const debugLabels = this.loadJSONOptional<DebugLabelsConfig>('debug_labels.json');
+      const languageProfiles = this.loadJSONOptional<LanguageProfilesConfig>(
+        "language_profiles.json",
+      );
+      const debugLabels =
+        this.loadJSONOptional<DebugLabelsConfig>("debug_labels.json");
 
       // Extended optional files
-      const fallbacks = this.loadJSONOptional<FallbacksConfig>('fallbacks.json');
-      const productHelp = this.loadJSONOptional<ProductHelpConfig>('koda_product_help.json');
-      const capabilitiesCatalog = this.loadJSONOptional<CapabilitiesCatalogConfig>('capabilities_catalog.json');
+      const fallbacks =
+        this.loadJSONOptional<FallbacksConfig>("fallbacks.json");
+      const productHelp = this.loadJSONOptional<ProductHelpConfig>(
+        "koda_product_help.json",
+      );
+      const capabilitiesCatalog =
+        this.loadJSONOptional<CapabilitiesCatalogConfig>(
+          "capabilities_catalog.json",
+        );
       // CHATGPT PARITY: Skip loading 95MB intent_patterns.json - it was NEVER USED
       // getIntentPatternsConfig() and getIntentPatterns() were never called
       // All routing uses RuntimePatternsService with intent_patterns.runtime.json
       const intentPatterns: IntentPatternsConfig | undefined = undefined;
-      const analyticsPhrases = this.loadJSONOptional<AnalyticsPhrasesConfig>('analytics_phrases.json');
-      const docAliases = this.loadJSONOptional<DocAliasesConfig>('doc_aliases.json');
-      const docQuerySynonyms = this.loadJSONOptional<DocQuerySynonymsConfig>('doc_query_synonyms.json');
+      const analyticsPhrases = this.loadJSONOptional<AnalyticsPhrasesConfig>(
+        "analytics_phrases.json",
+      );
+      const docAliases =
+        this.loadJSONOptional<DocAliasesConfig>("doc_aliases.json");
+      const docQuerySynonyms = this.loadJSONOptional<DocQuerySynonymsConfig>(
+        "doc_query_synonyms.json",
+      );
 
       // Load all 25 individual intent configs
       const intentConfigs: IntentConfigsMap = {};
       let loadedIntentCount = 0;
       for (const intentId of ALL_INTENT_IDS) {
-        const intentConfig = this.loadJSONOptional<IndividualIntentConfig>(`${intentId}.json`);
+        const intentConfig = this.loadJSONOptional<IndividualIntentConfig>(
+          `${intentId}.json`,
+        );
         if (intentConfig) {
           intentConfigs[intentId] = intentConfig;
           loadedIntentCount++;
         }
       }
-      this.logger.info(`[PromptConfig] Loaded ${loadedIntentCount}/${ALL_INTENT_IDS.length} individual intent configs`);
+      this.logger.info(
+        `[PromptConfig] Loaded ${loadedIntentCount}/${ALL_INTENT_IDS.length} individual intent configs`,
+      );
 
       // Step 3: Validate schemas
       this.validateSystemPrompts(systemPrompts);
@@ -675,10 +727,12 @@ export class PromptConfigService {
       const duration = this.loadedAt - startTime;
 
       this.logger.info(
-        `[PromptConfig] Loaded ${this.fileMetadata.length} files in ${duration}ms`
+        `[PromptConfig] Loaded ${this.fileMetadata.length} files in ${duration}ms`,
       );
     } catch (error: any) {
-      this.logger.error(`[PromptConfig] Initialization failed: ${error.message}`);
+      this.logger.error(
+        `[PromptConfig] Initialization failed: ${error.message}`,
+      );
       throw new Error(`PromptConfig initialization failed: ${error.message}`);
     }
   }
@@ -705,12 +759,14 @@ export class PromptConfigService {
 
     // Find prompt by mode (intentKey)
     const promptEntry = this.bundle!.systemPrompts.prompts.find(
-      (p) => p.mode === intentKey || p.mode.toUpperCase() === intentKey.toUpperCase()
+      (p) =>
+        p.mode === intentKey ||
+        p.mode.toUpperCase() === intentKey.toUpperCase(),
     );
 
     if (!promptEntry) {
       const error = `System prompt not found for intent: ${intentKey}`;
-      if (this.env === 'prod') {
+      if (this.env === "prod") {
         throw new Error(error);
       } else {
         this.logger.warn(`[PromptConfig] ${error} (using fallback)`);
@@ -721,11 +777,14 @@ export class PromptConfigService {
     const langData = promptEntry.languages[language];
     if (!langData) {
       const error = `System prompt not found for language: ${language} (intent: ${intentKey})`;
-      if (this.env === 'prod') {
+      if (this.env === "prod") {
         throw new Error(error);
       } else {
         this.logger.warn(`[PromptConfig] ${error} (trying 'en')`);
-        return promptEntry.languages['en']?.systemPrompt || this.getFallbackSystemPrompt(intentKey, language);
+        return (
+          promptEntry.languages["en"]?.systemPrompt ||
+          this.getFallbackSystemPrompt(intentKey, language)
+        );
       }
     }
 
@@ -742,12 +801,12 @@ export class PromptConfigService {
   }): AnswerStyleResolved {
     this.assertInitialized();
 
-    const { styleId, language, questionType = 'DEFAULT' } = args;
+    const { styleId, language, questionType = "DEFAULT" } = args;
 
     const intentStyles = this.bundle!.answerStyles[styleId];
     if (!intentStyles) {
       const error = `Answer style not found for styleId: ${styleId}`;
-      if (this.env === 'prod') {
+      if (this.env === "prod") {
         throw new Error(error);
       } else {
         this.logger.warn(`[PromptConfig] ${error} (using default)`);
@@ -755,12 +814,15 @@ export class PromptConfigService {
       }
     }
 
-    const questionTypeStyles = intentStyles[questionType] || intentStyles['DEFAULT'] || intentStyles[Object.keys(intentStyles)[0]];
+    const questionTypeStyles =
+      intentStyles[questionType] ||
+      intentStyles["DEFAULT"] ||
+      intentStyles[Object.keys(intentStyles)[0]];
     if (!questionTypeStyles) {
       return this.getDefaultAnswerStyle();
     }
 
-    const langStyle = questionTypeStyles[language] || questionTypeStyles['en'];
+    const langStyle = questionTypeStyles[language] || questionTypeStyles["en"];
     return langStyle || this.getDefaultAnswerStyle();
   }
 
@@ -782,7 +844,7 @@ export class PromptConfigService {
       return [];
     }
 
-    const langExamples = intentExamples[language] || intentExamples['en'];
+    const langExamples = intentExamples[language] || intentExamples["en"];
     if (!langExamples || !Array.isArray(langExamples)) {
       return [];
     }
@@ -803,11 +865,13 @@ export class PromptConfigService {
 
     const component = this.bundle!.markdownComponents.components[componentKey];
     if (!component) {
-      this.logger.warn(`[PromptConfig] Markdown component not found: ${componentKey}`);
-      return '';
+      this.logger.warn(
+        `[PromptConfig] Markdown component not found: ${componentKey}`,
+      );
+      return "";
     }
 
-    return component[language] || component['en'] || '';
+    return component[language] || component["en"] || "";
   }
 
   /**
@@ -830,17 +894,21 @@ export class PromptConfigService {
   /**
    * Get validation policy
    */
-  public getValidationPolicy(args: { intentKey: string }): ValidationPolicy | null {
+  public getValidationPolicy(args: {
+    intentKey: string;
+  }): ValidationPolicy | null {
     this.assertInitialized();
 
     const { intentKey } = args;
 
     const policy = this.bundle!.validationPolicies.policies.find(
-      (p) => p.category === intentKey || p.name === intentKey
+      (p) => p.category === intentKey || p.name === intentKey,
     );
 
     if (!policy) {
-      this.logger.warn(`[PromptConfig] Validation policy not found: ${intentKey}`);
+      this.logger.warn(
+        `[PromptConfig] Validation policy not found: ${intentKey}`,
+      );
       return null;
     }
 
@@ -859,11 +927,15 @@ export class PromptConfigService {
     const { intentKey } = args;
 
     const policy = this.bundle!.retrievalPolicies.policies.find(
-      (p) => p.intentType === intentKey || p.intentType.toUpperCase() === intentKey.toUpperCase()
+      (p) =>
+        p.intentType === intentKey ||
+        p.intentType.toUpperCase() === intentKey.toUpperCase(),
     );
 
     if (!policy) {
-      this.logger.warn(`[PromptConfig] Retrieval policy not found: ${intentKey}`);
+      this.logger.warn(
+        `[PromptConfig] Retrieval policy not found: ${intentKey}`,
+      );
       return null;
     }
 
@@ -886,7 +958,9 @@ export class PromptConfigService {
       return `Error: ${errorKey}`;
     }
 
-    return errorMessages[language] || errorMessages['en'] || `Error: ${errorKey}`;
+    return (
+      errorMessages[language] || errorMessages["en"] || `Error: ${errorKey}`
+    );
   }
 
   /**
@@ -923,25 +997,29 @@ export class PromptConfigService {
     const { fallbackKey, language, styleId } = args;
 
     if (!this.bundle!.fallbacks) {
-      this.logger.warn('[PromptConfig] Fallbacks config not loaded');
+      this.logger.warn("[PromptConfig] Fallbacks config not loaded");
       return null;
     }
 
-    const fallback = this.bundle!.fallbacks.fallbacks.find(f => f.key === fallbackKey);
+    const fallback = this.bundle!.fallbacks.fallbacks.find(
+      (f) => f.key === fallbackKey,
+    );
     if (!fallback) {
       this.logger.warn(`[PromptConfig] Fallback not found: ${fallbackKey}`);
       return null;
     }
 
     // Find the style (use specified, default, or first available)
-    const targetStyleId = styleId || fallback.defaultStyleId || fallback.styles[0]?.id;
-    const style = fallback.styles.find(s => s.id === targetStyleId) || fallback.styles[0];
+    const targetStyleId =
+      styleId || fallback.defaultStyleId || fallback.styles[0]?.id;
+    const style =
+      fallback.styles.find((s) => s.id === targetStyleId) || fallback.styles[0];
 
     if (!style) {
       return null;
     }
 
-    const langTemplate = style.languages[language] || style.languages['en'];
+    const langTemplate = style.languages[language] || style.languages["en"];
     return langTemplate?.template || null;
   }
 
@@ -965,17 +1043,19 @@ export class PromptConfigService {
     const { topicId, language } = args;
 
     if (!this.bundle!.productHelp) {
-      this.logger.warn('[PromptConfig] Product help config not loaded');
+      this.logger.warn("[PromptConfig] Product help config not loaded");
       return null;
     }
 
-    const topic = this.bundle!.productHelp.topics.find(t => t.id === topicId);
+    const topic = this.bundle!.productHelp.topics.find((t) => t.id === topicId);
     if (!topic) {
-      this.logger.warn(`[PromptConfig] Product help topic not found: ${topicId}`);
+      this.logger.warn(
+        `[PromptConfig] Product help topic not found: ${topicId}`,
+      );
       return null;
     }
 
-    const content = topic.content[language] || topic.content['en'];
+    const content = topic.content[language] || topic.content["en"];
     return content || null;
   }
 
@@ -999,15 +1079,18 @@ export class PromptConfigService {
 
     for (const topic of this.bundle!.productHelp.topics) {
       // Check keywords
-      const keywords = topic.keywords?.[language] || topic.keywords?.['en'] || [];
-      const matchesKeyword = keywords.some(k => k.toLowerCase().includes(keywordLower));
+      const keywords =
+        topic.keywords?.[language] || topic.keywords?.["en"] || [];
+      const matchesKeyword = keywords.some((k) =>
+        k.toLowerCase().includes(keywordLower),
+      );
 
       // Check title/body
-      const content = topic.content[language] || topic.content['en'];
-      const matchesContent = content && (
-        content.title.toLowerCase().includes(keywordLower) ||
-        content.body.toLowerCase().includes(keywordLower)
-      );
+      const content = topic.content[language] || topic.content["en"];
+      const matchesContent =
+        content &&
+        (content.title.toLowerCase().includes(keywordLower) ||
+          content.body.toLowerCase().includes(keywordLower));
 
       if (matchesKeyword || matchesContent) {
         results.push({
@@ -1034,26 +1117,34 @@ export class PromptConfigService {
   public getCapability(args: {
     capabilityId: string;
     language: LanguageCode;
-  }): { name: string; description: string; examples?: string[]; enabled: boolean } | null {
+  }): {
+    name: string;
+    description: string;
+    examples?: string[];
+    enabled: boolean;
+  } | null {
     this.assertInitialized();
 
     const { capabilityId, language } = args;
 
     if (!this.bundle!.capabilitiesCatalog) {
-      this.logger.warn('[PromptConfig] Capabilities catalog not loaded');
+      this.logger.warn("[PromptConfig] Capabilities catalog not loaded");
       return null;
     }
 
-    const capability = this.bundle!.capabilitiesCatalog.capabilities.find(c => c.id === capabilityId);
+    const capability = this.bundle!.capabilitiesCatalog.capabilities.find(
+      (c) => c.id === capabilityId,
+    );
     if (!capability) {
       this.logger.warn(`[PromptConfig] Capability not found: ${capabilityId}`);
       return null;
     }
 
     return {
-      name: capability.name[language] || capability.name['en'] || capabilityId,
-      description: capability.description[language] || capability.description['en'] || '',
-      examples: capability.examples?.[language] || capability.examples?.['en'],
+      name: capability.name[language] || capability.name["en"] || capabilityId,
+      description:
+        capability.description[language] || capability.description["en"] || "",
+      examples: capability.examples?.[language] || capability.examples?.["en"],
       enabled: capability.enabled,
     };
   }
@@ -1061,20 +1152,22 @@ export class PromptConfigService {
   /**
    * Get all enabled capabilities
    */
-  public getEnabledCapabilities(language: LanguageCode): Array<{ id: string; name: string; description: string }> {
+  public getEnabledCapabilities(
+    language: LanguageCode,
+  ): Array<{ id: string; name: string; description: string }> {
     this.assertInitialized();
 
     if (!this.bundle!.capabilitiesCatalog) {
       return [];
     }
 
-    return this.bundle!.capabilitiesCatalog.capabilities
-      .filter(c => c.enabled)
-      .map(c => ({
-        id: c.id,
-        name: c.name[language] || c.name['en'] || c.id,
-        description: c.description[language] || c.description['en'] || '',
-      }));
+    return this.bundle!.capabilitiesCatalog.capabilities.filter(
+      (c) => c.enabled,
+    ).map((c) => ({
+      id: c.id,
+      name: c.name[language] || c.name["en"] || c.id,
+      description: c.description[language] || c.description["en"] || "",
+    }));
   }
 
   /**
@@ -1126,7 +1219,7 @@ export class PromptConfigService {
       return [];
     }
 
-    return categoryPhrases[language] || categoryPhrases['en'] || [];
+    return categoryPhrases[language] || categoryPhrases["en"] || [];
   }
 
   /**
@@ -1155,7 +1248,9 @@ export class PromptConfigService {
     }
 
     // Try case-insensitive match
-    for (const [key, value] of Object.entries(this.bundle!.docAliases.aliases)) {
+    for (const [key, value] of Object.entries(
+      this.bundle!.docAliases.aliases,
+    )) {
       if (key.toLowerCase() === aliasLower) {
         return value;
       }
@@ -1190,7 +1285,9 @@ export class PromptConfigService {
     }
 
     // Try case-insensitive match
-    for (const [key, value] of Object.entries(this.bundle!.docQuerySynonyms.synonyms)) {
+    for (const [key, value] of Object.entries(
+      this.bundle!.docQuerySynonyms.synonyms,
+    )) {
       if (key.toLowerCase() === termLower) {
         return value;
       }
@@ -1215,7 +1312,10 @@ export class PromptConfigService {
     for (const word of words) {
       const synonyms = this.getQuerySynonyms(word);
       for (const synonym of synonyms) {
-        const expandedQuery = query.replace(new RegExp(`\\b${word}\\b`, 'gi'), synonym);
+        const expandedQuery = query.replace(
+          new RegExp(`\\b${word}\\b`, "gi"),
+          synonym,
+        );
         if (!expanded.includes(expandedQuery)) {
           expanded.push(expandedQuery);
         }
@@ -1248,7 +1348,9 @@ export class PromptConfigService {
   /**
    * Get individual intent config by ID
    */
-  public getIntentConfig(intentId: IntentId): IndividualIntentConfig | undefined {
+  public getIntentConfig(
+    intentId: IntentId,
+  ): IndividualIntentConfig | undefined {
     this.assertInitialized();
     return this.bundle!.intentConfigs[intentId];
   }
@@ -1256,7 +1358,10 @@ export class PromptConfigService {
   /**
    * Get keywords for an intent and language
    */
-  public getIntentKeywords(intentId: IntentId, language: LanguageCode): string[] {
+  public getIntentKeywords(
+    intentId: IntentId,
+    language: LanguageCode,
+  ): string[] {
     this.assertInitialized();
 
     const config = this.bundle!.intentConfigs[intentId];
@@ -1264,10 +1369,12 @@ export class PromptConfigService {
       return [];
     }
 
-    const langMap: { [key in LanguageCode]: 'english' | 'portuguese' | 'spanish' } = {
-      en: 'english',
-      pt: 'portuguese',
-      es: 'spanish',
+    const langMap: {
+      [key in LanguageCode]: "english" | "portuguese" | "spanish";
+    } = {
+      en: "english",
+      pt: "portuguese",
+      es: "spanish",
     };
 
     return config.keywords[langMap[language]] || config.keywords.english || [];
@@ -1276,7 +1383,10 @@ export class PromptConfigService {
   /**
    * Get patterns for an intent and language
    */
-  public getIntentPatterns(intentId: IntentId, language: LanguageCode): string[] {
+  public getIntentPatterns(
+    intentId: IntentId,
+    language: LanguageCode,
+  ): string[] {
     this.assertInitialized();
 
     const config = this.bundle!.intentConfigs[intentId];
@@ -1284,10 +1394,12 @@ export class PromptConfigService {
       return [];
     }
 
-    const langMap: { [key in LanguageCode]: 'english' | 'portuguese' | 'spanish' } = {
-      en: 'english',
-      pt: 'portuguese',
-      es: 'spanish',
+    const langMap: {
+      [key in LanguageCode]: "english" | "portuguese" | "spanish";
+    } = {
+      en: "english",
+      pt: "portuguese",
+      es: "spanish",
     };
 
     return config.patterns[langMap[language]] || config.patterns.english || [];
@@ -1296,7 +1408,10 @@ export class PromptConfigService {
   /**
    * Get examples for an intent and language
    */
-  public getIntentExamples(intentId: IntentId, language: LanguageCode): string[] {
+  public getIntentExamples(
+    intentId: IntentId,
+    language: LanguageCode,
+  ): string[] {
     this.assertInitialized();
 
     const config = this.bundle!.intentConfigs[intentId];
@@ -1304,10 +1419,12 @@ export class PromptConfigService {
       return [];
     }
 
-    const langMap: { [key in LanguageCode]: 'english' | 'portuguese' | 'spanish' } = {
-      en: 'english',
-      pt: 'portuguese',
-      es: 'spanish',
+    const langMap: {
+      [key in LanguageCode]: "english" | "portuguese" | "spanish";
+    } = {
+      en: "english",
+      pt: "portuguese",
+      es: "spanish",
     };
 
     return config.examples[langMap[language]] || config.examples.english || [];
@@ -1339,7 +1456,7 @@ export class PromptConfigService {
     this.assertInitialized();
 
     const configs = this.bundle!.intentConfigs;
-    return ALL_INTENT_IDS.filter(id => configs[id] !== undefined);
+    return ALL_INTENT_IDS.filter((id) => configs[id] !== undefined);
   }
 
   /**
@@ -1356,7 +1473,9 @@ export class PromptConfigService {
 
   private assertInitialized(): void {
     if (!this.bundle) {
-      throw new Error('PromptConfigService not initialized. Call init() first.');
+      throw new Error(
+        "PromptConfigService not initialized. Call init() first.",
+      );
     }
   }
 
@@ -1371,12 +1490,12 @@ export class PromptConfigService {
     }
 
     try {
-      const content = fs.readFileSync(filePath, 'utf-8');
+      const content = fs.readFileSync(filePath, "utf-8");
       const data = JSON.parse(content);
 
       this.fileMetadata.push({
         name: filename,
-        bytes: Buffer.byteLength(content, 'utf-8'),
+        bytes: Buffer.byteLength(content, "utf-8"),
       });
 
       return data as T;
@@ -1403,73 +1522,98 @@ export class PromptConfigService {
     try {
       return this.loadJSON<T>(filename);
     } catch (error: any) {
-      this.logger.warn(`[PromptConfig] Failed to load optional file ${filename}: ${error.message}`);
+      this.logger.warn(
+        `[PromptConfig] Failed to load optional file ${filename}: ${error.message}`,
+      );
       return undefined;
     }
   }
 
   private validateSystemPrompts(config: SystemPromptsConfig): void {
     if (!config.prompts || !Array.isArray(config.prompts)) {
-      throw new Error('system prompt config: missing or invalid "prompts" array');
+      throw new Error(
+        'system prompt config: missing or invalid "prompts" array',
+      );
     }
 
     for (const prompt of config.prompts) {
       if (!prompt.mode) {
         throw new Error('system prompt config: prompt missing "mode" field');
       }
-      if (!prompt.languages || typeof prompt.languages !== 'object') {
-        throw new Error(`system prompt config: prompt "${prompt.mode}" missing "languages" object`);
+      if (!prompt.languages || typeof prompt.languages !== "object") {
+        throw new Error(
+          `system prompt config: prompt "${prompt.mode}" missing "languages" object`,
+        );
       }
     }
 
-    this.logger.info(`[PromptConfig] Validated ${config.prompts.length} system prompts`);
+    this.logger.info(
+      `[PromptConfig] Validated ${config.prompts.length} system prompts`,
+    );
   }
 
   private validateAnswerStyles(config: AnswerStylesConfig): void {
-    const intentKeys = Object.keys(config).filter(k => k !== '_comment');
+    const intentKeys = Object.keys(config).filter((k) => k !== "_comment");
 
     if (intentKeys.length === 0) {
-      throw new Error('answer_styles.json: no intent keys found');
+      throw new Error("answer_styles.json: no intent keys found");
     }
 
-    this.logger.info(`[PromptConfig] Validated ${intentKeys.length} answer style intents`);
+    this.logger.info(
+      `[PromptConfig] Validated ${intentKeys.length} answer style intents`,
+    );
   }
 
   private validateValidationPolicies(config: ValidationPoliciesConfig): void {
     if (!config.policies || !Array.isArray(config.policies)) {
-      throw new Error('validation_policies.json: missing or invalid "policies" array');
+      throw new Error(
+        'validation_policies.json: missing or invalid "policies" array',
+      );
     }
 
-    this.logger.info(`[PromptConfig] Validated ${config.policies.length} validation policies`);
+    this.logger.info(
+      `[PromptConfig] Validated ${config.policies.length} validation policies`,
+    );
   }
 
   private validateRetrievalPolicies(config: RetrievalPoliciesConfig): void {
     if (!config.policies || !Array.isArray(config.policies)) {
-      throw new Error('retrieval_policies.json: missing or invalid "policies" array');
+      throw new Error(
+        'retrieval_policies.json: missing or invalid "policies" array',
+      );
     }
 
     for (const policy of config.policies) {
       if (!policy.intentType) {
-        throw new Error('retrieval_policies.json: policy missing "intentType" field');
+        throw new Error(
+          'retrieval_policies.json: policy missing "intentType" field',
+        );
       }
       if (!policy.retrieval) {
-        throw new Error(`retrieval_policies.json: policy "${policy.intentType}" missing "retrieval" field`);
+        throw new Error(
+          `retrieval_policies.json: policy "${policy.intentType}" missing "retrieval" field`,
+        );
       }
     }
 
-    this.logger.info(`[PromptConfig] Validated ${config.policies.length} retrieval policies`);
+    this.logger.info(
+      `[PromptConfig] Validated ${config.policies.length} retrieval policies`,
+    );
   }
 
-  private getFallbackSystemPrompt(intentKey: string, language: LanguageCode): string {
+  private getFallbackSystemPrompt(
+    intentKey: string,
+    language: LanguageCode,
+  ): string {
     return `You are Allybi, an AI assistant. Answer the user's question helpfully and accurately.`;
   }
 
   private getDefaultAnswerStyle(): AnswerStyleResolved {
     return {
-      structure: 'paragraph',
-      tone: 'professional',
-      verbosity: 'balanced',
-      formatting: ['markdown'],
+      structure: "paragraph",
+      tone: "professional",
+      verbosity: "balanced",
+      formatting: ["markdown"],
     };
   }
 }
@@ -1486,7 +1630,9 @@ let promptConfigInstance: PromptConfigService | null = null;
  */
 export function getPromptConfig(): PromptConfigService {
   if (!promptConfigInstance) {
-    throw new Error('PromptConfig not initialized. Call initPromptConfig() at startup.');
+    throw new Error(
+      "PromptConfig not initialized. Call initPromptConfig() at startup.",
+    );
   }
   return promptConfigInstance;
 }
@@ -1497,11 +1643,11 @@ export function getPromptConfig(): PromptConfigService {
  */
 export function initPromptConfig(opts: {
   dataDir?: string;
-  env: 'dev' | 'prod' | 'test';
+  env: "dev" | "prod" | "test";
   logger?: LoggerLike;
 }): void {
   if (promptConfigInstance) {
-    console.warn('[PromptConfig] Already initialized, skipping');
+    console.warn("[PromptConfig] Already initialized, skipping");
     return;
   }
 

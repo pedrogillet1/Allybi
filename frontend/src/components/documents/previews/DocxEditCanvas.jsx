@@ -197,13 +197,6 @@ function stripLeadingListMarker(value) {
     .trim();
 }
 
-function normalizeHtmlForCompare(value) {
-  return String(value || '')
-    .replace(/\u00A0/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
 function ensureNonEmptyDocxHtml(value, fallbackText = '') {
   const html = String(value || '').trim();
   const plain = stripHtml(html).replace(/\u00A0/g, ' ').trim();
@@ -804,51 +797,8 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     el.style.boxShadow = 'inset 0 0 0 1px rgba(17, 24, 39, 0.10)';
   };
 
-	  const upsertDraftBadge = (el) => {
-	    // Inline "Draft" badges inside the document created visual duplication and appeared to
-	    // "move" during scrolling when multiple paragraphs were affected. The right-panel
-	    // confirmation strip already communicates draft state, so disable inline badges.
-	    return;
-	    if (!el) return;
-	    // Add badge (contentEditable=false so it doesn't get edited).
-	    try {
-	      const pid = String(el.getAttribute?.('data-paragraph-id') || '').trim();
-      // IMPORTANT: attach to the paragraph element. Attaching to the parent container
-      // makes badges look like they "move" when you scroll.
-      const host = el;
-      host.style.position = host.style.position || 'relative';
-
-      // Remove any previous badge for this paragraph.
-      try {
-        const old = pid
-          ? host.querySelector?.(`[data-allybi-draft-badge-for="${CSS.escape(pid)}"]`)
-          : host.querySelector?.('[data-allybi-draft-badge="1"]');
-        if (old && old.parentNode) old.parentNode.removeChild(old);
-      } catch {}
-
-      const badge = window.document.createElement('span');
-      badge.setAttribute('data-allybi-draft-badge', '1');
-      if (pid) badge.setAttribute('data-allybi-draft-badge-for', pid);
-      badge.setAttribute('data-allybi-ui', '1');
-      badge.setAttribute('contenteditable', 'false');
-      badge.innerText = 'Draft';
-      badge.style.position = 'absolute';
-      badge.style.top = '-12px';
-      badge.style.right = '0px';
-      badge.style.height = '22px';
-      badge.style.display = 'inline-flex';
-      badge.style.alignItems = 'center';
-      badge.style.padding = '0 10px';
-      badge.style.borderRadius = '999px';
-      badge.style.border = '1px solid rgba(17,24,39,0.12)';
-      badge.style.background = 'rgba(255,255,255,0.92)';
-      badge.style.fontFamily = 'Plus Jakarta Sans, sans-serif';
-      badge.style.fontWeight = '900';
-      badge.style.fontSize = '11px';
-      badge.style.color = '#111827';
-      badge.style.boxShadow = '0 10px 22px rgba(17,24,39,0.08)';
-      host.appendChild(badge);
-    } catch {}
+  const upsertDraftBadge = () => {
+    // Inline draft badges are intentionally disabled.
   };
 
   const clearDraftDecoration = (el) => {
@@ -1563,7 +1513,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     const effectiveProposedText = toRequiredEditText(proposedText);
     const baselineHtml = actions.getBaseline(paragraphId) || toHtmlFromPlain(beforeTextRaw).trim();
     const textChanged = proposedText !== beforeTextRaw.trim();
-    const htmlChanged = normalizeHtmlForCompare(nextHtml) !== normalizeHtmlForCompare(baselineHtml);
+    const htmlChanged = sanitizeDocxRichHtml(nextHtml) !== sanitizeDocxRichHtml(baselineHtml);
 
     if (!textChanged && !htmlChanged) {
       if (!silent) {
@@ -1582,7 +1532,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
           kind: 'docx_paragraph',
           paragraphId,
           beforeText: beforeTextRaw,
-          afterText: proposedText,
+          afterText: toRequiredEditText(proposedText),
           afterHtml: safeBundleAfterHtml,
         }]
       : null;
@@ -1624,7 +1574,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
         console.warn('[DocxEditCanvas] Manual save: backend says noop', { res, paragraphId, beforeText, effectiveProposedText });
         const stillDirty =
           proposedText !== beforeTextRaw.trim() ||
-          normalizeHtmlForCompare(nextHtml) !== normalizeHtmlForCompare(baselineHtml);
+          sanitizeDocxRichHtml(nextHtml) !== sanitizeDocxRichHtml(baselineHtml);
         if (stillDirty) {
           if (!silent) {
             const msg = 'Save was rejected as no-op while local changes are still pending.';
@@ -1635,7 +1585,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
         }
         // Sync local baseline to prevent repeated noop save attempts caused by minor
         // local HTML normalization differences.
-        actions.updateBaseline(paragraphId, String(nextHtml || '').trim());
+        actions.updateBaseline(paragraphId, sanitizeDocxRichHtml(nextHtml || ''));
         actions.updateBlockText(paragraphId, proposedText);
         actions.clearDirty(paragraphId);
         onDirtyChangeRef.current?.(actions.getDirtyPids().length > 0);
@@ -1671,7 +1621,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       }
 
       // Atomic state update
-      actions.updateBaseline(paragraphId, String(nextHtml || '').trim());
+      actions.updateBaseline(paragraphId, sanitizeDocxRichHtml(nextHtml || ''));
       actions.updateBlockText(paragraphId, proposedText);
       actions.clearDirty(paragraphId);
       onDirtyChangeRef.current?.(actions.getDirtyPids().length > 0);
@@ -1725,18 +1675,13 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
 
   // Dedicated save function for explicit Save button.
   // Uses the same backend apply route as chat (bundle patches for DOCX paragraph updates).
-  const saveAllManualEdits = useCallback(async () => {
-    if (isManualSaveRef.current) return [];
-    isManualSaveRef.current = true;
-    const results = [];
-
-    // Collect candidates by real text/html diffs against the server baseline.
-    // Dirty tracking is treated as a hint only (it can become stale when focus moves).
+  const collectPendingEditCandidates = useCallback(() => {
     const candidatePidSet = new Set();
     const staleDirtyPids = [];
     const dirtySet = new Set(
       (actions.getDirtyPids?.() || []).map((p) => String(p || '').trim()).filter(Boolean),
     );
+
     for (const block of blocks) {
       const pid = String(block?.paragraphId || '').trim();
       if (!pid) continue;
@@ -1746,21 +1691,40 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
         if (dirtySet.has(pid)) staleDirtyPids.push(pid);
         continue;
       }
+
       const originalText = String(block.text || '').replace(/\u00A0/g, ' ').trim();
       const proposedText = String(liveText || '').trim();
       const baselineHtml = actions.getBaseline(pid) || toHtmlFromPlain(originalText).trim();
       const textChanged = proposedText !== originalText;
-      const htmlChanged = normalizeHtmlForCompare(liveHtml) !== normalizeHtmlForCompare(baselineHtml);
-      // Only treat HTML-only deltas as save candidates when the paragraph is
-      // explicitly dirty. This avoids repeated noop saves from harmless DOM drift.
+      const htmlChanged = sanitizeDocxRichHtml(liveHtml) !== sanitizeDocxRichHtml(baselineHtml);
+
+      // Only treat HTML-only deltas as save candidates when explicitly dirty.
+      // This avoids repeated noop saves from harmless DOM drift.
       if (textChanged || (dirtySet.has(pid) && htmlChanged)) {
         candidatePidSet.add(pid);
-      } else if (dirtySet.has(pid)) {
+      }
+    }
+
+    return {
+      dirtySet,
+      candidatePids: Array.from(candidatePidSet),
+      staleDirtyPids,
+    };
+  }, [actions, blocks, getLiveHtmlFor, getLiveTextFor]);
+
+  const saveAllManualEdits = useCallback(async () => {
+    if (isManualSaveRef.current) return [];
+    isManualSaveRef.current = true;
+    const results = [];
+
+    const { dirtySet, candidatePids, staleDirtyPids } = collectPendingEditCandidates();
+    const candidatePidSet = new Set(candidatePids);
+    for (const pid of Array.from(dirtySet)) {
+      if (!candidatePidSet.has(pid)) {
         // Drop stale dirty flags so Save button status matches reality.
         actions.clearDirty(pid);
       }
     }
-    const candidatePids = Array.from(candidatePidSet);
     for (const pid of staleDirtyPids) {
       actions.clearDirty(pid);
     }
@@ -1807,13 +1771,10 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     if (lastRevisionId) {
       onApplied?.({ revisionId: lastRevisionId });
     }
-    const pendingAfter = (actions.getDirtyPids?.() || [])
-      .map((pid) => String(pid || '').trim())
-      .filter(Boolean)
-      .some((pid) => getLiveTextFor(pid) != null && getLiveHtmlFor(pid) != null);
+    const pendingAfter = collectPendingEditCandidates().candidatePids.length > 0;
     onDirtyChangeRef.current?.(pendingAfter);
     return results;
-  }, [blocks, actions, getLiveTextFor, getLiveHtmlFor, submitSingleEdit, onApplied]);
+  }, [actions, collectPendingEditCandidates, submitSingleEdit, onApplied]);
 
   const scheduleAutoSave = useCallback(() => {
     if (readOnly) return;
@@ -1862,27 +1823,8 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   }, [commitParagraph]);
 
   const hasPendingEdits = useCallback(() => {
-    const dirtySet = new Set(
-      (actions.getDirtyPids?.() || []).map((pid) => String(pid || '').trim()).filter(Boolean),
-    );
-    for (const block of blocks) {
-      const pid = String(block?.paragraphId || '').trim();
-      if (!pid) continue;
-      const liveText = getLiveTextFor(pid);
-      const liveHtml = getLiveHtmlFor(pid);
-      if (liveText == null || liveHtml == null) {
-        // Ignore stale dirty ids that no longer resolve to a live paragraph node.
-        continue;
-      }
-      const originalText = String(block.text || '').replace(/\u00A0/g, ' ').trim();
-      const proposedText = String(liveText || '').trim();
-      const baselineHtml = actions.getBaseline(pid) || toHtmlFromPlain(originalText).trim();
-      const textChanged = proposedText !== originalText;
-      const htmlChanged = normalizeHtmlForCompare(liveHtml) !== normalizeHtmlForCompare(baselineHtml);
-      if (textChanged || htmlChanged || dirtySet.has(pid)) return true;
-    }
-    return false;
-  }, [actions, blocks, getLiveHtmlFor, getLiveTextFor]);
+    return collectPendingEditCandidates().candidatePids.length > 0;
+  }, [collectPendingEditCandidates]);
 
   const applySelected = useCallback(async () => {
     if (!docId || !selectedBlock?.paragraphId) return;

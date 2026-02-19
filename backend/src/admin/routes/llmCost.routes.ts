@@ -3,11 +3,14 @@
  * GET /api/admin/llm-cost
  */
 
-import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { listLlmCalls, getLlmSummary } from '../../services/admin';
-import { parseRange, normalizeRange } from '../../services/admin/_shared/rangeWindow';
-import { getGoogleMetrics } from '../../services/admin/googleMetrics.service';
+import { Router, Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
+import { listLlmCalls, getLlmSummary } from "../../services/admin";
+import {
+  parseRange,
+  normalizeRange,
+} from "../../services/admin/_shared/rangeWindow";
+import { getGoogleMetrics } from "../../services/admin/googleMetrics.service";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -18,34 +21,38 @@ const prisma = new PrismaClient();
  */
 const LLM_PRICING: Record<string, { input: number; output: number }> = {
   // Gemini 2.0 Flash (context <= 128k)
-  'gemini-2.0-flash': { input: 0.10, output: 0.40 },
-  'gemini-2.0-flash-exp': { input: 0.10, output: 0.40 },
-  'gemini-2.0-flash-001': { input: 0.10, output: 0.40 },
+  "gemini-2.0-flash": { input: 0.1, output: 0.4 },
+  "gemini-2.0-flash-exp": { input: 0.1, output: 0.4 },
+  "gemini-2.0-flash-001": { input: 0.1, output: 0.4 },
   // Gemini 1.5 Flash (context <= 128k)
-  'gemini-1.5-flash': { input: 0.075, output: 0.30 },
-  'gemini-1.5-flash-latest': { input: 0.075, output: 0.30 },
-  'gemini-1.5-flash-001': { input: 0.075, output: 0.30 },
-  'gemini-1.5-flash-002': { input: 0.075, output: 0.30 },
+  "gemini-1.5-flash": { input: 0.075, output: 0.3 },
+  "gemini-1.5-flash-latest": { input: 0.075, output: 0.3 },
+  "gemini-1.5-flash-001": { input: 0.075, output: 0.3 },
+  "gemini-1.5-flash-002": { input: 0.075, output: 0.3 },
   // Gemini 1.5 Pro (context <= 128k)
-  'gemini-1.5-pro': { input: 1.25, output: 5.00 },
-  'gemini-1.5-pro-latest': { input: 1.25, output: 5.00 },
-  'gemini-1.5-pro-001': { input: 1.25, output: 5.00 },
-  'gemini-1.5-pro-002': { input: 1.25, output: 5.00 },
+  "gemini-1.5-pro": { input: 1.25, output: 5.0 },
+  "gemini-1.5-pro-latest": { input: 1.25, output: 5.0 },
+  "gemini-1.5-pro-001": { input: 1.25, output: 5.0 },
+  "gemini-1.5-pro-002": { input: 1.25, output: 5.0 },
   // Gemini 1.0 Pro
-  'gemini-1.0-pro': { input: 0.50, output: 1.50 },
-  'gemini-pro': { input: 0.50, output: 1.50 },
+  "gemini-1.0-pro": { input: 0.5, output: 1.5 },
+  "gemini-pro": { input: 0.5, output: 1.5 },
   // OpenAI (for reference if used)
-  'gpt-4o': { input: 2.50, output: 10.00 },
-  'gpt-4o-mini': { input: 0.15, output: 0.60 },
-  'gpt-4-turbo': { input: 10.00, output: 30.00 },
-  'gpt-3.5-turbo': { input: 0.50, output: 1.50 },
+  "gpt-4o": { input: 2.5, output: 10.0 },
+  "gpt-4o-mini": { input: 0.15, output: 0.6 },
+  "gpt-4-turbo": { input: 10.0, output: 30.0 },
+  "gpt-3.5-turbo": { input: 0.5, output: 1.5 },
 };
 
 /**
  * Calculate cost for a single LLM call
  */
-function calculateCallCost(model: string, promptTokens: number | null, completionTokens: number | null): number {
-  const pricing = LLM_PRICING[model] || LLM_PRICING['gemini-1.5-flash']; // Default fallback
+function calculateCallCost(
+  model: string,
+  promptTokens: number | null,
+  completionTokens: number | null,
+): number {
+  const pricing = LLM_PRICING[model] || LLM_PRICING["gemini-1.5-flash"]; // Default fallback
   const inputCost = ((promptTokens || 0) / 1_000_000) * pricing.input;
   const outputCost = ((completionTokens || 0) / 1_000_000) * pricing.output;
   return inputCost + outputCost;
@@ -55,10 +62,10 @@ function calculateCallCost(model: string, promptTokens: number | null, completio
  * GET /api/admin/llm-cost
  * Returns LLM cost summary with breakdowns
  */
-router.get('/', async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
   try {
-    const range = (req.query.range as string) || '7d';
-    const rangeKey = normalizeRange(range, '7d');
+    const range = (req.query.range as string) || "7d";
+    const rangeKey = normalizeRange(range, "7d");
     const window = parseRange(rangeKey);
 
     const [result, google] = await Promise.all([
@@ -67,14 +74,21 @@ router.get('/', async (req: Request, res: Response) => {
     ]);
 
     // Get recent calls for cost calculation
-    const recentCalls = await listLlmCalls(prisma, { range: rangeKey, limit: 10000 });
+    const recentCalls = await listLlmCalls(prisma, {
+      range: rangeKey,
+      limit: 10000,
+    });
 
     // Calculate total cost and cost per model
     let totalCostUsd = 0;
     const modelCosts = new Map<string, { tokens: number; cost: number }>();
 
     for (const call of recentCalls.items) {
-      const cost = calculateCallCost(call.model, call.promptTokens, call.completionTokens);
+      const cost = calculateCallCost(
+        call.model,
+        call.promptTokens,
+        call.completionTokens,
+      );
       totalCostUsd += cost;
 
       const existing = modelCosts.get(call.model) || { tokens: 0, cost: 0 };
@@ -93,7 +107,9 @@ router.get('/', async (req: Request, res: Response) => {
       .sort((a, b) => b.valueUsd - a.valueUsd);
 
     // Count recent errors
-    const recentErrors = recentCalls.items.filter(c => c.status === 'fail').length;
+    const recentErrors = recentCalls.items.filter(
+      (c) => c.status === "fail",
+    ).length;
 
     res.json({
       ok: true,
@@ -115,24 +131,28 @@ router.get('/', async (req: Request, res: Response) => {
           tokensPerDay: [],
           costByModel,
         },
-        calls: recentCalls.items.slice(0, 50).map(c => ({
+        calls: recentCalls.items.slice(0, 50).map((c) => ({
           ...c,
-          costUsd: calculateCallCost(c.model, c.promptTokens, c.completionTokens),
+          costUsd: calculateCallCost(
+            c.model,
+            c.promptTokens,
+            c.completionTokens,
+          ),
         })),
         google: { gemini: google.gemini },
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
     });
   } catch (error) {
-    console.error('[Admin] LLM cost error:', error);
+    console.error("[Admin] LLM cost error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch LLM cost',
-      code: 'LLM_COST_ERROR',
+      error: "Failed to fetch LLM cost",
+      code: "LLM_COST_ERROR",
     });
   }
 });
@@ -141,9 +161,9 @@ router.get('/', async (req: Request, res: Response) => {
  * GET /api/admin/llm-cost/calls
  * Returns paginated list of LLM calls with cost
  */
-router.get('/calls', async (req: Request, res: Response) => {
+router.get("/calls", async (req: Request, res: Response) => {
   try {
-    const range = (req.query.range as string) || '7d';
+    const range = (req.query.range as string) || "7d";
     const limit = parseInt(req.query.limit as string) || 50;
     const cursor = req.query.cursor as string | undefined;
     const provider = req.query.provider as string | undefined;
@@ -160,9 +180,13 @@ router.get('/calls', async (req: Request, res: Response) => {
     });
 
     // Add cost to each call
-    const callsWithCost = result.items.map(call => ({
+    const callsWithCost = result.items.map((call) => ({
       ...call,
-      costUsd: calculateCallCost(call.model, call.promptTokens, call.completionTokens),
+      costUsd: calculateCallCost(
+        call.model,
+        call.promptTokens,
+        call.completionTokens,
+      ),
     }));
 
     res.json({
@@ -174,18 +198,18 @@ router.get('/calls', async (req: Request, res: Response) => {
         calls: callsWithCost,
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
       ...(result.nextCursor && { nextCursor: result.nextCursor }),
     });
   } catch (error) {
-    console.error('[Admin] LLM calls error:', error);
+    console.error("[Admin] LLM calls error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch LLM calls',
-      code: 'LLM_CALLS_ERROR',
+      error: "Failed to fetch LLM calls",
+      code: "LLM_CALLS_ERROR",
     });
   }
 });

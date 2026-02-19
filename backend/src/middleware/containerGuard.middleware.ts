@@ -10,8 +10,8 @@
  * - Any code path that bypasses server.ts initialization
  */
 
-import { Request, Response, NextFunction } from 'express';
-import { getContainer } from '../bootstrap/container';
+import { Request, Response, NextFunction } from "express";
+import { getContainer } from "../bootstrap/container";
 
 /**
  * Middleware that checks if the service container is initialized.
@@ -20,30 +20,36 @@ import { getContainer } from '../bootstrap/container';
  * For health checks, this middleware is skipped to allow monitoring systems
  * to detect the uninitialized state.
  */
-export function containerGuard(req: Request, res: Response, next: NextFunction): void {
+export function containerGuard(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   // Skip guard for health check endpoints (they report container status)
-  if (req.path.startsWith('/health')) {
+  if (req.path.startsWith("/health")) {
     return next();
   }
 
   try {
     const container = getContainer();
     if (!container.isInitialized()) {
-      console.error('[ContainerGuard] Service container not initialized - rejecting request');
+      console.error(
+        "[ContainerGuard] Service container not initialized - rejecting request",
+      );
       res.status(503).json({
-        error: 'Service Unavailable',
-        message: 'Server is starting up. Please try again in a moment.',
-        code: 'CONTAINER_NOT_INITIALIZED',
+        error: "Service Unavailable",
+        message: "Server is starting up. Please try again in a moment.",
+        code: "CONTAINER_NOT_INITIALIZED",
       });
       return;
     }
     next();
   } catch (error) {
-    console.error('[ContainerGuard] Error checking container status:', error);
+    console.error("[ContainerGuard] Error checking container status:", error);
     res.status(503).json({
-      error: 'Service Unavailable',
-      message: 'Server is starting up. Please try again in a moment.',
-      code: 'CONTAINER_CHECK_FAILED',
+      error: "Service Unavailable",
+      message: "Server is starting up. Please try again in a moment.",
+      code: "CONTAINER_CHECK_FAILED",
     });
   }
 }
@@ -65,7 +71,9 @@ export function isContainerReady(): boolean {
  */
 export function assertContainerReady(): void {
   if (!isContainerReady()) {
-    throw new Error('CONTAINER_NOT_INITIALIZED: Service container must be initialized before use');
+    throw new Error(
+      "CONTAINER_NOT_INITIALIZED: Service container must be initialized before use",
+    );
   }
 }
 
@@ -86,9 +94,11 @@ export async function ensureContainerInitialized(): Promise<void> {
   }
 
   // Dynamically import to avoid circular dependencies
-  const { initializeContainer } = await import('../bootstrap/container');
+  const { initializeContainer } = await import("../bootstrap/container");
   await initializeContainer();
-  console.log('[ContainerGuard] Container initialized for alternate entrypoint');
+  console.log(
+    "[ContainerGuard] Container initialized for alternate entrypoint",
+  );
 }
 
 export default containerGuard;

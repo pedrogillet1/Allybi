@@ -70,13 +70,17 @@ const DEFAULT_CONFIG: OpenAISafetyAdapterConfig = {
 };
 
 // Conservative internal id/path patterns
-const INTERNAL_ID_RE = /\b(docId|chunkId|internalId|traceId|requestId)\b\s*[:=]\s*[A-Za-z0-9._-]+/gi;
+const INTERNAL_ID_RE =
+  /\b(docId|chunkId|internalId|traceId|requestId)\b\s*[:=]\s*[A-Za-z0-9._-]+/gi;
 const SYSTEM_PATH_RE = /([A-Z]:\\|\/home\/|\/Users\/)[^\s"]+/g;
 
 export class OpenAISafetyAdapterService {
   private cfg: OpenAISafetyAdapterConfig;
 
-  constructor(private readonly bankLoader?: BankLoader, cfg: Partial<OpenAISafetyAdapterConfig> = {}) {
+  constructor(
+    private readonly bankLoader?: BankLoader,
+    cfg: Partial<OpenAISafetyAdapterConfig> = {},
+  ) {
     this.cfg = { ...DEFAULT_CONFIG, ...cfg };
   }
 
@@ -95,7 +99,9 @@ export class OpenAISafetyAdapterService {
       for (const m of next.messages) {
         if (Array.isArray((m as any).parts)) {
           const before = (m as any).parts.length;
-          (m as any).parts = (m as any).parts.filter((p: any) => p?.type !== "image_url");
+          (m as any).parts = (m as any).parts.filter(
+            (p: any) => p?.type !== "image_url",
+          );
           if ((m as any).parts.length !== before) changed = true;
         }
       }
@@ -139,7 +145,9 @@ export class OpenAISafetyAdapterService {
 
     // OpenAI may indicate content filtering via finish_reason in chat completions
     const finish = raw?.choices?.[0]?.finish_reason;
-    const contentFiltered = typeof finish === "string" && finish.toLowerCase().includes("content_filter");
+    const contentFiltered =
+      typeof finish === "string" &&
+      finish.toLowerCase().includes("content_filter");
 
     // Some OpenAI systems include moderation-like structures in provider responses
     const flagged =

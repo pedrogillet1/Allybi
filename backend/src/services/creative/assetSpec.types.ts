@@ -1,25 +1,30 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const AssetTypeSchema = z.enum([
-  'image',
-  'icon',
-  'illustration',
-  'background',
-  'diagram',
-  'chart',
-  'mockup',
+  "image",
+  "icon",
+  "illustration",
+  "background",
+  "diagram",
+  "chart",
+  "mockup",
 ]);
 
-export const BackgroundModeSchema = z.enum(['transparent', 'solid', 'gradient', 'photo']);
+export const BackgroundModeSchema = z.enum([
+  "transparent",
+  "solid",
+  "gradient",
+  "photo",
+]);
 
 export const StyleModeSchema = z.enum([
-  'photoreal',
-  '3d',
-  'flat',
-  'line-art',
-  'minimal',
-  'isometric',
-  'brand-match',
+  "photoreal",
+  "3d",
+  "flat",
+  "line-art",
+  "minimal",
+  "isometric",
+  "brand-match",
 ]);
 
 export const AssetSizeSchema = z
@@ -44,7 +49,10 @@ export const AssetConstraintSchema = z
 
 export const AssetStyleHintsSchema = z
   .object({
-    palette: z.array(z.string().regex(/^#([0-9A-Fa-f]{6})$/)).max(12).default([]),
+    palette: z
+      .array(z.string().regex(/^#([0-9A-Fa-f]{6})$/))
+      .max(12)
+      .default([]),
     typographyHint: z.string().trim().max(120).optional(),
     compositionHint: z.string().trim().max(240).optional(),
     textureHint: z.string().trim().max(120).optional(),
@@ -57,8 +65,8 @@ export const AssetSpecSchema = z
     type: AssetTypeSchema,
     purpose: z.string().trim().min(3).max(300),
     size: AssetSizeSchema,
-    backgroundMode: BackgroundModeSchema.default('transparent'),
-    styleMode: StyleModeSchema.default('brand-match'),
+    backgroundMode: BackgroundModeSchema.default("transparent"),
+    styleMode: StyleModeSchema.default("brand-match"),
     styleHints: AssetStyleHintsSchema.default({
       palette: [],
     }),
@@ -79,7 +87,7 @@ export const AssetSpecSchema = z
 
 export const AssetSpecBatchSchema = z
   .object({
-    version: z.literal('1.0').default('1.0'),
+    version: z.literal("1.0").default("1.0"),
     assets: z.array(AssetSpecSchema).min(1).max(30),
   })
   .strict();

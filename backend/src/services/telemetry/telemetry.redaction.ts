@@ -53,7 +53,9 @@ export function redactText(input: string, cfg: RedactionConfig): RedactedText {
   const length = s.length;
 
   const allowPreview = cfg.allowPreview === true;
-  const maxPreview = Number.isFinite(cfg.maxPreviewChars) ? Math.max(0, cfg.maxPreviewChars!) : 0;
+  const maxPreview = Number.isFinite(cfg.maxPreviewChars)
+    ? Math.max(0, cfg.maxPreviewChars!)
+    : 0;
 
   let preview: string | undefined;
   if (allowPreview && maxPreview > 0) {
@@ -69,7 +71,10 @@ export function redactText(input: string, cfg: RedactionConfig): RedactedText {
  * - keep length
  * - hash the base name
  */
-export function redactFilename(filename: string, cfg: RedactionConfig): {
+export function redactFilename(
+  filename: string,
+  cfg: RedactionConfig,
+): {
   baseHash: string;
   ext: string;
   length: number;
@@ -120,15 +125,103 @@ export function extractKeywords(text: string, maxKeywords = 8): string[] {
 
 const STOPWORDS = new Set([
   // English
-  "the","and","for","with","this","that","from","into","your","you","are","was","were","have","has","had",
-  "what","when","where","why","how","can","could","should","would","will","not","yes","but","about","over",
-  "under","between","during","before","after","than","then","there","here","their","they","them","his","her",
-  "she","him","our","ours","who","whom","which","while","also",
+  "the",
+  "and",
+  "for",
+  "with",
+  "this",
+  "that",
+  "from",
+  "into",
+  "your",
+  "you",
+  "are",
+  "was",
+  "were",
+  "have",
+  "has",
+  "had",
+  "what",
+  "when",
+  "where",
+  "why",
+  "how",
+  "can",
+  "could",
+  "should",
+  "would",
+  "will",
+  "not",
+  "yes",
+  "but",
+  "about",
+  "over",
+  "under",
+  "between",
+  "during",
+  "before",
+  "after",
+  "than",
+  "then",
+  "there",
+  "here",
+  "their",
+  "they",
+  "them",
+  "his",
+  "her",
+  "she",
+  "him",
+  "our",
+  "ours",
+  "who",
+  "whom",
+  "which",
+  "while",
+  "also",
 
   // Portuguese (common)
-  "para","com","sem","isso","essa","este","esta","aquele","aquela","sobre","entre","durante","antes","depois",
-  "como","qual","quais","quando","onde","porque","porquê","pode","podem","deve","devem","não","sim","mas",
-  "tambem","também","seus","suas","dele","dela","eles","elas","nosso","nossa","vocês","voce","você"
+  "para",
+  "com",
+  "sem",
+  "isso",
+  "essa",
+  "este",
+  "esta",
+  "aquele",
+  "aquela",
+  "sobre",
+  "entre",
+  "durante",
+  "antes",
+  "depois",
+  "como",
+  "qual",
+  "quais",
+  "quando",
+  "onde",
+  "porque",
+  "porquê",
+  "pode",
+  "podem",
+  "deve",
+  "devem",
+  "não",
+  "sim",
+  "mas",
+  "tambem",
+  "também",
+  "seus",
+  "suas",
+  "dele",
+  "dela",
+  "eles",
+  "elas",
+  "nosso",
+  "nossa",
+  "vocês",
+  "voce",
+  "você",
 ]);
 
 /* ----------------------------- helpers ----------------------------- */

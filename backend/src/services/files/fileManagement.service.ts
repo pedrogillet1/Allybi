@@ -12,16 +12,16 @@
  * - This service is PURE orchestration: it does not parse docs itself.
  */
 
-import crypto from 'crypto';
+import crypto from "crypto";
 
-export type StorageProvider = 'local' | 's3';
+export type StorageProvider = "local" | "s3";
 
 export interface UploadInput {
-  originalName: string;       // e.g. "report.pdf"
-  mimeType: string;           // e.g. "application/pdf"
+  originalName: string; // e.g. "report.pdf"
+  mimeType: string; // e.g. "application/pdf"
   sizeBytes: number;
-  buffer: Buffer;             // (or stream in your controller)
-  folderPath?: string;        // optional
+  buffer: Buffer; // (or stream in your controller)
+  folderPath?: string; // optional
 }
 
 export interface FileRecord {
@@ -47,7 +47,7 @@ export interface FileRecord {
 
   // optional indexing metadata
   indexedAt?: string | null;
-  extractionStatus?: 'pending' | 'ok' | 'failed';
+  extractionStatus?: "pending" | "ok" | "failed";
   extractionError?: string | null;
 
   tags?: string[];
@@ -56,7 +56,11 @@ export interface FileRecord {
 
 export interface FileRepo {
   create(file: FileRecord): Promise<FileRecord>;
-  update(userId: string, fileId: string, patch: Partial<FileRecord>): Promise<FileRecord>;
+  update(
+    userId: string,
+    fileId: string,
+    patch: Partial<FileRecord>,
+  ): Promise<FileRecord>;
   getById(userId: string, fileId: string): Promise<FileRecord | null>;
   softDelete(userId: string, fileId: string): Promise<FileRecord | null>;
   listByUser(userId: string): Promise<FileRecord[]>;
@@ -125,25 +129,32 @@ export class FileManagementService {
     private readonly queue: IngestionQueue,
     private readonly validator: FileValidator,
     private readonly clock: Clock = { nowIso: () => new Date().toISOString() },
-    private readonly logger: Logger = console
+    private readonly logger: Logger = console,
   ) {}
 
   // -----------------------------
   // Upload (create + ingest)
   // -----------------------------
 
-  async upload(userId: string, input: UploadInput): Promise<{
+  async upload(
+    userId: string,
+    input: UploadInput,
+  ): Promise<{
     file: FileRecord;
     ingestJobId: string;
   }> {
     const validated = this.validator.validateUpload(input);
     if (!validated.ok) {
-      throw new Error(validated.reason || 'Upload rejected');
+      throw new Error(validated.reason || "Upload rejected");
     }
 
     const now = this.clock.nowIso();
-    const fileId = this.makeId('doc');
-    const storageKey = this.makeStorageKey(userId, fileId, validated.normalized.filename);
+    const fileId = this.makeId("doc");
+    const storageKey = this.makeStorageKey(
+      userId,
+      fileId,
+      validated.normalized.filename,
+    );
 
     // 1) Store raw
     await this.storage.putObject({
@@ -173,7 +184,7 @@ export class FileManagementService {
       isDeleted: false,
       isProcessing: true,
       indexedAt: null,
-      extractionStatus: 'pending',
+      extractionStatus: "pending",
       extractionError: null,
       tags: [],
       domainId: null,
@@ -189,7 +200,7 @@ export class FileManagementService {
       extension: created.extension,
     });
 
-    this.logger.info('[FileManagement] upload queued', {
+    this.logger.info("[FileManagement] upload queued", {
       userId,
       fileId: created.id,
       jobId,
@@ -204,19 +215,25 @@ export class FileManagementService {
   // Update operations
   // -----------------------------
 
-  async rename(userId: string, fileId: string, newFilename: string): Promise<FileRecord> {
+  async rename(
+    userId: string,
+    fileId: string,
+    newFilename: string,
+  ): Promise<FileRecord> {
     const now = this.clock.nowIso();
 
     // Keep extension consistent unless you explicitly want to allow changing it.
     const current = await this.repo.getById(userId, fileId);
-    if (!current || current.isDeleted) throw new Error('File not found');
+    if (!current || current.isDeleted) throw new Error("File not found");
 
     const normalized = this.normalizeFilename(newFilename);
     const newExt = this.getExtension(normalized);
 
     // Disallow changing extension (prevents mismatch with extraction/index)
     if (newExt && newExt !== current.extension) {
-      throw new Error(`Cannot change extension from .${current.extension} to .${newExt}`);
+      throw new Error(
+        `Cannot change extension from .${current.extension} to .${newExt}`,
+      );
     }
 
     const updated = await this.repo.update(userId, fileId, {
@@ -224,41 +241,63 @@ export class FileManagementService {
       updatedAt: now,
     });
 
-    this.logger.info('[FileManagement] renamed', { userId, fileId, filename: normalized });
+    this.logger.info("[FileManagement] renamed", {
+      userId,
+      fileId,
+      filename: normalized,
+    });
     return updated;
   }
 
-  async move(userId: string, fileId: string, folderPath: string | null): Promise<FileRecord> {
+  async move(
+    userId: string,
+    fileId: string,
+    folderPath: string | null,
+  ): Promise<FileRecord> {
     const now = this.clock.nowIso();
     const updated = await this.repo.update(userId, fileId, {
       folderPath: folderPath || undefined,
       updatedAt: now,
     });
 
-    this.logger.info('[FileManagement] moved', { userId, fileId, folderPath });
+    this.logger.info("[FileManagement] moved", { userId, fileId, folderPath });
     return updated;
   }
 
-  async setTags(userId: string, fileId: string, tags: string[]): Promise<FileRecord> {
+  async setTags(
+    userId: string,
+    fileId: string,
+    tags: string[],
+  ): Promise<FileRecord> {
     const now = this.clock.nowIso();
-    const clean = [...new Set((tags || []).map(t => t.trim()).filter(Boolean))].slice(0, 32);
+    const clean = [
+      ...new Set((tags || []).map((t) => t.trim()).filter(Boolean)),
+    ].slice(0, 32);
 
     const updated = await this.repo.update(userId, fileId, {
       tags: clean,
       updatedAt: now,
     });
 
-    this.logger.info('[FileManagement] tags updated', { userId, fileId, tagsCount: clean.length });
+    this.logger.info("[FileManagement] tags updated", {
+      userId,
+      fileId,
+      tagsCount: clean.length,
+    });
     return updated;
   }
 
   // Called by ingestion worker when indexing finishes
-  async markIngested(userId: string, fileId: string, params: {
-    extractionStatus: 'ok' | 'failed';
-    extractionError?: string | null;
-    domainId?: string | null;
-    indexedAt?: string;
-  }): Promise<FileRecord> {
+  async markIngested(
+    userId: string,
+    fileId: string,
+    params: {
+      extractionStatus: "ok" | "failed";
+      extractionError?: string | null;
+      domainId?: string | null;
+      indexedAt?: string;
+    },
+  ): Promise<FileRecord> {
     const now = this.clock.nowIso();
     return this.repo.update(userId, fileId, {
       isProcessing: false,
@@ -274,7 +313,10 @@ export class FileManagementService {
   // Delete (soft delete + async purge)
   // -----------------------------
 
-  async delete(userId: string, fileId: string): Promise<{
+  async delete(
+    userId: string,
+    fileId: string,
+  ): Promise<{
     deleted: boolean;
     deleteJobId?: string;
   }> {
@@ -292,7 +334,11 @@ export class FileManagementService {
       storageKey: file.storageKey,
     });
 
-    this.logger.info('[FileManagement] delete queued', { userId, fileId, jobId });
+    this.logger.info("[FileManagement] delete queued", {
+      userId,
+      fileId,
+      jobId,
+    });
     return { deleted: true, deleteJobId: jobId };
   }
 
@@ -301,7 +347,7 @@ export class FileManagementService {
     const file = await this.repo.getById(userId, fileId);
     if (!file) return;
     await this.storage.deleteObject(file.storageKey);
-    this.logger.warn('[FileManagement] storage purged', { userId, fileId });
+    this.logger.warn("[FileManagement] storage purged", { userId, fileId });
   }
 
   // -----------------------------
@@ -309,22 +355,26 @@ export class FileManagementService {
   // -----------------------------
 
   private makeId(prefix: string): string {
-    const rand = crypto.randomBytes(10).toString('hex');
+    const rand = crypto.randomBytes(10).toString("hex");
     return `${prefix}:${rand}`;
   }
 
-  private makeStorageKey(userId: string, fileId: string, filename: string): string {
-    const safeName = filename.replace(/[^\w.\-() ]+/g, '_').trim();
+  private makeStorageKey(
+    userId: string,
+    fileId: string,
+    filename: string,
+  ): string {
+    const safeName = filename.replace(/[^\w.\-() ]+/g, "_").trim();
     return `users/${userId}/docs/${fileId}/${safeName}`;
   }
 
   private normalizeFilename(name: string): string {
-    const base = (name || '').split('/').pop()?.split('\\').pop() || '';
-    return base.replace(/\s+/g, ' ').trim();
+    const base = (name || "").split("/").pop()?.split("\\").pop() || "";
+    return base.replace(/\s+/g, " ").trim();
   }
 
   private getExtension(filename: string): string {
     const m = filename.toLowerCase().match(/\.([a-z0-9]{1,8})$/);
-    return m ? m[1] : '';
+    return m ? m[1] : "";
   }
 }

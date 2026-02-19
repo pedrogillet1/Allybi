@@ -3,7 +3,7 @@
  * Parse date ranges and calculate time windows for analytics queries
  */
 
-export type RangeKey = '24h' | '7d' | '30d' | '90d';
+export type RangeKey = "24h" | "7d" | "30d" | "90d";
 
 export interface TimeWindow {
   from: Date;
@@ -11,25 +11,28 @@ export interface TimeWindow {
 }
 
 const RANGE_MS: Record<RangeKey, number> = {
-  '24h': 24 * 60 * 60 * 1000,
-  '7d': 7 * 24 * 60 * 60 * 1000,
-  '30d': 30 * 24 * 60 * 60 * 1000,
-  '90d': 90 * 24 * 60 * 60 * 1000,
+  "24h": 24 * 60 * 60 * 1000,
+  "7d": 7 * 24 * 60 * 60 * 1000,
+  "30d": 30 * 24 * 60 * 60 * 1000,
+  "90d": 90 * 24 * 60 * 60 * 1000,
 };
 
 const RANGE_ALIASES: Record<string, RangeKey> = {
-  '1d': '24h',
-  '24h': '24h',
-  '7d': '7d',
-  '30d': '30d',
-  '90d': '90d',
+  "1d": "24h",
+  "24h": "24h",
+  "7d": "7d",
+  "30d": "30d",
+  "90d": "90d",
 };
 
 /**
  * Normalize range string to canonical form
  */
-export function normalizeRange(range: unknown, fallback: RangeKey = '7d'): RangeKey {
-  if (typeof range !== 'string') return fallback;
+export function normalizeRange(
+  range: unknown,
+  fallback: RangeKey = "7d",
+): RangeKey {
+  if (typeof range !== "string") return fallback;
   const key = range.toLowerCase().trim();
   return RANGE_ALIASES[key] ?? fallback;
 }
@@ -37,7 +40,10 @@ export function normalizeRange(range: unknown, fallback: RangeKey = '7d'): Range
 /**
  * Parse range into time window {from, to}
  */
-export function parseRange(range: unknown, fallback: RangeKey = '7d'): TimeWindow {
+export function parseRange(
+  range: unknown,
+  fallback: RangeKey = "7d",
+): TimeWindow {
   const key = normalizeRange(range, fallback);
   const ms = RANGE_MS[key];
   const to = new Date();
@@ -48,7 +54,10 @@ export function parseRange(range: unknown, fallback: RangeKey = '7d'): TimeWindo
 /**
  * Get previous period window for trend/delta calculations
  */
-export function previousWindow(range: unknown, fallback: RangeKey = '7d'): TimeWindow {
+export function previousWindow(
+  range: unknown,
+  fallback: RangeKey = "7d",
+): TimeWindow {
   const key = normalizeRange(range, fallback);
   const ms = RANGE_MS[key];
   const to = new Date(Date.now() - ms);
@@ -59,7 +68,7 @@ export function previousWindow(range: unknown, fallback: RangeKey = '7d'): TimeW
 /**
  * Get range in days
  */
-export function rangeToDays(range: unknown, fallback: RangeKey = '7d'): number {
+export function rangeToDays(range: unknown, fallback: RangeKey = "7d"): number {
   const key = normalizeRange(range, fallback);
   return RANGE_MS[key] / (24 * 60 * 60 * 1000);
 }
@@ -67,7 +76,10 @@ export function rangeToDays(range: unknown, fallback: RangeKey = '7d'): number {
 /**
  * Get range in hours
  */
-export function rangeToHours(range: unknown, fallback: RangeKey = '7d'): number {
+export function rangeToHours(
+  range: unknown,
+  fallback: RangeKey = "7d",
+): number {
   const key = normalizeRange(range, fallback);
   return RANGE_MS[key] / (60 * 60 * 1000);
 }

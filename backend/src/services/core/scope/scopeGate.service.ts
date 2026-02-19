@@ -193,7 +193,12 @@ export interface ScopeDecision {
   // Optional disambiguation payload (no user-facing text)
   disambiguation?: {
     candidateType: "document";
-    options: Array<{ docId: string; score: number; title?: string | null; filename?: string | null }>;
+    options: Array<{
+      docId: string;
+      score: number;
+      title?: string | null;
+      filename?: string | null;
+    }>;
     maxOptions: number;
     maxQuestions: number;
     reasonCode: ScopeReasonCode;
@@ -232,13 +237,15 @@ function isProd(env: EnvName): boolean {
 
 function detectFilenameToken(q: string): string | null {
   // conservative: filename with extension
-  const m = q.match(/\b\w[\w\-_. ]{0,160}\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g|webp)\b/i);
+  const m = q.match(
+    /\b\w[\w\-_. ]{0,160}\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g|webp)\b/i,
+  );
   return m ? m[0].trim() : null;
 }
 
 function tokenOverlap(aTokens: string[], bTokens: string[]): number {
-  const a = new Set(aTokens.filter(t => t.length >= 2));
-  const b = new Set(bTokens.filter(t => t.length >= 2));
+  const a = new Set(aTokens.filter((t) => t.length >= 2));
+  const b = new Set(bTokens.filter((t) => t.length >= 2));
   if (!a.size || !b.size) return 0;
   let hit = 0;
   for (const t of a) if (b.has(t)) hit++;
@@ -249,7 +256,7 @@ function simpleTokens(s: string): string[] {
   return lower(s)
     .replace(/["“”]/g, " ")
     .split(/[\s,;:.!?()]+/)
-    .map(t => t.trim())
+    .map((t) => t.trim())
     .filter(Boolean);
 }
 
@@ -260,10 +267,13 @@ function simpleTokens(s: string): string[] {
 export class ScopeGateService {
   constructor(
     private readonly bankLoader: BankLoader,
-    private readonly docStore: DocStore
+    private readonly docStore: DocStore,
   ) {}
 
-  async evaluate(state: ConversationStateLike, input: ScopeGateInput): Promise<ScopeDecision> {
+  async evaluate(
+    state: ConversationStateLike,
+    input: ScopeGateInput,
+  ): Promise<ScopeDecision> {
     const debug = { appliedRules: [] as string[], notes: [] as string[] };
 
     // 0) Safety gate
@@ -282,10 +292,10 @@ export class ScopeGateService {
           sheetHintPresent: false,
           activeSheetName: null,
           rangeExplicit: false,
-          activeRangeA1: null
+          activeRangeA1: null,
         },
         scope: { candidateDocIds: [], scopeKey: this.scopeKey([]) },
-        debug
+        debug,
       });
     }
 
@@ -299,7 +309,9 @@ export class ScopeGateService {
     const rankFeatures = this.safeGetBank<any>("ambiguity_rank_features");
 
     // 2) Doc inventory
-    const docs = input.overrides?.forceNoDocsIndexed ? [] : await this.docStore.listDocs();
+    const docs = input.overrides?.forceNoDocsIndexed
+      ? []
+      : await this.docStore.listDocs();
     if (!docs.length) {
       debug.appliedRules.push("no_docs_indexed");
       return this.finish(state, input, {
@@ -316,10 +328,10 @@ export class ScopeGateService {
           sheetHintPresent: false,
           activeSheetName: null,
           rangeExplicit: false,
-          activeRangeA1: null
+          activeRangeA1: null,
         },
         scope: { candidateDocIds: [], scopeKey: this.scopeKey([]) },
-        debug
+        debug,
       });
     }
 
@@ -329,8 +341,12 @@ export class ScopeGateService {
     const qLower = lower(qNorm);
 
     // Derive intentFamily/discovery
-    const isDiscovery = Boolean(input.overrides?.forceDiscovery) || (input.signals.intentFamily === "doc_discovery");
-    const corpusAllowed = Boolean(input.signals.corpusSearchAllowed ?? isDiscovery);
+    const isDiscovery =
+      Boolean(input.overrides?.forceDiscovery) ||
+      input.signals.intentFamily === "doc_discovery";
+    const corpusAllowed = Boolean(
+      input.signals.corpusSearchAllowed ?? isDiscovery,
+    );
 
     // Discourse: topic shift breaks continuity; correction can still be follow-up but may change target
     const discourse = input.signals.discourse ?? {};
@@ -353,7 +369,10 @@ export class ScopeGateService {
     const resolvedDocIdFromUpstream = input.signals.resolvedDocId ?? null;
 
     // If upstream resolved an explicit docId, treat as explicit doc ref
-    const explicitDocRef = explicitDocRefFromUpstream || Boolean(resolvedDocIdFromUpstream) || Boolean(filenameToken);
+    const explicitDocRef =
+      explicitDocRefFromUpstream ||
+      Boolean(resolvedDocIdFromUpstream) ||
+      Boolean(filenameToken);
 
     // 7) Resolve explicit doc reference to a docId if needed
     const explicitResolved = await this.resolveExplicitDocRef({
@@ -361,9 +380,11 @@ export class ScopeGateService {
       qNorm,
       filenameToken,
       upstreamResolvedDocId: resolvedDocIdFromUpstream,
-      disableDocAliasMatching: Boolean(input.overrides?.disableDocAliasMatching),
+      disableDocAliasMatching: Boolean(
+        input.overrides?.disableDocAliasMatching,
+      ),
       docAliasesBank,
-      stopwordsDocnames
+      stopwordsDocnames,
     });
 
     // 8) Compute lock intent for this turn
@@ -394,17 +415,25 @@ export class ScopeGateService {
     const continuityAllowed = isFollowup && !topicShift;
 
     // 9) Sheet/range scope hints
-    const sheetName = input.signals.resolvedSheetName ?? state.persistent.scope.activeSheetName ?? null;
-    const rangeA1 = input.signals.resolvedRangeA1 ?? state.persistent.scope.activeRangeA1 ?? null;
+    const sheetName =
+      input.signals.resolvedSheetName ??
+      state.persistent.scope.activeSheetName ??
+      null;
+    const rangeA1 =
+      input.signals.resolvedRangeA1 ??
+      state.persistent.scope.activeRangeA1 ??
+      null;
 
-    const sheetHintPresent = Boolean(input.signals.sheetHintPresent) || Boolean(sheetName);
-    const rangeExplicit = Boolean(input.signals.rangeExplicit) || Boolean(rangeA1);
+    const sheetHintPresent =
+      Boolean(input.signals.sheetHintPresent) || Boolean(sheetName);
+    const rangeExplicit =
+      Boolean(input.signals.rangeExplicit) || Boolean(rangeA1);
 
     // If sheet/range explicit, treat as hard sheet lock within the doc (if doc is known)
     const hardSheetLock = Boolean(sheetHintPresent || rangeExplicit);
 
     // 10) Candidate doc IDs determination
-    let candidateDocIds: string[] = docs.map(d => d.docId);
+    let candidateDocIds: string[] = docs.map((d) => d.docId);
 
     // Rule: explicit doc ref -> single doc scope
     if (explicitResolved.docId) {
@@ -412,17 +441,26 @@ export class ScopeGateService {
     } else if (hardDocLock && activeDocId && !corpusAllowed) {
       // Rule: hard lock applies except discovery
       candidateDocIds = [activeDocId];
-    } else if ((input.signals as any).singleDocIntent && activeDocId && !corpusAllowed) {
+    } else if (
+      (input.signals as any).singleDocIntent &&
+      activeDocId &&
+      !corpusAllowed
+    ) {
       // Rule: single doc intent prefers active doc if available
       candidateDocIds = [activeDocId];
-    } else if (continuityAllowed && activeDocId && !corpusAllowed && !hardDocLock) {
+    } else if (
+      continuityAllowed &&
+      activeDocId &&
+      !corpusAllowed &&
+      !hardDocLock
+    ) {
       // Soft continuity: narrow to active doc ONLY if we have no explicit doc ref and not discovery
       // This is a ChatGPT-like bias, not a hard lock.
       debug.appliedRules.push("followup_soft_narrow_to_active_doc");
       candidateDocIds = [activeDocId];
     } else {
       // corpus-wide (default)
-      candidateDocIds = docs.map(d => d.docId);
+      candidateDocIds = docs.map((d) => d.docId);
     }
 
     // 11) Ambiguity handling: if user clearly referenced "a doc" but we cannot resolve it safely
@@ -437,12 +475,21 @@ export class ScopeGateService {
       needsDocChoice = true;
 
       // Score doc candidates using simple overlap as a fallback ranking (bank-driven thresholds are applied)
-      disambiguationOptions = this.rankDocCandidatesByName(docs, qNorm, stopwordsDocnames, rankFeatures);
+      disambiguationOptions = this.rankDocCandidatesByName(
+        docs,
+        qNorm,
+        stopwordsDocnames,
+        rankFeatures,
+      );
 
       // Apply policy thresholds (autopick vs disambiguate)
-      const policy = ambiguityPolicies?.config?.actionsContract?.thresholds ?? {};
+      const policy =
+        ambiguityPolicies?.config?.actionsContract?.thresholds ?? {};
       const topScore = disambiguationOptions[0]?.score ?? 0;
-      const gap = disambiguationOptions.length >= 2 ? topScore - (disambiguationOptions[1].score ?? 0) : 1;
+      const gap =
+        disambiguationOptions.length >= 2
+          ? topScore - (disambiguationOptions[1].score ?? 0)
+          : 1;
 
       const autopickTop = Number(policy.autopickTopScore ?? 0.85);
       const autopickGap = Number(policy.autopickGap ?? 0.25);
@@ -465,12 +512,14 @@ export class ScopeGateService {
       hardSheetLock,
       sheetName: hardSheetLock ? sheetName : null,
       rangeA1: hardSheetLock ? rangeA1 : null,
-      corpusAllowed
+      corpusAllowed,
     });
 
     // 13) Build decision
     if (needsDocChoice) {
-      const maxOptions = Number(ambiguityPolicies?.config?.actionsContract?.thresholds?.maxOptions ?? 4);
+      const maxOptions = Number(
+        ambiguityPolicies?.config?.actionsContract?.thresholds?.maxOptions ?? 4,
+      );
 
       return this.finish(state, input, {
         action: "route",
@@ -489,24 +538,32 @@ export class ScopeGateService {
           rangeExplicit: Boolean(rangeExplicit),
           activeRangeA1: rangeA1,
 
-          needsDocChoice: true
+          needsDocChoice: true,
         },
         scope: { candidateDocIds, scopeKey },
         disambiguation: {
           candidateType: "document",
-          options: disambiguationOptions
-            .slice(0, maxOptions)
-            .map(o => ({ docId: o.docId, score: o.score, title: o.title ?? null, filename: o.filename ?? null })),
+          options: disambiguationOptions.slice(0, maxOptions).map((o) => ({
+            docId: o.docId,
+            score: o.score,
+            title: o.title ?? null,
+            filename: o.filename ?? null,
+          })),
           maxOptions,
           maxQuestions: 1,
-          reasonCode: "needs_doc_choice"
+          reasonCode: "needs_doc_choice",
         },
-        debug: isProd(input.env) ? undefined : debug
+        debug: isProd(input.env) ? undefined : debug,
       });
     }
 
     // 14) Normal allow path
-    const hardScopeActive = Boolean(explicitResolved.docId || (hardDocLock && activeDocId) || hardSheetLock || (input.signals as any).hardScopeActive);
+    const hardScopeActive = Boolean(
+      explicitResolved.docId ||
+        (hardDocLock && activeDocId) ||
+        hardSheetLock ||
+        (input.signals as any).hardScopeActive,
+    );
 
     return this.finish(state, input, {
       action: "allow",
@@ -514,7 +571,7 @@ export class ScopeGateService {
       reasonCodes: [
         ...(explicitResolved.docId ? ["explicit_doc_required"] : []),
         ...(isDiscovery ? ["discovery_mode"] : []),
-        ...(continuityAllowed && isFollowup ? ["followup_continuity"] : [])
+        ...(continuityAllowed && isFollowup ? ["followup_continuity"] : []),
       ] as ScopeReasonCode[],
       signals: {
         hardScopeActive,
@@ -526,10 +583,10 @@ export class ScopeGateService {
         sheetHintPresent: Boolean(sheetHintPresent),
         activeSheetName: sheetName,
         rangeExplicit: Boolean(rangeExplicit),
-        activeRangeA1: rangeA1
+        activeRangeA1: rangeA1,
       },
       scope: { candidateDocIds, scopeKey },
-      debug: isProd(input.env) ? undefined : debug
+      debug: isProd(input.env) ? undefined : debug,
     });
   }
 
@@ -545,23 +602,35 @@ export class ScopeGateService {
     disableDocAliasMatching: boolean;
     docAliasesBank: any | null;
     stopwordsDocnames: any | null;
-  }): Promise<{ docId: string | null; confidence: number; method: "upstream" | "filename" | "alias" | "none" }> {
+  }): Promise<{
+    docId: string | null;
+    confidence: number;
+    method: "upstream" | "filename" | "alias" | "none";
+  }> {
     // Upstream resolved docId
-    if (args.upstreamResolvedDocId) return { docId: args.upstreamResolvedDocId, confidence: 0.95, method: "upstream" };
+    if (args.upstreamResolvedDocId)
+      return {
+        docId: args.upstreamResolvedDocId,
+        confidence: 0.95,
+        method: "upstream",
+      };
 
     // Filename exact match (normalize minimal)
     if (args.filenameToken) {
       const ft = lower(args.filenameToken);
       for (const d of args.docs) {
         const fn = lower(d.filename ?? "");
-        if (fn && fn === ft) return { docId: d.docId, confidence: 0.95, method: "filename" };
+        if (fn && fn === ft)
+          return { docId: d.docId, confidence: 0.95, method: "filename" };
         // allow basename match (without path noise)
-        if (fn && fn.endsWith(ft)) return { docId: d.docId, confidence: 0.9, method: "filename" };
+        if (fn && fn.endsWith(ft))
+          return { docId: d.docId, confidence: 0.9, method: "filename" };
       }
     }
 
     // Alias / title match (guarded)
-    if (args.disableDocAliasMatching) return { docId: null, confidence: 0, method: "none" };
+    if (args.disableDocAliasMatching)
+      return { docId: null, confidence: 0, method: "none" };
 
     // Use token overlap on doc title + filename tokens as deterministic fallback
     const qTokens = this.docnameTokens(args.qNorm, args.stopwordsDocnames);
@@ -570,13 +639,24 @@ export class ScopeGateService {
     let best: { docId: string; score: number } | null = null;
     for (const d of args.docs) {
       const tTokens = this.docnameTokens(d.title ?? "", args.stopwordsDocnames);
-      const fTokens = this.docnameTokens(d.filename ?? "", args.stopwordsDocnames);
-      const score = Math.max(tokenOverlap(qTokens, tTokens), tokenOverlap(qTokens, fTokens));
+      const fTokens = this.docnameTokens(
+        d.filename ?? "",
+        args.stopwordsDocnames,
+      );
+      const score = Math.max(
+        tokenOverlap(qTokens, tTokens),
+        tokenOverlap(qTokens, fTokens),
+      );
       if (!best || score > best.score) best = { docId: d.docId, score };
     }
 
     const min = Number(args.docAliasesBank?.config?.minAliasConfidence ?? 0.75);
-    if (best && best.score >= min) return { docId: best.docId, confidence: clamp01(best.score), method: "alias" };
+    if (best && best.score >= min)
+      return {
+        docId: best.docId,
+        confidence: clamp01(best.score),
+        method: "alias",
+      };
 
     return { docId: null, confidence: 0, method: "none" };
   }
@@ -611,7 +691,7 @@ export class ScopeGateService {
       "presentación",
       "presentacion",
       "hoja",
-      "tabla"
+      "tabla",
     ]);
 
     const status = new Set<string>([
@@ -636,10 +716,10 @@ export class ScopeGateService {
       "nuevo",
       "antiguo",
       "borrador",
-      "version"
+      "version",
     ]);
 
-    const filtered = toks.filter(t => !generic.has(t) && !status.has(t));
+    const filtered = toks.filter((t) => !generic.has(t) && !status.has(t));
     return filtered;
   }
 
@@ -651,14 +731,17 @@ export class ScopeGateService {
     docs: DocMeta[],
     query: string,
     stopwordsDocnames: any | null,
-    rankFeatures: any | null
+    rankFeatures: any | null,
   ): ScopeCandidate[] {
     const qTokens = this.docnameTokens(query, stopwordsDocnames);
     const out: ScopeCandidate[] = [];
 
     for (const d of docs) {
       const titleTokens = this.docnameTokens(d.title ?? "", stopwordsDocnames);
-      const fileTokens = this.docnameTokens(d.filename ?? "", stopwordsDocnames);
+      const fileTokens = this.docnameTokens(
+        d.filename ?? "",
+        stopwordsDocnames,
+      );
 
       const titleOverlap = tokenOverlap(qTokens, titleTokens);
       const fileOverlap = tokenOverlap(qTokens, fileTokens);
@@ -669,7 +752,8 @@ export class ScopeGateService {
       // Light boost if filename contains an exact token substring
       const qLower = lower(query);
       const fnLower = lower(d.filename ?? "");
-      if (fnLower && qLower.length >= 4 && fnLower.includes(qLower)) score = Math.max(score, 0.82);
+      if (fnLower && qLower.length >= 4 && fnLower.includes(qLower))
+        score = Math.max(score, 0.82);
 
       score = clamp01(score);
 
@@ -678,10 +762,10 @@ export class ScopeGateService {
         score,
         reasons: [
           titleOverlap >= fileOverlap ? "title_overlap" : "filename_overlap",
-          score >= 0.85 ? "high_confidence" : "needs_disambiguation"
+          score >= 0.85 ? "high_confidence" : "needs_disambiguation",
         ],
         title: d.title ?? null,
-        filename: d.filename ?? null
+        filename: d.filename ?? null,
       });
     }
 
@@ -703,7 +787,7 @@ export class ScopeGateService {
   private scopeKey(docIds: string[], extra?: Record<string, any>): string {
     const stable = {
       docs: [...docIds].sort(),
-      ...(extra ?? {})
+      ...(extra ?? {}),
     };
     return sha256(JSON.stringify(stable)).slice(0, 20);
   }
@@ -715,7 +799,7 @@ export class ScopeGateService {
   private finish(
     state: ConversationStateLike,
     input: ScopeGateInput,
-    partial: Omit<ScopeDecision, "debug"> & { debug?: ScopeDecision["debug"] }
+    partial: Omit<ScopeDecision, "debug"> & { debug?: ScopeDecision["debug"] },
   ): ScopeDecision {
     // Ensure uniqueness & stable arrays
     const reasonCodes = Array.from(new Set(partial.reasonCodes));
@@ -724,7 +808,7 @@ export class ScopeGateService {
     const decision: ScopeDecision = {
       ...partial,
       reasonCodes,
-      scope: { ...partial.scope, candidateDocIds }
+      scope: { ...partial.scope, candidateDocIds },
     };
 
     // Never emit debug in production

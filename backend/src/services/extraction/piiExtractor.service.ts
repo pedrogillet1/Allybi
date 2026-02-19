@@ -11,71 +11,84 @@
  * - pii_validation.any.json: Checksum validation rules
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 // ============================================================================
 // INTERFACES
 // ============================================================================
 
 export interface ExtractedPiiField {
-  fieldType: string;         // e.g., 'cpf', 'rg', 'passport_number'
-  value: string;             // The extracted value
-  confidence: number;        // 0-1 confidence score
-  labelFound?: string;       // Nearby label that was detected
-  position?: {               // Position in text (if available)
+  fieldType: string; // e.g., 'cpf', 'rg', 'passport_number'
+  value: string; // The extracted value
+  confidence: number; // 0-1 confidence score
+  labelFound?: string; // Nearby label that was detected
+  position?: {
+    // Position in text (if available)
     start: number;
     end: number;
   };
-  validated?: boolean;       // True if passed checksum validation
-  normalizedValue?: string;  // Cleaned/formatted value
+  validated?: boolean; // True if passed checksum validation
+  normalizedValue?: string; // Cleaned/formatted value
 }
 
 export interface PiiExtractionResult {
   fields: ExtractedPiiField[];
-  documentType?: string;     // Detected doc type (passport, id_card, etc.)
-  language?: string;         // Detected language
-  confidence: number;        // Overall extraction confidence
+  documentType?: string; // Detected doc type (passport, id_card, etc.)
+  language?: string; // Detected language
+  confidence: number; // Overall extraction confidence
 }
 
 // Bank data structures
 interface PiiPatternsBank {
   _meta: { id: string; version: string };
-  patterns: Record<string, {
-    regex: string[];
-    confidence: number;
-    requireLabelNearby?: boolean;
-    labelWindowChars?: number;
-  }>;
+  patterns: Record<
+    string,
+    {
+      regex: string[];
+      confidence: number;
+      requireLabelNearby?: boolean;
+      labelWindowChars?: number;
+    }
+  >;
 }
 
 interface PiiFieldLabelsBank {
   _meta: { id: string; version: string };
-  fields: Record<string, {
-    en: string[];
-    pt: string[];
-    es: string[];
-  }>;
+  fields: Record<
+    string,
+    {
+      en: string[];
+      pt: string[];
+      es: string[];
+    }
+  >;
 }
 
 interface PiiNormalizationBank {
   _meta: { id: string; version: string };
   aliases: Record<string, string[]>;
-  normalizers?: Record<string, {
-    removeChars?: string[];
-    format?: string;
-  }>;
+  normalizers?: Record<
+    string,
+    {
+      removeChars?: string[];
+      format?: string;
+    }
+  >;
 }
 
 interface PiiValidationBank {
   _meta: { id: string; version: string };
-  validators: Record<string, {
-    algorithm?: string;
-    minLength?: number;
-    maxLength?: number;
-    pattern?: string;
-    checksum?: string;
-  }>;
+  validators: Record<
+    string,
+    {
+      algorithm?: string;
+      minLength?: number;
+      maxLength?: number;
+      pattern?: string;
+      checksum?: string;
+    }
+  >;
 }
 
 // ============================================================================
@@ -83,7 +96,7 @@ interface PiiValidationBank {
 // ============================================================================
 
 export class PiiExtractorService {
-  private logger: Pick<Console, 'info' | 'warn' | 'debug'>;
+  private logger: Pick<Console, "info" | "warn" | "debug">;
   private banksPath: string;
 
   // Loaded banks
@@ -96,9 +109,13 @@ export class PiiExtractorService {
   private compiledPatterns: Map<string, RegExp[]> = new Map();
   private compiledLabels: Map<string, RegExp> = new Map();
 
-  constructor(config?: { logger?: Pick<Console, 'info' | 'warn' | 'debug'>; banksPath?: string }) {
+  constructor(config?: {
+    logger?: Pick<Console, "info" | "warn" | "debug">;
+    banksPath?: string;
+  }) {
     this.logger = config?.logger || console;
-    this.banksPath = config?.banksPath || path.join(__dirname, '../../data_banks');
+    this.banksPath =
+      config?.banksPath || path.join(__dirname, "../../data_banks");
     this.loadBanks();
   }
 
@@ -108,18 +125,26 @@ export class PiiExtractorService {
 
   private loadBanks(): void {
     try {
-      this.patternsBank = this.loadBank<PiiPatternsBank>('entities/pii_patterns.any.json');
-      this.fieldLabelsBank = this.loadBank<PiiFieldLabelsBank>('entities/pii_field_labels.any.json');
-      this.normalizationBank = this.loadBank<PiiNormalizationBank>('entities/pii_normalization.any.json');
-      this.validationBank = this.loadBank<PiiValidationBank>('entities/pii_validation.any.json');
+      this.patternsBank = this.loadBank<PiiPatternsBank>(
+        "entities/pii_patterns.any.json",
+      );
+      this.fieldLabelsBank = this.loadBank<PiiFieldLabelsBank>(
+        "entities/pii_field_labels.any.json",
+      );
+      this.normalizationBank = this.loadBank<PiiNormalizationBank>(
+        "entities/pii_normalization.any.json",
+      );
+      this.validationBank = this.loadBank<PiiValidationBank>(
+        "entities/pii_validation.any.json",
+      );
 
       // Compile patterns for performance
       this.compilePatterns();
       this.compileLabels();
 
-      this.logger.debug?.('[PiiExtractor] Banks loaded successfully');
+      this.logger.debug?.("[PiiExtractor] Banks loaded successfully");
     } catch (error) {
-      this.logger.warn?.('[PiiExtractor] Failed to load banks:', error);
+      this.logger.warn?.("[PiiExtractor] Failed to load banks:", error);
     }
   }
 
@@ -130,10 +155,13 @@ export class PiiExtractorService {
         this.logger.debug?.(`[PiiExtractor] Bank not found: ${relativePath}`);
         return null;
       }
-      const content = fs.readFileSync(fullPath, 'utf-8');
+      const content = fs.readFileSync(fullPath, "utf-8");
       return JSON.parse(content) as T;
     } catch (error) {
-      this.logger.warn?.(`[PiiExtractor] Error loading bank ${relativePath}:`, error);
+      this.logger.warn?.(
+        `[PiiExtractor] Error loading bank ${relativePath}:`,
+        error,
+      );
       return null;
     }
   }
@@ -141,13 +169,17 @@ export class PiiExtractorService {
   private compilePatterns(): void {
     if (!this.patternsBank?.patterns) return;
 
-    for (const [fieldType, config] of Object.entries(this.patternsBank.patterns)) {
+    for (const [fieldType, config] of Object.entries(
+      this.patternsBank.patterns,
+    )) {
       const regexes: RegExp[] = [];
       for (const pattern of config.regex) {
         try {
-          regexes.push(new RegExp(pattern, 'gi'));
+          regexes.push(new RegExp(pattern, "gi"));
         } catch (e) {
-          this.logger.warn?.(`[PiiExtractor] Invalid regex for ${fieldType}: ${pattern}`);
+          this.logger.warn?.(
+            `[PiiExtractor] Invalid regex for ${fieldType}: ${pattern}`,
+          );
         }
       }
       this.compiledPatterns.set(fieldType, regexes);
@@ -157,7 +189,9 @@ export class PiiExtractorService {
   private compileLabels(): void {
     if (!this.fieldLabelsBank?.fields) return;
 
-    for (const [fieldType, labels] of Object.entries(this.fieldLabelsBank.fields)) {
+    for (const [fieldType, labels] of Object.entries(
+      this.fieldLabelsBank.fields,
+    )) {
       // Combine all language labels into one regex
       const allLabels = [
         ...(labels.en || []),
@@ -165,11 +199,18 @@ export class PiiExtractorService {
         ...(labels.es || []),
       ];
       if (allLabels.length > 0) {
-        const escapedLabels = allLabels.map(l => l.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        const escapedLabels = allLabels.map((l) =>
+          l.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+        );
         try {
-          this.compiledLabels.set(fieldType, new RegExp(`\\b(${escapedLabels.join('|')})\\b`, 'gi'));
+          this.compiledLabels.set(
+            fieldType,
+            new RegExp(`\\b(${escapedLabels.join("|")})\\b`, "gi"),
+          );
         } catch (e) {
-          this.logger.warn?.(`[PiiExtractor] Failed to compile labels for ${fieldType}`);
+          this.logger.warn?.(
+            `[PiiExtractor] Failed to compile labels for ${fieldType}`,
+          );
         }
       }
     }
@@ -192,7 +233,9 @@ export class PiiExtractorService {
 
     const textLower = text.toLowerCase();
 
-    for (const [fieldType, config] of Object.entries(this.patternsBank.patterns)) {
+    for (const [fieldType, config] of Object.entries(
+      this.patternsBank.patterns,
+    )) {
       const patterns = this.compiledPatterns.get(fieldType) || [];
       const labelRegex = this.compiledLabels.get(fieldType);
 
@@ -203,7 +246,10 @@ export class PiiExtractorService {
 
         while ((match = regex.exec(text)) !== null) {
           const value = match[0];
-          const position = { start: match.index, end: match.index + value.length };
+          const position = {
+            start: match.index,
+            end: match.index + value.length,
+          };
 
           // Check if label is required nearby
           let labelFound: string | undefined;
@@ -261,9 +307,10 @@ export class PiiExtractorService {
     const deduped = this.deduplicateFields(fields);
 
     // Calculate overall confidence
-    const overallConfidence = deduped.length > 0
-      ? deduped.reduce((sum, f) => sum + f.confidence, 0) / deduped.length
-      : 0;
+    const overallConfidence =
+      deduped.length > 0
+        ? deduped.reduce((sum, f) => sum + f.confidence, 0) / deduped.length
+        : 0;
 
     return {
       fields: deduped,
@@ -277,7 +324,7 @@ export class PiiExtractorService {
    */
   extractField(text: string, fieldType: string): ExtractedPiiField[] {
     const result = this.extract(text);
-    return result.fields.filter(f => f.fieldType === fieldType);
+    return result.fields.filter((f) => f.fieldType === fieldType);
   }
 
   // ==========================================================================
@@ -287,7 +334,10 @@ export class PiiExtractorService {
   /**
    * Validate a PII field value using bank-defined rules
    */
-  validate(fieldType: string, value: string): { valid: boolean; reason?: string } {
+  validate(
+    fieldType: string,
+    value: string,
+  ): { valid: boolean; reason?: string } {
     const validator = this.validationBank?.validators[fieldType];
     if (!validator) {
       return { valid: true }; // No validator = assume valid
@@ -295,10 +345,10 @@ export class PiiExtractorService {
 
     // Length checks
     if (validator.minLength && value.length < validator.minLength) {
-      return { valid: false, reason: 'Too short' };
+      return { valid: false, reason: "Too short" };
     }
     if (validator.maxLength && value.length > validator.maxLength) {
-      return { valid: false, reason: 'Too long' };
+      return { valid: false, reason: "Too long" };
     }
 
     // Pattern check
@@ -306,7 +356,7 @@ export class PiiExtractorService {
       try {
         const regex = new RegExp(validator.pattern);
         if (!regex.test(value)) {
-          return { valid: false, reason: 'Pattern mismatch' };
+          return { valid: false, reason: "Pattern mismatch" };
         }
       } catch (e) {
         // Invalid pattern, skip check
@@ -315,9 +365,13 @@ export class PiiExtractorService {
 
     // Checksum validation
     if (validator.checksum) {
-      const isValid = this.validateChecksum(fieldType, value, validator.checksum);
+      const isValid = this.validateChecksum(
+        fieldType,
+        value,
+        validator.checksum,
+      );
       if (!isValid) {
-        return { valid: false, reason: 'Checksum failed' };
+        return { valid: false, reason: "Checksum failed" };
       }
     }
 
@@ -327,15 +381,19 @@ export class PiiExtractorService {
   /**
    * Validate checksum for specific algorithms
    */
-  private validateChecksum(fieldType: string, value: string, algorithm: string): boolean {
-    const digits = value.replace(/\D/g, '');
+  private validateChecksum(
+    fieldType: string,
+    value: string,
+    algorithm: string,
+  ): boolean {
+    const digits = value.replace(/\D/g, "");
 
     switch (algorithm) {
-      case 'cpf_mod11':
+      case "cpf_mod11":
         return this.validateCpf(digits);
-      case 'cnpj_mod11':
+      case "cnpj_mod11":
         return this.validateCnpj(digits);
-      case 'luhn':
+      case "luhn":
         return this.validateLuhn(digits);
       default:
         return true; // Unknown algorithm, assume valid
@@ -429,18 +487,18 @@ export class PiiExtractorService {
     // Remove specified characters
     if (normalizer.removeChars) {
       for (const char of normalizer.removeChars) {
-        normalized = normalized.split(char).join('');
+        normalized = normalized.split(char).join("");
       }
     }
 
     // Apply format if specified (e.g., "###.###.###-##" for CPF)
     if (normalizer.format && /^\d+$/.test(normalized)) {
-      let formatted = '';
+      let formatted = "";
       let digitIndex = 0;
       for (const char of normalizer.format) {
-        if (char === '#' && digitIndex < normalized.length) {
+        if (char === "#" && digitIndex < normalized.length) {
           formatted += normalized[digitIndex++];
-        } else if (char !== '#') {
+        } else if (char !== "#") {
           formatted += char;
         }
       }
@@ -472,9 +530,12 @@ export class PiiExtractorService {
       }
 
       // Check for overlap with already-selected fields
-      const overlaps = usedRanges.some(range =>
-        (field.position!.start >= range.start && field.position!.start < range.end) ||
-        (field.position!.end > range.start && field.position!.end <= range.end)
+      const overlaps = usedRanges.some(
+        (range) =>
+          (field.position!.start >= range.start &&
+            field.position!.start < range.end) ||
+          (field.position!.end > range.start &&
+            field.position!.end <= range.end),
       );
 
       if (!overlaps) {
@@ -496,10 +557,10 @@ export class PiiExtractorService {
   /**
    * Get field labels for a specific field type and language
    */
-  getFieldLabels(fieldType: string, language: string = 'en'): string[] {
+  getFieldLabels(fieldType: string, language: string = "en"): string[] {
     const labels = this.fieldLabelsBank?.fields[fieldType];
     if (!labels) return [];
-    return labels[language as 'en' | 'pt' | 'es'] || labels.en || [];
+    return labels[language as "en" | "pt" | "es"] || labels.en || [];
   }
 }
 

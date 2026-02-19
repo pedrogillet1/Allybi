@@ -1,4 +1,4 @@
-import { clamp } from '../../../utils';
+import { clamp } from "../../../utils";
 /**
  * Operator Tiebreakers Service — CLEAN (Bank-driven, ChatGPT-style)
  *
@@ -15,14 +15,14 @@ import { clamp } from '../../../utils';
  * Bank: routing/routing_operator_tiebreakers.any.json (bank id: routing_operator_tiebreakers)
  */
 
-import { getBank } from '../banks/bankLoader.service';
-import type { IntentFamily, Operator } from '../../../types/intents.types';
+import { getBank } from "../banks/bankLoader.service";
+import type { IntentFamily, Operator } from "../../../types/intents.types";
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export type LanguageKey = 'en' | 'pt' | 'es';
+export type LanguageKey = "en" | "pt" | "es";
 
 export interface TiebreakerRoute {
   intentFamily: IntentFamily;
@@ -110,7 +110,12 @@ interface NewFamilyScoring {
 
 // Bank types (supports both legacy and new)
 interface TiebreakerBank {
-  _meta: { id: string; version: string; description: string; lastUpdated?: string };
+  _meta: {
+    id: string;
+    version: string;
+    description: string;
+    lastUpdated?: string;
+  };
 
   // new
   config?: {
@@ -120,7 +125,7 @@ interface TiebreakerBank {
       caseSensitive?: boolean;
       requireWordBoundary?: boolean;
       checkNegativesFirst?: boolean;
-      scoringMode?: 'weighted_hits' | 'first_match';
+      scoringMode?: "weighted_hits" | "first_match";
     };
     precedenceOrder?: string[];
     treatAsTieIfGapLt?: number;
@@ -144,8 +149,16 @@ interface TiebreakerBank {
   type_preferences?: Record<string, LegacyTypePreference>;
   explicit_rules?: { rules: any[] };
   fallback_rules?: {
-    has_documents: { intentFamily: string; operator: string; confidence: number };
-    no_documents: { intentFamily: string; operator: string; confidence: number };
+    has_documents: {
+      intentFamily: string;
+      operator: string;
+      confidence: number;
+    };
+    no_documents: {
+      intentFamily: string;
+      operator: string;
+      confidence: number;
+    };
   };
 }
 
@@ -157,7 +170,7 @@ interface CompiledPattern {
 interface CompiledExplicitRule {
   id: string;
   priority: number;
-  matchMode: 'any' | 'all' | 'regex';
+  matchMode: "any" | "all" | "regex";
   keywordsAny: string[];
   keywordsAll: string[];
   negativesAny: string[];
@@ -200,7 +213,7 @@ export class OperatorTiebreakersService {
     caseSensitive: false,
     requireWordBoundary: true,
     checkNegativesFirst: true,
-    scoringMode: 'weighted_hits' as 'weighted_hits' | 'first_match'
+    scoringMode: "weighted_hits" as "weighted_hits" | "first_match",
   };
 
   private precedenceOrder: IntentFamily[] = [];
@@ -227,22 +240,24 @@ export class OperatorTiebreakersService {
     if (this.loaded) return;
     this.loaded = true;
 
-    const bank = getBank<TiebreakerBank>('routing_operator_tiebreakers');
+    const bank = getBank<TiebreakerBank>("routing_operator_tiebreakers");
     if (!bank) {
-      console.warn('[OperatorTiebreakers] Bank not found: routing_operator_tiebreakers');
+      console.warn(
+        "[OperatorTiebreakers] Bank not found: routing_operator_tiebreakers",
+      );
       return;
     }
     this.bank = bank;
 
     const enabled = bank.config?.enabled ?? true;
     if (!enabled) {
-      console.warn('[OperatorTiebreakers] Disabled by bank config');
+      console.warn("[OperatorTiebreakers] Disabled by bank config");
       return;
     }
 
     this.compile();
     console.log(
-      `[OperatorTiebreakers] Loaded v${bank._meta?.version ?? 'unknown'} | explicitRules=${this.explicitRules.length} | typePrefs=${this.typePrefs.size} | legacyRoutes=${this.legacyRoutes.length}`
+      `[OperatorTiebreakers] Loaded v${bank._meta?.version ?? "unknown"} | explicitRules=${this.explicitRules.length} | typePrefs=${this.typePrefs.size} | legacyRoutes=${this.legacyRoutes.length}`,
     );
   }
 
@@ -257,15 +272,25 @@ export class OperatorTiebreakersService {
       this.matching = {
         ...this.matching,
         useRegex: matchingConfig.useRegex ?? this.matching.useRegex,
-        caseSensitive: matchingConfig.caseSensitive ?? this.matching.caseSensitive,
-        requireWordBoundary: matchingConfig.requireWordBoundary ?? this.matching.requireWordBoundary,
-        checkNegativesFirst: matchingConfig.checkNegativesFirst ?? this.matching.checkNegativesFirst,
-        scoringMode: (matchingConfig.scoringMode || 'weighted_hits') as 'weighted_hits' | 'first_match'
+        caseSensitive:
+          matchingConfig.caseSensitive ?? this.matching.caseSensitive,
+        requireWordBoundary:
+          matchingConfig.requireWordBoundary ??
+          this.matching.requireWordBoundary,
+        checkNegativesFirst:
+          matchingConfig.checkNegativesFirst ??
+          this.matching.checkNegativesFirst,
+        scoringMode: (matchingConfig.scoringMode || "weighted_hits") as
+          | "weighted_hits"
+          | "first_match",
       };
     }
 
-    const precedenceSource = this.bank.precedence_order || bank.config?.precedenceOrder || [];
-    this.precedenceOrder = (precedenceSource || []).map((s: string) => s.toLowerCase() as IntentFamily);
+    const precedenceSource =
+      this.bank.precedence_order || bank.config?.precedenceOrder || [];
+    this.precedenceOrder = (precedenceSource || []).map(
+      (s: string) => s.toLowerCase() as IntentFamily,
+    );
 
     this.compileExplicitRules();
     this.compileTypePreferences();
@@ -300,7 +325,10 @@ export class OperatorTiebreakersService {
     return null;
   }
 
-  getTypePreferences(query: string, language: LanguageKey): { preferredTypes: string[]; suggestedOperator?: Operator } | null {
+  getTypePreferences(
+    query: string,
+    language: LanguageKey,
+  ): { preferredTypes: string[]; suggestedOperator?: Operator } | null {
     if (!this.loaded) this.load();
     const q = normalize(query);
 
@@ -326,27 +354,28 @@ export class OperatorTiebreakersService {
     if (!this.bank) {
       // Hardcoded fallback if bank not loaded
       return hasDocuments
-        ? { intentFamily: 'documents', operator: 'extract', confidence: 0.5 }
-        : { intentFamily: 'help', operator: 'capabilities', confidence: 0.4 };
+        ? { intentFamily: "documents", operator: "extract", confidence: 0.5 }
+        : { intentFamily: "help", operator: "capabilities", confidence: 0.4 };
     }
 
     // Support both new format (fallback.hasDocuments) and legacy (fallback_rules.has_documents)
     const bankAny = this.bank as any;
     const fallbackConfig = hasDocuments
-      ? (bankAny.fallback?.hasDocuments || this.bank.fallback_rules?.has_documents)
-      : (bankAny.fallback?.noDocuments || this.bank.fallback_rules?.no_documents);
+      ? bankAny.fallback?.hasDocuments ||
+        this.bank.fallback_rules?.has_documents
+      : bankAny.fallback?.noDocuments || this.bank.fallback_rules?.no_documents;
 
     if (!fallbackConfig) {
       return hasDocuments
-        ? { intentFamily: 'documents', operator: 'extract', confidence: 0.55 }
-        : { intentFamily: 'help', operator: 'capabilities', confidence: 0.45 };
+        ? { intentFamily: "documents", operator: "extract", confidence: 0.55 }
+        : { intentFamily: "help", operator: "capabilities", confidence: 0.45 };
     }
 
     return {
       intentFamily: fallbackConfig.intentFamily as IntentFamily,
       operator: fallbackConfig.operator as Operator,
       confidence: fallbackConfig.confidence,
-      reason: hasDocuments ? 'fallback_has_documents' : 'fallback_no_documents',
+      reason: hasDocuments ? "fallback_has_documents" : "fallback_no_documents",
     };
   }
 
@@ -378,11 +407,12 @@ export class OperatorTiebreakersService {
     this.explicitRules = [];
     if (!this.bank) return;
 
-    const container = (this.bank as any).explicitRules || this.bank.explicit_rules;
+    const container =
+      (this.bank as any).explicitRules || this.bank.explicit_rules;
     const rules: NewExplicitRule[] = container?.rules || [];
 
     for (const r of rules) {
-      const priority = typeof r.priority === 'number' ? r.priority : 0;
+      const priority = typeof r.priority === "number" ? r.priority : 0;
 
       const ifAny = (r.ifAnyMatch || []).map((s) => normalizeToken(s));
       const ifAll = (r.ifAllMatch || []).map((s) => normalizeToken(s));
@@ -390,11 +420,16 @@ export class OperatorTiebreakersService {
       const negAll = (r.negativesAll || []).map((s) => normalizeToken(s));
 
       const regexAny = (r.ifAnyRegex || [])
-        .map((x) => safeRegex(x.regex, x.flags || (this.matching.caseSensitive ? '' : 'i')))
+        .map((x) =>
+          safeRegex(
+            x.regex,
+            x.flags || (this.matching.caseSensitive ? "" : "i"),
+          ),
+        )
         .filter((rx): rx is RegExp => !!rx);
 
-      const matchMode: 'any' | 'all' | 'regex' =
-        regexAny.length > 0 ? 'regex' : ifAll.length > 0 ? 'all' : 'any';
+      const matchMode: "any" | "all" | "regex" =
+        regexAny.length > 0 ? "regex" : ifAll.length > 0 ? "all" : "any";
 
       this.explicitRules.push({
         id: r.id,
@@ -407,11 +442,11 @@ export class OperatorTiebreakersService {
         regexAny,
         route: {
           intentFamily: r.route.intentFamily.toLowerCase() as IntentFamily,
-          operator: r.route.operator.toLowerCase() as Operator
+          operator: r.route.operator.toLowerCase() as Operator,
         },
         preferredTypes: r.preferredTypes,
         confidence: clamp(r.confidence, 0.1, 0.99),
-        rationale: r.rationale
+        rationale: r.rationale,
       });
     }
 
@@ -419,7 +454,10 @@ export class OperatorTiebreakersService {
     this.explicitRules.sort((a, b) => b.priority - a.priority);
   }
 
-  private matchExplicitRules(normalizedQuery: string, _lang: LanguageKey): TiebreakerRoute | null {
+  private matchExplicitRules(
+    normalizedQuery: string,
+    _lang: LanguageKey,
+  ): TiebreakerRoute | null {
     // NOTE: explicit rules are already language-aware through the phrases you add per language.
     // We just match on normalizedQuery.
 
@@ -428,25 +466,35 @@ export class OperatorTiebreakersService {
 
       let matched = false;
 
-      if (r.matchMode === 'regex') {
+      if (r.matchMode === "regex") {
         matched = r.regexAny.some((rx) => rx.test(normalizedQuery));
-      } else if (r.matchMode === 'all') {
-        matched = r.keywordsAll.length > 0 && r.keywordsAll.every((k) => tokenPresent(normalizedQuery, k, this.matching.requireWordBoundary));
+      } else if (r.matchMode === "all") {
+        matched =
+          r.keywordsAll.length > 0 &&
+          r.keywordsAll.every((k) =>
+            tokenPresent(normalizedQuery, k, this.matching.requireWordBoundary),
+          );
       } else {
-        matched = r.keywordsAny.length > 0 && r.keywordsAny.some((k) => tokenPresent(normalizedQuery, k, this.matching.requireWordBoundary));
+        matched =
+          r.keywordsAny.length > 0 &&
+          r.keywordsAny.some((k) =>
+            tokenPresent(normalizedQuery, k, this.matching.requireWordBoundary),
+          );
       }
 
       if (!matched) continue;
 
-      console.log(`[OperatorTiebreakers] Explicit rule matched: ${r.id} → ${r.route.intentFamily}/${r.route.operator}`);
+      console.log(
+        `[OperatorTiebreakers] Explicit rule matched: ${r.id} → ${r.route.intentFamily}/${r.route.operator}`,
+      );
 
       return {
         intentFamily: r.route.intentFamily,
         operator: r.route.operator,
         confidence: r.confidence,
         preferredTypes: r.preferredTypes,
-        reason: r.rationale || 'explicit_rule',
-        matchedRule: r.id
+        reason: r.rationale || "explicit_rule",
+        matchedRule: r.id,
       };
     }
 
@@ -455,11 +503,21 @@ export class OperatorTiebreakersService {
 
   private hasNegatives(query: string, rule: CompiledExplicitRule): boolean {
     // negativesAny: any present blocks
-    if (rule.negativesAny.length > 0 && rule.negativesAny.some((n) => tokenPresent(query, n, this.matching.requireWordBoundary))) {
+    if (
+      rule.negativesAny.length > 0 &&
+      rule.negativesAny.some((n) =>
+        tokenPresent(query, n, this.matching.requireWordBoundary),
+      )
+    ) {
       return true;
     }
     // negativesAll: if all are present, block
-    if (rule.negativesAll.length > 0 && rule.negativesAll.every((n) => tokenPresent(query, n, this.matching.requireWordBoundary))) {
+    if (
+      rule.negativesAll.length > 0 &&
+      rule.negativesAll.every((n) =>
+        tokenPresent(query, n, this.matching.requireWordBoundary),
+      )
+    ) {
       return true;
     }
     return false;
@@ -478,18 +536,24 @@ export class OperatorTiebreakersService {
 
     for (const [key, pref] of Object.entries(src) as Array<[string, any]>) {
       // Skip metadata keys
-      if (key.startsWith('_')) continue;
+      if (key.startsWith("_")) continue;
       if (!pref?.preferredTypes || !pref?.patterns) continue;
 
       const compiled: CompiledTypePreference = {
         preferredTypes: pref.preferredTypes,
-        patternsByLang: { en: [], pt: [], es: [] }
+        patternsByLang: { en: [], pt: [], es: [] },
       };
 
-      for (const lang of (['en', 'pt', 'es'] as LanguageKey[])) {
+      for (const lang of ["en", "pt", "es"] as LanguageKey[]) {
         const patterns: string[] = pref.patterns?.[lang] || [];
         compiled.patternsByLang[lang] = patterns
-          .map((p) => compilePhrase(p, this.matching.caseSensitive, this.matching.requireWordBoundary))
+          .map((p) =>
+            compilePhrase(
+              p,
+              this.matching.caseSensitive,
+              this.matching.requireWordBoundary,
+            ),
+          )
           .filter((x): x is CompiledPattern => !!x);
       }
 
@@ -505,26 +569,48 @@ export class OperatorTiebreakersService {
     this.legacyRoutes = [];
     if (!this.bank?.operator_tiebreakers) return;
 
-    const langs: LanguageKey[] = ['en', 'pt', 'es'];
+    const langs: LanguageKey[] = ["en", "pt", "es"];
 
-    for (const [familyKey, tb] of Object.entries(this.bank.operator_tiebreakers)) {
-      if (familyKey === '_description') continue;
+    for (const [familyKey, tb] of Object.entries(
+      this.bank.operator_tiebreakers,
+    )) {
+      if (familyKey === "_description") continue;
 
       for (const [routeKey, cfg] of Object.entries(tb)) {
-        if (routeKey === 'description' || typeof cfg === 'string') continue;
+        if (routeKey === "description" || typeof cfg === "string") continue;
 
         const c = cfg as LegacyRouteConfig;
 
-        const patternsByLang: Record<LanguageKey, CompiledPattern[]> = { en: [], pt: [], es: [] };
-        const negativesByLang: Record<LanguageKey, CompiledPattern[]> = { en: [], pt: [], es: [] };
+        const patternsByLang: Record<LanguageKey, CompiledPattern[]> = {
+          en: [],
+          pt: [],
+          es: [],
+        };
+        const negativesByLang: Record<LanguageKey, CompiledPattern[]> = {
+          en: [],
+          pt: [],
+          es: [],
+        };
 
         for (const lang of langs) {
           patternsByLang[lang] = (c.patterns?.[lang] || [])
-            .map((p) => compilePhrase(p, this.matching.caseSensitive, this.matching.requireWordBoundary))
+            .map((p) =>
+              compilePhrase(
+                p,
+                this.matching.caseSensitive,
+                this.matching.requireWordBoundary,
+              ),
+            )
             .filter((x): x is CompiledPattern => !!x);
 
           negativesByLang[lang] = (c.negatives?.[lang] || [])
-            .map((p) => compilePhrase(p, this.matching.caseSensitive, this.matching.requireWordBoundary))
+            .map((p) =>
+              compilePhrase(
+                p,
+                this.matching.caseSensitive,
+                this.matching.requireWordBoundary,
+              ),
+            )
             .filter((x): x is CompiledPattern => !!x);
         }
 
@@ -534,13 +620,16 @@ export class OperatorTiebreakersService {
           baseConfidence: clamp(c.confidence, 0.1, 0.99),
           patternsByLang,
           negativesByLang,
-          familyKey
+          familyKey,
         });
       }
     }
   }
 
-  private matchLegacyRoutes(query: string, lang: LanguageKey): TiebreakerRoute | null {
+  private matchLegacyRoutes(
+    query: string,
+    lang: LanguageKey,
+  ): TiebreakerRoute | null {
     if (this.legacyRoutes.length === 0) return null;
 
     const MATCH_BONUS = 0.08;
@@ -552,12 +641,23 @@ export class OperatorTiebreakersService {
       const patterns = r.patternsByLang[lang] || [];
       const negatives = r.negativesByLang[lang] || [];
 
-      if (this.matching.checkNegativesFirst && negatives.some((p) => p.rx.test(query))) continue;
+      if (
+        this.matching.checkNegativesFirst &&
+        negatives.some((p) => p.rx.test(query))
+      )
+        continue;
 
-      const matchCount = patterns.reduce((n, p) => (p.rx.test(query) ? n + 1 : n), 0);
+      const matchCount = patterns.reduce(
+        (n, p) => (p.rx.test(query) ? n + 1 : n),
+        0,
+      );
       if (matchCount === 0) continue;
 
-      if (!this.matching.checkNegativesFirst && negatives.some((p) => p.rx.test(query))) continue;
+      if (
+        !this.matching.checkNegativesFirst &&
+        negatives.some((p) => p.rx.test(query))
+      )
+        continue;
 
       let score = r.baseConfidence + (matchCount - 1) * MATCH_BONUS;
       if (matchCount === 1) score -= WEAK_PENALTY;
@@ -567,7 +667,7 @@ export class OperatorTiebreakersService {
         operator: r.operator,
         confidence: clamp(score, 0.1, 0.99),
         reason: `legacy:${r.familyKey} (${matchCount} hits)`,
-        matchedRule: `legacy:${r.familyKey}`
+        matchedRule: `legacy:${r.familyKey}`,
       };
 
       if (!best || score > best.score) best = { score, route };
@@ -589,11 +689,11 @@ export default OperatorTiebreakersService;
 // ============================================================================
 
 function normalize(s: string): string {
-  return (s || '')
+  return (s || "")
     .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/\s+/g, ' ')
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -601,17 +701,21 @@ function normalizeToken(s: string): string {
   return normalize(s);
 }
 
-function tokenPresent(query: string, token: string, wordBoundary: boolean): boolean {
+function tokenPresent(
+  query: string,
+  token: string,
+  wordBoundary: boolean,
+): boolean {
   if (!token) return false;
   if (!wordBoundary) return query.includes(token);
 
   // word boundary safe match
-  const rx = new RegExp(`\\b${escapeRegex(token)}\\b`, 'i');
+  const rx = new RegExp(`\\b${escapeRegex(token)}\\b`, "i");
   return rx.test(query);
 }
 
 function escapeRegex(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 // clamp imported from ../../../utils
@@ -624,11 +728,15 @@ function safeRegex(pattern: string, flags: string): RegExp | null {
   }
 }
 
-function compilePhrase(phrase: string, caseSensitive: boolean, wordBoundary: boolean): CompiledPattern | null {
-  const raw = (phrase || '').trim();
+function compilePhrase(
+  phrase: string,
+  caseSensitive: boolean,
+  wordBoundary: boolean,
+): CompiledPattern | null {
+  const raw = (phrase || "").trim();
   if (!raw) return null;
 
-  const flags = caseSensitive ? '' : 'i';
+  const flags = caseSensitive ? "" : "i";
 
   // Treat raw as a literal phrase unless it already looks like regex
   // (We keep this conservative.)

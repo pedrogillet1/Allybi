@@ -34,7 +34,9 @@ describe("XlsxFileEditorService computeOps", () => {
     const wb = new ExcelJS.Workbook();
     await wb.xlsx.load(edited);
     const ws = wb.getWorksheet("Sheet1");
-    const tables = ((ws as any)?.model?.tables || []) as Array<{ name?: string }>;
+    const tables = ((ws as any)?.model?.tables || []) as Array<{
+      name?: string;
+    }>;
 
     expect(Array.isArray(tables)).toBe(true);
     expect(tables.length).toBeGreaterThan(0);
@@ -55,7 +57,9 @@ describe("XlsxFileEditorService computeOps", () => {
       ],
     });
 
-    await expect(svc.computeOps(input, payload)).rejects.toThrow("CHART_ENGINE_UNAVAILABLE");
+    await expect(svc.computeOps(input, payload)).rejects.toThrow(
+      "CHART_ENGINE_UNAVAILABLE",
+    );
   });
 
   test("sorts a selected range by numeric column ascending", async () => {
@@ -87,7 +91,11 @@ describe("XlsxFileEditorService computeOps", () => {
     const input = await buildWorkbookBuffer();
     const payload = JSON.stringify({
       ops: [
-        { kind: "set_number_format", rangeA1: "Sheet1!B2:B3", pattern: "#,##0" },
+        {
+          kind: "set_number_format",
+          rangeA1: "Sheet1!B2:B3",
+          pattern: "#,##0",
+        },
         { kind: "filter_range", rangeA1: "Sheet1!A1:B3" },
       ],
     });

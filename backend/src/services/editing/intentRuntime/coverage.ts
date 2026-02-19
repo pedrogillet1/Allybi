@@ -73,7 +73,11 @@ function loadTestCases(testDir: string): GoldenTestCase[] {
     if (!fs.existsSync(filePath)) continue;
     try {
       const raw = JSON.parse(fs.readFileSync(filePath, "utf8"));
-      const cases = Array.isArray(raw?.cases) ? raw.cases : Array.isArray(raw) ? raw : [];
+      const cases = Array.isArray(raw?.cases)
+        ? raw.cases
+        : Array.isArray(raw)
+          ? raw
+          : [];
       allCases.push(...cases);
     } catch {
       // Skip invalid files
@@ -190,9 +194,7 @@ function runSingleTest(tc: GoldenTestCase): TestResult {
 // Coverage analysis
 // ---------------------------------------------------------------------------
 
-function findUncoveredOperators(
-  testCases: GoldenTestCase[],
-): string[] {
+function findUncoveredOperators(testCases: GoldenTestCase[]): string[] {
   const catalog = loadOperatorCatalog();
   const coveredOps = new Set<string>();
 
@@ -256,9 +258,7 @@ export function runCoverage(testDir: string): CoverageReport {
   const passed = results.filter((r) => r.passed).length;
   const failed = results.filter((r) => !r.passed).length;
   const uncoveredOperators = findUncoveredOperators(testCases);
-  const unmatchedTests = results
-    .filter((r) => !r.passed)
-    .map((r) => r.testId);
+  const unmatchedTests = results.filter((r) => !r.passed).map((r) => r.testId);
 
   // Detect collisions across all domains/langs
   const collisions = [
@@ -288,9 +288,7 @@ export function generateMarkdownReport(report: CoverageReport): string {
   lines.push(`**Total tests:** ${report.total}`);
   lines.push(`**Passed:** ${report.passed}`);
   lines.push(`**Failed:** ${report.failed}`);
-  lines.push(
-    `**Pass rate:** ${(report.passRate * 100).toFixed(1)}%`,
-  );
+  lines.push(`**Pass rate:** ${(report.passRate * 100).toFixed(1)}%`);
   lines.push("");
 
   if (report.uncoveredOperators.length > 0) {

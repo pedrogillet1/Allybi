@@ -14,7 +14,7 @@ router.post(
   authMiddleware,
   rateLimitMiddleware,
   validate(ragQuerySchema),
-  (req, res, next) => ragController.query(req, res, next)
+  (req, res, next) => ragController.query(req, res, next),
 );
 
 router.post(
@@ -22,14 +22,12 @@ router.post(
   authMiddleware,
   rateLimitMiddleware,
   validate(ragQuerySchema),
-  (req, res, next) => ragController.stream(req, res, next)
+  (req, res, next) => ragController.stream(req, res, next),
 );
 
 // POST /query/stop — not yet implemented in controller
-router.post(
-  "/query/stop",
-  authMiddleware,
-  (_req, res) => res.json({ ok: true, stopped: true })
+router.post("/query/stop", authMiddleware, (_req, res) =>
+  res.json({ ok: true, stopped: true }),
 );
 
 export default router;

@@ -8,8 +8,8 @@
  * - Regression tracking
  */
 
-import type { PrismaClient } from '@prisma/client';
-import { supportsModel } from './_shared/prismaAdapter';
+import type { PrismaClient } from "@prisma/client";
+import { supportsModel } from "./_shared/prismaAdapter";
 
 // ============================================================================
 // Types
@@ -23,7 +23,7 @@ export interface TestCase {
   expectedIntent: string;
   minScore: number;
   lastRun: string | null;
-  status: 'passed' | 'failed' | 'skipped' | 'pending';
+  status: "passed" | "failed" | "skipped" | "pending";
   actualScore: number | null;
   actualDomain: string | null;
   regressionDelta: number | null;
@@ -63,15 +63,19 @@ export interface TestSuiteResult {
  * Get test suite data
  * Returns test cases and run history if configured, or indicates not available
  */
-export async function getTestSuite(prisma: PrismaClient): Promise<TestSuiteResult> {
+export async function getTestSuite(
+  prisma: PrismaClient,
+): Promise<TestSuiteResult> {
   // Check if test suite tables exist
   // For now, we don't have dedicated test suite tables, so return as not configured
-  const hasTestSuiteTable = supportsModel(prisma, 'testCase') || supportsModel(prisma, 'goldenQuery');
+  const hasTestSuiteTable =
+    supportsModel(prisma, "testCase") || supportsModel(prisma, "goldenQuery");
 
   if (!hasTestSuiteTable) {
     return {
       available: false,
-      message: 'Quality test suite not configured. Create golden queries and test cases to track answer quality over time.',
+      message:
+        "Quality test suite not configured. Create golden queries and test cases to track answer quality over time.",
       stats: {
         totalTests: 0,
         passed: 0,
@@ -110,18 +114,19 @@ export async function runTestSuite(prisma: PrismaClient): Promise<{
   message: string;
   run?: TestRun;
 }> {
-  const hasTestSuiteTable = supportsModel(prisma, 'testCase') || supportsModel(prisma, 'goldenQuery');
+  const hasTestSuiteTable =
+    supportsModel(prisma, "testCase") || supportsModel(prisma, "goldenQuery");
 
   if (!hasTestSuiteTable) {
     return {
       success: false,
-      message: 'Test suite not configured. Cannot run tests.',
+      message: "Test suite not configured. Cannot run tests.",
     };
   }
 
   // Placeholder for actual test execution
   return {
     success: false,
-    message: 'Test execution not implemented.',
+    message: "Test execution not implemented.",
   };
 }

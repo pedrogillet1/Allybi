@@ -42,15 +42,26 @@ export interface ProviderStreamResult {
 
 export interface LlmClient {
   provider: LlmProviderId;
-  stream(request: LlmRequest, signal?: AbortSignal): Promise<ProviderStreamResult>;
+  stream(
+    request: LlmRequest,
+    signal?: AbortSignal,
+  ): Promise<ProviderStreamResult>;
 }
 
 export interface LlmResponseParserService {
-  parse(args: { provider: LlmProviderId; model: LlmModelId; raw: any }): LlmResponse;
+  parse(args: {
+    provider: LlmProviderId;
+    model: LlmModelId;
+    raw: any;
+  }): LlmResponse;
 }
 
 export interface LlmTelemetryService {
-  start(args: { provider: LlmProviderId; model: LlmModelId; correlationId?: string }): { markFirstToken: () => void; finish: (usage?: LlmUsage) => any };
+  start(args: {
+    provider: LlmProviderId;
+    model: LlmModelId;
+    correlationId?: string;
+  }): { markFirstToken: () => void; finish: (usage?: LlmUsage) => any };
 }
 
 /**
@@ -58,9 +69,9 @@ export interface LlmTelemetryService {
  * The frontend also does smoothing, but backends should avoid sending giant chunks.
  */
 export interface StreamNormalizationOptions {
-  maxDeltaChars: number;         // cap per delta event
-  flushOnNewline: boolean;       // split deltas on newlines where possible
-  heartbeatEveryMs: number;      // optional keepalive events
+  maxDeltaChars: number; // cap per delta event
+  flushOnNewline: boolean; // split deltas on newlines where possible
+  heartbeatEveryMs: number; // optional keepalive events
 }
 
 const DEFAULT_STREAM_OPTS: StreamNormalizationOptions = {
@@ -84,13 +95,17 @@ function normalizeFinishReason(raw: any): LlmFinishReason {
   if (s.includes("stop")) return "stop";
   if (s.includes("length") || s.includes("max_tokens")) return "length";
   if (s.includes("tool")) return "tool_calls";
-  if (s.includes("content_filter") || s.includes("safety")) return "content_filter";
+  if (s.includes("content_filter") || s.includes("safety"))
+    return "content_filter";
   if (s.includes("cancel")) return "cancelled";
   if (s.includes("error")) return "error";
   return "unknown";
 }
 
-function chunkTextByRules(text: string, opts: StreamNormalizationOptions): string[] {
+function chunkTextByRules(
+  text: string,
+  opts: StreamNormalizationOptions,
+): string[] {
   const t = text ?? "";
   if (!t) return [];
 
@@ -148,12 +163,16 @@ function extractDeltaText(provider: LlmProviderId, chunk: any): string {
   // chunk.candidates[0].content.parts[].text
   const parts = chunk?.candidates?.[0]?.content?.parts;
   if (Array.isArray(parts)) {
-    const t = parts.map((p: any) => p?.text).filter((x: any) => typeof x === "string").join("");
+    const t = parts
+      .map((p: any) => p?.text)
+      .filter((x: any) => typeof x === "string")
+      .join("");
     if (t) return t;
   }
 
   // Gemini alt:
-  if (typeof chunk?.candidates?.[0]?.output === "string") return chunk.candidates[0].output;
+  if (typeof chunk?.candidates?.[0]?.output === "string")
+    return chunk.candidates[0].output;
 
   // Ollama:
   // chunk.response
@@ -166,7 +185,10 @@ function extractDeltaText(provider: LlmProviderId, chunk: any): string {
  * Attempt to detect tool calls from provider stream chunks (optional).
  * Many providers only provide tool call details at the final response.
  */
-function extractToolCallDelta(provider: LlmProviderId, chunk: any): { toolCallId: string; deltaJson: string } | null {
+function extractToolCallDelta(
+  provider: LlmProviderId,
+  chunk: any,
+): { toolCallId: string; deltaJson: string } | null {
   // OpenAI: choices[0].delta.tool_calls[].function.arguments
   const tc = chunk?.choices?.[0]?.delta?.tool_calls;
   if (Array.isArray(tc) && tc.length) {
@@ -201,7 +223,10 @@ function isTerminalChunk(provider: LlmProviderId, chunk: any): boolean {
   return false;
 }
 
-function extractFinishReason(provider: LlmProviderId, chunk: any): LlmFinishReason {
+function extractFinishReason(
+  provider: LlmProviderId,
+  chunk: any,
+): LlmFinishReason {
   const fr =
     chunk?.choices?.[0]?.finish_reason ??
     chunk?.candidates?.[0]?.finishReason ??
@@ -215,19 +240,30 @@ export class LlmStreamAdapterService {
   constructor(
     private readonly llmClient: LlmClient,
     private readonly responseParser: LlmResponseParserService,
-    private readonly telemetry?: LlmTelemetryService
+    private readonly telemetry?: LlmTelemetryService,
   ) {}
 
   /**
    * Create a normalized stream.
    */
-  async stream(request: LlmRequest, signal?: AbortSignal, opts?: Partial<StreamNormalizationOptions>): Promise<AsyncIterable<LlmStreamEvent>> {
-    const options: StreamNormalizationOptions = { ...DEFAULT_STREAM_OPTS, ...(opts || {}) };
+  async stream(
+    request: LlmRequest,
+    signal?: AbortSignal,
+    opts?: Partial<StreamNormalizationOptions>,
+  ): Promise<AsyncIterable<LlmStreamEvent>> {
+    const options: StreamNormalizationOptions = {
+      ...DEFAULT_STREAM_OPTS,
+      ...(opts || {}),
+    };
 
     const provider = request.route.provider;
     const model = request.route.model;
 
-    const telem = this.telemetry?.start({ provider, model, correlationId: request.correlationId });
+    const telem = this.telemetry?.start({
+      provider,
+      model,
+      correlationId: request.correlationId,
+    });
 
     const result = await this.llmClient.stream(request, signal);
 
@@ -270,7 +306,11 @@ export class LlmStreamAdapterService {
           // Tool call delta (optional)
           const toolDelta = extractToolCallDelta(provider, chunk);
           if (toolDelta) {
-            yield { type: "tool_call_delta", toolCallId: toolDelta.toolCallId, deltaJson: toolDelta.deltaJson };
+            yield {
+              type: "tool_call_delta",
+              toolCallId: toolDelta.toolCallId,
+              deltaJson: toolDelta.deltaJson,
+            };
           }
 
           // Delta text
@@ -295,16 +335,28 @@ export class LlmStreamAdapterService {
 
         // Emit FINAL
         // If finalRaw is a full response, parse it. Otherwise build minimal raw for parser.
-        const rawForParser = finalRaw ?? { response: accumulatedText, done: true, finish_reason: finishReason };
-        const parsed = self.responseParser.parse({ provider, model, raw: rawForParser });
+        const rawForParser = finalRaw ?? {
+          response: accumulatedText,
+          done: true,
+          finish_reason: finishReason,
+        };
+        const parsed = self.responseParser.parse({
+          provider,
+          model,
+          raw: rawForParser,
+        });
 
         // Ensure we at least have the accumulated stream text
-        const finalText = parsed.text && parsed.text.length ? parsed.text : accumulatedText;
+        const finalText =
+          parsed.text && parsed.text.length ? parsed.text : accumulatedText;
 
         const response: LlmResponse = {
           ...parsed,
           text: finalText,
-          finishReason: parsed.finishReason && parsed.finishReason !== "unknown" ? parsed.finishReason : finishReason,
+          finishReason:
+            parsed.finishReason && parsed.finishReason !== "unknown"
+              ? parsed.finishReason
+              : finishReason,
         };
 
         // Telemetry finish
@@ -322,7 +374,10 @@ export class LlmStreamAdapterService {
           code: "llm_stream_error",
           message: safeString(err?.message || "Stream failed"),
           retryable,
-          detail: process.env.NODE_ENV === "production" ? undefined : { stack: err?.stack },
+          detail:
+            process.env.NODE_ENV === "production"
+              ? undefined
+              : { stack: err?.stack },
         };
       } finally {
         // If aborted and no final emitted, emit a final “cancelled” response

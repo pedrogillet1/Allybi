@@ -21,8 +21,7 @@ import { lookupParserEntry } from "./loaders";
 
 const SHEET_RANGE_RE =
   /(?:'([^']+)'|([A-Za-z0-9_][A-Za-z0-9_ ]*))!([A-Za-z]{1,3}\d{1,7}(?::[A-Za-z]{1,3}\d{1,7})?)/g;
-const BARE_RANGE_RE =
-  /\b([A-Za-z]{1,3}\d{1,7}(?::[A-Za-z]{1,3}\d{1,7})?)\b/g;
+const BARE_RANGE_RE = /\b([A-Za-z]{1,3}\d{1,7}(?::[A-Za-z]{1,3}\d{1,7})?)\b/g;
 
 function extractA1Ranges(text: string): string[] {
   const results: string[] = [];
@@ -130,10 +129,7 @@ function parseNumber(val: string): number | null {
 // Color extraction
 // ---------------------------------------------------------------------------
 
-function extractColor(
-  text: string,
-  lang: "en" | "pt",
-): string | null {
+function extractColor(text: string, lang: "en" | "pt"): string | null {
   // Try hex code first
   const hexMatch = text.match(/#[0-9A-Fa-f]{6}\b/);
   if (hexMatch) return hexMatch[0].toUpperCase();
@@ -200,7 +196,8 @@ function extractFontSize(text: string): number | null {
 // ---------------------------------------------------------------------------
 
 function extractChartType(text: string, lang: "en" | "pt"): string | null {
-  const dictId = lang === "pt" ? "excel_chart_types_pt" : "excel_chart_types_en";
+  const dictId =
+    lang === "pt" ? "excel_chart_types_pt" : "excel_chart_types_en";
   const low = text.toLowerCase();
   const words = low.split(/\s+/);
 
@@ -250,7 +247,9 @@ function translateFormulaToEn(formula: string): string {
  * Tokenize a formula into string-literal and non-string segments.
  * Only non-string segments should be locale-transformed.
  */
-function tokenizeFormula(formula: string): Array<{ text: string; isString: boolean }> {
+function tokenizeFormula(
+  formula: string,
+): Array<{ text: string; isString: boolean }> {
   const tokens: Array<{ text: string; isString: boolean }> = [];
   let i = 0;
   while (i < formula.length) {
@@ -406,10 +405,7 @@ function extractFormatPattern(text: string): string | null {
 // Heading level extraction
 // ---------------------------------------------------------------------------
 
-function extractHeadingLevel(
-  text: string,
-  lang: "en" | "pt",
-): number | null {
+function extractHeadingLevel(text: string, lang: "en" | "pt"): number | null {
   const dictId =
     lang === "pt" ? "docx_heading_levels_pt" : "docx_heading_levels_en";
   const low = text.toLowerCase();
@@ -424,9 +420,7 @@ function extractHeadingLevel(
   }
 
   // Fallback: look for "heading N" / "título N"
-  const headingMatch = text.match(
-    /\b(?:heading|titulo|título)\s+(\d)\b/i,
-  );
+  const headingMatch = text.match(/\b(?:heading|titulo|título)\s+(\d)\b/i);
   if (headingMatch) return parseInt(headingMatch[1], 10);
 
   return null;
@@ -452,16 +446,11 @@ function extractLanguage(text: string): string | null {
 // Boolean flag extraction
 // ---------------------------------------------------------------------------
 
-function extractBooleanFlag(
-  text: string,
-  slotName: string,
-): boolean | null {
+function extractBooleanFlag(text: string, slotName: string): boolean | null {
   const low = text.toLowerCase();
   if (/\b(?:without|no|disable|remove|off|sem|desabilite)\b/.test(low))
     return false;
-  if (
-    /\b(?:with|yes|enable|add|on|com|habilite|ative)\b/.test(low)
-  )
+  if (/\b(?:with|yes|enable|add|on|com|habilite|ative)\b/.test(low))
     return true;
   return null;
 }
@@ -485,10 +474,14 @@ function extractAlignment(text: string): string | null {
 
 function extractSortSpec(text: string): string | null {
   // Look for "by column X" or "by FIELD_NAME"
-  const byMatch = text.match(/\bby\s+(?:column\s+)?['"]?([A-Za-z][A-Za-z0-9_ ]*?)['"]?\s*(?:ascending|descending|asc|desc|$)/i);
+  const byMatch = text.match(
+    /\bby\s+(?:column\s+)?['"]?([A-Za-z][A-Za-z0-9_ ]*?)['"]?\s*(?:ascending|descending|asc|desc|$)/i,
+  );
   if (byMatch) return byMatch[1].trim();
 
-  const porMatch = text.match(/\bpor\s+(?:coluna\s+)?['"]?([A-Za-z][A-Za-z0-9_ ]*?)['"]?\s*(?:crescente|decrescente|$)/i);
+  const porMatch = text.match(
+    /\bpor\s+(?:coluna\s+)?['"]?([A-Za-z][A-Za-z0-9_ ]*?)['"]?\s*(?:crescente|decrescente|$)/i,
+  );
   if (porMatch) return porMatch[1].trim();
 
   return null;
@@ -529,15 +522,34 @@ function extractLocatorText(text: string): string | null {
 function extractScope(text: string): string | null {
   const low = text.toLowerCase();
   // "all headings" / "every header" / "all titles"
-  if (/\b(?:all|every|each|todos?\s+os?)\s+(?:headings?|headers?|titles?|títulos?|cabeçalhos?)\b/i.test(low)) return "all_headings";
+  if (
+    /\b(?:all|every|each|todos?\s+os?)\s+(?:headings?|headers?|titles?|títulos?|cabeçalhos?)\b/i.test(
+      low,
+    )
+  )
+    return "all_headings";
   // "this section" / "esta seção"
-  if (/\b(?:this|the|current|esta|essa)\s+(?:section|seção|secao)\b/i.test(low)) return "section";
+  if (/\b(?:this|the|current|esta|essa)\s+(?:section|seção|secao)\b/i.test(low))
+    return "section";
   // "all bullets" / "all list items" / "every bullet point"
-  if (/\b(?:all|every|each|todos?\s+os?)\s+(?:bullets?|list\s*items?|bullet\s*points?|itens?\s+de?\s+lista|marcadores?)\b/i.test(low)) return "all_list_items";
+  if (
+    /\b(?:all|every|each|todos?\s+os?)\s+(?:bullets?|list\s*items?|bullet\s*points?|itens?\s+de?\s+lista|marcadores?)\b/i.test(
+      low,
+    )
+  )
+    return "all_list_items";
   // "entire document" / "whole document"
-  if (/\b(?:entire|whole|all|todo\s+o?)\s+(?:document|documento|doc)\b/i.test(low)) return "document";
+  if (
+    /\b(?:entire|whole|all|todo\s+o?)\s+(?:document|documento|doc)\b/i.test(low)
+  )
+    return "document";
   // "all paragraphs"
-  if (/\b(?:all|every|each|todos?\s+os?)\s+(?:paragraphs?|parágrafos?|paragrafos?)\b/i.test(low)) return "all_paragraphs";
+  if (
+    /\b(?:all|every|each|todos?\s+os?)\s+(?:paragraphs?|parágrafos?|paragrafos?)\b/i.test(
+      low,
+    )
+  )
+    return "all_paragraphs";
   return null;
 }
 
@@ -547,9 +559,12 @@ function extractScope(text: string): string | null {
 
 function extractTextCase(text: string): string | null {
   const low = text.toLowerCase();
-  if (/\b(?:title\s*case|capitalize|maiúscula\s+inicial)\b/i.test(low)) return "title";
-  if (/\b(?:upper\s*case|all\s*caps|maiúscul[ao]s?|caixa\s*alta)\b/i.test(low)) return "upper";
-  if (/\b(?:lower\s*case|no\s*caps|minúscul[ao]s?|caixa\s*baixa)\b/i.test(low)) return "lower";
+  if (/\b(?:title\s*case|capitalize|maiúscula\s+inicial)\b/i.test(low))
+    return "title";
+  if (/\b(?:upper\s*case|all\s*caps|maiúscul[ao]s?|caixa\s*alta)\b/i.test(low))
+    return "upper";
+  if (/\b(?:lower\s*case|no\s*caps|minúscul[ao]s?|caixa\s*baixa)\b/i.test(low))
+    return "lower";
   if (/\b(?:sentence\s*case|frase)\b/i.test(low)) return "sentence";
   return null;
 }
@@ -560,8 +575,16 @@ function extractTextCase(text: string): string | null {
 
 function extractListType(text: string): string | null {
   const low = text.toLowerCase();
-  if (/\b(?:numbered|numbering|numbers?|ordered|numerada|numerado|numerad[ao]s?|números)\b/.test(low)) return "numbered";
-  if (/\b(?:bullet|bullets|bulleted|unordered|marcadores?|marcador)\b/.test(low)) return "bulleted";
+  if (
+    /\b(?:numbered|numbering|numbers?|ordered|numerada|numerado|numerad[ao]s?|números)\b/.test(
+      low,
+    )
+  )
+    return "numbered";
+  if (
+    /\b(?:bullet|bullets|bulleted|unordered|marcadores?|marcador)\b/.test(low)
+  )
+    return "bulleted";
   return null;
 }
 
@@ -571,8 +594,10 @@ function extractListType(text: string): string | null {
 
 function extractDirection(text: string): string | null {
   const low = text.toLowerCase();
-  if (/\b(?:promote|indent|increase\s+level|promov|recuar)\b/.test(low)) return "promote";
-  if (/\b(?:demote|outdent|decrease\s+level|rebaixar|avançar)\b/.test(low)) return "demote";
+  if (/\b(?:promote|indent|increase\s+level|promov|recuar)\b/.test(low))
+    return "promote";
+  if (/\b(?:demote|outdent|decrease\s+level|rebaixar|avançar)\b/.test(low))
+    return "demote";
   return null;
 }
 
@@ -584,7 +609,11 @@ function runExtractor(
   extractor: SlotExtractor,
   text: string,
   lang: "en" | "pt",
-  viewerContext: { selection?: unknown; sheetName?: string; frozenSelection?: unknown },
+  viewerContext: {
+    selection?: unknown;
+    sheetName?: string;
+    frozenSelection?: unknown;
+  },
 ): unknown {
   switch (extractor.type) {
     case "A1_RANGE": {
@@ -723,7 +752,9 @@ export function fillSlots(
     const value = runExtractor(extractor, text, lang, viewerContext);
 
     // Collect locale conversions from formula extraction
-    const conversions = (runExtractor as any).__lastConversions as string[] | undefined;
+    const conversions = (runExtractor as any).__lastConversions as
+      | string[]
+      | undefined;
     if (conversions?.length) {
       localeConversions = [...(localeConversions || []), ...conversions];
       (runExtractor as any).__lastConversions = undefined;
@@ -739,5 +770,9 @@ export function fillSlots(
     }
   }
 
-  return { filled, missing, ...(localeConversions?.length ? { localeConversions } : {}) };
+  return {
+    filled,
+    missing,
+    ...(localeConversions?.length ? { localeConversions } : {}),
+  };
 }

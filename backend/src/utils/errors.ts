@@ -17,19 +17,19 @@ export class ValidationError extends AppError {
 }
 
 export class UnauthorizedError extends AppError {
-  constructor(message: string = 'Unauthorized') {
+  constructor(message: string = "Unauthorized") {
     super(message, 401);
   }
 }
 
 export class ForbiddenError extends AppError {
-  constructor(message: string = 'Forbidden') {
+  constructor(message: string = "Forbidden") {
     super(message, 403);
   }
 }
 
 export class NotFoundError extends AppError {
-  constructor(message: string = 'Resource not found') {
+  constructor(message: string = "Resource not found") {
     super(message, 404);
   }
 }
@@ -41,19 +41,19 @@ export class ConflictError extends AppError {
 }
 
 export class RateLimitError extends AppError {
-  constructor(message: string = 'Too many requests') {
+  constructor(message: string = "Too many requests") {
     super(message, 429);
   }
 }
 
 export class AIServiceError extends AppError {
-  constructor(message: string = 'AI service unavailable') {
+  constructor(message: string = "AI service unavailable") {
     super(message, 503);
   }
 }
 
 export class OCRError extends AppError {
-  constructor(message: string = 'Document text extraction failed') {
+  constructor(message: string = "Document text extraction failed") {
     super(message, 422);
   }
 }

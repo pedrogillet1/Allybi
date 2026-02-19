@@ -1,5 +1,7 @@
 function normalizeWhitespaceForEdit(value: string): string {
-  return String(value || "").replace(/\s+/g, " ").trim();
+  return String(value || "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function tokenOverlapRatio(left: string, right: string): number {
@@ -21,7 +23,10 @@ function tokenOverlapRatio(left: string, right: string): number {
   return hit / Math.max(a.size, b.size);
 }
 
-export function looksLikeTruncatedSpanPayload(originalText: string, proposedText: string): boolean {
+export function looksLikeTruncatedSpanPayload(
+  originalText: string,
+  proposedText: string,
+): boolean {
   const before = normalizeWhitespaceForEdit(originalText);
   const after = normalizeWhitespaceForEdit(proposedText);
   if (!before || !after) return false;
@@ -32,4 +37,3 @@ export function looksLikeTruncatedSpanPayload(originalText: string, proposedText
   const overlap = tokenOverlapRatio(before, after);
   return tooShort && overlap < 0.35;
 }
-

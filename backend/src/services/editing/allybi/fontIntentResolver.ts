@@ -20,7 +20,9 @@ function normalized(value: string): string {
 }
 
 function tokenize(value: string): string[] {
-  return normalized(value).split(/[^a-z0-9]+/).filter(Boolean);
+  return normalized(value)
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
 }
 
 function hasWholePhrase(text: string, phrase: string): boolean {
@@ -61,8 +63,13 @@ function editDistanceWithinOne(a: string, b: string): boolean {
 
 function hasFuzzyAlias(textTokens: string[], alias: string): boolean {
   const aliasTokens = tokenize(alias);
-  if (!aliasTokens.length || textTokens.length < aliasTokens.length) return false;
-  for (let start = 0; start <= textTokens.length - aliasTokens.length; start += 1) {
+  if (!aliasTokens.length || textTokens.length < aliasTokens.length)
+    return false;
+  for (
+    let start = 0;
+    start <= textTokens.length - aliasTokens.length;
+    start += 1
+  ) {
     const slice = textTokens.slice(start, start + aliasTokens.length);
     let ok = true;
     for (let i = 0; i < aliasTokens.length; i += 1) {
@@ -78,23 +85,32 @@ function hasFuzzyAlias(textTokens: string[], alias: string): boolean {
 
 function hasDirectiveCue(message: string, language: "en" | "pt"): boolean {
   const banks = loadAllybiBanks();
-  const cueBank = banks.fontAliases?.phrases && typeof banks.fontAliases.phrases === "object"
-    ? banks.fontAliases.phrases
-    : {};
+  const cueBank =
+    banks.fontAliases?.phrases && typeof banks.fontAliases.phrases === "object"
+      ? banks.fontAliases.phrases
+      : {};
   const raw = Array.isArray(cueBank?.[language]) ? cueBank[language] : [];
   const cues = raw.map((x: any) => normalized(String(x || ""))).filter(Boolean);
-  const defaultCues = language === "pt"
-    ? ["mude para", "troque para", "deixe em", "coloque em", "use"]
-    : ["change to", "set to", "make this", "use", "switch to"];
+  const defaultCues =
+    language === "pt"
+      ? ["mude para", "troque para", "deixe em", "coloque em", "use"]
+      : ["change to", "set to", "make this", "use", "switch to"];
   const joined = normalized(message);
-  return [...cues, ...defaultCues].some((cue) => cue.length > 0 && joined.includes(cue));
+  return [...cues, ...defaultCues].some(
+    (cue) => cue.length > 0 && joined.includes(cue),
+  );
 }
 
-export function resolveFontIntent(message: string, language: "en" | "pt"): FontIntentResolution {
+export function resolveFontIntent(
+  message: string,
+  language: "en" | "pt",
+): FontIntentResolution {
   const banks = loadAllybiBanks();
-  const familiesObj = banks.fontAliases?.families && typeof banks.fontAliases.families === "object"
-    ? (banks.fontAliases.families as Record<string, any>)
-    : {};
+  const familiesObj =
+    banks.fontAliases?.families &&
+    typeof banks.fontAliases.families === "object"
+      ? (banks.fontAliases.families as Record<string, any>)
+      : {};
   const supportedFamilies = Object.keys(familiesObj).filter(Boolean);
   const text = String(message || "");
   const normText = normalized(text);
@@ -107,7 +123,9 @@ export function resolveFontIntent(message: string, language: "en" | "pt"): FontI
   for (const family of supportedFamilies) {
     const info = familiesObj[family] || {};
     const aliases = Array.isArray(info.aliases) ? info.aliases : [];
-    const ambiguousAliases = Array.isArray(info.ambiguous) ? info.ambiguous : [];
+    const ambiguousAliases = Array.isArray(info.ambiguous)
+      ? info.ambiguous
+      : [];
     const allAliases = [family, ...aliases]
       .map((x: any) => String(x || "").trim())
       .filter(Boolean);
@@ -129,14 +147,14 @@ export function resolveFontIntent(message: string, language: "en" | "pt"): FontI
       }
     }
 
-    for (const amb of ambiguousAliases.map((x: any) => String(x || "").trim()).filter(Boolean)) {
+    for (const amb of ambiguousAliases
+      .map((x: any) => String(x || "").trim())
+      .filter(Boolean)) {
       if (hasWholePhrase(normText, amb)) ambiguous.push(family);
     }
 
     if (!exactMatch && !fuzzyMatch) continue;
-    const confidence = exactMatch
-      ? (cue ? 0.95 : 0.86)
-      : (cue ? 0.8 : 0.72);
+    const confidence = exactMatch ? (cue ? 0.95 : 0.86) : cue ? 0.8 : 0.72;
 
     if (!best || confidence > best.confidence) {
       best = { family, confidence };
@@ -176,4 +194,3 @@ export function resolveFontIntent(message: string, language: "en" | "pt"): FontI
     supportedFamilies,
   };
 }
-

@@ -6,7 +6,11 @@
  * blocks back to the HTML subset that docxEditor.applyParagraphEdit() accepts.
  */
 
-import { DocxAnchorsService, RichParagraphNode, RichRun } from './docxAnchors.service';
+import {
+  DocxAnchorsService,
+  RichParagraphNode,
+  RichRun,
+} from "./docxAnchors.service";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -23,7 +27,7 @@ export interface ToMarkdownResult {
 }
 
 export interface MarkdownPatch {
-  type: 'modify' | 'insert' | 'delete';
+  type: "modify" | "insert" | "delete";
   docIndex: number;
   /** For insert: the docIndex of the paragraph this goes after (-1 = before all) */
   afterDocIndex?: number;
@@ -54,30 +58,35 @@ export type NumberingFormatMap = Map<string, Map<string, string>>;
 function resolveListType(
   numberingSignature: string | undefined,
   numberingFormats: NumberingFormatMap | undefined,
-): 'bullet' | 'numbered' | null {
+): "bullet" | "numbered" | null {
   if (!numberingSignature) return null;
-  const [ilvl, numId] = numberingSignature.split(':');
-  if (!numId || !numberingFormats) return 'bullet'; // default to bullet if no numbering.xml
+  const [ilvl, numId] = numberingSignature.split(":");
+  if (!numId || !numberingFormats) return "bullet"; // default to bullet if no numbering.xml
   const lvlMap = numberingFormats.get(numId);
-  if (!lvlMap) return 'bullet';
-  const fmt = lvlMap.get(ilvl || '0') || '';
-  if (fmt === 'decimal' || fmt === 'lowerLetter' || fmt === 'upperLetter' ||
-      fmt === 'lowerRoman' || fmt === 'upperRoman') {
-    return 'numbered';
+  if (!lvlMap) return "bullet";
+  const fmt = lvlMap.get(ilvl || "0") || "";
+  if (
+    fmt === "decimal" ||
+    fmt === "lowerLetter" ||
+    fmt === "upperLetter" ||
+    fmt === "lowerRoman" ||
+    fmt === "upperRoman"
+  ) {
+    return "numbered";
   }
-  return 'bullet';
+  return "bullet";
 }
 
 function listIndent(numberingSignature: string | undefined): number {
   if (!numberingSignature) return 0;
-  const ilvl = Number(numberingSignature.split(':')[0]);
+  const ilvl = Number(numberingSignature.split(":")[0]);
   return Number.isFinite(ilvl) && ilvl > 0 ? ilvl : 0;
 }
 
 // ─── Rich runs → Markdown inline formatting ─────────────────────────────────
 
 function runsToMarkdown(runs: RichRun[]): string {
-  if (!runs.length) return '';
+  if (!runs.length) return "";
 
   const parts: string[] = [];
   for (const run of runs) {
@@ -94,7 +103,7 @@ function runsToMarkdown(runs: RichRun[]): string {
     parts.push(text);
   }
 
-  return parts.join('');
+  return parts.join("");
 }
 
 // ─── toMarkdown ──────────────────────────────────────────────────────────────
@@ -113,18 +122,17 @@ export function toMarkdown(
     lines.push(`<!-- docx:${node.docIndex} -->`);
 
     // Build the content line
-    const inlineText = node.runs.length > 0
-      ? runsToMarkdown(node.runs)
-      : node.text;
+    const inlineText =
+      node.runs.length > 0 ? runsToMarkdown(node.runs) : node.text;
 
-    let line = '';
+    let line = "";
 
     if (node.headingLevel && node.headingLevel >= 1 && node.headingLevel <= 6) {
-      line = `${'#'.repeat(node.headingLevel)} ${inlineText}`;
+      line = `${"#".repeat(node.headingLevel)} ${inlineText}`;
     } else if (node.numberingSignature) {
       const type = resolveListType(node.numberingSignature, numberingFormats);
-      const indent = '  '.repeat(listIndent(node.numberingSignature));
-      if (type === 'numbered') {
+      const indent = "  ".repeat(listIndent(node.numberingSignature));
+      if (type === "numbered") {
         line = `${indent}1. ${inlineText}`;
       } else {
         line = `${indent}- ${inlineText}`;
@@ -134,7 +142,7 @@ export function toMarkdown(
     }
 
     lines.push(line);
-    lines.push(''); // blank line between paragraphs
+    lines.push(""); // blank line between paragraphs
 
     paragraphMap.push({
       docIndex: node.docIndex,
@@ -145,7 +153,7 @@ export function toMarkdown(
   }
 
   return {
-    markdown: lines.join('\n'),
+    markdown: lines.join("\n"),
     paragraphMap,
   };
 }
@@ -160,7 +168,7 @@ interface MdBlock {
 const MARKER_RE = /^<!-- docx:(\d+) -->$/;
 
 function parseMdBlocks(md: string): MdBlock[] {
-  const lines = md.split('\n');
+  const lines = md.split("\n");
   const blocks: MdBlock[] = [];
   let currentIndex = -1;
   let currentLines: string[] = [];
@@ -172,7 +180,7 @@ function parseMdBlocks(md: string): MdBlock[] {
       if (currentIndex >= 0) {
         blocks.push({
           docIndex: currentIndex,
-          content: currentLines.join('\n').trim(),
+          content: currentLines.join("\n").trim(),
         });
       }
       currentIndex = Number(match[1]);
@@ -186,14 +194,14 @@ function parseMdBlocks(md: string): MdBlock[] {
   if (currentIndex >= 0) {
     blocks.push({
       docIndex: currentIndex,
-      content: currentLines.join('\n').trim(),
+      content: currentLines.join("\n").trim(),
     });
   }
 
   // Capture any content before the first marker as an insert
-  const firstMarkerLine = lines.findIndex(l => MARKER_RE.test(l.trim()));
+  const firstMarkerLine = lines.findIndex((l) => MARKER_RE.test(l.trim()));
   if (firstMarkerLine > 0) {
-    const preContent = lines.slice(0, firstMarkerLine).join('\n').trim();
+    const preContent = lines.slice(0, firstMarkerLine).join("\n").trim();
     if (preContent) {
       blocks.unshift({ docIndex: -1, content: preContent });
     }
@@ -211,8 +219,8 @@ export function diffMarkdown(
   const newBlocks = parseMdBlocks(newMd);
 
   const patches: MarkdownPatch[] = [];
-  const oldByIndex = new Map(oldBlocks.map(b => [b.docIndex, b]));
-  const newByIndex = new Map(newBlocks.map(b => [b.docIndex, b]));
+  const oldByIndex = new Map(oldBlocks.map((b) => [b.docIndex, b]));
+  const newByIndex = new Map(newBlocks.map((b) => [b.docIndex, b]));
 
   // Find modifications and deletions
   for (const oldBlock of oldBlocks) {
@@ -220,17 +228,21 @@ export function diffMarkdown(
     const newBlock = newByIndex.get(oldBlock.docIndex);
     if (!newBlock) {
       // Deleted
-      const mapEntry = paragraphMap.find(e => e.docIndex === oldBlock.docIndex);
+      const mapEntry = paragraphMap.find(
+        (e) => e.docIndex === oldBlock.docIndex,
+      );
       patches.push({
-        type: 'delete',
+        type: "delete",
         docIndex: oldBlock.docIndex,
         paragraphId: mapEntry?.paragraphId,
       });
     } else if (newBlock.content !== oldBlock.content) {
       // Modified
-      const mapEntry = paragraphMap.find(e => e.docIndex === oldBlock.docIndex);
+      const mapEntry = paragraphMap.find(
+        (e) => e.docIndex === oldBlock.docIndex,
+      );
       patches.push({
-        type: 'modify',
+        type: "modify",
         docIndex: oldBlock.docIndex,
         paragraphId: mapEntry?.paragraphId,
         newMarkdown: newBlock.content,
@@ -252,12 +264,13 @@ export function diffMarkdown(
       }
     }
 
-    const afterEntry = afterDocIndex >= 0
-      ? paragraphMap.find(e => e.docIndex === afterDocIndex)
-      : null;
+    const afterEntry =
+      afterDocIndex >= 0
+        ? paragraphMap.find((e) => e.docIndex === afterDocIndex)
+        : null;
 
     patches.push({
-      type: 'insert',
+      type: "insert",
       docIndex: newBlock.docIndex,
       afterDocIndex,
       paragraphId: afterEntry?.paragraphId,
@@ -279,20 +292,20 @@ export function markdownBlockToHtml(md: string): string {
   let text = md.trim();
 
   // Strip heading prefix (the patch kind targets a specific paragraph, heading level is preserved)
-  text = text.replace(/^#{1,6}\s+/, '');
+  text = text.replace(/^#{1,6}\s+/, "");
 
   // Strip list prefix
-  text = text.replace(/^(\s*)([-*]|\d+\.)\s+/, '');
+  text = text.replace(/^(\s*)([-*]|\d+\.)\s+/, "");
 
   // Convert inline formatting to HTML
   // Order matters: process longer patterns first
 
   // Bold: **text**
-  text = text.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  text = text.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
   // Italic: *text*
-  text = text.replace(/\*(.+?)\*/g, '<i>$1</i>');
+  text = text.replace(/\*(.+?)\*/g, "<i>$1</i>");
   // Strikethrough: ~~text~~
-  text = text.replace(/~~(.+?)~~/g, '<s>$1</s>');
+  text = text.replace(/~~(.+?)~~/g, "<s>$1</s>");
   // Underline: <u>text</u> — pass through as-is
   // Hyperlinks: [text](url) → <a href="url">text</a>
   text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
@@ -306,54 +319,61 @@ export function toPatchPayload(
   patches: MarkdownPatch[],
   richNodes: RichParagraphNode[],
 ): DocxBundlePatch[] {
-  const nodeByDocIndex = new Map(richNodes.map(n => [n.docIndex, n]));
+  const nodeByDocIndex = new Map(richNodes.map((n) => [n.docIndex, n]));
   const result: DocxBundlePatch[] = [];
 
   for (const patch of patches) {
     switch (patch.type) {
-      case 'modify': {
+      case "modify": {
         const node = nodeByDocIndex.get(patch.docIndex);
         const pid = patch.paragraphId || node?.paragraphId;
         if (!pid || !patch.newMarkdown) continue;
         result.push({
-          kind: 'docx_paragraph',
+          kind: "docx_paragraph",
           paragraphId: pid,
           afterHtml: markdownBlockToHtml(patch.newMarkdown),
         });
         break;
       }
 
-      case 'delete': {
+      case "delete": {
         const node = nodeByDocIndex.get(patch.docIndex);
         const pid = patch.paragraphId || node?.paragraphId;
         if (!pid) continue;
         result.push({
-          kind: 'docx_delete_paragraph',
+          kind: "docx_delete_paragraph",
           paragraphId: pid,
         });
         break;
       }
 
-      case 'insert': {
+      case "insert": {
         // Insert before the next existing paragraph after the insertion point.
         // If afterDocIndex is -1, insert before the first paragraph.
-        const html = patch.newMarkdown ? markdownBlockToHtml(patch.newMarkdown) : '';
+        const html = patch.newMarkdown
+          ? markdownBlockToHtml(patch.newMarkdown)
+          : "";
         if (!html) continue;
 
         if (patch.afterDocIndex != null && patch.afterDocIndex >= 0) {
           // Find the paragraph AFTER afterDocIndex to use as insert-before target
-          const sortedNodes = [...richNodes].sort((a, b) => a.docIndex - b.docIndex);
-          const afterIdx = sortedNodes.findIndex(n => n.docIndex === patch.afterDocIndex);
-          const nextNode = afterIdx >= 0 && afterIdx < sortedNodes.length - 1
-            ? sortedNodes[afterIdx + 1]
-            : null;
+          const sortedNodes = [...richNodes].sort(
+            (a, b) => a.docIndex - b.docIndex,
+          );
+          const afterIdx = sortedNodes.findIndex(
+            (n) => n.docIndex === patch.afterDocIndex,
+          );
+          const nextNode =
+            afterIdx >= 0 && afterIdx < sortedNodes.length - 1
+              ? sortedNodes[afterIdx + 1]
+              : null;
 
           if (nextNode) {
             result.push({
-              kind: 'docx_insert_before',
+              kind: "docx_insert_before",
               paragraphId: nextNode.paragraphId,
               content: html,
-              format: 'html',
+              format: "html",
             });
           } else {
             // Inserting at the end — use the after-node's ID with insert_before
@@ -363,10 +383,10 @@ export function toPatchPayload(
             const afterNode = nodeByDocIndex.get(patch.afterDocIndex);
             if (afterNode) {
               result.push({
-                kind: 'docx_insert_before',
+                kind: "docx_insert_before",
                 paragraphId: afterNode.paragraphId,
                 content: html,
-                format: 'html',
+                format: "html",
               });
             }
           }
@@ -375,10 +395,10 @@ export function toPatchPayload(
           const first = richNodes[0];
           if (first) {
             result.push({
-              kind: 'docx_insert_before',
+              kind: "docx_insert_before",
               paragraphId: first.paragraphId,
               content: html,
-              format: 'html',
+              format: "html",
             });
           }
         }
@@ -408,7 +428,11 @@ export async function buildDocxBundlePatchesFromMarkdown(
       ? paragraphMap
       : current.paragraphMap;
 
-  const markdownPatches = diffMarkdown(current.markdown, targetMarkdown, mapForDiff);
+  const markdownPatches = diffMarkdown(
+    current.markdown,
+    targetMarkdown,
+    mapForDiff,
+  );
   const bundlePatches = toPatchPayload(markdownPatches, richNodes);
 
   return {
@@ -422,7 +446,7 @@ export async function buildDocxBundlePatchesFromMarkdown(
 // ─── Utility: strip markers for LLM ─────────────────────────────────────────
 
 export function stripDocxMarkers(md: string): string {
-  return md.replace(/<!-- docx:\d+ -->\n?/g, '');
+  return md.replace(/<!-- docx:\d+ -->\n?/g, "");
 }
 
 /**
@@ -445,8 +469,8 @@ export function reattachMarkers(
       result.push(`<!-- docx:${originalDocIndices[i]} -->`);
     }
     result.push(para);
-    result.push('');
+    result.push("");
   }
 
-  return result.join('\n');
+  return result.join("\n");
 }

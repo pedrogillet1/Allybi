@@ -71,7 +71,9 @@ describe("EditOrchestratorService apply proof", () => {
     expect(out.proof?.fileHashBefore).toBe("hash_before");
     expect(out.proof?.fileHashAfter).toBe("hash_after");
     expect(out.proof?.affectedRanges).toContain("SUMMARY 1!D35:D48");
-    expect(Number(out.proof?.changedCellsCount || 0)).toBeGreaterThanOrEqual(14);
+    expect(Number(out.proof?.changedCellsCount || 0)).toBeGreaterThanOrEqual(
+      14,
+    );
   });
 
   test("includes paragraph target proof for DOCX bundles", async () => {
@@ -124,7 +126,11 @@ describe("EditOrchestratorService apply proof", () => {
       beforeText: "old",
       proposedText: JSON.stringify({
         patches: [
-          { kind: "docx_paragraph", paragraphId: "docx:p:abc", afterText: "merged" },
+          {
+            kind: "docx_paragraph",
+            paragraphId: "docx:p:abc",
+            afterText: "merged",
+          },
           { kind: "docx_delete_paragraph", paragraphId: "docx:p:def" },
         ],
       }),
@@ -134,7 +140,8 @@ describe("EditOrchestratorService apply proof", () => {
     expect(out.ok).toBe(true);
     expect(out.applied).toBe(true);
     expect(out.proof?.verified).toBe(true);
-    expect(out.proof?.affectedParagraphIds).toEqual(expect.arrayContaining(["docx:p:abc", "docx:p:def"]));
+    expect(out.proof?.affectedParagraphIds).toEqual(
+      expect.arrayContaining(["docx:p:abc", "docx:p:def"]),
+    );
   });
 });
-

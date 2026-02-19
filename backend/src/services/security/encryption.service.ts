@@ -13,11 +13,19 @@ export class EncryptionService {
   }
 
   encryptStringToJson(plaintext: string, key: Buffer, aad?: string): string {
-    const payload = this.encryptBuffer(Buffer.from(plaintext, "utf8"), key, aad);
+    const payload = this.encryptBuffer(
+      Buffer.from(plaintext, "utf8"),
+      key,
+      aad,
+    );
     return JSON.stringify(payload);
   }
 
-  decryptStringFromJson(payloadJson: string, key: Buffer, aad?: string): string {
+  decryptStringFromJson(
+    payloadJson: string,
+    key: Buffer,
+    aad?: string,
+  ): string {
     const payload = JSON.parse(payloadJson) as EncryptedPayload;
     const pt = this.decryptBuffer(payload, key, aad);
     return pt.toString("utf8");
@@ -32,7 +40,11 @@ export class EncryptionService {
     return JSON.parse(s) as T;
   }
 
-  encryptBuffer(plaintext: Buffer, key: Buffer, aad?: string): EncryptedPayload {
+  encryptBuffer(
+    plaintext: Buffer,
+    key: Buffer,
+    aad?: string,
+  ): EncryptedPayload {
     if (key.length !== 32) throw new Error("AES-256-GCM key must be 32 bytes");
     const iv = crypto.randomBytes(IV_LEN);
     const cipher = crypto.createCipheriv(ALG, key, iv);
@@ -55,7 +67,8 @@ export class EncryptionService {
 
   decryptBuffer(payload: EncryptedPayload, key: Buffer, aad?: string): Buffer {
     if (key.length !== 32) throw new Error("AES-256-GCM key must be 32 bytes");
-    if (payload.v !== 1 || payload.alg !== "AES-256-GCM") throw new Error("Unsupported payload");
+    if (payload.v !== 1 || payload.alg !== "AES-256-GCM")
+      throw new Error("Unsupported payload");
 
     const iv = unb64(payload.ivB64);
     const tag = unb64(payload.tagB64);

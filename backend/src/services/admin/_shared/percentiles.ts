@@ -20,7 +20,9 @@ export function percentile(sortedValues: number[], p: number): number {
 
   // Linear interpolation
   const fraction = index - lower;
-  return sortedValues[lower] + fraction * (sortedValues[upper] - sortedValues[lower]);
+  return (
+    sortedValues[lower] + fraction * (sortedValues[upper] - sortedValues[lower])
+  );
 }
 
 /**
@@ -55,7 +57,7 @@ export function p99(values: number[]): number {
  */
 export function calculatePercentiles(
   values: number[],
-  percentiles: number[] = [50, 95, 99]
+  percentiles: number[] = [50, 95, 99],
 ): Record<string, number> {
   if (!values.length) {
     return percentiles.reduce((acc, p) => ({ ...acc, [`p${p}`]: 0 }), {});
@@ -63,10 +65,13 @@ export function calculatePercentiles(
 
   const sorted = [...values].sort((a, b) => a - b);
 
-  return percentiles.reduce((acc, p) => ({
-    ...acc,
-    [`p${p}`]: Math.round(percentile(sorted, p)),
-  }), {});
+  return percentiles.reduce(
+    (acc, p) => ({
+      ...acc,
+      [`p${p}`]: Math.round(percentile(sorted, p)),
+    }),
+    {},
+  );
 }
 
 /**
@@ -83,7 +88,16 @@ export function calculateStats(values: number[]): {
   p99: number;
 } {
   if (!values.length) {
-    return { count: 0, sum: 0, mean: 0, min: 0, max: 0, p50: 0, p95: 0, p99: 0 };
+    return {
+      count: 0,
+      sum: 0,
+      mean: 0,
+      min: 0,
+      max: 0,
+      p50: 0,
+      p95: 0,
+      p99: 0,
+    };
   }
 
   const sorted = [...values].sort((a, b) => a - b);

@@ -18,7 +18,10 @@ export function normalizeTurnSuccess(result: ChatResult): ResponseEnvelope {
   };
 }
 
-export function normalizeTurnError(errorCode: string, message: string): ResponseEnvelope {
+export function normalizeTurnError(
+  errorCode: string,
+  message: string,
+): ResponseEnvelope {
   return { ok: false, errorCode, message };
 }
 
@@ -27,7 +30,8 @@ function extractRevisionId(payload: unknown): string | undefined {
   if (Array.isArray(payload)) {
     for (const item of payload) {
       const revisionId = (item as any)?.revisionId;
-      if (typeof revisionId === "string" && revisionId.trim()) return revisionId.trim();
+      if (typeof revisionId === "string" && revisionId.trim())
+        return revisionId.trim();
     }
   }
   const single = (payload as any)?.revisionId;

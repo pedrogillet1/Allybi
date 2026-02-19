@@ -3,11 +3,11 @@
  * Security counters and audit events (deterministic, empty if no data)
  */
 
-import type { PrismaClient } from '@prisma/client';
-import { parseRange, normalizeRange } from './_shared/rangeWindow';
-import { clampLimit } from './_shared/clamp';
-import { processPage, buildCursorClause } from './_shared/pagination';
-import { supportsModel } from './_shared/prismaAdapter';
+import type { PrismaClient } from "@prisma/client";
+import { parseRange, normalizeRange } from "./_shared/rangeWindow";
+import { clampLimit } from "./_shared/clamp";
+import { processPage, buildCursorClause } from "./_shared/pagination";
+import { supportsModel } from "./_shared/prismaAdapter";
 
 export interface SecurityCounters {
   privacyBlocks: number;
@@ -39,9 +39,9 @@ export interface SecurityResult {
  */
 export async function getSecurity(
   prisma: PrismaClient,
-  params: { range?: string; limit?: number; cursor?: string }
+  params: { range?: string; limit?: number; cursor?: string },
 ): Promise<SecurityResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
   const limit = clampLimit(params.limit, 50);
   const cursorClause = buildCursorClause(params.cursor);
@@ -67,48 +67,74 @@ export async function getSecurity(
   let nextCursor: string | undefined;
 
   // Try to read from AuditLog if available
-  if (supportsModel(prisma, 'auditLog')) {
+  if (supportsModel(prisma, "auditLog")) {
     // Get security-related events
     const securityActions = [
-      'PRIVACY_BLOCK',
-      'REDACTION',
-      'LOGIN_FAILED',
-      'login_failed',
-      'ACCESS_DENIED',
-      'access_denied',
-      'AUTH_FAILURE',
-      'auth_failure',
-      'BLOCKED',
-      'blocked',
+      "PRIVACY_BLOCK",
+      "REDACTION",
+      "LOGIN_FAILED",
+      "login_failed",
+      "ACCESS_DENIED",
+      "access_denied",
+      "AUTH_FAILURE",
+      "auth_failure",
+      "BLOCKED",
+      "blocked",
     ];
 
     // Count security events
-    const [privacyBlocks, redactions, failedAuth, accessDenied] = await Promise.all([
-      safe(() => prisma.auditLog.count({
-        where: {
-          createdAt: { gte: from, lt: to },
-          action: { in: ['PRIVACY_BLOCK', 'privacy_block', 'BLOCKED', 'blocked'] },
-        },
-      }), 0),
-      safe(() => prisma.auditLog.count({
-        where: {
-          createdAt: { gte: from, lt: to },
-          action: { in: ['REDACTION', 'redaction', 'REDACT', 'redact'] },
-        },
-      }), 0),
-      safe(() => prisma.auditLog.count({
-        where: {
-          createdAt: { gte: from, lt: to },
-          action: { in: ['LOGIN_FAILED', 'login_failed', 'AUTH_FAILURE', 'auth_failure'] },
-        },
-      }), 0),
-      safe(() => prisma.auditLog.count({
-        where: {
-          createdAt: { gte: from, lt: to },
-          action: { in: ['ACCESS_DENIED', 'access_denied'] },
-        },
-      }), 0),
-    ]);
+    const [privacyBlocks, redactions, failedAuth, accessDenied] =
+      await Promise.all([
+        safe(
+          () =>
+            prisma.auditLog.count({
+              where: {
+                createdAt: { gte: from, lt: to },
+                action: {
+                  in: ["PRIVACY_BLOCK", "privacy_block", "BLOCKED", "blocked"],
+                },
+              },
+            }),
+          0,
+        ),
+        safe(
+          () =>
+            prisma.auditLog.count({
+              where: {
+                createdAt: { gte: from, lt: to },
+                action: { in: ["REDACTION", "redaction", "REDACT", "redact"] },
+              },
+            }),
+          0,
+        ),
+        safe(
+          () =>
+            prisma.auditLog.count({
+              where: {
+                createdAt: { gte: from, lt: to },
+                action: {
+                  in: [
+                    "LOGIN_FAILED",
+                    "login_failed",
+                    "AUTH_FAILURE",
+                    "auth_failure",
+                  ],
+                },
+              },
+            }),
+          0,
+        ),
+        safe(
+          () =>
+            prisma.auditLog.count({
+              where: {
+                createdAt: { gte: from, lt: to },
+                action: { in: ["ACCESS_DENIED", "access_denied"] },
+              },
+            }),
+          0,
+        ),
+      ]);
 
     counters = {
       privacyBlocks: privacyBlocks as number,
@@ -118,30 +144,34 @@ export async function getSecurity(
     };
 
     // Get security events with pagination
-    const events = await safe(() => prisma.auditLog.findMany({
-      where: {
-        createdAt: { gte: from, lt: to },
-        action: { in: securityActions },
-      },
-      take: limit + 1,
-      ...cursorClause,
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        createdAt: true,
-        userId: true,
-        action: true,
-        resource: true,
-        status: true,
-        ipAddress: true,
-        details: true,
-      },
-    }), []);
+    const events = await safe(
+      () =>
+        prisma.auditLog.findMany({
+          where: {
+            createdAt: { gte: from, lt: to },
+            action: { in: securityActions },
+          },
+          take: limit + 1,
+          ...cursorClause,
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            createdAt: true,
+            userId: true,
+            action: true,
+            resource: true,
+            status: true,
+            ipAddress: true,
+            details: true,
+          },
+        }),
+      [],
+    );
 
     const page = processPage(events, limit);
     nextCursor = page.nextCursor ?? undefined;
 
-    items = page.page.map(e => ({
+    items = page.page.map((e) => ({
       at: e.createdAt.toISOString(),
       userId: e.userId,
       action: e.action,
@@ -153,32 +183,40 @@ export async function getSecurity(
   }
 
   // Also check AdminAuditLog if available
-  if (supportsModel(prisma, 'adminAuditLog')) {
+  if (supportsModel(prisma, "adminAuditLog")) {
     const adminSecurityActions = [
-      'ADMIN_LOGIN_FAILED',
-      'admin_login_failed',
-      'ADMIN_ACCESS_DENIED',
-      'admin_access_denied',
+      "ADMIN_LOGIN_FAILED",
+      "admin_login_failed",
+      "ADMIN_ACCESS_DENIED",
+      "admin_access_denied",
     ];
 
-    const adminFailedAuth = await safe(() => prisma.adminAuditLog.count({
-      where: {
-        timestamp: { gte: from, lt: to },
-        action: { in: adminSecurityActions },
-      },
-    }), 0);
+    const adminFailedAuth = await safe(
+      () =>
+        prisma.adminAuditLog.count({
+          where: {
+            timestamp: { gte: from, lt: to },
+            action: { in: adminSecurityActions },
+          },
+        }),
+      0,
+    );
 
     counters.failedAuth += adminFailedAuth as number;
   }
 
   // Check for suspicious sessions
-  if (supportsModel(prisma, 'session')) {
-    const suspiciousSessions = await safe(() => prisma.session.count({
-      where: {
-        createdAt: { gte: from, lt: to },
-        isSuspicious: true,
-      },
-    }), 0);
+  if (supportsModel(prisma, "session")) {
+    const suspiciousSessions = await safe(
+      () =>
+        prisma.session.count({
+          where: {
+            createdAt: { gte: from, lt: to },
+            isSuspicious: true,
+          },
+        }),
+      0,
+    );
 
     counters.accessDenied += suspiciousSessions as number;
   }

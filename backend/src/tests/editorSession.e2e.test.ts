@@ -14,7 +14,12 @@ describe("editor session e2e (no redis)", () => {
 
     const svc = new EditorSessionService(state, stream, locks, patchQueue);
 
-    const ctx = { userId: "u1", conversationId: "c1", correlationId: "t1", clientMessageId: "m1" };
+    const ctx = {
+      userId: "u1",
+      conversationId: "c1",
+      correlationId: "t1",
+      clientMessageId: "m1",
+    };
 
     const { session, lock } = await svc.start(ctx, { documentId: "d1" });
     expect(session.sessionId).toBeTruthy();
@@ -23,19 +28,30 @@ describe("editor session e2e (no redis)", () => {
 
     const patch = svc.proposePatch(ctx, {
       sessionId: session.sessionId,
-      patch: { kind: "replace_text", target: { type: "docx_paragraph", id: "p1" }, payload: { newText: "Hello" } },
+      patch: {
+        kind: "replace_text",
+        target: { type: "docx_paragraph", id: "p1" },
+        payload: { newText: "Hello" },
+      },
     });
     expect(patch.patchId).toBeTruthy();
 
-    const enq = await svc.enqueuePatch(ctx, { sessionId: session.sessionId, patchId: patch.patchId });
+    const enq = await svc.enqueuePatch(ctx, {
+      sessionId: session.sessionId,
+      patchId: patch.patchId,
+    });
     expect(enq.jobId).toBe("job_test_001");
 
-    const committed = await svc.commit(ctx, { sessionId: session.sessionId, reason: "apply" });
+    const committed = await svc.commit(ctx, {
+      sessionId: session.sessionId,
+      reason: "apply",
+    });
     expect(committed.status).toBe("committed");
 
     // release lock
     await locks.release(lock);
-    expect(await locks.isLocked({ userId: "u1", documentId: "d1" })).toBe(false);
+    expect(await locks.isLocked({ userId: "u1", documentId: "d1" })).toBe(
+      false,
+    );
   });
 });
-

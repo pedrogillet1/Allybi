@@ -10,58 +10,58 @@
  */
 
 export type DomainId =
-  | 'general'
+  | "general"
 
   // Finance family
-  | 'finance_corporate'
-  | 'finance_real_estate'
-  | 'finance_markets'
-  | 'finance_lending'
-  | 'finance_payments'
+  | "finance_corporate"
+  | "finance_real_estate"
+  | "finance_markets"
+  | "finance_lending"
+  | "finance_payments"
 
   // Accounting family
-  | 'accounting_gl'
-  | 'accounting_ap_ar'
-  | 'accounting_tax'
-  | 'accounting_audit'
+  | "accounting_gl"
+  | "accounting_ap_ar"
+  | "accounting_tax"
+  | "accounting_audit"
 
   // Excel family
-  | 'excel_modeling'
-  | 'excel_audit_tracing'
-  | 'excel_reporting'
+  | "excel_modeling"
+  | "excel_audit_tracing"
+  | "excel_reporting"
 
   // Legal family
-  | 'legal_contracts'
-  | 'legal_compliance'
-  | 'legal_disputes'
+  | "legal_contracts"
+  | "legal_compliance"
+  | "legal_disputes"
 
   // Medical family
-  | 'medical_labs'
-  | 'medical_clinical'
-  | 'medical_insurance'
+  | "medical_labs"
+  | "medical_clinical"
+  | "medical_insurance"
 
   // Personal documents family
-  | 'identity_docs'
-  | 'address_proof'
-  | 'vehicle_docs'
-  | 'housing_rent_mortgage'
-  | 'utilities_bills'
+  | "identity_docs"
+  | "address_proof"
+  | "vehicle_docs"
+  | "housing_rent_mortgage"
+  | "utilities_bills"
 
   // Billing/commerce family
-  | 'invoices_billing'
-  | 'banking_statements'
-  | 'credit_cards'
-  | 'insurance';
+  | "invoices_billing"
+  | "banking_statements"
+  | "credit_cards"
+  | "insurance";
 
 export type DomainFamilyId =
-  | 'general'
-  | 'finance'
-  | 'accounting'
-  | 'excel'
-  | 'legal'
-  | 'medical'
-  | 'personal_docs'
-  | 'billing';
+  | "general"
+  | "finance"
+  | "accounting"
+  | "excel"
+  | "legal"
+  | "medical"
+  | "personal_docs"
+  | "billing";
 
 export type DomainConfidence = {
   domain: DomainId;
@@ -75,36 +75,36 @@ export type DomainDetectionResult = {
   alternatives?: DomainConfidence[]; // sorted desc
   matchedTerms?: Array<{
     term: string;
-    weight: 'strong' | 'medium' | 'weak';
-    source: 'query' | 'title' | 'snippet';
+    weight: "strong" | "medium" | "weak";
+    source: "query" | "title" | "snippet";
   }>;
 };
 
 export type RetrievalProfileId =
-  | 'balanced'
-  | 'numeric_leaning'
-  | 'numeric_strict'
-  | 'structure_first'
-  | 'ocr_tolerant'
-  | 'field_extraction'
-  | 'quote_friendly'
-  | 'legal_quote'
-  | 'medical_fields'
-  | 'market_filings';
+  | "balanced"
+  | "numeric_leaning"
+  | "numeric_strict"
+  | "structure_first"
+  | "ocr_tolerant"
+  | "field_extraction"
+  | "quote_friendly"
+  | "legal_quote"
+  | "medical_fields"
+  | "market_filings";
 
 export type FormattingProfileId =
-  | 'default'
-  | 'numbers_first'
-  | 'tables_first'
-  | 'fields_first'
-  | 'bullets_first'
-  | 'compliance_cautious'
-  | 'medical_calm'
-  | 'legal_precise';
+  | "default"
+  | "numbers_first"
+  | "tables_first"
+  | "fields_first"
+  | "bullets_first"
+  | "compliance_cautious"
+  | "medical_calm"
+  | "legal_precise";
 
 export type DomainDocAffinity = {
   preferredDocTypes: string[]; // e.g., ['pdf','xlsx']
-  ocrTolerance: 'low' | 'medium' | 'high';
+  ocrTolerance: "low" | "medium" | "high";
 };
 
 export type DomainDefinition = {

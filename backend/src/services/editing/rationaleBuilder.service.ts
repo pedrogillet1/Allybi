@@ -41,7 +41,9 @@ export class RationaleBuilderService {
       guardrails.push("Named entities preserved");
     }
     if ((input.sourceProofCount || 0) > 0) {
-      reasons.push(`Grounded with ${input.sourceProofCount} local proof excerpt(s).`);
+      reasons.push(
+        `Grounded with ${input.sourceProofCount} local proof excerpt(s).`,
+      );
       guardrails.push("Evidence anchored");
     }
     if (input.targetAmbiguous) {
@@ -65,4 +67,3 @@ export class RationaleBuilderService {
     };
   }
 }
-

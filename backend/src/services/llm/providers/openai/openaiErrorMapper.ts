@@ -50,7 +50,9 @@ function sanitizeMessage(msg: any): string {
 
 function statusFrom(err: any): number | undefined {
   const status = err?.status ?? err?.response?.status ?? err?.statusCode;
-  return typeof status === "number" && Number.isFinite(status) ? status : undefined;
+  return typeof status === "number" && Number.isFinite(status)
+    ? status
+    : undefined;
 }
 
 function errorTypeString(err: any): string {
@@ -58,12 +60,23 @@ function errorTypeString(err: any): string {
 }
 
 function messageFrom(err: any): string {
-  return sanitizeMessage(err?.message ?? err?.response?.data?.error?.message ?? err?.response?.data?.message ?? "Request failed");
+  return sanitizeMessage(
+    err?.message ??
+      err?.response?.data?.error?.message ??
+      err?.response?.data?.message ??
+      "Request failed",
+  );
 }
 
 function isNetworkish(err: any): boolean {
   const code = String(err?.code ?? "").toUpperCase();
-  return ["ECONNABORTED", "ECONNRESET", "ETIMEDOUT", "ENOTFOUND", "EAI_AGAIN"].includes(code);
+  return [
+    "ECONNABORTED",
+    "ECONNRESET",
+    "ETIMEDOUT",
+    "ENOTFOUND",
+    "EAI_AGAIN",
+  ].includes(code);
 }
 
 export function mapOpenAIError(err: any): MappedOpenAIError {
@@ -73,20 +86,44 @@ export function mapOpenAIError(err: any): MappedOpenAIError {
 
   // Rate limit
   if (status === 429) {
-    return { code: "openai_rate_limited", message: msg, status, retryable: true, detail: isProd() ? undefined : err };
+    return {
+      code: "openai_rate_limited",
+      message: msg,
+      status,
+      retryable: true,
+      detail: isProd() ? undefined : err,
+    };
   }
 
   // Auth errors
   if (status === 401) {
-    return { code: "openai_unauthorized", message: msg, status, retryable: false, detail: isProd() ? undefined : err };
+    return {
+      code: "openai_unauthorized",
+      message: msg,
+      status,
+      retryable: false,
+      detail: isProd() ? undefined : err,
+    };
   }
   if (status === 403) {
-    return { code: "openai_forbidden", message: msg, status, retryable: false, detail: isProd() ? undefined : err };
+    return {
+      code: "openai_forbidden",
+      message: msg,
+      status,
+      retryable: false,
+      detail: isProd() ? undefined : err,
+    };
   }
 
   // Timeout / network
   if (isNetworkish(err) || t.includes("timeout")) {
-    return { code: "openai_timeout", message: msg, status, retryable: true, detail: isProd() ? undefined : err };
+    return {
+      code: "openai_timeout",
+      message: msg,
+      status,
+      retryable: true,
+      detail: isProd() ? undefined : err,
+    };
   }
 
   // Bad request
@@ -94,30 +131,76 @@ export function mapOpenAIError(err: any): MappedOpenAIError {
     // model not found / invalid request / tool schema mismatch, etc.
     const lower = msg.toLowerCase();
     if (lower.includes("model") && lower.includes("not found")) {
-      return { code: "openai_model_not_found", message: msg, status, retryable: false, detail: isProd() ? undefined : err };
+      return {
+        code: "openai_model_not_found",
+        message: msg,
+        status,
+        retryable: false,
+        detail: isProd() ? undefined : err,
+      };
     }
-    if (lower.includes("maximum context length") || lower.includes("context length") || lower.includes("too many tokens")) {
-      return { code: "openai_context_length", message: msg, status, retryable: false, detail: isProd() ? undefined : err };
+    if (
+      lower.includes("maximum context length") ||
+      lower.includes("context length") ||
+      lower.includes("too many tokens")
+    ) {
+      return {
+        code: "openai_context_length",
+        message: msg,
+        status,
+        retryable: false,
+        detail: isProd() ? undefined : err,
+      };
     }
-    return { code: "openai_bad_request", message: msg, status, retryable: false, detail: isProd() ? undefined : err };
+    return {
+      code: "openai_bad_request",
+      message: msg,
+      status,
+      retryable: false,
+      detail: isProd() ? undefined : err,
+    };
   }
 
   // Server errors
   if (typeof status === "number" && status >= 500 && status <= 599) {
-    return { code: "openai_server_error", message: msg, status, retryable: true, detail: isProd() ? undefined : err };
+    return {
+      code: "openai_server_error",
+      message: msg,
+      status,
+      retryable: true,
+      detail: isProd() ? undefined : err,
+    };
   }
 
   // Explicit stream errors
   if (t.includes("stream")) {
-    return { code: "openai_stream_error", message: msg, status, retryable: true, detail: isProd() ? undefined : err };
+    return {
+      code: "openai_stream_error",
+      message: msg,
+      status,
+      retryable: true,
+      detail: isProd() ? undefined : err,
+    };
   }
 
   // Generic network error
   if (isNetworkish(err)) {
-    return { code: "openai_network_error", message: msg, status, retryable: true, detail: isProd() ? undefined : err };
+    return {
+      code: "openai_network_error",
+      message: msg,
+      status,
+      retryable: true,
+      detail: isProd() ? undefined : err,
+    };
   }
 
-  return { code: "openai_unknown_error", message: msg, status, retryable: false, detail: isProd() ? undefined : err };
+  return {
+    code: "openai_unknown_error",
+    message: msg,
+    status,
+    retryable: false,
+    detail: isProd() ? undefined : err,
+  };
 }
 
 export default mapOpenAIError;

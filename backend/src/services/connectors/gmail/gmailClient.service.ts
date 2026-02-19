@@ -1,4 +1,4 @@
-import { google, gmail_v1 } from 'googleapis';
+import { google, gmail_v1 } from "googleapis";
 
 export interface GmailRequestContext {
   correlationId?: string;
@@ -18,9 +18,12 @@ export class GmailClientError extends Error {
   public readonly retryable: boolean;
   public readonly status?: number;
 
-  constructor(message: string, opts: { code: string; retryable: boolean; status?: number }) {
+  constructor(
+    message: string,
+    opts: { code: string; retryable: boolean; status?: number },
+  ) {
     super(message);
-    this.name = 'GmailClientError';
+    this.name = "GmailClientError";
     this.code = opts.code;
     this.retryable = opts.retryable;
     this.status = opts.status;
@@ -51,10 +54,10 @@ export class GmailClientService {
     const client = this.createClient(accessToken);
 
     return this.withRetry(async () => {
-      const response = await client.users.getProfile({ userId: 'me' });
+      const response = await client.users.getProfile({ userId: "me" });
       if (!response.data) {
-        throw new GmailClientError('Gmail profile payload is empty.', {
-          code: 'EMPTY_PROFILE_PAYLOAD',
+        throw new GmailClientError("Gmail profile payload is empty.", {
+          code: "EMPTY_PROFILE_PAYLOAD",
           retryable: false,
         });
       }
@@ -78,7 +81,7 @@ export class GmailClientService {
 
     return this.withRetry(async () => {
       const response = await client.users.messages.list({
-        userId: 'me',
+        userId: "me",
         q: params.q,
         labelIds: params.labelIds,
         maxResults: params.maxResults,
@@ -97,8 +100,8 @@ export class GmailClientService {
   ): Promise<gmail_v1.Schema$Message> {
     this.assertToken(accessToken);
     if (!messageId.trim()) {
-      throw new GmailClientError('messageId is required.', {
-        code: 'INVALID_MESSAGE_ID',
+      throw new GmailClientError("messageId is required.", {
+        code: "INVALID_MESSAGE_ID",
         retryable: false,
       });
     }
@@ -107,16 +110,19 @@ export class GmailClientService {
 
     return this.withRetry(async () => {
       const response = await client.users.messages.get({
-        userId: 'me',
+        userId: "me",
         id: messageId,
-        format: 'full',
+        format: "full",
       });
 
       if (!response.data) {
-        throw new GmailClientError(`Gmail returned empty message payload for ${messageId}.`, {
-          code: 'EMPTY_MESSAGE_PAYLOAD',
-          retryable: false,
-        });
+        throw new GmailClientError(
+          `Gmail returned empty message payload for ${messageId}.`,
+          {
+            code: "EMPTY_MESSAGE_PAYLOAD",
+            retryable: false,
+          },
+        );
       }
 
       return response.data;
@@ -129,25 +135,34 @@ export class GmailClientService {
     _ctx?: GmailRequestContext,
   ): Promise<{ data: string }> {
     this.assertToken(accessToken);
-    const messageId = String(params.messageId || '').trim();
-    const attachmentId = String(params.attachmentId || '').trim();
+    const messageId = String(params.messageId || "").trim();
+    const attachmentId = String(params.attachmentId || "").trim();
     if (!messageId) {
-      throw new GmailClientError('messageId is required.', { code: 'INVALID_MESSAGE_ID', retryable: false });
+      throw new GmailClientError("messageId is required.", {
+        code: "INVALID_MESSAGE_ID",
+        retryable: false,
+      });
     }
     if (!attachmentId) {
-      throw new GmailClientError('attachmentId is required.', { code: 'INVALID_ATTACHMENT_ID', retryable: false });
+      throw new GmailClientError("attachmentId is required.", {
+        code: "INVALID_ATTACHMENT_ID",
+        retryable: false,
+      });
     }
 
     const client = this.createClient(accessToken);
     return this.withRetry(async () => {
       const response = await client.users.messages.attachments.get({
-        userId: 'me',
+        userId: "me",
         messageId,
         id: attachmentId,
       });
       const data = (response.data as any)?.data;
-      if (typeof data !== 'string') {
-        throw new GmailClientError('Gmail attachment payload missing data.', { code: 'EMPTY_ATTACHMENT_DATA', retryable: false });
+      if (typeof data !== "string") {
+        throw new GmailClientError("Gmail attachment payload missing data.", {
+          code: "EMPTY_ATTACHMENT_DATA",
+          retryable: false,
+        });
       }
       return { data };
     });
@@ -157,7 +172,9 @@ export class GmailClientService {
     accessToken: string,
     params: {
       startHistoryId: string;
-      historyTypes?: Array<'messageAdded' | 'messageDeleted' | 'labelAdded' | 'labelRemoved'>;
+      historyTypes?: Array<
+        "messageAdded" | "messageDeleted" | "labelAdded" | "labelRemoved"
+      >;
       maxResults?: number;
       pageToken?: string;
     },
@@ -166,17 +183,20 @@ export class GmailClientService {
     this.assertToken(accessToken);
 
     if (!params.startHistoryId?.trim()) {
-      throw new GmailClientError('startHistoryId is required for Gmail history listing.', {
-        code: 'INVALID_HISTORY_CURSOR',
-        retryable: false,
-      });
+      throw new GmailClientError(
+        "startHistoryId is required for Gmail history listing.",
+        {
+          code: "INVALID_HISTORY_CURSOR",
+          retryable: false,
+        },
+      );
     }
 
     const client = this.createClient(accessToken);
 
     return this.withRetry(async () => {
       const response = await client.users.history.list({
-        userId: 'me',
+        userId: "me",
         startHistoryId: params.startHistoryId,
         historyTypes: params.historyTypes,
         maxResults: params.maxResults,
@@ -195,86 +215,109 @@ export class GmailClientService {
       body: string;
       cc?: string;
       bcc?: string;
-      attachments?: Array<{ filename: string; mimeType: string; content: Buffer }>;
+      attachments?: Array<{
+        filename: string;
+        mimeType: string;
+        content: Buffer;
+      }>;
     },
     _ctx?: GmailRequestContext,
   ): Promise<gmail_v1.Schema$Message> {
     this.assertToken(accessToken);
     if (!params.to?.trim()) {
-      throw new GmailClientError('"to" address is required.', { code: 'INVALID_RECIPIENT', retryable: false });
+      throw new GmailClientError('"to" address is required.', {
+        code: "INVALID_RECIPIENT",
+        retryable: false,
+      });
     }
 
     const client = this.createClient(accessToken);
 
     const safeFilename = (name: string) =>
-      String(name || 'attachment')
-        .replace(/[\r\n]/g, ' ')
-        .replace(/["<>]/g, '')
+      String(name || "attachment")
+        .replace(/[\r\n]/g, " ")
+        .replace(/["<>]/g, "")
         .trim()
-        .slice(0, 180) || 'attachment';
+        .slice(0, 180) || "attachment";
 
-    const wrapBase64 = (b64: string) => (b64.match(/.{1,76}/g) || [b64]).join('\r\n');
+    const wrapBase64 = (b64: string) =>
+      (b64.match(/.{1,76}/g) || [b64]).join("\r\n");
 
-    const attachments = Array.isArray(params.attachments) ? params.attachments.filter(Boolean) : [];
+    const attachments = Array.isArray(params.attachments)
+      ? params.attachments.filter(Boolean)
+      : [];
 
-    const subject = params.subject || '(no subject)';
+    const subject = params.subject || "(no subject)";
     const baseHeaders = [
       `To: ${params.to}`,
       ...(params.cc ? [`Cc: ${params.cc}`] : []),
       ...(params.bcc ? [`Bcc: ${params.bcc}`] : []),
       `Subject: ${subject}`,
-      'MIME-Version: 1.0',
+      "MIME-Version: 1.0",
     ];
 
     let rfc2822: string;
     if (!attachments.length) {
-      const headers = [...baseHeaders, 'Content-Type: text/plain; charset="UTF-8"'];
-      rfc2822 = `${headers.join('\r\n')}\r\n\r\n${params.body || ''}`;
+      const headers = [
+        ...baseHeaders,
+        'Content-Type: text/plain; charset="UTF-8"',
+      ];
+      rfc2822 = `${headers.join("\r\n")}\r\n\r\n${params.body || ""}`;
     } else {
       const boundary = `koda_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-      const headers = [...baseHeaders, `Content-Type: multipart/mixed; boundary="${boundary}"`];
+      const headers = [
+        ...baseHeaders,
+        `Content-Type: multipart/mixed; boundary="${boundary}"`,
+      ];
 
       const parts: string[] = [];
       // Text part
       parts.push(
         `--${boundary}\r\n` +
-        `Content-Type: text/plain; charset="UTF-8"\r\n` +
-        `Content-Transfer-Encoding: 7bit\r\n\r\n` +
-        `${params.body || ''}\r\n`
+          `Content-Type: text/plain; charset="UTF-8"\r\n` +
+          `Content-Transfer-Encoding: 7bit\r\n\r\n` +
+          `${params.body || ""}\r\n`,
       );
 
       // Attachments
       for (const a of attachments) {
         const filename = safeFilename(a.filename);
-        const mimeType = (a.mimeType || 'application/octet-stream').trim() || 'application/octet-stream';
-        const contentB64 = wrapBase64(Buffer.from(a.content || Buffer.alloc(0)).toString('base64'));
+        const mimeType =
+          (a.mimeType || "application/octet-stream").trim() ||
+          "application/octet-stream";
+        const contentB64 = wrapBase64(
+          Buffer.from(a.content || Buffer.alloc(0)).toString("base64"),
+        );
         parts.push(
           `--${boundary}\r\n` +
-          `Content-Type: ${mimeType}; name="${filename}"\r\n` +
-          `Content-Disposition: attachment; filename="${filename}"\r\n` +
-          `Content-Transfer-Encoding: base64\r\n\r\n` +
-          `${contentB64}\r\n`
+            `Content-Type: ${mimeType}; name="${filename}"\r\n` +
+            `Content-Disposition: attachment; filename="${filename}"\r\n` +
+            `Content-Transfer-Encoding: base64\r\n\r\n` +
+            `${contentB64}\r\n`,
         );
       }
 
       parts.push(`--${boundary}--`);
-      rfc2822 = `${headers.join('\r\n')}\r\n\r\n${parts.join('')}`;
+      rfc2822 = `${headers.join("\r\n")}\r\n\r\n${parts.join("")}`;
     }
 
     const raw = Buffer.from(rfc2822)
-      .toString('base64')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/g, '');
+      .toString("base64")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/g, "");
 
     return this.withRetry(async () => {
       const response = await client.users.messages.send({
-        userId: 'me',
+        userId: "me",
         requestBody: { raw },
       });
 
       if (!response.data) {
-        throw new GmailClientError('Gmail send returned empty payload.', { code: 'EMPTY_SEND_PAYLOAD', retryable: false });
+        throw new GmailClientError("Gmail send returned empty payload.", {
+          code: "EMPTY_SEND_PAYLOAD",
+          retryable: false,
+        });
       }
 
       return response.data;
@@ -284,13 +327,13 @@ export class GmailClientService {
   private createClient(accessToken: string): gmail_v1.Gmail {
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: accessToken });
-    return google.gmail({ version: 'v1', auth });
+    return google.gmail({ version: "v1", auth });
   }
 
   private assertToken(accessToken: string): void {
     if (!accessToken || !accessToken.trim()) {
-      throw new GmailClientError('A valid Gmail access token is required.', {
-        code: 'INVALID_ACCESS_TOKEN',
+      throw new GmailClientError("A valid Gmail access token is required.", {
+        code: "INVALID_ACCESS_TOKEN",
         retryable: false,
       });
     }
@@ -315,7 +358,8 @@ export class GmailClientService {
 
         const wait = Math.min(
           this.options.maxBackoffMs,
-          this.options.baseBackoffMs * Math.pow(2, Math.max(0, attempt - 1)) + Math.floor(Math.random() * 100),
+          this.options.baseBackoffMs * Math.pow(2, Math.max(0, attempt - 1)) +
+            Math.floor(Math.random() * 100),
         );
 
         await new Promise((resolve) => setTimeout(resolve, wait));
@@ -337,24 +381,27 @@ export class GmailClientService {
     };
 
     const status = e?.status ?? e?.response?.status;
-    const code = String(e?.code ?? 'UNKNOWN');
+    const code = String(e?.code ?? "UNKNOWN");
     const message =
       e?.response?.data?.error?.message ||
       e?.errors?.[0]?.message ||
       e?.message ||
-      'Unknown Gmail API error';
+      "Unknown Gmail API error";
 
     if (status === 401 || status === 403) {
-      return new GmailClientError('Gmail auth failed. Reconnect may be required.', {
-        code: 'AUTH_ERROR',
-        retryable: false,
-        status,
-      });
+      return new GmailClientError(
+        "Gmail auth failed. Reconnect may be required.",
+        {
+          code: "AUTH_ERROR",
+          retryable: false,
+          status,
+        },
+      );
     }
 
     if (status === 404) {
       return new GmailClientError(message, {
-        code: 'NOT_FOUND',
+        code: "NOT_FOUND",
         retryable: false,
         status,
       });
@@ -362,7 +409,7 @@ export class GmailClientService {
 
     if (status === 400 && /history/i.test(message)) {
       return new GmailClientError(message, {
-        code: 'INVALID_HISTORY_CURSOR',
+        code: "INVALID_HISTORY_CURSOR",
         retryable: false,
         status,
       });
@@ -370,21 +417,21 @@ export class GmailClientService {
 
     if ([408, 429, 500, 502, 503, 504].includes(status ?? -1)) {
       return new GmailClientError(message, {
-        code: 'TRANSIENT_API_ERROR',
+        code: "TRANSIENT_API_ERROR",
         retryable: true,
         status,
       });
     }
 
-    if (['ETIMEDOUT', 'ECONNRESET', 'ENOTFOUND'].includes(code)) {
+    if (["ETIMEDOUT", "ECONNRESET", "ENOTFOUND"].includes(code)) {
       return new GmailClientError(message, {
-        code: 'NETWORK_ERROR',
+        code: "NETWORK_ERROR",
         retryable: true,
       });
     }
 
     return new GmailClientError(message, {
-      code: 'API_ERROR',
+      code: "API_ERROR",
       retryable: false,
       status,
     });

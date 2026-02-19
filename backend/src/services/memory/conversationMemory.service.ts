@@ -5,7 +5,7 @@
  * MVP: In-memory storage with database fallback
  */
 
-import prisma from '../../config/database';
+import prisma from "../../config/database";
 
 /**
  * Per-message metadata for intent inheritance
@@ -20,7 +20,7 @@ export interface ConversationContext {
   conversationId: string;
   userId: string;
   messages: Array<{
-    role: 'user' | 'assistant';
+    role: "user" | "assistant";
     content: string;
     timestamp: Date;
     // P0 FIX: Per-message metadata for follow-up intent inheritance
@@ -40,7 +40,9 @@ export class ConversationMemoryService {
   /**
    * Get conversation context
    */
-  async getContext(conversationId: string): Promise<ConversationContext | null> {
+  async getContext(
+    conversationId: string,
+  ): Promise<ConversationContext | null> {
     // Check cache first
     if (this.cache.has(conversationId)) {
       return this.cache.get(conversationId)!;
@@ -50,7 +52,7 @@ export class ConversationMemoryService {
     try {
       const messages = await prisma.message.findMany({
         where: { conversationId },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: this.maxMessages,
         select: {
           content: true,
@@ -68,28 +70,33 @@ export class ConversationMemoryService {
       }
 
       // P0 FIX: Parse metadata JSON string to object for intent retrieval
-      const parsedMessages = messages.reverse().map(m => {
+      const parsedMessages = messages.reverse().map((m) => {
         // Parse metadata if it's a string (stored as JSON in DB)
         let parsedMetadata: any = undefined;
         if (m.metadata) {
           try {
-            parsedMetadata = typeof m.metadata === 'string'
-              ? JSON.parse(m.metadata)
-              : m.metadata;
+            parsedMetadata =
+              typeof m.metadata === "string"
+                ? JSON.parse(m.metadata)
+                : m.metadata;
           } catch {
             // Ignore parse errors, metadata will be undefined
           }
         }
         return {
-          role: m.role as 'user' | 'assistant',
-          content: m.content ?? '',
+          role: m.role as "user" | "assistant",
+          content: m.content ?? "",
           timestamp: m.createdAt,
           // P0 FIX: Include intent in message for getLastIntentFromConversation
-          metadata: parsedMetadata ? {
-            intent: parsedMetadata.primaryIntent,
-            confidence: parsedMetadata.confidence,
-            sourceDocumentIds: parsedMetadata.sourceDocuments || parsedMetadata.sourceDocumentIds,
-          } : undefined,
+          metadata: parsedMetadata
+            ? {
+                intent: parsedMetadata.primaryIntent,
+                confidence: parsedMetadata.confidence,
+                sourceDocumentIds:
+                  parsedMetadata.sourceDocuments ||
+                  parsedMetadata.sourceDocumentIds,
+              }
+            : undefined,
         };
       });
 
@@ -99,7 +106,7 @@ export class ConversationMemoryService {
       let lastDocumentIds: string[] | undefined;
       for (let i = parsedMessages.length - 1; i >= 0; i--) {
         const msg = parsedMessages[i];
-        if (msg.role === 'assistant' && msg.metadata) {
+        if (msg.role === "assistant" && msg.metadata) {
           lastIntent = msg.metadata.intent;
           lastDocumentIds = msg.metadata.sourceDocumentIds;
           break; // Only need the most recent assistant message
@@ -108,7 +115,7 @@ export class ConversationMemoryService {
 
       const context: ConversationContext = {
         conversationId,
-        userId: messages[0].conversation?.userId || '',
+        userId: messages[0].conversation?.userId || "",
         messages: parsedMessages,
         // P1 FIX: Populate metadata.lastIntent and lastDocumentIds from DB messages
         metadata: {
@@ -117,7 +124,9 @@ export class ConversationMemoryService {
         },
       };
 
-      console.log(`[ConversationMemory] Loaded from DB: lastIntent=${lastIntent}, lastDocIds=${lastDocumentIds?.length || 0}`);
+      console.log(
+        `[ConversationMemory] Loaded from DB: lastIntent=${lastIntent}, lastDocIds=${lastDocumentIds?.length || 0}`,
+      );
 
       this.cache.set(conversationId, context);
       return context;
@@ -132,16 +141,20 @@ export class ConversationMemoryService {
    */
   async addMessage(
     conversationId: string,
-    role: 'user' | 'assistant',
+    role: "user" | "assistant",
     content: string,
-    messageMetadata?: { intent?: string; confidence?: number; sourceDocumentIds?: string[] }
+    messageMetadata?: {
+      intent?: string;
+      confidence?: number;
+      sourceDocumentIds?: string[];
+    },
   ): Promise<void> {
     let context = await this.getContext(conversationId);
 
     if (!context) {
       context = {
         conversationId,
-        userId: '',
+        userId: "",
         messages: [],
         metadata: {},
       };
@@ -176,7 +189,7 @@ export class ConversationMemoryService {
    */
   async updateMetadata(
     conversationId: string,
-    metadata: Partial<ConversationContext['metadata']>
+    metadata: Partial<ConversationContext["metadata"]>,
   ): Promise<void> {
     const context = await this.getContext(conversationId);
     if (context) {

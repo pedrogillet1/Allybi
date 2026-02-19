@@ -1,8 +1,8 @@
-import * as crypto from 'crypto';
-import prisma from '../../config/database';
-import { uploadFile } from '../../config/storage';
-import { addDocumentJob } from '../../queues/document.queue';
-import { logger } from '../../infra/logger';
+import * as crypto from "crypto";
+import prisma from "../../config/database";
+import { uploadFile } from "../../config/storage";
+import { addDocumentJob } from "../../queues/document.queue";
+import { logger } from "../../infra/logger";
 
 export interface RevisionContext {
   correlationId?: string;
@@ -43,54 +43,64 @@ export class RevisionServiceError extends Error {
 
   constructor(message: string, code: string) {
     super(message);
-    this.name = 'RevisionServiceError';
+    this.name = "RevisionServiceError";
     this.code = code;
   }
 }
 
 const MIME_EXTENSION_MAP: Record<string, string> = {
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
-  'application/pdf': '.pdf',
-  'text/plain': '.txt',
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    ".docx",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+    ".pptx",
+  "application/pdf": ".pdf",
+  "text/plain": ".txt",
 };
 
 function normalizeFilename(base: string): string {
   return base
-    .replace(/[\x00-\x1F\x7F]/g, '')
-    .replace(/[\\/:*?"<>|]/g, '-')
-    .replace(/\s+/g, ' ')
+    .replace(/[\x00-\x1F\x7F]/g, "")
+    .replace(/[\\/:*?"<>|]/g, "-")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
 function toBaseName(filename: string): string {
   const normalized = normalizeFilename(filename);
-  const dot = normalized.lastIndexOf('.');
+  const dot = normalized.lastIndexOf(".");
   if (dot <= 0) return normalized;
   return normalized.slice(0, dot);
 }
 
 function toExtension(filename: string): string {
   const normalized = normalizeFilename(filename);
-  const dot = normalized.lastIndexOf('.');
-  if (dot <= 0) return '';
+  const dot = normalized.lastIndexOf(".");
+  if (dot <= 0) return "";
   return normalized.slice(dot).toLowerCase();
 }
 
 function extensionForMime(mimeType: string): string {
-  return MIME_EXTENSION_MAP[mimeType] ?? '';
+  return MIME_EXTENSION_MAP[mimeType] ?? "";
 }
 
-function generateRevisionStorageKey(userId: string, rootDocumentId: string, extension: string): string {
-  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const rand = crypto.randomBytes(8).toString('hex');
-  const ext = extension.startsWith('.') ? extension : extension ? `.${extension}` : '';
+function generateRevisionStorageKey(
+  userId: string,
+  rootDocumentId: string,
+  extension: string,
+): string {
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const rand = crypto.randomBytes(8).toString("hex");
+  const ext = extension.startsWith(".")
+    ? extension
+    : extension
+      ? `.${extension}`
+      : "";
   return `users/${userId}/revisions/${rootDocumentId}/${stamp}-${rand}${ext}`;
 }
 
 function sha256(buffer: Buffer): string {
-  return crypto.createHash('sha256').update(buffer).digest('hex');
+  return crypto.createHash("sha256").update(buffer).digest("hex");
 }
 
 export class RevisionService {
@@ -102,15 +112,24 @@ export class RevisionService {
     const sourceDocumentId = input.sourceDocumentId.trim();
 
     if (!userId) {
-      throw new RevisionServiceError('userId is required.', 'INVALID_USER_ID');
+      throw new RevisionServiceError("userId is required.", "INVALID_USER_ID");
     }
 
     if (!sourceDocumentId) {
-      throw new RevisionServiceError('sourceDocumentId is required.', 'INVALID_SOURCE_DOCUMENT_ID');
+      throw new RevisionServiceError(
+        "sourceDocumentId is required.",
+        "INVALID_SOURCE_DOCUMENT_ID",
+      );
     }
 
-    if (!Buffer.isBuffer(input.contentBuffer) || input.contentBuffer.length === 0) {
-      throw new RevisionServiceError('contentBuffer must contain bytes.', 'INVALID_CONTENT_BUFFER');
+    if (
+      !Buffer.isBuffer(input.contentBuffer) ||
+      input.contentBuffer.length === 0
+    ) {
+      throw new RevisionServiceError(
+        "contentBuffer must contain bytes.",
+        "INVALID_CONTENT_BUFFER",
+      );
     }
 
     const source = await prisma.document.findFirst({
@@ -127,7 +146,10 @@ export class RevisionService {
     });
 
     if (!source) {
-      throw new RevisionServiceError('Source document not found.', 'SOURCE_DOCUMENT_NOT_FOUND');
+      throw new RevisionServiceError(
+        "Source document not found.",
+        "SOURCE_DOCUMENT_NOT_FOUND",
+      );
     }
 
     const rootDocumentId = await this.resolveRootDocumentId(source.id);
@@ -141,13 +163,25 @@ export class RevisionService {
     const revisionNumber = currentRevisions;
 
     const mimeType = input.mimeType?.trim() || source.mimeType;
-    const sourceFilename = input.filename?.trim() || source.filename || 'document';
-    const preferredExt = extensionForMime(mimeType) || toExtension(sourceFilename) || '.bin';
-    const baseName = toBaseName(sourceFilename) || 'document';
-    const revisionFilename = normalizeFilename(`${baseName} (rev ${revisionNumber})${preferredExt}`);
+    const sourceFilename =
+      input.filename?.trim() || source.filename || "document";
+    const preferredExt =
+      extensionForMime(mimeType) || toExtension(sourceFilename) || ".bin";
+    const baseName = toBaseName(sourceFilename) || "document";
+    const revisionFilename = normalizeFilename(
+      `${baseName} (rev ${revisionNumber})${preferredExt}`,
+    );
 
-    const storageKey = generateRevisionStorageKey(userId, rootDocumentId, preferredExt);
-    await uploadFile(storageKey, input.contentBuffer, mimeType || 'application/octet-stream');
+    const storageKey = generateRevisionStorageKey(
+      userId,
+      rootDocumentId,
+      preferredExt,
+    );
+    await uploadFile(
+      storageKey,
+      input.contentBuffer,
+      mimeType || "application/octet-stream",
+    );
 
     const fileHash = sha256(input.contentBuffer);
 
@@ -161,7 +195,7 @@ export class RevisionService {
         mimeType,
         fileHash,
         parentVersionId: rootDocumentId,
-        status: 'uploaded',
+        status: "uploaded",
         error: null,
       },
       select: {
@@ -185,7 +219,7 @@ export class RevisionService {
       });
     }
 
-    logger.info('[RevisionService] revision created', {
+    logger.info("[RevisionService] revision created", {
       documentId: created.id,
       sourceDocumentId: source.id,
       rootDocumentId,
@@ -219,7 +253,10 @@ export class RevisionService {
     const normalizedDocId = documentId.trim();
 
     if (!normalizedUserId || !normalizedDocId) {
-      throw new RevisionServiceError('userId and documentId are required.', 'INVALID_LIST_REVISIONS_INPUT');
+      throw new RevisionServiceError(
+        "userId and documentId are required.",
+        "INVALID_LIST_REVISIONS_INPUT",
+      );
     }
 
     const source = await prisma.document.findFirst({
@@ -228,7 +265,10 @@ export class RevisionService {
     });
 
     if (!source) {
-      throw new RevisionServiceError('Document not found.', 'DOCUMENT_NOT_FOUND');
+      throw new RevisionServiceError(
+        "Document not found.",
+        "DOCUMENT_NOT_FOUND",
+      );
     }
 
     const rootDocumentId = await this.resolveRootDocumentId(source.id);
@@ -238,7 +278,7 @@ export class RevisionService {
         userId: normalizedUserId,
         OR: [{ id: rootDocumentId }, { parentVersionId: rootDocumentId }],
       },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: "asc" },
       select: {
         id: true,
         filename: true,
@@ -271,13 +311,17 @@ export class RevisionService {
 
     while (currentId && safety < 20) {
       safety += 1;
-      const row: { id: string; parentVersionId: string | null } | null = await prisma.document.findUnique({
-        where: { id: currentId },
-        select: { id: true, parentVersionId: true },
-      });
+      const row: { id: string; parentVersionId: string | null } | null =
+        await prisma.document.findUnique({
+          where: { id: currentId },
+          select: { id: true, parentVersionId: true },
+        });
 
       if (!row) {
-        throw new RevisionServiceError(`Revision chain broken for document ${documentId}.`, 'REVISION_CHAIN_BROKEN');
+        throw new RevisionServiceError(
+          `Revision chain broken for document ${documentId}.`,
+          "REVISION_CHAIN_BROKEN",
+        );
       }
 
       if (!row.parentVersionId) {
@@ -287,7 +331,10 @@ export class RevisionService {
       currentId = row.parentVersionId;
     }
 
-    throw new RevisionServiceError('Revision chain exceeded safety depth.', 'REVISION_CHAIN_DEPTH_EXCEEDED');
+    throw new RevisionServiceError(
+      "Revision chain exceeded safety depth.",
+      "REVISION_CHAIN_DEPTH_EXCEEDED",
+    );
   }
 }
 

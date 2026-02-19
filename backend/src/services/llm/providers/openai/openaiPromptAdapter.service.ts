@@ -135,7 +135,9 @@ export interface OpenAIPromptAdapterConfig {
 }
 
 const DEFAULT_CONFIG: OpenAIPromptAdapterConfig = {
-  preferredApi: (process.env.OPENAI_PREFERRED_API as OpenAITransportApi) || "chat_completions",
+  preferredApi:
+    (process.env.OPENAI_PREFERRED_API as OpenAITransportApi) ||
+    "chat_completions",
   allowedModels: ["gpt-5-mini", "gpt-5.2"],
   strictModelAllowlist: true,
   defaultModelFinal: "gpt-5.2",
@@ -173,7 +175,10 @@ function isNonEmptyArray(a: any): boolean {
   return Array.isArray(a) && a.length > 0;
 }
 
-function normalizeModel(requested: string, cfg: OpenAIPromptAdapterConfig): string {
+function normalizeModel(
+  requested: string,
+  cfg: OpenAIPromptAdapterConfig,
+): string {
   const m = (requested || "").trim();
   if (!m) return cfg.defaultModelFinal;
 
@@ -220,13 +225,18 @@ function messageToText(m: LlmMessage): string {
   return "";
 }
 
-function assertNoImageParts(messages: LlmMessage[], cfg: OpenAIPromptAdapterConfig) {
+function assertNoImageParts(
+  messages: LlmMessage[],
+  cfg: OpenAIPromptAdapterConfig,
+) {
   for (const m of messages) {
     if (!m.parts) continue;
     for (const p of m.parts) {
       if (p.type === "image_url") {
         if (cfg.strictNoImages) {
-          throw new Error("OpenAI prompt adapter: image parts are not allowed in this lane");
+          throw new Error(
+            "OpenAI prompt adapter: image parts are not allowed in this lane",
+          );
         }
       }
     }
@@ -254,7 +264,9 @@ function toOpenAITools(tools: any[] | undefined): any[] | undefined {
 
     const name = t?.name || t?.function?.name;
     const description = t?.description || t?.function?.description || "";
-    const parameters = t?.parameters || t?.function?.parameters || t?.schema || { type: "object", properties: {} };
+    const parameters = t?.parameters ||
+      t?.function?.parameters ||
+      t?.schema || { type: "object", properties: {} };
 
     return {
       type: "function",
@@ -262,7 +274,11 @@ function toOpenAITools(tools: any[] | undefined): any[] | undefined {
     };
   });
 
-  normalized.sort((a, b) => String(a.function?.name || "").localeCompare(String(b.function?.name || "")));
+  normalized.sort((a, b) =>
+    String(a.function?.name || "").localeCompare(
+      String(b.function?.name || ""),
+    ),
+  );
   return normalized;
 }
 
@@ -327,9 +343,13 @@ function toOpenAIResponsesInput(messages: LlmMessage[]): any[] {
   });
 }
 
-function buildHeaders(request: LlmRequest, cfg: OpenAIPromptAdapterConfig): Record<string, string> {
+function buildHeaders(
+  request: LlmRequest,
+  cfg: OpenAIPromptAdapterConfig,
+): Record<string, string> {
   const headers: Record<string, string> = {};
-  if (request.correlationId) headers[cfg.correlationHeaderName] = request.correlationId;
+  if (request.correlationId)
+    headers[cfg.correlationHeaderName] = request.correlationId;
   return headers;
 }
 
@@ -338,7 +358,10 @@ function inferStage(request: LlmRequest): "draft" | "final" {
   return st === "final" ? "final" : "draft";
 }
 
-function resolveGenerationDefaults(req: LlmRequest, cfg: OpenAIPromptAdapterConfig): LlmGenerationOptions {
+function resolveGenerationDefaults(
+  req: LlmRequest,
+  cfg: OpenAIPromptAdapterConfig,
+): LlmGenerationOptions {
   // Allybi always streams unless caller explicitly disables
   const stream = req.options?.stream !== false;
 
@@ -353,17 +376,17 @@ function resolveGenerationDefaults(req: LlmRequest, cfg: OpenAIPromptAdapterConf
     typeof req.options?.maxOutputTokens === "number"
       ? Math.max(1, Math.floor(req.options.maxOutputTokens))
       : isNav
-      ? cfg.defaults.maxOutputTokensNav
-      : isDisambiguation
-      ? cfg.defaults.maxOutputTokensDisambiguation
-      : cfg.defaults.maxOutputTokensFinal;
+        ? cfg.defaults.maxOutputTokensNav
+        : isDisambiguation
+          ? cfg.defaults.maxOutputTokensDisambiguation
+          : cfg.defaults.maxOutputTokensFinal;
 
   const temperature =
     typeof req.options?.temperature === "number"
       ? req.options.temperature
       : stage === "final"
-      ? cfg.defaults.temperatureFinal
-      : cfg.defaults.temperatureFinal;
+        ? cfg.defaults.temperatureFinal
+        : cfg.defaults.temperatureFinal;
 
   const topP =
     typeof req.options?.topP === "number"
@@ -376,7 +399,7 @@ function resolveGenerationDefaults(req: LlmRequest, cfg: OpenAIPromptAdapterConf
     topP,
     maxOutputTokens,
     stop: req.options?.stop,
-    deterministic: req.options?.deterministic ?? (stage === "final"),
+    deterministic: req.options?.deterministic ?? stage === "final",
   };
 }
 
@@ -404,7 +427,10 @@ export class OpenAIPromptAdapterService {
     const stage = inferStage(request);
 
     // 1) Validate model and pick fallback deterministically
-    const model = normalizeModel(request.route?.model || this.cfg.defaultModelFinal, this.cfg);
+    const model = normalizeModel(
+      request.route?.model || this.cfg.defaultModelFinal,
+      this.cfg,
+    );
 
     // 2) Validate message parts (images disallowed in this lane by default)
     let messages = request.messages || [];
@@ -417,9 +443,14 @@ export class OpenAIPromptAdapterService {
     }
 
     // 4) Tools (optional)
-    const toolsEnabled = this.cfg.allowTools && Array.isArray(request.tools) && request.tools.length > 0;
+    const toolsEnabled =
+      this.cfg.allowTools &&
+      Array.isArray(request.tools) &&
+      request.tools.length > 0;
     const tools = toolsEnabled ? toOpenAITools(request.tools) : undefined;
-    const tool_choice = toolsEnabled ? toOpenAIToolChoice(request.toolChoice) : "none";
+    const tool_choice = toolsEnabled
+      ? toOpenAIToolChoice(request.toolChoice)
+      : "none";
 
     // 5) Generation defaults (stage + answerMode aware)
     const gen = resolveGenerationDefaults(request, this.cfg);
@@ -467,11 +498,22 @@ export class OpenAIPromptAdapterService {
       stream: gen.stream,
       temperature: gen.temperature,
       top_p: gen.topP,
-      ...(typeof gen.maxOutputTokens === "number" ? { max_completion_tokens: clampInt(gen.maxOutputTokens, 1, 8192, this.cfg.defaults.maxOutputTokensFinal) } : {}),
+      ...(typeof gen.maxOutputTokens === "number"
+        ? {
+            max_completion_tokens: clampInt(
+              gen.maxOutputTokens,
+              1,
+              8192,
+              this.cfg.defaults.maxOutputTokensFinal,
+            ),
+          }
+        : {}),
       ...(gen.stop ? { stop: gen.stop } : {}),
       ...(tools ? { tools } : {}),
       ...(tool_choice ? { tool_choice } : {}),
-      ...(gen.stream && this.cfg.includeUsageInStream ? { stream_options: { include_usage: true } } : {}),
+      ...(gen.stream && this.cfg.includeUsageInStream
+        ? { stream_options: { include_usage: true } }
+        : {}),
     };
 
     return {

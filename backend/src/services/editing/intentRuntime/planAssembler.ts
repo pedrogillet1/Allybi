@@ -209,22 +209,51 @@ function validateRequiredSlots(
 // ---------------------------------------------------------------------------
 
 const STRUCTURE_OPS = new Set([
-  "DOCX_INSERT_BEFORE", "DOCX_INSERT_AFTER", "DOCX_DELETE_PARAGRAPH",
-  "DOCX_MERGE_PARAGRAPHS", "DOCX_SPLIT_PARAGRAPH",
-  "DOCX_LIST_APPLY_BULLETS", "DOCX_LIST_APPLY_NUMBERING", "DOCX_LIST_REMOVE",
-  "DOCX_LIST_PROMOTE_DEMOTE", "DOCX_LIST_RESTART_NUMBERING", "DOCX_NUMBERING_REPAIR",
-  "XLSX_INSERT_ROWS", "XLSX_DELETE_ROWS", "XLSX_INSERT_COLUMNS", "XLSX_DELETE_COLUMNS",
-  "XLSX_ADD_SHEET", "XLSX_RENAME_SHEET", "XLSX_DELETE_SHEET",
-  "XLSX_MERGE_CELLS", "XLSX_TABLE_CREATE", "XLSX_SORT_RANGE", "XLSX_FILTER_APPLY",
-  "XLSX_FILTER_CLEAR", "XLSX_FREEZE_PANES", "XLSX_HIDE_ROWS_COLS", "XLSX_SHOW_ROWS_COLS",
+  "DOCX_INSERT_BEFORE",
+  "DOCX_INSERT_AFTER",
+  "DOCX_DELETE_PARAGRAPH",
+  "DOCX_MERGE_PARAGRAPHS",
+  "DOCX_SPLIT_PARAGRAPH",
+  "DOCX_LIST_APPLY_BULLETS",
+  "DOCX_LIST_APPLY_NUMBERING",
+  "DOCX_LIST_REMOVE",
+  "DOCX_LIST_PROMOTE_DEMOTE",
+  "DOCX_LIST_RESTART_NUMBERING",
+  "DOCX_NUMBERING_REPAIR",
+  "XLSX_INSERT_ROWS",
+  "XLSX_DELETE_ROWS",
+  "XLSX_INSERT_COLUMNS",
+  "XLSX_DELETE_COLUMNS",
+  "XLSX_ADD_SHEET",
+  "XLSX_RENAME_SHEET",
+  "XLSX_DELETE_SHEET",
+  "XLSX_MERGE_CELLS",
+  "XLSX_TABLE_CREATE",
+  "XLSX_SORT_RANGE",
+  "XLSX_FILTER_APPLY",
+  "XLSX_FILTER_CLEAR",
+  "XLSX_FREEZE_PANES",
+  "XLSX_HIDE_ROWS_COLS",
+  "XLSX_SHOW_ROWS_COLS",
 ]);
 
 const FORMAT_OPS = new Set([
-  "DOCX_SET_RUN_STYLE", "DOCX_CLEAR_RUN_STYLE", "DOCX_SET_PARAGRAPH_STYLE",
-  "DOCX_SET_HEADING_LEVEL", "DOCX_SET_ALIGNMENT", "DOCX_SET_INDENTATION",
-  "DOCX_SET_LINE_SPACING", "DOCX_SET_PARAGRAPH_SPACING", "DOCX_SET_TEXT_CASE",
-  "XLSX_FORMAT_RANGE", "XLSX_SET_NUMBER_FORMAT", "XLSX_WRAP_TEXT", "XLSX_AUTO_FIT",
-  "XLSX_COND_FORMAT_DATA_BARS", "XLSX_COND_FORMAT_COLOR_SCALE", "XLSX_COND_FORMAT_TOP_N",
+  "DOCX_SET_RUN_STYLE",
+  "DOCX_CLEAR_RUN_STYLE",
+  "DOCX_SET_PARAGRAPH_STYLE",
+  "DOCX_SET_HEADING_LEVEL",
+  "DOCX_SET_ALIGNMENT",
+  "DOCX_SET_INDENTATION",
+  "DOCX_SET_LINE_SPACING",
+  "DOCX_SET_PARAGRAPH_SPACING",
+  "DOCX_SET_TEXT_CASE",
+  "XLSX_FORMAT_RANGE",
+  "XLSX_SET_NUMBER_FORMAT",
+  "XLSX_WRAP_TEXT",
+  "XLSX_AUTO_FIT",
+  "XLSX_COND_FORMAT_DATA_BARS",
+  "XLSX_COND_FORMAT_COLOR_SCALE",
+  "XLSX_COND_FORMAT_TOP_N",
   "XLSX_DATA_VALIDATION_SET",
 ]);
 
@@ -238,7 +267,8 @@ function buildTargetDescription(
   op: string,
   params: Record<string, unknown>,
 ): string {
-  const target = params.targetId || params.targets || params.rangeA1 || params.range || "";
+  const target =
+    params.targetId || params.targets || params.rangeA1 || params.range || "";
   const targetStr = Array.isArray(target)
     ? target.slice(0, 3).join(", ") + (target.length > 3 ? "..." : "")
     : String(target || "").slice(0, 60);
@@ -255,13 +285,20 @@ function buildUiMeta(
   const entry = catalog[op];
   let label: string;
   if (entry?.uiStepTemplate) {
-    const template = language === "pt" ? entry.uiStepTemplate.pt : entry.uiStepTemplate.en;
-    label = template.replace(/\{\{(\w+)\}\}/g, (_m, slot) => {
-      const v = params[slot];
-      return v != null ? String(v) : "...";
-    }).replace(/\.{3}$/, "").trim();
+    const template =
+      language === "pt" ? entry.uiStepTemplate.pt : entry.uiStepTemplate.en;
+    label = template
+      .replace(/\{\{(\w+)\}\}/g, (_m, slot) => {
+        const v = params[slot];
+        return v != null ? String(v) : "...";
+      })
+      .replace(/\.{3}$/, "")
+      .trim();
   } else {
-    label = op.replace(/^(?:XLSX_|DOCX_)/, "").replace(/_/g, " ").toLowerCase();
+    label = op
+      .replace(/^(?:XLSX_|DOCX_)/, "")
+      .replace(/_/g, " ")
+      .toLowerCase();
   }
   return {
     label,
@@ -314,8 +351,7 @@ export function assemblePlan(
             (r) => r.slot === missingSlot,
           );
           if (rule) {
-            const message =
-              input.language === "pt" ? rule.ask_pt : rule.ask_en;
+            const message = input.language === "pt" ? rule.ask_pt : rule.ask_en;
             allMissing.push({ slot: missingSlot, message });
           }
         }
@@ -325,7 +361,9 @@ export function assemblePlan(
         op: opStr,
         params,
         stepId: `step_${steps.length + 1}`,
-        ...(slots.localeConversions?.length ? { localeConversions: slots.localeConversions } : {}),
+        ...(slots.localeConversions?.length
+          ? { localeConversions: slots.localeConversions }
+          : {}),
       });
     }
   }
@@ -334,9 +372,7 @@ export function assemblePlan(
   const deduped = deduplicateSteps(steps);
 
   // Sort by dependency order
-  const ordered = deduped.sort(
-    (a, b) => getOpOrder(a.op) - getOpOrder(b.op),
-  );
+  const ordered = deduped.sort((a, b) => getOpOrder(a.op) - getOpOrder(b.op));
 
   // Re-assign step IDs after ordering and attach uiMeta
   const finalSteps = ordered.map((step, idx) => ({

@@ -1,7 +1,7 @@
-import cron from 'node-cron';
-import prisma from '../config/database';
-import { Pinecone } from '@pinecone-database/pinecone';
-import { UPLOAD_CONFIG } from '../config/upload.config';
+import cron from "node-cron";
+import prisma from "../config/database";
+import { Pinecone } from "@pinecone-database/pinecone";
+import { UPLOAD_CONFIG } from "../config/upload.config";
 
 /**
  * Orphan Cleanup Scheduler
@@ -44,7 +44,9 @@ interface CleanupReport {
  * Clean orphaned Pinecone vectors
  * Finds vectors where documentId doesn't exist in the database
  */
-async function cleanOrphanedPineconeVectors(): Promise<CleanupReport['pinecone']> {
+async function cleanOrphanedPineconeVectors(): Promise<
+  CleanupReport["pinecone"]
+> {
   const result = {
     orphanedVectors: 0,
     deletedVectors: 0,
@@ -53,24 +55,28 @@ async function cleanOrphanedPineconeVectors(): Promise<CleanupReport['pinecone']
 
   const apiKey = process.env.PINECONE_API_KEY;
   if (!apiKey) {
-    console.log('⚠️ [OrphanCleanup] Pinecone not configured, skipping vector cleanup');
+    console.log(
+      "⚠️ [OrphanCleanup] Pinecone not configured, skipping vector cleanup",
+    );
     return result;
   }
 
   try {
-    console.log('🔍 [OrphanCleanup] Scanning Pinecone for orphaned vectors...');
+    console.log("🔍 [OrphanCleanup] Scanning Pinecone for orphaned vectors...");
 
     const pinecone = new Pinecone({ apiKey });
-    const indexName = process.env.PINECONE_INDEX_NAME || 'koda-openai';
+    const indexName = process.env.PINECONE_INDEX_NAME || "koda-openai";
     const index = pinecone.index(indexName);
 
     // Get all valid document IDs from database
     const validDocs = await prisma.document.findMany({
       select: { id: true },
     });
-    const validDocIds = new Set(validDocs.map(d => d.id));
+    const validDocIds = new Set(validDocs.map((d) => d.id));
 
-    console.log(`📊 [OrphanCleanup] Found ${validDocIds.size} valid documents in database`);
+    console.log(
+      `📊 [OrphanCleanup] Found ${validDocIds.size} valid documents in database`,
+    );
 
     // Query Pinecone for vectors (sample up to 10000)
     const dummyVector = new Array(1536).fill(0); // OpenAI dimensions
@@ -95,27 +101,36 @@ async function cleanOrphanedPineconeVectors(): Promise<CleanupReport['pinecone']
     result.orphanedVectors = orphanedVectorIds.length;
 
     if (orphanedVectorIds.length > 0) {
-      console.log(`⚠️ [OrphanCleanup] Found ${orphanedVectorIds.length} orphaned vectors from ${orphanedDocIds.size} deleted documents`);
+      console.log(
+        `⚠️ [OrphanCleanup] Found ${orphanedVectorIds.length} orphaned vectors from ${orphanedDocIds.size} deleted documents`,
+      );
 
       // Delete in batches of 1000 (Pinecone limit)
       const BATCH_SIZE = 1000;
       for (let i = 0; i < orphanedVectorIds.length; i += BATCH_SIZE) {
-        const batch = orphanedVectorIds.slice(i, Math.min(i + BATCH_SIZE, orphanedVectorIds.length));
+        const batch = orphanedVectorIds.slice(
+          i,
+          Math.min(i + BATCH_SIZE, orphanedVectorIds.length),
+        );
         try {
           await index.deleteMany(batch);
           result.deletedVectors += batch.length;
-          console.log(`  ✅ Deleted batch ${Math.floor(i / BATCH_SIZE) + 1}: ${batch.length} vectors`);
+          console.log(
+            `  ✅ Deleted batch ${Math.floor(i / BATCH_SIZE) + 1}: ${batch.length} vectors`,
+          );
         } catch (error: any) {
-          result.errors.push(`Batch ${Math.floor(i / BATCH_SIZE) + 1} failed: ${error.message}`);
+          result.errors.push(
+            `Batch ${Math.floor(i / BATCH_SIZE) + 1} failed: ${error.message}`,
+          );
           console.error(`  ❌ Batch delete failed: ${error.message}`);
         }
       }
     } else {
-      console.log('✅ [OrphanCleanup] No orphaned Pinecone vectors found');
+      console.log("✅ [OrphanCleanup] No orphaned Pinecone vectors found");
     }
   } catch (error: any) {
     result.errors.push(`Pinecone cleanup failed: ${error.message}`);
-    console.error('❌ [OrphanCleanup] Pinecone cleanup error:', error.message);
+    console.error("❌ [OrphanCleanup] Pinecone cleanup error:", error.message);
   }
 
   return result;
@@ -127,7 +142,7 @@ async function cleanOrphanedPineconeVectors(): Promise<CleanupReport['pinecone']
  * The deletion flow now properly deletes uploaded files during document/folder deletion,
  * so orphaned files should be rare. Implement listing only if historical orphan cleanup is required.
  */
-async function cleanOrphanedStorageFiles(): Promise<CleanupReport['storage']> {
+async function cleanOrphanedStorageFiles(): Promise<CleanupReport["storage"]> {
   const result = {
     orphanedFiles: 0,
     deletedFiles: 0,
@@ -136,8 +151,12 @@ async function cleanOrphanedStorageFiles(): Promise<CleanupReport['storage']> {
 
   // Storage file listing not implemented in current storage abstraction.
   // The critical fix is that document/folder deletion now properly deletes uploaded files.
-  console.log('ℹ️ [OrphanCleanup] Cloud storage file listing not implemented - skipping storage cleanup');
-  console.log('   Note: Document/folder deletion now properly cleans up uploaded files');
+  console.log(
+    "ℹ️ [OrphanCleanup] Cloud storage file listing not implemented - skipping storage cleanup",
+  );
+  console.log(
+    "   Note: Document/folder deletion now properly cleans up uploaded files",
+  );
 
   return result;
 }
@@ -146,7 +165,7 @@ async function cleanOrphanedStorageFiles(): Promise<CleanupReport['storage']> {
  * Clean orphaned PostgreSQL embeddings
  * This should rarely be needed due to cascade deletes, but handles edge cases
  */
-async function cleanOrphanedEmbeddings(): Promise<CleanupReport['embeddings']> {
+async function cleanOrphanedEmbeddings(): Promise<CleanupReport["embeddings"]> {
   const result = {
     orphanedEmbeddings: 0,
     deletedEmbeddings: 0,
@@ -154,7 +173,9 @@ async function cleanOrphanedEmbeddings(): Promise<CleanupReport['embeddings']> {
   };
 
   try {
-    console.log('🔍 [OrphanCleanup] Scanning PostgreSQL for orphaned embeddings...');
+    console.log(
+      "🔍 [OrphanCleanup] Scanning PostgreSQL for orphaned embeddings...",
+    );
 
     // Find embeddings where documentId doesn't exist in documents table
     // Using raw SQL for efficiency with large tables
@@ -169,7 +190,9 @@ async function cleanOrphanedEmbeddings(): Promise<CleanupReport['embeddings']> {
     result.orphanedEmbeddings = count;
 
     if (count > 0) {
-      console.log(`⚠️ [OrphanCleanup] Found ${count} orphaned embeddings in PostgreSQL`);
+      console.log(
+        `⚠️ [OrphanCleanup] Found ${count} orphaned embeddings in PostgreSQL`,
+      );
 
       // Delete orphaned embeddings
       const deleteResult = await prisma.$executeRaw`
@@ -180,11 +203,14 @@ async function cleanOrphanedEmbeddings(): Promise<CleanupReport['embeddings']> {
       result.deletedEmbeddings = deleteResult;
       console.log(`  ✅ Deleted ${deleteResult} orphaned embeddings`);
     } else {
-      console.log('✅ [OrphanCleanup] No orphaned PostgreSQL embeddings found');
+      console.log("✅ [OrphanCleanup] No orphaned PostgreSQL embeddings found");
     }
   } catch (error: any) {
     result.errors.push(`Embeddings cleanup failed: ${error.message}`);
-    console.error('❌ [OrphanCleanup] Embeddings cleanup error:', error.message);
+    console.error(
+      "❌ [OrphanCleanup] Embeddings cleanup error:",
+      error.message,
+    );
   }
 
   return result;
@@ -195,7 +221,7 @@ async function cleanOrphanedEmbeddings(): Promise<CleanupReport['embeddings']> {
  * Finds documents stuck in 'uploading' status for longer than UPLOAD_SESSION_EXPIRATION_HOURS
  * Marks them as 'failed_timeout' so users know the upload didn't complete
  */
-async function cleanStaleUploads(): Promise<CleanupReport['staleUploads']> {
+async function cleanStaleUploads(): Promise<CleanupReport["staleUploads"]> {
   const result = {
     foundStale: 0,
     markedFailed: 0,
@@ -203,7 +229,7 @@ async function cleanStaleUploads(): Promise<CleanupReport['staleUploads']> {
   };
 
   try {
-    console.log('🔍 [OrphanCleanup] Scanning for stale upload sessions...');
+    console.log("🔍 [OrphanCleanup] Scanning for stale upload sessions...");
 
     const expirationHours = UPLOAD_CONFIG.UPLOAD_SESSION_EXPIRATION_HOURS;
     const cutoffDate = new Date(Date.now() - expirationHours * 60 * 60 * 1000);
@@ -211,7 +237,7 @@ async function cleanStaleUploads(): Promise<CleanupReport['staleUploads']> {
     // Find documents stuck in 'uploading' status past the expiration threshold
     const staleUploads = await prisma.document.findMany({
       where: {
-        status: 'uploading',
+        status: "uploading",
         createdAt: {
           lt: cutoffDate,
         },
@@ -227,12 +253,18 @@ async function cleanStaleUploads(): Promise<CleanupReport['staleUploads']> {
     result.foundStale = staleUploads.length;
 
     if (staleUploads.length > 0) {
-      console.log(`⚠️ [OrphanCleanup] Found ${staleUploads.length} stale uploads older than ${expirationHours}h`);
+      console.log(
+        `⚠️ [OrphanCleanup] Found ${staleUploads.length} stale uploads older than ${expirationHours}h`,
+      );
 
       // Log details for debugging
       for (const doc of staleUploads.slice(0, 10)) {
-        const age = Math.round((Date.now() - doc.createdAt.getTime()) / (1000 * 60 * 60));
-        console.log(`   - ${doc.filename} (${doc.id.slice(0, 8)}...) - ${age}h old`);
+        const age = Math.round(
+          (Date.now() - doc.createdAt.getTime()) / (1000 * 60 * 60),
+        );
+        console.log(
+          `   - ${doc.filename} (${doc.id.slice(0, 8)}...) - ${age}h old`,
+        );
       }
       if (staleUploads.length > 10) {
         console.log(`   ... and ${staleUploads.length - 10} more`);
@@ -240,37 +272,49 @@ async function cleanStaleUploads(): Promise<CleanupReport['staleUploads']> {
 
       // Update status to 'failed_timeout' in batches for safety
       const BATCH_SIZE = 100;
-      const staleIds = staleUploads.map(d => d.id);
+      const staleIds = staleUploads.map((d) => d.id);
 
       for (let i = 0; i < staleIds.length; i += BATCH_SIZE) {
-        const batch = staleIds.slice(i, Math.min(i + BATCH_SIZE, staleIds.length));
+        const batch = staleIds.slice(
+          i,
+          Math.min(i + BATCH_SIZE, staleIds.length),
+        );
         try {
           const updateResult = await prisma.document.updateMany({
             where: {
               id: { in: batch },
-              status: 'uploading', // Double-check status hasn't changed
+              status: "uploading", // Double-check status hasn't changed
             },
             data: {
-              status: 'failed',
+              status: "failed",
               // Store timeout info in metadata if the field exists
               updatedAt: new Date(),
             },
           });
           result.markedFailed += updateResult.count;
-          console.log(`  ✅ Marked batch ${Math.floor(i / BATCH_SIZE) + 1}: ${updateResult.count} uploads as failed`);
+          console.log(
+            `  ✅ Marked batch ${Math.floor(i / BATCH_SIZE) + 1}: ${updateResult.count} uploads as failed`,
+          );
         } catch (error: any) {
-          result.errors.push(`Batch ${Math.floor(i / BATCH_SIZE) + 1} failed: ${error.message}`);
+          result.errors.push(
+            `Batch ${Math.floor(i / BATCH_SIZE) + 1} failed: ${error.message}`,
+          );
           console.error(`  ❌ Batch update failed: ${error.message}`);
         }
       }
 
-      console.log(`✅ [OrphanCleanup] Marked ${result.markedFailed}/${result.foundStale} stale uploads as failed`);
+      console.log(
+        `✅ [OrphanCleanup] Marked ${result.markedFailed}/${result.foundStale} stale uploads as failed`,
+      );
     } else {
-      console.log('✅ [OrphanCleanup] No stale upload sessions found');
+      console.log("✅ [OrphanCleanup] No stale upload sessions found");
     }
   } catch (error: any) {
     result.errors.push(`Stale upload cleanup failed: ${error.message}`);
-    console.error('❌ [OrphanCleanup] Stale upload cleanup error:', error.message);
+    console.error(
+      "❌ [OrphanCleanup] Stale upload cleanup error:",
+      error.message,
+    );
   }
 
   return result;
@@ -279,20 +323,32 @@ async function cleanStaleUploads(): Promise<CleanupReport['staleUploads']> {
 /**
  * Run stale upload cleanup only (runs daily)
  */
-export async function runStaleUploadCleanup(): Promise<CleanupReport['staleUploads']> {
-  console.log('\n═══════════════════════════════════════════════════════════════');
-  console.log('🧹 [OrphanCleanup] Starting stale upload cleanup...');
-  console.log('═══════════════════════════════════════════════════════════════\n');
+export async function runStaleUploadCleanup(): Promise<
+  CleanupReport["staleUploads"]
+> {
+  console.log(
+    "\n═══════════════════════════════════════════════════════════════",
+  );
+  console.log("🧹 [OrphanCleanup] Starting stale upload cleanup...");
+  console.log(
+    "═══════════════════════════════════════════════════════════════\n",
+  );
 
   const result = await cleanStaleUploads();
 
-  console.log('\n═══════════════════════════════════════════════════════════════');
-  console.log('📊 [OrphanCleanup] STALE UPLOAD CLEANUP REPORT');
-  console.log('═══════════════════════════════════════════════════════════════');
+  console.log(
+    "\n═══════════════════════════════════════════════════════════════",
+  );
+  console.log("📊 [OrphanCleanup] STALE UPLOAD CLEANUP REPORT");
+  console.log(
+    "═══════════════════════════════════════════════════════════════",
+  );
   console.log(`  - Found stale: ${result.foundStale}`);
   console.log(`  - Marked failed: ${result.markedFailed}`);
   console.log(`  - Errors: ${result.errors.length}`);
-  console.log('═══════════════════════════════════════════════════════════════\n');
+  console.log(
+    "═══════════════════════════════════════════════════════════════\n",
+  );
 
   return result;
 }
@@ -302,9 +358,13 @@ export async function runStaleUploadCleanup(): Promise<CleanupReport['staleUploa
  * Cleans all external storage systems
  */
 export async function runOrphanCleanup(): Promise<CleanupReport> {
-  console.log('\n═══════════════════════════════════════════════════════════════');
-  console.log('🧹 [OrphanCleanup] Starting automated orphan cleanup...');
-  console.log('═══════════════════════════════════════════════════════════════\n');
+  console.log(
+    "\n═══════════════════════════════════════════════════════════════",
+  );
+  console.log("🧹 [OrphanCleanup] Starting automated orphan cleanup...");
+  console.log(
+    "═══════════════════════════════════════════════════════════════\n",
+  );
 
   const startTime = Date.now();
 
@@ -318,32 +378,38 @@ export async function runOrphanCleanup(): Promise<CleanupReport> {
 
   const duration = ((Date.now() - startTime) / 1000).toFixed(1);
 
-  console.log('\n═══════════════════════════════════════════════════════════════');
-  console.log('📊 [OrphanCleanup] CLEANUP REPORT');
-  console.log('═══════════════════════════════════════════════════════════════');
+  console.log(
+    "\n═══════════════════════════════════════════════════════════════",
+  );
+  console.log("📊 [OrphanCleanup] CLEANUP REPORT");
+  console.log(
+    "═══════════════════════════════════════════════════════════════",
+  );
   console.log(`Timestamp: ${report.timestamp.toISOString()}`);
   console.log(`Duration: ${duration}s`);
-  console.log('');
-  console.log('Pinecone Vectors:');
+  console.log("");
+  console.log("Pinecone Vectors:");
   console.log(`  - Orphaned: ${report.pinecone.orphanedVectors}`);
   console.log(`  - Deleted: ${report.pinecone.deletedVectors}`);
   console.log(`  - Errors: ${report.pinecone.errors.length}`);
-  console.log('');
-  console.log('Storage Files:');
+  console.log("");
+  console.log("Storage Files:");
   console.log(`  - Orphaned: ${report.storage.orphanedFiles}`);
   console.log(`  - Deleted: ${report.storage.deletedFiles}`);
   console.log(`  - Errors: ${report.storage.errors.length}`);
-  console.log('');
-  console.log('PostgreSQL Embeddings:');
+  console.log("");
+  console.log("PostgreSQL Embeddings:");
   console.log(`  - Orphaned: ${report.embeddings.orphanedEmbeddings}`);
   console.log(`  - Deleted: ${report.embeddings.deletedEmbeddings}`);
   console.log(`  - Errors: ${report.embeddings.errors.length}`);
-  console.log('');
-  console.log('Stale Uploads:');
+  console.log("");
+  console.log("Stale Uploads:");
   console.log(`  - Found stale: ${report.staleUploads.foundStale}`);
   console.log(`  - Marked failed: ${report.staleUploads.markedFailed}`);
   console.log(`  - Errors: ${report.staleUploads.errors.length}`);
-  console.log('═══════════════════════════════════════════════════════════════\n');
+  console.log(
+    "═══════════════════════════════════════════════════════════════\n",
+  );
 
   // Log any errors
   const allErrors = [
@@ -354,7 +420,7 @@ export async function runOrphanCleanup(): Promise<CleanupReport> {
   ];
 
   if (allErrors.length > 0) {
-    console.warn('⚠️ [OrphanCleanup] Errors encountered during cleanup:');
+    console.warn("⚠️ [OrphanCleanup] Errors encountered during cleanup:");
     allErrors.forEach((err, i) => console.warn(`  ${i + 1}. ${err}`));
   }
 
@@ -368,26 +434,28 @@ export async function runOrphanCleanup(): Promise<CleanupReport> {
  */
 export function startOrphanCleanupScheduler() {
   // Run full cleanup every Sunday at 3:00 AM (server time)
-  cron.schedule('0 3 * * 0', async () => {
-    console.log('🔔 [OrphanCleanup] Running scheduled weekly full cleanup...');
+  cron.schedule("0 3 * * 0", async () => {
+    console.log("🔔 [OrphanCleanup] Running scheduled weekly full cleanup...");
     await runOrphanCleanup();
   });
 
   // Run stale upload cleanup daily at 4:00 AM (server time)
-  cron.schedule('0 4 * * *', async () => {
-    console.log('🔔 [OrphanCleanup] Running scheduled daily stale upload cleanup...');
+  cron.schedule("0 4 * * *", async () => {
+    console.log(
+      "🔔 [OrphanCleanup] Running scheduled daily stale upload cleanup...",
+    );
     await runStaleUploadCleanup();
   });
 
-  console.log('✅ Orphan cleanup scheduler started:');
-  console.log('   - Full cleanup: Sundays at 3:00 AM');
-  console.log('   - Stale uploads: Daily at 4:00 AM');
+  console.log("✅ Orphan cleanup scheduler started:");
+  console.log("   - Full cleanup: Sundays at 3:00 AM");
+  console.log("   - Stale uploads: Daily at 4:00 AM");
 }
 
 /**
  * Run cleanup manually (for testing or immediate cleanup)
  */
 export async function runManualCleanup(): Promise<CleanupReport> {
-  console.log('🧹 [OrphanCleanup] Running manual cleanup...');
+  console.log("🧹 [OrphanCleanup] Running manual cleanup...");
   return await runOrphanCleanup();
 }

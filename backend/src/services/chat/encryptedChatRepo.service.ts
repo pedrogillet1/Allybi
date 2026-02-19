@@ -52,14 +52,24 @@ export class EncryptedChatRepo {
     return msg;
   }
 
-  async listMessagesDecrypted(userId: string, conversationId: string, limit = 50) {
+  async listMessagesDecrypted(
+    userId: string,
+    conversationId: string,
+    limit = 50,
+  ) {
     const ck = await this.convoKeys.getConversationKey(userId, conversationId);
 
     const rows = await this.prisma.message.findMany({
       where: { conversationId },
       orderBy: { createdAt: "asc" },
       take: limit,
-      select: { id: true, role: true, contentEncrypted: true, createdAt: true, metadata: true },
+      select: {
+        id: true,
+        role: true,
+        contentEncrypted: true,
+        createdAt: true,
+        metadata: true,
+      },
     });
 
     return rows.map((r) => ({
@@ -67,7 +77,14 @@ export class EncryptedChatRepo {
       role: r.role,
       createdAt: r.createdAt,
       content: r.contentEncrypted
-        ? this.chatCrypto.decryptMessage(userId, conversationId, r.id, r.role, r.contentEncrypted, ck)
+        ? this.chatCrypto.decryptMessage(
+            userId,
+            conversationId,
+            r.id,
+            r.role,
+            r.contentEncrypted,
+            ck,
+          )
         : "",
       metadata: r.metadata,
     }));
@@ -79,7 +96,12 @@ export class EncryptedChatRepo {
     titlePlain: string,
   ) {
     const ck = await this.convoKeys.getConversationKey(userId, conversationId);
-    const titleEnc = this.chatCrypto.encryptTitle(userId, conversationId, titlePlain, ck);
+    const titleEnc = this.chatCrypto.encryptTitle(
+      userId,
+      conversationId,
+      titlePlain,
+      ck,
+    );
 
     await this.prisma.conversation.update({
       where: { id: conversationId },
@@ -97,10 +119,16 @@ export class EncryptedChatRepo {
       where: { id: conversationId },
       select: { title: true, titleEncrypted: true, userId: true },
     });
-    if (!convo || convo.userId !== userId) throw new Error("Conversation not found");
+    if (!convo || convo.userId !== userId)
+      throw new Error("Conversation not found");
 
     if (convo.titleEncrypted) {
-      return this.chatCrypto.decryptTitle(userId, conversationId, convo.titleEncrypted, ck);
+      return this.chatCrypto.decryptTitle(
+        userId,
+        conversationId,
+        convo.titleEncrypted,
+        ck,
+      );
     }
     return convo.title ?? null;
   }

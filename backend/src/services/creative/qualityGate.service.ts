@@ -1,5 +1,5 @@
-import type { AssetSpec } from './assetSpec.types';
-import type { StyleDNAProfile } from './styleDNA.service';
+import type { AssetSpec } from "./assetSpec.types";
+import type { StyleDNAProfile } from "./styleDNA.service";
 
 export interface RenderedAssetSignals {
   width: number;
@@ -24,16 +24,16 @@ export interface QualityGateInput {
   placementFrame?: PlacementFrame;
 }
 
-export type QualitySeverity = 'LOW' | 'MED' | 'HIGH';
+export type QualitySeverity = "LOW" | "MED" | "HIGH";
 
 export interface QualityIssue {
   code:
-    | 'DIMENSION_MISMATCH'
-    | 'TEXT_DETECTED_WHEN_FORBIDDEN'
-    | 'BRAND_COLOR_DRIFT'
-    | 'OVERSIZED_FILE'
-    | 'ALIGNMENT_DRIFT'
-    | 'READABILITY_LOW';
+    | "DIMENSION_MISMATCH"
+    | "TEXT_DETECTED_WHEN_FORBIDDEN"
+    | "BRAND_COLOR_DRIFT"
+    | "OVERSIZED_FILE"
+    | "ALIGNMENT_DRIFT"
+    | "READABILITY_LOW";
   severity: QualitySeverity;
   message: string;
   suggestion?: string;
@@ -88,63 +88,90 @@ export class QualityGateService {
   evaluate(input: QualityGateInput): QualityGateResult {
     const issues: QualityIssue[] = [];
 
-    const expectedAspect = aspectRatio(input.spec.size.width, input.spec.size.height);
-    const actualAspect = aspectRatio(input.rendered.width, input.rendered.height);
+    const expectedAspect = aspectRatio(
+      input.spec.size.width,
+      input.spec.size.height,
+    );
+    const actualAspect = aspectRatio(
+      input.rendered.width,
+      input.rendered.height,
+    );
 
-    const aspectDelta = expectedAspect > 0 ? Math.abs(actualAspect - expectedAspect) / expectedAspect : 1;
+    const aspectDelta =
+      expectedAspect > 0
+        ? Math.abs(actualAspect - expectedAspect) / expectedAspect
+        : 1;
     const dimensionError =
-      Math.abs(input.rendered.width - input.spec.size.width) / Math.max(1, input.spec.size.width) +
-      Math.abs(input.rendered.height - input.spec.size.height) / Math.max(1, input.spec.size.height);
+      Math.abs(input.rendered.width - input.spec.size.width) /
+        Math.max(1, input.spec.size.width) +
+      Math.abs(input.rendered.height - input.spec.size.height) /
+        Math.max(1, input.spec.size.height);
 
-    const alignment = clamp01(1 - Math.min(1, aspectDelta * 1.3 + dimensionError * 0.5));
+    const alignment = clamp01(
+      1 - Math.min(1, aspectDelta * 1.3 + dimensionError * 0.5),
+    );
 
     if (alignment < 0.75) {
       issues.push({
-        code: 'DIMENSION_MISMATCH',
-        severity: alignment < 0.5 ? 'HIGH' : 'MED',
+        code: "DIMENSION_MISMATCH",
+        severity: alignment < 0.5 ? "HIGH" : "MED",
         message: `Rendered dimensions ${input.rendered.width}x${input.rendered.height} differ from expected ${input.spec.size.width}x${input.spec.size.height}.`,
-        suggestion: 'Re-render using exact target dimensions and lock aspect ratio.',
+        suggestion:
+          "Re-render using exact target dimensions and lock aspect ratio.",
       });
     }
 
     if (input.placementFrame) {
-      const frameAspect = aspectRatio(input.placementFrame.width, input.placementFrame.height);
-      const placementDelta = frameAspect > 0 ? Math.abs(actualAspect - frameAspect) / frameAspect : 1;
+      const frameAspect = aspectRatio(
+        input.placementFrame.width,
+        input.placementFrame.height,
+      );
+      const placementDelta =
+        frameAspect > 0
+          ? Math.abs(actualAspect - frameAspect) / frameAspect
+          : 1;
       if (placementDelta > 0.18) {
         issues.push({
-          code: 'ALIGNMENT_DRIFT',
-          severity: placementDelta > 0.35 ? 'HIGH' : 'MED',
+          code: "ALIGNMENT_DRIFT",
+          severity: placementDelta > 0.35 ? "HIGH" : "MED",
           message: `Asset aspect ratio is misaligned with placement frame (${placementDelta.toFixed(2)} delta).`,
-          suggestion: 'Use contain mode or regenerate at frame ratio to avoid crop/stretch.',
+          suggestion:
+            "Use contain mode or regenerate at frame ratio to avoid crop/stretch.",
         });
       }
     }
 
-    const detectedText = input.rendered.detectedText?.trim() || '';
+    const detectedText = input.rendered.detectedText?.trim() || "";
     let readability = 1;
 
     if (input.spec.constraints.noText && detectedText.length > 0) {
       readability = 0.25;
       issues.push({
-        code: 'TEXT_DETECTED_WHEN_FORBIDDEN',
-        severity: 'HIGH',
-        message: 'Detected embedded text even though asset constraints require text-free output.',
-        suggestion: 'Regenerate with stronger negative prompt for text overlays.',
+        code: "TEXT_DETECTED_WHEN_FORBIDDEN",
+        severity: "HIGH",
+        message:
+          "Detected embedded text even though asset constraints require text-free output.",
+        suggestion:
+          "Regenerate with stronger negative prompt for text overlays.",
       });
     } else if (!input.spec.constraints.noText && detectedText.length > 0) {
       const wordCount = detectedText.split(/\s+/).filter(Boolean).length;
       readability = clamp01(1 - Math.max(0, wordCount - 25) / 80);
       if (readability < 0.7) {
         issues.push({
-          code: 'READABILITY_LOW',
-          severity: 'MED',
+          code: "READABILITY_LOW",
+          severity: "MED",
           message: `Detected text payload appears too dense (${wordCount} words) for slide readability.`,
-          suggestion: 'Reduce text amount or split content across separate layout blocks.',
+          suggestion:
+            "Reduce text amount or split content across separate layout blocks.",
         });
       }
     }
 
-    const allowedColors = [...input.styleDNA.primaryPalette, ...input.styleDNA.accentPalette]
+    const allowedColors = [
+      ...input.styleDNA.primaryPalette,
+      ...input.styleDNA.accentPalette,
+    ]
       .map((value) => value.trim())
       .filter(Boolean);
 
@@ -152,7 +179,9 @@ export class QualityGateService {
     if (allowedColors.length > 0 && input.rendered.dominantColors.length > 0) {
       const distances = input.rendered.dominantColors
         .map((color) => {
-          const nearest = allowedColors.map((brand) => rgbDistance(color, brand));
+          const nearest = allowedColors.map((brand) =>
+            rgbDistance(color, brand),
+          );
           return Math.min(...nearest);
         })
         .filter((distance) => Number.isFinite(distance));
@@ -166,29 +195,40 @@ export class QualityGateService {
 
       if (brandConsistency < 0.72) {
         issues.push({
-          code: 'BRAND_COLOR_DRIFT',
-          severity: brandConsistency < 0.45 ? 'HIGH' : 'MED',
+          code: "BRAND_COLOR_DRIFT",
+          severity: brandConsistency < 0.45 ? "HIGH" : "MED",
           message: `Dominant colors drift from brand palette (avg RGB distance ${avgDistance.toFixed(1)}).`,
-          suggestion: 'Regenerate using strict palette lock and lower creative temperature.',
+          suggestion:
+            "Regenerate using strict palette lock and lower creative temperature.",
         });
       }
     }
 
     const maxBytes = input.spec.constraints.maxFileSizeKb * 1024;
-    const fileCompliance = clamp01(1 - Math.max(0, input.rendered.fileSizeBytes - maxBytes) / Math.max(1, maxBytes));
+    const fileCompliance = clamp01(
+      1 -
+        Math.max(0, input.rendered.fileSizeBytes - maxBytes) /
+          Math.max(1, maxBytes),
+    );
 
     if (input.rendered.fileSizeBytes > maxBytes) {
       issues.push({
-        code: 'OVERSIZED_FILE',
-        severity: input.rendered.fileSizeBytes > maxBytes * 1.5 ? 'HIGH' : 'MED',
+        code: "OVERSIZED_FILE",
+        severity:
+          input.rendered.fileSizeBytes > maxBytes * 1.5 ? "HIGH" : "MED",
         message: `Rendered asset size ${(input.rendered.fileSizeBytes / 1024).toFixed(1)}KB exceeds limit ${(maxBytes / 1024).toFixed(1)}KB.`,
-        suggestion: 'Re-encode as WebP or reduce dimensions/quality.',
+        suggestion: "Re-encode as WebP or reduce dimensions/quality.",
       });
     }
 
-    const score = clamp01(readability * 0.25 + alignment * 0.3 + brandConsistency * 0.3 + fileCompliance * 0.15);
+    const score = clamp01(
+      readability * 0.25 +
+        alignment * 0.3 +
+        brandConsistency * 0.3 +
+        fileCompliance * 0.15,
+    );
 
-    const hasHighIssue = issues.some((issue) => issue.severity === 'HIGH');
+    const hasHighIssue = issues.some((issue) => issue.severity === "HIGH");
     const pass = score >= 0.72 && !hasHighIssue;
 
     return {

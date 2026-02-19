@@ -18,7 +18,7 @@ import crypto from "crypto";
 export type HashAlgo = "sha256" | "sha512";
 
 export interface HashOptions {
-  algo?: HashAlgo;          // default sha256
+  algo?: HashAlgo; // default sha256
   encoding?: "hex" | "base64"; // default hex
   /**
    * If provided, the output is truncated to this many chars (useful for IDs).
@@ -74,7 +74,11 @@ export function sha512(input: string | Buffer, truncateTo?: number): string {
  * HMAC (useful for request signing, token hashing with a secret).
  * Never store raw tokens; store HMAC(token).
  */
-export function hmacSha256(secret: string, message: string, opts: { encoding?: "hex" | "base64"; truncateTo?: number } = {}): string {
+export function hmacSha256(
+  secret: string,
+  message: string,
+  opts: { encoding?: "hex" | "base64"; truncateTo?: number } = {},
+): string {
   const encoding = opts.encoding || "hex";
   const h = crypto.createHmac("sha256", secret);
   h.update(message);
@@ -87,7 +91,12 @@ export function hmacSha256(secret: string, message: string, opts: { encoding?: "
  * - Uses sha256(model:salt:text)
  * - Truncates to 32 chars by default for filesystem friendliness.
  */
-export function makeCacheKey(params: { text: string; salt?: string; model?: string; truncateTo?: number }): string {
+export function makeCacheKey(params: {
+  text: string;
+  salt?: string;
+  model?: string;
+  truncateTo?: number;
+}): string {
   const model = params.model || "default";
   const salt = params.salt || "";
   const text = params.text || "";

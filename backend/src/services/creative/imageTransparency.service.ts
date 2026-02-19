@@ -27,7 +27,9 @@ function median(values: number[]): number {
   if (values.length === 0) return 0;
   const sorted = [...values].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
+  return sorted.length % 2
+    ? sorted[mid]
+    : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
 }
 
 /**
@@ -45,7 +47,10 @@ export function hasMeaningfulTransparency(params: {
   const minFrac = Math.max(0.0005, params.minTransparentFraction ?? 0.0025);
 
   const { rgba, width, height } = params;
-  const totalSamples = Math.max(1, Math.floor((width * height) / (stride * stride)));
+  const totalSamples = Math.max(
+    1,
+    Math.floor((width * height) / (stride * stride)),
+  );
 
   let transparent = 0;
   let sampled = 0;
@@ -93,7 +98,10 @@ export function estimateFlatBackgroundRgb(params: {
   };
 
   // Sample a small patch in each corner.
-  const patch = Math.max(2, Math.min(10, Math.floor(Math.min(width, height) / 20)));
+  const patch = Math.max(
+    2,
+    Math.min(10, Math.floor(Math.min(width, height) / 20)),
+  );
   for (let dy = 0; dy < patch; dy += 1) {
     for (let dx = 0; dx < patch; dx += 1) {
       push(dx, dy);
@@ -166,7 +174,7 @@ export function removeFlatBackgroundToTransparent(params: {
       aFactor = Math.max(0, Math.min(1, t));
     }
 
-    const a = clamp255(Math.round((a0 * aFactor)));
+    const a = clamp255(Math.round(a0 * aFactor));
     out[i + 3] = a;
   }
 

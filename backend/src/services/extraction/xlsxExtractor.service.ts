@@ -13,15 +13,15 @@
  * - Financial indicator detection
  */
 
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 import type {
   XlsxExtractionResult,
   XlsxSheetSummary,
   XlsxCellFact,
   BaseExtractionResult,
-} from '../../types/extraction.types';
-import type { XlsxCellAnchor } from '../../types/extraction.types';
-import { createXlsxCellAnchor } from '../../types/extraction.types';
+} from "../../types/extraction.types";
+import type { XlsxCellAnchor } from "../../types/extraction.types";
+import { createXlsxCellAnchor } from "../../types/extraction.types";
 
 // ============================================================================
 // Constants
@@ -32,54 +32,54 @@ import { createXlsxCellAnchor } from '../../types/extraction.types';
  */
 const FINANCIAL_KEYWORDS = [
   // Income Statement
-  'revenue',
-  'receita',
-  'sales',
-  'vendas',
-  'gross profit',
-  'lucro bruto',
-  'operating income',
-  'operating profit',
-  'ebit',
-  'ebitda',
-  'net income',
-  'lucro líquido',
-  'earnings',
-  'profit',
-  'lucro',
-  'margin',
-  'margem',
+  "revenue",
+  "receita",
+  "sales",
+  "vendas",
+  "gross profit",
+  "lucro bruto",
+  "operating income",
+  "operating profit",
+  "ebit",
+  "ebitda",
+  "net income",
+  "lucro líquido",
+  "earnings",
+  "profit",
+  "lucro",
+  "margin",
+  "margem",
   // Balance Sheet
-  'assets',
-  'ativos',
-  'liabilities',
-  'passivos',
-  'equity',
-  'patrimônio',
-  'cash',
-  'caixa',
-  'debt',
-  'dívida',
-  'inventory',
-  'estoque',
-  'receivables',
-  'contas a receber',
-  'payables',
-  'contas a pagar',
+  "assets",
+  "ativos",
+  "liabilities",
+  "passivos",
+  "equity",
+  "patrimônio",
+  "cash",
+  "caixa",
+  "debt",
+  "dívida",
+  "inventory",
+  "estoque",
+  "receivables",
+  "contas a receber",
+  "payables",
+  "contas a pagar",
   // Cash Flow
-  'cash flow',
-  'fluxo de caixa',
-  'operating cash',
-  'investing',
-  'financing',
-  'capex',
+  "cash flow",
+  "fluxo de caixa",
+  "operating cash",
+  "investing",
+  "financing",
+  "capex",
   // Ratios
-  'roi',
-  'roe',
-  'roa',
-  'eps',
-  'p/e',
-  'debt/equity',
+  "roi",
+  "roe",
+  "roa",
+  "eps",
+  "p/e",
+  "debt/equity",
 ];
 
 /**
@@ -135,11 +135,13 @@ const QUARTER_PATTERNS: { pattern: RegExp; quarter: number }[] = [
 /**
  * Parse period information from a header string (e.g., "Jul-2024", "Q3 2023")
  */
-function parsePeriod(header: string): {
-  year?: number;
-  month?: number;
-  quarter?: number;
-} | undefined {
+function parsePeriod(header: string):
+  | {
+      year?: number;
+      month?: number;
+      quarter?: number;
+    }
+  | undefined {
   const result: { year?: number; month?: number; quarter?: number } = {};
   const str = String(header);
 
@@ -177,7 +179,7 @@ function parsePeriod(header: string): {
  * Check if headers contain temporal columns
  */
 function hasTemporalHeaders(headers: string[]): boolean {
-  return headers.some(h => {
+  return headers.some((h) => {
     const str = String(h);
     // Check for year
     if (/\b(19|20)\d{2}\b/.test(str)) return true;
@@ -198,7 +200,7 @@ function hasTemporalHeaders(headers: string[]): boolean {
  */
 function isFinancialMetric(label: string): boolean {
   const lower = String(label).toLowerCase();
-  return FINANCIAL_KEYWORDS.some(kw => lower.includes(kw));
+  return FINANCIAL_KEYWORDS.some((kw) => lower.includes(kw));
 }
 
 // ============================================================================
@@ -209,7 +211,7 @@ function isFinancialMetric(label: string): boolean {
  * Convert column index to Excel column letter (0 -> A, 25 -> Z, 26 -> AA)
  */
 function colIndexToLetter(index: number): string {
-  let result = '';
+  let result = "";
   let n = index;
   while (n >= 0) {
     result = String.fromCharCode((n % 26) + 65) + result;
@@ -241,12 +243,12 @@ interface ProcessedSheet {
 function processSheet(
   sheet: XLSX.WorkSheet,
   sheetName: string,
-  sheetIndex: number
+  sheetIndex: number,
 ): ProcessedSheet {
   // Convert to array of arrays
   const data = XLSX.utils.sheet_to_json<any[]>(sheet, {
     header: 1,
-    defval: '',
+    defval: "",
     blankrows: false,
     raw: false,
   }) as any[][];
@@ -276,13 +278,19 @@ function processSheet(
     const row = data[i];
     if (!row || row.length === 0) continue;
 
-    const nonEmpty = row.filter(c => c !== null && c !== undefined && c !== '');
-    const stringCount = nonEmpty.filter(c => typeof c === 'string' && isNaN(Number(c))).length;
+    const nonEmpty = row.filter(
+      (c) => c !== null && c !== undefined && c !== "",
+    );
+    const stringCount = nonEmpty.filter(
+      (c) => typeof c === "string" && isNaN(Number(c)),
+    ).length;
 
     // Header row should have mostly string values
     if (nonEmpty.length >= 2 && stringCount / nonEmpty.length > 0.5) {
       headerRowIndex = i;
-      headers = row.map(c => (c !== null && c !== undefined ? String(c).trim() : ''));
+      headers = row.map((c) =>
+        c !== null && c !== undefined ? String(c).trim() : "",
+      );
       break;
     }
   }
@@ -291,7 +299,7 @@ function processSheet(
   const rowLabels: string[] = [];
   for (let i = headerRowIndex + 1; i < data.length; i++) {
     const row = data[i];
-    if (row && row[0] !== null && row[0] !== undefined && row[0] !== '') {
+    if (row && row[0] !== null && row[0] !== undefined && row[0] !== "") {
       const label = String(row[0]).trim();
       if (label && !rowLabels.includes(label)) {
         rowLabels.push(label);
@@ -300,7 +308,7 @@ function processSheet(
   }
 
   // Calculate dimensions
-  const columnCount = Math.max(...data.map(row => (row ? row.length : 0)));
+  const columnCount = Math.max(...data.map((row) => (row ? row.length : 0)));
   const rowCount = data.length;
 
   // Check for temporal and financial content
@@ -316,32 +324,33 @@ function processSheet(
       const row = data[rowIdx];
       if (!row) continue;
 
-      const rowLabel = row[0] !== null && row[0] !== undefined ? String(row[0]).trim() : '';
+      const rowLabel =
+        row[0] !== null && row[0] !== undefined ? String(row[0]).trim() : "";
       if (!rowLabel) continue;
 
       // Process each cell in the row
       for (let colIdx = 1; colIdx < row.length; colIdx++) {
         const cellValue = row[colIdx];
-        if (cellValue === null || cellValue === undefined || cellValue === '') {
+        if (cellValue === null || cellValue === undefined || cellValue === "") {
           continue;
         }
 
-        const colHeader = headers[colIdx] || '';
+        const colHeader = headers[colIdx] || "";
         const cellAddress = getCellAddress(rowIdx, colIdx);
 
         // Determine value type
         let value: number | string = cellValue;
-        let valueType: 'number' | 'string' | 'date' | 'formula' = 'string';
+        let valueType: "number" | "string" | "date" | "formula" = "string";
 
-        if (typeof cellValue === 'number') {
+        if (typeof cellValue === "number") {
           value = cellValue;
-          valueType = 'number';
+          valueType = "number";
         } else if (!isNaN(Number(cellValue))) {
           value = Number(cellValue);
-          valueType = 'number';
+          valueType = "number";
         } else if (cellValue instanceof Date) {
           value = cellValue.toISOString();
-          valueType = 'date';
+          valueType = "date";
         }
 
         // Parse period from column header
@@ -369,8 +378,8 @@ function processSheet(
 
   // Add headers
   if (headers.length > 0) {
-    textContent += `Headers: ${headers.filter(h => h).join(' | ')}\n`;
-    textContent += '-'.repeat(60) + '\n';
+    textContent += `Headers: ${headers.filter((h) => h).join(" | ")}\n`;
+    textContent += "-".repeat(60) + "\n";
   }
 
   // Add data rows
@@ -380,11 +389,11 @@ function processSheet(
 
     const rowText = row
       .map((cell, idx) => {
-        if (cell === null || cell === undefined || cell === '') return '';
-        return typeof cell === 'string' ? `"${cell}"` : String(cell);
+        if (cell === null || cell === undefined || cell === "") return "";
+        return typeof cell === "string" ? `"${cell}"` : String(cell);
       })
-      .filter(c => c)
-      .join(' | ');
+      .filter((c) => c)
+      .join(" | ");
 
     if (rowText) {
       textContent += `Row ${i}: ${rowText}\n`;
@@ -401,7 +410,7 @@ function processSheet(
       index: sheetIndex,
       rowCount,
       columnCount,
-      headers: headers.filter(h => h),
+      headers: headers.filter((h) => h),
       rowLabels: rowLabels.slice(0, 50), // Limit stored row labels
       hasTemporalColumns: temporal,
       isFinancial: financial,
@@ -438,14 +447,16 @@ function processSheet(
  * ```
  */
 export async function extractXlsxWithAnchors(
-  buffer: Buffer
+  buffer: Buffer,
 ): Promise<XlsxExtractionResult> {
-  console.log(`📊 [XLSX] Starting structured extraction (${buffer.length} bytes)...`);
+  console.log(
+    `📊 [XLSX] Starting structured extraction (${buffer.length} bytes)...`,
+  );
 
   try {
     // Read workbook
     const workbook = XLSX.read(buffer, {
-      type: 'buffer',
+      type: "buffer",
       cellFormula: true,
       cellStyles: true,
       cellDates: true,
@@ -453,7 +464,7 @@ export async function extractXlsxWithAnchors(
     });
 
     if (!workbook || !workbook.SheetNames || workbook.SheetNames.length === 0) {
-      throw new Error('Excel file contains no sheets');
+      throw new Error("Excel file contains no sheets");
     }
 
     const sheetNames = workbook.SheetNames;
@@ -461,7 +472,7 @@ export async function extractXlsxWithAnchors(
     const allCellFacts: XlsxCellFact[] = [];
     const allHeaders: Set<string> = new Set();
     const allRowLabels: Set<string> = new Set();
-    let textContent = '';
+    let textContent = "";
     let isFinancial = false;
 
     // Process each sheet
@@ -477,7 +488,7 @@ export async function extractXlsxWithAnchors(
       const processed = processSheet(sheet, sheetName, i);
       sheets.push(processed.summary);
       allCellFacts.push(...processed.cellFacts);
-      textContent += processed.textContent + '\n\n';
+      textContent += processed.textContent + "\n\n";
 
       // Aggregate headers and row labels
       processed.summary.headers.forEach((h: any) => allHeaders.add(h));
@@ -490,14 +501,14 @@ export async function extractXlsxWithAnchors(
 
     const wordCount = textContent
       .split(/\s+/)
-      .filter(w => w.length > 0).length;
+      .filter((w) => w.length > 0).length;
 
     console.log(
-      `✅ [XLSX] Extracted ${sheetNames.length} sheets, ${allCellFacts.length} cell facts, ${isFinancial ? 'financial' : 'non-financial'}`
+      `✅ [XLSX] Extracted ${sheetNames.length} sheets, ${allCellFacts.length} cell facts, ${isFinancial ? "financial" : "non-financial"}`,
     );
 
     return {
-      sourceType: 'xlsx',
+      sourceType: "xlsx",
       text: textContent.trim(),
       sheetCount: sheetNames.length,
       sheetNames,
@@ -510,23 +521,23 @@ export async function extractXlsxWithAnchors(
       confidence: 1.0,
     };
   } catch (error: any) {
-    console.error('❌ [XLSX] Extraction failed:', error.message);
+    console.error("❌ [XLSX] Extraction failed:", error.message);
 
     if (
-      error.message?.includes('Unsupported file') ||
-      error.message?.includes('ZIP')
+      error.message?.includes("Unsupported file") ||
+      error.message?.includes("ZIP")
     ) {
       throw new Error(
-        'Excel file is corrupted or in an unsupported format. Expected .xlsx or .xls file.'
+        "Excel file is corrupted or in an unsupported format. Expected .xlsx or .xls file.",
       );
     }
 
     if (
-      error.message?.includes('encrypted') ||
-      error.message?.includes('password')
+      error.message?.includes("encrypted") ||
+      error.message?.includes("password")
     ) {
       throw new Error(
-        'Excel file is password-protected. Please remove the password and try again.'
+        "Excel file is password-protected. Please remove the password and try again.",
       );
     }
 
@@ -543,7 +554,7 @@ export async function extractXlsxWithAnchors(
  * Use extractXlsxWithAnchors() for anchor support.
  */
 export async function extractTextFromExcel(
-  buffer: Buffer
+  buffer: Buffer,
 ): Promise<BaseExtractionResult> {
   const result = await extractXlsxWithAnchors(buffer);
   return {
@@ -561,11 +572,15 @@ export async function extractTextFromExcel(
  * Create an XLSX cell anchor for a cell fact.
  */
 export function createCellAnchorFromFact(fact: XlsxCellFact): XlsxCellAnchor {
-  return createXlsxCellAnchor((fact as any).sheet ?? fact.sheetName, fact.cell, {
-    rowLabel: fact.rowLabel,
-    colHeader: fact.colHeader,
-    period: fact.period,
-  });
+  return createXlsxCellAnchor(
+    (fact as any).sheet ?? fact.sheetName,
+    fact.cell,
+    {
+      rowLabel: fact.rowLabel,
+      colHeader: fact.colHeader,
+      period: fact.period,
+    },
+  );
 }
 
 /**
@@ -588,7 +603,7 @@ export function findCellFact(
     year?: number;
     quarter?: number;
     sheet?: string;
-  }
+  },
 ): XlsxCellFact | undefined {
   const { rowLabel, month, year, quarter, sheet } = options;
 
@@ -602,7 +617,10 @@ export function findCellFact(
     if (rowLabel) {
       const factLabel = fact.rowLabel.toLowerCase();
       const searchLabel = rowLabel.toLowerCase();
-      if (!factLabel.includes(searchLabel) && !searchLabel.includes(factLabel)) {
+      if (
+        !factLabel.includes(searchLabel) &&
+        !searchLabel.includes(factLabel)
+      ) {
         return false;
       }
     }

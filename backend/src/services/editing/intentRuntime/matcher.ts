@@ -135,7 +135,9 @@ function jaccardScore(a: string, b: string): number {
   const tb = tokenize(b);
   if (!ta.size || !tb.size) return 0;
   let inter = 0;
-  ta.forEach((t) => { if (tb.has(t)) inter += 1; });
+  ta.forEach((t) => {
+    if (tb.has(t)) inter += 1;
+  });
   const union = ta.size + tb.size - inter;
   return union > 0 ? inter / union : 0;
 }

@@ -61,7 +61,10 @@ function coerceScalar(input: unknown): string | number | boolean | null {
   return raw;
 }
 
-function normalizeRange(input: unknown, fallbackSheetName?: string | null): string | null {
+function normalizeRange(
+  input: unknown,
+  fallbackSheetName?: string | null,
+): string | null {
   const raw = String(input || "").trim();
   if (!raw) return null;
   const embedded = extractRangeFromMessage(raw);
@@ -72,7 +75,10 @@ function normalizeRange(input: unknown, fallbackSheetName?: string | null): stri
       .slice(0, bang)
       .replace(/^'+|'+$/g, "")
       .replace(/^.*\b(?:from|on|in|at)\s+/i, "")
-      .replace(/^(?:in|on|at|from|using|use|em|na|no|make|set|create|insert|delete|format|sort|filter)\s+/i, "")
+      .replace(
+        /^(?:in|on|at|from|using|use|em|na|no|make|set|create|insert|delete|format|sort|filter)\s+/i,
+        "",
+      )
       .trim();
     const a1 = candidate.slice(bang + 1).trim();
     if (!sheet || !a1) return null;
@@ -86,7 +92,10 @@ function normalizeRange(input: unknown, fallbackSheetName?: string | null): stri
 function sheetFromRange(rangeA1: string): string | null {
   const bang = String(rangeA1 || "").indexOf("!");
   if (bang <= 0) return null;
-  return String(rangeA1.slice(0, bang)).replace(/^'/, "").replace(/'$/, "").trim() || null;
+  return (
+    String(rangeA1.slice(0, bang)).replace(/^'/, "").replace(/'$/, "").trim() ||
+    null
+  );
 }
 
 function firstNonEmptyString(values: unknown[]): string | null {
@@ -162,7 +171,8 @@ function resolveSemanticMatch(
   for (const colHeader of uniqueCols) {
     const score = scoreMessageMatch(messageNorm, colHeader);
     if (!score) continue;
-    if (!bestCol || score > bestCol.score) bestCol = { label: colHeader, score };
+    if (!bestCol || score > bestCol.score)
+      bestCol = { label: colHeader, score };
   }
 
   return {
@@ -191,7 +201,8 @@ function resolveSemanticCellTarget(
     if (!row || !col || !a1 || !sheetName) continue;
     if (normalizeText(row) !== normalizeText(semantic.rowLabel)) continue;
     if (normalizeText(col) !== normalizeText(semantic.colHeader)) continue;
-    const score = semantic.rowScore + semantic.colScore + row.length + col.length;
+    const score =
+      semantic.rowScore + semantic.colScore + row.length + col.length;
     if (!best || score > best.score) best = { sheetName, a1, score };
   }
   return best ? { sheetName: best.sheetName, a1: best.a1 } : null;
@@ -206,7 +217,13 @@ function resolveSemanticColumnRange(
   const semantic = resolveSemanticMatch(message, facts);
   if (!semantic.colHeader) return null;
 
-  let best: { sheetName: string; col: string; minRow: number; maxRow: number; score: number } | null = null;
+  let best: {
+    sheetName: string;
+    col: string;
+    minRow: number;
+    maxRow: number;
+    score: number;
+  } | null = null;
 
   const bySheetAndHeader = new Map<string, Array<{ cell: string }>>();
   for (const fact of facts) {
@@ -255,15 +272,13 @@ function resolveSemanticTableRange(
   const facts = Array.isArray(cellFacts) ? cellFacts : [];
   if (!facts.length) return null;
 
-  let best:
-    | {
-        sheetName: string;
-        minCol: number;
-        maxCol: number;
-        minRow: number;
-        maxRow: number;
-      }
-    | null = null;
+  let best: {
+    sheetName: string;
+    minCol: number;
+    maxCol: number;
+    minRow: number;
+    maxRow: number;
+  } | null = null;
 
   const colToNumber = (col: string): number =>
     String(col || "")
@@ -304,7 +319,9 @@ function resolveSemanticTableRange(
     const minRow = Math.min(...coords.map((v) => v.row));
     const maxRow = Math.max(...coords.map((v) => v.row));
     const currentArea = (maxCol - minCol + 1) * (maxRow - minRow + 1);
-    const bestArea = best ? (best.maxCol - best.minCol + 1) * (best.maxRow - best.minRow + 1) : -1;
+    const bestArea = best
+      ? (best.maxCol - best.minCol + 1) * (best.maxRow - best.minRow + 1)
+      : -1;
     if (!best || currentArea > bestArea) {
       best = { sheetName, minCol, maxCol, minRow, maxRow };
     }
@@ -320,7 +337,9 @@ function resolveSemanticTableRange(
 function extractRangeFromMessage(message: string): string | null {
   const text = String(message || "").trim();
   if (!text) return null;
-  const withSheet = text.match(/(?:^|[\s,(])((?:'[^']+'|[A-Za-z0-9_.-]+(?:\s+[A-Za-z0-9_.-]+){0,4})![A-Z]{1,3}\d{1,7}(?::[A-Z]{1,3}\d{1,7})?)(?=$|[\s),.;])/i);
+  const withSheet = text.match(
+    /(?:^|[\s,(])((?:'[^']+'|[A-Za-z0-9_.-]+(?:\s+[A-Za-z0-9_.-]+){0,4})![A-Z]{1,3}\d{1,7}(?::[A-Z]{1,3}\d{1,7})?)(?=$|[\s),.;])/i,
+  );
   if (withSheet?.[1]) return String(withSheet[1]).trim();
   const bare = text.match(/\b([A-Z]{1,3}\d{1,7}(?::[A-Z]{1,3}\d{1,7})?)\b/i);
   if (bare?.[1]) return String(bare[1]).trim();
@@ -332,7 +351,8 @@ function extractAllRangesFromMessage(message: string): string[] {
   if (!text) return [];
   const out = new Set<string>();
 
-  const withSheetRegex = /(?:^|[\s,(])((?:'[^']+'|[A-Za-z0-9_.-]+(?:\s+[A-Za-z0-9_.-]+){0,4})![A-Z]{1,3}\d{1,7}(?::[A-Z]{1,3}\d{1,7})?)(?=$|[\s),.;])/gi;
+  const withSheetRegex =
+    /(?:^|[\s,(])((?:'[^']+'|[A-Za-z0-9_.-]+(?:\s+[A-Za-z0-9_.-]+){0,4})![A-Z]{1,3}\d{1,7}(?::[A-Z]{1,3}\d{1,7})?)(?=$|[\s),.;])/gi;
   let m: RegExpExecArray | null = null;
   while ((m = withSheetRegex.exec(text)) != null) {
     const value = String(m[1] || "").trim();
@@ -359,8 +379,14 @@ function formatPatternFromMessage(message: string): string | null {
   };
 
   const explicitDigits = text.match(/(\d+)\s*decimal/);
-  const explicitWords = Object.entries(decimalWordMap).find(([word]) => new RegExp(`\\b${word}\\s+decimals?\\b`, "i").test(text));
-  const decimals = explicitDigits ? Math.max(0, Math.min(6, Number(explicitDigits[1]))) : (explicitWords ? explicitWords[1] : null);
+  const explicitWords = Object.entries(decimalWordMap).find(([word]) =>
+    new RegExp(`\\b${word}\\s+decimals?\\b`, "i").test(text),
+  );
+  const decimals = explicitDigits
+    ? Math.max(0, Math.min(6, Number(explicitDigits[1])))
+    : explicitWords
+      ? explicitWords[1]
+      : null;
 
   if (/\bcurrency\b|\$|usd|dollar/.test(text)) {
     const d = decimals == null ? 2 : decimals;
@@ -370,13 +396,19 @@ function formatPatternFromMessage(message: string): string | null {
     const d = decimals == null ? 0 : decimals;
     return d <= 0 ? "0%" : `0.${"0".repeat(d)}%`;
   }
-  if (/\bnumber format\b|\bdecimal\b|\bformat\b/.test(text) && decimals != null) {
+  if (
+    /\bnumber format\b|\bdecimal\b|\bformat\b/.test(text) &&
+    decimals != null
+  ) {
     return decimals <= 0 ? "#,##0" : `#,##0.${"0".repeat(decimals)}`;
   }
   return null;
 }
 
-function parseSheetMention(message: string, sheetNames?: string[]): string | null {
+function parseSheetMention(
+  message: string,
+  sheetNames?: string[],
+): string | null {
   const names = Array.isArray(sheetNames) ? sheetNames.filter(Boolean) : [];
   if (!names.length) return null;
   const lowerMessage = String(message || "").toLowerCase();
@@ -388,7 +420,9 @@ function parseSheetMention(message: string, sheetNames?: string[]): string | nul
   return null;
 }
 
-function parseRowInsertIntent(message: string): { count: number; row: number } | null {
+function parseRowInsertIntent(
+  message: string,
+): { count: number; row: number } | null {
   const text = String(message || "").toLowerCase();
   if (!/\binsert\b/.test(text) || !/\brow/.test(text)) return null;
   const countMatch = text.match(/\binsert\s+(\d+)\s+rows?\b/);
@@ -400,7 +434,9 @@ function parseRowInsertIntent(message: string): { count: number; row: number } |
   return { count, row };
 }
 
-function parseRowDeleteIntent(message: string): { startRow: number; count: number } | null {
+function parseRowDeleteIntent(
+  message: string,
+): { startRow: number; count: number } | null {
   const text = String(message || "").toLowerCase();
   if (!/\b(delete|remove)\b/.test(text) || !/\brow/.test(text)) return null;
   // "delete rows 5 through 10" / "delete rows 5 to 10" / "delete rows 5-10"
@@ -420,9 +456,13 @@ function parseRowDeleteIntent(message: string): { startRow: number; count: numbe
   return null;
 }
 
-function parseSetCellNumericIntent(message: string): { cellA1: string; value: number; sheetName?: string } | null {
+function parseSetCellNumericIntent(
+  message: string,
+): { cellA1: string; value: number; sheetName?: string } | null {
   const text = String(message || "");
-  const m = text.match(/\b(?:on\s+([A-Za-z0-9_.-]+)\s*,?\s*)?(?:set|change|update)\s+([A-Za-z]{1,3}\d{1,7})\s+to\s+(-?[\d,]+(?:\.\d+)?)/i);
+  const m = text.match(
+    /\b(?:on\s+([A-Za-z0-9_.-]+)\s*,?\s*)?(?:set|change|update)\s+([A-Za-z]{1,3}\d{1,7})\s+to\s+(-?[\d,]+(?:\.\d+)?)/i,
+  );
   if (!m?.[2] || !m?.[3]) return null;
   const value = Number(String(m[3]).replace(/,/g, ""));
   if (!Number.isFinite(value)) return null;
@@ -433,26 +473,43 @@ function parseSetCellNumericIntent(message: string): { cellA1: string; value: nu
   };
 }
 
-function parseChartIntent(message: string, sheetNames?: string[], fallbackSheetName?: string | null): ComputeOp | null {
+function parseChartIntent(
+  message: string,
+  sheetNames?: string[],
+  fallbackSheetName?: string | null,
+): ComputeOp | null {
   const text = String(message || "");
   if (!/\bchart\b/i.test(text)) return null;
 
   const ranges = extractAllRangesFromMessage(text);
   if (!ranges.length) return null;
 
-  const type =
-    /\bbar\b/i.test(text) ? "bar"
-      : /\bline\b/i.test(text) ? "line"
-        : /\bpie\b/i.test(text) ? "pie"
-          : /\bscatter\b/i.test(text) ? "scatter"
-            : "bar";
+  const type = /\bbar\b/i.test(text)
+    ? "bar"
+    : /\bline\b/i.test(text)
+      ? "line"
+      : /\bpie\b/i.test(text)
+        ? "pie"
+        : /\bscatter\b/i.test(text)
+          ? "scatter"
+          : "bar";
 
-  const inferredSheet = parseSheetMention(text, sheetNames) || String(fallbackSheetName || "").trim() || undefined;
+  const inferredSheet =
+    parseSheetMention(text, sheetNames) ||
+    String(fallbackSheetName || "").trim() ||
+    undefined;
   const first = normalizeRange(ranges[0], inferredSheet || null);
   if (!first) return null;
-  const second = ranges
-    .map((value) => normalizeRange(value, inferredSheet || sheetFromRange(first) || null))
-    .find((value) => Boolean(value) && String(value).toUpperCase() !== String(first).toUpperCase()) || null;
+  const second =
+    ranges
+      .map((value) =>
+        normalizeRange(value, inferredSheet || sheetFromRange(first) || null),
+      )
+      .find(
+        (value) =>
+          Boolean(value) &&
+          String(value).toUpperCase() !== String(first).toUpperCase(),
+      ) || null;
   const titleMatch = text.match(/\btitled?\s+["“”']?([^"“”']{2,120})["“”']?/i);
   const title = titleMatch?.[1] ? String(titleMatch[1]).trim() : undefined;
 
@@ -487,10 +544,15 @@ function toComputeOp(
     params.targetSheet,
   ]);
   const explicitSheet = explicitSheetRaw
-    ? String(explicitSheetRaw).replace(/^(?:in|on|at)\s+/i, "").trim()
+    ? String(explicitSheetRaw)
+        .replace(/^(?:in|on|at)\s+/i, "")
+        .trim()
     : null;
   const effectiveSheet = explicitSheet || fallbackSheetName || null;
-  const rangeA1 = normalizeRange(params.rangeA1 || params.range || params.a1 || fallbackRangeA1, effectiveSheet);
+  const rangeA1 = normalizeRange(
+    params.rangeA1 || params.range || params.a1 || fallbackRangeA1,
+    effectiveSheet,
+  );
 
   switch (step.op) {
     case "XLSX_SET_CELL_VALUE":
@@ -506,11 +568,16 @@ function toComputeOp(
     }
     case "XLSX_SET_CELL_FORMULA": {
       if (!rangeA1 || !("formula" in params)) return null;
-      const target = normalizeRange(params.rangeA1 || params.a1, effectiveSheet);
+      const target = normalizeRange(
+        params.rangeA1 || params.a1,
+        effectiveSheet,
+      );
       if (!target) return null;
       const formulaRaw = String(params.formula || "").trim();
       if (!formulaRaw) return null;
-      const formula = formulaRaw.startsWith("=") ? formulaRaw.slice(1).trim() : formulaRaw;
+      const formula = formulaRaw.startsWith("=")
+        ? formulaRaw.slice(1).trim()
+        : formulaRaw;
       return {
         kind: "set_formula",
         a1: target,
@@ -532,10 +599,17 @@ function toComputeOp(
       const format: Record<string, unknown> = {};
       if (typeof params.bold === "boolean") format.bold = params.bold;
       if (typeof params.italic === "boolean") format.italic = params.italic;
-      if (typeof params.underline === "boolean") format.underline = params.underline;
-      if (typeof params.color === "string" && params.color.trim()) format.color = params.color;
-      if (typeof params.fontFamily === "string" && params.fontFamily.trim()) format.fontFamily = params.fontFamily;
-      if (typeof params.fontSize === "number" && Number.isFinite(params.fontSize)) format.fontSizePt = params.fontSize;
+      if (typeof params.underline === "boolean")
+        format.underline = params.underline;
+      if (typeof params.color === "string" && params.color.trim())
+        format.color = params.color;
+      if (typeof params.fontFamily === "string" && params.fontFamily.trim())
+        format.fontFamily = params.fontFamily;
+      if (
+        typeof params.fontSize === "number" &&
+        Number.isFinite(params.fontSize)
+      )
+        format.fontSizePt = params.fontSize;
       if (!Object.keys(format).length) return null;
       return {
         kind: "format_range",
@@ -547,7 +621,12 @@ function toComputeOp(
       if (!rangeA1) return null;
       const sortSpecs = Array.isArray(params.sortSpecs)
         ? params.sortSpecs
-        : [{ column: String(params.column || "2"), order: String(params.order || "ASC").toUpperCase() }];
+        : [
+            {
+              column: String(params.column || "2"),
+              order: String(params.order || "ASC").toUpperCase(),
+            },
+          ];
       return {
         kind: "sort_range",
         rangeA1,
@@ -563,7 +642,8 @@ function toComputeOp(
       };
     }
     case "XLSX_FILTER_CLEAR": {
-      const inferredSheet = effectiveSheet || (rangeA1 ? sheetFromRange(rangeA1) : null);
+      const inferredSheet =
+        effectiveSheet || (rangeA1 ? sheetFromRange(rangeA1) : null);
       if (!inferredSheet) return null;
       return {
         kind: "clear_filter",
@@ -576,22 +656,28 @@ function toComputeOp(
         kind: "create_table",
         rangeA1,
         hasHeader: params.hasHeader !== false,
-        ...(typeof params.style === "string" && params.style.trim() ? { style: params.style } : {}),
+        ...(typeof params.style === "string" && params.style.trim()
+          ? { style: params.style }
+          : {}),
       };
     }
     case "XLSX_FREEZE_PANES": {
-      const inferredSheet = effectiveSheet || (rangeA1 ? sheetFromRange(rangeA1) : null);
+      const inferredSheet =
+        effectiveSheet || (rangeA1 ? sheetFromRange(rangeA1) : null);
       if (!inferredSheet) return null;
       return {
         kind: "set_freeze_panes",
         sheetName: inferredSheet,
         frozenRowCount: Number(params.frozenRowCount || params.rows || 0),
-        frozenColumnCount: Number(params.frozenColumnCount || params.columns || 0),
+        frozenColumnCount: Number(
+          params.frozenColumnCount || params.columns || 0,
+        ),
       };
     }
     case "XLSX_INSERT_ROWS":
     case "XLSX_DELETE_ROWS": {
-      const inferredSheet = effectiveSheet || (rangeA1 ? sheetFromRange(rangeA1) : null);
+      const inferredSheet =
+        effectiveSheet || (rangeA1 ? sheetFromRange(rangeA1) : null);
       if (!inferredSheet) return null;
       // Derive startIndex/count from rangeA1 when not explicitly provided
       let rowStart = Number(params.startIndex ?? -1);
@@ -607,7 +693,8 @@ function toComputeOp(
       }
       if (rowStart < 0) rowStart = 0;
       if (!rowCount) rowCount = 1;
-      const rowKind = step.op === "XLSX_INSERT_ROWS" ? "insert_rows" : "delete_rows";
+      const rowKind =
+        step.op === "XLSX_INSERT_ROWS" ? "insert_rows" : "delete_rows";
       return {
         kind: rowKind,
         sheetName: inferredSheet,
@@ -617,14 +704,19 @@ function toComputeOp(
     }
     case "XLSX_INSERT_COLUMNS":
     case "XLSX_DELETE_COLUMNS": {
-      const inferredSheet = effectiveSheet || (rangeA1 ? sheetFromRange(rangeA1) : null);
+      const inferredSheet =
+        effectiveSheet || (rangeA1 ? sheetFromRange(rangeA1) : null);
       if (!inferredSheet) return null;
       // Derive startIndex/count from rangeA1 when not explicitly provided
       let colStart = Number(params.startIndex ?? -1);
       let colCount = Number(params.count ?? 0);
       if ((colStart < 0 || !colCount) && rangeA1) {
         const colLetters = String(rangeA1).match(/([A-Z]+)/gi);
-        const colToNum = (s: string) => s.toUpperCase().split("").reduce((acc, ch) => acc * 26 + (ch.charCodeAt(0) - 64), 0);
+        const colToNum = (s: string) =>
+          s
+            .toUpperCase()
+            .split("")
+            .reduce((acc, ch) => acc * 26 + (ch.charCodeAt(0) - 64), 0);
         const c1 = colLetters?.[0] ? colToNum(colLetters[0]) : 0;
         const c2 = colLetters?.[1] ? colToNum(colLetters[1]) : c1;
         if (c1 > 0) {
@@ -634,7 +726,8 @@ function toComputeOp(
       }
       if (colStart < 0) colStart = 0;
       if (!colCount) colCount = 1;
-      const colKind = step.op === "XLSX_INSERT_COLUMNS" ? "insert_columns" : "delete_columns";
+      const colKind =
+        step.op === "XLSX_INSERT_COLUMNS" ? "insert_columns" : "delete_columns";
       return {
         kind: colKind,
         sheetName: inferredSheet,
@@ -644,17 +737,22 @@ function toComputeOp(
     }
     case "XLSX_CHART_CREATE": {
       if (!rangeA1) return null;
-      const type = String(params.chartType || params.type || "line").trim().toLowerCase();
+      const type = String(params.chartType || params.type || "line")
+        .trim()
+        .toLowerCase();
       return {
         kind: "create_chart",
         rangeA1,
         type,
-        ...(typeof params.title === "string" && params.title.trim() ? { title: params.title } : {}),
+        ...(typeof params.title === "string" && params.title.trim()
+          ? { title: params.title }
+          : {}),
       };
     }
     case "XLSX_DATA_VALIDATION_SET": {
       if (!rangeA1) return null;
-      const rule = params.rule && typeof params.rule === "object" ? params.rule : null;
+      const rule =
+        params.rule && typeof params.rule === "object" ? params.rule : null;
       if (!rule) return null;
       return {
         kind: "set_data_validation",
@@ -674,15 +772,18 @@ export class ExcelSourceOfTruthService {
 
     const explicitRanges = extractAllRangesFromMessage(message);
     const sheetFromMessage = parseSheetMention(message, input.sheetNames);
-    const fallbackSheetFromViewer = String(input.viewerSheetName || "").trim() || null;
+    const fallbackSheetFromViewer =
+      String(input.viewerSheetName || "").trim() || null;
     const chosenSheet = sheetFromMessage || fallbackSheetFromViewer || null;
 
     // Hard guard: formatting commands must never be converted to value writes.
     const explicitFormatPattern = formatPatternFromMessage(message);
     if (explicitFormatPattern) {
       const chosenRange =
-        normalizeRange(explicitRanges[0] || input.viewerRangeA1 || "", chosenSheet) ||
-        normalizeRange(input.viewerRangeA1 || "", chosenSheet);
+        normalizeRange(
+          explicitRanges[0] || input.viewerRangeA1 || "",
+          chosenSheet,
+        ) || normalizeRange(input.viewerRangeA1 || "", chosenSheet);
       if (chosenRange) {
         return {
           kind: "plan",
@@ -737,7 +838,11 @@ export class ExcelSourceOfTruthService {
 
     // Hard guard: "delete these/selected rows" — derive from viewer selection.
     const low = message.toLowerCase();
-    if (/\b(delete|remove)\b/.test(low) && /\b(these|selected|this)\b/.test(low) && /\brows?\b/.test(low)) {
+    if (
+      /\b(delete|remove)\b/.test(low) &&
+      /\b(these|selected|this)\b/.test(low) &&
+      /\brows?\b/.test(low)
+    ) {
       const viewerRange = input.viewerRangeA1;
       if (viewerRange) {
         const rowNums = String(viewerRange).match(/(\d+)/g);
@@ -771,7 +876,9 @@ export class ExcelSourceOfTruthService {
       if (rangeA1) {
         return {
           kind: "plan",
-          ops: [{ kind: "set_values", rangeA1, values: [[setCellNumeric.value]] }],
+          ops: [
+            { kind: "set_values", rangeA1, values: [[setCellNumeric.value]] },
+          ],
           sourcePatternIds: ["heuristic:set_cell_numeric"],
           canonicalOps: ["XLSX_SET_CELL_VALUE"],
         };
@@ -779,7 +886,11 @@ export class ExcelSourceOfTruthService {
     }
 
     // Hard guard: chart commands with one or two explicit ranges.
-    const chartHeuristic = parseChartIntent(message, input.sheetNames, chosenSheet);
+    const chartHeuristic = parseChartIntent(
+      message,
+      input.sheetNames,
+      chosenSheet,
+    );
     if (chartHeuristic) {
       return {
         kind: "plan",
@@ -817,7 +928,9 @@ export class ExcelSourceOfTruthService {
       return {
         kind: "clarification",
         message: String(first?.message || "Please clarify what to change."),
-        missingSlots: analyzed.missingSlots.map((item) => String(item.slot || "")).filter(Boolean),
+        missingSlots: analyzed.missingSlots
+          .map((item) => String(item.slot || ""))
+          .filter(Boolean),
         sourcePatternIds: analyzed.sourcePatternIds || [],
       };
     }
@@ -825,11 +938,21 @@ export class ExcelSourceOfTruthService {
     const unsupported: string[] = [];
     const ops: ComputeOp[] = [];
     const explicitRangeInMessage = extractRangeFromMessage(message);
-    const semanticCellTarget = resolveSemanticCellTarget(message, input.cellFacts);
-    const semanticColumnRange = resolveSemanticColumnRange(message, input.cellFacts);
+    const semanticCellTarget = resolveSemanticCellTarget(
+      message,
+      input.cellFacts,
+    );
+    const semanticColumnRange = resolveSemanticColumnRange(
+      message,
+      input.cellFacts,
+    );
     const semanticTableRange = resolveSemanticTableRange(input.cellFacts);
-    const hasSemanticTarget = Boolean(semanticCellTarget || semanticColumnRange || semanticTableRange);
-    const fallbackRangeA1 = explicitRangeInMessage || (hasSemanticTarget ? null : (input.viewerRangeA1 || null));
+    const hasSemanticTarget = Boolean(
+      semanticCellTarget || semanticColumnRange || semanticTableRange,
+    );
+    const fallbackRangeA1 =
+      explicitRangeInMessage ||
+      (hasSemanticTarget ? null : input.viewerRangeA1 || null);
     const sheetNameFallback =
       Array.isArray(input.sheetNames) && input.sheetNames.length > 0
         ? String(input.sheetNames[0] || "").trim() || null
@@ -842,11 +965,23 @@ export class ExcelSourceOfTruthService {
       null;
 
     for (const step of analyzed.ops) {
-      const paramsWithSemantic = { ...(step.params || {}) } as Record<string, unknown>;
-      const needsRangeA1 = !String(paramsWithSemantic.rangeA1 || paramsWithSemantic.range || paramsWithSemantic.a1 || "").trim();
+      const paramsWithSemantic = { ...(step.params || {}) } as Record<
+        string,
+        unknown
+      >;
+      const needsRangeA1 = !String(
+        paramsWithSemantic.rangeA1 ||
+          paramsWithSemantic.range ||
+          paramsWithSemantic.a1 ||
+          "",
+      ).trim();
       if (needsRangeA1) {
-        if (step.op === "XLSX_SET_CELL_VALUE" || step.op === "XLSX_SET_CELL_FORMULA") {
-          if (semanticCellTarget?.a1) paramsWithSemantic.rangeA1 = semanticCellTarget.a1;
+        if (
+          step.op === "XLSX_SET_CELL_VALUE" ||
+          step.op === "XLSX_SET_CELL_FORMULA"
+        ) {
+          if (semanticCellTarget?.a1)
+            paramsWithSemantic.rangeA1 = semanticCellTarget.a1;
         } else if (
           step.op === "XLSX_SET_RANGE_VALUES" ||
           step.op === "XLSX_FORMAT_RANGE" ||
@@ -855,12 +990,17 @@ export class ExcelSourceOfTruthService {
           step.op === "XLSX_FILTER_APPLY" ||
           step.op === "XLSX_TABLE_CREATE"
         ) {
-          if (semanticColumnRange?.rangeA1) paramsWithSemantic.rangeA1 = semanticColumnRange.rangeA1;
+          if (semanticColumnRange?.rangeA1)
+            paramsWithSemantic.rangeA1 = semanticColumnRange.rangeA1;
         } else if (step.op === "XLSX_CHART_CREATE") {
-          if (semanticTableRange?.rangeA1) paramsWithSemantic.rangeA1 = semanticTableRange.rangeA1;
+          if (semanticTableRange?.rangeA1)
+            paramsWithSemantic.rangeA1 = semanticTableRange.rangeA1;
         }
       }
-      if (!String(paramsWithSemantic.sheetName || "").trim() && semanticSheetName) {
+      if (
+        !String(paramsWithSemantic.sheetName || "").trim() &&
+        semanticSheetName
+      ) {
         paramsWithSemantic.sheetName = semanticSheetName;
       }
       const mapped = toComputeOp(

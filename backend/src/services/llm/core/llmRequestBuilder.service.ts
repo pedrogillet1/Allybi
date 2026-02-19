@@ -51,13 +51,24 @@ export interface BankLoader {
  */
 export interface PromptRegistryService {
   buildPrompt(
-    promptId: "system" | "retrieval" | "compose_answer" | "disambiguation" | "fallback" | "tool",
-    ctx: any
+    promptId:
+      | "system"
+      | "retrieval"
+      | "compose_answer"
+      | "disambiguation"
+      | "fallback"
+      | "tool",
+    ctx: any,
   ): {
     id?: string;
     messages: Array<{ role: "system" | "developer" | "user"; content: string }>;
     trace?: {
-      orderedPrompts?: Array<{ bankId: string; version: string; templateId: string; hash: string }>;
+      orderedPrompts?: Array<{
+        bankId: string;
+        version: string;
+        templateId: string;
+        hash: string;
+      }>;
       appliedGuards?: string[];
       slotsFilled?: string[];
     };
@@ -71,12 +82,22 @@ export interface PromptRegistryService {
 export interface EvidencePackLike {
   query?: { original?: string; normalized?: string };
   scope?: { activeDocId?: string | null; explicitDocLock?: boolean };
-  stats?: { evidenceItems?: number; uniqueDocsInEvidence?: number; topScore?: number | null; scoreGap?: number | null };
+  stats?: {
+    evidenceItems?: number;
+    uniqueDocsInEvidence?: number;
+    topScore?: number | null;
+    scoreGap?: number | null;
+  };
   evidence: Array<{
     docId: string;
     title?: string | null;
     filename?: string | null;
-    location?: { page?: number | null; sheet?: string | null; slide?: number | null; sectionKey?: string | null };
+    location?: {
+      page?: number | null;
+      sheet?: string | null;
+      slide?: number | null;
+      sectionKey?: string | null;
+    };
     locationKey?: string;
     snippet?: string;
     score?: { finalScore?: number };
@@ -156,14 +177,25 @@ export class LlmRequestBuilderService {
   constructor(private readonly prompts: PromptRegistryService) {}
 
   build(input: BuildRequestInput): LlmRequest {
-    const maxQuestions = typeof input.signals.maxQuestions === "number" ? input.signals.maxQuestions : 1;
-    const disambiguationSignal = this.normalizeDisambiguationSignal(input, maxQuestions);
+    const maxQuestions =
+      typeof input.signals.maxQuestions === "number"
+        ? input.signals.maxQuestions
+        : 1;
+    const disambiguationSignal = this.normalizeDisambiguationSignal(
+      input,
+      maxQuestions,
+    );
 
     // Determine prompt type
     const promptType = this.choosePromptType(input, disambiguationSignal);
 
     // Build prompt context
-    const promptCtx = this.buildPromptContext(input, promptType, maxQuestions, disambiguationSignal);
+    const promptCtx = this.buildPromptContext(
+      input,
+      promptType,
+      maxQuestions,
+      disambiguationSignal,
+    );
 
     // Pull base prompt messages from prompt registry
     const prompt = this.prompts.buildPrompt(promptType, promptCtx);
@@ -217,7 +249,9 @@ export class LlmRequestBuilderService {
       route: input.route,
       messages,
       options,
-      correlationId: input.route?.constraints?.maxLatencyMs ? undefined : undefined,
+      correlationId: input.route?.constraints?.maxLatencyMs
+        ? undefined
+        : undefined,
       cacheKeyHint: this.cacheKeyHint(input, promptType),
       kodaMeta: {
         promptType,
@@ -225,7 +259,9 @@ export class LlmRequestBuilderService {
         answerMode: input.signals.answerMode,
         operator: input.signals.operator,
         intentFamily: input.signals.intentFamily,
-        reasonCodes: input.signals.fallback?.reasonCode ? [input.signals.fallback.reasonCode] : [],
+        reasonCodes: input.signals.fallback?.reasonCode
+          ? [input.signals.fallback.reasonCode]
+          : [],
       },
     };
   }
@@ -237,9 +273,19 @@ export class LlmRequestBuilderService {
   private choosePromptType(
     input: BuildRequestInput,
     disambiguationSignal: DisambiguationPayload | null,
-  ): "system" | "retrieval" | "compose_answer" | "disambiguation" | "fallback" | "tool" {
+  ):
+    | "system"
+    | "retrieval"
+    | "compose_answer"
+    | "disambiguation"
+    | "fallback"
+    | "tool" {
     // Disambiguation always wins
-    if (disambiguationSignal?.active || input.signals.answerMode === "rank_disambiguate") return "disambiguation";
+    if (
+      disambiguationSignal?.active ||
+      input.signals.answerMode === "rank_disambiguate"
+    )
+      return "disambiguation";
 
     // Retrieval planning flows
     if (
@@ -251,7 +297,8 @@ export class LlmRequestBuilderService {
     }
 
     // File actions can use tool prompt shape
-    if (input.signals.operatorFamily === "file_actions" && input.toolContext) return "tool";
+    if (input.signals.operatorFamily === "file_actions" && input.toolContext)
+      return "tool";
 
     // Fallback triggered
     if (input.signals.fallback?.triggered) return "fallback";
@@ -269,10 +316,19 @@ export class LlmRequestBuilderService {
     const evidenceStats = input.evidencePack?.stats ?? {};
     const evidenceSummary = input.evidencePack
       ? {
-          evidenceCount: Number(evidenceStats.evidenceItems ?? input.evidencePack.evidence?.length ?? 0),
-          uniqueDocs: Number(evidenceStats.uniqueDocsInEvidence ?? new Set(input.evidencePack.evidence.map((e) => e.docId)).size),
+          evidenceCount: Number(
+            evidenceStats.evidenceItems ??
+              input.evidencePack.evidence?.length ??
+              0,
+          ),
+          uniqueDocs: Number(
+            evidenceStats.uniqueDocsInEvidence ??
+              new Set(input.evidencePack.evidence.map((e) => e.docId)).size,
+          ),
           topScore: evidenceStats.topScore ?? null,
-          hasTables: input.evidencePack.evidence.some((e) => e.evidenceType === "table"),
+          hasTables: input.evidencePack.evidence.some(
+            (e) => e.evidenceType === "table",
+          ),
         }
       : undefined;
 
@@ -297,7 +353,10 @@ export class LlmRequestBuilderService {
         ? {
             active: true,
             candidateType: disambiguationSignal.candidateType,
-            options: disambiguationSignal.options.map((o) => ({ id: o.id, label: o.label })),
+            options: disambiguationSignal.options.map((o) => ({
+              id: o.id,
+              label: o.label,
+            })),
           }
         : { active: false },
 
@@ -323,7 +382,10 @@ export class LlmRequestBuilderService {
   // User payload construction
   // -------------------------
 
-  private buildUserPayload(input: BuildRequestInput, disambiguationSignal: DisambiguationPayload | null): string {
+  private buildUserPayload(
+    input: BuildRequestInput,
+    disambiguationSignal: DisambiguationPayload | null,
+  ): string {
     const parts: string[] = [];
 
     // Memory context (bounded, already packed)
@@ -332,18 +394,24 @@ export class LlmRequestBuilderService {
     }
 
     // Evidence context: compact “Evidence” section (do not dump everything)
-    if (input.evidencePack && Array.isArray(input.evidencePack.evidence) && input.evidencePack.evidence.length) {
+    if (
+      input.evidencePack &&
+      Array.isArray(input.evidencePack.evidence) &&
+      input.evidencePack.evidence.length
+    ) {
       parts.push(this.renderEvidenceForPrompt(input.evidencePack));
     }
 
     // Disambiguation options (if active) — keep minimal; prompt handles rendering policy
     if (disambiguationSignal?.active) {
-      const opts = disambiguationSignal.options.slice(0, disambiguationSignal.maxOptions);
+      const opts = disambiguationSignal.options.slice(
+        0,
+        disambiguationSignal.maxOptions,
+      );
       parts.push(
-        [
-          "### Options",
-          ...opts.map((o, i) => `- (${i + 1}) ${o.label}`),
-        ].join("\n")
+        ["### Options", ...opts.map((o, i) => `- (${i + 1}) ${o.label}`)].join(
+          "\n",
+        ),
       );
     }
 
@@ -353,8 +421,12 @@ export class LlmRequestBuilderService {
         [
           "### Tool Context",
           `toolName: ${input.toolContext.toolName}`,
-          input.toolContext.toolArgs ? `toolArgs: ${JSON.stringify(input.toolContext.toolArgs)}` : "",
-        ].filter(Boolean).join("\n")
+          input.toolContext.toolArgs
+            ? `toolArgs: ${JSON.stringify(input.toolContext.toolArgs)}`
+            : "",
+        ]
+          .filter(Boolean)
+          .join("\n"),
       );
     }
 
@@ -372,19 +444,21 @@ export class LlmRequestBuilderService {
     lines.push("### Evidence (use only this)");
     for (const e of top) {
       const title = e.title || e.filename || e.docId;
-      const loc = e.location?.page != null
-        ? `p.${e.location.page}`
-        : e.location?.slide != null
-        ? `s.${e.location.slide}`
-        : e.location?.sheet
-        ? `sheet:${e.location.sheet}`
-        : e.location?.sectionKey
-        ? `sec:${e.location.sectionKey}`
-        : "";
+      const loc =
+        e.location?.page != null
+          ? `p.${e.location.page}`
+          : e.location?.slide != null
+            ? `s.${e.location.slide}`
+            : e.location?.sheet
+              ? `sheet:${e.location.sheet}`
+              : e.location?.sectionKey
+                ? `sec:${e.location.sectionKey}`
+                : "";
 
       const snippet = (e.snippet || "").trim().replace(/\s+/g, " ");
       // Keep snippet short
-      const clipped = snippet.length > 260 ? snippet.slice(0, 259) + "…" : snippet;
+      const clipped =
+        snippet.length > 260 ? snippet.slice(0, 259) + "…" : snippet;
 
       lines.push(`- [${title}]${loc ? ` (${loc})` : ""}: ${clipped}`);
     }
@@ -410,8 +484,12 @@ export class LlmRequestBuilderService {
     return core;
   }
 
-  private normalizeDisambiguationSignal(input: BuildRequestInput, maxQuestions: number): DisambiguationPayload | null {
-    if (input.signals.disambiguation?.active) return input.signals.disambiguation;
+  private normalizeDisambiguationSignal(
+    input: BuildRequestInput,
+    maxQuestions: number,
+  ): DisambiguationPayload | null {
+    if (input.signals.disambiguation?.active)
+      return input.signals.disambiguation;
     if (input.signals.answerMode !== "rank_disambiguate") return null;
     return {
       active: true,

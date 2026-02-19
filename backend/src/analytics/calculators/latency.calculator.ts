@@ -10,7 +10,7 @@ export type ApiPerfEvent = {
 };
 
 export type LatencyOptions = {
-  field: 'latencyMs' | 'ttftMs';
+  field: "latencyMs" | "ttftMs";
   routePrefix?: string;
 };
 
@@ -53,7 +53,7 @@ export function percentile(sortedValues: number[], p: number): number | null {
  */
 export function calculateLatencyMetrics(
   apiEvents: ApiPerfEvent[],
-  opts: LatencyOptions
+  opts: LatencyOptions,
 ): LatencyResult {
   const emptyResult: LatencyResult = {
     count: 0,
@@ -81,7 +81,12 @@ export function calculateLatencyMetrics(
     const value = event[field];
 
     // Skip null, undefined, NaN, negative values
-    if (value == null || typeof value !== 'number' || isNaN(value) || value < 0) {
+    if (
+      value == null ||
+      typeof value !== "number" ||
+      isNaN(value) ||
+      value < 0
+    ) {
       continue;
     }
 
@@ -113,7 +118,7 @@ export function calculateLatencyMetrics(
  */
 export function calculateLatencyByRoute(
   apiEvents: ApiPerfEvent[],
-  opts: Omit<LatencyOptions, 'routePrefix'>
+  opts: Omit<LatencyOptions, "routePrefix">,
 ): Array<{ route: string } & LatencyResult> {
   if (!apiEvents || apiEvents.length === 0) {
     return [];
@@ -123,7 +128,7 @@ export function calculateLatencyByRoute(
   const byRoute = new Map<string, ApiPerfEvent[]>();
 
   for (const event of apiEvents) {
-    const route = event.route || 'unknown';
+    const route = event.route || "unknown";
     if (!byRoute.has(route)) {
       byRoute.set(route, []);
     }
@@ -134,7 +139,10 @@ export function calculateLatencyByRoute(
   const results: Array<{ route: string } & LatencyResult> = [];
 
   for (const [route, events] of Array.from(byRoute.entries())) {
-    const metrics = calculateLatencyMetrics(events, { ...opts, routePrefix: undefined });
+    const metrics = calculateLatencyMetrics(events, {
+      ...opts,
+      routePrefix: undefined,
+    });
     results.push({ route, ...metrics });
   }
 

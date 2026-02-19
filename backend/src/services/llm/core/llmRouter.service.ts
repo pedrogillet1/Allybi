@@ -159,7 +159,10 @@ function bool(v: any): boolean {
 }
 
 function isNavPills(ctx: RouteContext): boolean {
-  return (ctx.answerMode ?? "") === "nav_pills" || (ctx.operatorFamily ?? "") === "file_actions";
+  return (
+    (ctx.answerMode ?? "") === "nav_pills" ||
+    (ctx.operatorFamily ?? "") === "file_actions"
+  );
 }
 
 function hasAnyReason(ctx: RouteContext, codes: string[]): boolean {
@@ -167,7 +170,11 @@ function hasAnyReason(ctx: RouteContext, codes: string[]): boolean {
   return codes.some((c) => s.has(c));
 }
 
-function pickHealth(health: ProviderHealth[] | undefined, provider: LlmProviderId, model: LlmModelId): { ok: boolean } {
+function pickHealth(
+  health: ProviderHealth[] | undefined,
+  provider: LlmProviderId,
+  model: LlmModelId,
+): { ok: boolean } {
   if (!health || !health.length) return { ok: true };
   const p = health.find((h) => h.provider === provider);
   if (!p) return { ok: true };
@@ -201,8 +208,11 @@ export class LlmRouterService {
     }
 
     // 1) Load optional banks
-    const caps = this.safeGetBank<ProviderCapabilitiesBank>("providerCapabilities");
-    const fallbacks = this.safeGetBank<ProviderFallbacksBank>("providerFallbacks");
+    const caps = this.safeGetBank<ProviderCapabilitiesBank>(
+      "providerCapabilities",
+    );
+    const fallbacks =
+      this.safeGetBank<ProviderFallbacksBank>("providerFallbacks");
     const flags = this.safeGetBank<FeatureFlagsBank>("feature_flags");
 
     const feature = flags?.flags ?? {};
@@ -213,15 +223,22 @@ export class LlmRouterService {
     const reason = this.computeRouteReason(ctx);
 
     // 3) Choose a primary target (provider/model) using bank defaults + Allybi heuristics
-    const primary = this.choosePrimaryTarget(ctx, reason, caps, { preferLocalInDev });
+    const primary = this.choosePrimaryTarget(ctx, reason, caps, {
+      preferLocalInDev,
+    });
 
     // 4) Validate capability constraints and provider health
     const needStreaming = bool(ctx.requireStreaming);
     const needTools = ctx.allowTools !== false;
 
     const okPrimary =
-      this.isTargetSupported(primary.provider, primary.model, caps, needStreaming, needTools) &&
-      pickHealth(ctx.providerHealth, primary.provider, primary.model).ok;
+      this.isTargetSupported(
+        primary.provider,
+        primary.model,
+        caps,
+        needStreaming,
+        needTools,
+      ) && pickHealth(ctx.providerHealth, primary.provider, primary.model).ok;
 
     if (okPrimary) {
       return {
@@ -239,12 +256,23 @@ export class LlmRouterService {
     }
 
     // 5) Fallback chain (bank-driven if present, else deterministic default)
-    const fbList = this.computeFallbackList(primary, needStreaming, needTools, fallbacks, enableMultiProvider);
+    const fbList = this.computeFallbackList(
+      primary,
+      needStreaming,
+      needTools,
+      fallbacks,
+      enableMultiProvider,
+    );
 
     for (const cand of fbList) {
       const supported =
-        this.isTargetSupported(cand.provider, cand.model, caps, needStreaming, needTools) &&
-        pickHealth(ctx.providerHealth, cand.provider, cand.model).ok;
+        this.isTargetSupported(
+          cand.provider,
+          cand.model,
+          caps,
+          needStreaming,
+          needTools,
+        ) && pickHealth(ctx.providerHealth, cand.provider, cand.model).ok;
 
       if (supported) {
         return {
@@ -283,9 +311,21 @@ export class LlmRouterService {
 
   private computeRouteReason(ctx: RouteContext): LlmRouteReason {
     // Highest priority: strict correctness retries
-    if (ctx.numericStrict || hasAnyReason(ctx, ["numeric_truncation_detected", "numeric_not_in_source"])) return "numeric_strict";
-    if (ctx.quoteStrict || hasAnyReason(ctx, ["quote_too_long"])) return "quote_strict";
-    if (ctx.hallucinationGuard || hasAnyReason(ctx, ["hallucination_risk_high"])) return "hallucination_guard";
+    if (
+      ctx.numericStrict ||
+      hasAnyReason(ctx, [
+        "numeric_truncation_detected",
+        "numeric_not_in_source",
+      ])
+    )
+      return "numeric_strict";
+    if (ctx.quoteStrict || hasAnyReason(ctx, ["quote_too_long"]))
+      return "quote_strict";
+    if (
+      ctx.hallucinationGuard ||
+      hasAnyReason(ctx, ["hallucination_risk_high"])
+    )
+      return "hallucination_guard";
     if (hasAnyReason(ctx, ["wrong_doc_detected"])) return "policy_retry";
     if (hasAnyReason(ctx, ["refusal_required"])) return "fallback_only";
 
@@ -294,7 +334,12 @@ export class LlmRouterService {
 
     // Fast path conditions: nav_pills or low-latency requirements
     if (isNavPills(ctx)) return "fast_path";
-    if (typeof ctx.latencyBudgetMs === "number" && ctx.latencyBudgetMs > 0 && ctx.latencyBudgetMs <= 2000) return "fast_path";
+    if (
+      typeof ctx.latencyBudgetMs === "number" &&
+      ctx.latencyBudgetMs > 0 &&
+      ctx.latencyBudgetMs <= 2000
+    )
+      return "fast_path";
 
     return "fast_path";
   }
@@ -307,7 +352,7 @@ export class LlmRouterService {
     ctx: RouteContext,
     reason: LlmRouteReason,
     caps: ProviderCapabilitiesBank | null,
-    opts: { preferLocalInDev: boolean }
+    opts: { preferLocalInDev: boolean },
   ): { provider: LlmProviderId; model: LlmModelId; stage: "draft" | "final" } {
     // Bank defaults if present
     const bankDraft = caps?.defaults?.draft;
@@ -316,15 +361,28 @@ export class LlmRouterService {
     // Allybi default strategy:
     // - Draft/fast path: Gemini 2.5 Flash (streaming-first)
     // - Final/precision: Gemini 2.5 Flash
-    const DEFAULT_DRAFT = { provider: "gemini" as LlmProviderId, model: "gemini-2.5-flash" as LlmModelId };
-    const DEFAULT_FINAL = { provider: "gemini" as LlmProviderId, model: "gemini-2.5-flash" as LlmModelId };
+    const DEFAULT_DRAFT = {
+      provider: "gemini" as LlmProviderId,
+      model: "gemini-2.5-flash" as LlmModelId,
+    };
+    const DEFAULT_FINAL = {
+      provider: "gemini" as LlmProviderId,
+      model: "gemini-2.5-flash" as LlmModelId,
+    };
 
     // Dev/local cost control: optionally prefer local for draft
-    const localDraft = { provider: "local" as LlmProviderId, model: "local-default" as LlmModelId };
+    const localDraft = {
+      provider: "local" as LlmProviderId,
+      model: "local-default" as LlmModelId,
+    };
 
     // Decide stage override from reason
     const stage: "draft" | "final" =
-      reason === "quality_finish" || reason === "numeric_strict" || reason === "quote_strict" || reason === "hallucination_guard" || reason === "policy_retry"
+      reason === "quality_finish" ||
+      reason === "numeric_strict" ||
+      reason === "quote_strict" ||
+      reason === "hallucination_guard" ||
+      reason === "policy_retry"
         ? "final"
         : ctx.stage;
 
@@ -351,7 +409,7 @@ export class LlmRouterService {
     model: LlmModelId,
     caps: ProviderCapabilitiesBank | null,
     needStreaming: boolean,
-    needTools: boolean
+    needTools: boolean,
   ): boolean {
     // If no capabilities bank, assume supported (system is configured elsewhere)
     if (!caps?.providers) return true;
@@ -375,17 +433,22 @@ export class LlmRouterService {
   // -----------------------------
 
   private computeFallbackList(
-    primary: { provider: LlmProviderId; model: LlmModelId; stage: "draft" | "final" },
+    primary: {
+      provider: LlmProviderId;
+      model: LlmModelId;
+      stage: "draft" | "final";
+    },
     needStreaming: boolean,
     needTools: boolean,
     fallbacks: ProviderFallbacksBank | null,
-    enableMultiProvider: boolean
+    enableMultiProvider: boolean,
   ): Array<{ provider: LlmProviderId; model: LlmModelId }> {
     const out: Array<{ provider: LlmProviderId; model: LlmModelId }> = [];
 
     // 1) Bank-driven fallbacks
     const fallbackRules =
-      fallbacks?.config?.enabled !== false && Array.isArray(fallbacks?.fallbacks)
+      fallbacks?.config?.enabled !== false &&
+      Array.isArray(fallbacks?.fallbacks)
         ? fallbacks.fallbacks
         : [];
 
@@ -394,11 +457,14 @@ export class LlmRouterService {
         const w = rule.when ?? {};
         const matchProvider = !w.provider || w.provider === primary.provider;
         const matchModel = !w.model || w.model === primary.model;
-        const matchStreaming = w.needStreaming == null ? true : w.needStreaming === needStreaming;
-        const matchTools = w.needTools == null ? true : w.needTools === needTools;
+        const matchStreaming =
+          w.needStreaming == null ? true : w.needStreaming === needStreaming;
+        const matchTools =
+          w.needTools == null ? true : w.needTools === needTools;
 
         if (matchProvider && matchModel && matchStreaming && matchTools) {
-          for (const t of rule.try ?? []) out.push({ provider: t.provider, model: t.model });
+          for (const t of rule.try ?? [])
+            out.push({ provider: t.provider, model: t.model });
         }
       }
     }

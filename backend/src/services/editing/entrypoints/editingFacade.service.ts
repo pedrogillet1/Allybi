@@ -1,7 +1,4 @@
-import type {
-  EditRevisionStore,
-  EditTelemetry,
-} from "../editing.types";
+import type { EditRevisionStore, EditTelemetry } from "../editing.types";
 import {
   EditHandlerService,
   type EditHandlerRequest,
@@ -19,7 +16,10 @@ export type EditingFacadeResponse = EditHandlerResponse;
 export class EditingFacadeService {
   private readonly handler: EditHandlerService;
 
-  constructor(opts?: { revisionStore?: EditRevisionStore; telemetry?: EditTelemetry }) {
+  constructor(opts?: {
+    revisionStore?: EditRevisionStore;
+    telemetry?: EditTelemetry;
+  }) {
     this.handler = new EditHandlerService({
       revisionStore: opts?.revisionStore,
       telemetry: opts?.telemetry,
@@ -30,4 +30,3 @@ export class EditingFacadeService {
     return this.handler.execute(input);
   }
 }
-

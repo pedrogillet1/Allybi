@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from "express";
 
 /**
  * HISTORY CONTROLLER (ChatGPT-like)
@@ -15,7 +15,7 @@ import type { Request, Response, NextFunction } from 'express';
 
 type UUID = string;
 
-export type ConversationVisibility = 'active' | 'archived' | 'deleted';
+export type ConversationVisibility = "active" | "archived" | "deleted";
 
 export interface ConversationSummary {
   id: UUID;
@@ -30,7 +30,7 @@ export interface ConversationSummary {
 
 export interface ConversationMessage {
   id: UUID;
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
   createdAt: string;
 }
@@ -54,25 +54,43 @@ export interface ChatHistoryService {
     q?: string;
   }): Promise<ListConversationsResult>;
 
-  getConversation(args: { userId: string; conversationId: string }): Promise<ConversationDetail | null>;
+  getConversation(args: {
+    userId: string;
+    conversationId: string;
+  }): Promise<ConversationDetail | null>;
 
   updateConversation(args: {
     userId: string;
     conversationId: string;
-    patch: Partial<Pick<ConversationSummary, 'title' | 'pinned' | 'visibility'>>;
+    patch: Partial<
+      Pick<ConversationSummary, "title" | "pinned" | "visibility">
+    >;
   }): Promise<ConversationSummary>;
 
-  deleteConversation(args: { userId: string; conversationId: string }): Promise<{ deleted: true }>;
+  deleteConversation(args: {
+    userId: string;
+    conversationId: string;
+  }): Promise<{ deleted: true }>;
 
-  searchConversations(args: { userId: string; q: string; limit: number }): Promise<ConversationSummary[]>;
+  searchConversations(args: {
+    userId: string;
+    q: string;
+    limit: number;
+  }): Promise<ConversationSummary[]>;
 
-  generateTitle?: (args: { userId: string; conversationId: string }) => Promise<{ title: string }>;
+  generateTitle?: (args: {
+    userId: string;
+    conversationId: string;
+  }) => Promise<{ title: string }>;
 }
 
 function getHistoryService(req: Request): ChatHistoryService {
-  const svc = (req.app.locals?.services?.history ?? req.app.locals?.historyService) as ChatHistoryService | undefined;
+  const svc = (req.app.locals?.services?.history ??
+    req.app.locals?.historyService) as ChatHistoryService | undefined;
   if (!svc) {
-    const err = new Error('History service not available (bootstrap wiring missing).');
+    const err = new Error(
+      "History service not available (bootstrap wiring missing).",
+    );
     // @ts-expect-error
     err.statusCode = 503;
     throw err;
@@ -90,8 +108,8 @@ function getUserId(req: Request): string {
     anyReq.session?.userId ||
     anyReq.userId;
 
-  if (!userId || typeof userId !== 'string') {
-    const err = new Error('Unauthorized (missing user id).');
+  if (!userId || typeof userId !== "string") {
+    const err = new Error("Unauthorized (missing user id).");
     // @ts-expect-error
     err.statusCode = 401;
     throw err;
@@ -106,32 +124,36 @@ function clampInt(n: number, min: number, max: number): number {
 
 function readLimit(req: Request, fallback = 20): number {
   const raw = req.query.limit ?? fallback;
-  const parsed = typeof raw === 'string' ? Number(raw) : Number(raw);
+  const parsed = typeof raw === "string" ? Number(raw) : Number(raw);
   return clampInt(parsed || fallback, 1, 50);
 }
 
 function readCursor(req: Request): string | undefined {
   const c = req.query.cursor;
-  return typeof c === 'string' && c.trim() ? c.trim() : undefined;
+  return typeof c === "string" && c.trim() ? c.trim() : undefined;
 }
 
 function readBool(v: unknown): boolean | undefined {
-  if (typeof v !== 'string') return undefined;
+  if (typeof v !== "string") return undefined;
   const s = v.trim().toLowerCase();
-  if (['1', 'true', 'yes', 'y'].includes(s)) return true;
-  if (['0', 'false', 'no', 'n'].includes(s)) return false;
+  if (["1", "true", "yes", "y"].includes(s)) return true;
+  if (["0", "false", "no", "n"].includes(s)) return false;
   return undefined;
 }
 
 function readString(v: unknown, maxLen: number): string | undefined {
-  if (typeof v !== 'string') return undefined;
+  if (typeof v !== "string") return undefined;
   const s = v.trim();
   if (!s) return undefined;
   return s.length > maxLen ? s.slice(0, maxLen) : s;
 }
 
 export class HistoryController {
-  listConversations = async (req: Request, res: Response, next: NextFunction) => {
+  listConversations = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const history = getHistoryService(req);
       const userId = getUserId(req);
@@ -162,11 +184,13 @@ export class HistoryController {
       const history = getHistoryService(req);
       const userId = getUserId(req);
 
-      const conversationId = String(req.params.conversationId || '').trim();
-      if (!conversationId) return res.status(400).json({ error: 'Missing conversationId.' });
+      const conversationId = String(req.params.conversationId || "").trim();
+      if (!conversationId)
+        return res.status(400).json({ error: "Missing conversationId." });
 
       const convo = await history.getConversation({ userId, conversationId });
-      if (!convo) return res.status(404).json({ error: 'Conversation not found.' });
+      if (!convo)
+        return res.status(404).json({ error: "Conversation not found." });
 
       return res.json(convo);
     } catch (err) {
@@ -174,13 +198,18 @@ export class HistoryController {
     }
   };
 
-  searchConversations = async (req: Request, res: Response, next: NextFunction) => {
+  searchConversations = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const history = getHistoryService(req);
       const userId = getUserId(req);
 
       const q = readString(req.body?.q ?? req.query.q, 160);
-      if (!q) return res.status(400).json({ error: 'Missing search query "q".' });
+      if (!q)
+        return res.status(400).json({ error: 'Missing search query "q".' });
 
       const limitRaw = req.body?.limit ?? req.query.limit ?? 20;
       const limit = clampInt(Number(limitRaw) || 20, 1, 50);
@@ -192,24 +221,36 @@ export class HistoryController {
     }
   };
 
-  updateConversation = async (req: Request, res: Response, next: NextFunction) => {
+  updateConversation = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const history = getHistoryService(req);
       const userId = getUserId(req);
 
-      const conversationId = String(req.params.conversationId || '').trim();
-      if (!conversationId) return res.status(400).json({ error: 'Missing conversationId.' });
+      const conversationId = String(req.params.conversationId || "").trim();
+      if (!conversationId)
+        return res.status(400).json({ error: "Missing conversationId." });
 
       const title = readString(req.body?.title, 80);
-      const pinned = typeof req.body?.pinned === 'boolean' ? req.body.pinned : undefined;
+      const pinned =
+        typeof req.body?.pinned === "boolean" ? req.body.pinned : undefined;
       const visibilityRaw = req.body?.visibility;
       const visibility: ConversationVisibility | undefined =
-        visibilityRaw === 'active' || visibilityRaw === 'archived' || visibilityRaw === 'deleted'
+        visibilityRaw === "active" ||
+        visibilityRaw === "archived" ||
+        visibilityRaw === "deleted"
           ? visibilityRaw
           : undefined;
 
-      if (title === undefined && pinned === undefined && visibility === undefined) {
-        return res.status(400).json({ error: 'No valid fields to update.' });
+      if (
+        title === undefined &&
+        pinned === undefined &&
+        visibility === undefined
+      ) {
+        return res.status(400).json({ error: "No valid fields to update." });
       }
 
       const patch: any = {};
@@ -217,22 +258,34 @@ export class HistoryController {
       if (pinned !== undefined) patch.pinned = pinned;
       if (visibility !== undefined) patch.visibility = visibility;
 
-      const updated = await history.updateConversation({ userId, conversationId, patch });
+      const updated = await history.updateConversation({
+        userId,
+        conversationId,
+        patch,
+      });
       return res.json(updated);
     } catch (err) {
       return next(err);
     }
   };
 
-  deleteConversation = async (req: Request, res: Response, next: NextFunction) => {
+  deleteConversation = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const history = getHistoryService(req);
       const userId = getUserId(req);
 
-      const conversationId = String(req.params.conversationId || '').trim();
-      if (!conversationId) return res.status(400).json({ error: 'Missing conversationId.' });
+      const conversationId = String(req.params.conversationId || "").trim();
+      if (!conversationId)
+        return res.status(400).json({ error: "Missing conversationId." });
 
-      const result = await history.deleteConversation({ userId, conversationId });
+      const result = await history.deleteConversation({
+        userId,
+        conversationId,
+      });
       return res.json(result);
     } catch (err) {
       return next(err);
@@ -245,19 +298,22 @@ export class HistoryController {
       const userId = getUserId(req);
 
       if (!history.generateTitle) {
-        return res.status(501).json({ error: 'Title generation not supported.' });
+        return res
+          .status(501)
+          .json({ error: "Title generation not supported." });
       }
 
-      const conversationId = String(req.params.conversationId || '').trim();
-      if (!conversationId) return res.status(400).json({ error: 'Missing conversationId.' });
+      const conversationId = String(req.params.conversationId || "").trim();
+      if (!conversationId)
+        return res.status(400).json({ error: "Missing conversationId." });
 
       const { title } = await history.generateTitle({ userId, conversationId });
-      const safeTitle = (title || '').trim().slice(0, 80);
+      const safeTitle = (title || "").trim().slice(0, 80);
 
       const updated = await history.updateConversation({
         userId,
         conversationId,
-        patch: { title: safeTitle || 'Untitled' },
+        patch: { title: safeTitle || "Untitled" },
       });
 
       return res.json(updated);

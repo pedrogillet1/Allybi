@@ -13,74 +13,81 @@
  * - Carry explicit reasonCodes so quality gates can replace bad fallbacks ("no relevant info").
  */
 
-import type { DocId, DocType, MimeType, ISODateTime, DocumentFile, FileListAttachment } from './files.types';
-import type { SourceButtonsAttachment } from './attachments.types';
+import type {
+  DocId,
+  DocType,
+  MimeType,
+  ISODateTime,
+  DocumentFile,
+  FileListAttachment,
+} from "./files.types";
+import type { SourceButtonsAttachment } from "./attachments.types";
 
 /** Intent family chosen by the intent engine */
 export type IntentFamily =
-  | 'documents'
-  | 'file_actions'
-  | 'navigation'
-  | 'help'
-  | 'conversation'
-  | 'account'
-  | 'unknown';
+  | "documents"
+  | "file_actions"
+  | "navigation"
+  | "help"
+  | "conversation"
+  | "account"
+  | "unknown";
 
 /** Operator chosen by the router */
 export type Operator =
-  | 'summarize'
-  | 'extract'
-  | 'compute'
-  | 'compare'
-  | 'quote'
-  | 'locate_content'
-  | 'locate_docs'
-  | 'open'
-  | 'where'
-  | 'list'
-  | 'filter'
-  | 'sort'
-  | 'group'
-  | 'count'
-  | 'stats'
-  | 'help'
-  | 'greeting'
-  | 'fallback';
+  | "summarize"
+  | "extract"
+  | "compute"
+  | "compare"
+  | "quote"
+  | "locate_content"
+  | "locate_docs"
+  | "open"
+  | "where"
+  | "list"
+  | "filter"
+  | "sort"
+  | "group"
+  | "count"
+  | "stats"
+  | "help"
+  | "greeting"
+  | "fallback";
 
 /** Answer mode (maps to render_policy + frontend UI contract) */
 export type AnswerMode =
-  | 'doc_grounded_single'
-  | 'doc_grounded_multi'
-  | 'doc_grounded_table'
-  | 'doc_grounded_quote'
-  | 'rank_autopick'
-  | 'rank_disambiguate'
-  | 'nav_pills'
-  | 'help_steps'
-  | 'no_docs'
-  | 'scoped_not_found'
-  | 'refusal'
-  | 'general_answer';
+  | "doc_grounded_single"
+  | "doc_grounded_multi"
+  | "doc_grounded_table"
+  | "doc_grounded_quote"
+  | "rank_autopick"
+  | "rank_disambiguate"
+  | "nav_pills"
+  | "help_steps"
+  | "no_docs"
+  | "scoped_not_found"
+  | "refusal"
+  | "general_answer";
 
 /** Why a fallback happened (drives adaptive microcopy) */
 export type ReasonCode =
-  | 'ok'
-  | 'no_docs_indexed'
-  | 'indexing_in_progress'
-  | 'extraction_failed'
-  | 'scope_hard_constraints_empty'
-  | 'no_relevant_chunks_in_scoped_docs'
-  | 'ambiguous_doc_choice'
-  | 'wrong_doc_risk'
-  | 'policy_refusal_required'
-  | 'bad_fallback_detected'
-  | 'unknown_error';
+  | "ok"
+  | "no_docs_indexed"
+  | "indexing_in_progress"
+  | "extraction_failed"
+  | "scope_hard_constraints_empty"
+  | "no_relevant_chunks_in_scoped_docs"
+  | "ambiguous_doc_choice"
+  | "wrong_doc_risk"
+  | "policy_refusal_required"
+  | "bad_fallback_detected"
+  | "unknown_error";
 
 /** Confidence breakdown for routing + retrieval */
 export interface ConfidenceInfo {
   topScore?: number; // 0..1
   margin?: number; // 0..1
-  level?: 'low' | 'medium' | 'high';
+  level?: "low" | "medium" | "high";
   reasons?: string[];
 }
 
@@ -95,12 +102,12 @@ export interface ExplicitDocRef {
 export interface ActiveDocRef {
   present: boolean;
   docId?: DocId;
-  lockType?: 'soft' | 'hard';
+  lockType?: "soft" | "hard";
 }
 
 /** Scope snapshot at time of handling */
 export interface ScopeSnapshot {
-  type: 'none' | 'all' | 'filtered' | 'single';
+  type: "none" | "all" | "filtered" | "single";
   candidateDocIds?: DocId[];
   chosenDocIds?: DocId[];
   explicitDocRef?: ExplicitDocRef;
@@ -134,11 +141,15 @@ export interface EvidenceSnippet {
 }
 
 /** Generic attachment union (frontend renders by type) */
-export type Attachment = SourceButtonsAttachment | FileListAttachment | SelectFileAttachment | GroupedFilesAttachment;
+export type Attachment =
+  | SourceButtonsAttachment
+  | FileListAttachment
+  | SelectFileAttachment
+  | GroupedFilesAttachment;
 
 /** Selection attachment (disambiguation UI) */
 export interface SelectFileAttachment {
-  type: 'select_file';
+  type: "select_file";
   prompt: string;
   options: Array<{
     documentId: DocId;
@@ -152,7 +163,7 @@ export interface SelectFileAttachment {
 
 /** Grouped files attachment (optional, for folder breakdown UI) */
 export interface GroupedFilesAttachment {
-  type: 'grouped_files';
+  type: "grouped_files";
   groups: Array<{
     label: string; // folder/category name
     items: DocumentFile[];
@@ -163,7 +174,13 @@ export interface GroupedFilesAttachment {
 
 /** Output constraints requested by the user (affects composer) */
 export interface OutputConstraints {
-  outputShape?: 'paragraph' | 'bullets' | 'numbered_list' | 'table' | 'file_list' | 'button_only';
+  outputShape?:
+    | "paragraph"
+    | "bullets"
+    | "numbered_list"
+    | "table"
+    | "file_list"
+    | "button_only";
   exactBullets?: number;
   exactNumberedItems?: number;
   requireTable?: boolean;
@@ -243,7 +260,7 @@ export interface HandlerResult {
 
     // Domain/language (as detected)
     domainId?: string;
-    language?: 'en' | 'pt' | 'es';
+    language?: "en" | "pt" | "es";
 
     // Debug flags (should be stripped in prod render)
     traceId?: string;

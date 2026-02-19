@@ -11,38 +11,47 @@
 
 // Lazy import: geminiGateway resolves at runtime from LLM layer
 let _geminiGateway: any = null;
-const geminiGateway: { quickGenerate: (prompt: string, opts?: any) => Promise<string> } = {
+const geminiGateway: {
+  quickGenerate: (prompt: string, opts?: any) => Promise<string>;
+} = {
   async quickGenerate(prompt: string, opts?: any): Promise<string> {
     if (!_geminiGateway) {
       try {
         // Variable path prevents tsc from following the import into the WIP LLM folder
-        const modPath = '../llm/providers/gemini/geminiGateway.service';
+        const modPath = "../llm/providers/gemini/geminiGateway.service";
         const mod = await import(/* @vite-ignore */ modPath);
         _geminiGateway = new mod.GeminiGatewayService();
       } catch {
-        console.warn('[TitleGen] GeminiGateway not available');
-        return '';
+        console.warn("[TitleGen] GeminiGateway not available");
+        return "";
       }
     }
     return _geminiGateway.quickGenerate(prompt, opts);
-  }
+  },
 };
 
 export type TitleMode =
-  | 'chat_title'
-  | 'answer_title'
-  | 'answer_sections'
-  | 'document_title';
+  | "chat_title"
+  | "answer_title"
+  | "answer_sections"
+  | "document_title";
 
 export interface TitleParams {
   mode: TitleMode;
-  language: 'pt' | 'en' | string;
+  language: "pt" | "en" | string;
   userMessage?: string;
   assistantPreview?: string;
   answerDraft?: string;
   documentText?: string;
   filename?: string;
-  domainHint?: 'finance' | 'accounting' | 'legal' | 'medical' | 'education' | 'research' | 'general';
+  domainHint?:
+    | "finance"
+    | "accounting"
+    | "legal"
+    | "medical"
+    | "education"
+    | "research"
+    | "general";
 }
 
 export interface TitleResult {
@@ -55,20 +64,22 @@ export interface TitleResult {
 /**
  * Main title generation function
  */
-export async function generateTitleArtifacts(params: TitleParams): Promise<TitleResult> {
+export async function generateTitleArtifacts(
+  params: TitleParams,
+): Promise<TitleResult> {
   const { mode } = params;
 
   switch (mode) {
-    case 'chat_title':
+    case "chat_title":
       return { chatTitle: await generateChatTitle(params) };
 
-    case 'answer_title':
+    case "answer_title":
       return { answerTitle: await generateAnswerTitle(params) };
 
-    case 'answer_sections':
+    case "answer_sections":
       return { sectionHeadings: await generateSectionHeadings(params) };
 
-    case 'document_title':
+    case "document_title":
       return { documentTitle: await generateDocumentTitle(params) };
 
     default:
@@ -89,7 +100,7 @@ async function generateChatTitle(params: TitleParams): Promise<string> {
   const { language, userMessage, assistantPreview } = params;
 
   if (!userMessage) {
-    throw new Error('userMessage is required for chat_title mode');
+    throw new Error("userMessage is required for chat_title mode");
   }
 
   const prompt = `You are Allybi's Title Engine.
@@ -120,24 +131,26 @@ LANG=${language}
 USER_MESSAGE:
 "${userMessage}"
 
-${assistantPreview ? `ASSISTANT_PREVIEW:\n"${assistantPreview.substring(0, 200)}..."` : ''}
+${assistantPreview ? `ASSISTANT_PREVIEW:\n"${assistantPreview.substring(0, 200)}..."` : ""}
 
 TASK:
 Generate a short, engaging conversation title following the rules above.
 Output: return **ONLY** the title text, nothing else.`;
 
   try {
-    const title = await geminiGateway.quickGenerate(prompt, { temperature: 0.7, maxTokens: 30 });
+    const title = await geminiGateway.quickGenerate(prompt, {
+      temperature: 0.7,
+      maxTokens: 30,
+    });
 
-    if (!title) return 'New Conversation';
+    if (!title) return "New Conversation";
 
     // Remove quotes if present
-    return title.replace(/^["']|["']$/g, '').replace(/^#+\s*/, '');
-
+    return title.replace(/^["']|["']$/g, "").replace(/^#+\s*/, "");
   } catch (error) {
-    console.error('[TitleGen] Failed to generate chat title:', error);
+    console.error("[TitleGen] Failed to generate chat title:", error);
     // Fallback: extract first few words from user message
-    return userMessage.split(' ').slice(0, 5).join(' ') + '...';
+    return userMessage.split(" ").slice(0, 5).join(" ") + "...";
   }
 }
 
@@ -154,7 +167,7 @@ async function generateAnswerTitle(params: TitleParams): Promise<string> {
   const { language, userMessage, answerDraft } = params;
 
   if (!userMessage) {
-    throw new Error('userMessage is required for answer_title mode');
+    throw new Error("userMessage is required for answer_title mode");
   }
 
   const prompt = `You are Allybi's Answer Title Generator.
@@ -185,23 +198,25 @@ LANG=${language}
 USER_QUESTION:
 "${userMessage}"
 
-${answerDraft ? `ANSWER_PREVIEW:\n"${answerDraft.substring(0, 300)}..."` : ''}
+${answerDraft ? `ANSWER_PREVIEW:\n"${answerDraft.substring(0, 300)}..."` : ""}
 
 TASK:
 Generate a clear, engaging H1 title for this answer.
 Output: return **ONLY** the title text.`;
 
   try {
-    const title = await geminiGateway.quickGenerate(prompt, { temperature: 0.7, maxTokens: 40 });
+    const title = await geminiGateway.quickGenerate(prompt, {
+      temperature: 0.7,
+      maxTokens: 40,
+    });
 
-    if (!title) return 'Answer';
+    if (!title) return "Answer";
 
     // Remove markdown symbols and quotes
-    return title.replace(/^#+\s*/, '').replace(/^["']|["']$/g, '');
-
+    return title.replace(/^#+\s*/, "").replace(/^["']|["']$/g, "");
   } catch (error) {
-    console.error('[TitleGen] Failed to generate answer title:', error);
-    return 'Answer';
+    console.error("[TitleGen] Failed to generate answer title:", error);
+    return "Answer";
   }
 }
 
@@ -217,7 +232,9 @@ async function generateSectionHeadings(params: TitleParams): Promise<string[]> {
   const { language, userMessage, answerDraft, domainHint } = params;
 
   if (!userMessage || !answerDraft) {
-    throw new Error('userMessage and answerDraft are required for answer_sections mode');
+    throw new Error(
+      "userMessage and answerDraft are required for answer_sections mode",
+    );
   }
 
   const prompt = `You are Allybi's Section Heading Generator.
@@ -239,7 +256,7 @@ Examples in English:
 {"headings": ["Current scenario", "Scenario with mezzanine", "ROI and payback", "Conclusion"]}
 
 LANG=${language}
-${domainHint ? `DOMAIN=${domainHint}` : ''}
+${domainHint ? `DOMAIN=${domainHint}` : ""}
 
 USER_QUESTION:
 "${userMessage}"
@@ -252,7 +269,10 @@ Generate 2-5 clear section headings for this answer.
 Output: return **ONLY** a JSON object like {"headings": ["...", "..."]}`;
 
   try {
-    const content = await geminiGateway.quickGenerate(prompt, { temperature: 0.7, maxTokens: 150 });
+    const content = await geminiGateway.quickGenerate(prompt, {
+      temperature: 0.7,
+      maxTokens: 150,
+    });
 
     if (!content) return [];
 
@@ -261,11 +281,13 @@ Output: return **ONLY** a JSON object like {"headings": ["...", "..."]}`;
 
     // Clean up headings
     return headings.map((h: string) =>
-      h.replace(/^#+\s*/, '').replace(/^["']|["']$/g, '').trim()
+      h
+        .replace(/^#+\s*/, "")
+        .replace(/^["']|["']$/g, "")
+        .trim(),
     );
-
   } catch (error) {
-    console.error('[TitleGen] Failed to generate section headings:', error);
+    console.error("[TitleGen] Failed to generate section headings:", error);
     return [];
   }
 }
@@ -283,7 +305,9 @@ async function generateDocumentTitle(params: TitleParams): Promise<string> {
   const { language, filename, documentText } = params;
 
   if (!filename && !documentText) {
-    throw new Error('filename or documentText is required for document_title mode');
+    throw new Error(
+      "filename or documentText is required for document_title mode",
+    );
   }
 
   const prompt = `You are Allybi's Document Title Engine.
@@ -311,28 +335,30 @@ Examples in English:
 
 LANG=${language}
 
-${filename ? `FILENAME: ${filename}` : ''}
+${filename ? `FILENAME: ${filename}` : ""}
 
-${documentText ? `DOCUMENT_EXCERPT:\n${documentText.substring(0, 2000)}` : ''}
+${documentText ? `DOCUMENT_EXCERPT:\n${documentText.substring(0, 2000)}` : ""}
 
 TASK:
 Generate a short, descriptive title for this document.
 Output: return **ONLY** the title text.`;
 
   try {
-    const title = await geminiGateway.quickGenerate(prompt, { temperature: 0.7, maxTokens: 30 });
+    const title = await geminiGateway.quickGenerate(prompt, {
+      temperature: 0.7,
+      maxTokens: 30,
+    });
 
-    if (!title) return filename || 'Untitled Document';
+    if (!title) return filename || "Untitled Document";
 
     // Remove file extensions and quotes
     return title
-      .replace(/\.(pdf|docx?|xlsx?|txt|md)$/i, '')
-      .replace(/^["']|["']$/g, '')
-      .replace(/^#+\s*/, '');
-
+      .replace(/\.(pdf|docx?|xlsx?|txt|md)$/i, "")
+      .replace(/^["']|["']$/g, "")
+      .replace(/^#+\s*/, "");
   } catch (error) {
-    console.error('[TitleGen] Failed to generate document title:', error);
-    return filename || 'Untitled Document';
+    console.error("[TitleGen] Failed to generate document title:", error);
+    return filename || "Untitled Document";
   }
 }
 
@@ -346,10 +372,10 @@ export async function generateChatTitleOnly(params: {
   language: string;
 }): Promise<string> {
   const result = await generateTitleArtifacts({
-    mode: 'chat_title',
-    ...params
+    mode: "chat_title",
+    ...params,
   });
-  return result.chatTitle || 'New Conversation';
+  return result.chatTitle || "New Conversation";
 }
 
 export async function generateAnswerTitleOnly(params: {
@@ -358,21 +384,21 @@ export async function generateAnswerTitleOnly(params: {
   language: string;
 }): Promise<string> {
   const result = await generateTitleArtifacts({
-    mode: 'answer_title',
-    ...params
+    mode: "answer_title",
+    ...params,
   });
-  return result.answerTitle || 'Answer';
+  return result.answerTitle || "Answer";
 }
 
 export async function generateSectionHeadingsOnly(params: {
   userMessage: string;
   answerDraft: string;
   language: string;
-  domainHint?: TitleParams['domainHint'];
+  domainHint?: TitleParams["domainHint"];
 }): Promise<string[]> {
   const result = await generateTitleArtifacts({
-    mode: 'answer_sections',
-    ...params
+    mode: "answer_sections",
+    ...params,
   });
   return result.sectionHeadings || [];
 }
@@ -383,10 +409,10 @@ export async function generateDocumentTitleOnly(params: {
   language: string;
 }): Promise<string> {
   const result = await generateTitleArtifacts({
-    mode: 'document_title',
-    ...params
+    mode: "document_title",
+    ...params,
   });
-  return result.documentTitle || params.filename || 'Untitled Document';
+  return result.documentTitle || params.filename || "Untitled Document";
 }
 
 export default {
@@ -394,5 +420,5 @@ export default {
   generateChatTitleOnly,
   generateAnswerTitleOnly,
   generateSectionHeadingsOnly,
-  generateDocumentTitleOnly
+  generateDocumentTitleOnly,
 };

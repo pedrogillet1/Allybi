@@ -3,12 +3,12 @@
  * LLM call analytics, token usage, and cost tracking
  */
 
-import type { PrismaClient } from '@prisma/client';
-import { parseRange, normalizeRange } from './_shared/rangeWindow';
-import { clampLimit } from './_shared/clamp';
-import { processPage, buildCursorClause } from './_shared/pagination';
-import { p50, p95 } from './_shared/percentiles';
-import { supportsModel } from './_shared/prismaAdapter';
+import type { PrismaClient } from "@prisma/client";
+import { parseRange, normalizeRange } from "./_shared/rangeWindow";
+import { clampLimit } from "./_shared/clamp";
+import { processPage, buildCursorClause } from "./_shared/pagination";
+import { p50, p95 } from "./_shared/percentiles";
+import { supportsModel } from "./_shared/prismaAdapter";
 
 export interface AdminLLMRow {
   at: string;
@@ -88,9 +88,9 @@ export interface ListLLMCallsParams {
  */
 export async function listLlmCalls(
   prisma: PrismaClient,
-  params: ListLLMCallsParams
+  params: ListLLMCallsParams,
 ): Promise<LLMListResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
   const limit = clampLimit(params.limit, 50);
   const cursorClause = buildCursorClause(params.cursor);
@@ -98,7 +98,7 @@ export async function listLlmCalls(
   const { from, to } = window;
 
   // Check if we have modelCall model
-  if (!supportsModel(prisma, 'modelCall')) {
+  if (!supportsModel(prisma, "modelCall")) {
     return { range: rangeKey, items: [] };
   }
 
@@ -116,7 +116,7 @@ export async function listLlmCalls(
     where,
     take: limit + 1,
     ...cursorClause,
-    orderBy: { at: 'desc' },
+    orderBy: { at: "desc" },
     select: {
       id: true,
       at: true,
@@ -138,7 +138,7 @@ export async function listLlmCalls(
 
   const { page, nextCursor } = processPage(calls, limit);
 
-  const items: AdminLLMRow[] = page.map(c => ({
+  const items: AdminLLMRow[] = page.map((c) => ({
     at: c.at.toISOString(),
     userId: c.userId,
     provider: c.provider,
@@ -167,15 +167,15 @@ export async function listLlmCalls(
  */
 export async function getLlmSummary(
   prisma: PrismaClient,
-  params: { range?: string }
+  params: { range?: string },
 ): Promise<LLMSummaryResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
 
   const { from, to } = window;
 
   // Check if we have modelCall model
-  if (!supportsModel(prisma, 'modelCall')) {
+  if (!supportsModel(prisma, "modelCall")) {
     return {
       range: rangeKey,
       summary: {
@@ -208,24 +208,41 @@ export async function getLlmSummary(
 
   // Calculate totals
   const calls = allCalls.length;
-  const tokensTotal = allCalls.reduce((sum, c) => sum + (c.totalTokens ?? 0), 0);
-  const errorCount = allCalls.filter(c => c.status === 'fail').length;
-  const latencies = allCalls.map(c => c.durationMs ?? 0).filter(v => v > 0);
+  const tokensTotal = allCalls.reduce(
+    (sum, c) => sum + (c.totalTokens ?? 0),
+    0,
+  );
+  const errorCount = allCalls.filter((c) => c.status === "fail").length;
+  const latencies = allCalls.map((c) => c.durationMs ?? 0).filter((v) => v > 0);
 
   // Calculate breakdowns
-  const providerMap = new Map<string, { calls: number; tokens: number; errors: number; latencies: number[] }>();
-  const modelMap = new Map<string, { calls: number; tokens: number; errors: number; latencies: number[] }>();
-  const stageMap = new Map<string, { calls: number; tokens: number; errors: number; latencies: number[] }>();
+  const providerMap = new Map<
+    string,
+    { calls: number; tokens: number; errors: number; latencies: number[] }
+  >();
+  const modelMap = new Map<
+    string,
+    { calls: number; tokens: number; errors: number; latencies: number[] }
+  >();
+  const stageMap = new Map<
+    string,
+    { calls: number; tokens: number; errors: number; latencies: number[] }
+  >();
 
   for (const c of allCalls) {
     // Provider
     if (!providerMap.has(c.provider)) {
-      providerMap.set(c.provider, { calls: 0, tokens: 0, errors: 0, latencies: [] });
+      providerMap.set(c.provider, {
+        calls: 0,
+        tokens: 0,
+        errors: 0,
+        latencies: [],
+      });
     }
     const providerData = providerMap.get(c.provider)!;
     providerData.calls++;
     providerData.tokens += c.totalTokens ?? 0;
-    if (c.status === 'fail') providerData.errors++;
+    if (c.status === "fail") providerData.errors++;
     if (c.durationMs) providerData.latencies.push(c.durationMs);
 
     // Model
@@ -235,7 +252,7 @@ export async function getLlmSummary(
     const modelData = modelMap.get(c.model)!;
     modelData.calls++;
     modelData.tokens += c.totalTokens ?? 0;
-    if (c.status === 'fail') modelData.errors++;
+    if (c.status === "fail") modelData.errors++;
     if (c.durationMs) modelData.latencies.push(c.durationMs);
 
     // Stage
@@ -245,7 +262,7 @@ export async function getLlmSummary(
     const stageData = stageMap.get(c.stage)!;
     stageData.calls++;
     stageData.tokens += c.totalTokens ?? 0;
-    if (c.status === 'fail') stageData.errors++;
+    if (c.status === "fail") stageData.errors++;
     if (c.durationMs) stageData.latencies.push(c.durationMs);
   }
 
@@ -263,7 +280,10 @@ export async function getLlmSummary(
         provider,
         calls: data.calls,
         tokens: data.tokens,
-        errorRate: data.calls > 0 ? Math.round((data.errors / data.calls) * 10000) / 100 : 0,
+        errorRate:
+          data.calls > 0
+            ? Math.round((data.errors / data.calls) * 10000) / 100
+            : 0,
         latencyP50: p50(data.latencies),
       }))
       .sort((a, b) => b.calls - a.calls),
@@ -273,7 +293,10 @@ export async function getLlmSummary(
         model,
         calls: data.calls,
         tokens: data.tokens,
-        errorRate: data.calls > 0 ? Math.round((data.errors / data.calls) * 10000) / 100 : 0,
+        errorRate:
+          data.calls > 0
+            ? Math.round((data.errors / data.calls) * 10000) / 100
+            : 0,
         latencyP50: p50(data.latencies),
       }))
       .sort((a, b) => b.calls - a.calls),
@@ -283,7 +306,10 @@ export async function getLlmSummary(
         stage,
         calls: data.calls,
         tokens: data.tokens,
-        errorRate: data.calls > 0 ? Math.round((data.errors / data.calls) * 10000) / 100 : 0,
+        errorRate:
+          data.calls > 0
+            ? Math.round((data.errors / data.calls) * 10000) / 100
+            : 0,
         latencyP50: p50(data.latencies),
       }))
       .sort((a, b) => b.calls - a.calls),

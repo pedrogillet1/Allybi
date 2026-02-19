@@ -6,21 +6,21 @@
  * SECURITY: Keys contain only safe identifiers, never PII or content.
  */
 
-import { config } from '../../config/env';
+import { config } from "../../config/env";
 
 // ─────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────
 
 export type TimeRange =
-  | '1h'
-  | '6h'
-  | '24h'
-  | '7d'
-  | '14d'
-  | '30d'
-  | '90d'
-  | 'all'
+  | "1h"
+  | "6h"
+  | "24h"
+  | "7d"
+  | "14d"
+  | "30d"
+  | "90d"
+  | "all"
   | { start: string; end: string }; // ISO date strings
 
 export interface BaseFilters {
@@ -41,24 +41,24 @@ export interface UserFilters extends BaseFilters {
 
 export interface FileFilters extends BaseFilters {
   mimeType?: string;
-  sizeRange?: 'small' | 'medium' | 'large';
+  sizeRange?: "small" | "medium" | "large";
   processingStatus?: string;
 }
 
 export interface QueryFilters extends BaseFilters {
   hasResponse?: boolean;
-  responseTime?: 'fast' | 'medium' | 'slow';
+  responseTime?: "fast" | "medium" | "slow";
 }
 
 export interface CostFilters extends BaseFilters {
-  costRange?: 'low' | 'medium' | 'high';
+  costRange?: "low" | "medium" | "high";
 }
 
 // ─────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────
 
-const ENV = config.NODE_ENV || 'development';
+const ENV = config.NODE_ENV || "development";
 const PREFIX = `koda:analytics:${ENV}`;
 
 /**
@@ -69,9 +69,11 @@ const PREFIX = `koda:analytics:${ENV}`;
  * - Converts booleans/numbers to strings
  * - Returns URL-safe encoded string
  */
-export function normalizeFilters(filters: Record<string, unknown> | undefined): string {
+export function normalizeFilters(
+  filters: Record<string, unknown> | undefined,
+): string {
   if (!filters || Object.keys(filters).length === 0) {
-    return '';
+    return "";
   }
 
   const normalized: Record<string, string> = {};
@@ -94,13 +96,13 @@ export function normalizeFilters(filters: Record<string, unknown> | undefined): 
         .map(String)
         .sort();
       if (sorted.length > 0) {
-        normalized[key] = sorted.join(',');
+        normalized[key] = sorted.join(",");
       }
       continue;
     }
 
     // Handle objects - recursively normalize
-    if (typeof value === 'object') {
+    if (typeof value === "object") {
       const nested = normalizeFilters(value as Record<string, unknown>);
       if (nested) {
         normalized[key] = nested;
@@ -113,13 +115,13 @@ export function normalizeFilters(filters: Record<string, unknown> | undefined): 
   }
 
   if (Object.keys(normalized).length === 0) {
-    return '';
+    return "";
   }
 
   // Create stable query string
   const parts = Object.entries(normalized)
     .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-    .join('&');
+    .join("&");
 
   return parts;
 }
@@ -128,7 +130,7 @@ export function normalizeFilters(filters: Record<string, unknown> | undefined): 
  * Convert TimeRange to a stable string representation
  */
 function normalizeRange(range: TimeRange): string {
-  if (typeof range === 'string') {
+  if (typeof range === "string") {
     return range;
   }
   // Custom date range - use ISO strings
@@ -138,14 +140,18 @@ function normalizeRange(range: TimeRange): string {
 /**
  * Build a cache key from parts
  */
-function buildKey(endpoint: string, range: TimeRange, filters?: Record<string, unknown>): string {
+function buildKey(
+  endpoint: string,
+  range: TimeRange,
+  filters?: Record<string, unknown>,
+): string {
   const rangeStr = normalizeRange(range);
   const filterStr = normalizeFilters(filters);
   const parts = [PREFIX, endpoint, rangeStr];
   if (filterStr) {
     parts.push(filterStr);
   }
-  return parts.join(':');
+  return parts.join(":");
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -157,70 +163,70 @@ export const cacheKeys = {
    * Overview dashboard metrics (total users, queries, files, etc.)
    */
   overview(range: TimeRange): string {
-    return buildKey('overview', range);
+    return buildKey("overview", range);
   },
 
   /**
    * User analytics (DAU, WAU, retention, etc.)
    */
   users(range: TimeRange, filters?: UserFilters): string {
-    return buildKey('users', range, filters);
+    return buildKey("users", range, filters);
   },
 
   /**
    * File analytics (uploads, processing, storage)
    */
   files(range: TimeRange, filters?: FileFilters): string {
-    return buildKey('files', range, filters);
+    return buildKey("files", range, filters);
   },
 
   /**
    * Query analytics (volume, latency, patterns)
    */
   queries(range: TimeRange, filters?: QueryFilters): string {
-    return buildKey('queries', range, filters);
+    return buildKey("queries", range, filters);
   },
 
   /**
    * Answer quality metrics (format scores, weak evidence, etc.)
    */
   answerQuality(range: TimeRange): string {
-    return buildKey('answer-quality', range);
+    return buildKey("answer-quality", range);
   },
 
   /**
    * LLM cost breakdown by provider/model
    */
   llmCost(range: TimeRange, filters?: CostFilters): string {
-    return buildKey('llm-cost', range, filters);
+    return buildKey("llm-cost", range, filters);
   },
 
   /**
    * Reliability metrics (error rates, latency percentiles)
    */
   reliability(range: TimeRange): string {
-    return buildKey('reliability', range);
+    return buildKey("reliability", range);
   },
 
   /**
    * Security metrics (auth failures, rate limits, anomalies)
    */
   security(range: TimeRange): string {
-    return buildKey('security', range);
+    return buildKey("security", range);
   },
 
   /**
    * Live feed snapshot (recent activity)
    */
-  liveFeed(range: TimeRange | 'now' = 'now'): string {
-    return buildKey('live-feed', range === 'now' ? '1h' : range);
+  liveFeed(range: TimeRange | "now" = "now"): string {
+    return buildKey("live-feed", range === "now" ? "1h" : range);
   },
 
   /**
    * Retention cohort data
    */
   retention(range: TimeRange): string {
-    return buildKey('retention', range);
+    return buildKey("retention", range);
   },
 
   /**
@@ -242,7 +248,7 @@ export const cacheKeys = {
  * Validate that a key is safe to use (starts with our prefix)
  */
 export function isSafeKey(key: string): boolean {
-  return key.startsWith('koda:analytics:');
+  return key.startsWith("koda:analytics:");
 }
 
 export default cacheKeys;

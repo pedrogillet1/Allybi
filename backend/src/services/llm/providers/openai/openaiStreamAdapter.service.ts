@@ -68,7 +68,8 @@ function normalizeFinishReason(raw: any): LlmFinishReason {
   if (s.includes("stop")) return "stop";
   if (s.includes("length") || s.includes("max_tokens")) return "length";
   if (s.includes("tool")) return "tool_calls";
-  if (s.includes("content_filter") || s.includes("safety")) return "content_filter";
+  if (s.includes("content_filter") || s.includes("safety"))
+    return "content_filter";
   if (s.includes("cancel")) return "cancelled";
   if (s.includes("error")) return "error";
   return "unknown";
@@ -127,13 +128,16 @@ function extractDeltaText(evt: any): string {
 /**
  * Extract tool call deltas (Chat Completions).
  */
-function extractToolCallDelta(evt: any): { toolCallId: string; deltaJson: string } | null {
+function extractToolCallDelta(
+  evt: any,
+): { toolCallId: string; deltaJson: string } | null {
   const tc = evt?.choices?.[0]?.delta?.tool_calls;
   if (Array.isArray(tc) && tc.length) {
     const t0 = tc[0];
     const id = String(t0.id ?? "toolcall_0");
     const args = t0.function?.arguments;
-    if (typeof args === "string" && args.length) return { toolCallId: id, deltaJson: args };
+    if (typeof args === "string" && args.length)
+      return { toolCallId: id, deltaJson: args };
   }
   return null;
 }
@@ -142,14 +146,15 @@ function extractUsage(evt: any): LlmUsage | undefined {
   const u = evt?.usage;
   if (!u || typeof u !== "object") return undefined;
 
-  const inputTokens =
-    Number.isFinite(u.prompt_tokens) ? Math.max(0, Math.floor(u.prompt_tokens)) : undefined;
-  const outputTokens =
-    Number.isFinite(u.completion_tokens) ? Math.max(0, Math.floor(u.completion_tokens)) : undefined;
-  const totalTokens =
-    Number.isFinite(u.total_tokens)
-      ? Math.max(0, Math.floor(u.total_tokens))
-      : inputTokens != null && outputTokens != null
+  const inputTokens = Number.isFinite(u.prompt_tokens)
+    ? Math.max(0, Math.floor(u.prompt_tokens))
+    : undefined;
+  const outputTokens = Number.isFinite(u.completion_tokens)
+    ? Math.max(0, Math.floor(u.completion_tokens))
+    : undefined;
+  const totalTokens = Number.isFinite(u.total_tokens)
+    ? Math.max(0, Math.floor(u.total_tokens))
+    : inputTokens != null && outputTokens != null
       ? inputTokens + outputTokens
       : undefined;
 
@@ -175,7 +180,11 @@ function isTerminalOpenAIEvent(evt: any): boolean {
 }
 
 function extractFinishReason(evt: any): LlmFinishReason {
-  const fr = evt?.choices?.[0]?.finish_reason ?? evt?.finish_reason ?? evt?.done_reason ?? null;
+  const fr =
+    evt?.choices?.[0]?.finish_reason ??
+    evt?.finish_reason ??
+    evt?.done_reason ??
+    null;
   return normalizeFinishReason(fr);
 }
 
@@ -193,7 +202,10 @@ export class OpenAIStreamAdapterService {
     signal?: AbortSignal;
     opts?: Partial<OpenAIStreamAdapterOptions>;
   }): AsyncIterable<LlmStreamEvent> {
-    const opts: OpenAIStreamAdapterOptions = { ...DEFAULT_OPTS, ...(args.opts || {}) };
+    const opts: OpenAIStreamAdapterOptions = {
+      ...DEFAULT_OPTS,
+      ...(args.opts || {}),
+    };
 
     // META early
     yield {
@@ -205,7 +217,9 @@ export class OpenAIStreamAdapterService {
       cached: false,
     };
 
-    let nextHeartbeatAt = opts.includeHeartbeat ? nowMs() + opts.heartbeatEveryMs : 0;
+    let nextHeartbeatAt = opts.includeHeartbeat
+      ? nowMs() + opts.heartbeatEveryMs
+      : 0;
 
     let accumulatedText = "";
     let finishReason: LlmFinishReason = "unknown";
@@ -228,7 +242,12 @@ export class OpenAIStreamAdapterService {
 
         // Tool deltas
         const tcd = extractToolCallDelta(evt);
-        if (tcd) yield { type: "tool_call_delta", toolCallId: tcd.toolCallId, deltaJson: tcd.deltaJson };
+        if (tcd)
+          yield {
+            type: "tool_call_delta",
+            toolCallId: tcd.toolCallId,
+            deltaJson: tcd.deltaJson,
+          };
 
         // Text deltas
         const delta = extractDeltaText(evt);
@@ -268,7 +287,10 @@ export class OpenAIStreamAdapterService {
         code: "openai_stream_error",
         message: safeString(err?.message || "Stream failed"),
         retryable: false,
-        detail: process.env.NODE_ENV === "production" ? undefined : { stack: err?.stack },
+        detail:
+          process.env.NODE_ENV === "production"
+            ? undefined
+            : { stack: err?.stack },
       };
     } finally {
       // If aborted without final, still emit a final response so downstream can close streams cleanly.

@@ -1,4 +1,7 @@
-import type { StreamSink, LLMStreamingConfig } from "./llm/types/llmStreaming.types";
+import type {
+  StreamSink,
+  LLMStreamingConfig,
+} from "./llm/types/llmStreaming.types";
 import { ChatRuntimeService } from "./chatRuntime.service";
 import { ConversationNotFoundError } from "./chatRuntime.contracts";
 import type {
@@ -61,11 +64,15 @@ export class PrismaChatService implements PrismaChatServicePort {
     this.runtime = new ChatRuntimeService(engine, opts);
     // Staged cutover switch for centralized turn routing.
     // default=true preserves current behavior unless explicitly disabled.
-    this.useKernel = (process.env.PRISMA_CHAT_KERNEL_ENABLED ?? "true") !== "false";
+    this.useKernel =
+      (process.env.PRISMA_CHAT_KERNEL_ENABLED ?? "true") !== "false";
     this.kernel = new ChatKernelService({
       chat: (req: ChatRequest) => this.runtime.chat(req),
-      streamChat: (params: { req: ChatRequest; sink: StreamSink; streamingConfig: LLMStreamingConfig }) =>
-        this.runtime.streamChat(params),
+      streamChat: (params: {
+        req: ChatRequest;
+        sink: StreamSink;
+        streamingConfig: LLMStreamingConfig;
+      }) => this.runtime.streamChat(params),
     });
   }
 
@@ -83,15 +90,24 @@ export class PrismaChatService implements PrismaChatServicePort {
     return this.kernel.streamTurn(params);
   }
 
-  async createConversation(params: { userId: string; title?: string }): Promise<ConversationDTO> {
+  async createConversation(params: {
+    userId: string;
+    title?: string;
+  }): Promise<ConversationDTO> {
     return this.runtime.createConversation(params);
   }
 
-  async listConversations(userId: string, opts: ConversationListOptions = {}): Promise<ConversationDTO[]> {
+  async listConversations(
+    userId: string,
+    opts: ConversationListOptions = {},
+  ): Promise<ConversationDTO[]> {
     return this.runtime.listConversations(userId, opts);
   }
 
-  async getConversation(userId: string, conversationId: string): Promise<ConversationDTO | null> {
+  async getConversation(
+    userId: string,
+    conversationId: string,
+  ): Promise<ConversationDTO | null> {
     return this.runtime.getConversation(userId, conversationId);
   }
 
@@ -100,18 +116,31 @@ export class PrismaChatService implements PrismaChatServicePort {
     conversationId: string,
     opts: ConversationMessagesOptions = {},
   ): Promise<ConversationWithMessagesDTO | null> {
-    return this.runtime.getConversationWithMessages(userId, conversationId, opts);
+    return this.runtime.getConversationWithMessages(
+      userId,
+      conversationId,
+      opts,
+    );
   }
 
-  async updateTitle(userId: string, conversationId: string, title: string): Promise<ConversationDTO | null> {
+  async updateTitle(
+    userId: string,
+    conversationId: string,
+    title: string,
+  ): Promise<ConversationDTO | null> {
     return this.runtime.updateTitle(userId, conversationId, title);
   }
 
-  async deleteConversation(userId: string, conversationId: string): Promise<{ ok: boolean }> {
+  async deleteConversation(
+    userId: string,
+    conversationId: string,
+  ): Promise<{ ok: boolean }> {
     return this.runtime.deleteConversation(userId, conversationId);
   }
 
-  async deleteAllConversations(userId: string): Promise<{ ok: boolean; deleted: number }> {
+  async deleteAllConversations(
+    userId: string,
+  ): Promise<{ ok: boolean; deleted: number }> {
     return this.runtime.deleteAllConversations(userId);
   }
 

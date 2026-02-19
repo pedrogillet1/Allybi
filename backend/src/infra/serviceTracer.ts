@@ -10,7 +10,7 @@
  * @version 1.0.0
  */
 
-import { AsyncLocalStorage } from 'async_hooks';
+import { AsyncLocalStorage } from "async_hooks";
 
 // ============================================================================
 // TYPES
@@ -95,10 +95,10 @@ function addTrace(entry: TraceEntry) {
  */
 export function traceService<T extends object>(
   serviceName: string,
-  instance: T
+  instance: T,
 ): T {
   // In production, you might want to disable tracing
-  if (process.env.DISABLE_TRACING === 'true') {
+  if (process.env.DISABLE_TRACING === "true") {
     return instance;
   }
 
@@ -107,17 +107,17 @@ export function traceService<T extends object>(
       const value = Reflect.get(target, prop, receiver);
 
       // Don't wrap non-functions
-      if (typeof value !== 'function') return value;
+      if (typeof value !== "function") return value;
 
       // Don't wrap private methods (start with _)
-      if (String(prop).startsWith('_')) return value;
+      if (String(prop).startsWith("_")) return value;
 
       // Don't wrap common internal methods
       const skipMethods = [
-        'constructor',
-        'toString',
-        'valueOf',
-        'toJSON',
+        "constructor",
+        "toString",
+        "valueOf",
+        "toJSON",
         Symbol.toStringTag,
         Symbol.iterator,
       ];
@@ -153,7 +153,7 @@ export function traceService<T extends object>(
                 entry.error = err?.message || String(err);
                 addTrace(entry);
                 throw err;
-              }
+              },
             );
           }
 
@@ -177,16 +177,16 @@ export function traceService<T extends object>(
  */
 export function traceModule<T extends Record<string, any>>(
   moduleName: string,
-  moduleExports: T
+  moduleExports: T,
 ): T {
-  if (process.env.DISABLE_TRACING === 'true') {
+  if (process.env.DISABLE_TRACING === "true") {
     return moduleExports;
   }
 
   const traced: Record<string, any> = {};
 
   for (const [key, value] of Object.entries(moduleExports)) {
-    if (typeof value === 'function') {
+    if (typeof value === "function") {
       traced[key] = function (...args: any[]) {
         const requestId = getCurrentRequestId();
         const startTime = Date.now();
@@ -213,7 +213,7 @@ export function traceModule<T extends Record<string, any>>(
                 entry.error = err?.message || String(err);
                 addTrace(entry);
                 throw err;
-              }
+              },
             );
           }
 
@@ -260,11 +260,11 @@ export function getServicesForRequest(requestId: string): Set<string> {
  */
 export function getMethodsForService(
   requestId: string,
-  serviceName: string
+  serviceName: string,
 ): string[] {
   return traceLog
     .filter(
-      (entry) => entry.requestId === requestId && entry.service === serviceName
+      (entry) => entry.requestId === requestId && entry.service === serviceName,
     )
     .map((entry) => entry.method);
 }
@@ -292,15 +292,15 @@ export function printTrace(requestId: string) {
 
   console.log(`\n======== TRACE FOR REQUEST: ${requestId} ========`);
   console.log(`Total calls: ${trace.length}`);
-  console.log('');
+  console.log("");
 
   for (const entry of trace) {
-    const duration = entry.duration !== undefined ? `${entry.duration}ms` : '?';
-    const error = entry.error ? ` [ERROR: ${entry.error}]` : '';
+    const duration = entry.duration !== undefined ? `${entry.duration}ms` : "?";
+    const error = entry.error ? ` [ERROR: ${entry.error}]` : "";
     console.log(`  [${duration}] ${entry.service}.${entry.method}()${error}`);
   }
 
-  console.log('================================================\n');
+  console.log("================================================\n");
 }
 
 /**
@@ -312,18 +312,13 @@ export function generateTraceReport(): {
   serviceUsage: Map<string, number>;
   averageDuration: Map<string, number>;
 } {
-  const requestIds = new Set(
-    traceLog.map((e) => e.requestId).filter(Boolean)
-  );
+  const requestIds = new Set(traceLog.map((e) => e.requestId).filter(Boolean));
   const serviceUsage = new Map<string, number>();
   const serviceDurations = new Map<string, number[]>();
 
   for (const entry of traceLog) {
     // Count service usage
-    serviceUsage.set(
-      entry.service,
-      (serviceUsage.get(entry.service) || 0) + 1
-    );
+    serviceUsage.set(entry.service, (serviceUsage.get(entry.service) || 0) + 1);
 
     // Track durations
     if (entry.duration !== undefined) {
@@ -355,23 +350,23 @@ export function generateTraceReport(): {
 export function printTraceReport() {
   const report = generateTraceReport();
 
-  console.log('\n======== SERVICE TRACE REPORT ========');
+  console.log("\n======== SERVICE TRACE REPORT ========");
   console.log(`Total Requests: ${report.totalRequests}`);
   console.log(`Total Calls: ${report.totalCalls}`);
-  console.log('');
-  console.log('Service Usage:');
+  console.log("");
+  console.log("Service Usage:");
 
   const sortedServices = [...report.serviceUsage.entries()].sort(
-    (a, b) => b[1] - a[1]
+    (a, b) => b[1] - a[1],
   );
 
   for (const [service, count] of sortedServices) {
     const avgDuration = report.averageDuration.get(service);
-    const durationStr = avgDuration ? ` (avg ${avgDuration}ms)` : '';
+    const durationStr = avgDuration ? ` (avg ${avgDuration}ms)` : "";
     console.log(`  ${service}: ${count} calls${durationStr}`);
   }
 
-  console.log('==========================================\n');
+  console.log("==========================================\n");
 }
 
 /**

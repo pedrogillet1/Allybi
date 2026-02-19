@@ -3,11 +3,11 @@
  * Evidence strength analysis and quality metrics
  */
 
-import type { PrismaClient } from '@prisma/client';
-import { parseRange, normalizeRange } from './_shared/rangeWindow';
-import { clampLimit } from './_shared/clamp';
-import { processPage, buildCursorClause } from './_shared/pagination';
-import { supportsModel } from './_shared/prismaAdapter';
+import type { PrismaClient } from "@prisma/client";
+import { parseRange, normalizeRange } from "./_shared/rangeWindow";
+import { clampLimit } from "./_shared/clamp";
+import { processPage, buildCursorClause } from "./_shared/pagination";
+import { supportsModel } from "./_shared/prismaAdapter";
 
 // Thresholds
 const WEAK_EVIDENCE_THRESHOLD = 0.35;
@@ -67,9 +67,9 @@ export interface GetQualityParams {
  */
 export async function getQuality(
   prisma: PrismaClient,
-  params: GetQualityParams
+  params: GetQualityParams,
 ): Promise<QualityResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
   const limit = clampLimit(params.limit, 50);
   const cursorClause = buildCursorClause(params.cursor);
@@ -77,13 +77,20 @@ export async function getQuality(
   const { from, to } = window;
 
   // Check if we have retrievalEvent data
-  if (supportsModel(prisma, 'retrievalEvent')) {
+  if (supportsModel(prisma, "retrievalEvent")) {
     const eventCount = await prisma.retrievalEvent.count({
       where: { at: { gte: from, lt: to } },
     });
 
     if (eventCount > 0) {
-      return getQualityFromRetrievalEvents(prisma, params, rangeKey, window, limit, cursorClause);
+      return getQualityFromRetrievalEvents(
+        prisma,
+        params,
+        rangeKey,
+        window,
+        limit,
+        cursorClause,
+      );
     }
   }
 
@@ -100,7 +107,7 @@ async function getQualityFromRetrievalEvents(
   rangeKey: string,
   window: { from: Date; to: Date },
   limit: number,
-  cursorClause: Record<string, unknown>
+  cursorClause: Record<string, unknown>,
 ): Promise<QualityResult> {
   const { from, to } = window;
 
@@ -129,11 +136,14 @@ async function getQualityFromRetrievalEvents(
   // Calculate totals
   const total = allEvents.length;
   const weak = allEvents.filter(
-    e => (e.evidenceStrength !== null && e.evidenceStrength < WEAK_EVIDENCE_THRESHOLD) ||
-         e.fallbackReasonCode === 'WEAK_EVIDENCE'
+    (e) =>
+      (e.evidenceStrength !== null &&
+        e.evidenceStrength < WEAK_EVIDENCE_THRESHOLD) ||
+      e.fallbackReasonCode === "WEAK_EVIDENCE",
   ).length;
   const none = allEvents.filter(
-    e => e.evidenceStrength === null || e.fallbackReasonCode === 'NO_EVIDENCE'
+    (e) =>
+      e.evidenceStrength === null || e.fallbackReasonCode === "NO_EVIDENCE",
   ).length;
 
   const totals: QualityTotals = {
@@ -145,17 +155,33 @@ async function getQualityFromRetrievalEvents(
   };
 
   // Calculate breakdown by domain
-  const domainMap = new Map<string, { total: number; weak: number; evidenceSum: number; evidenceCount: number }>();
-  const intentMap = new Map<string, { total: number; weak: number; evidenceSum: number; evidenceCount: number }>();
-  const operatorMap = new Map<string, { total: number; weak: number; evidenceSum: number; evidenceCount: number }>();
+  const domainMap = new Map<
+    string,
+    { total: number; weak: number; evidenceSum: number; evidenceCount: number }
+  >();
+  const intentMap = new Map<
+    string,
+    { total: number; weak: number; evidenceSum: number; evidenceCount: number }
+  >();
+  const operatorMap = new Map<
+    string,
+    { total: number; weak: number; evidenceSum: number; evidenceCount: number }
+  >();
 
   for (const e of allEvents) {
-    const isWeak = (e.evidenceStrength !== null && e.evidenceStrength < WEAK_EVIDENCE_THRESHOLD) ||
-                   e.fallbackReasonCode === 'WEAK_EVIDENCE';
+    const isWeak =
+      (e.evidenceStrength !== null &&
+        e.evidenceStrength < WEAK_EVIDENCE_THRESHOLD) ||
+      e.fallbackReasonCode === "WEAK_EVIDENCE";
 
     // Domain
     if (!domainMap.has(e.domain)) {
-      domainMap.set(e.domain, { total: 0, weak: 0, evidenceSum: 0, evidenceCount: 0 });
+      domainMap.set(e.domain, {
+        total: 0,
+        weak: 0,
+        evidenceSum: 0,
+        evidenceCount: 0,
+      });
     }
     const domainData = domainMap.get(e.domain)!;
     domainData.total++;
@@ -167,7 +193,12 @@ async function getQualityFromRetrievalEvents(
 
     // Intent
     if (!intentMap.has(e.intent)) {
-      intentMap.set(e.intent, { total: 0, weak: 0, evidenceSum: 0, evidenceCount: 0 });
+      intentMap.set(e.intent, {
+        total: 0,
+        weak: 0,
+        evidenceSum: 0,
+        evidenceCount: 0,
+      });
     }
     const intentData = intentMap.get(e.intent)!;
     intentData.total++;
@@ -179,7 +210,12 @@ async function getQualityFromRetrievalEvents(
 
     // Operator
     if (!operatorMap.has(e.operator)) {
-      operatorMap.set(e.operator, { total: 0, weak: 0, evidenceSum: 0, evidenceCount: 0 });
+      operatorMap.set(e.operator, {
+        total: 0,
+        weak: 0,
+        evidenceSum: 0,
+        evidenceCount: 0,
+      });
     }
     const operatorData = operatorMap.get(e.operator)!;
     operatorData.total++;
@@ -196,8 +232,14 @@ async function getQualityFromRetrievalEvents(
       .map(([domain, data]) => ({
         domain,
         total: data.total,
-        weakRate: data.total > 0 ? Math.round((data.weak / data.total) * 10000) / 100 : 0,
-        avgEvidence: data.evidenceCount > 0 ? Math.round((data.evidenceSum / data.evidenceCount) * 1000) / 1000 : 0,
+        weakRate:
+          data.total > 0
+            ? Math.round((data.weak / data.total) * 10000) / 100
+            : 0,
+        avgEvidence:
+          data.evidenceCount > 0
+            ? Math.round((data.evidenceSum / data.evidenceCount) * 1000) / 1000
+            : 0,
       }))
       .sort((a, b) => b.total - a.total),
 
@@ -205,8 +247,14 @@ async function getQualityFromRetrievalEvents(
       .map(([intent, data]) => ({
         intent,
         total: data.total,
-        weakRate: data.total > 0 ? Math.round((data.weak / data.total) * 10000) / 100 : 0,
-        avgEvidence: data.evidenceCount > 0 ? Math.round((data.evidenceSum / data.evidenceCount) * 1000) / 1000 : 0,
+        weakRate:
+          data.total > 0
+            ? Math.round((data.weak / data.total) * 10000) / 100
+            : 0,
+        avgEvidence:
+          data.evidenceCount > 0
+            ? Math.round((data.evidenceSum / data.evidenceCount) * 1000) / 1000
+            : 0,
       }))
       .sort((a, b) => b.total - a.total),
 
@@ -214,8 +262,14 @@ async function getQualityFromRetrievalEvents(
       .map(([operator, data]) => ({
         operator,
         total: data.total,
-        weakRate: data.total > 0 ? Math.round((data.weak / data.total) * 10000) / 100 : 0,
-        avgEvidence: data.evidenceCount > 0 ? Math.round((data.evidenceSum / data.evidenceCount) * 1000) / 1000 : 0,
+        weakRate:
+          data.total > 0
+            ? Math.round((data.weak / data.total) * 10000) / 100
+            : 0,
+        avgEvidence:
+          data.evidenceCount > 0
+            ? Math.round((data.evidenceSum / data.evidenceCount) * 1000) / 1000
+            : 0,
       }))
       .sort((a, b) => b.total - a.total),
   };
@@ -225,7 +279,7 @@ async function getQualityFromRetrievalEvents(
     where,
     take: limit + 1,
     ...cursorClause,
-    orderBy: { at: 'desc' },
+    orderBy: { at: "desc" },
     select: {
       id: true,
       at: true,
@@ -242,7 +296,7 @@ async function getQualityFromRetrievalEvents(
 
   const { page, nextCursor } = processPage(events, limit);
 
-  const items: QualityQueryRow[] = page.map(e => ({
+  const items: QualityQueryRow[] = page.map((e) => ({
     at: e.at.toISOString(),
     userId: e.userId,
     intent: e.intent,
@@ -271,7 +325,7 @@ async function getQualityFromMessages(
   prisma: PrismaClient,
   rangeKey: string,
   window: { from: Date; to: Date },
-  limit: number
+  limit: number,
 ): Promise<QualityResult> {
   const { from, to } = window;
 
@@ -295,14 +349,14 @@ async function getQualityFromMessages(
         },
       },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
     take: limit,
   });
 
   // Get user messages for the feed
   const userMessages = await prisma.message.findMany({
     where: {
-      role: 'user',
+      role: "user",
       createdAt: { gte: from, lt: to },
     },
     select: {
@@ -316,7 +370,7 @@ async function getQualityFromMessages(
         },
       },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
     take: limit,
   });
 
@@ -333,18 +387,18 @@ async function getQualityFromMessages(
 
   // Build breakdown by conversation activity
   const breakdown: QualityBreakdown = {
-    byDomain: [{ domain: 'general', total, weakRate: 0, avgEvidence: 0 }],
-    byIntent: [{ intent: 'user_query', total, weakRate: 0, avgEvidence: 0 }],
-    byOperator: [{ operator: 'chat', total, weakRate: 0, avgEvidence: 0 }],
+    byDomain: [{ domain: "general", total, weakRate: 0, avgEvidence: 0 }],
+    byIntent: [{ intent: "user_query", total, weakRate: 0, avgEvidence: 0 }],
+    byOperator: [{ operator: "chat", total, weakRate: 0, avgEvidence: 0 }],
   };
 
   // Build items from messages
-  const items: QualityQueryRow[] = userMessages.map(m => ({
+  const items: QualityQueryRow[] = userMessages.map((m) => ({
     at: m.createdAt.toISOString(),
-    userId: m.conversation?.userId || 'unknown',
-    intent: 'user_query',
-    operator: 'chat',
-    domain: 'general',
+    userId: m.conversation?.userId || "unknown",
+    intent: "user_query",
+    operator: "chat",
+    domain: "general",
     evidenceStrength: null,
     fallbackReasonCode: null,
     sourcesCount: null,

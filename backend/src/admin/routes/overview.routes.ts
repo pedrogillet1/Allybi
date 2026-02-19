@@ -3,11 +3,14 @@
  * GET /api/admin/overview
  */
 
-import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { getOverview, getTimeseries } from '../../services/admin';
-import { parseRange, normalizeRange } from '../../services/admin/_shared/rangeWindow';
-import { getGoogleMetrics } from '../../services/admin/googleMetrics.service';
+import { Router, Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
+import { getOverview, getTimeseries } from "../../services/admin";
+import {
+  parseRange,
+  normalizeRange,
+} from "../../services/admin/_shared/rangeWindow";
+import { getGoogleMetrics } from "../../services/admin/googleMetrics.service";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -16,10 +19,10 @@ const prisma = new PrismaClient();
  * GET /api/admin/overview
  * Returns dashboard KPIs
  */
-router.get('/', async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
   try {
-    const range = (req.query.range as string) || '7d';
-    const rangeKey = normalizeRange(range, '7d');
+    const range = (req.query.range as string) || "7d";
+    const rangeKey = normalizeRange(range, "7d");
     const window = parseRange(rangeKey);
     const [result, google] = await Promise.all([
       getOverview(prisma, { range: rangeKey }),
@@ -36,17 +39,17 @@ router.get('/', async (req: Request, res: Response) => {
         google,
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
     });
   } catch (error) {
-    console.error('[Admin] Overview error:', error);
+    console.error("[Admin] Overview error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch overview',
-      code: 'OVERVIEW_ERROR',
+      error: "Failed to fetch overview",
+      code: "OVERVIEW_ERROR",
     });
   }
 });
@@ -55,10 +58,10 @@ router.get('/', async (req: Request, res: Response) => {
  * GET /api/admin/overview/timeseries
  * Returns timeseries data for a specific metric
  */
-router.get('/timeseries', async (req: Request, res: Response) => {
+router.get("/timeseries", async (req: Request, res: Response) => {
   try {
-    const range = (req.query.range as string) || '7d';
-    const metric = (req.query.metric as string) || 'dau';
+    const range = (req.query.range as string) || "7d";
+    const metric = (req.query.metric as string) || "dau";
     const result = await getTimeseries(prisma, { range, metric });
 
     res.json({
@@ -70,17 +73,17 @@ router.get('/timeseries', async (req: Request, res: Response) => {
         points: result.points,
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
     });
   } catch (error) {
-    console.error('[Admin] Timeseries error:', error);
+    console.error("[Admin] Timeseries error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch timeseries',
-      code: 'TIMESERIES_ERROR',
+      error: "Failed to fetch timeseries",
+      code: "TIMESERIES_ERROR",
     });
   }
 });

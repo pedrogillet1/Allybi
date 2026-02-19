@@ -1,52 +1,52 @@
-export type EditIntent = 'EDITING';
+export type EditIntent = "EDITING";
 
-export type EditDomain = 'docx' | 'sheets' | 'slides';
+export type EditDomain = "docx" | "sheets" | "slides";
 
-export type EditScope = 'workspace' | 'documents';
+export type EditScope = "workspace" | "documents";
 
 export type EditOperator =
-  | 'EDIT_PARAGRAPH'
-  | 'ADD_PARAGRAPH'
-  | 'EDIT_CELL'
-  | 'EDIT_RANGE'
-  | 'ADD_SHEET'
-  | 'RENAME_SHEET'
-  | 'CREATE_CHART'
-  | 'ADD_SLIDE'
-  | 'REWRITE_SLIDE_TEXT'
-  | 'REPLACE_IMAGE'
-  | 'DELETE_ROW'
-  | 'DELETE_COLUMN'
-  | 'DELETE_SHEET'
-  | 'DELETE_SLIDE'
-  | 'MOVE_COLUMN';
+  | "EDIT_PARAGRAPH"
+  | "ADD_PARAGRAPH"
+  | "EDIT_CELL"
+  | "EDIT_RANGE"
+  | "ADD_SHEET"
+  | "RENAME_SHEET"
+  | "CREATE_CHART"
+  | "ADD_SLIDE"
+  | "REWRITE_SLIDE_TEXT"
+  | "REPLACE_IMAGE"
+  | "DELETE_ROW"
+  | "DELETE_COLUMN"
+  | "DELETE_SHEET"
+  | "DELETE_SLIDE"
+  | "MOVE_COLUMN";
 
 export type EditPlanType =
-  | 'EDIT_PARAGRAPH'
-  | 'ADD_PARAGRAPH'
-  | 'EDIT_CELL'
-  | 'EDIT_RANGE'
-  | 'ADD_SHEET'
-  | 'CREATE_CHART'
-  | 'ADD_SLIDE'
-  | 'REWRITE_SLIDE_TEXT'
-  | 'REPLACE_IMAGE'
-  | 'DELETE_ROW'
-  | 'DELETE_COLUMN'
-  | 'DELETE_SHEET'
-  | 'DELETE_SLIDE'
-  | 'MOVE_COLUMN';
+  | "EDIT_PARAGRAPH"
+  | "ADD_PARAGRAPH"
+  | "EDIT_CELL"
+  | "EDIT_RANGE"
+  | "ADD_SHEET"
+  | "CREATE_CHART"
+  | "ADD_SLIDE"
+  | "REWRITE_SLIDE_TEXT"
+  | "REPLACE_IMAGE"
+  | "DELETE_ROW"
+  | "DELETE_COLUMN"
+  | "DELETE_SHEET"
+  | "DELETE_SLIDE"
+  | "MOVE_COLUMN";
 
-export type EditRiskLevel = 'LOW' | 'MED' | 'HIGH';
+export type EditRiskLevel = "LOW" | "MED" | "HIGH";
 
 export type EditActionPillType =
-  | 'confirm'
-  | 'cancel'
-  | 'pick_target'
-  | 'undo'
-  | 'open_doc'
-  | 'go_to_location'
-  | 'export';
+  | "confirm"
+  | "cancel"
+  | "pick_target"
+  | "undo"
+  | "open_doc"
+  | "go_to_location"
+  | "export";
 
 export interface EditRequestContext {
   correlationId: string;
@@ -69,8 +69,8 @@ export interface EditRoutingDecision {
 export interface EditConstraintExtraction {
   preserveNumbers: boolean;
   preserveEntities: boolean;
-  styleTarget?: 'formal' | 'casual' | 'professional' | 'neutral';
-  language?: 'en' | 'pt';
+  styleTarget?: "formal" | "casual" | "professional" | "neutral";
+  language?: "en" | "pt";
   strictMode?: boolean;
   preserveTokens?: string[];
 }
@@ -93,8 +93,8 @@ export interface EditPlanBase {
 }
 
 export interface EditParagraphPlan extends EditPlanBase {
-  type: 'EDIT_PARAGRAPH';
-  domain: 'docx';
+  type: "EDIT_PARAGRAPH";
+  domain: "docx";
   targetRef: string;
   payload: {
     paragraphId: string;
@@ -103,8 +103,8 @@ export interface EditParagraphPlan extends EditPlanBase {
 }
 
 export interface EditCellPlan extends EditPlanBase {
-  type: 'EDIT_CELL';
-  domain: 'sheets';
+  type: "EDIT_CELL";
+  domain: "sheets";
   targetRef: string;
   payload: {
     sheetName: string;
@@ -114,8 +114,8 @@ export interface EditCellPlan extends EditPlanBase {
 }
 
 export interface EditRangePlan extends EditPlanBase {
-  type: 'EDIT_RANGE';
-  domain: 'sheets';
+  type: "EDIT_RANGE";
+  domain: "sheets";
   targetRef: string;
   payload: {
     rangeA1: string;
@@ -124,38 +124,38 @@ export interface EditRangePlan extends EditPlanBase {
 }
 
 export interface AddSheetPlan extends EditPlanBase {
-  type: 'ADD_SHEET';
-  domain: 'sheets';
+  type: "ADD_SHEET";
+  domain: "sheets";
   payload: {
     title: string;
   };
 }
 
 export interface CreateChartPlan extends EditPlanBase {
-  type: 'CREATE_CHART';
-  domain: 'sheets';
+  type: "CREATE_CHART";
+  domain: "sheets";
   payload: {
     chartType:
-      | 'BAR'
-      | 'LINE'
-      | 'PIE'
-      | 'AREA'
-      | 'SCATTER'
-      | 'COLUMN'
-      | 'STACKED_BAR'
-      | 'STACKED_COLUMN'
-      | 'COMBO'
-      | 'BUBBLE'
-      | 'RADAR'
-      | 'HISTOGRAM';
+      | "BAR"
+      | "LINE"
+      | "PIE"
+      | "AREA"
+      | "SCATTER"
+      | "COLUMN"
+      | "STACKED_BAR"
+      | "STACKED_COLUMN"
+      | "COMBO"
+      | "BUBBLE"
+      | "RADAR"
+      | "HISTOGRAM";
     rangeA1: string;
     title?: string;
   };
 }
 
 export interface AddSlidePlan extends EditPlanBase {
-  type: 'ADD_SLIDE';
-  domain: 'slides';
+  type: "ADD_SLIDE";
+  domain: "slides";
   payload: {
     layout: string;
     insertionIndex?: number;
@@ -165,8 +165,8 @@ export interface AddSlidePlan extends EditPlanBase {
 }
 
 export interface RewriteSlideTextPlan extends EditPlanBase {
-  type: 'REWRITE_SLIDE_TEXT';
-  domain: 'slides';
+  type: "REWRITE_SLIDE_TEXT";
+  domain: "slides";
   targetRef: string;
   payload: {
     objectId: string;
@@ -175,8 +175,8 @@ export interface RewriteSlideTextPlan extends EditPlanBase {
 }
 
 export interface ReplaceImagePlan extends EditPlanBase {
-  type: 'REPLACE_IMAGE';
-  domain: 'slides';
+  type: "REPLACE_IMAGE";
+  domain: "slides";
   targetRef: string;
   payload: {
     imageObjectId: string;
@@ -213,13 +213,13 @@ export interface EditTargetResolution {
 }
 
 export interface DiffSegment {
-  type: 'unchanged' | 'inserted' | 'deleted' | 'replaced';
+  type: "unchanged" | "inserted" | "deleted" | "replaced";
   before?: string;
   after?: string;
 }
 
 export interface EditDiff {
-  kind: 'paragraph' | 'cell' | 'slide_text' | 'structural';
+  kind: "paragraph" | "cell" | "slide_text" | "structural";
   summary: string;
   segments: DiffSegment[];
   before?: string;
@@ -235,7 +235,11 @@ export interface EditRationale {
 }
 
 export interface EditProof {
-  sourceType: 'target_excerpt' | 'retrieval_chunk' | 'policy_check' | 'validator';
+  sourceType:
+    | "target_excerpt"
+    | "retrieval_chunk"
+    | "policy_check"
+    | "validator";
   label: string;
   value: string;
 }

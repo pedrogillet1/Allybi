@@ -31,14 +31,18 @@ function context(messageText: string, ranges: any[]): TurnContext {
 describe("EditorModeGuard", () => {
   test("selection in viewer mode forces editor route", () => {
     const guard = new EditorModeGuard();
-    const result = guard.enforce(context("make this red", [{ paragraphId: "p1" }]));
+    const result = guard.enforce(
+      context("make this red", [{ paragraphId: "p1" }]),
+    );
     expect(result.routeForcedToEditor).toBe(true);
     expect(result.allowConnectorEscape).toBe(false);
   });
 
   test("explicit connector intent allows connector escape", () => {
     const guard = new EditorModeGuard();
-    const result = guard.enforce(context("email pedro", [{ paragraphId: "p1" }]));
+    const result = guard.enforce(
+      context("email pedro", [{ paragraphId: "p1" }]),
+    );
     expect(result.routeForcedToEditor).toBe(false);
     expect(result.allowConnectorEscape).toBe(true);
   });

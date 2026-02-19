@@ -13,8 +13,8 @@
  * - Each event has: event: <type>\n data: <json>\n\n
  */
 
-import type { Attachment } from './attachments.types';
-import type { ChatRole as ChatMessageRole } from './chat.types';
+import type { Attachment } from "./attachments.types";
+import type { ChatRole as ChatMessageRole } from "./chat.types";
 
 // ----------------------------------------------------------------------------
 // Core IDs / Status
@@ -24,27 +24,32 @@ export type ConversationId = string;
 export type MessageId = string;
 export type RequestId = string;
 
-export type StreamStatus = 'queued' | 'streaming' | 'done' | 'error' | 'canceled';
+export type StreamStatus =
+  | "queued"
+  | "streaming"
+  | "done"
+  | "error"
+  | "canceled";
 
 // ----------------------------------------------------------------------------
 // Streaming “stage” (optional UX: Thinking / Searching / Composing)
 // ----------------------------------------------------------------------------
 
 export type StreamStage =
-  | 'thinking'
-  | 'routing'
-  | 'scoping'
-  | 'retrieving'
-  | 'reading'
-  | 'composing'
-  | 'validating'
-  | 'finalizing';
+  | "thinking"
+  | "routing"
+  | "scoping"
+  | "retrieving"
+  | "reading"
+  | "composing"
+  | "validating"
+  | "finalizing";
 
 export interface StreamStageUpdate {
   stage: StreamStage;
-  message?: string;          // small UX string
-  progress?: number;         // 0..1
-  at?: string;               // ISO timestamp
+  message?: string; // small UX string
+  progress?: number; // 0..1
+  at?: string; // ISO timestamp
 }
 
 // ----------------------------------------------------------------------------
@@ -52,14 +57,14 @@ export interface StreamStageUpdate {
 // ----------------------------------------------------------------------------
 
 export type SseEventType =
-  | 'chat.start'
-  | 'chat.stage'
-  | 'chat.delta'
-  | 'chat.attachments'
-  | 'chat.meta'
-  | 'chat.done'
-  | 'chat.error'
-  | 'chat.ping';
+  | "chat.start"
+  | "chat.stage"
+  | "chat.delta"
+  | "chat.attachments"
+  | "chat.meta"
+  | "chat.done"
+  | "chat.error"
+  | "chat.ping";
 
 // ----------------------------------------------------------------------------
 // Base Event
@@ -80,13 +85,13 @@ export interface ChatStartPayload {
   messageId: MessageId;
 
   role: ChatMessageRole; // usually 'assistant'
-  status: StreamStatus;  // 'streaming'
+  status: StreamStatus; // 'streaming'
 
   // optional: allow frontend to render optimistically
   createdAt?: string; // ISO
 }
 
-export type ChatStartEvent = SseBaseEvent<'chat.start', ChatStartPayload>;
+export type ChatStartEvent = SseBaseEvent<"chat.start", ChatStartPayload>;
 
 // ----------------------------------------------------------------------------
 // Stage Event
@@ -98,7 +103,7 @@ export interface ChatStagePayload extends StreamStageUpdate {
   messageId: MessageId;
 }
 
-export type ChatStageEvent = SseBaseEvent<'chat.stage', ChatStagePayload>;
+export type ChatStageEvent = SseBaseEvent<"chat.stage", ChatStagePayload>;
 
 // ----------------------------------------------------------------------------
 // Delta Event (token streaming)
@@ -116,7 +121,7 @@ export interface ChatDeltaPayload {
   index?: number;
 }
 
-export type ChatDeltaEvent = SseBaseEvent<'chat.delta', ChatDeltaPayload>;
+export type ChatDeltaEvent = SseBaseEvent<"chat.delta", ChatDeltaPayload>;
 
 // ----------------------------------------------------------------------------
 // Attachments Event
@@ -128,11 +133,14 @@ export interface ChatAttachmentsPayload {
   messageId: MessageId;
 
   // Replace or append attachments
-  mode?: 'replace' | 'append';
+  mode?: "replace" | "append";
   attachments: Attachment[];
 }
 
-export type ChatAttachmentsEvent = SseBaseEvent<'chat.attachments', ChatAttachmentsPayload>;
+export type ChatAttachmentsEvent = SseBaseEvent<
+  "chat.attachments",
+  ChatAttachmentsPayload
+>;
 
 // ----------------------------------------------------------------------------
 // Meta Event (answerMode, confidence, followups, domain, etc.)
@@ -144,7 +152,7 @@ export interface ChatMetaPayload {
   messageId: MessageId;
 
   answerMode?: string | null; // e.g. nav_pills, doc_grounded_single, scoped_not_found
-  domainId?: string | null;   // e.g. finance_markets
+  domainId?: string | null; // e.g. finance_markets
   confidence?: number | null; // 0..1
 
   // Used for regenerate variety
@@ -157,7 +165,7 @@ export interface ChatMetaPayload {
   traceKey?: string;
 }
 
-export type ChatMetaEvent = SseBaseEvent<'chat.meta', ChatMetaPayload>;
+export type ChatMetaEvent = SseBaseEvent<"chat.meta", ChatMetaPayload>;
 
 // ----------------------------------------------------------------------------
 // Done Event
@@ -168,7 +176,7 @@ export interface ChatDonePayload {
   conversationId: ConversationId;
   messageId: MessageId;
 
-  status: 'done';
+  status: "done";
 
   // Final assistant content (optional).
   // Many implementations stream all content via delta and leave this empty.
@@ -178,36 +186,36 @@ export interface ChatDonePayload {
   attachments?: Attachment[];
 
   // Final meta snapshot
-  meta?: Omit<ChatMetaPayload, 'requestId' | 'conversationId' | 'messageId'>;
+  meta?: Omit<ChatMetaPayload, "requestId" | "conversationId" | "messageId">;
 
   finishedAt?: string; // ISO
 }
 
-export type ChatDoneEvent = SseBaseEvent<'chat.done', ChatDonePayload>;
+export type ChatDoneEvent = SseBaseEvent<"chat.done", ChatDonePayload>;
 
 // ----------------------------------------------------------------------------
 // Error Event
 // ----------------------------------------------------------------------------
 
 export type ChatErrorCode =
-  | 'BAD_REQUEST'
-  | 'UNAUTHORIZED'
-  | 'FORBIDDEN'
-  | 'NOT_FOUND'
-  | 'RATE_LIMITED'
-  | 'SCOPE_EMPTY'
-  | 'NO_DOCS'
-  | 'EXTRACTION_FAILED'
-  | 'RETRIEVAL_FAILED'
-  | 'COMPOSE_FAILED'
-  | 'INTERNAL_ERROR';
+  | "BAD_REQUEST"
+  | "UNAUTHORIZED"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "RATE_LIMITED"
+  | "SCOPE_EMPTY"
+  | "NO_DOCS"
+  | "EXTRACTION_FAILED"
+  | "RETRIEVAL_FAILED"
+  | "COMPOSE_FAILED"
+  | "INTERNAL_ERROR";
 
 export interface ChatErrorPayload {
   requestId?: RequestId;
   conversationId?: ConversationId;
   messageId?: MessageId;
 
-  status: 'error';
+  status: "error";
   code: ChatErrorCode;
   message: string;
 
@@ -218,7 +226,7 @@ export interface ChatErrorPayload {
   retryable?: boolean;
 }
 
-export type ChatErrorEvent = SseBaseEvent<'chat.error', ChatErrorPayload>;
+export type ChatErrorEvent = SseBaseEvent<"chat.error", ChatErrorPayload>;
 
 // ----------------------------------------------------------------------------
 // Ping / Keep-alive
@@ -228,7 +236,7 @@ export interface ChatPingPayload {
   at: string; // ISO
 }
 
-export type ChatPingEvent = SseBaseEvent<'chat.ping', ChatPingPayload>;
+export type ChatPingEvent = SseBaseEvent<"chat.ping", ChatPingPayload>;
 
 // ----------------------------------------------------------------------------
 // Union Types
@@ -255,7 +263,7 @@ export interface ChatStreamRequest {
   userText: string;
 
   // optional context flags
-  language?: 'en' | 'pt' | 'es';
+  language?: "en" | "pt" | "es";
   userRequestedShort?: boolean;
 
   // doc scope hints

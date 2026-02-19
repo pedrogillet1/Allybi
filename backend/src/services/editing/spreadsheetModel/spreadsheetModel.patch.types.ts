@@ -30,7 +30,13 @@ export type PatchOp =
       ranges?: A1Range[];
     }
   | { op: "CLEAR_CONTENT"; sheet?: string; range: A1Range }
-  | { op: "SET_NUMBER_FORMAT"; sheet?: string; range: A1Range; format: string; ranges?: A1Range[] }
+  | {
+      op: "SET_NUMBER_FORMAT";
+      sheet?: string;
+      range: A1Range;
+      format: string;
+      ranges?: A1Range[];
+    }
   | {
       op: "SET_STYLE";
       sheet?: string;
@@ -47,15 +53,48 @@ export type PatchOp =
   | { op: "ADD_SHEET"; name: string }
   | { op: "RENAME_SHEET"; from: string; to: string }
   | { op: "DELETE_SHEET"; name: string }
-  | { op: "SORT_RANGE"; sheet?: string; range: A1Range; keys: SortKey[]; hasHeader?: boolean }
-  | { op: "FILTER_RANGE"; sheet?: string; range: A1Range; filters?: FilterSpec[] }
+  | {
+      op: "SORT_RANGE";
+      sheet?: string;
+      range: A1Range;
+      keys: SortKey[];
+      hasHeader?: boolean;
+    }
+  | {
+      op: "FILTER_RANGE";
+      sheet?: string;
+      range: A1Range;
+      filters?: FilterSpec[];
+    }
   | { op: "CLEAR_FILTER"; sheet: string }
   | { op: "FREEZE_PANES"; sheet: string; rowSplit?: number; colSplit?: number }
-  | { op: "CREATE_TABLE"; sheet?: string; range: A1Range; name?: string; style?: TableStyleSpec; hasHeader?: boolean }
-  | { op: "SET_VALIDATION"; sheet?: string; range: A1Range; rule: ValidationRule }
+  | {
+      op: "CREATE_TABLE";
+      sheet?: string;
+      range: A1Range;
+      name?: string;
+      style?: TableStyleSpec;
+      hasHeader?: boolean;
+    }
+  | {
+      op: "SET_VALIDATION";
+      sheet?: string;
+      range: A1Range;
+      rule: ValidationRule;
+    }
   | { op: "CLEAR_VALIDATION"; sheet?: string; range: A1Range }
-  | { op: "SET_CONDITIONAL_FORMAT"; sheet?: string; range: A1Range; rule: ConditionalFormatRule }
-  | { op: "CREATE_CHART_CARD"; sheet?: string; range: A1Range; chart: ChartSpec };
+  | {
+      op: "SET_CONDITIONAL_FORMAT";
+      sheet?: string;
+      range: A1Range;
+      rule: ConditionalFormatRule;
+    }
+  | {
+      op: "CREATE_CHART_CARD";
+      sheet?: string;
+      range: A1Range;
+      chart: ChartSpec;
+    };
 
 export type PatchPlanTranslationResult = {
   patchOps: PatchOp[];

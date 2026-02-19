@@ -60,7 +60,12 @@ export interface ConversationStateLike {
   };
   history: {
     recentTokens: string[];
-    recentFallbacks: Array<{ reasonCode: string; fallbackType: string; strategy: string; turnId: number }>;
+    recentFallbacks: Array<{
+      reasonCode: string;
+      fallbackType: string;
+      strategy: string;
+      turnId: number;
+    }>;
   };
   ephemeral: {
     turn: { turnId: number };
@@ -179,20 +184,33 @@ function pickBySeed<T>(items: T[], seed: string): T | null {
 export class MicrocopyPickerService {
   constructor(private readonly bankLoader: BankLoader) {}
 
-  buildPlan(state: ConversationStateLike, ctx: MicrocopyContext): MicrocopyPlan {
-    const debug = { selectedBy: [] as string[], rejectedBy: [] as string[], seed: "" };
+  buildPlan(
+    state: ConversationStateLike,
+    ctx: MicrocopyContext,
+  ): MicrocopyPlan {
+    const debug = {
+      selectedBy: [] as string[],
+      rejectedBy: [] as string[],
+      seed: "",
+    };
 
     // Load relevant banks (soft)
     const uiTokensBank = this.safeGetBank<any>("ui_copy_tokens");
     const navMicrocopy = this.safeGetBank<any>("nav_microcopy");
-    const fileActionsMicrocopy = this.safeGetBank<any>("file_actions_microcopy");
+    const fileActionsMicrocopy = this.safeGetBank<any>(
+      "file_actions_microcopy",
+    );
     const disambigMicrocopy = this.safeGetBank<any>("disambiguation_microcopy");
     const nextStepBank = this.safeGetBank<any>("ui_next_step_suggestion");
     const softCloseBank = this.safeGetBank<any>("ui_soft_close");
 
     // Variation controls (default if bank missing)
-    const entropyWindow = Number(uiTokensBank?.config?.variationControl?.entropyWindow ?? 7);
-    const cooldownTurns = Number(uiTokensBank?.config?.variationControl?.cooldownTurns ?? 3);
+    const entropyWindow = Number(
+      uiTokensBank?.config?.variationControl?.entropyWindow ?? 7,
+    );
+    const cooldownTurns = Number(
+      uiTokensBank?.config?.variationControl?.cooldownTurns ?? 3,
+    );
 
     const turnId = state.ephemeral?.turn?.turnId ?? 0;
     const seedBase =
@@ -259,13 +277,19 @@ export class MicrocopyPickerService {
       fragments.push({
         bankId: "ui_next_step_suggestion",
         fragmentIntent,
-        selectorKey: this.rotateSelectorKeyIfRepeated(state, selectorKey, cooldownTurns),
+        selectorKey: this.rotateSelectorKeyIfRepeated(
+          state,
+          selectorKey,
+          cooldownTurns,
+        ),
         constraints: {
           maxSentences: 1,
           maxQuestions: 1,
           avoidTimeEstimates: reason === "indexing_in_progress",
-          mustNotAssertAbsence: reason === "scope_hard_constraints_empty" || reason === "no_relevant_chunks_in_scoped_docs"
-        }
+          mustNotAssertAbsence:
+            reason === "scope_hard_constraints_empty" ||
+            reason === "no_relevant_chunks_in_scoped_docs",
+        },
       });
 
       recordTokens.push(`ui_next_step_suggestion:${reason}:${fragmentIntent}`);
@@ -283,8 +307,12 @@ export class MicrocopyPickerService {
       fragments.push({
         bankId: "ui_soft_close",
         fragmentIntent: "soft_close",
-        selectorKey: this.rotateSelectorKeyIfRepeated(state, selectorKey, cooldownTurns),
-        constraints: { maxSentences: 1, mustNotAskQuestion: true }
+        selectorKey: this.rotateSelectorKeyIfRepeated(
+          state,
+          selectorKey,
+          cooldownTurns,
+        ),
+        constraints: { maxSentences: 1, mustNotAskQuestion: true },
       });
 
       recordTokens.push(`ui_soft_close:${ctx.answerMode}`);
@@ -294,7 +322,12 @@ export class MicrocopyPickerService {
     // 3) Anti-repetition (tokens + fragments)
     // ----------------------------------------
 
-    const { finalTokens, changed } = this.applyTokenAntiRepetition(state, uiTokens, seedBase, cooldownTurns);
+    const { finalTokens, changed } = this.applyTokenAntiRepetition(
+      state,
+      uiTokens,
+      seedBase,
+      cooldownTurns,
+    );
     if (changed) debug.selectedBy.push("anti_repetition:tokens_rotated");
 
     // Record final tokens
@@ -311,10 +344,10 @@ export class MicrocopyPickerService {
         maxIntroSentences,
         maxQuestions,
         suppressSourcesHeader,
-        suppressActions
+        suppressActions,
       },
       recordTokens: uniq(recordTokens),
-      debug: isProd(ctx.env) ? undefined : debug
+      debug: isProd(ctx.env) ? undefined : debug,
     };
 
     return plan;
@@ -324,7 +357,10 @@ export class MicrocopyPickerService {
   // Nav type token resolution
   // -----------------------------
 
-  private navTypeToken(ctx: MicrocopyContext, navMicrocopy: any | null): string | null {
+  private navTypeToken(
+    ctx: MicrocopyContext,
+    navMicrocopy: any | null,
+  ): string | null {
     // If nav_microcopy defines nav types, prefer them; else infer from operator/intent.
     const op = (ctx.operator ?? "").toLowerCase();
     const intent = (ctx.intentFamily ?? "").toLowerCase();
@@ -332,7 +368,8 @@ export class MicrocopyPickerService {
     // Minimal inference (no hardcoded phrases): only return semantic token keys.
     if (op === "open" || /open/.test(op)) return "ui_nav_open";
     if (op === "locate_file") return "ui_nav_where";
-    if (op === "locate_docs" || intent === "doc_discovery") return "ui_nav_discover";
+    if (op === "locate_docs" || intent === "doc_discovery")
+      return "ui_nav_discover";
 
     // If answerMode is nav and operator unknown, generic nav token
     return "ui_nav_generic";
@@ -370,10 +407,14 @@ export class MicrocopyPickerService {
   // Anti-repetition helpers
   // -----------------------------
 
-  private rotateSelectorKeyIfRepeated(state: ConversationStateLike, selectorKey: string, cooldownTurns: number): string {
+  private rotateSelectorKeyIfRepeated(
+    state: ConversationStateLike,
+    selectorKey: string,
+    cooldownTurns: number,
+  ): string {
     const recentTokens = state.history?.recentTokens ?? [];
     // If the selectorKey was used recently, rotate with a deterministic suffix.
-    const wasUsed = recentTokens.some(t => t.includes(selectorKey));
+    const wasUsed = recentTokens.some((t) => t.includes(selectorKey));
     if (!wasUsed) return selectorKey;
 
     const turnId = state.ephemeral?.turn?.turnId ?? 0;
@@ -385,7 +426,7 @@ export class MicrocopyPickerService {
     state: ConversationStateLike,
     tokens: string[],
     seedBase: string,
-    cooldownTurns: number
+    cooldownTurns: number,
   ): { finalTokens: string[]; changed: boolean } {
     const recent = state.history?.recentTokens ?? [];
     const turnId = state.ephemeral?.turn?.turnId ?? 0;
@@ -413,15 +454,32 @@ export class MicrocopyPickerService {
     return { finalTokens, changed };
   }
 
-  private siblingToken(token: string, seedBase: string, turnId: number): string | null {
+  private siblingToken(
+    token: string,
+    seedBase: string,
+    turnId: number,
+  ): string | null {
     // Small semantic-preserving alternatives.
     // These are token keys, not phrases.
     const siblings: Record<string, string[]> = {
-      ui_intro_neutral: ["ui_intro_neutral", "ui_intro_direct", "ui_intro_compact"],
-      ui_next_step_suggestion: ["ui_next_step_suggestion", "ui_next_step_prompt"],
-      ui_disambiguation_intro: ["ui_disambiguation_intro", "ui_disambiguation_compact"],
+      ui_intro_neutral: [
+        "ui_intro_neutral",
+        "ui_intro_direct",
+        "ui_intro_compact",
+      ],
+      ui_next_step_suggestion: [
+        "ui_next_step_suggestion",
+        "ui_next_step_prompt",
+      ],
+      ui_disambiguation_intro: [
+        "ui_disambiguation_intro",
+        "ui_disambiguation_compact",
+      ],
       ui_nav_intro: ["ui_nav_intro", "ui_nav_intro_compact"],
-      ui_conversation_minimal: ["ui_conversation_minimal", "ui_conversation_ack"]
+      ui_conversation_minimal: [
+        "ui_conversation_minimal",
+        "ui_conversation_ack",
+      ],
     };
 
     const list = siblings[token] ?? null;

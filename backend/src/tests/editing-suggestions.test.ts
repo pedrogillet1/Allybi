@@ -86,7 +86,11 @@ async function main(): Promise<void> {
   const anchors = new DocxAnchorsService();
   const paragraphs = await anchors.extractParagraphNodes(buffer);
 
-  assert(paragraphs.length >= 4, "extract anchors", `expected >=4 paragraphs, got ${paragraphs.length}`);
+  assert(
+    paragraphs.length >= 4,
+    "extract anchors",
+    `expected >=4 paragraphs, got ${paragraphs.length}`,
+  );
 
   const svc = new EditSuggestionsService();
   const suggestions = svc.suggestDocx({
@@ -97,17 +101,41 @@ async function main(): Promise<void> {
     language: "en",
   });
 
-  assert(Array.isArray(suggestions) && suggestions.length > 0, "has suggestions", "no suggestions returned");
+  assert(
+    Array.isArray(suggestions) && suggestions.length > 0,
+    "has suggestions",
+    "no suggestions returned",
+  );
 
   const ids = new Set(paragraphs.map((p) => p.paragraphId));
   const sugIds = new Set<string>();
   const sugLabels = new Set<string>();
   for (const s of suggestions) {
-    assert(Boolean(s.paragraphId && ids.has(s.paragraphId)), "suggestion paragraphId exists", `missing paragraphId=${s.paragraphId}`);
-    assert(Boolean(s.label && s.label.length <= 60), "label sane", `label="${s.label}"`);
-    assert(Boolean(s.instruction && s.instruction.length <= 240), "instruction sane", `instruction len=${(s.instruction || "").length}`);
-    assert(!sugIds.has(s.paragraphId), "unique paragraphId", `duplicate paragraphId=${s.paragraphId}`);
-    assert(!sugLabels.has(s.label), "unique label", `duplicate label=${s.label}`);
+    assert(
+      Boolean(s.paragraphId && ids.has(s.paragraphId)),
+      "suggestion paragraphId exists",
+      `missing paragraphId=${s.paragraphId}`,
+    );
+    assert(
+      Boolean(s.label && s.label.length <= 60),
+      "label sane",
+      `label="${s.label}"`,
+    );
+    assert(
+      Boolean(s.instruction && s.instruction.length <= 240),
+      "instruction sane",
+      `instruction len=${(s.instruction || "").length}`,
+    );
+    assert(
+      !sugIds.has(s.paragraphId),
+      "unique paragraphId",
+      `duplicate paragraphId=${s.paragraphId}`,
+    );
+    assert(
+      !sugLabels.has(s.label),
+      "unique label",
+      `duplicate label=${s.label}`,
+    );
     sugIds.add(s.paragraphId);
     sugLabels.add(s.label);
   }
@@ -129,4 +157,3 @@ main().catch((e) => {
   console.error("Fatal:", e);
   process.exit(1);
 });
-

@@ -12,11 +12,11 @@
 // Constants
 // ---------------------------------------------------------------------------
 
-export const MARKER_OPEN = '{{';
-export const MARKER_CLOSE = '}}';
-export const FIELD_SEP = '::';
-export const DOC_PREFIX = 'DOC';
-export const LOAD_MORE_PREFIX = 'LOAD_MORE';
+export const MARKER_OPEN = "{{";
+export const MARKER_CLOSE = "}}";
+export const FIELD_SEP = "::";
+export const DOC_PREFIX = "DOC";
+export const LOAD_MORE_PREFIX = "LOAD_MORE";
 
 // ---------------------------------------------------------------------------
 // Compiled regex patterns
@@ -51,7 +51,7 @@ export function decodeMarkerValue(value: string): string {
 
 /** Strip surrounding double-quotes then URI-decode. */
 export function stripAndDecode(value: string): string {
-  const stripped = value.replace(/^"(.*)"$/, '$1');
+  const stripped = value.replace(/^"(.*)"$/, "$1");
   return decodeMarkerValue(stripped);
 }
 
@@ -81,7 +81,9 @@ export function createLoadMoreMarker(opts: {
  *   ]);
  *   // → '{{DOC::id=abc::name="My%20File.pdf"::type=pdf}}'
  */
-export function createDocumentMarker(fields: [string, string | number][]): string {
+export function createDocumentMarker(
+  fields: [string, string | number][],
+): string {
   const inner = fields.map(([k, v]) => `${k}=${v}`).join(FIELD_SEP);
   return `${MARKER_OPEN}${DOC_PREFIX}${FIELD_SEP}${inner}${MARKER_CLOSE}`;
 }
@@ -96,11 +98,11 @@ export function createDocumentMarker(fields: [string, string | number][]): strin
  */
 export function parseMarkerFields(marker: string): Record<string, string> {
   // Strip outer {{ PREFIX :: ... }}
-  const inner = marker.replace(/^\{\{[A-Z_]+::/, '').replace(/\}\}$/, '');
+  const inner = marker.replace(/^\{\{[A-Z_]+::/, "").replace(/\}\}$/, "");
   const result: Record<string, string> = {};
 
   for (const segment of inner.split(FIELD_SEP)) {
-    const eqIdx = segment.indexOf('=');
+    const eqIdx = segment.indexOf("=");
     if (eqIdx === -1) continue;
     const key = segment.slice(0, eqIdx);
     const val = segment.slice(eqIdx + 1);
@@ -111,7 +113,10 @@ export function parseMarkerFields(marker: string): Record<string, string> {
 }
 
 /** Extract a single field value from a marker (returns raw value or null). */
-export function extractMarkerField(marker: string, fieldName: string): string | null {
+export function extractMarkerField(
+  marker: string,
+  fieldName: string,
+): string | null {
   const fields = parseMarkerFields(marker);
   return fields[fieldName] ?? null;
 }
@@ -121,11 +126,17 @@ export function extractMarkerField(marker: string, fieldName: string): string | 
 // ---------------------------------------------------------------------------
 
 export function isDocumentMarker(text: string): boolean {
-  return text.startsWith(`${MARKER_OPEN}${DOC_PREFIX}${FIELD_SEP}`) && text.endsWith(MARKER_CLOSE);
+  return (
+    text.startsWith(`${MARKER_OPEN}${DOC_PREFIX}${FIELD_SEP}`) &&
+    text.endsWith(MARKER_CLOSE)
+  );
 }
 
 export function isLoadMoreMarker(text: string): boolean {
-  return text.startsWith(`${MARKER_OPEN}${LOAD_MORE_PREFIX}${FIELD_SEP}`) && text.endsWith(MARKER_CLOSE);
+  return (
+    text.startsWith(`${MARKER_OPEN}${LOAD_MORE_PREFIX}${FIELD_SEP}`) &&
+    text.endsWith(MARKER_CLOSE)
+  );
 }
 
 export function isMarker(text: string): boolean {
@@ -138,11 +149,14 @@ export function isMarker(text: string): boolean {
 
 /** Count how many DOC markers appear in the text. */
 export function countDocumentMarkers(text: string): number {
-  const matches = text.match(new RegExp(DOC_MARKER_RE.source, 'g'));
+  const matches = text.match(new RegExp(DOC_MARKER_RE.source, "g"));
   return matches ? matches.length : 0;
 }
 
 /** Remove all Koda markers from text, collapsing leftover whitespace. */
 export function removeAllMarkers(text: string): string {
-  return text.replace(new RegExp(ANY_MARKER_RE.source, 'g'), '').replace(/\s{2,}/g, ' ').trim();
+  return text
+    .replace(new RegExp(ANY_MARKER_RE.source, "g"), "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 }

@@ -1,6 +1,6 @@
-import * as crypto from 'crypto';
-import { promises as fs } from 'fs';
-import path from 'path';
+import * as crypto from "crypto";
+import { promises as fs } from "fs";
+import path from "path";
 
 export interface AssetLibraryRecord {
   id: string;
@@ -20,7 +20,7 @@ export interface AssetLibraryRecord {
 export interface StoreAssetInput {
   userId: string;
   buffer: Buffer;
-  mimeType: 'image/png' | 'image/webp';
+  mimeType: "image/png" | "image/webp";
   width: number;
   height: number;
   sha256?: string;
@@ -34,20 +34,25 @@ export interface AssetLibraryListFilter {
   limit?: number;
 }
 
-const DEFAULT_ROOT = path.resolve(process.cwd(), 'storage', 'creative', 'assets');
+const DEFAULT_ROOT = path.resolve(
+  process.cwd(),
+  "storage",
+  "creative",
+  "assets",
+);
 
 function extFromMime(mime: string): string {
-  if (mime === 'image/png') return 'png';
-  if (mime === 'image/webp') return 'webp';
-  return 'bin';
+  if (mime === "image/png") return "png";
+  if (mime === "image/webp") return "webp";
+  return "bin";
 }
 
 function sha256(buffer: Buffer): string {
-  return crypto.createHash('sha256').update(buffer).digest('hex');
+  return crypto.createHash("sha256").update(buffer).digest("hex");
 }
 
 function metadataPath(root: string, userId: string): string {
-  return path.join(root, userId, 'index.json');
+  return path.join(root, userId, "index.json");
 }
 
 /**
@@ -59,11 +64,11 @@ export class AssetLibraryService {
   async store(input: StoreAssetInput): Promise<AssetLibraryRecord> {
     const userId = input.userId.trim();
     if (!userId) {
-      throw new Error('userId is required for asset storage.');
+      throw new Error("userId is required for asset storage.");
     }
 
     if (!Buffer.isBuffer(input.buffer) || input.buffer.length === 0) {
-      throw new Error('Asset buffer is required.');
+      throw new Error("Asset buffer is required.");
     }
 
     const now = new Date();
@@ -81,7 +86,11 @@ export class AssetLibraryService {
     let thumbnailPath: string | undefined;
     if (input.thumbnailBuffer && input.thumbnailBuffer.length > 0) {
       thumbnailPath = path.join(relativeDir, `${id}.thumb.webp`);
-      await fs.writeFile(path.join(this.root, thumbnailPath), input.thumbnailBuffer, { mode: 0o600 });
+      await fs.writeFile(
+        path.join(this.root, thumbnailPath),
+        input.thumbnailBuffer,
+        { mode: 0o600 },
+      );
     }
 
     const record: AssetLibraryRecord = {
@@ -106,12 +115,18 @@ export class AssetLibraryService {
     return record;
   }
 
-  async getById(userId: string, assetId: string): Promise<AssetLibraryRecord | null> {
+  async getById(
+    userId: string,
+    assetId: string,
+  ): Promise<AssetLibraryRecord | null> {
     const records = await this.readIndex(userId);
     return records.find((record) => record.id === assetId) ?? null;
   }
 
-  async list(userId: string, filter: AssetLibraryListFilter = {}): Promise<AssetLibraryRecord[]> {
+  async list(
+    userId: string,
+    filter: AssetLibraryListFilter = {},
+  ): Promise<AssetLibraryRecord[]> {
     const records = await this.readIndex(userId);
     const filtered = records.filter((record) => {
       if (!filter.tag) return true;
@@ -125,7 +140,7 @@ export class AssetLibraryService {
   private async readIndex(userId: string): Promise<AssetLibraryRecord[]> {
     const filePath = metadataPath(this.root, userId);
     try {
-      const raw = await fs.readFile(filePath, 'utf8');
+      const raw = await fs.readFile(filePath, "utf8");
       const parsed = JSON.parse(raw) as AssetLibraryRecord[];
       return Array.isArray(parsed) ? parsed : [];
     } catch {
@@ -133,11 +148,17 @@ export class AssetLibraryService {
     }
   }
 
-  private async writeIndex(userId: string, records: AssetLibraryRecord[]): Promise<void> {
+  private async writeIndex(
+    userId: string,
+    records: AssetLibraryRecord[],
+  ): Promise<void> {
     const filePath = metadataPath(this.root, userId);
     await fs.mkdir(path.dirname(filePath), { recursive: true });
     const tempPath = `${filePath}.tmp`;
-    await fs.writeFile(tempPath, JSON.stringify(records), { encoding: 'utf8', mode: 0o600 });
+    await fs.writeFile(tempPath, JSON.stringify(records), {
+      encoding: "utf8",
+      mode: 0o600,
+    });
     await fs.rename(tempPath, filePath);
   }
 }

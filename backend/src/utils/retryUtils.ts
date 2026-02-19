@@ -19,15 +19,15 @@ const DEFAULT_RETRY_OPTIONS: Required<RetryOptions> = {
   maxDelayMs: 8000,
   backoffMultiplier: 2,
   retryableErrors: [
-    'RESOURCE_EXHAUSTED',
-    'UNAVAILABLE',
-    'DEADLINE_EXCEEDED',
-    'INTERNAL',
-    '503',
-    '429',
-    'overload',
-    'quota',
-    'rate limit',
+    "RESOURCE_EXHAUSTED",
+    "UNAVAILABLE",
+    "DEADLINE_EXCEEDED",
+    "INTERNAL",
+    "503",
+    "429",
+    "overload",
+    "quota",
+    "rate limit",
   ],
 };
 
@@ -43,8 +43,8 @@ function sleep(ms: number): Promise<void> {
  */
 function isRetryableError(error: any, retryableErrors: string[]): boolean {
   const errorString = JSON.stringify(error).toLowerCase();
-  const errorMessage = error?.message?.toLowerCase() || '';
-  const errorCode = error?.code?.toString() || '';
+  const errorMessage = error?.message?.toLowerCase() || "";
+  const errorCode = error?.code?.toString() || "";
 
   return retryableErrors.some((retryableError) => {
     const searchTerm = retryableError.toLowerCase();
@@ -74,7 +74,7 @@ function isRetryableError(error: any, retryableErrors: string[]): boolean {
  */
 export async function retryWithBackoff<T>(
   fn: () => Promise<T>,
-  options: RetryOptions = {}
+  options: RetryOptions = {},
 ): Promise<T> {
   const config = { ...DEFAULT_RETRY_OPTIONS, ...options };
   let lastError: any;
@@ -94,7 +94,10 @@ export async function retryWithBackoff<T>(
 
       // Check if error is retryable
       if (!isRetryableError(error, config.retryableErrors)) {
-        console.error(`❌ [RETRY] Non-retryable error on attempt ${attempt}:`, error);
+        console.error(
+          `❌ [RETRY] Non-retryable error on attempt ${attempt}:`,
+          error,
+        );
         throw error;
       }
 
@@ -107,13 +110,13 @@ export async function retryWithBackoff<T>(
       // Calculate delay with exponential backoff
       const delayMs = Math.min(
         config.initialDelayMs * Math.pow(config.backoffMultiplier, attempt - 1),
-        config.maxDelayMs
+        config.maxDelayMs,
       );
 
       console.warn(
         `⚠️ [RETRY] Attempt ${attempt} failed (retryable error). ` +
-        `Retrying in ${delayMs}ms...`,
-        (error as any)?.message || error
+          `Retrying in ${delayMs}ms...`,
+        (error as any)?.message || error,
       );
 
       await sleep(delayMs);
@@ -131,7 +134,7 @@ export async function retryWithBackoff<T>(
 export async function retryStreamingWithBackoff<T>(
   fn: (onChunk: (chunk: string) => void) => Promise<T>,
   onChunk: (chunk: string) => void,
-  options: RetryOptions = {}
+  options: RetryOptions = {},
 ): Promise<T> {
   const config = { ...DEFAULT_RETRY_OPTIONS, ...options };
   let lastError: any;
@@ -160,7 +163,7 @@ export async function retryStreamingWithBackoff<T>(
         // If we retried, we need to send all chunks from this successful attempt
         // (only if we didn't already send them)
         if (accumulatedChunks.length === 0) {
-          attemptChunks.forEach(chunk => onChunk(chunk));
+          attemptChunks.forEach((chunk) => onChunk(chunk));
         }
       }
 
@@ -173,26 +176,31 @@ export async function retryStreamingWithBackoff<T>(
 
       // Check if error is retryable
       if (!isRetryableError(error, config.retryableErrors)) {
-        console.error(`❌ [RETRY-STREAM] Non-retryable error on attempt ${attempt}:`, error);
+        console.error(
+          `❌ [RETRY-STREAM] Non-retryable error on attempt ${attempt}:`,
+          error,
+        );
         throw error;
       }
 
       // Don't retry if this was the last attempt
       if (attempt === config.maxAttempts) {
-        console.error(`❌ [RETRY-STREAM] All ${config.maxAttempts} attempts failed`);
+        console.error(
+          `❌ [RETRY-STREAM] All ${config.maxAttempts} attempts failed`,
+        );
         break;
       }
 
       // Calculate delay with exponential backoff
       const delayMs = Math.min(
         config.initialDelayMs * Math.pow(config.backoffMultiplier, attempt - 1),
-        config.maxDelayMs
+        config.maxDelayMs,
       );
 
       console.warn(
         `⚠️ [RETRY-STREAM] Attempt ${attempt} failed (retryable error). ` +
-        `Retrying in ${delayMs}ms...`,
-        (error as any)?.message || error
+          `Retrying in ${delayMs}ms...`,
+        (error as any)?.message || error,
       );
 
       await sleep(delayMs);

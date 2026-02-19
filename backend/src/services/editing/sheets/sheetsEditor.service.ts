@@ -1,12 +1,12 @@
-import type { sheets_v4 } from 'googleapis';
+import type { sheets_v4 } from "googleapis";
 import {
   SheetsClientError,
   SheetsClientService,
   type SheetsRequestContext,
   type SheetsValue,
   type SheetsValueGrid,
-} from './sheetsClient.service';
-import { SheetsValidatorsService } from './sheetsValidators.service';
+} from "./sheetsClient.service";
+import { SheetsValidatorsService } from "./sheetsValidators.service";
 
 export interface CreateSheetResult {
   sheetId: number;
@@ -48,7 +48,9 @@ export interface SheetsConditionalFormatInput {
 export class SheetsEditorService {
   private readonly validators: SheetsValidatorsService;
 
-  constructor(private readonly sheetsClient: SheetsClientService = new SheetsClientService()) {
+  constructor(
+    private readonly sheetsClient: SheetsClientService = new SheetsClientService(),
+  ) {
     this.validators = new SheetsValidatorsService(this.sheetsClient);
   }
 
@@ -65,12 +67,17 @@ export class SheetsEditorService {
     ctx?: SheetsRequestContext,
   ): Promise<number> {
     const normalized = this.assertSheetName(sheetName);
-    const spreadsheet = await this.sheetsClient.getSpreadsheet(spreadsheetId, ctx);
-    const match = spreadsheet.sheets?.find((s) => s.properties?.title === normalized);
+    const spreadsheet = await this.sheetsClient.getSpreadsheet(
+      spreadsheetId,
+      ctx,
+    );
+    const match = spreadsheet.sheets?.find(
+      (s) => s.properties?.title === normalized,
+    );
     const id = match?.properties?.sheetId;
-    if (typeof id !== 'number') {
+    if (typeof id !== "number") {
       throw new SheetsClientError(`Sheet "${normalized}" not found.`, {
-        code: 'SHEET_NOT_FOUND',
+        code: "SHEET_NOT_FOUND",
         retryable: false,
       });
     }
@@ -84,7 +91,11 @@ export class SheetsEditorService {
     count: number,
     ctx?: SheetsRequestContext,
   ): Promise<void> {
-    const { sheetId } = await this.resolveSheetId(spreadsheetId, sheetIdOrName, ctx);
+    const { sheetId } = await this.resolveSheetId(
+      spreadsheetId,
+      sheetIdOrName,
+      ctx,
+    );
     this.assertRowIndex(startIndex, "startIndex");
     this.assertPositiveCount(count, "count");
 
@@ -114,7 +125,11 @@ export class SheetsEditorService {
     count: number,
     ctx?: SheetsRequestContext,
   ): Promise<void> {
-    const { sheetId, maxRows } = await this.resolveSheetId(spreadsheetId, sheetIdOrName, ctx);
+    const { sheetId, maxRows } = await this.resolveSheetId(
+      spreadsheetId,
+      sheetIdOrName,
+      ctx,
+    );
     this.assertRowIndex(startIndex, "startIndex");
     this.assertPositiveCount(count, "count");
     if (maxRows != null && startIndex + count > maxRows) {
@@ -149,7 +164,11 @@ export class SheetsEditorService {
     count: number,
     ctx?: SheetsRequestContext,
   ): Promise<void> {
-    const { sheetId } = await this.resolveSheetId(spreadsheetId, sheetIdOrName, ctx);
+    const { sheetId } = await this.resolveSheetId(
+      spreadsheetId,
+      sheetIdOrName,
+      ctx,
+    );
     this.assertColumnIndex(startIndex, "startIndex");
     this.assertPositiveCount(count, "count");
 
@@ -179,14 +198,21 @@ export class SheetsEditorService {
     count: number,
     ctx?: SheetsRequestContext,
   ): Promise<void> {
-    const { sheetId, maxCols } = await this.resolveSheetId(spreadsheetId, sheetIdOrName, ctx);
+    const { sheetId, maxCols } = await this.resolveSheetId(
+      spreadsheetId,
+      sheetIdOrName,
+      ctx,
+    );
     this.assertColumnIndex(startIndex, "startIndex");
     this.assertPositiveCount(count, "count");
     if (maxCols != null && startIndex + count > maxCols) {
-      throw new SheetsClientError("Column delete out of bounds for this sheet.", {
-        code: "COLUMN_INDEX_OUT_OF_BOUNDS",
-        retryable: false,
-      });
+      throw new SheetsClientError(
+        "Column delete out of bounds for this sheet.",
+        {
+          code: "COLUMN_INDEX_OUT_OF_BOUNDS",
+          retryable: false,
+        },
+      );
     }
 
     await this.sheetsClient.batchUpdate(
@@ -214,8 +240,13 @@ export class SheetsEditorService {
   ): Promise<{ sheetId: number; maxRows?: number; maxCols?: number }> {
     if (typeof sheetIdOrName === "number") {
       this.assertSheetId(sheetIdOrName);
-      const spreadsheet = await this.sheetsClient.getSpreadsheet(spreadsheetId, ctx);
-      const sheet = spreadsheet.sheets?.find((s) => s.properties?.sheetId === sheetIdOrName);
+      const spreadsheet = await this.sheetsClient.getSpreadsheet(
+        spreadsheetId,
+        ctx,
+      );
+      const sheet = spreadsheet.sheets?.find(
+        (s) => s.properties?.sheetId === sheetIdOrName,
+      );
       if (!sheet) {
         throw new SheetsClientError(`Sheet id ${sheetIdOrName} not found.`, {
           code: "SHEET_NOT_FOUND",
@@ -230,7 +261,10 @@ export class SheetsEditorService {
     }
 
     const name = this.assertSheetName(String(sheetIdOrName));
-    const spreadsheet = await this.sheetsClient.getSpreadsheet(spreadsheetId, ctx);
+    const spreadsheet = await this.sheetsClient.getSpreadsheet(
+      spreadsheetId,
+      ctx,
+    );
     const sheet = spreadsheet.sheets?.find((s) => s.properties?.title === name);
     const id = sheet?.properties?.sheetId;
     if (typeof id !== "number") {
@@ -253,13 +287,21 @@ export class SheetsEditorService {
   ): Promise<CreateSheetResult> {
     const normalizedTitle = this.normalizeSheetTitle(title);
 
-    const spreadsheet = await this.sheetsClient.getSpreadsheet(spreadsheetId, ctx);
-    const alreadyExists = spreadsheet.sheets?.some((sheet) => sheet.properties?.title === normalizedTitle);
+    const spreadsheet = await this.sheetsClient.getSpreadsheet(
+      spreadsheetId,
+      ctx,
+    );
+    const alreadyExists = spreadsheet.sheets?.some(
+      (sheet) => sheet.properties?.title === normalizedTitle,
+    );
     if (alreadyExists) {
-      throw new SheetsClientError(`Sheet "${normalizedTitle}" already exists.`, {
-        code: 'SHEET_ALREADY_EXISTS',
-        retryable: false,
-      });
+      throw new SheetsClientError(
+        `Sheet "${normalizedTitle}" already exists.`,
+        {
+          code: "SHEET_ALREADY_EXISTS",
+          retryable: false,
+        },
+      );
     }
 
     const response = await this.sheetsClient.batchUpdate(
@@ -277,9 +319,9 @@ export class SheetsEditorService {
     );
 
     const sheetId = response.replies?.[0]?.addSheet?.properties?.sheetId;
-    if (typeof sheetId !== 'number') {
-      throw new SheetsClientError('Sheet created but no sheetId returned.', {
-        code: 'MISSING_SHEET_ID',
+    if (typeof sheetId !== "number") {
+      throw new SheetsClientError("Sheet created but no sheetId returned.", {
+        code: "MISSING_SHEET_ID",
         retryable: false,
       });
     }
@@ -296,11 +338,16 @@ export class SheetsEditorService {
     this.assertSheetId(sheetId);
     const normalizedTitle = this.normalizeSheetTitle(newTitle);
 
-    const spreadsheet = await this.sheetsClient.getSpreadsheet(spreadsheetId, ctx);
-    const sheet = spreadsheet.sheets?.find((entry) => entry.properties?.sheetId === sheetId);
+    const spreadsheet = await this.sheetsClient.getSpreadsheet(
+      spreadsheetId,
+      ctx,
+    );
+    const sheet = spreadsheet.sheets?.find(
+      (entry) => entry.properties?.sheetId === sheetId,
+    );
     if (!sheet) {
       throw new SheetsClientError(`Sheet id ${sheetId} not found.`, {
-        code: 'SHEET_NOT_FOUND',
+        code: "SHEET_NOT_FOUND",
         retryable: false,
       });
     }
@@ -314,7 +361,7 @@ export class SheetsEditorService {
               sheetId,
               title: normalizedTitle,
             },
-            fields: 'title',
+            fields: "title",
           },
         },
       ],
@@ -327,7 +374,11 @@ export class SheetsEditorService {
     sheetIdOrName: number | string,
     ctx?: SheetsRequestContext,
   ): Promise<void> {
-    const { sheetId } = await this.resolveSheetId(spreadsheetId, sheetIdOrName, ctx);
+    const { sheetId } = await this.resolveSheetId(
+      spreadsheetId,
+      sheetIdOrName,
+      ctx,
+    );
     await this.sheetsClient.batchUpdate(
       spreadsheetId,
       [
@@ -351,15 +402,24 @@ export class SheetsEditorService {
     const normalizedSheetName = this.assertSheetName(sheetName);
     const range = `${normalizedSheetName}!${a1}`;
 
-    const bounds = await this.validators.validateRangeWithinBounds(spreadsheetId, range, ctx);
+    const bounds = await this.validators.validateRangeWithinBounds(
+      spreadsheetId,
+      range,
+      ctx,
+    );
     if (!bounds.valid) {
-      throw new SheetsClientError(bounds.reason ?? 'Cell out of bounds.', {
-        code: 'RANGE_OUT_OF_BOUNDS',
+      throw new SheetsClientError(bounds.reason ?? "Cell out of bounds.", {
+        code: "RANGE_OUT_OF_BOUNDS",
         retryable: false,
       });
     }
 
-    const response = await this.sheetsClient.setValues(spreadsheetId, range, [[newValue]], ctx);
+    const response = await this.sheetsClient.setValues(
+      spreadsheetId,
+      range,
+      [[newValue]],
+      ctx,
+    );
 
     return {
       updatedRange: response.updatedRange ?? range,
@@ -377,15 +437,24 @@ export class SheetsEditorService {
   ): Promise<EditOperationResult> {
     this.assertValues(values);
 
-    const bounds = await this.validators.validateRangeWithinBounds(spreadsheetId, rangeA1, ctx);
+    const bounds = await this.validators.validateRangeWithinBounds(
+      spreadsheetId,
+      rangeA1,
+      ctx,
+    );
     if (!bounds.valid) {
-      throw new SheetsClientError(bounds.reason ?? 'Range out of bounds.', {
-        code: 'RANGE_OUT_OF_BOUNDS',
+      throw new SheetsClientError(bounds.reason ?? "Range out of bounds.", {
+        code: "RANGE_OUT_OF_BOUNDS",
         retryable: false,
       });
     }
 
-    const response = await this.sheetsClient.setValues(spreadsheetId, rangeA1, values, ctx);
+    const response = await this.sheetsClient.setValues(
+      spreadsheetId,
+      rangeA1,
+      values,
+      ctx,
+    );
 
     return {
       updatedRange: response.updatedRange ?? rangeA1,
@@ -403,34 +472,45 @@ export class SheetsEditorService {
     ctx?: SheetsRequestContext,
   ): Promise<void> {
     this.assertSheetId(sheetId);
-    this.assertColumnIndex(columnIndex, 'columnIndex');
-    this.assertColumnIndex(destinationIndex, 'destinationIndex');
+    this.assertColumnIndex(columnIndex, "columnIndex");
+    this.assertColumnIndex(destinationIndex, "destinationIndex");
 
     if (columnIndex === destinationIndex) return;
 
-    const spreadsheet = await this.sheetsClient.getSpreadsheet(spreadsheetId, ctx);
-    const targetSheet = spreadsheet.sheets?.find((sheet) => sheet.properties?.sheetId === sheetId);
+    const spreadsheet = await this.sheetsClient.getSpreadsheet(
+      spreadsheetId,
+      ctx,
+    );
+    const targetSheet = spreadsheet.sheets?.find(
+      (sheet) => sheet.properties?.sheetId === sheetId,
+    );
 
     if (!targetSheet?.properties?.gridProperties?.columnCount) {
-      throw new SheetsClientError(`Sheet id ${sheetId} not found or missing grid metadata.`, {
-        code: 'SHEET_NOT_FOUND',
-        retryable: false,
-      });
+      throw new SheetsClientError(
+        `Sheet id ${sheetId} not found or missing grid metadata.`,
+        {
+          code: "SHEET_NOT_FOUND",
+          retryable: false,
+        },
+      );
     }
 
     const maxColumns = targetSheet.properties.gridProperties.columnCount;
     if (columnIndex >= maxColumns || destinationIndex > maxColumns) {
-      throw new SheetsClientError('Column index out of bounds for this sheet.', {
-        code: 'COLUMN_INDEX_OUT_OF_BOUNDS',
-        retryable: false,
-      });
+      throw new SheetsClientError(
+        "Column index out of bounds for this sheet.",
+        {
+          code: "COLUMN_INDEX_OUT_OF_BOUNDS",
+          retryable: false,
+        },
+      );
     }
 
     const request: sheets_v4.Schema$Request = {
       moveDimension: {
         source: {
           sheetId,
-          dimension: 'COLUMNS',
+          dimension: "COLUMNS",
           startIndex: columnIndex,
           endIndex: columnIndex + 1,
         },
@@ -448,25 +528,39 @@ export class SheetsEditorService {
     ctx?: SheetsRequestContext,
   ): Promise<void> {
     const parsed = this.parseRangeA1(rangeA1);
-    const bounds = await this.validators.validateRangeWithinBounds(spreadsheetId, rangeA1, ctx);
+    const bounds = await this.validators.validateRangeWithinBounds(
+      spreadsheetId,
+      rangeA1,
+      ctx,
+    );
     if (!bounds.valid) {
       throw new SheetsClientError(bounds.reason ?? "Range out of bounds.", {
         code: "RANGE_OUT_OF_BOUNDS",
         retryable: false,
       });
     }
-    const { sheetId } = await this.resolveSheetId(spreadsheetId, parsed.sheetName, ctx);
+    const { sheetId } = await this.resolveSheetId(
+      spreadsheetId,
+      parsed.sheetName,
+      ctx,
+    );
     const specs = (Array.isArray(sortSpecs) ? sortSpecs : [])
       .filter((s) => Number.isInteger(s?.dimensionIndex))
       .map((s) => ({
         dimensionIndex: Number(s.dimensionIndex),
-        sortOrder: String(s.sortOrder || "ASCENDING").toUpperCase() === "DESCENDING" ? "DESCENDING" : "ASCENDING",
+        sortOrder:
+          String(s.sortOrder || "ASCENDING").toUpperCase() === "DESCENDING"
+            ? "DESCENDING"
+            : "ASCENDING",
       }));
     if (!specs.length) {
-      throw new SheetsClientError("sort_range requires at least one valid sort spec.", {
-        code: "INVALID_SORT_SPEC",
-        retryable: false,
-      });
+      throw new SheetsClientError(
+        "sort_range requires at least one valid sort spec.",
+        {
+          code: "INVALID_SORT_SPEC",
+          retryable: false,
+        },
+      );
     }
 
     await this.sheetsClient.batchUpdate(
@@ -495,14 +589,22 @@ export class SheetsEditorService {
     ctx?: SheetsRequestContext,
   ): Promise<void> {
     const parsed = this.parseRangeA1(rangeA1);
-    const bounds = await this.validators.validateRangeWithinBounds(spreadsheetId, rangeA1, ctx);
+    const bounds = await this.validators.validateRangeWithinBounds(
+      spreadsheetId,
+      rangeA1,
+      ctx,
+    );
     if (!bounds.valid) {
       throw new SheetsClientError(bounds.reason ?? "Range out of bounds.", {
         code: "RANGE_OUT_OF_BOUNDS",
         retryable: false,
       });
     }
-    const { sheetId } = await this.resolveSheetId(spreadsheetId, parsed.sheetName, ctx);
+    const { sheetId } = await this.resolveSheetId(
+      spreadsheetId,
+      parsed.sheetName,
+      ctx,
+    );
 
     await this.sheetsClient.batchUpdate(
       spreadsheetId,
@@ -530,7 +632,11 @@ export class SheetsEditorService {
     sheetIdOrName: number | string,
     ctx?: SheetsRequestContext,
   ): Promise<void> {
-    const { sheetId } = await this.resolveSheetId(spreadsheetId, sheetIdOrName, ctx);
+    const { sheetId } = await this.resolveSheetId(
+      spreadsheetId,
+      sheetIdOrName,
+      ctx,
+    );
     await this.sheetsClient.batchUpdate(
       spreadsheetId,
       [
@@ -551,20 +657,31 @@ export class SheetsEditorService {
     ctx?: SheetsRequestContext,
   ): Promise<void> {
     const parsed = this.parseRangeA1(rangeA1);
-    const bounds = await this.validators.validateRangeWithinBounds(spreadsheetId, rangeA1, ctx);
+    const bounds = await this.validators.validateRangeWithinBounds(
+      spreadsheetId,
+      rangeA1,
+      ctx,
+    );
     if (!bounds.valid) {
       throw new SheetsClientError(bounds.reason ?? "Range out of bounds.", {
         code: "RANGE_OUT_OF_BOUNDS",
         retryable: false,
       });
     }
-    const { sheetId } = await this.resolveSheetId(spreadsheetId, parsed.sheetName, ctx);
+    const { sheetId } = await this.resolveSheetId(
+      spreadsheetId,
+      parsed.sheetName,
+      ctx,
+    );
     const safePattern = String(pattern || "").trim();
     if (!safePattern) {
-      throw new SheetsClientError("set_number_format requires a format pattern.", {
-        code: "INVALID_NUMBER_FORMAT",
-        retryable: false,
-      });
+      throw new SheetsClientError(
+        "set_number_format requires a format pattern.",
+        {
+          code: "INVALID_NUMBER_FORMAT",
+          retryable: false,
+        },
+      );
     }
 
     await this.sheetsClient.batchUpdate(
@@ -609,64 +726,75 @@ export class SheetsEditorService {
     ctx?: SheetsRequestContext,
   ): Promise<void> {
     const parsed = this.parseRangeA1(rangeA1);
-    const bounds = await this.validators.validateRangeWithinBounds(spreadsheetId, rangeA1, ctx);
+    const bounds = await this.validators.validateRangeWithinBounds(
+      spreadsheetId,
+      rangeA1,
+      ctx,
+    );
     if (!bounds.valid) {
       throw new SheetsClientError(bounds.reason ?? "Range out of bounds.", {
-        code: "RANGE_OUT_OF_BOUNDS", retryable: false,
+        code: "RANGE_OUT_OF_BOUNDS",
+        retryable: false,
       });
     }
-    const { sheetId } = await this.resolveSheetId(spreadsheetId, parsed.sheetName, ctx);
+    const { sheetId } = await this.resolveSheetId(
+      spreadsheetId,
+      parsed.sheetName,
+      ctx,
+    );
 
     const textFormat: Record<string, unknown> = {};
     const fields: string[] = [];
 
     if (format.color) {
-      const hex = format.color.replace(/^#/, '');
+      const hex = format.color.replace(/^#/, "");
       textFormat.foregroundColor = {
-        red:   parseInt(hex.slice(0, 2), 16) / 255,
+        red: parseInt(hex.slice(0, 2), 16) / 255,
         green: parseInt(hex.slice(2, 4), 16) / 255,
-        blue:  parseInt(hex.slice(4, 6), 16) / 255,
+        blue: parseInt(hex.slice(4, 6), 16) / 255,
       };
-      fields.push('userEnteredFormat.textFormat.foregroundColor');
+      fields.push("userEnteredFormat.textFormat.foregroundColor");
     }
-    if (typeof format.bold === 'boolean') {
+    if (typeof format.bold === "boolean") {
       textFormat.bold = format.bold;
-      fields.push('userEnteredFormat.textFormat.bold');
+      fields.push("userEnteredFormat.textFormat.bold");
     }
-    if (typeof format.italic === 'boolean') {
+    if (typeof format.italic === "boolean") {
       textFormat.italic = format.italic;
-      fields.push('userEnteredFormat.textFormat.italic');
+      fields.push("userEnteredFormat.textFormat.italic");
     }
-    if (typeof format.underline === 'boolean') {
+    if (typeof format.underline === "boolean") {
       textFormat.underline = format.underline;
-      fields.push('userEnteredFormat.textFormat.underline');
+      fields.push("userEnteredFormat.textFormat.underline");
     }
     if (format.fontSizePt && format.fontSizePt > 0) {
       textFormat.fontSize = format.fontSizePt;
-      fields.push('userEnteredFormat.textFormat.fontSize');
+      fields.push("userEnteredFormat.textFormat.fontSize");
     }
     if (format.fontFamily) {
       textFormat.fontFamily = format.fontFamily;
-      fields.push('userEnteredFormat.textFormat.fontFamily');
+      fields.push("userEnteredFormat.textFormat.fontFamily");
     }
 
     if (!fields.length) return;
 
     await this.sheetsClient.batchUpdate(
       spreadsheetId,
-      [{
-        repeatCell: {
-          range: {
-            sheetId,
-            startRowIndex: parsed.startRowIndex,
-            endRowIndex: parsed.endRowIndexExclusive,
-            startColumnIndex: parsed.startColumnIndex,
-            endColumnIndex: parsed.endColumnIndexExclusive,
+      [
+        {
+          repeatCell: {
+            range: {
+              sheetId,
+              startRowIndex: parsed.startRowIndex,
+              endRowIndex: parsed.endRowIndexExclusive,
+              startColumnIndex: parsed.startColumnIndex,
+              endColumnIndex: parsed.endColumnIndexExclusive,
+            },
+            cell: { userEnteredFormat: { textFormat } },
+            fields: fields.join(","),
           },
-          cell: { userEnteredFormat: { textFormat } },
-          fields: fields.join(','),
         },
-      }],
+      ],
       ctx,
     );
   }
@@ -678,9 +806,19 @@ export class SheetsEditorService {
     frozenColumnCount: number,
     ctx?: SheetsRequestContext,
   ): Promise<void> {
-    const { sheetId } = await this.resolveSheetId(spreadsheetId, sheetIdOrName, ctx);
-    const rows = Number.isInteger(frozenRowCount) && frozenRowCount >= 0 ? frozenRowCount : 0;
-    const cols = Number.isInteger(frozenColumnCount) && frozenColumnCount >= 0 ? frozenColumnCount : 0;
+    const { sheetId } = await this.resolveSheetId(
+      spreadsheetId,
+      sheetIdOrName,
+      ctx,
+    );
+    const rows =
+      Number.isInteger(frozenRowCount) && frozenRowCount >= 0
+        ? frozenRowCount
+        : 0;
+    const cols =
+      Number.isInteger(frozenColumnCount) && frozenColumnCount >= 0
+        ? frozenColumnCount
+        : 0;
 
     await this.sheetsClient.batchUpdate(
       spreadsheetId,
@@ -694,7 +832,8 @@ export class SheetsEditorService {
                 frozenColumnCount: cols,
               },
             },
-            fields: "gridProperties.frozenRowCount,gridProperties.frozenColumnCount",
+            fields:
+              "gridProperties.frozenRowCount,gridProperties.frozenColumnCount",
           },
         },
       ],
@@ -709,14 +848,22 @@ export class SheetsEditorService {
     ctx?: SheetsRequestContext,
   ): Promise<void> {
     const parsed = this.parseRangeA1(rangeA1);
-    const bounds = await this.validators.validateRangeWithinBounds(spreadsheetId, rangeA1, ctx);
+    const bounds = await this.validators.validateRangeWithinBounds(
+      spreadsheetId,
+      rangeA1,
+      ctx,
+    );
     if (!bounds.valid) {
       throw new SheetsClientError(bounds.reason ?? "Range out of bounds.", {
         code: "RANGE_OUT_OF_BOUNDS",
         retryable: false,
       });
     }
-    const { sheetId } = await this.resolveSheetId(spreadsheetId, parsed.sheetName, ctx);
+    const { sheetId } = await this.resolveSheetId(
+      spreadsheetId,
+      parsed.sheetName,
+      ctx,
+    );
     const condition = this.buildValidationCondition(input);
 
     await this.sheetsClient.batchUpdate(
@@ -735,7 +882,8 @@ export class SheetsEditorService {
               condition,
               strict: input.strict !== false,
               showCustomUi: input.showCustomUi !== false,
-              inputMessage: String(input.inputMessage || "").trim() || undefined,
+              inputMessage:
+                String(input.inputMessage || "").trim() || undefined,
             },
           },
         },
@@ -750,14 +898,22 @@ export class SheetsEditorService {
     ctx?: SheetsRequestContext,
   ): Promise<void> {
     const parsed = this.parseRangeA1(rangeA1);
-    const bounds = await this.validators.validateRangeWithinBounds(spreadsheetId, rangeA1, ctx);
+    const bounds = await this.validators.validateRangeWithinBounds(
+      spreadsheetId,
+      rangeA1,
+      ctx,
+    );
     if (!bounds.valid) {
       throw new SheetsClientError(bounds.reason ?? "Range out of bounds.", {
         code: "RANGE_OUT_OF_BOUNDS",
         retryable: false,
       });
     }
-    const { sheetId } = await this.resolveSheetId(spreadsheetId, parsed.sheetName, ctx);
+    const { sheetId } = await this.resolveSheetId(
+      spreadsheetId,
+      parsed.sheetName,
+      ctx,
+    );
 
     await this.sheetsClient.batchUpdate(
       spreadsheetId,
@@ -786,23 +942,38 @@ export class SheetsEditorService {
     ctx?: SheetsRequestContext,
   ): Promise<void> {
     const parsed = this.parseRangeA1(rangeA1);
-    const bounds = await this.validators.validateRangeWithinBounds(spreadsheetId, rangeA1, ctx);
+    const bounds = await this.validators.validateRangeWithinBounds(
+      spreadsheetId,
+      rangeA1,
+      ctx,
+    );
     if (!bounds.valid) {
       throw new SheetsClientError(bounds.reason ?? "Range out of bounds.", {
         code: "RANGE_OUT_OF_BOUNDS",
         retryable: false,
       });
     }
-    const { sheetId } = await this.resolveSheetId(spreadsheetId, parsed.sheetName, ctx);
+    const { sheetId } = await this.resolveSheetId(
+      spreadsheetId,
+      parsed.sheetName,
+      ctx,
+    );
     const conditionType = String(input?.type || "").toUpperCase();
     const condValue = String(input?.value ?? "").trim();
     if (!condValue) {
-      throw new SheetsClientError("apply_conditional_format requires a condition value.", {
-        code: "INVALID_CONDITIONAL_FORMAT",
-        retryable: false,
-      });
+      throw new SheetsClientError(
+        "apply_conditional_format requires a condition value.",
+        {
+          code: "INVALID_CONDITIONAL_FORMAT",
+          retryable: false,
+        },
+      );
     }
-    if (!["NUMBER_GREATER", "NUMBER_LESS", "TEXT_CONTAINS"].includes(conditionType)) {
+    if (
+      !["NUMBER_GREATER", "NUMBER_LESS", "TEXT_CONTAINS"].includes(
+        conditionType,
+      )
+    ) {
       throw new SheetsClientError("Unsupported conditional format type.", {
         code: "INVALID_CONDITIONAL_FORMAT",
         retryable: false,
@@ -830,16 +1001,15 @@ export class SheetsEditorService {
               ],
               booleanRule: {
                 condition: {
-                  type: conditionType as "NUMBER_GREATER" | "NUMBER_LESS" | "TEXT_CONTAINS",
+                  type: conditionType as
+                    | "NUMBER_GREATER"
+                    | "NUMBER_LESS"
+                    | "TEXT_CONTAINS",
                   values: [{ userEnteredValue: condValue }],
                 },
                 format: {
-                  ...(bg
-                    ? { backgroundColor: bg }
-                    : {}),
-                  ...(fg
-                    ? { textFormat: { foregroundColor: fg } }
-                    : {}),
+                  ...(bg ? { backgroundColor: bg } : {}),
+                  ...(fg ? { textFormat: { foregroundColor: fg } } : {}),
                 },
               },
             },
@@ -856,7 +1026,11 @@ export class SheetsEditorService {
     opts: { hideGridlines?: boolean },
     ctx?: SheetsRequestContext,
   ): Promise<void> {
-    const { sheetId } = await this.resolveSheetId(spreadsheetId, sheetIdOrName, ctx);
+    const { sheetId } = await this.resolveSheetId(
+      spreadsheetId,
+      sheetIdOrName,
+      ctx,
+    );
     await this.sheetsClient.batchUpdate(
       spreadsheetId,
       [
@@ -879,15 +1053,15 @@ export class SheetsEditorService {
   private normalizeSheetTitle(title: string): string {
     const normalized = title.trim();
     if (!normalized) {
-      throw new SheetsClientError('Sheet title must not be empty.', {
-        code: 'INVALID_SHEET_TITLE',
+      throw new SheetsClientError("Sheet title must not be empty.", {
+        code: "INVALID_SHEET_TITLE",
         retryable: false,
       });
     }
 
     if (normalized.length > 100) {
-      throw new SheetsClientError('Sheet title cannot exceed 100 characters.', {
-        code: 'INVALID_SHEET_TITLE',
+      throw new SheetsClientError("Sheet title cannot exceed 100 characters.", {
+        code: "INVALID_SHEET_TITLE",
         retryable: false,
       });
     }
@@ -898,8 +1072,8 @@ export class SheetsEditorService {
   private assertSheetName(sheetName: string): string {
     const normalized = sheetName.trim();
     if (!normalized) {
-      throw new SheetsClientError('sheetName is required.', {
-        code: 'INVALID_SHEET_NAME',
+      throw new SheetsClientError("sheetName is required.", {
+        code: "INVALID_SHEET_NAME",
         retryable: false,
       });
     }
@@ -908,8 +1082,8 @@ export class SheetsEditorService {
 
   private assertSheetId(sheetId: number): void {
     if (!Number.isInteger(sheetId) || sheetId < 0) {
-      throw new SheetsClientError('sheetId must be a non-negative integer.', {
-        code: 'INVALID_SHEET_ID',
+      throw new SheetsClientError("sheetId must be a non-negative integer.", {
+        code: "INVALID_SHEET_ID",
         retryable: false,
       });
     }
@@ -936,30 +1110,42 @@ export class SheetsEditorService {
   private assertColumnIndex(value: number, name: string): void {
     if (!Number.isInteger(value) || value < 0) {
       throw new SheetsClientError(`${name} must be a non-negative integer.`, {
-        code: 'INVALID_COLUMN_INDEX',
+        code: "INVALID_COLUMN_INDEX",
         retryable: false,
       });
     }
   }
 
   private assertValues(values: SheetsValueGrid): void {
-    if (!Array.isArray(values) || values.length === 0 || values[0].length === 0) {
-      throw new SheetsClientError('values must contain at least one row and one column.', {
-        code: 'INVALID_VALUES',
-        retryable: false,
-      });
+    if (
+      !Array.isArray(values) ||
+      values.length === 0 ||
+      values[0].length === 0
+    ) {
+      throw new SheetsClientError(
+        "values must contain at least one row and one column.",
+        {
+          code: "INVALID_VALUES",
+          retryable: false,
+        },
+      );
     }
 
     const width = values[0].length;
     if (values.some((row) => row.length !== width)) {
-      throw new SheetsClientError('values rows must be rectangular (same number of columns).', {
-        code: 'INVALID_VALUES',
-        retryable: false,
-      });
+      throw new SheetsClientError(
+        "values rows must be rectangular (same number of columns).",
+        {
+          code: "INVALID_VALUES",
+          retryable: false,
+        },
+      );
     }
   }
 
-  private inferNumberFormatType(pattern: string): "NUMBER" | "CURRENCY" | "PERCENT" | "DATE" | "DATE_TIME" | "TEXT" {
+  private inferNumberFormatType(
+    pattern: string,
+  ): "NUMBER" | "CURRENCY" | "PERCENT" | "DATE" | "DATE_TIME" | "TEXT" {
     const p = String(pattern || "").trim();
     if (!p) return "NUMBER";
     if (/%/.test(p)) return "PERCENT";
@@ -971,17 +1157,22 @@ export class SheetsEditorService {
     return "NUMBER";
   }
 
-  private buildValidationCondition(input: SheetsDataValidationInput): sheets_v4.Schema$BooleanCondition {
+  private buildValidationCondition(
+    input: SheetsDataValidationInput,
+  ): sheets_v4.Schema$BooleanCondition {
     const type = String(input?.type || "").toUpperCase();
     if (type === "ONE_OF_LIST") {
       const values = (Array.isArray(input?.values) ? input.values : [])
         .map((v) => String(v || "").trim())
         .filter(Boolean);
       if (!values.length) {
-        throw new SheetsClientError("ONE_OF_LIST validation requires non-empty values.", {
-          code: "INVALID_DATA_VALIDATION",
-          retryable: false,
-        });
+        throw new SheetsClientError(
+          "ONE_OF_LIST validation requires non-empty values.",
+          {
+            code: "INVALID_DATA_VALIDATION",
+            retryable: false,
+          },
+        );
       }
       return {
         type: "ONE_OF_LIST",
@@ -992,23 +1183,32 @@ export class SheetsEditorService {
       const min = Number(input?.min);
       const max = Number(input?.max);
       if (!Number.isFinite(min) || !Number.isFinite(max)) {
-        throw new SheetsClientError("NUMBER_BETWEEN validation requires numeric min and max.", {
-          code: "INVALID_DATA_VALIDATION",
-          retryable: false,
-        });
+        throw new SheetsClientError(
+          "NUMBER_BETWEEN validation requires numeric min and max.",
+          {
+            code: "INVALID_DATA_VALIDATION",
+            retryable: false,
+          },
+        );
       }
       return {
         type: "NUMBER_BETWEEN",
-        values: [{ userEnteredValue: String(min) }, { userEnteredValue: String(max) }],
+        values: [
+          { userEnteredValue: String(min) },
+          { userEnteredValue: String(max) },
+        ],
       };
     }
     if (type === "NUMBER_GREATER") {
       const min = Number(input?.min);
       if (!Number.isFinite(min)) {
-        throw new SheetsClientError("NUMBER_GREATER validation requires numeric min.", {
-          code: "INVALID_DATA_VALIDATION",
-          retryable: false,
-        });
+        throw new SheetsClientError(
+          "NUMBER_GREATER validation requires numeric min.",
+          {
+            code: "INVALID_DATA_VALIDATION",
+            retryable: false,
+          },
+        );
       }
       return {
         type: "NUMBER_GREATER",
@@ -1018,10 +1218,13 @@ export class SheetsEditorService {
     if (type === "TEXT_CONTAINS") {
       const token = String(input?.values?.[0] || "").trim();
       if (!token) {
-        throw new SheetsClientError("TEXT_CONTAINS validation requires a token value.", {
-          code: "INVALID_DATA_VALIDATION",
-          retryable: false,
-        });
+        throw new SheetsClientError(
+          "TEXT_CONTAINS validation requires a token value.",
+          {
+            code: "INVALID_DATA_VALIDATION",
+            retryable: false,
+          },
+        );
       }
       return {
         type: "TEXT_CONTAINS",
@@ -1055,21 +1258,30 @@ export class SheetsEditorService {
     const raw = String(rangeA1 || "").trim();
     const bang = raw.indexOf("!");
     if (bang <= 0) {
-      throw new SheetsClientError("Range must include a sheet name, e.g. Sheet1!A1:B10.", {
-        code: "INVALID_RANGE",
-        retryable: false,
-      });
+      throw new SheetsClientError(
+        "Range must include a sheet name, e.g. Sheet1!A1:B10.",
+        {
+          code: "INVALID_RANGE",
+          retryable: false,
+        },
+      );
     }
     const sheetPartRaw = raw.slice(0, bang).trim();
     const cellPartRaw = raw.slice(bang + 1).trim();
-    const sheetName = sheetPartRaw.replace(/^'/, "").replace(/'$/, "").replace(/''/g, "'").trim();
+    const sheetName = sheetPartRaw
+      .replace(/^'/, "")
+      .replace(/'$/, "")
+      .replace(/''/g, "'")
+      .trim();
     if (!sheetName || !cellPartRaw) {
       throw new SheetsClientError("Invalid A1 range.", {
         code: "INVALID_RANGE",
         retryable: false,
       });
     }
-    const [startCellRaw, endCellRaw] = cellPartRaw.includes(":") ? cellPartRaw.split(":") : [cellPartRaw, cellPartRaw];
+    const [startCellRaw, endCellRaw] = cellPartRaw.includes(":")
+      ? cellPartRaw.split(":")
+      : [cellPartRaw, cellPartRaw];
     const start = this.parseA1Cell(startCellRaw);
     const end = this.parseA1Cell(endCellRaw);
     return {
@@ -1082,7 +1294,10 @@ export class SheetsEditorService {
   }
 
   private parseA1Cell(cell: string): { rowIndex: number; columnIndex: number } {
-    const normalized = String(cell || "").replace(/\$/g, "").toUpperCase().trim();
+    const normalized = String(cell || "")
+      .replace(/\$/g, "")
+      .toUpperCase()
+      .trim();
     const match = normalized.match(/^([A-Z]+)(\d+)$/);
     if (!match) {
       throw new SheetsClientError(`Invalid A1 cell reference: ${cell}`, {
@@ -1097,7 +1312,8 @@ export class SheetsEditorService {
 
   private columnLettersToIndex(columnLetters: string): number {
     let result = 0;
-    for (const char of columnLetters) result = result * 26 + (char.charCodeAt(0) - 64);
+    for (const char of columnLetters)
+      result = result * 26 + (char.charCodeAt(0) - 64);
     return result - 1;
   }
 }

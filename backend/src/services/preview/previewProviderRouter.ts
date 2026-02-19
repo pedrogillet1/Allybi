@@ -9,32 +9,32 @@
  */
 
 export enum PreviewProvider {
-  CLOUDCONVERT = 'cloudconvert',
-  GOOGLE_SLIDES = 'google_slides',
-  NONE = 'none',
+  CLOUDCONVERT = "cloudconvert",
+  GOOGLE_SLIDES = "google_slides",
+  NONE = "none",
 }
 
 // File extensions that don't need preview conversion
-const SKIP_EXTENSIONS = ['txt', 'md', 'csv', 'json', 'xml', 'html', 'htm'];
+const SKIP_EXTENSIONS = ["txt", "md", "csv", "json", "xml", "html", "htm"];
 
 // MIME types that are already viewable natively (no conversion needed)
 const NATIVE_MIME_TYPES = [
-  'application/pdf',
-  'text/plain',
-  'text/markdown',
-  'text/csv',
-  'text/html',
-  'application/json',
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-  'image/svg+xml',
+  "application/pdf",
+  "text/plain",
+  "text/markdown",
+  "text/csv",
+  "text/html",
+  "application/json",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/svg+xml",
 ];
 
 const PPTX_MIME_TYPES = [
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-  'application/vnd.ms-powerpoint',
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "application/vnd.ms-powerpoint",
 ];
 
 /**
@@ -46,7 +46,10 @@ const PPTX_MIME_TYPES = [
  *
  * Everything else that needs conversion → CloudConvert.
  */
-export function choosePreviewProvider(mimeType: string, filename?: string): PreviewProvider {
+export function choosePreviewProvider(
+  mimeType: string,
+  filename?: string,
+): PreviewProvider {
   // Skip native formats
   if (NATIVE_MIME_TYPES.includes(mimeType)) {
     return PreviewProvider.NONE;
@@ -54,7 +57,7 @@ export function choosePreviewProvider(mimeType: string, filename?: string): Prev
 
   // Skip by extension
   if (filename) {
-    const ext = filename.split('.').pop()?.toLowerCase();
+    const ext = filename.split(".").pop()?.toLowerCase();
     if (ext && SKIP_EXTENSIONS.includes(ext)) {
       return PreviewProvider.NONE;
     }
@@ -66,16 +69,18 @@ export function choosePreviewProvider(mimeType: string, filename?: string): Prev
       process.env.GOOGLE_APPLICATION_CREDENTIALS &&
       process.env.GOOGLE_SLIDES_FOLDER_ID
     );
-    return hasGoogleSlides ? PreviewProvider.GOOGLE_SLIDES : PreviewProvider.CLOUDCONVERT;
+    return hasGoogleSlides
+      ? PreviewProvider.GOOGLE_SLIDES
+      : PreviewProvider.CLOUDCONVERT;
   }
 
   // All other Office formats → CloudConvert
   if (
-    mimeType.startsWith('application/vnd.openxmlformats') ||
-    mimeType.startsWith('application/vnd.ms-') ||
-    mimeType === 'application/msword' ||
-    mimeType === 'application/rtf' ||
-    mimeType.startsWith('application/vnd.oasis.opendocument')
+    mimeType.startsWith("application/vnd.openxmlformats") ||
+    mimeType.startsWith("application/vnd.ms-") ||
+    mimeType === "application/msword" ||
+    mimeType === "application/rtf" ||
+    mimeType.startsWith("application/vnd.oasis.opendocument")
   ) {
     return PreviewProvider.CLOUDCONVERT;
   }

@@ -1,9 +1,15 @@
-import rateLimit, { ipKeyGenerator, Options } from 'express-rate-limit';
-import type { Request, Response } from 'express';
-import { Ratelimit } from '@upstash/ratelimit';
-import { redisConnection } from '../config/redis';
+import rateLimit, { ipKeyGenerator, Options } from "express-rate-limit";
+import type { Request, Response } from "express";
+import { Ratelimit } from "@upstash/ratelimit";
+import { redisConnection } from "../config/redis";
 
-const IS_PROD = process.env.NODE_ENV === 'production';
+const IS_PROD = process.env.NODE_ENV === "production";
+
+function getRateLimitIdentity(req: Request): string {
+  const userId = (req as any)?.user?.id;
+  if (userId) return `user:${String(userId)}`;
+  return `ip:${req.ip || "unknown"}`;
+}
 
 /**
  * Upstash Redis-backed rate limiter for production
@@ -16,22 +22,24 @@ if (IS_PROD && redisConnection) {
   // 10 requests per 15 minutes for auth endpoints
   upstashAuthLimiter = new Ratelimit({
     redis: redisConnection,
-    limiter: Ratelimit.slidingWindow(10, '15 m'),
-    prefix: 'koda:rl:auth',
+    limiter: Ratelimit.slidingWindow(10, "15 m"),
+    prefix: "koda:rl:auth",
     analytics: true,
   });
 
   // 10 requests per 15 minutes for admin endpoints
   upstashAdminLimiter = new Ratelimit({
     redis: redisConnection,
-    limiter: Ratelimit.slidingWindow(10, '15 m'),
-    prefix: 'koda:rl:admin',
+    limiter: Ratelimit.slidingWindow(10, "15 m"),
+    prefix: "koda:rl:admin",
     analytics: true,
   });
 
-  console.log('[RateLimit] Using Redis-backed rate limiting in production');
+  console.log("[RateLimit] Using Redis-backed rate limiting in production");
 } else if (IS_PROD) {
-  console.warn('[RateLimit] Redis not available, using in-memory rate limiting');
+  console.warn(
+    "[RateLimit] Redis not available, using in-memory rate limiting",
+  );
 }
 
 /**
@@ -40,7 +48,7 @@ if (IS_PROD && redisConnection) {
 function createHybridLimiter(
   memoryOptions: Partial<Options>,
   upstashLimiter: Ratelimit | null,
-  keyFn: (req: Request) => string
+  keyFn: (req: Request) => string,
 ) {
   // In production with Redis, use Upstash rate limiter
   if (IS_PROD && upstashLimiter) {
@@ -48,13 +56,13 @@ function createHybridLimiter(
       const key = keyFn(req);
       const result = await upstashLimiter.limit(key);
 
-      res.setHeader('X-RateLimit-Limit', result.limit);
-      res.setHeader('X-RateLimit-Remaining', result.remaining);
-      res.setHeader('X-RateLimit-Reset', result.reset);
+      res.setHeader("X-RateLimit-Limit", result.limit);
+      res.setHeader("X-RateLimit-Remaining", result.remaining);
+      res.setHeader("X-RateLimit-Reset", result.reset);
 
       if (!result.success) {
         res.status(429).json({
-          error: memoryOptions.message || 'Too many requests',
+          error: memoryOptions.message || "Too many requests",
           retryAfter: Math.ceil((result.reset - Date.now()) / 1000),
         });
         return;
@@ -74,7 +82,7 @@ function createHybridLimiter(
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: IS_PROD ? 300 : 500, // Stricter in production
-  message: 'Too many requests from this IP, please try again later.',
+  message: "Too many requests from this IP, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -92,27 +100,27 @@ export const authLimiter = createHybridLimiter(
   {
     windowMs: 15 * 60 * 1000,
     max: IS_PROD ? 10 : 100,
-    message: 'Too many authentication attempts, please try again later.',
+    message: "Too many authentication attempts, please try again later.",
     standardHeaders: true,
     legacyHeaders: false,
     skipSuccessfulRequests: true,
     keyGenerator: (req) => {
       const email = (req.body as any)?.email;
-      if (email && typeof email === 'string') {
+      if (email && typeof email === "string") {
         return `account:${email.toLowerCase().trim()}`;
       }
-      return ipKeyGenerator(req.ip || 'unknown');
+      return ipKeyGenerator(req.ip || "unknown");
     },
     validate: { keyGeneratorIpFallback: false },
   },
   upstashAuthLimiter,
   (req) => {
     const email = (req.body as any)?.email;
-    if (email && typeof email === 'string') {
+    if (email && typeof email === "string") {
       return `account:${email.toLowerCase().trim()}`;
     }
-    return `ip:${req.ip || 'unknown'}`;
-  }
+    return `ip:${req.ip || "unknown"}`;
+  },
 );
 
 /**
@@ -122,13 +130,13 @@ export const adminLimiter = createHybridLimiter(
   {
     windowMs: 15 * 60 * 1000,
     max: IS_PROD ? 10 : 20,
-    message: 'Too many admin login attempts.',
+    message: "Too many admin login attempts.",
     standardHeaders: true,
     legacyHeaders: false,
     skipSuccessfulRequests: true,
   },
   upstashAdminLimiter,
-  (req) => `admin:${req.ip || 'unknown'}`
+  (req) => `admin:${req.ip || "unknown"}`,
 );
 
 /**
@@ -137,7 +145,7 @@ export const adminLimiter = createHybridLimiter(
 export const twoFactorLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 3, // Limit each IP to 3 attempts per windowMs
-  message: 'Too many 2FA attempts, please try again later.',
+  message: "Too many 2FA attempts, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -148,9 +156,23 @@ export const twoFactorLimiter = rateLimit({
 export const aiLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 30, // 30 requests per minute
-  message: 'Too many AI requests, please slow down.',
+  message: "Too many AI requests, please slow down.",
   standardHeaders: true,
   legacyHeaders: false,
+});
+
+/**
+ * Editing apply limiter (separate from generic API limiter).
+ * Save flows can batch multiple paragraph applies in quick succession.
+ */
+export const editingApplyLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: IS_PROD ? 240 : 600,
+  message: "Too many edit apply requests, please slow down.",
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => getRateLimitIdentity(req),
+  validate: { keyGeneratorIpFallback: false },
 });
 
 /**
@@ -159,7 +181,7 @@ export const aiLimiter = rateLimit({
 export const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 200, // 200 uploads per hour (increased to support batch folder uploads)
-  message: 'Upload limit reached, please try again later.',
+  message: "Upload limit reached, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -170,7 +192,8 @@ export const uploadLimiter = rateLimit({
 export const presignedUrlLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 2000, // Allow bulk uploads of up to ~2000 files
-  message: 'Upload rate limit exceeded. Please wait before uploading more files.',
+  message:
+    "Upload rate limit exceeded. Please wait before uploading more files.",
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -181,7 +204,8 @@ export const presignedUrlLimiter = rateLimit({
 export const multipartUploadLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 500, // Allow multiple large file uploads
-  message: 'Multipart upload rate limit exceeded. Please wait before uploading more files.',
+  message:
+    "Multipart upload rate limit exceeded. Please wait before uploading more files.",
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -192,7 +216,7 @@ export const multipartUploadLimiter = rateLimit({
 export const downloadLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 60, // 60 downloads per minute
-  message: 'Too many downloads, please slow down.',
+  message: "Too many downloads, please slow down.",
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -203,7 +227,7 @@ export const downloadLimiter = rateLimit({
 export const searchLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 100, // 100 searches per minute
-  message: 'Too many search requests, please slow down.',
+  message: "Too many search requests, please slow down.",
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -214,13 +238,13 @@ export const searchLimiter = rateLimit({
 export const pptxPreviewLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 60, // 60 requests per minute per user
-  message: 'Too many preview requests, please slow down.',
+  message: "Too many preview requests, please slow down.",
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
     const userId = (req as any).user?.id;
     if (userId) return `user:${userId}`;
-    return ipKeyGenerator(req.ip || 'unknown');
+    return ipKeyGenerator(req.ip || "unknown");
   },
   validate: { keyGeneratorIpFallback: false },
 });
@@ -231,7 +255,8 @@ export const pptxPreviewLimiter = rateLimit({
 export const suspiciousActivityLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 10, // Only 10 requests per hour when flagged as suspicious
-  message: 'Your account has been temporarily restricted due to suspicious activity. Please contact support.',
+  message:
+    "Your account has been temporarily restricted due to suspicious activity. Please contact support.",
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -242,7 +267,7 @@ export const suspiciousActivityLimiter = rateLimit({
 export const statusPollingLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 120, // 120 requests per minute (polling every ~500ms)
-  message: 'Too many status polling requests, please slow down.',
+  message: "Too many status polling requests, please slow down.",
   standardHeaders: true,
   legacyHeaders: false,
 });

@@ -32,22 +32,57 @@ function mapRuntimeOpsToLegacyIntent(
     }
     if (upperOps.some((op) => op === "DOCX_SET_TEXT_CASE"))
       return { intentId: "DOCX_TEXT_CASE", isFormattingIntent: true };
-    if (upperOps.some((op) => op === "DOCX_SET_RUN_STYLE" || op === "DOCX_CLEAR_RUN_STYLE" || op === "DOCX_SET_PARAGRAPH_STYLE" || op === "DOCX_SET_HEADING_LEVEL" || op === "DOCX_SET_ALIGNMENT")) {
+    if (
+      upperOps.some(
+        (op) =>
+          op === "DOCX_SET_RUN_STYLE" ||
+          op === "DOCX_CLEAR_RUN_STYLE" ||
+          op === "DOCX_SET_PARAGRAPH_STYLE" ||
+          op === "DOCX_SET_HEADING_LEVEL" ||
+          op === "DOCX_SET_ALIGNMENT",
+      )
+    ) {
       return { intentId: "DOCX_FORMAT_INLINE", isFormattingIntent: true };
     }
-    if (upperOps.some((op) => op === "DOCX_REPLACE_SPAN" || op === "DOCX_REWRITE_PARAGRAPH" || op === "DOCX_REWRITE_SECTION")) {
+    if (
+      upperOps.some(
+        (op) =>
+          op === "DOCX_REPLACE_SPAN" ||
+          op === "DOCX_REWRITE_PARAGRAPH" ||
+          op === "DOCX_REWRITE_SECTION",
+      )
+    ) {
       return { intentId: "DOCX_REWRITE" };
     }
-    if (upperOps.some((op) => op === "DOCX_INSERT_AFTER" || op === "DOCX_INSERT_BEFORE")) {
+    if (
+      upperOps.some(
+        (op) => op === "DOCX_INSERT_AFTER" || op === "DOCX_INSERT_BEFORE",
+      )
+    ) {
       return { intentId: "DOCX_INSERT_PARAGRAPH" };
     }
     return { intentId: "DOCX_REWRITE" };
   }
 
-  if (upperOps.some((op) => op === "XLSX_SET_NUMBER_FORMAT" || op === "XLSX_FORMAT_RANGE" || op.includes("COND_FORMAT"))) {
+  if (
+    upperOps.some(
+      (op) =>
+        op === "XLSX_SET_NUMBER_FORMAT" ||
+        op === "XLSX_FORMAT_RANGE" ||
+        op.includes("COND_FORMAT"),
+    )
+  ) {
     return { intentId: "XLSX_FORMAT_RANGE", isFormattingIntent: true };
   }
-  if (upperOps.some((op) => op === "XLSX_SET_CELL_FORMULA" || op === "XLSX_SET_RANGE_FORMULAS" || op === "XLSX_FILL_DOWN" || op === "XLSX_FILL_RIGHT")) {
+  if (
+    upperOps.some(
+      (op) =>
+        op === "XLSX_SET_CELL_FORMULA" ||
+        op === "XLSX_SET_RANGE_FORMULAS" ||
+        op === "XLSX_FILL_DOWN" ||
+        op === "XLSX_FILL_RIGHT",
+    )
+  ) {
     return { intentId: "XLSX_FORMULA" };
   }
   if (upperOps.some((op) => op.startsWith("XLSX_CHART_"))) {
@@ -56,10 +91,18 @@ function mapRuntimeOpsToLegacyIntent(
   if (upperOps.some((op) => op === "XLSX_SORT_RANGE")) {
     return { intentId: "XLSX_SORT" };
   }
-  if (upperOps.some((op) => op === "XLSX_FILTER_APPLY" || op === "XLSX_FILTER_CLEAR")) {
+  if (
+    upperOps.some(
+      (op) => op === "XLSX_FILTER_APPLY" || op === "XLSX_FILTER_CLEAR",
+    )
+  ) {
     return { intentId: "XLSX_FILTER" };
   }
-  if (upperOps.some((op) => op === "XLSX_SET_RANGE_VALUES" || op === "XLSX_SET_CELL_VALUE")) {
+  if (
+    upperOps.some(
+      (op) => op === "XLSX_SET_RANGE_VALUES" || op === "XLSX_SET_CELL_VALUE",
+    )
+  ) {
     return { intentId: "XLSX_SET_VALUE" };
   }
   return { intentId: "XLSX_SET_VALUE" };
@@ -82,10 +125,15 @@ function normalizedText(value: string): string {
 }
 
 function tokenize(value: string): string[] {
-  return normalizedText(value).split(/[^a-z0-9]+/).filter(Boolean);
+  return normalizedText(value)
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
 }
 
-function phraseTokenCoverage(textTokens: string[], phraseTokens: string[]): number {
+function phraseTokenCoverage(
+  textTokens: string[],
+  phraseTokens: string[],
+): number {
   if (!textTokens.length || !phraseTokens.length) return 0;
   let hit = 0;
   for (const t of phraseTokens) {
@@ -94,7 +142,10 @@ function phraseTokenCoverage(textTokens: string[], phraseTokens: string[]): numb
   return hit / phraseTokens.length;
 }
 
-function orderedTokenCoverage(textTokens: string[], phraseTokens: string[]): number {
+function orderedTokenCoverage(
+  textTokens: string[],
+  phraseTokens: string[],
+): number {
   if (!textTokens.length || !phraseTokens.length) return 0;
   let cursor = 0;
   let hit = 0;
@@ -156,7 +207,11 @@ function overlapScore(a: string, b: string): number {
   return union > 0 ? inter / union : 0;
 }
 
-export function classifyAllybiIntent(message: string, filetype: "docx" | "xlsx" | "global", languageHint?: "en" | "pt"): ClassifiedIntent | null {
+export function classifyAllybiIntent(
+  message: string,
+  filetype: "docx" | "xlsx" | "global",
+  languageHint?: "en" | "pt",
+): ClassifiedIntent | null {
   if (filetype === "docx" || filetype === "xlsx") {
     const runtimeDomain = filetype === "docx" ? "docx" : "excel";
     const runtime = analyzeMessageToPlan({
@@ -166,9 +221,15 @@ export function classifyAllybiIntent(message: string, filetype: "docx" | "xlsx" 
       ...(languageHint ? { language: languageHint } : {}),
     });
 
-    if (runtime?.kind === "plan" && Array.isArray(runtime.ops) && runtime.ops.length > 0) {
+    if (
+      runtime?.kind === "plan" &&
+      Array.isArray(runtime.ops) &&
+      runtime.ops.length > 0
+    ) {
       const operatorCandidates = Array.from(
-        new Set(runtime.ops.map((op) => String(op?.op || "").trim()).filter(Boolean)),
+        new Set(
+          runtime.ops.map((op) => String(op?.op || "").trim()).filter(Boolean),
+        ),
       );
       const mapped = mapRuntimeOpsToLegacyIntent(operatorCandidates, filetype);
       return {
@@ -183,7 +244,11 @@ export function classifyAllybiIntent(message: string, filetype: "docx" | "xlsx" 
 
     if (runtime?.kind === "clarification") {
       const operatorCandidates = Array.from(
-        new Set((runtime.partialOps || []).map((op) => String(op?.op || "").trim()).filter(Boolean)),
+        new Set(
+          (runtime.partialOps || [])
+            .map((op) => String(op?.op || "").trim())
+            .filter(Boolean),
+        ),
       );
       const mapped = mapRuntimeOpsToLegacyIntent(operatorCandidates, filetype);
       return {
@@ -201,7 +266,12 @@ export function classifyAllybiIntent(message: string, filetype: "docx" | "xlsx" 
   const banks = loadAllybiBanks();
   const intentBank = banks.intents;
   const triggerBank = banks.languageTriggers;
-  if (!intentBank || !Array.isArray(intentBank.intents) || !triggerBank || !Array.isArray(triggerBank.triggers)) {
+  if (
+    !intentBank ||
+    !Array.isArray(intentBank.intents) ||
+    !triggerBank ||
+    !Array.isArray(triggerBank.triggers)
+  ) {
     return null;
   }
 
@@ -211,11 +281,13 @@ export function classifyAllybiIntent(message: string, filetype: "docx" | "xlsx" 
   if (filetype === "docx" || filetype === "xlsx") {
     const fontIntent = resolveFontIntent(message, language);
     if (fontIntent.matched && fontIntent.canonicalFamily) {
-      const operatorCandidates = filetype === "docx"
-        ? ["DOCX_SET_RUN_STYLE"]
-        : ["XLSX_FORMAT_RANGE", "XLSX_SET_NUMBER_FORMAT"];
+      const operatorCandidates =
+        filetype === "docx"
+          ? ["DOCX_SET_RUN_STYLE"]
+          : ["XLSX_FORMAT_RANGE", "XLSX_SET_NUMBER_FORMAT"];
       return {
-        intentId: filetype === "docx" ? "DOCX_FORMAT_INLINE" : "XLSX_FORMAT_RANGE",
+        intentId:
+          filetype === "docx" ? "DOCX_FORMAT_INLINE" : "XLSX_FORMAT_RANGE",
         confidence: Math.min(0.99, Math.max(0.72, fontIntent.confidence)),
         operatorCandidates,
         language,
@@ -227,11 +299,13 @@ export function classifyAllybiIntent(message: string, filetype: "docx" | "xlsx" 
       };
     }
     if (fontIntent.ambiguous) {
-      const operatorCandidates = filetype === "docx"
-        ? ["DOCX_SET_RUN_STYLE"]
-        : ["XLSX_FORMAT_RANGE", "XLSX_SET_NUMBER_FORMAT"];
+      const operatorCandidates =
+        filetype === "docx"
+          ? ["DOCX_SET_RUN_STYLE"]
+          : ["XLSX_FORMAT_RANGE", "XLSX_SET_NUMBER_FORMAT"];
       return {
-        intentId: filetype === "docx" ? "DOCX_FORMAT_INLINE" : "XLSX_FORMAT_RANGE",
+        intentId:
+          filetype === "docx" ? "DOCX_FORMAT_INLINE" : "XLSX_FORMAT_RANGE",
         confidence: 0.62,
         operatorCandidates,
         language,
@@ -255,14 +329,21 @@ export function classifyAllybiIntent(message: string, filetype: "docx" | "xlsx" 
     const intentId = String(trig?.intent_id || "").trim();
     if (!intentId) continue;
 
-    const intentEntry = (intentBank.intents as any[]).find((x) => String(x?.intent_id || "") === intentId);
+    const intentEntry = (intentBank.intents as any[]).find(
+      (x) => String(x?.intent_id || "") === intentId,
+    );
     if (!intentEntry) continue;
 
-    const scope = Array.isArray(intentEntry.filetype_scope) ? intentEntry.filetype_scope.map((x: any) => String(x)) : [];
+    const scope = Array.isArray(intentEntry.filetype_scope)
+      ? intentEntry.filetype_scope.map((x: any) => String(x))
+      : [];
     const filetypeMatch = scope.includes("global") || scope.includes(filetype);
     if (!filetypeMatch) continue;
 
-    const confidence = Math.min(0.99, 0.52 + phrase.length / 220 + matchScore * 0.4);
+    const confidence = Math.min(
+      0.99,
+      0.52 + phrase.length / 220 + matchScore * 0.4,
+    );
     const candidate: ClassifiedIntent = {
       intentId,
       confidence,
@@ -279,8 +360,15 @@ export function classifyAllybiIntent(message: string, filetype: "docx" | "xlsx" 
   if (best) return best;
 
   const byFiletype = (intentBank.intents as any[]).filter((x: any) => {
-    const scope = Array.isArray(x?.filetype_scope) ? x.filetype_scope.map((y: any) => String(y)) : [];
-    if (filetype !== "global" && scope.includes("global") && !scope.includes(filetype)) return false;
+    const scope = Array.isArray(x?.filetype_scope)
+      ? x.filetype_scope.map((y: any) => String(y))
+      : [];
+    if (
+      filetype !== "global" &&
+      scope.includes("global") &&
+      !scope.includes(filetype)
+    )
+      return false;
     return scope.includes(filetype) || scope.includes("global");
   });
 
@@ -290,9 +378,15 @@ export function classifyAllybiIntent(message: string, filetype: "docx" | "xlsx" 
   for (const entry of byFiletype) {
     const examples =
       language === "pt"
-        ? Array.isArray(entry?.examples_pt) ? entry.examples_pt : []
-        : Array.isArray(entry?.examples_en) ? entry.examples_en : [];
-    const negatives = Array.isArray(entry?.negative_examples) ? entry.negative_examples : [];
+        ? Array.isArray(entry?.examples_pt)
+          ? entry.examples_pt
+          : []
+        : Array.isArray(entry?.examples_en)
+          ? entry.examples_en
+          : [];
+    const negatives = Array.isArray(entry?.negative_examples)
+      ? entry.negative_examples
+      : [];
 
     let pos = 0;
     for (const ex of examples) {

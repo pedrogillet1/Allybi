@@ -20,7 +20,11 @@
  */
 
 import type { EnvName } from "../../types/llm.types";
-import { OPENAI_PRIMARY_MODEL, OPENAI_DRAFT_MODEL, listOpenAIModels } from "./openaiModels";
+import {
+  OPENAI_PRIMARY_MODEL,
+  OPENAI_DRAFT_MODEL,
+  listOpenAIModels,
+} from "./openaiModels";
 
 export interface OpenAIProviderConfig {
   env: EnvName;
@@ -33,8 +37,8 @@ export interface OpenAIProviderConfig {
   timeoutMs: number;
 
   // Models
-  defaultModelDraft: string;  // gpt-5-mini
-  defaultModelFinal: string;  // gpt-5.2
+  defaultModelDraft: string; // gpt-5-mini
+  defaultModelFinal: string; // gpt-5.2
   allowedModels: string[];
   strictModelAllowlist: boolean;
 
@@ -66,19 +70,23 @@ export function loadOpenAIConfig(env: EnvName): OpenAIProviderConfig {
 
     defaultModelDraft: process.env.OPENAI_DRAFT_MODEL || OPENAI_DRAFT_MODEL,
     defaultModelFinal: process.env.OPENAI_FINAL_MODEL || OPENAI_PRIMARY_MODEL,
-    allowedModels: (process.env.OPENAI_ALLOWED_MODELS
-      ? process.env.OPENAI_ALLOWED_MODELS.split(",").map((s) => s.trim()).filter(Boolean)
-      : listOpenAIModels()
-    ),
+    allowedModels: process.env.OPENAI_ALLOWED_MODELS
+      ? process.env.OPENAI_ALLOWED_MODELS.split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : listOpenAIModels(),
     strictModelAllowlist: process.env.OPENAI_STRICT_ALLOWLIST !== "false",
 
-    includeUsageInStream: process.env.OPENAI_INCLUDE_USAGE_IN_STREAM !== "false",
+    includeUsageInStream:
+      process.env.OPENAI_INCLUDE_USAGE_IN_STREAM !== "false",
     maxDeltaCharsSoft: Number(process.env.OPENAI_MAX_DELTA_CHARS_SOFT || 64),
 
     allowTools: process.env.OPENAI_ALLOW_TOOLS !== "false",
 
-    preferredApi: (process.env.OPENAI_PREFERRED_API as any) || "chat_completions",
-    supportsDeveloperRole: process.env.OPENAI_SUPPORTS_DEVELOPER_ROLE !== "false",
+    preferredApi:
+      (process.env.OPENAI_PREFERRED_API as any) || "chat_completions",
+    supportsDeveloperRole:
+      process.env.OPENAI_SUPPORTS_DEVELOPER_ROLE !== "false",
     strictNoImages: process.env.OPENAI_STRICT_NO_IMAGES !== "false",
   };
 }

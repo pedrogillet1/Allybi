@@ -14,15 +14,24 @@
  * - No tool execution (orchestrator)
  */
 
-import crypto from 'crypto';
-import type { LLMRequest, LLMMessage, LLMRole, LLMSampling } from './llmClient.interface';
-import type { ToolRegistry, ProviderToolCall, ToolResult } from './llmTools.types';
-import type { LLMProvider } from './llmErrors.types';
+import crypto from "crypto";
+import type {
+  LLMRequest,
+  LLMMessage,
+  LLMRole,
+  LLMSampling,
+} from "./llmClient.interface";
+import type {
+  ToolRegistry,
+  ProviderToolCall,
+  ToolResult,
+} from "./llmTools.types";
+import type { LLMProvider } from "./llmErrors.types";
 
-export type GeminiApiMode = 'generateContent' | 'streamGenerateContent';
+export type GeminiApiMode = "generateContent" | "streamGenerateContent";
 
 /** Gemini "role" values in REST API */
-type GeminiRole = 'user' | 'model';
+type GeminiRole = "user" | "model";
 
 /** Gemini request shapes (v1beta-like) */
 interface GeminiPartText {
@@ -43,7 +52,10 @@ interface GeminiPartFunctionResponse {
   };
 }
 
-type GeminiPart = GeminiPartText | GeminiPartFunctionCall | GeminiPartFunctionResponse;
+type GeminiPart =
+  | GeminiPartText
+  | GeminiPartFunctionCall
+  | GeminiPartFunctionResponse;
 
 interface GeminiContent {
   role: GeminiRole;
@@ -145,7 +157,7 @@ export interface GeminiPromptAdapterConfig {
    * - 'registry': keep registry.tools order as provided
    * - 'alpha': sort by tool name
    */
-  toolDeclarationOrder: 'registry' | 'alpha';
+  toolDeclarationOrder: "registry" | "alpha";
 
   /**
    * If true, we remove empty/whitespace-only messages (deterministic cleanup).
@@ -217,17 +229,20 @@ export class GeminiPromptAdapterService {
       : undefined;
 
     if (!c0?.content?.parts?.length) {
-      return { text: '', toolCalls: [], finishReason: c0?.finishReason, usage };
+      return { text: "", toolCalls: [], finishReason: c0?.finishReason, usage };
     }
 
     const toolCalls: ProviderToolCall[] = [];
-    let text = '';
+    let text = "";
 
     for (const part of c0.content.parts) {
       if (isTextPart(part)) {
         text += part.text;
       } else if (isFunctionCallPart(part)) {
-        const call = this.normalizeFunctionCall(part.functionCall.name, part.functionCall.args ?? {});
+        const call = this.normalizeFunctionCall(
+          part.functionCall.name,
+          part.functionCall.args ?? {},
+        );
         toolCalls.push(call);
       }
     }
@@ -252,7 +267,7 @@ export class GeminiPromptAdapterService {
     const name = params.functionName ?? params.toolResult.toolName;
 
     return {
-      role: 'user',
+      role: "user",
       parts: [
         {
           functionResponse: {
@@ -280,7 +295,10 @@ export class GeminiPromptAdapterService {
       parts.push({
         functionCall: {
           name: tc.name,
-          args: 'args' in tc ? (tc.args as Record<string, unknown>) : safeJsonParse(tc.argumentsJson) ?? {},
+          args:
+            "args" in tc
+              ? (tc.args as Record<string, unknown>)
+              : (safeJsonParse(tc.argumentsJson) ?? {}),
         },
       } as GeminiPartFunctionCall);
     }
@@ -289,16 +307,21 @@ export class GeminiPromptAdapterService {
 
   /* ------------------------- message building ------------------------- */
 
-  private buildContents(messages: LLMMessage[]): { contents: GeminiContent[]; systemParts: string[] } {
-    const cleaned = this.cfg.dropEmptyMessages ? messages.filter(m => !isEffectivelyEmpty(m)) : messages;
+  private buildContents(messages: LLMMessage[]): {
+    contents: GeminiContent[];
+    systemParts: string[];
+  } {
+    const cleaned = this.cfg.dropEmptyMessages
+      ? messages.filter((m) => !isEffectivelyEmpty(m))
+      : messages;
 
     const out: GeminiContent[] = [];
     const systemParts: string[] = [];
     const systemPreface: string[] = [];
 
     for (const m of cleaned) {
-      if (m.role === 'system' || m.role === 'developer') {
-        const text = (m.content ?? '').trim();
+      if (m.role === "system" || m.role === "developer") {
+        const text = (m.content ?? "").trim();
         if (!text) continue;
 
         if (this.cfg.useSystemInstruction) {
@@ -311,24 +334,28 @@ export class GeminiPromptAdapterService {
         continue;
       }
 
-      if (m.role === 'user') {
+      if (m.role === "user") {
         // If we have a legacy preface, inject it once before the first user message.
-        if (!this.cfg.useSystemInstruction && this.cfg.foldSystemAndDeveloperIntoUser && systemPreface.length > 0) {
+        if (
+          !this.cfg.useSystemInstruction &&
+          this.cfg.foldSystemAndDeveloperIntoUser &&
+          systemPreface.length > 0
+        ) {
           out.push({
-            role: 'user',
-            parts: [{ text: systemPreface.join('\n\n') }],
+            role: "user",
+            parts: [{ text: systemPreface.join("\n\n") }],
           });
           systemPreface.length = 0;
         }
 
         out.push({
-          role: 'user',
-          parts: [{ text: m.content ?? '' }],
+          role: "user",
+          parts: [{ text: m.content ?? "" }],
         });
         continue;
       }
 
-      if (m.role === 'assistant') {
+      if (m.role === "assistant") {
         const parts: GeminiPart[] = [];
         if (m.content) parts.push({ text: m.content });
 
@@ -338,33 +365,39 @@ export class GeminiPromptAdapterService {
 
         // If there's no content and no tool calls, keep deterministic empty model message only if not dropping empties
         if (parts.length === 0 && !this.cfg.dropEmptyMessages) {
-          parts.push({ text: '' });
+          parts.push({ text: "" });
         }
 
-        out.push({ role: 'model', parts });
+        out.push({ role: "model", parts });
         continue;
       }
 
-      if (m.role === 'tool') {
+      if (m.role === "tool") {
         // Tools results are represented as functionResponse parts
         if (m.toolResult) {
-          out.push(this.toolResultToGeminiContent({ toolResult: m.toolResult }));
+          out.push(
+            this.toolResultToGeminiContent({ toolResult: m.toolResult }),
+          );
         } else {
           // deterministic fallback: represent as empty user content
-          out.push({ role: 'user', parts: [{ text: '' }] });
+          out.push({ role: "user", parts: [{ text: "" }] });
         }
         continue;
       }
 
       // Unknown roles: fold as user text deterministically
-      out.push({ role: 'user', parts: [{ text: m.content ?? '' }] });
+      out.push({ role: "user", parts: [{ text: m.content ?? "" }] });
     }
 
     // If legacy systemPreface never got injected (no user message), inject once at end
-    if (!this.cfg.useSystemInstruction && this.cfg.foldSystemAndDeveloperIntoUser && systemPreface.length > 0) {
+    if (
+      !this.cfg.useSystemInstruction &&
+      this.cfg.foldSystemAndDeveloperIntoUser &&
+      systemPreface.length > 0
+    ) {
       out.push({
-        role: 'user',
-        parts: [{ text: systemPreface.join('\n\n') }],
+        role: "user",
+        parts: [{ text: systemPreface.join("\n\n") }],
       });
     }
 
@@ -376,12 +409,13 @@ export class GeminiPromptAdapterService {
   private buildToolSchema(registry?: ToolRegistry): GeminiToolSchema | null {
     if (!registry?.tools?.length) return null;
 
-    const tools = this.cfg.toolDeclarationOrder === 'alpha'
-      ? [...registry.tools].sort((a, b) => a.name.localeCompare(b.name))
-      : registry.tools;
+    const tools =
+      this.cfg.toolDeclarationOrder === "alpha"
+        ? [...registry.tools].sort((a, b) => a.name.localeCompare(b.name))
+        : registry.tools;
 
     return {
-      functionDeclarations: tools.map(t => ({
+      functionDeclarations: tools.map((t) => ({
         name: t.name,
         description: t.description,
         parameters: (t.inputSchema ?? {}) as Record<string, unknown>,
@@ -391,15 +425,19 @@ export class GeminiPromptAdapterService {
 
   /* ------------------------- generation config ------------------------- */
 
-  private buildGenerationConfig(sampling?: LLMSampling): GeminiGenerationConfig | undefined {
+  private buildGenerationConfig(
+    sampling?: LLMSampling,
+  ): GeminiGenerationConfig | undefined {
     if (!sampling) return undefined;
 
     // Gemini supports temperature/topP/maxOutputTokens. Keep minimal and deterministic.
     const out: GeminiGenerationConfig = {};
 
-    if (isFiniteNumber(sampling.temperature)) out.temperature = sampling.temperature;
+    if (isFiniteNumber(sampling.temperature))
+      out.temperature = sampling.temperature;
     if (isFiniteNumber(sampling.topP)) out.topP = sampling.topP;
-    if (isFiniteNumber(sampling.maxOutputTokens)) out.maxOutputTokens = sampling.maxOutputTokens;
+    if (isFiniteNumber(sampling.maxOutputTokens))
+      out.maxOutputTokens = sampling.maxOutputTokens;
 
     // Ignore presencePenalty/frequencyPenalty/seed unless you explicitly support them in your Gemini config layer.
     return out;
@@ -407,21 +445,28 @@ export class GeminiPromptAdapterService {
 
   /* ------------------------- function call normalization ------------------------- */
 
-  private normalizeFunctionCall(name: string, args: Record<string, unknown>): ProviderToolCall {
+  private normalizeFunctionCall(
+    name: string,
+    args: Record<string, unknown>,
+  ): ProviderToolCall {
     // Gemini provider tool call representation
     // Note: ProviderToolCall for google has no explicit callId slot.
     // If you need callId tracking, store it in args or meta upstream.
     // Here we optionally add a deterministic callId into args under a reserved key.
     if (this.cfg.deterministicToolCallIds) {
-      const callId = deterministicToolCallId(name, args, this.cfg.toolCallIdSalt ?? '');
+      const callId = deterministicToolCallId(
+        name,
+        args,
+        this.cfg.toolCallIdSalt ?? "",
+      );
       // Do not overwrite if already present
-      if (!Object.prototype.hasOwnProperty.call(args, '__callId')) {
+      if (!Object.prototype.hasOwnProperty.call(args, "__callId")) {
         args = { ...args, __callId: callId };
       }
     }
 
     return {
-      provider: 'google',
+      provider: "google",
       name,
       args,
     };
@@ -432,9 +477,11 @@ export class GeminiPromptAdapterService {
   private enforceMaxBytes(payload: GeminiRequestPayload): void {
     if (!this.cfg.maxRequestBytes) return;
     const raw = JSON.stringify(payload);
-    const bytes = Buffer.byteLength(raw, 'utf8');
+    const bytes = Buffer.byteLength(raw, "utf8");
     if (bytes > this.cfg.maxRequestBytes) {
-      throw new Error(`GEMINI_REQUEST_TOO_LARGE:${bytes}:${this.cfg.maxRequestBytes}`);
+      throw new Error(
+        `GEMINI_REQUEST_TOO_LARGE:${bytes}:${this.cfg.maxRequestBytes}`,
+      );
     }
   }
 }
@@ -442,15 +489,15 @@ export class GeminiPromptAdapterService {
 /* ------------------------- type guards + utils ------------------------- */
 
 function isTextPart(p: GeminiPart): p is GeminiPartText {
-  return typeof (p as any)?.text === 'string';
+  return typeof (p as any)?.text === "string";
 }
 
 function isFunctionCallPart(p: GeminiPart): p is GeminiPartFunctionCall {
-  return typeof (p as any)?.functionCall?.name === 'string';
+  return typeof (p as any)?.functionCall?.name === "string";
 }
 
 function isEffectivelyEmpty(m: LLMMessage): boolean {
-  const c = (m.content ?? '').trim();
+  const c = (m.content ?? "").trim();
   const hasToolCalls = !!m.toolCalls?.length;
   const hasToolResult = !!m.toolResult;
   // A message is "empty" only if it has no content and no tool-related payloads
@@ -458,7 +505,7 @@ function isEffectivelyEmpty(m: LLMMessage): boolean {
 }
 
 function isFiniteNumber(x: unknown): x is number {
-  return typeof x === 'number' && Number.isFinite(x);
+  return typeof x === "number" && Number.isFinite(x);
 }
 
 function safeJsonParse(s: string): any | null {
@@ -469,19 +516,23 @@ function safeJsonParse(s: string): any | null {
   }
 }
 
-function deterministicToolCallId(name: string, args: Record<string, unknown>, salt: string): string {
+function deterministicToolCallId(
+  name: string,
+  args: Record<string, unknown>,
+  salt: string,
+): string {
   const stableArgs = sortKeysDeep(args);
-  const h = crypto.createHash('sha256');
+  const h = crypto.createHash("sha256");
   h.update(salt);
-  h.update('|');
+  h.update("|");
   h.update(name);
-  h.update('|');
+  h.update("|");
   h.update(JSON.stringify(stableArgs));
-  return h.digest('hex').slice(0, 24);
+  return h.digest("hex").slice(0, 24);
 }
 
 function sortKeysDeep<T>(x: T): T {
-  if (x === null || typeof x !== 'object') return x;
+  if (x === null || typeof x !== "object") return x;
   if (Array.isArray(x)) return x.map(sortKeysDeep) as unknown as T;
 
   const obj = x as Record<string, unknown>;

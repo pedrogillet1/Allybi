@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken';
-import { config } from '../config/env';
+import jwt from "jsonwebtoken";
+import { config } from "../config/env";
 
 export interface AdminJWTPayload {
   adminId: string;
@@ -22,24 +22,30 @@ export const generateAdminRefreshToken = (payload: AdminJWTPayload): string => {
 
 export const verifyAdminAccessToken = (token: string): AdminJWTPayload => {
   try {
-    const decoded = jwt.verify(token, config.JWT_ADMIN_ACCESS_SECRET) as AdminJWTPayload;
+    const decoded = jwt.verify(
+      token,
+      config.JWT_ADMIN_ACCESS_SECRET,
+    ) as AdminJWTPayload;
     if (decoded.isAdmin !== true) {
-      throw new Error('Not an admin token');
+      throw new Error("Not an admin token");
     }
     return decoded;
   } catch (error) {
-    throw new Error('Invalid or expired admin access token');
+    throw new Error("Invalid or expired admin access token");
   }
 };
 
 export const verifyAdminRefreshToken = (token: string): AdminJWTPayload => {
   try {
-    const decoded = jwt.verify(token, config.JWT_ADMIN_REFRESH_SECRET) as AdminJWTPayload;
+    const decoded = jwt.verify(
+      token,
+      config.JWT_ADMIN_REFRESH_SECRET,
+    ) as AdminJWTPayload;
     if (decoded.isAdmin !== true) {
-      throw new Error('Not an admin token');
+      throw new Error("Not an admin token");
     }
     return decoded;
   } catch (error) {
-    throw new Error('Invalid or expired admin refresh token');
+    throw new Error("Invalid or expired admin refresh token");
   }
 };

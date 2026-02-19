@@ -15,8 +15,8 @@
  * - This file should only generate *internal* prompt scaffolding.
  */
 
-import crypto from 'crypto';
-import type { ToolDefinition, ToolRegistry } from './llmTools.types';
+import crypto from "crypto";
+import type { ToolDefinition, ToolRegistry } from "./llmTools.types";
 
 export interface ToolPromptBuilderConfig {
   /**
@@ -25,7 +25,7 @@ export interface ToolPromptBuilderConfig {
    * - 'alpha': sort by tool name
    * - 'category_alpha': sort by category, then name
    */
-  order: 'registry' | 'alpha' | 'category_alpha';
+  order: "registry" | "alpha" | "category_alpha";
 
   /**
    * Maximum tools to include in the prompt block (safety).
@@ -74,53 +74,76 @@ export interface ToolPromptBlock {
   included: Array<{ id: string; name: string }>;
 }
 
-export function buildToolPromptBlock(registry: ToolRegistry | undefined, cfg: ToolPromptBuilderConfig): ToolPromptBlock {
+export function buildToolPromptBlock(
+  registry: ToolRegistry | undefined,
+  cfg: ToolPromptBuilderConfig,
+): ToolPromptBlock {
   const tools = registry?.tools ?? [];
-  const ordered = orderTools(tools, cfg.order).slice(0, Math.max(0, cfg.maxToolsInPrompt));
+  const ordered = orderTools(tools, cfg.order).slice(
+    0,
+    Math.max(0, cfg.maxToolsInPrompt),
+  );
 
-  const included = ordered.map(t => ({ id: t.id, name: t.name }));
+  const included = ordered.map((t) => ({ id: t.id, name: t.name }));
 
   const lines: string[] = [];
-  lines.push('## Tool Use (Internal)');
-  lines.push('You may call tools when needed to complete the task. Use tools only when required.');
-  lines.push('Return tool calls in the provider-native tool-call format when supported.');
-  lines.push('');
+  lines.push("## Tool Use (Internal)");
+  lines.push(
+    "You may call tools when needed to complete the task. Use tools only when required.",
+  );
+  lines.push(
+    "Return tool calls in the provider-native tool-call format when supported.",
+  );
+  lines.push("");
 
-  lines.push('### Available tools');
+  lines.push("### Available tools");
   for (const t of ordered) {
     lines.push(renderToolLine(t, cfg));
   }
 
   if (cfg.includeGenericCallEnvelopeExample) {
-    lines.push('');
-    lines.push('### Generic tool-call envelope (for pattern learning)');
-    lines.push('If a tool call must be represented in plain text, use this strict JSON shape:');
-    lines.push('```json');
+    lines.push("");
+    lines.push("### Generic tool-call envelope (for pattern learning)");
+    lines.push(
+      "If a tool call must be represented in plain text, use this strict JSON shape:",
+    );
+    lines.push("```json");
     lines.push(
       JSON.stringify(
         {
           tool_call: {
-            name: '<tool_name>',
-            args: { '<key>': '<value>' },
+            name: "<tool_name>",
+            args: { "<key>": "<value>" },
           },
         },
         null,
-        2
-      )
+        2,
+      ),
     );
-    lines.push('```');
-    lines.push('Only emit the envelope when the provider does not support native tool calls.');
+    lines.push("```");
+    lines.push(
+      "Only emit the envelope when the provider does not support native tool calls.",
+    );
   }
 
-  const text = lines.join('\n');
-  const blockId = sha256((cfg.salt ?? '') + '|' + stableStringify(included) + '|' + String(cfg.includeSchemas));
+  const text = lines.join("\n");
+  const blockId = sha256(
+    (cfg.salt ?? "") +
+      "|" +
+      stableStringify(included) +
+      "|" +
+      String(cfg.includeSchemas),
+  );
 
   return { text, blockId: blockId.slice(0, 24), included };
 }
 
 /* ------------------------- render helpers ------------------------- */
 
-function renderToolLine(t: ToolDefinition, cfg: ToolPromptBuilderConfig): string {
+function renderToolLine(
+  t: ToolDefinition,
+  cfg: ToolPromptBuilderConfig,
+): string {
   const parts: string[] = [];
 
   // Base line
@@ -130,31 +153,37 @@ function renderToolLine(t: ToolDefinition, cfg: ToolPromptBuilderConfig): string
   if (cfg.includePolicyHints) {
     const p = t.policy;
     parts.push(
-      `  - policy: enabled=${p.enabled}, maxCallsPerTurn=${p.maxCallsPerTurn}, timeoutMs=${p.timeoutMs}, allowedUnderDocLock=${p.allowedUnderDocLock}, discoveryException=${p.discoveryException}, requiresMasking=${p.requiresMasking}`
+      `  - policy: enabled=${p.enabled}, maxCallsPerTurn=${p.maxCallsPerTurn}, timeoutMs=${p.timeoutMs}, allowedUnderDocLock=${p.allowedUnderDocLock}, discoveryException=${p.discoveryException}, requiresMasking=${p.requiresMasking}`,
     );
   }
 
   // Schema
   if (cfg.includeSchemas) {
-    const schema = truncate(stableStringify(t.inputSchema ?? {}), cfg.maxSchemaCharsPerTool);
+    const schema = truncate(
+      stableStringify(t.inputSchema ?? {}),
+      cfg.maxSchemaCharsPerTool,
+    );
     parts.push(`  - inputSchema: \`${schema}\``);
   }
 
-  return parts.join('\n');
+  return parts.join("\n");
 }
 
 function oneLine(s: string): string {
-  return String(s ?? '')
-    .replace(/\s+/g, ' ')
+  return String(s ?? "")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
 /* ------------------------- ordering ------------------------- */
 
-function orderTools(tools: ToolDefinition[], mode: ToolPromptBuilderConfig['order']): ToolDefinition[] {
-  if (mode === 'registry') return [...tools];
+function orderTools(
+  tools: ToolDefinition[],
+  mode: ToolPromptBuilderConfig["order"],
+): ToolDefinition[] {
+  if (mode === "registry") return [...tools];
 
-  if (mode === 'alpha') {
+  if (mode === "alpha") {
     return [...tools].sort((a, b) => a.name.localeCompare(b.name));
   }
 
@@ -176,18 +205,18 @@ function normalizeJson(x: unknown): unknown {
   if (x === null) return null;
 
   const t = typeof x;
-  if (t === 'string' || t === 'number' || t === 'boolean') return x;
-  if (t === 'bigint') return x.toString();
-  if (t === 'undefined' || t === 'function' || t === 'symbol') return null;
+  if (t === "string" || t === "number" || t === "boolean") return x;
+  if (t === "bigint") return x.toString();
+  if (t === "undefined" || t === "function" || t === "symbol") return null;
 
   if (Array.isArray(x)) return x.map(normalizeJson);
 
-  if (t === 'object') {
+  if (t === "object") {
     const obj = x as Record<string, unknown>;
     const out: Record<string, unknown> = {};
     for (const k of Object.keys(obj)) {
       const v = obj[k];
-      if (typeof v === 'undefined') continue;
+      if (typeof v === "undefined") continue;
       out[k] = normalizeJson(v);
     }
     return out;
@@ -199,7 +228,7 @@ function normalizeJson(x: unknown): unknown {
 function sortKeysDeep(x: unknown): unknown {
   if (x === null) return null;
   if (Array.isArray(x)) return x.map(sortKeysDeep);
-  if (typeof x !== 'object') return x;
+  if (typeof x !== "object") return x;
 
   const obj = x as Record<string, unknown>;
   const keys = Object.keys(obj).sort();
@@ -209,11 +238,11 @@ function sortKeysDeep(x: unknown): unknown {
 }
 
 function sha256(s: string): string {
-  return crypto.createHash('sha256').update(s, 'utf8').digest('hex');
+  return crypto.createHash("sha256").update(s, "utf8").digest("hex");
 }
 
 function truncate(s: string, n: number): string {
-  if (n <= 0) return '';
+  if (n <= 0) return "";
   if (s.length <= n) return s;
-  return s.slice(0, n) + '…';
+  return s.slice(0, n) + "…";
 }

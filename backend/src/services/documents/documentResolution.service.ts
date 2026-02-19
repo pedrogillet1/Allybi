@@ -3,13 +3,13 @@
  * Handles "this document", "the PDF", file name matching, etc.
  */
 
-import { injectable } from 'tsyringe';
+import { injectable } from "tsyringe";
 
 export interface ResolvedDocument {
   documentId: string;
   documentName: string;
   confidence: number;
-  matchType: 'exact' | 'fuzzy' | 'contextual';
+  matchType: "exact" | "fuzzy" | "contextual";
 }
 
 @injectable()
@@ -20,18 +20,23 @@ export class DocumentResolutionService {
   async resolveReferences(
     query: string,
     userId: string,
-    conversationContext?: unknown
+    conversationContext?: unknown,
   ): Promise<ResolvedDocument[]> {
     // TODO: Implement document reference resolution
-    throw new Error('DocumentResolutionService.resolveReferences not implemented');
+    throw new Error(
+      "DocumentResolutionService.resolveReferences not implemented",
+    );
   }
 
   /**
    * Match document by name or alias
    */
-  async matchByName(name: string, userId: string): Promise<ResolvedDocument | null> {
+  async matchByName(
+    name: string,
+    userId: string,
+  ): Promise<ResolvedDocument | null> {
     // TODO: Implement name matching with fuzzy search
-    throw new Error('DocumentResolutionService.matchByName not implemented');
+    throw new Error("DocumentResolutionService.matchByName not implemented");
   }
 
   /**
@@ -39,9 +44,11 @@ export class DocumentResolutionService {
    */
   async resolveContextualReference(
     reference: string,
-    conversationContext: unknown
+    conversationContext: unknown,
   ): Promise<ResolvedDocument | null> {
     // TODO: Implement contextual resolution
-    throw new Error('DocumentResolutionService.resolveContextualReference not implemented');
+    throw new Error(
+      "DocumentResolutionService.resolveContextualReference not implemented",
+    );
   }
 }

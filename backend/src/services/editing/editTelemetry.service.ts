@@ -6,7 +6,12 @@ import { TelemetryService } from "../telemetry/telemetry.service";
 import { redactText, stableObjectHash } from "../telemetry/telemetry.redaction";
 import type { EditTelemetry } from "./editing.types";
 
-type EditTelemetryEvent = "edit_planned" | "edit_previewed" | "edit_applied" | "edit_failed" | "edit_noop";
+type EditTelemetryEvent =
+  | "edit_planned"
+  | "edit_previewed"
+  | "edit_applied"
+  | "edit_failed"
+  | "edit_noop";
 
 function safeNumber(x: unknown): number | null {
   if (typeof x !== "number") return null;
@@ -40,11 +45,14 @@ export class EditTelemetryService implements EditTelemetry {
       salt?: string;
     },
   ) {
-    this.enabled = opts?.enabled ?? (process.env.TELEMETRY_ENABLED === "true");
+    this.enabled = opts?.enabled ?? process.env.TELEMETRY_ENABLED === "true";
     this.salt = opts?.salt ?? process.env.TELEMETRY_HASH_SALT ?? "dev-salt";
   }
 
-  async track(event: EditTelemetryEvent, payload: Record<string, unknown>): Promise<void> {
+  async track(
+    event: EditTelemetryEvent,
+    payload: Record<string, unknown>,
+  ): Promise<void> {
     if (!this.enabled) return;
 
     // Hard rule: do not persist raw bodies/tokens; only hashed signatures and numeric metrics.
@@ -63,9 +71,12 @@ export class EditTelemetryService implements EditTelemetry {
     const confidence = safeNumber(payload.confidence);
     const decisionMargin = safeNumber(payload.decisionMargin);
     const similarity = safeNumber(payload.similarity);
-    const preservePass = typeof payload.preservePass === "boolean" ? payload.preservePass : null;
+    const preservePass =
+      typeof payload.preservePass === "boolean" ? payload.preservePass : null;
     const requiresConfirmation =
-      typeof payload.requiresConfirmation === "boolean" ? payload.requiresConfirmation : null;
+      typeof payload.requiresConfirmation === "boolean"
+        ? payload.requiresConfirmation
+        : null;
     const missingRequiredEntities = safeNumber(payload.missingRequiredEntities);
 
     const error = safeString(payload.error, 240);
@@ -107,7 +118,11 @@ export class EditTelemetryService implements EditTelemetry {
     // Optional DB telemetry: write a generic UsageEvent (fail-open).
     // This intentionally avoids adding new Prisma models/enum values.
     // If your schema later adds a dedicated EditTelemetry table, switch this over.
-    if (this.telemetry && this.prisma && supportsModel(this.prisma, "usageEvent")) {
+    if (
+      this.telemetry &&
+      this.prisma &&
+      supportsModel(this.prisma, "usageEvent")
+    ) {
       const meta = {
         kind: "editing",
         event,
@@ -126,7 +141,9 @@ export class EditTelemetryService implements EditTelemetry {
         correlationId,
         clientMessageId,
         // Store only redacted error text for aggregation.
-        error: error ? redactText(error, { salt: this.salt, allowPreview: false }).hash : null,
+        error: error
+          ? redactText(error, { salt: this.salt, allowPreview: false }).hash
+          : null,
       };
 
       // Use an existing eventType to avoid enum mismatch breaking writes; telemetry service is fail-open anyway.

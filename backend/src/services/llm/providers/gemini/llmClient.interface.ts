@@ -1,2 +1,2 @@
 // Re-export from canonical location
-export * from '../../core/llmClient.interface';
+export * from "../../core/llmClient.interface";

@@ -1,17 +1,17 @@
 // file: src/analytics/rollups/dailyRollup.job.ts
 // Daily metrics rollup job - computes daily aggregates from telemetry tables
 
-import { PrismaClient } from '@prisma/client';
-import { percentile } from '../calculators/latency.calculator';
+import { PrismaClient } from "@prisma/client";
+import { percentile } from "../calculators/latency.calculator";
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────────────────────
 
 export interface DailyRollupOptions {
-  backfillDays?: number;       // Default: 3 days
-  maxBucketsPerRun?: number;   // Default: 14 buckets
-  dryRun?: boolean;            // Log only, don't write
+  backfillDays?: number; // Default: 3 days
+  maxBucketsPerRun?: number; // Default: 14 buckets
+  dryRun?: boolean; // Log only, don't write
 }
 
 export interface DailyMetrics {
@@ -92,7 +92,7 @@ function generateDayBuckets(start: Date, end: Date): Date[] {
 // ADVISORY LOCK
 // ─────────────────────────────────────────────────────────────
 
-const LOCK_KEY = 'koda:analytics:daily';
+const LOCK_KEY = "koda:analytics:daily";
 
 async function tryAcquireLock(prisma: PrismaClient): Promise<boolean> {
   const result = await prisma.$queryRaw<{ locked: boolean }[]>`
@@ -114,7 +114,7 @@ async function releaseLock(prisma: PrismaClient): Promise<void> {
 async function computeDailyMetrics(
   prisma: PrismaClient,
   bucketStart: Date,
-  bucketEnd: Date
+  bucketEnd: Date,
 ): Promise<DailyMetrics> {
   // Initialize with zeros
   const metrics: DailyMetrics = {
@@ -169,7 +169,9 @@ async function computeDailyMetrics(
   metrics.messages = Number(messagesResult[0]?.count || 0);
 
   // ─── Queries (from QueryTelemetry) ───
-  const queriesResult = await prisma.$queryRaw<{ count: bigint; weak: bigint }[]>`
+  const queriesResult = await prisma.$queryRaw<
+    { count: bigint; weak: bigint }[]
+  >`
     SELECT
       COUNT(*) as count,
       COUNT(*) FILTER (WHERE "hadFallback" = true OR "retrievalAdequate" = false) as weak
@@ -178,9 +180,8 @@ async function computeDailyMetrics(
   `;
   metrics.queries = Number(queriesResult[0]?.count || 0);
   metrics.weakEvidenceCount = Number(queriesResult[0]?.weak || 0);
-  metrics.weakEvidenceRate = metrics.queries > 0
-    ? metrics.weakEvidenceCount / metrics.queries
-    : 0;
+  metrics.weakEvidenceRate =
+    metrics.queries > 0 ? metrics.weakEvidenceCount / metrics.queries : 0;
 
   // ─── Documents Uploaded (from UsageEvent) ───
   const docsResult = await prisma.$queryRaw<{ count: bigint }[]>`
@@ -192,11 +193,13 @@ async function computeDailyMetrics(
   metrics.documentsUploaded = Number(docsResult[0]?.count || 0);
 
   // ─── API Performance (from APIPerformanceLog) ───
-  const apiResult = await prisma.$queryRaw<{
-    total: bigint;
-    errors: bigint;
-    latencies: number[];
-  }[]>`
+  const apiResult = await prisma.$queryRaw<
+    {
+      total: bigint;
+      errors: bigint;
+      latencies: number[];
+    }[]
+  >`
     SELECT
       COUNT(*) as total,
       COUNT(*) FILTER (WHERE "statusCode" >= 500 OR "rateLimitHit" = true) as errors,
@@ -207,25 +210,30 @@ async function computeDailyMetrics(
 
   metrics.apiRequests = Number(apiResult[0]?.total || 0);
   metrics.apiErrorCount = Number(apiResult[0]?.errors || 0);
-  metrics.apiErrorRate = metrics.apiRequests > 0
-    ? metrics.apiErrorCount / metrics.apiRequests
-    : 0;
+  metrics.apiErrorRate =
+    metrics.apiRequests > 0 ? metrics.apiErrorCount / metrics.apiRequests : 0;
 
-  const latencies = (apiResult[0]?.latencies || []).filter(l => l != null && l > 0);
+  const latencies = (apiResult[0]?.latencies || []).filter(
+    (l) => l != null && l > 0,
+  );
   if (latencies.length > 0) {
     latencies.sort((a, b) => a - b);
-    metrics.avgLatencyMs = Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length);
+    metrics.avgLatencyMs = Math.round(
+      latencies.reduce((a, b) => a + b, 0) / latencies.length,
+    );
     metrics.p50LatencyMs = Math.round(percentile(latencies, 50) || 0);
     metrics.p95LatencyMs = Math.round(percentile(latencies, 95) || 0);
   }
 
   // ─── LLM Usage (from TokenUsage) ───
-  const llmResult = await prisma.$queryRaw<{
-    calls: bigint;
-    cost: number;
-    tokensIn: bigint;
-    tokensOut: bigint;
-  }[]>`
+  const llmResult = await prisma.$queryRaw<
+    {
+      calls: bigint;
+      cost: number;
+      tokensIn: bigint;
+      tokensOut: bigint;
+    }[]
+  >`
     SELECT
       COUNT(*) as calls,
       COALESCE(SUM("totalCost"), 0) as cost,
@@ -242,10 +250,12 @@ async function computeDailyMetrics(
   metrics.llmTokensOut = Number(llmResult[0]?.tokensOut || 0);
 
   // ─── Failures (from ErrorLog) ───
-  const failuresResult = await prisma.$queryRaw<{
-    preview: bigint;
-    ingestion: bigint;
-  }[]>`
+  const failuresResult = await prisma.$queryRaw<
+    {
+      preview: bigint;
+      ingestion: bigint;
+    }[]
+  >`
     SELECT
       COUNT(*) FILTER (WHERE "errorType" ILIKE '%preview%') as preview,
       COUNT(*) FILTER (WHERE "errorType" ILIKE '%ingestion%' OR "errorType" ILIKE '%processing%') as ingestion
@@ -265,7 +275,7 @@ async function computeDailyMetrics(
 
 async function upsertDailyMetrics(
   prisma: PrismaClient,
-  metrics: DailyMetrics
+  metrics: DailyMetrics,
 ): Promise<void> {
   // Upsert into DailyAnalyticsAggregate (existing Prisma model)
   await prisma.dailyAnalyticsAggregate.upsert({
@@ -283,7 +293,10 @@ async function upsertDailyMetrics(
       totalInputTokens: metrics.llmTokensIn,
       totalOutputTokens: metrics.llmTokensOut,
       totalTokenCost: metrics.llmCostUsd,
-      totalErrors: metrics.apiErrorCount + metrics.previewFailures + metrics.ingestionFailures,
+      totalErrors:
+        metrics.apiErrorCount +
+        metrics.previewFailures +
+        metrics.ingestionFailures,
     },
     update: {
       activeUsers: metrics.activeUsers,
@@ -297,7 +310,10 @@ async function upsertDailyMetrics(
       totalInputTokens: metrics.llmTokensIn,
       totalOutputTokens: metrics.llmTokensOut,
       totalTokenCost: metrics.llmCostUsd,
-      totalErrors: metrics.apiErrorCount + metrics.previewFailures + metrics.ingestionFailures,
+      totalErrors:
+        metrics.apiErrorCount +
+        metrics.previewFailures +
+        metrics.ingestionFailures,
     },
   });
 }
@@ -308,7 +324,7 @@ async function upsertDailyMetrics(
 
 export async function runDailyRollup(
   prisma: PrismaClient,
-  opts?: DailyRollupOptions
+  opts?: DailyRollupOptions,
 ): Promise<RollupResult> {
   const startTime = Date.now();
   const backfillDays = opts?.backfillDays ?? 3;
@@ -328,7 +344,9 @@ export async function runDailyRollup(
   // Acquire advisory lock
   const gotLock = await tryAcquireLock(prisma);
   if (!gotLock) {
-    result.errors.push('Failed to acquire advisory lock - another instance may be running');
+    result.errors.push(
+      "Failed to acquire advisory lock - another instance may be running",
+    );
     result.durationMs = Date.now() - startTime;
     return result;
   }
@@ -366,7 +384,11 @@ export async function runDailyRollup(
       const bucketEnd = addDays(bucketStart, 1);
 
       try {
-        const metrics = await computeDailyMetrics(prisma, bucketStart, bucketEnd);
+        const metrics = await computeDailyMetrics(
+          prisma,
+          bucketStart,
+          bucketEnd,
+        );
 
         if (!dryRun) {
           await upsertDailyMetrics(prisma, metrics);
@@ -375,7 +397,9 @@ export async function runDailyRollup(
 
         result.bucketsProcessed++;
       } catch (err: any) {
-        result.errors.push(`Bucket ${formatDay(bucketStart)}: ${err.message || 'unknown error'}`);
+        result.errors.push(
+          `Bucket ${formatDay(bucketStart)}: ${err.message || "unknown error"}`,
+        );
         // Continue to next bucket
       }
     }

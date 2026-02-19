@@ -1,25 +1,60 @@
 import { extractChartDataFromRange } from "./spreadsheetModel.charts";
-import { clearAutoFilterRange, setAutoFilterRange } from "./spreadsheetModel.sortFilter";
+import {
+  clearAutoFilterRange,
+  setAutoFilterRange,
+} from "./spreadsheetModel.sortFilter";
 import { mergeStyleModels, registerStyle } from "./spreadsheetModel.style";
 import { upsertTable } from "./spreadsheetModel.table";
 import { setConditionalFormat } from "./spreadsheetModel.conditionalFormat";
-import { clearValidationRule, setValidationRule } from "./spreadsheetModel.validation";
-import { cellKey, forEachCellInRange, formatCellRef, formatRangeA1, parseA1Range, parseCellKey } from "./spreadsheetModel.range";
+import {
+  clearValidationRule,
+  setValidationRule,
+} from "./spreadsheetModel.validation";
+import {
+  cellKey,
+  forEachCellInRange,
+  formatCellRef,
+  formatRangeA1,
+  parseA1Range,
+  parseCellKey,
+} from "./spreadsheetModel.range";
 import { validatePatchOps } from "./spreadsheetModel.patch.validate";
-import { coerceScalarToTypedValue, normalizeFormula } from "./spreadsheetModel.valueCoercion";
-import type { PatchApplyResult, PatchApplyStatus, PatchOp } from "./spreadsheetModel.patch.types";
-import type { CellModel, SheetModel, SpreadsheetModel, SortKey } from "./spreadsheetModel.types";
+import {
+  coerceScalarToTypedValue,
+  normalizeFormula,
+} from "./spreadsheetModel.valueCoercion";
+import type {
+  PatchApplyResult,
+  PatchApplyStatus,
+  PatchOp,
+} from "./spreadsheetModel.patch.types";
+import type {
+  CellModel,
+  SheetModel,
+  SpreadsheetModel,
+  SortKey,
+} from "./spreadsheetModel.types";
 
 function cloneModel<T>(input: T): T {
   return JSON.parse(JSON.stringify(input));
 }
 
-function getSheetByName(model: SpreadsheetModel, sheetName: string): SheetModel | undefined {
-  const needle = String(sheetName || "").trim().toLowerCase();
-  return model.sheets.find((sheet) => sheet.name.trim().toLowerCase() === needle);
+function getSheetByName(
+  model: SpreadsheetModel,
+  sheetName: string,
+): SheetModel | undefined {
+  const needle = String(sheetName || "")
+    .trim()
+    .toLowerCase();
+  return model.sheets.find(
+    (sheet) => sheet.name.trim().toLowerCase() === needle,
+  );
 }
 
-function ensureSheetByName(model: SpreadsheetModel, sheetName: string): SheetModel {
+function ensureSheetByName(
+  model: SpreadsheetModel,
+  sheetName: string,
+): SheetModel {
   const out = getSheetByName(model, sheetName);
   if (!out) throw new Error(`Sheet not found: ${sheetName}`);
   return out;
@@ -30,7 +65,12 @@ function bumpGridBounds(sheet: SheetModel, row: number, col: number): void {
   sheet.grid.maxCol = Math.max(Number(sheet.grid.maxCol || 0), col);
 }
 
-function setCellValuePreserveStyle(sheet: SheetModel, row: number, col: number, value: unknown): boolean {
+function setCellValuePreserveStyle(
+  sheet: SheetModel,
+  row: number,
+  col: number,
+  value: unknown,
+): boolean {
   const key = cellKey(row, col);
   const prev = sheet.cells[key] || {};
   const next: CellModel = { ...prev };
@@ -46,7 +86,12 @@ function setCellValuePreserveStyle(sheet: SheetModel, row: number, col: number, 
   return changed;
 }
 
-function setCellFormulaPreserveStyle(sheet: SheetModel, row: number, col: number, formula: string): boolean {
+function setCellFormulaPreserveStyle(
+  sheet: SheetModel,
+  row: number,
+  col: number,
+  formula: string,
+): boolean {
   const key = cellKey(row, col);
   const prev = sheet.cells[key] || {};
   const next: CellModel = { ...prev, f: normalizeFormula(formula) };
@@ -57,7 +102,11 @@ function setCellFormulaPreserveStyle(sheet: SheetModel, row: number, col: number
   return changed;
 }
 
-function clearCellContent(sheet: SheetModel, row: number, col: number): boolean {
+function clearCellContent(
+  sheet: SheetModel,
+  row: number,
+  col: number,
+): boolean {
   const key = cellKey(row, col);
   const prev = sheet.cells[key];
   if (!prev) return false;
@@ -73,7 +122,12 @@ function clearCellContent(sheet: SheetModel, row: number, col: number): boolean 
   return true;
 }
 
-function setNumberFormat(sheet: SheetModel, row: number, col: number, format: string): boolean {
+function setNumberFormat(
+  sheet: SheetModel,
+  row: number,
+  col: number,
+  format: string,
+): boolean {
   const key = cellKey(row, col);
   const prev = sheet.cells[key] || {};
   const next: CellModel = { ...prev, nf: String(format || "").trim() };
@@ -98,11 +152,20 @@ function clearFormatting(sheet: SheetModel, row: number, col: number): boolean {
   return true;
 }
 
-function setStyle(sheet: SheetModel, model: SpreadsheetModel, row: number, col: number, patch: PatchOp & { op: "SET_STYLE" }): boolean {
+function setStyle(
+  sheet: SheetModel,
+  model: SpreadsheetModel,
+  row: number,
+  col: number,
+  patch: PatchOp & { op: "SET_STYLE" },
+): boolean {
   const key = cellKey(row, col);
   const prev = sheet.cells[key] || {};
   const currentStyle = prev.s ? model.styles[prev.s] : null;
-  const nextStyle = patch.merge === "override" ? patch.stylePatch : mergeStyleModels(currentStyle, patch.stylePatch);
+  const nextStyle =
+    patch.merge === "override"
+      ? patch.stylePatch
+      : mergeStyleModels(currentStyle, patch.stylePatch);
   const styleRef = registerStyle(model, nextStyle);
   const next: CellModel = {
     ...prev,
@@ -115,7 +178,12 @@ function setStyle(sheet: SheetModel, model: SpreadsheetModel, row: number, col: 
   return changed;
 }
 
-function shiftRows(sheet: SheetModel, atRow: number, count: number, mode: "insert" | "delete"): boolean {
+function shiftRows(
+  sheet: SheetModel,
+  atRow: number,
+  count: number,
+  mode: "insert" | "delete",
+): boolean {
   const nextCells: Record<string, CellModel> = {};
   let changed = false;
 
@@ -142,13 +210,21 @@ function shiftRows(sheet: SheetModel, atRow: number, count: number, mode: "inser
 
   if (changed) {
     sheet.cells = nextCells;
-    sheet.grid.maxRow = Math.max(1, Number(sheet.grid.maxRow || 1) + (mode === "insert" ? count : -count));
+    sheet.grid.maxRow = Math.max(
+      1,
+      Number(sheet.grid.maxRow || 1) + (mode === "insert" ? count : -count),
+    );
   }
 
   return changed;
 }
 
-function shiftCols(sheet: SheetModel, atCol: number, count: number, mode: "insert" | "delete"): boolean {
+function shiftCols(
+  sheet: SheetModel,
+  atCol: number,
+  count: number,
+  mode: "insert" | "delete",
+): boolean {
   const nextCells: Record<string, CellModel> = {};
   let changed = false;
 
@@ -175,7 +251,10 @@ function shiftCols(sheet: SheetModel, atCol: number, count: number, mode: "inser
 
   if (changed) {
     sheet.cells = nextCells;
-    sheet.grid.maxCol = Math.max(1, Number(sheet.grid.maxCol || 1) + (mode === "insert" ? count : -count));
+    sheet.grid.maxCol = Math.max(
+      1,
+      Number(sheet.grid.maxCol || 1) + (mode === "insert" ? count : -count),
+    );
   }
 
   return changed;
@@ -186,11 +265,16 @@ function valueForSort(cell?: CellModel): string | number {
   if (typeof raw === "number") return raw;
   if (typeof raw === "boolean") return raw ? 1 : 0;
   const asNumber = Number(String(raw ?? "").replace(/,/g, ""));
-  if (Number.isFinite(asNumber) && String(raw ?? "").trim() !== "") return asNumber;
+  if (Number.isFinite(asNumber) && String(raw ?? "").trim() !== "")
+    return asNumber;
   return String(raw ?? "").toLowerCase();
 }
 
-function resolveSortColumn(startCol: number, width: number, key: SortKey): number {
+function resolveSortColumn(
+  startCol: number,
+  width: number,
+  key: SortKey,
+): number {
   if (typeof key.column === "number") {
     const n = Math.trunc(key.column);
     if (n >= 1 && n <= width) return startCol + (n - 1);
@@ -200,13 +284,17 @@ function resolveSortColumn(startCol: number, width: number, key: SortKey): numbe
   if (!text) return startCol;
   if (/^[A-Za-z]+$/.test(text)) {
     let out = 0;
-    for (const ch of text.toUpperCase()) out = out * 26 + (ch.charCodeAt(0) - 64);
+    for (const ch of text.toUpperCase())
+      out = out * 26 + (ch.charCodeAt(0) - 64);
     return Math.max(1, out);
   }
   return startCol;
 }
 
-function sortRange(sheet: SheetModel, op: PatchOp & { op: "SORT_RANGE" }): boolean {
+function sortRange(
+  sheet: SheetModel,
+  op: PatchOp & { op: "SORT_RANGE" },
+): boolean {
   const parsed = parseA1Range(op.range, op.sheet || undefined);
   const width = parsed.end.col - parsed.start.col + 1;
   const hasHeader = op.hasHeader !== false;
@@ -223,7 +311,10 @@ function sortRange(sheet: SheetModel, op: PatchOp & { op: "SORT_RANGE" }): boole
     rows.push({ rowNumber: r, cells });
   }
 
-  const keys = Array.isArray(op.keys) && op.keys.length ? op.keys : [{ column: 1, order: "ASC" as const }];
+  const keys =
+    Array.isArray(op.keys) && op.keys.length
+      ? op.keys
+      : [{ column: 1, order: "ASC" as const }];
   rows.sort((left, right) => {
     for (const key of keys) {
       const col = resolveSortColumn(parsed.start.col, width, key);
@@ -263,7 +354,10 @@ function rangeList(op: { range: string; ranges?: string[] }): string[] {
   return Array.from(new Set(out));
 }
 
-export function applyPatchOpsToSpreadsheetModel(modelInput: SpreadsheetModel, patchOpsInput: PatchOp[]): PatchApplyResult {
+export function applyPatchOpsToSpreadsheetModel(
+  modelInput: SpreadsheetModel,
+  patchOpsInput: PatchOp[],
+): PatchApplyResult {
   const model = cloneModel(modelInput);
   const statuses: PatchApplyStatus[] = [];
   const touchedRanges = new Set<string>();
@@ -288,7 +382,8 @@ export function applyPatchOpsToSpreadsheetModel(modelInput: SpreadsheetModel, pa
       if (op.op === "ADD_SHEET") {
         const name = String(op.name || "").trim();
         if (!name) throw new Error("Sheet name is required");
-        if (getSheetByName(model, name)) throw new Error(`Sheet already exists: ${name}`);
+        if (getSheetByName(model, name))
+          throw new Error(`Sheet already exists: ${name}`);
         model.sheets.push({
           id: `sheet_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
           name,
@@ -303,7 +398,8 @@ export function applyPatchOpsToSpreadsheetModel(modelInput: SpreadsheetModel, pa
         const sheet = ensureSheetByName(model, op.from);
         const target = String(op.to || "").trim();
         if (!target) throw new Error("RENAME_SHEET requires destination name");
-        if (getSheetByName(model, target)) throw new Error(`Sheet already exists: ${target}`);
+        if (getSheetByName(model, target))
+          throw new Error(`Sheet already exists: ${target}`);
         if (sheet.name !== target) {
           sheet.name = target;
           changed = true;
@@ -311,24 +407,50 @@ export function applyPatchOpsToSpreadsheetModel(modelInput: SpreadsheetModel, pa
         }
       } else if (op.op === "DELETE_SHEET") {
         const before = model.sheets.length;
-        model.sheets = model.sheets.filter((sheet) => sheet.name.toLowerCase() !== String(op.name || "").trim().toLowerCase());
+        model.sheets = model.sheets.filter(
+          (sheet) =>
+            sheet.name.toLowerCase() !==
+            String(op.name || "")
+              .trim()
+              .toLowerCase(),
+        );
         changed = model.sheets.length !== before;
         if (changed) changedStructuresCount += 1;
       } else if (op.op === "INSERT_ROWS") {
         const sheet = ensureSheetByName(model, op.sheet);
-        changed = shiftRows(sheet, Math.max(1, Math.trunc(op.atRow)), Math.max(1, Math.trunc(op.count || 1)), "insert");
+        changed = shiftRows(
+          sheet,
+          Math.max(1, Math.trunc(op.atRow)),
+          Math.max(1, Math.trunc(op.count || 1)),
+          "insert",
+        );
         if (changed) changedStructuresCount += 1;
       } else if (op.op === "DELETE_ROWS") {
         const sheet = ensureSheetByName(model, op.sheet);
-        changed = shiftRows(sheet, Math.max(1, Math.trunc(op.atRow)), Math.max(1, Math.trunc(op.count || 1)), "delete");
+        changed = shiftRows(
+          sheet,
+          Math.max(1, Math.trunc(op.atRow)),
+          Math.max(1, Math.trunc(op.count || 1)),
+          "delete",
+        );
         if (changed) changedStructuresCount += 1;
       } else if (op.op === "INSERT_COLUMNS") {
         const sheet = ensureSheetByName(model, op.sheet);
-        changed = shiftCols(sheet, Math.max(1, Math.trunc(op.atCol)), Math.max(1, Math.trunc(op.count || 1)), "insert");
+        changed = shiftCols(
+          sheet,
+          Math.max(1, Math.trunc(op.atCol)),
+          Math.max(1, Math.trunc(op.count || 1)),
+          "insert",
+        );
         if (changed) changedStructuresCount += 1;
       } else if (op.op === "DELETE_COLUMNS") {
         const sheet = ensureSheetByName(model, op.sheet);
-        changed = shiftCols(sheet, Math.max(1, Math.trunc(op.atCol)), Math.max(1, Math.trunc(op.count || 1)), "delete");
+        changed = shiftCols(
+          sheet,
+          Math.max(1, Math.trunc(op.atCol)),
+          Math.max(1, Math.trunc(op.count || 1)),
+          "delete",
+        );
         if (changed) changedStructuresCount += 1;
       } else if (op.op === "CLEAR_FILTER") {
         const sheet = ensureSheetByName(model, op.sheet);
@@ -360,7 +482,10 @@ export function applyPatchOpsToSpreadsheetModel(modelInput: SpreadsheetModel, pa
       } else if (op.op === "CREATE_TABLE") {
         const parsed = parseA1Range(op.range, op.sheet);
         upsertTable(model, {
-          id: String(op.name || `table_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`),
+          id: String(
+            op.name ||
+              `table_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          ),
           sheetName: parsed.sheetName,
           range: formatRangeA1(parsed),
           hasHeader: op.hasHeader !== false,
@@ -370,7 +495,14 @@ export function applyPatchOpsToSpreadsheetModel(modelInput: SpreadsheetModel, pa
         // Apply thin borders to all cells so the live preview shows table outlines
         const tableSheet = ensureSheetByName(model, parsed.sheetName);
         const thinBorder = { style: "thin" };
-        const borderPatch = { border: { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder } };
+        const borderPatch = {
+          border: {
+            top: thinBorder,
+            bottom: thinBorder,
+            left: thinBorder,
+            right: thinBorder,
+          },
+        };
         for (let r = parsed.start.row; r <= parsed.end.row; r++) {
           for (let c = parsed.start.col; c <= parsed.end.col; c++) {
             const k = cellKey(r, c);
@@ -381,7 +513,10 @@ export function applyPatchOpsToSpreadsheetModel(modelInput: SpreadsheetModel, pa
             const extra = isHeader
               ? { font: { bold: true }, fill: { color: "#4472C4" } }
               : {};
-            const merged = mergeStyleModels(currentStyle, { ...borderPatch, ...extra });
+            const merged = mergeStyleModels(currentStyle, {
+              ...borderPatch,
+              ...extra,
+            });
             const ref = registerStyle(model, merged);
             tableSheet.cells[k] = { ...existing, ...(ref ? { s: ref } : {}) };
             bumpGridBounds(tableSheet, r, c);
@@ -398,9 +533,13 @@ export function applyPatchOpsToSpreadsheetModel(modelInput: SpreadsheetModel, pa
       } else if (op.op === "CLEAR_VALIDATION") {
         const parsed = parseA1Range(op.range, op.sheet);
         const sheet = ensureSheetByName(model, parsed.sheetName);
-        const before = Array.isArray(sheet.validations) ? sheet.validations.length : 0;
+        const before = Array.isArray(sheet.validations)
+          ? sheet.validations.length
+          : 0;
         clearValidationRule(sheet, formatRangeA1(parsed));
-        const after = Array.isArray(sheet.validations) ? sheet.validations.length : 0;
+        const after = Array.isArray(sheet.validations)
+          ? sheet.validations.length
+          : 0;
         changed = before !== after;
       } else if (op.op === "SET_CONDITIONAL_FORMAT") {
         const parsed = parseA1Range(op.range, op.sheet);
@@ -425,25 +564,43 @@ export function applyPatchOpsToSpreadsheetModel(modelInput: SpreadsheetModel, pa
           const sheet = ensureSheetByName(model, parsed.sheetName);
 
           if (op.op === "SET_VALUE") {
-            const matrix = Array.isArray(op.values) ? op.values : Array.isArray(op.value) ? (op.value as any) : null;
+            const matrix = Array.isArray(op.values)
+              ? op.values
+              : Array.isArray(op.value)
+                ? (op.value as any)
+                : null;
             const matrixMode = op.mode === "matrix" || Array.isArray(matrix);
             if (matrixMode && Array.isArray(matrix)) {
               for (let r = 0; r <= parsed.end.row - parsed.start.row; r += 1) {
-                for (let c = 0; c <= parsed.end.col - parsed.start.col; c += 1) {
+                for (
+                  let c = 0;
+                  c <= parsed.end.col - parsed.start.col;
+                  c += 1
+                ) {
                   const sourceRow = Array.isArray(matrix[r]) ? matrix[r] : [];
                   const value = sourceRow[c];
                   if (value === undefined) continue;
-                  changed = setCellValuePreserveStyle(sheet, parsed.start.row + r, parsed.start.col + c, value) || changed;
+                  changed =
+                    setCellValuePreserveStyle(
+                      sheet,
+                      parsed.start.row + r,
+                      parsed.start.col + c,
+                      value,
+                    ) || changed;
                 }
               }
             } else {
               forEachCellInRange(parsed, (row, col) => {
-                changed = setCellValuePreserveStyle(sheet, row, col, op.value) || changed;
+                changed =
+                  setCellValuePreserveStyle(sheet, row, col, op.value) ||
+                  changed;
               });
             }
           } else if (op.op === "SET_FORMULA") {
             forEachCellInRange(parsed, (row, col) => {
-              changed = setCellFormulaPreserveStyle(sheet, row, col, op.formula) || changed;
+              changed =
+                setCellFormulaPreserveStyle(sheet, row, col, op.formula) ||
+                changed;
             });
           } else if (op.op === "CLEAR_CONTENT") {
             forEachCellInRange(parsed, (row, col) => {
@@ -471,7 +628,12 @@ export function applyPatchOpsToSpreadsheetModel(modelInput: SpreadsheetModel, pa
         index,
         op: op.op,
         status: changed ? "applied" : "noop",
-        ...(changed ? { range: ("range" in op ? String((op as any).range || "") : undefined) } : {}),
+        ...(changed
+          ? {
+              range:
+                "range" in op ? String((op as any).range || "") : undefined,
+            }
+          : {}),
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -509,7 +671,9 @@ export function summarizePatchStatuses(statuses: PatchApplyStatus[]): {
     else if (status.status === "noop") noop += 1;
     else {
       rejected += 1;
-      rejectedOps.push(`${status.op}${status.message ? `:${status.message}` : ""}`);
+      rejectedOps.push(
+        `${status.op}${status.message ? `:${status.message}` : ""}`,
+      );
     }
   }
 
@@ -520,7 +684,11 @@ export function locateRangeFromTouched(touchedRanges: string[]): string | null {
   return touchedRanges.length ? touchedRanges[0] : null;
 }
 
-export function formatSingleCellRange(sheetName: string, row: number, col: number): string {
+export function formatSingleCellRange(
+  sheetName: string,
+  row: number,
+  col: number,
+): string {
   const a1 = formatCellRef(row, col);
   return `${sheetName}!${a1}`;
 }

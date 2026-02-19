@@ -1,9 +1,15 @@
-import * as crypto from 'crypto';
-import type { slides_v1 } from 'googleapis';
-import prisma from '../../config/database';
-import { logger } from '../../infra/logger';
-import { SlidesClientService, type SlidesRequestContext } from '../editing/slides/slidesClient.service';
-import { SlidesLayoutService, type SlidesThemeProfile } from '../editing/slides/slidesLayout.service';
+import * as crypto from "crypto";
+import type { slides_v1 } from "googleapis";
+import prisma from "../../config/database";
+import { logger } from "../../infra/logger";
+import {
+  SlidesClientService,
+  type SlidesRequestContext,
+} from "../editing/slides/slidesClient.service";
+import {
+  SlidesLayoutService,
+  type SlidesThemeProfile,
+} from "../editing/slides/slidesLayout.service";
 
 export interface StyleDNAContext extends SlidesRequestContext {}
 
@@ -15,7 +21,7 @@ export interface ExtractStyleDNAInput {
 }
 
 export interface StyleDNAProfile {
-  version: '1.0';
+  version: "1.0";
   documentId: string;
   presentationId: string;
   primaryPalette: string[];
@@ -25,17 +31,20 @@ export interface StyleDNAProfile {
   titleFontSizePt: number;
   bodyFontSizePt: number;
   dominantLayouts: Array<{ layout: string; count: number }>;
-  preferredImageStyle: 'photo' | 'illustration' | 'mixed';
-  titleTone: 'formal' | 'neutral' | 'bold';
-  visualDensity: 'low' | 'medium' | 'high';
-  spacingPreference: 'airy' | 'balanced' | 'compact';
+  preferredImageStyle: "photo" | "illustration" | "mixed";
+  titleTone: "formal" | "neutral" | "bold";
+  visualDensity: "low" | "medium" | "high";
+  spacingPreference: "airy" | "balanced" | "compact";
   confidence: number;
   extractedAt: string;
   fingerprint: string;
 }
 
 export interface StyleDNARepository {
-  getByDocument(userId: string, documentId: string): Promise<StyleDNAProfile | null>;
+  getByDocument(
+    userId: string,
+    documentId: string,
+  ): Promise<StyleDNAProfile | null>;
   save(userId: string, documentId: string, dna: StyleDNAProfile): Promise<void>;
 }
 
@@ -50,9 +59,13 @@ function asArray<T>(value: T | T[] | null | undefined): T[] {
 }
 
 function hexFromColor(
-  color: slides_v1.Schema$OptionalColor | slides_v1.Schema$OpaqueColor | undefined,
+  color:
+    | slides_v1.Schema$OptionalColor
+    | slides_v1.Schema$OpaqueColor
+    | undefined,
 ): string | null {
-  const opaque = (color as slides_v1.Schema$OptionalColor | undefined)?.opaqueColor
+  const opaque = (color as slides_v1.Schema$OptionalColor | undefined)
+    ?.opaqueColor
     ? (color as slides_v1.Schema$OptionalColor).opaqueColor
     : (color as slides_v1.Schema$OpaqueColor | undefined);
 
@@ -60,14 +73,17 @@ function hexFromColor(
   if (!rgb) return null;
 
   const clamp = (n: number | null | undefined): number => {
-    if (typeof n !== 'number' || Number.isNaN(n)) return 0;
+    if (typeof n !== "number" || Number.isNaN(n)) return 0;
     return Math.max(0, Math.min(255, Math.round(n * 255)));
   };
 
   const r = clamp(rgb.red);
   const g = clamp(rgb.green);
   const b = clamp(rgb.blue);
-  return `#${[r, g, b].map((x) => x.toString(16).padStart(2, '0')).join('').toUpperCase()}`;
+  return `#${[r, g, b]
+    .map((x) => x.toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase()}`;
 }
 
 function uniq<T>(values: T[]): T[] {
@@ -78,7 +94,7 @@ function safeParseJson(input: string | null): Record<string, unknown> {
   if (!input) return {};
   try {
     const parsed = JSON.parse(input) as unknown;
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
       return parsed as Record<string, unknown>;
     }
     return {};
@@ -98,15 +114,22 @@ function extractShapeText(shape: slides_v1.Schema$Shape | undefined): string {
     }
   }
 
-  return chunks.join(' ').replace(/\s+/g, ' ').trim();
+  return chunks.join(" ").replace(/\s+/g, " ").trim();
 }
 
 function computeFingerprint(payload: Record<string, unknown>): string {
-  return crypto.createHash('sha256').update(JSON.stringify(payload)).digest('hex').slice(0, 24);
+  return crypto
+    .createHash("sha256")
+    .update(JSON.stringify(payload))
+    .digest("hex")
+    .slice(0, 24);
 }
 
 class PrismaStyleDNARepository implements StyleDNARepository {
-  async getByDocument(userId: string, documentId: string): Promise<StyleDNAProfile | null> {
+  async getByDocument(
+    userId: string,
+    documentId: string,
+  ): Promise<StyleDNAProfile | null> {
     const doc = await prisma.document.findFirst({
       where: { id: documentId, userId },
       select: { id: true },
@@ -121,18 +144,24 @@ class PrismaStyleDNARepository implements StyleDNARepository {
       select: { slidesData: true },
     });
 
-    const envelope = safeParseJson(meta?.slidesData ?? null) as SlidesDataEnvelope;
+    const envelope = safeParseJson(
+      meta?.slidesData ?? null,
+    ) as SlidesDataEnvelope;
     return envelope.styleDNA ?? null;
   }
 
-  async save(userId: string, documentId: string, dna: StyleDNAProfile): Promise<void> {
+  async save(
+    userId: string,
+    documentId: string,
+    dna: StyleDNAProfile,
+  ): Promise<void> {
     const doc = await prisma.document.findFirst({
       where: { id: documentId, userId },
       select: { id: true },
     });
 
     if (!doc) {
-      throw new Error('Document not found for Style DNA save.');
+      throw new Error("Document not found for Style DNA save.");
     }
 
     const existing = await prisma.documentMetadata.findUnique({
@@ -166,7 +195,10 @@ export class StyleDNAService {
     private readonly repository: StyleDNARepository = new PrismaStyleDNARepository(),
   ) {}
 
-  async getStyleDNA(userId: string, documentId: string): Promise<StyleDNAProfile | null> {
+  async getStyleDNA(
+    userId: string,
+    documentId: string,
+  ): Promise<StyleDNAProfile | null> {
     return this.repository.getByDocument(userId, documentId);
   }
 
@@ -179,7 +211,9 @@ export class StyleDNAService {
     const presentationId = input.presentationId.trim();
 
     if (!userId || !documentId || !presentationId) {
-      throw new Error('userId, documentId and presentationId are required to extract Style DNA.');
+      throw new Error(
+        "userId, documentId and presentationId are required to extract Style DNA.",
+      );
     }
 
     if (!input.forceRefresh) {
@@ -194,10 +228,15 @@ export class StyleDNAService {
       this.slidesLayout.detectTheme(presentationId, ctx),
     ]);
 
-    const dna = this.buildProfile(documentId, presentationId, presentation, theme);
+    const dna = this.buildProfile(
+      documentId,
+      presentationId,
+      presentation,
+      theme,
+    );
     await this.repository.save(userId, documentId, dna);
 
-    logger.info('[StyleDNA] extracted and stored', {
+    logger.info("[StyleDNA] extracted and stored", {
       userId,
       documentId,
       presentationId,
@@ -224,19 +263,28 @@ export class StyleDNAService {
   ): Promise<StyleDNAProfile> {
     const presentationId = input.presentationId.trim();
     if (!presentationId) {
-      throw new Error('presentationId is required to extract ephemeral Style DNA.');
+      throw new Error(
+        "presentationId is required to extract ephemeral Style DNA.",
+      );
     }
 
-    const documentId = (input.documentId || `ephemeral-${presentationId}`).trim();
+    const documentId = (
+      input.documentId || `ephemeral-${presentationId}`
+    ).trim();
 
     const [presentation, theme] = await Promise.all([
       this.slidesClient.getPresentation(presentationId, ctx),
       this.slidesLayout.detectTheme(presentationId, ctx),
     ]);
 
-    const dna = this.buildProfile(documentId, presentationId, presentation, theme);
+    const dna = this.buildProfile(
+      documentId,
+      presentationId,
+      presentation,
+      theme,
+    );
 
-    logger.info('[StyleDNA] extracted ephemeral', {
+    logger.info("[StyleDNA] extracted ephemeral", {
       presentationId,
       documentId,
       correlationId: ctx?.correlationId,
@@ -256,9 +304,9 @@ export class StyleDNAService {
     const merged: StyleDNAProfile = {
       ...base,
       ...overrides,
-      version: '1.0',
+      version: "1.0",
       extractedAt: new Date().toISOString(),
-      fingerprint: '',
+      fingerprint: "",
     };
 
     merged.fingerprint = computeFingerprint({
@@ -295,10 +343,14 @@ export class StyleDNAService {
 
     for (const slide of slides) {
       const pageElements = slide.pageElements ?? [];
-      const layoutName = (slide.slideProperties?.layoutObjectId || 'unknown').trim() || 'unknown';
+      const layoutName =
+        (slide.slideProperties?.layoutObjectId || "unknown").trim() ||
+        "unknown";
       layoutCounts.set(layoutName, (layoutCounts.get(layoutName) ?? 0) + 1);
 
-      const bgHex = hexFromColor(slide.pageProperties?.pageBackgroundFill?.solidFill?.color);
+      const bgHex = hexFromColor(
+        slide.pageProperties?.pageBackgroundFill?.solidFill?.color,
+      );
       if (bgHex) {
         colorSamples.push(bgHex);
       }
@@ -309,12 +361,21 @@ export class StyleDNAService {
           const placeholderType = element.shape.placeholder?.type;
           const text = extractShapeText(element.shape);
 
-          if ((placeholderType === 'TITLE' || placeholderType === 'CENTERED_TITLE') && text) {
+          if (
+            (placeholderType === "TITLE" ||
+              placeholderType === "CENTERED_TITLE") &&
+            text
+          ) {
             titleSamples.push(text);
           } else if (text) {
             bodyWordCounts.push(text.split(/\s+/).filter(Boolean).length);
           }
-        } else if (element.image || element.video || element.wordArt || element.table) {
+        } else if (
+          element.image ||
+          element.video ||
+          element.wordArt ||
+          element.table
+        ) {
           visualShapes += 1;
         }
       }
@@ -328,13 +389,18 @@ export class StyleDNAService {
     const avgBodyWords =
       bodyWordCounts.length === 0
         ? 0
-        : bodyWordCounts.reduce((sum, value) => sum + value, 0) / bodyWordCounts.length;
+        : bodyWordCounts.reduce((sum, value) => sum + value, 0) /
+          bodyWordCounts.length;
 
-    const visualRatio = visualShapes === 0 ? 0 : visualShapes / Math.max(1, textShapes + visualShapes);
+    const visualRatio =
+      visualShapes === 0
+        ? 0
+        : visualShapes / Math.max(1, textShapes + visualShapes);
     const titleLength =
       titleSamples.length === 0
         ? 0
-        : titleSamples.reduce((sum, text) => sum + text.length, 0) / titleSamples.length;
+        : titleSamples.reduce((sum, text) => sum + text.length, 0) /
+          titleSamples.length;
 
     const primaryPalette = uniq([
       theme.primaryTextColor,
@@ -342,19 +408,30 @@ export class StyleDNAService {
       ...colorSamples.slice(0, 4),
     ]).filter(Boolean);
 
-    const accentPalette = uniq([theme.accentColor, ...colorSamples.slice(4, 8)]).filter(Boolean);
+    const accentPalette = uniq([
+      theme.accentColor,
+      ...colorSamples.slice(4, 8),
+    ]).filter(Boolean);
 
-    const preferredImageStyle: StyleDNAProfile['preferredImageStyle'] =
-      visualRatio > 0.5 ? 'photo' : visualRatio < 0.2 ? 'illustration' : 'mixed';
+    const preferredImageStyle: StyleDNAProfile["preferredImageStyle"] =
+      visualRatio > 0.5
+        ? "photo"
+        : visualRatio < 0.2
+          ? "illustration"
+          : "mixed";
 
-    const titleTone: StyleDNAProfile['titleTone'] =
-      titleLength > 55 ? 'formal' : titleLength < 30 ? 'bold' : 'neutral';
+    const titleTone: StyleDNAProfile["titleTone"] =
+      titleLength > 55 ? "formal" : titleLength < 30 ? "bold" : "neutral";
 
-    const visualDensity: StyleDNAProfile['visualDensity'] =
-      avgBodyWords > 90 ? 'high' : avgBodyWords > 45 ? 'medium' : 'low';
+    const visualDensity: StyleDNAProfile["visualDensity"] =
+      avgBodyWords > 90 ? "high" : avgBodyWords > 45 ? "medium" : "low";
 
-    const spacingPreference: StyleDNAProfile['spacingPreference'] =
-      visualDensity === 'high' ? 'compact' : visualDensity === 'low' ? 'airy' : 'balanced';
+    const spacingPreference: StyleDNAProfile["spacingPreference"] =
+      visualDensity === "high"
+        ? "compact"
+        : visualDensity === "low"
+          ? "airy"
+          : "balanced";
 
     const confidence = Math.max(
       0.45,
@@ -384,7 +461,7 @@ export class StyleDNAService {
     };
 
     return {
-      version: '1.0',
+      version: "1.0",
       documentId,
       presentationId,
       primaryPalette,

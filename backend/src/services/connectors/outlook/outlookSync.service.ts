@@ -1,10 +1,15 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+import { promises as fs } from "fs";
+import path from "path";
 
-import GraphClientService, { type GraphMessageItem } from './graphClient.service';
-import { OutlookOAuthService } from './outlookOAuth.service';
-import { TokenVaultService } from '../tokenVault.service';
-import { ConnectorsIngestionService, type ConnectorDocument } from '../connectorsIngestion.service';
+import GraphClientService, {
+  type GraphMessageItem,
+} from "./graphClient.service";
+import { OutlookOAuthService } from "./outlookOAuth.service";
+import { TokenVaultService } from "../tokenVault.service";
+import {
+  ConnectorsIngestionService,
+  type ConnectorDocument,
+} from "../connectorsIngestion.service";
 
 interface OutlookCursorData {
   lastSyncAt?: string;
@@ -30,14 +35,19 @@ export interface OutlookSyncInput {
 }
 
 export interface OutlookSyncResult {
-  provider: 'outlook';
+  provider: "outlook";
   syncedCount: number;
-  mode: 'initial' | 'incremental';
+  mode: "initial" | "incremental";
   lastSyncAt: string;
   foldersScanned: number;
 }
 
-const CURSOR_ROOT = path.resolve(process.cwd(), 'storage', 'connectors', 'cursors');
+const CURSOR_ROOT = path.resolve(
+  process.cwd(),
+  "storage",
+  "connectors",
+  "cursors",
+);
 
 function safeDate(input?: string): Date | null {
   if (!input) return null;
@@ -69,42 +79,55 @@ export class OutlookSyncService {
     const cursorFile = await this.readCursorFile(input.userId);
     const prior: OutlookCursorData = cursorFile.providers.outlook ?? {};
 
-    const mode: 'initial' | 'incremental' = !prior.lastSyncAt || input.forceResync ? 'initial' : 'incremental';
+    const mode: "initial" | "incremental" =
+      !prior.lastSyncAt || input.forceResync ? "initial" : "incremental";
 
     // Fetch all mail folders.
     let folders = await this.withTokenRefresh(
       input.userId,
       accessToken,
       (token) => this.graphClient.listMailFolders(token),
-      (newToken) => { accessToken = newToken; },
+      (newToken) => {
+        accessToken = newToken;
+      },
     );
 
     // Filter out folders with zero items to avoid wasted requests.
     folders = folders.filter((f) => (f.totalItemCount ?? 1) > 0);
 
-    const folderCursors: Record<string, { lastReceivedDateTime?: string }> = { ...(prior.folders ?? {}) };
+    const folderCursors: Record<string, { lastReceivedDateTime?: string }> = {
+      ...(prior.folders ?? {}),
+    };
     let totalSynced = 0;
 
     for (const folder of folders) {
       // For incremental sync, use the per-folder cursor.
-      const folderSince = mode === 'incremental' ? folderCursors[folder.id]?.lastReceivedDateTime : undefined;
+      const folderSince =
+        mode === "incremental"
+          ? folderCursors[folder.id]?.lastReceivedDateTime
+          : undefined;
 
       let messages: GraphMessageItem[];
       try {
         messages = await this.withTokenRefresh(
           input.userId,
           accessToken,
-          (token) => this.graphClient.listAllMessages({
-            accessToken: token,
-            folder: folder.id,
-            sinceIso: folderSince,
-          }),
-          (newToken) => { accessToken = newToken; },
+          (token) =>
+            this.graphClient.listAllMessages({
+              accessToken: token,
+              folder: folder.id,
+              sinceIso: folderSince,
+            }),
+          (newToken) => {
+            accessToken = newToken;
+          },
         );
       } catch (err) {
         // Skip folders that fail (permission denied, token errors, timeouts, etc.).
         const msg = err instanceof Error ? err.message : String(err);
-        console.warn(`[OutlookSync] Skipping folder "${folder.displayName}" (${folder.id}): ${msg}`);
+        console.warn(
+          `[OutlookSync] Skipping folder "${folder.displayName}" (${folder.id}): ${msg}`,
+        );
         continue;
       }
 
@@ -147,7 +170,7 @@ export class OutlookSyncService {
     await this.writeCursorFile(input.userId, cursorFile);
 
     return {
-      provider: 'outlook',
+      provider: "outlook",
       syncedCount: totalSynced,
       mode,
       lastSyncAt,
@@ -159,20 +182,25 @@ export class OutlookSyncService {
     return this.sync(input);
   }
 
-  private mapMessages(messages: GraphMessageItem[], folderName: string): ConnectorDocument[] {
+  private mapMessages(
+    messages: GraphMessageItem[],
+    folderName: string,
+  ): ConnectorDocument[] {
     const docs: ConnectorDocument[] = [];
 
     for (const m of messages) {
       const text = this.graphClient.getMessageText(m);
       if (!text.trim()) continue;
 
-      const timestamp = safeDate(m.receivedDateTime) || safeDate(m.sentDateTime) || new Date();
-      const from = m.from?.emailAddress?.address || m.from?.emailAddress?.name || '';
+      const timestamp =
+        safeDate(m.receivedDateTime) || safeDate(m.sentDateTime) || new Date();
+      const from =
+        m.from?.emailAddress?.address || m.from?.emailAddress?.name || "";
 
       docs.push({
-        sourceType: 'outlook',
+        sourceType: "outlook",
         sourceId: m.id,
-        title: (m.subject || '(no subject)').trim(),
+        title: (m.subject || "(no subject)").trim(),
         body: text,
         timestamp,
         actors: [from].filter(Boolean),
@@ -192,13 +220,14 @@ export class OutlookSyncService {
 
   private async getAccessToken(userId: string): Promise<string> {
     try {
-      return await this.tokenVault.getValidAccessToken(userId, 'outlook');
+      return await this.tokenVault.getValidAccessToken(userId, "outlook");
     } catch {
       try {
         const refreshed = await this.outlookOAuth.refreshAccessToken(userId);
         return refreshed.accessToken;
       } catch (refreshErr) {
-        const msg = refreshErr instanceof Error ? refreshErr.message : String(refreshErr);
+        const msg =
+          refreshErr instanceof Error ? refreshErr.message : String(refreshErr);
         throw new Error(`Outlook token refresh failed: ${msg}`);
       }
     }
@@ -214,7 +243,11 @@ export class OutlookSyncService {
       return await fn(currentToken);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      if (msg.includes('401') || msg.includes('InvalidAuthenticationToken') || msg.includes('expired')) {
+      if (
+        msg.includes("401") ||
+        msg.includes("InvalidAuthenticationToken") ||
+        msg.includes("expired")
+      ) {
         const refreshed = await this.outlookOAuth.refreshAccessToken(userId);
         onRefresh(refreshed.accessToken);
         return fn(refreshed.accessToken);
@@ -228,7 +261,7 @@ export class OutlookSyncService {
     const filePath = path.join(CURSOR_ROOT, `${userId}.json`);
 
     try {
-      const raw = await fs.readFile(filePath, 'utf8');
+      const raw = await fs.readFile(filePath, "utf8");
       const parsed = JSON.parse(raw) as ConnectorCursorFile;
       if (parsed?.version === 1 && parsed?.userId === userId) return parsed;
       return { version: 1, userId, providers: {} };
@@ -237,12 +270,18 @@ export class OutlookSyncService {
     }
   }
 
-  private async writeCursorFile(userId: string, payload: ConnectorCursorFile): Promise<void> {
+  private async writeCursorFile(
+    userId: string,
+    payload: ConnectorCursorFile,
+  ): Promise<void> {
     await fs.mkdir(CURSOR_ROOT, { recursive: true });
     const filePath = path.join(CURSOR_ROOT, `${userId}.json`);
     const tmpPath = `${filePath}.tmp`;
 
-    await fs.writeFile(tmpPath, JSON.stringify(payload), { encoding: 'utf8', mode: 0o600 });
+    await fs.writeFile(tmpPath, JSON.stringify(payload), {
+      encoding: "utf8",
+      mode: 0o600,
+    });
     await fs.rename(tmpPath, filePath);
   }
 }

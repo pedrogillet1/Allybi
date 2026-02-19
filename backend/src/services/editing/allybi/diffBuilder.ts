@@ -10,8 +10,18 @@ export function buildAllybiDiff(input: {
   if (input.canonicalOperator.startsWith("XLSX_")) {
     return legacyDiffBuilder.buildCellDiff(input.beforeText, input.afterText);
   }
-  if (input.canonicalOperator.includes("INSERT") || input.canonicalOperator.includes("DELETE") || input.canonicalOperator.includes("LIST_")) {
-    return legacyDiffBuilder.buildStructuralDiff(input.beforeText, input.afterText);
+  if (
+    input.canonicalOperator.includes("INSERT") ||
+    input.canonicalOperator.includes("DELETE") ||
+    input.canonicalOperator.includes("LIST_")
+  ) {
+    return legacyDiffBuilder.buildStructuralDiff(
+      input.beforeText,
+      input.afterText,
+    );
   }
-  return legacyDiffBuilder.buildParagraphDiff(input.beforeText, input.afterText);
+  return legacyDiffBuilder.buildParagraphDiff(
+    input.beforeText,
+    input.afterText,
+  );
 }

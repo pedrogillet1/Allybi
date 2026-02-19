@@ -10,37 +10,37 @@
  * - Sources are rendered via attachments (source_buttons), not inline.
  */
 
-import type { OutputShape, AnswerMode } from './operators.types';
-import type { DomainId } from './domains.types';
+import type { OutputShape, AnswerMode } from "./operators.types";
+import type { DomainId } from "./domains.types";
 
 // ----------------------------------------------------------------------------
 // Documents
 // ----------------------------------------------------------------------------
 
 export type DocType =
-  | 'pdf'
-  | 'doc'
-  | 'docx'
-  | 'ppt'
-  | 'pptx'
-  | 'xls'
-  | 'xlsx'
-  | 'csv'
-  | 'txt'
-  | 'md'
-  | 'png'
-  | 'jpg'
-  | 'jpeg'
-  | 'webp'
-  | 'unknown';
+  | "pdf"
+  | "doc"
+  | "docx"
+  | "ppt"
+  | "pptx"
+  | "xls"
+  | "xlsx"
+  | "csv"
+  | "txt"
+  | "md"
+  | "png"
+  | "jpg"
+  | "jpeg"
+  | "webp"
+  | "unknown";
 
 export interface DocumentRef {
-  docId: string;            // canonical id used across system
-  fileName: string;         // original filename (with extension)
-  docTitle?: string;        // display title (if different)
+  docId: string; // canonical id used across system
+  fileName: string; // original filename (with extension)
+  docTitle?: string; // display title (if different)
   docType: DocType;
   folderPath?: string;
-  uploadedAt?: string;      // ISO
+  uploadedAt?: string; // ISO
   sizeBytes?: number;
   sha256?: string;
   tags?: string[];
@@ -52,15 +52,15 @@ export interface DocumentRef {
 
 export interface ExplicitDocRef {
   present: boolean;
-  type?: 'docId' | 'filename';
-  value?: string;           // docId or filename
+  type?: "docId" | "filename";
+  value?: string; // docId or filename
 }
 
 export interface ActiveDocRef {
   present: boolean;
   docId?: string;
-  lockType?: 'soft' | 'hard';
-  lastSwitchedAt?: string;  // ISO
+  lockType?: "soft" | "hard";
+  lastSwitchedAt?: string; // ISO
 }
 
 export interface ScopeHard {
@@ -91,9 +91,9 @@ export interface CandidateDoc {
   docType: DocType;
   folderPath?: string;
   uploadedAt?: string;
-  score?: number;           // ranking score (0..1)
-  tags?: string[];          // preference tags
-  filterNotes?: string[];   // why kept/dropped
+  score?: number; // ranking score (0..1)
+  tags?: string[]; // preference tags
+  filterNotes?: string[]; // why kept/dropped
 }
 
 // ----------------------------------------------------------------------------
@@ -102,9 +102,9 @@ export interface CandidateDoc {
 
 export interface TimeHint {
   raw?: string; // original text fragment
-  type?: 'month' | 'quarter' | 'year' | 'range' | 'relative';
+  type?: "month" | "quarter" | "year" | "range" | "relative";
   start?: string; // ISO date
-  end?: string;   // ISO date
+  end?: string; // ISO date
   year?: number;
   quarter?: 1 | 2 | 3 | 4;
 }
@@ -116,7 +116,13 @@ export interface MetricHint {
 
 export interface EntityHint {
   raw?: string;
-  entityType?: 'person' | 'company' | 'property' | 'account' | 'project' | 'unknown';
+  entityType?:
+    | "person"
+    | "company"
+    | "property"
+    | "account"
+    | "project"
+    | "unknown";
   entityValue?: string;
 }
 
@@ -152,14 +158,18 @@ export interface QuerySignals {
   groundingFailSoft?: boolean;
 
   // meta
-  language?: 'en' | 'pt' | 'es';
+  language?: "en" | "pt" | "es";
 }
 
 // ----------------------------------------------------------------------------
 // Retrieval Config + Profiles
 // ----------------------------------------------------------------------------
 
-export type RetrievalMethod = 'lexical' | 'semantic' | 'hybrid' | 'metadata_only';
+export type RetrievalMethod =
+  | "lexical"
+  | "semantic"
+  | "hybrid"
+  | "metadata_only";
 
 export interface RetrievalWeights {
   lexical: number;
@@ -194,11 +204,11 @@ export interface RetrievalLimits {
 // ----------------------------------------------------------------------------
 
 export type EvidenceKind =
-  | 'chunk_match'
-  | 'quote'
-  | 'table_cell_match'
-  | 'page_map_ref'
-  | 'extraction';
+  | "chunk_match"
+  | "quote"
+  | "table_cell_match"
+  | "page_map_ref"
+  | "extraction";
 
 export interface EvidenceLocation {
   // pdf/doc
@@ -226,12 +236,12 @@ export interface EvidenceItem {
   docType?: DocType;
 
   chunkId?: string;
-  score: number;            // 0..1
+  score: number; // 0..1
   tags?: string[];
 
   location?: EvidenceLocation;
 
-  text: string;             // truncated chunk text
+  text: string; // truncated chunk text
 }
 
 export interface SourcesUiPackage {
@@ -267,7 +277,12 @@ export interface RetrievalResult {
   // reason codes for empty results
   empty?: {
     isEmpty: boolean;
-    reasonCode?: 'no_docs_indexed' | 'scope_hard_constraints_empty' | 'no_relevant_chunks_in_scoped_docs' | 'indexing_in_progress' | 'extraction_failed';
+    reasonCode?:
+      | "no_docs_indexed"
+      | "scope_hard_constraints_empty"
+      | "no_relevant_chunks_in_scoped_docs"
+      | "indexing_in_progress"
+      | "extraction_failed";
     reasonShort?: string;
   };
 
@@ -282,18 +297,22 @@ export interface RetrievalResult {
 // Grounding Verdict (post-retrieval / pre-compose)
 // ----------------------------------------------------------------------------
 
-export type GroundingVerdict = 'pass' | 'pass_with_warning' | 'fail_soft' | 'fail_hard';
+export type GroundingVerdict =
+  | "pass"
+  | "pass_with_warning"
+  | "fail_soft"
+  | "fail_hard";
 
 export interface GroundingResult {
   verdict: GroundingVerdict;
   reasons: string[];
   recommendedAction:
-    | 'proceed'
-    | 'add_hedge_or_cite'
-    | 'ask_one_clarification'
-    | 'narrow_scope'
-    | 'retry_retrieval'
-    | 'no_docs_or_block';
+    | "proceed"
+    | "add_hedge_or_cite"
+    | "ask_one_clarification"
+    | "narrow_scope"
+    | "retry_retrieval"
+    | "no_docs_or_block";
 
   evidenceStats?: {
     docsUsed: number;
@@ -313,7 +332,7 @@ export interface ComposeContext {
   turnId: string;
 
   queryText: string;
-  language: 'en' | 'pt' | 'es';
+  language: "en" | "pt" | "es";
 
   domain: DomainId;
   signals: QuerySignals;
@@ -404,7 +423,7 @@ export interface RankingParams {
 export type RankedChunks = EvidenceItem[];
 
 export interface LoadMoreMarker {
-  type: 'load_more';
+  type: "load_more";
   totalAvailable?: number;
   displayed?: number;
   totalDocs?: number;

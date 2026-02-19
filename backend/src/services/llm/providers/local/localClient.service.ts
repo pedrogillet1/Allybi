@@ -27,9 +27,9 @@ import type {
   LLMCompletionResponse,
   LLMStreamResponse,
   LLMMessage,
-} from '../../core/llmClient.interface';
+} from "../../core/llmClient.interface";
 
-import type { LLMProvider } from '../../types/llmErrors.types';
+import type { LLMProvider } from "../../types/llmErrors.types";
 
 import type {
   LLMStreamingConfig,
@@ -38,17 +38,21 @@ import type {
   StreamEvent,
   StreamDelta,
   StreamingHooks,
-} from '../../types/llmStreaming.types';
+} from "../../types/llmStreaming.types";
 
-import { loadLocalConfig, type LocalConfig, type LocalApiFormat } from './localConfig';
-import { LOCAL_MODEL_DEFAULTS } from './localModels';
+import {
+  loadLocalConfig,
+  type LocalConfig,
+  type LocalApiFormat,
+} from "./localConfig";
+import { LOCAL_MODEL_DEFAULTS } from "./localModels";
 
 // ---------------------------------------------------------------------------
 // Ollama API types
 // ---------------------------------------------------------------------------
 
 interface OllamaMessage {
-  role: 'system' | 'user' | 'assistant';
+  role: "system" | "user" | "assistant";
   content: string;
 }
 
@@ -97,7 +101,7 @@ interface OllamaTagsResponse {
 // ---------------------------------------------------------------------------
 
 interface OAIMessage {
-  role: 'system' | 'user' | 'assistant';
+  role: "system" | "user" | "assistant";
   content: string;
 }
 
@@ -137,7 +141,7 @@ interface OAIChatResponse {
 // ---------------------------------------------------------------------------
 
 export class LocalClientService implements LLMClient {
-  public readonly provider: LLMProvider = 'ollama';
+  public readonly provider: LLMProvider = "ollama";
 
   private static readonly MODEL_CACHE_TTL = 60_000; // 1 min
 
@@ -156,21 +160,25 @@ export class LocalClientService implements LLMClient {
   async ping(): Promise<{ ok: boolean; provider: LLMProvider; t: number }> {
     const t = Date.now();
     try {
-      const url = this.cfg.apiFormat === 'ollama'
-        ? `${this.baseUrl()}/api/tags`
-        : `${this.baseUrl()}/v1/models`;
+      const url =
+        this.cfg.apiFormat === "ollama"
+          ? `${this.baseUrl()}/api/tags`
+          : `${this.baseUrl()}/v1/models`;
 
       const ac = new AbortController();
       const timeout = setTimeout(() => ac.abort(), this.cfg.health.timeoutMs);
 
       try {
-        const res = await fetch(url, { signal: ac.signal, headers: this.authHeaders() });
-        return { ok: res.ok, provider: 'ollama', t };
+        const res = await fetch(url, {
+          signal: ac.signal,
+          headers: this.authHeaders(),
+        });
+        return { ok: res.ok, provider: "ollama", t };
       } finally {
         clearTimeout(timeout);
       }
     } catch {
-      return { ok: false, provider: 'ollama', t };
+      return { ok: false, provider: "ollama", t };
     }
   }
 
@@ -184,7 +192,7 @@ export class LocalClientService implements LLMClient {
     const timeout = setTimeout(() => ac.abort(), this.cfg.timeoutMs);
 
     try {
-      if (this.cfg.apiFormat === 'openai_compat') {
+      if (this.cfg.apiFormat === "openai_compat") {
         return await this.completeOAI(req, model, ac.signal);
       }
       return await this.completeOllama(req, model, ac.signal);
@@ -208,11 +216,11 @@ export class LocalClientService implements LLMClient {
     const model = req.model.model || this.cfg.defaultModel;
 
     const state: StreamState = {
-      phase: 'init',
-      kind: 'answer',
+      phase: "init",
+      kind: "answer",
       traceId: req.traceId,
       startedAtMs: Date.now(),
-      accumulatedText: '',
+      accumulatedText: "",
       markers: [],
       heldMarkers: [],
       abortRequested: false,
@@ -221,7 +229,7 @@ export class LocalClientService implements LLMClient {
 
     // Emit start
     this.emit(sink, {
-      event: 'start',
+      event: "start",
       data: { kind: state.kind, t: Date.now(), traceId: state.traceId },
     });
     hooks?.onStart?.(state);
@@ -230,10 +238,26 @@ export class LocalClientService implements LLMClient {
     const timeout = setTimeout(() => ac.abort(), this.cfg.timeoutMs);
 
     try {
-      if (this.cfg.apiFormat === 'openai_compat') {
-        return await this.streamOAI(req, model, sink, config, hooks, state, ac.signal);
+      if (this.cfg.apiFormat === "openai_compat") {
+        return await this.streamOAI(
+          req,
+          model,
+          sink,
+          config,
+          hooks,
+          state,
+          ac.signal,
+        );
       }
-      return await this.streamOllama(req, model, sink, config, hooks, state, ac.signal);
+      return await this.streamOllama(
+        req,
+        model,
+        sink,
+        config,
+        hooks,
+        state,
+        ac.signal,
+      );
     } catch (e) {
       return this.handleStreamError(e, req, sink, hooks, state);
     } finally {
@@ -260,8 +284,8 @@ export class LocalClientService implements LLMClient {
     };
 
     const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...this.authHeaders() },
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...this.authHeaders() },
       body: JSON.stringify(body),
       signal,
     });
@@ -270,7 +294,7 @@ export class LocalClientService implements LLMClient {
       const errText = await safeReadText(res);
       throw new Error(
         JSON.stringify({
-          code: 'LOCAL_HTTP_ERROR',
+          code: "LOCAL_HTTP_ERROR",
           status: res.status,
           body: truncate(errText, 2000),
         }),
@@ -283,11 +307,12 @@ export class LocalClientService implements LLMClient {
       traceId: req.traceId,
       turnId: req.turnId,
       model: req.model,
-      content: json.message?.content ?? '',
+      content: json.message?.content ?? "",
       usage: {
         promptTokens: json.prompt_eval_count,
         completionTokens: json.eval_count,
-        totalTokens: (json.prompt_eval_count ?? 0) + (json.eval_count ?? 0) || undefined,
+        totalTokens:
+          (json.prompt_eval_count ?? 0) + (json.eval_count ?? 0) || undefined,
       },
     };
   }
@@ -315,33 +340,40 @@ export class LocalClientService implements LLMClient {
     };
 
     const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...this.authHeaders() },
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...this.authHeaders() },
       body: JSON.stringify(body),
       signal,
     });
 
     if (!res.ok || !res.body) {
       const errText = await safeReadText(res);
-      this.emitStreamError(sink, hooks, state, 'LLM_PROVIDER_BAD_REQUEST', res.status, errText);
+      this.emitStreamError(
+        sink,
+        hooks,
+        state,
+        "LLM_PROVIDER_BAD_REQUEST",
+        res.status,
+        errText,
+      );
       return this.buildStreamReturn(req, state);
     }
 
-    state.phase = 'preamble';
+    state.phase = "preamble";
 
     const reader = res.body.getReader();
-    const decoder = new TextDecoder('utf-8');
-    let buffer = '';
+    const decoder = new TextDecoder("utf-8");
+    let buffer = "";
     let firstTokenEmitted = false;
-    let finalUsage: LLMCompletionResponse['usage'] | undefined;
+    let finalUsage: LLMCompletionResponse["usage"] | undefined;
 
     while (sink.isOpen()) {
       const { value, done } = await reader.read();
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() ?? '';
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
 
       for (const line of lines) {
         const trimmed = line.trim();
@@ -350,26 +382,32 @@ export class LocalClientService implements LLMClient {
         const chunk = safeJsonParse(trimmed) as OllamaChatResponse | null;
         if (!chunk) continue;
 
-        const text = chunk.message?.content ?? '';
+        const text = chunk.message?.content ?? "";
 
         if (text) {
           if (!firstTokenEmitted) {
             firstTokenEmitted = true;
             state.firstTokenAtMs = Date.now();
-            this.emit(sink, { event: 'progress', data: { stage: 'generation', t: Date.now() } });
+            this.emit(sink, {
+              event: "progress",
+              data: { stage: "generation", t: Date.now() },
+            });
             hooks?.onFirstToken?.(state);
           }
 
-          const deltas = chunkText(text, config.chunking?.maxCharsPerDelta ?? 64);
+          const deltas = chunkText(
+            text,
+            config.chunking?.maxCharsPerDelta ?? 64,
+          );
 
           for (const dText of deltas) {
             if (!sink.isOpen()) break;
 
             const delta: StreamDelta = { text: dText };
-            state.phase = 'delta';
+            state.phase = "delta";
             state.accumulatedText += dText;
 
-            this.emit(sink, { event: 'delta', data: delta });
+            this.emit(sink, { event: "delta", data: delta });
             hooks?.onDelta?.(delta, state);
 
             const targetMs = config.chunking?.targetDeltaEveryMs;
@@ -382,7 +420,9 @@ export class LocalClientService implements LLMClient {
           finalUsage = {
             promptTokens: chunk.prompt_eval_count,
             completionTokens: chunk.eval_count,
-            totalTokens: (chunk.prompt_eval_count ?? 0) + (chunk.eval_count ?? 0) || undefined,
+            totalTokens:
+              (chunk.prompt_eval_count ?? 0) + (chunk.eval_count ?? 0) ||
+              undefined,
           };
         }
       }
@@ -411,8 +451,8 @@ export class LocalClientService implements LLMClient {
     };
 
     const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...this.authHeaders() },
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...this.authHeaders() },
       body: JSON.stringify(body),
       signal,
     });
@@ -421,7 +461,7 @@ export class LocalClientService implements LLMClient {
       const errText = await safeReadText(res);
       throw new Error(
         JSON.stringify({
-          code: 'LOCAL_HTTP_ERROR',
+          code: "LOCAL_HTTP_ERROR",
           status: res.status,
           body: truncate(errText, 2000),
         }),
@@ -435,7 +475,7 @@ export class LocalClientService implements LLMClient {
       traceId: req.traceId,
       turnId: req.turnId,
       model: req.model,
-      content: choice?.message?.content ?? '',
+      content: choice?.message?.content ?? "",
       usage: json.usage
         ? {
             promptTokens: json.usage.prompt_tokens,
@@ -469,23 +509,30 @@ export class LocalClientService implements LLMClient {
     };
 
     const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...this.authHeaders() },
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...this.authHeaders() },
       body: JSON.stringify(body),
       signal,
     });
 
     if (!res.ok || !res.body) {
       const errText = await safeReadText(res);
-      this.emitStreamError(sink, hooks, state, 'LLM_PROVIDER_BAD_REQUEST', res.status, errText);
+      this.emitStreamError(
+        sink,
+        hooks,
+        state,
+        "LLM_PROVIDER_BAD_REQUEST",
+        res.status,
+        errText,
+      );
       return this.buildStreamReturn(req, state);
     }
 
-    state.phase = 'preamble';
+    state.phase = "preamble";
 
     const reader = res.body.getReader();
-    const decoder = new TextDecoder('utf-8');
-    let buffer = '';
+    const decoder = new TextDecoder("utf-8");
+    let buffer = "";
     let firstTokenEmitted = false;
 
     while (sink.isOpen()) {
@@ -493,41 +540,47 @@ export class LocalClientService implements LLMClient {
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() ?? '';
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
 
       for (const line of lines) {
         const trimmed = line.trim();
         if (!trimmed) continue;
 
         // SSE format: "data: {...}" or "data: [DONE]"
-        if (!trimmed.startsWith('data:')) continue;
+        if (!trimmed.startsWith("data:")) continue;
         const payload = trimmed.slice(5).trim();
-        if (payload === '[DONE]') continue;
+        if (payload === "[DONE]") continue;
 
         const chunk = safeJsonParse(payload) as OAIChatResponse | null;
         if (!chunk) continue;
 
-        const text = chunk.choices?.[0]?.delta?.content ?? '';
+        const text = chunk.choices?.[0]?.delta?.content ?? "";
 
         if (text) {
           if (!firstTokenEmitted) {
             firstTokenEmitted = true;
             state.firstTokenAtMs = Date.now();
-            this.emit(sink, { event: 'progress', data: { stage: 'generation', t: Date.now() } });
+            this.emit(sink, {
+              event: "progress",
+              data: { stage: "generation", t: Date.now() },
+            });
             hooks?.onFirstToken?.(state);
           }
 
-          const deltas = chunkText(text, config.chunking?.maxCharsPerDelta ?? 64);
+          const deltas = chunkText(
+            text,
+            config.chunking?.maxCharsPerDelta ?? 64,
+          );
 
           for (const dText of deltas) {
             if (!sink.isOpen()) break;
 
             const delta: StreamDelta = { text: dText };
-            state.phase = 'delta';
+            state.phase = "delta";
             state.accumulatedText += dText;
 
-            this.emit(sink, { event: 'delta', data: delta });
+            this.emit(sink, { event: "delta", data: delta });
             hooks?.onDelta?.(delta, state);
 
             const targetMs = config.chunking?.targetDeltaEveryMs;
@@ -550,30 +603,32 @@ export class LocalClientService implements LLMClient {
 
     for (const m of messages) {
       // Ollama supports system, user, assistant roles
-      if (m.role === 'system' || m.role === 'developer') {
-        if (m.content) out.push({ role: 'system', content: m.content });
+      if (m.role === "system" || m.role === "developer") {
+        if (m.content) out.push({ role: "system", content: m.content });
         continue;
       }
 
-      if (m.role === 'user') {
-        out.push({ role: 'user', content: m.content ?? '' });
+      if (m.role === "user") {
+        out.push({ role: "user", content: m.content ?? "" });
         continue;
       }
 
-      if (m.role === 'assistant') {
-        out.push({ role: 'assistant', content: m.content ?? '' });
+      if (m.role === "assistant") {
+        out.push({ role: "assistant", content: m.content ?? "" });
         continue;
       }
 
-      if (m.role === 'tool') {
+      if (m.role === "tool") {
         // Ollama does not have native tool-result messages.
         // Fold tool results into a user message for context continuity.
         const result = m.toolResult;
         if (result) {
           out.push({
-            role: 'user',
+            role: "user",
             content: `[Tool result for ${result.toolName}]: ${
-              result.ok ? JSON.stringify(result.output ?? null) : `Error: ${result.error?.message ?? 'unknown'}`
+              result.ok
+                ? JSON.stringify(result.output ?? null)
+                : `Error: ${result.error?.message ?? "unknown"}`
             }`,
           });
         }
@@ -588,28 +643,30 @@ export class LocalClientService implements LLMClient {
     const out: OAIMessage[] = [];
 
     for (const m of messages) {
-      if (m.role === 'system' || m.role === 'developer') {
-        if (m.content) out.push({ role: 'system', content: m.content });
+      if (m.role === "system" || m.role === "developer") {
+        if (m.content) out.push({ role: "system", content: m.content });
         continue;
       }
 
-      if (m.role === 'user') {
-        out.push({ role: 'user', content: m.content ?? '' });
+      if (m.role === "user") {
+        out.push({ role: "user", content: m.content ?? "" });
         continue;
       }
 
-      if (m.role === 'assistant') {
-        out.push({ role: 'assistant', content: m.content ?? '' });
+      if (m.role === "assistant") {
+        out.push({ role: "assistant", content: m.content ?? "" });
         continue;
       }
 
-      if (m.role === 'tool') {
+      if (m.role === "tool") {
         const result = m.toolResult;
         if (result) {
           out.push({
-            role: 'user',
+            role: "user",
             content: `[Tool result for ${result.toolName}]: ${
-              result.ok ? JSON.stringify(result.output ?? null) : `Error: ${result.error?.message ?? 'unknown'}`
+              result.ok
+                ? JSON.stringify(result.output ?? null)
+                : `Error: ${result.error?.message ?? "unknown"}`
             }`,
           });
         }
@@ -624,22 +681,26 @@ export class LocalClientService implements LLMClient {
   // Options mapping
   // -------------------------------------------------------------------------
 
-  private toOllamaOptions(req: LLMRequest): OllamaChatRequest['options'] {
+  private toOllamaOptions(req: LLMRequest): OllamaChatRequest["options"] {
     const s = req.sampling;
-    const opts: OllamaChatRequest['options'] = {};
+    const opts: OllamaChatRequest["options"] = {};
 
     if (s) {
       if (s.temperature !== undefined) opts.temperature = s.temperature;
       if (s.topP !== undefined) opts.top_p = s.topP;
       if (s.maxOutputTokens !== undefined) opts.num_predict = s.maxOutputTokens;
       if (s.seed !== undefined) opts.seed = s.seed;
-      if (s.presencePenalty !== undefined) opts.presence_penalty = s.presencePenalty;
-      if (s.frequencyPenalty !== undefined) opts.frequency_penalty = s.frequencyPenalty;
+      if (s.presencePenalty !== undefined)
+        opts.presence_penalty = s.presencePenalty;
+      if (s.frequencyPenalty !== undefined)
+        opts.frequency_penalty = s.frequencyPenalty;
     }
 
     // Ollama-specific hardware options from config
-    if (this.cfg.ollama.numThreads !== undefined) opts.num_thread = this.cfg.ollama.numThreads;
-    if (this.cfg.ollama.numGpu !== undefined) opts.num_gpu = this.cfg.ollama.numGpu;
+    if (this.cfg.ollama.numThreads !== undefined)
+      opts.num_thread = this.cfg.ollama.numThreads;
+    if (this.cfg.ollama.numGpu !== undefined)
+      opts.num_gpu = this.cfg.ollama.numGpu;
 
     return Object.keys(opts).length > 0 ? opts : undefined;
   }
@@ -653,8 +714,10 @@ export class LocalClientService implements LLMClient {
     if (s.topP !== undefined) opts.top_p = s.topP;
     if (s.maxOutputTokens !== undefined) opts.max_tokens = s.maxOutputTokens;
     if (s.seed !== undefined) opts.seed = s.seed;
-    if (s.presencePenalty !== undefined) opts.presence_penalty = s.presencePenalty;
-    if (s.frequencyPenalty !== undefined) opts.frequency_penalty = s.frequencyPenalty;
+    if (s.presencePenalty !== undefined)
+      opts.presence_penalty = s.presencePenalty;
+    if (s.frequencyPenalty !== undefined)
+      opts.frequency_penalty = s.frequencyPenalty;
 
     return opts;
   }
@@ -669,23 +732,30 @@ export class LocalClientService implements LLMClient {
    */
   async listAvailableModels(): Promise<string[]> {
     const now = Date.now();
-    if (this.cachedModels && now - this.cachedModelsAt < LocalClientService.MODEL_CACHE_TTL) {
+    if (
+      this.cachedModels &&
+      now - this.cachedModelsAt < LocalClientService.MODEL_CACHE_TTL
+    ) {
       return this.cachedModels;
     }
 
     try {
-      if (this.cfg.apiFormat === 'ollama') {
-        const res = await fetch(`${this.baseUrl()}/api/tags`, { headers: this.authHeaders() });
+      if (this.cfg.apiFormat === "ollama") {
+        const res = await fetch(`${this.baseUrl()}/api/tags`, {
+          headers: this.authHeaders(),
+        });
         if (!res.ok) return Object.keys(LOCAL_MODEL_DEFAULTS);
 
         const json = (await res.json()) as OllamaTagsResponse;
-        this.cachedModels = json.models?.map(m => m.name) ?? [];
+        this.cachedModels = json.models?.map((m) => m.name) ?? [];
       } else {
-        const res = await fetch(`${this.baseUrl()}/v1/models`, { headers: this.authHeaders() });
+        const res = await fetch(`${this.baseUrl()}/v1/models`, {
+          headers: this.authHeaders(),
+        });
         if (!res.ok) return Object.keys(LOCAL_MODEL_DEFAULTS);
 
         const json = (await res.json()) as { data?: Array<{ id: string }> };
-        this.cachedModels = json.data?.map(m => m.id) ?? [];
+        this.cachedModels = json.data?.map((m) => m.id) ?? [];
       }
 
       this.cachedModelsAt = now;
@@ -704,17 +774,17 @@ export class LocalClientService implements LLMClient {
     sink: StreamSink,
     hooks: StreamingHooks | undefined,
     state: StreamState,
-    usage: LLMCompletionResponse['usage'] | undefined,
+    usage: LLMCompletionResponse["usage"] | undefined,
   ): void {
-    state.phase = 'finalizing';
+    state.phase = "finalizing";
 
     const finalEvent: StreamEvent = {
-      event: 'final',
+      event: "final",
       data: {
         text: state.accumulatedText,
         kind: state.kind,
         llm: {
-          provider: 'ollama',
+          provider: "ollama",
           model: req.model.model,
           promptTokens: usage?.promptTokens,
           completionTokens: usage?.completionTokens,
@@ -744,7 +814,7 @@ export class LocalClientService implements LLMClient {
     errText: string,
   ): void {
     const errEvent: StreamEvent = {
-      event: 'error',
+      event: "error",
       data: {
         code,
         message: JSON.stringify({ status, body: truncate(errText, 2000) }),
@@ -769,22 +839,24 @@ export class LocalClientService implements LLMClient {
       return this.buildStreamReturn(req, state);
     }
 
-    const isAbort = e instanceof Error && (e.name === 'AbortError' || /abort/i.test(e.message));
+    const isAbort =
+      e instanceof Error &&
+      (e.name === "AbortError" || /abort/i.test(e.message));
 
     if (isAbort) {
-      state.phase = 'aborted';
+      state.phase = "aborted";
       const abortEvent: StreamEvent = {
-        event: 'abort',
-        data: { reason: 'timeout', t: Date.now(), traceId: state.traceId },
+        event: "abort",
+        data: { reason: "timeout", t: Date.now(), traceId: state.traceId },
       };
       this.emit(sink, abortEvent);
       hooks?.onAbort?.(abortEvent.data, state);
     } else {
-      state.phase = 'error';
+      state.phase = "error";
       const errEvent: StreamEvent = {
-        event: 'error',
+        event: "error",
         data: {
-          code: 'LLM_GENERATION_FAILED',
+          code: "LLM_GENERATION_FAILED",
           message: sanitizeErrMessage(e),
           traceId: state.traceId,
           t: Date.now(),
@@ -798,7 +870,10 @@ export class LocalClientService implements LLMClient {
     return this.buildStreamReturn(req, state);
   }
 
-  private buildStreamReturn(req: LLMRequest, state: StreamState): LLMStreamResponse {
+  private buildStreamReturn(
+    req: LLMRequest,
+    state: StreamState,
+  ): LLMStreamResponse {
     return {
       traceId: req.traceId,
       turnId: req.turnId,
@@ -814,13 +889,13 @@ export class LocalClientService implements LLMClient {
   }
 
   private baseUrl(): string {
-    return this.cfg.baseUrl.replace(/\/$/, '');
+    return this.cfg.baseUrl.replace(/\/$/, "");
   }
 
   /** Build auth headers when apiKey is configured (RunPod, secured vLLM, hosted Ollama). */
   private authHeaders(): Record<string, string> {
     const h: Record<string, string> = {};
-    if (this.cfg.apiKey) h['Authorization'] = `Bearer ${this.cfg.apiKey}`;
+    if (this.cfg.apiKey) h["Authorization"] = `Bearer ${this.cfg.apiKey}`;
     return h;
   }
 }
@@ -841,18 +916,18 @@ async function safeReadText(res: Response): Promise<string> {
   try {
     return await res.text();
   } catch {
-    return '';
+    return "";
   }
 }
 
 function truncate(s: string, n: number): string {
   if (s.length <= n) return s;
-  return s.slice(0, n) + '\u2026';
+  return s.slice(0, n) + "\u2026";
 }
 
 function sanitizeErrMessage(e: unknown): string {
   if (e instanceof Error) return truncate(e.message, 800);
-  return 'unknown_error';
+  return "unknown_error";
 }
 
 function chunkText(text: string, maxChars: number): string[] {
@@ -869,5 +944,5 @@ function chunkText(text: string, maxChars: number): string[] {
 }
 
 function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

@@ -1,16 +1,16 @@
 export type RichMessageBlockType =
-  | 'status'
-  | 'text'
-  | 'bullets'
-  | 'table'
-  | 'citations'
-  | 'target'
-  | 'diff'
-  | 'why'
-  | 'proof'
-  | 'actions'
-  | 'choices'
-  | 'preview';
+  | "status"
+  | "text"
+  | "bullets"
+  | "table"
+  | "citations"
+  | "target"
+  | "diff"
+  | "why"
+  | "proof"
+  | "actions"
+  | "choices"
+  | "preview";
 
 export interface RichMessage {
   blocks: RichMessageBlock[];
@@ -32,30 +32,30 @@ export type RichMessageBlock =
   | PreviewBlock;
 
 export interface StatusBlock {
-  type: 'status';
+  type: "status";
   stage: string;
   message?: string;
 }
 
 export interface TextBlock {
-  type: 'text';
+  type: "text";
   text: string;
 }
 
 export interface BulletsBlock {
-  type: 'bullets';
+  type: "bullets";
   items: string[];
 }
 
 export interface TableBlock {
-  type: 'table';
+  type: "table";
   caption?: string;
   headers: string[];
   rows: string[][];
 }
 
 export interface CitationItem {
-  sourceType: 'doc' | 'gmail' | 'outlook' | 'slack';
+  sourceType: "doc" | "gmail" | "outlook" | "slack";
   sourceId: string;
   timestamp: string;
   title?: string;
@@ -68,7 +68,7 @@ export interface CitationItem {
 }
 
 export interface CitationsBlock {
-  type: 'citations';
+  type: "citations";
   items: CitationItem[];
 }
 
@@ -81,21 +81,21 @@ export interface TargetCandidate {
 }
 
 export interface TargetBlock {
-  type: 'target';
+  type: "target";
   label: string;
   confidence: number;
   candidates?: TargetCandidate[];
 }
 
 export interface DiffSegment {
-  type: 'unchanged' | 'inserted' | 'deleted' | 'replaced';
+  type: "unchanged" | "inserted" | "deleted" | "replaced";
   before?: string;
   after?: string;
 }
 
 export interface DiffBlock {
-  type: 'diff';
-  kind: 'paragraph' | 'cell' | 'slide_text' | 'structural';
+  type: "diff";
+  kind: "paragraph" | "cell" | "slide_text" | "structural";
   summary: string;
   segments: DiffSegment[];
   before?: string;
@@ -104,21 +104,25 @@ export interface DiffBlock {
 }
 
 export interface WhyBlock {
-  type: 'why';
+  type: "why";
   reasons: string[];
   preserved: string[];
   styleMatched?: string;
-  riskLevel: 'LOW' | 'MED' | 'HIGH';
+  riskLevel: "LOW" | "MED" | "HIGH";
 }
 
 export interface ProofItem {
-  sourceType: 'target_excerpt' | 'retrieval_chunk' | 'policy_check' | 'validator';
+  sourceType:
+    | "target_excerpt"
+    | "retrieval_chunk"
+    | "policy_check"
+    | "validator";
   label: string;
   value: string;
 }
 
 export interface ProofBlock {
-  type: 'proof';
+  type: "proof";
   items: ProofItem[];
 }
 
@@ -129,7 +133,7 @@ export interface ActionPill {
 }
 
 export interface ActionsBlock {
-  type: 'actions';
+  type: "actions";
   items: ActionPill[];
 }
 
@@ -140,13 +144,13 @@ export interface ChoiceOption {
 }
 
 export interface ChoicesBlock {
-  type: 'choices';
+  type: "choices";
   prompt: string;
   options: ChoiceOption[];
 }
 
 export interface PreviewBlock {
-  type: 'preview';
+  type: "preview";
   assetUrl: string;
   thumbUrl?: string;
   width?: number;

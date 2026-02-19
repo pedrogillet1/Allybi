@@ -25,7 +25,15 @@ export interface DocumentRecord {
   createdAt?: string;
   updatedAt?: string;
   status?: "ready" | "processing" | "failed";
-  docType?: "pdf" | "docx" | "pptx" | "xlsx" | "csv" | "txt" | "image" | "unknown";
+  docType?:
+    | "pdf"
+    | "docx"
+    | "pptx"
+    | "xlsx"
+    | "csv"
+    | "txt"
+    | "image"
+    | "unknown";
   domains?: string[];
 }
 
@@ -56,11 +64,18 @@ export interface DocumentService {
     docTypes?: string[];
   }): Promise<{ items: DocumentRecord[]; nextCursor?: string }>;
 
-  get(input: { userId: string; documentId: string }): Promise<DocumentRecord | null>;
+  get(input: {
+    userId: string;
+    documentId: string;
+  }): Promise<DocumentRecord | null>;
 
   upload(input: { userId: string; data: UploadInput }): Promise<DocumentRecord>;
 
-  delete(input: { userId: string; documentId: string; source?: string }): Promise<{ deleted: true }>;
+  delete(input: {
+    userId: string;
+    documentId: string;
+    source?: string;
+  }): Promise<{ deleted: true }>;
 
   preview(input: {
     userId: string;
@@ -69,7 +84,10 @@ export interface DocumentService {
     page?: number;
   }): Promise<DocumentPreview>;
 
-  reindex?(input: { userId: string; documentId: string }): Promise<{ status: "queued" | "started" }>;
+  reindex?(input: {
+    userId: string;
+    documentId: string;
+  }): Promise<{ status: "queued" | "started" }>;
 
   getSupportedTypes?(): Promise<{ mimeTypes: string[]; extensions: string[] }>;
 
@@ -92,7 +110,9 @@ function ok<T>(res: Response, data: T, status = 200) {
 }
 
 function err(res: Response, code: string, message: string, status = 400) {
-  return res.status(status).json({ ok: false, error: { code, message } } satisfies ApiErr);
+  return res
+    .status(status)
+    .json({ ok: false, error: { code, message } } satisfies ApiErr);
 }
 
 function asString(v: unknown): string | null {
@@ -114,21 +134,41 @@ function getUserId(req: Request): string | null {
   return typeof userId === "string" && userId.trim() ? userId.trim() : null;
 }
 
-function mapError(e: unknown): { code: string; message: string; status: number } {
+function mapError(e: unknown): {
+  code: string;
+  message: string;
+  status: number;
+} {
   const msg = e instanceof Error ? e.message : "Unknown error";
   const m = msg.toLowerCase();
 
   if (m.includes("unauthorized") || m.includes("not authenticated")) {
-    return { code: "AUTH_UNAUTHORIZED", message: "Not authenticated.", status: 401 };
+    return {
+      code: "AUTH_UNAUTHORIZED",
+      message: "Not authenticated.",
+      status: 401,
+    };
   }
   if (m.includes("not found")) {
-    return { code: "DOC_NOT_FOUND", message: "Document not found.", status: 404 };
+    return {
+      code: "DOC_NOT_FOUND",
+      message: "Document not found.",
+      status: 404,
+    };
   }
   if (m.includes("payload too large")) {
-    return { code: "PAYLOAD_TOO_LARGE", message: "File too large.", status: 413 };
+    return {
+      code: "PAYLOAD_TOO_LARGE",
+      message: "File too large.",
+      status: 413,
+    };
   }
   if (m.includes("unsupported") || m.includes("invalid mime")) {
-    return { code: "UNSUPPORTED_FILE_TYPE", message: "Unsupported file type.", status: 400 };
+    return {
+      code: "UNSUPPORTED_FILE_TYPE",
+      message: "Unsupported file type.",
+      status: 400,
+    };
   }
 
   // Default: treat as internal error unless we recognize it as client input.
@@ -141,10 +181,18 @@ function mapError(e: unknown): { code: string; message: string; status: number }
 
   const isProd = process.env.NODE_ENV === "production";
   if (isLikelyClientError) {
-    return { code: "DOC_ERROR", message: msg || "Document error.", status: 400 };
+    return {
+      code: "DOC_ERROR",
+      message: msg || "Document error.",
+      status: 400,
+    };
   }
 
-  return { code: "DOC_ERROR", message: isProd ? "Internal server error" : (msg || "Document error."), status: 500 };
+  return {
+    code: "DOC_ERROR",
+    message: isProd ? "Internal server error" : msg || "Document error.",
+    status: 500,
+  };
 }
 
 export class DocumentController {
@@ -152,7 +200,8 @@ export class DocumentController {
 
   list = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const limit = Math.min(Math.max(asInt(req.query.limit) ?? 10000, 1), 10000);
     const cursor = asString(req.query.cursor) ?? undefined;
@@ -160,10 +209,22 @@ export class DocumentController {
     const q = asString(req.query.q) ?? undefined;
 
     const typesRaw = asString(req.query.types);
-    const docTypes = typesRaw ? typesRaw.split(",").map((s) => s.trim()).filter(Boolean) : undefined;
+    const docTypes = typesRaw
+      ? typesRaw
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : undefined;
 
     try {
-      const result = await this.docs.list({ userId, limit, cursor, folderId, q, docTypes });
+      const result = await this.docs.list({
+        userId,
+        limit,
+        cursor,
+        folderId,
+        q,
+        docTypes,
+      });
       return ok(res, result, 200);
     } catch (e) {
       const mapped = mapError(e);
@@ -173,10 +234,17 @@ export class DocumentController {
 
   get = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const documentId = asString(req.params.id);
-    if (!documentId) return err(res, "VALIDATION_DOC_ID_REQUIRED", "Document id is required.", 400);
+    if (!documentId)
+      return err(
+        res,
+        "VALIDATION_DOC_ID_REQUIRED",
+        "Document id is required.",
+        400,
+      );
 
     try {
       const doc = await this.docs.get({ userId, documentId });
@@ -190,12 +258,14 @@ export class DocumentController {
 
   upload = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     try {
       const anyReq = req as any;
       const file: Express.Multer.File | undefined =
-        anyReq.file ?? (Array.isArray(anyReq.files) ? anyReq.files[0] : undefined);
+        anyReq.file ??
+        (Array.isArray(anyReq.files) ? anyReq.files[0] : undefined);
 
       const folderId = asString((req.body as any)?.folderId) ?? null;
 
@@ -223,7 +293,7 @@ export class DocumentController {
           res,
           "VALIDATION_UPLOAD_REQUIRED",
           "Provide either an uploaded file (multipart) or filename + mimeType (+ storageKey).",
-          400
+          400,
         );
       }
 
@@ -247,16 +317,28 @@ export class DocumentController {
 
   preview = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const documentId = asString(req.params.id);
-    if (!documentId) return err(res, "VALIDATION_DOC_ID_REQUIRED", "Document id is required.", 400);
+    if (!documentId)
+      return err(
+        res,
+        "VALIDATION_DOC_ID_REQUIRED",
+        "Document id is required.",
+        400,
+      );
 
     const mode = (asString(req.query.mode) as any) ?? "auto";
     const page = asInt(req.query.page) ?? undefined;
 
     try {
-      const preview = await this.docs.preview({ userId, documentId, mode, page });
+      const preview = await this.docs.preview({
+        userId,
+        documentId,
+        mode,
+        page,
+      });
       return ok(res, preview, 200);
     } catch (e) {
       const mapped = mapError(e);
@@ -266,10 +348,17 @@ export class DocumentController {
 
   reindex = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const documentId = asString(req.params.id);
-    if (!documentId) return err(res, "VALIDATION_DOC_ID_REQUIRED", "Document id is required.", 400);
+    if (!documentId)
+      return err(
+        res,
+        "VALIDATION_DOC_ID_REQUIRED",
+        "Document id is required.",
+        400,
+      );
 
     if (!this.docs.reindex) {
       return err(res, "NOT_IMPLEMENTED", "Reindex is not enabled.", 501);
@@ -286,19 +375,32 @@ export class DocumentController {
 
   stream = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const documentId = asString(req.params.id);
-    if (!documentId) return err(res, "VALIDATION_DOC_ID_REQUIRED", "Document id is required.", 400);
+    if (!documentId)
+      return err(
+        res,
+        "VALIDATION_DOC_ID_REQUIRED",
+        "Document id is required.",
+        400,
+      );
 
     if (!this.docs.streamFile) {
       return err(res, "NOT_IMPLEMENTED", "File streaming is not enabled.", 501);
     }
 
     try {
-      const { buffer, mimeType, filename } = await this.docs.streamFile({ userId, documentId });
+      const { buffer, mimeType, filename } = await this.docs.streamFile({
+        userId,
+        documentId,
+      });
       res.setHeader("Content-Type", mimeType);
-      res.setHeader("Content-Disposition", `inline; filename="${encodeURIComponent(filename)}"`);
+      res.setHeader(
+        "Content-Disposition",
+        `inline; filename="${encodeURIComponent(filename)}"`,
+      );
       res.setHeader("Content-Length", buffer.length);
       return void res.send(buffer);
     } catch (e) {
@@ -309,17 +411,27 @@ export class DocumentController {
 
   download = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const documentId = asString(req.params.id);
-    if (!documentId) return err(res, "VALIDATION_DOC_ID_REQUIRED", "Document id is required.", 400);
+    if (!documentId)
+      return err(
+        res,
+        "VALIDATION_DOC_ID_REQUIRED",
+        "Document id is required.",
+        400,
+      );
 
     if (!this.docs.getDownloadUrl) {
       return err(res, "NOT_IMPLEMENTED", "Download is not enabled.", 501);
     }
 
     try {
-      const { url, filename } = await this.docs.getDownloadUrl({ userId, documentId });
+      const { url, filename } = await this.docs.getDownloadUrl({
+        userId,
+        documentId,
+      });
       return ok(res, { url, filename }, 200);
     } catch (e) {
       const mapped = mapError(e);
@@ -329,16 +441,24 @@ export class DocumentController {
 
   delete = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const documentId = asString(req.params.id);
-    if (!documentId) return err(res, "VALIDATION_DOC_ID_REQUIRED", "Document id is required.", 400);
+    if (!documentId)
+      return err(
+        res,
+        "VALIDATION_DOC_ID_REQUIRED",
+        "Document id is required.",
+        400,
+      );
 
     try {
-      const sourceHeader = Array.isArray(req.headers['x-delete-source'])
-        ? req.headers['x-delete-source'][0]
-        : req.headers['x-delete-source'];
-      const source = asString(sourceHeader) ?? asString(req.query.source) ?? undefined;
+      const sourceHeader = Array.isArray(req.headers["x-delete-source"])
+        ? req.headers["x-delete-source"][0]
+        : req.headers["x-delete-source"];
+      const source =
+        asString(sourceHeader) ?? asString(req.query.source) ?? undefined;
       const out = await this.docs.delete({ userId, documentId, source });
       return ok(res, out, 200);
     } catch (e) {

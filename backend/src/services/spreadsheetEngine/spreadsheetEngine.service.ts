@@ -1,5 +1,8 @@
 import { logger } from "../../infra/logger";
-import { SpreadsheetEngineClient, SpreadsheetEngineClientError } from "./spreadsheetEngine.client";
+import {
+  SpreadsheetEngineClient,
+  SpreadsheetEngineClientError,
+} from "./spreadsheetEngine.client";
 import type {
   SpreadsheetEngineExecuteRequest,
   SpreadsheetEngineExecuteResponse,
@@ -13,8 +16,13 @@ export class SpreadsheetEngineService {
   private readonly client: SpreadsheetEngineClient;
   private readonly modeValue: SpreadsheetEngineMode;
 
-  constructor(opts?: { client?: SpreadsheetEngineClient; mode?: SpreadsheetEngineMode }) {
-    this.modeValue = opts?.mode ?? coerceSpreadsheetEngineMode(process.env.SPREADSHEET_ENGINE_MODE || "off");
+  constructor(opts?: {
+    client?: SpreadsheetEngineClient;
+    mode?: SpreadsheetEngineMode;
+  }) {
+    this.modeValue =
+      opts?.mode ??
+      coerceSpreadsheetEngineMode(process.env.SPREADSHEET_ENGINE_MODE || "off");
     this.client = opts?.client ?? new SpreadsheetEngineClient();
   }
 
@@ -26,7 +34,9 @@ export class SpreadsheetEngineService {
     return this.modeValue !== "off";
   }
 
-  async execute(req: SpreadsheetEngineExecuteRequest): Promise<SpreadsheetEngineExecuteResponse> {
+  async execute(
+    req: SpreadsheetEngineExecuteRequest,
+  ): Promise<SpreadsheetEngineExecuteResponse> {
     if (!this.enabled()) {
       throw new SpreadsheetEngineClientError("Spreadsheet engine mode is off", {
         code: "ENGINE_MODE_OFF",
@@ -46,7 +56,9 @@ export class SpreadsheetEngineService {
     return response;
   }
 
-  async insight(req: SpreadsheetEngineInsightRequest): Promise<SpreadsheetEngineInsightResponse> {
+  async insight(
+    req: SpreadsheetEngineInsightRequest,
+  ): Promise<SpreadsheetEngineInsightResponse> {
     if (!this.enabled()) {
       throw new SpreadsheetEngineClientError("Spreadsheet engine mode is off", {
         code: "ENGINE_MODE_OFF",

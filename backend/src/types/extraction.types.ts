@@ -11,47 +11,43 @@
  */
 
 export type SupportedMimeType =
-  | 'application/pdf'
-  | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // docx
-  | 'application/vnd.openxmlformats-officedocument.presentationml.presentation' // pptx
-  | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' // xlsx
-  | 'text/csv'
-  | 'text/plain'
-  | 'image/png'
-  | 'image/jpeg'
-  | 'image/jpg'
-  | 'image/webp'
+  | "application/pdf"
+  | "application/vnd.openxmlformats-officedocument.wordprocessingml.document" // docx
+  | "application/vnd.openxmlformats-officedocument.presentationml.presentation" // pptx
+  | "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" // xlsx
+  | "text/csv"
+  | "text/plain"
+  | "image/png"
+  | "image/jpeg"
+  | "image/jpg"
+  | "image/webp"
   | string;
 
 export type SupportedDocType =
-  | 'pdf'
-  | 'docx'
-  | 'pptx'
-  | 'xlsx'
-  | 'csv'
-  | 'txt'
-  | 'image'
-  | 'unknown';
+  | "pdf"
+  | "docx"
+  | "pptx"
+  | "xlsx"
+  | "csv"
+  | "txt"
+  | "image"
+  | "unknown";
 
 export type ExtractionEngine =
-  | 'pdf_text'
-  | 'pdf_ocr'
-  | 'image_ocr'
-  | 'docx_parser'
-  | 'pptx_parser'
-  | 'xlsx_parser'
-  | 'csv_parser'
-  | 'txt_parser'
-  | 'hybrid'
-  | 'unknown';
+  | "pdf_text"
+  | "pdf_ocr"
+  | "image_ocr"
+  | "docx_parser"
+  | "pptx_parser"
+  | "xlsx_parser"
+  | "csv_parser"
+  | "txt_parser"
+  | "hybrid"
+  | "unknown";
 
-export type ExtractionStatus =
-  | 'ok'
-  | 'partial'
-  | 'failed'
-  | 'skipped';
+export type ExtractionStatus = "ok" | "partial" | "failed" | "skipped";
 
-export type Severity = 'info' | 'warning' | 'error';
+export type Severity = "info" | "warning" | "error";
 
 export interface ExtractionWarning {
   code: string; // e.g. "PDF_PARSE_GLYPH_WARN", "OCR_LOW_CONFIDENCE"
@@ -73,7 +69,13 @@ export interface ExtractionError {
  * - Locate_content answers
  * - Spreadsheet cell extraction
  */
-export type EvidenceLocationType = 'page' | 'slide' | 'sheet' | 'cell' | 'section' | 'line';
+export type EvidenceLocationType =
+  | "page"
+  | "slide"
+  | "sheet"
+  | "cell"
+  | "section"
+  | "line";
 
 export interface EvidenceLocation {
   type: EvidenceLocationType;
@@ -112,7 +114,7 @@ export interface ExtractedChunk {
   // Optional signals for ranking/quality gates
   ocrConfidence?: number; // 0..1
   gibberishScore?: number; // 0..1
-  languageHint?: 'en' | 'pt' | 'es' | 'any';
+  languageHint?: "en" | "pt" | "es" | "any";
   tags?: string[]; // e.g. ["table", "heading", "kv", "list", "numeric"]
   createdAt?: string; // ISO
 }
@@ -144,7 +146,7 @@ export interface ExtractedTable {
  */
 export interface ExtractedSpreadsheet {
   docId: string;
-  docType: 'xlsx' | 'csv';
+  docType: "xlsx" | "csv";
 
   sheets: Array<{
     sheetName: string;
@@ -227,7 +229,7 @@ export interface ExtractionResult {
  */
 export interface IndexBuildResult {
   docId: string;
-  status: 'indexed' | 'skipped' | 'failed';
+  status: "indexed" | "skipped" | "failed";
   chunkCount: number;
   tableCount?: number;
   fieldCount?: number;
@@ -267,7 +269,7 @@ export interface ExtractorInput {
   filePath?: string;
 
   // Hints
-  languageHint?: 'en' | 'pt' | 'es' | 'any';
+  languageHint?: "en" | "pt" | "es" | "any";
   maxPages?: number;
   maxChars?: number;
 
@@ -287,29 +289,31 @@ export interface Extractor {
  * Common codes (optional): helps standardize warnings/errors across extractors.
  */
 export const EXTRACTION_WARNING_CODES = {
-  OCR_LOW_CONFIDENCE: 'OCR_LOW_CONFIDENCE',
-  OCR_PARTIAL: 'OCR_PARTIAL',
-  PDF_PARSE_GLYPH_WARN: 'PDF_PARSE_GLYPH_WARN',
-  PDF_TEXT_GIBBERISH: 'PDF_TEXT_GIBBERISH',
-  TABLE_PARSE_PARTIAL: 'TABLE_PARSE_PARTIAL',
-  DOCX_PARSE_PARTIAL: 'DOCX_PARSE_PARTIAL',
-  PPTX_PARSE_PARTIAL: 'PPTX_PARSE_PARTIAL',
-  XLSX_PARSE_PARTIAL: 'XLSX_PARSE_PARTIAL',
+  OCR_LOW_CONFIDENCE: "OCR_LOW_CONFIDENCE",
+  OCR_PARTIAL: "OCR_PARTIAL",
+  PDF_PARSE_GLYPH_WARN: "PDF_PARSE_GLYPH_WARN",
+  PDF_TEXT_GIBBERISH: "PDF_TEXT_GIBBERISH",
+  TABLE_PARSE_PARTIAL: "TABLE_PARSE_PARTIAL",
+  DOCX_PARSE_PARTIAL: "DOCX_PARSE_PARTIAL",
+  PPTX_PARSE_PARTIAL: "PPTX_PARSE_PARTIAL",
+  XLSX_PARSE_PARTIAL: "XLSX_PARSE_PARTIAL",
 } as const;
 
 export const EXTRACTION_ERROR_CODES = {
-  PDF_PARSE_FAILED: 'PDF_PARSE_FAILED',
-  OCR_FAILED: 'OCR_FAILED',
-  DOCX_PARSE_FAILED: 'DOCX_PARSE_FAILED',
-  PPTX_PARSE_FAILED: 'PPTX_PARSE_FAILED',
-  XLSX_PARSE_FAILED: 'XLSX_PARSE_FAILED',
-  CSV_PARSE_FAILED: 'CSV_PARSE_FAILED',
-  TXT_PARSE_FAILED: 'TXT_PARSE_FAILED',
-  UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
+  PDF_PARSE_FAILED: "PDF_PARSE_FAILED",
+  OCR_FAILED: "OCR_FAILED",
+  DOCX_PARSE_FAILED: "DOCX_PARSE_FAILED",
+  PPTX_PARSE_FAILED: "PPTX_PARSE_FAILED",
+  XLSX_PARSE_FAILED: "XLSX_PARSE_FAILED",
+  CSV_PARSE_FAILED: "CSV_PARSE_FAILED",
+  TXT_PARSE_FAILED: "TXT_PARSE_FAILED",
+  UNSUPPORTED_TYPE: "UNSUPPORTED_TYPE",
 } as const;
 
-export type ExtractionWarningCode = (typeof EXTRACTION_WARNING_CODES)[keyof typeof EXTRACTION_WARNING_CODES];
-export type ExtractionErrorCode = (typeof EXTRACTION_ERROR_CODES)[keyof typeof EXTRACTION_ERROR_CODES];
+export type ExtractionWarningCode =
+  (typeof EXTRACTION_WARNING_CODES)[keyof typeof EXTRACTION_WARNING_CODES];
+export type ExtractionErrorCode =
+  (typeof EXTRACTION_ERROR_CODES)[keyof typeof EXTRACTION_ERROR_CODES];
 
 // ---------------------------------------------------------------------------
 // Specialized result aliases used by extractor services
@@ -322,31 +326,95 @@ export type PptxExtractionResult = ExtractionResult;
 export type XlsxExtractionResult = ExtractionResult;
 
 // DOCX-specific types
-export interface DocxSection { heading?: string; text?: string; level?: number; content?: string; children?: DocxSection[]; paragraphStart?: number; paragraphEnd?: number; path?: string[]; [k: string]: any; }
-export interface DocxHeadingAnchor { heading: string; level: number; [k: string]: any; }
-export interface DocxParagraphAnchor { paragraphIndex: number; [k: string]: any; }
-export function createDocxHeadingAnchor(heading: string, level: number, ..._rest: any[]): DocxHeadingAnchor {
+export interface DocxSection {
+  heading?: string;
+  text?: string;
+  level?: number;
+  content?: string;
+  children?: DocxSection[];
+  paragraphStart?: number;
+  paragraphEnd?: number;
+  path?: string[];
+  [k: string]: any;
+}
+export interface DocxHeadingAnchor {
+  heading: string;
+  level: number;
+  [k: string]: any;
+}
+export interface DocxParagraphAnchor {
+  paragraphIndex: number;
+  [k: string]: any;
+}
+export function createDocxHeadingAnchor(
+  heading: string,
+  level: number,
+  ..._rest: any[]
+): DocxHeadingAnchor {
   return { heading, level };
 }
 
 // PDF-specific types
-export interface PdfExtractedPage { pageNumber?: number; page?: number; text: string; ocrConfidence?: number; [k: string]: any; }
-export interface PdfPageAnchor { pageNumber: number; [k: string]: any; }
-export function createPdfPageAnchor(pageNumber: number, ..._rest: any[]): PdfPageAnchor {
+export interface PdfExtractedPage {
+  pageNumber?: number;
+  page?: number;
+  text: string;
+  ocrConfidence?: number;
+  [k: string]: any;
+}
+export interface PdfPageAnchor {
+  pageNumber: number;
+  [k: string]: any;
+}
+export function createPdfPageAnchor(
+  pageNumber: number,
+  ..._rest: any[]
+): PdfPageAnchor {
   return { pageNumber };
 }
 
 // PPTX-specific types
-export interface PptxExtractedSlide { slideNumber?: number; slide?: number; text: string; notes?: string; [k: string]: any; }
-export interface PptSlideAnchor { slideNumber: number; [k: string]: any; }
-export function createPptSlideAnchor(slideNumber: number, ..._rest: any[]): PptSlideAnchor {
+export interface PptxExtractedSlide {
+  slideNumber?: number;
+  slide?: number;
+  text: string;
+  notes?: string;
+  [k: string]: any;
+}
+export interface PptSlideAnchor {
+  slideNumber: number;
+  [k: string]: any;
+}
+export function createPptSlideAnchor(
+  slideNumber: number,
+  ..._rest: any[]
+): PptSlideAnchor {
   return { slideNumber };
 }
 
 // XLSX-specific types
-export interface XlsxSheetSummary { sheetName?: string; name?: string; rowCount?: number; columnCount?: number; [k: string]: any; }
-export interface XlsxCellFact { cell: string; value: string; sheetName?: string; [k: string]: any; }
-export interface XlsxCellAnchor { cell: string; sheetName?: string; [k: string]: any; }
-export function createXlsxCellAnchor(cell: string, sheetName?: string, ..._rest: any[]): XlsxCellAnchor {
+export interface XlsxSheetSummary {
+  sheetName?: string;
+  name?: string;
+  rowCount?: number;
+  columnCount?: number;
+  [k: string]: any;
+}
+export interface XlsxCellFact {
+  cell: string;
+  value: string;
+  sheetName?: string;
+  [k: string]: any;
+}
+export interface XlsxCellAnchor {
+  cell: string;
+  sheetName?: string;
+  [k: string]: any;
+}
+export function createXlsxCellAnchor(
+  cell: string,
+  sheetName?: string,
+  ..._rest: any[]
+): XlsxCellAnchor {
   return { cell, sheetName };
 }

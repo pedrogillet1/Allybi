@@ -37,7 +37,9 @@ describe("EditOrchestratorService stale-plan protections", () => {
     const revisionStore = {
       createRevision: jest
         .fn()
-        .mockRejectedValue(new Error("REPLAN_REQUIRED: document changed since plan.")),
+        .mockRejectedValue(
+          new Error("REPLAN_REQUIRED: document changed since plan."),
+        ),
       undoToRevision: jest.fn(),
     };
 
@@ -76,4 +78,3 @@ describe("EditOrchestratorService stale-plan protections", () => {
     );
   });
 });
-

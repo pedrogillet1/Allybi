@@ -50,7 +50,7 @@ function isError(statusCode: number, include429: boolean): boolean {
  */
 export function calculateErrorRate(
   apiEvents: ApiPerfEvent[],
-  opts?: ErrorRateOptions
+  opts?: ErrorRateOptions,
 ): ErrorRateResult {
   const include429 = opts?.include429 !== false; // Default true
 
@@ -71,7 +71,7 @@ export function calculateErrorRate(
   let totalErrors = 0;
 
   for (const event of apiEvents) {
-    const route = event.route || 'unknown';
+    const route = event.route || "unknown";
     const statusCode = event.statusCode ?? 0;
 
     if (!routeStats.has(route)) {
@@ -116,7 +116,7 @@ export function calculateErrorRate(
  */
 export function calculateErrorRateSeries(
   apiEvents: ApiPerfEvent[],
-  opts?: ErrorRateOptions
+  opts?: ErrorRateOptions,
 ): Array<{ day: string; total: number; errors: number; errorRate: number }> {
   const include429 = opts?.include429 !== false;
 
@@ -148,7 +148,7 @@ export function calculateErrorRateSeries(
   // Build sorted series
   const days = Array.from(byDay.keys()).sort();
 
-  return days.map(day => {
+  return days.map((day) => {
     const stats = byDay.get(day)!;
     return {
       day,

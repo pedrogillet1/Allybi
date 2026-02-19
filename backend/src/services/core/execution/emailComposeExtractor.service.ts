@@ -49,7 +49,10 @@ function safeRegex(pattern: string, flags: string): RegExp | null {
   }
 }
 
-function pickPatterns(rule: RegexByLang | undefined, lang: LanguageCode): string[] {
+function pickPatterns(
+  rule: RegexByLang | undefined,
+  lang: LanguageCode,
+): string[] {
   if (!rule) return [];
   return [...(rule.any ?? []), ...(rule[lang] ?? [])];
 }
@@ -59,7 +62,9 @@ function stripDiacritics(input: string): string {
 }
 
 function normalize(input: string): string {
-  return stripDiacritics(String(input || "")).replace(/\s+/g, " ").trim();
+  return stripDiacritics(String(input || ""))
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export interface ExtractedEmailCompose {
@@ -77,7 +82,9 @@ export class EmailComposeExtractorService {
   private readonly bank: EmailActionOperatorsBank | null;
 
   constructor() {
-    this.bank = getOptionalBank<EmailActionOperatorsBank>("email_action_operators") ?? null;
+    this.bank =
+      getOptionalBank<EmailActionOperatorsBank>("email_action_operators") ??
+      null;
   }
 
   isEnabled(): boolean {
@@ -94,35 +101,65 @@ export class EmailComposeExtractorService {
 
     const provider = this.extractProvider(normalized);
 
-    const to = this.extractFirst(cfg?.fields?.to?.patterns, raw, lang)?.trim() ?? null;
-    const subjectRaw = this.extractFirst(cfg?.fields?.subject?.patterns, raw, lang);
+    const to =
+      this.extractFirst(cfg?.fields?.to?.patterns, raw, lang)?.trim() ?? null;
+    const subjectRaw = this.extractFirst(
+      cfg?.fields?.subject?.patterns,
+      raw,
+      lang,
+    );
     const bodyRaw = this.extractFirst(cfg?.fields?.body?.patterns, raw, lang);
-    const attRaw = this.extractAll(cfg?.fields?.attachmentNames?.patterns, raw, lang);
-    const purposeHint = this.extractFirst(cfg?.hints?.purpose?.patterns, raw, lang);
+    const attRaw = this.extractAll(
+      cfg?.fields?.attachmentNames?.patterns,
+      raw,
+      lang,
+    );
+    const purposeHint = this.extractFirst(
+      cfg?.hints?.purpose?.patterns,
+      raw,
+      lang,
+    );
 
     const lengthHint = (() => {
-      const hasShort = this.matchesAny(cfg?.hints?.length?.short?.patterns, raw, lang);
-      const hasLong = this.matchesAny(cfg?.hints?.length?.long?.patterns, raw, lang);
+      const hasShort = this.matchesAny(
+        cfg?.hints?.length?.short?.patterns,
+        raw,
+        lang,
+      );
+      const hasLong = this.matchesAny(
+        cfg?.hints?.length?.long?.patterns,
+        raw,
+        lang,
+      );
       if (hasShort && !hasLong) return "short";
       if (hasLong && !hasShort) return "long";
       return null;
     })();
 
     const toneHint = (() => {
-      if (this.matchesAny(cfg?.hints?.tone?.formal?.patterns, raw, lang)) return "formal";
-      if (this.matchesAny(cfg?.hints?.tone?.casual?.patterns, raw, lang)) return "casual";
-      if (this.matchesAny(cfg?.hints?.tone?.professionalWarm?.patterns, raw, lang)) return "professional_warm";
+      if (this.matchesAny(cfg?.hints?.tone?.formal?.patterns, raw, lang))
+        return "formal";
+      if (this.matchesAny(cfg?.hints?.tone?.casual?.patterns, raw, lang))
+        return "casual";
+      if (
+        this.matchesAny(cfg?.hints?.tone?.professionalWarm?.patterns, raw, lang)
+      )
+        return "professional_warm";
       return null;
     })();
 
     const subject = subjectRaw ? subjectRaw.trim().slice(0, maxSubject) : null;
     const body = bodyRaw ? bodyRaw.trim().slice(0, maxBody) : null;
 
-    const attachmentNames = Array.from(new Set(attRaw.map((s) => s.trim()).filter(Boolean))).slice(0, 10);
+    const attachmentNames = Array.from(
+      new Set(attRaw.map((s) => s.trim()).filter(Boolean)),
+    ).slice(0, 10);
 
     // Minimal cleanup: if subject accidentally includes body marker, trim it.
     const cleanedSubject = subject
-      ? subject.replace(/\s+(?:and|with)\s+(?:body|message|text)\b[\s\S]*$/i, "").trim()
+      ? subject
+          .replace(/\s+(?:and|with)\s+(?:body|message|text)\b[\s\S]*$/i, "")
+          .trim()
       : null;
 
     return {
@@ -143,9 +180,13 @@ export class EmailComposeExtractorService {
     return m[lang] || m.en || "Missing required information.";
   }
 
-  private extractProvider(normalizedLower: string): "gmail" | "outlook" | "email" | null {
+  private extractProvider(
+    normalizedLower: string,
+  ): "gmail" | "outlook" | "email" | null {
     const pCfg = this.bank?.config?.composeExtraction?.provider;
-    const allowed = (pCfg?.allowed || []).map((s) => String(s || "").toLowerCase()).filter(Boolean);
+    const allowed = (pCfg?.allowed || [])
+      .map((s) => String(s || "").toLowerCase())
+      .filter(Boolean);
     const aliases = pCfg?.aliases || {};
 
     const aliasKeys = Object.keys(aliases).sort((a, b) => b.length - a.length);
@@ -153,14 +194,20 @@ export class EmailComposeExtractorService {
       const key = normalize(k).toLowerCase();
       if (!key) continue;
       if (normalizedLower.includes(key)) {
-        const mapped = String((aliases as any)[k] || "").toLowerCase().trim();
-        if (mapped === "gmail" || mapped === "outlook" || mapped === "email") return mapped;
+        const mapped = String((aliases as any)[k] || "")
+          .toLowerCase()
+          .trim();
+        if (mapped === "gmail" || mapped === "outlook" || mapped === "email")
+          return mapped;
       }
     }
 
     for (const p of allowed) {
       if (!p) continue;
-      const rx = safeRegex(`\\b${p.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\b`, "i");
+      const rx = safeRegex(
+        `\\b${p.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\b`,
+        "i",
+      );
       if (rx && rx.test(normalizedLower)) {
         if (p === "gmail" || p === "outlook" || p === "email") return p;
       }
@@ -169,7 +216,11 @@ export class EmailComposeExtractorService {
     return null;
   }
 
-  private extractFirst(patterns: RegexByLang | undefined, raw: string, lang: LanguageCode): string | null {
+  private extractFirst(
+    patterns: RegexByLang | undefined,
+    raw: string,
+    lang: LanguageCode,
+  ): string | null {
     const list = pickPatterns(patterns, lang);
     for (const p of list) {
       const rx = safeRegex(p, "i");
@@ -182,7 +233,11 @@ export class EmailComposeExtractorService {
     return null;
   }
 
-  private extractAll(patterns: RegexByLang | undefined, raw: string, lang: LanguageCode): string[] {
+  private extractAll(
+    patterns: RegexByLang | undefined,
+    raw: string,
+    lang: LanguageCode,
+  ): string[] {
     const out: string[] = [];
     const list = pickPatterns(patterns, lang);
     for (const p of list) {
@@ -197,7 +252,11 @@ export class EmailComposeExtractorService {
     return out;
   }
 
-  private matchesAny(patterns: RegexByLang | undefined, raw: string, lang: LanguageCode): boolean {
+  private matchesAny(
+    patterns: RegexByLang | undefined,
+    raw: string,
+    lang: LanguageCode,
+  ): boolean {
     const list = pickPatterns(patterns, lang);
     for (const p of list) {
       const rx = safeRegex(p, "i");

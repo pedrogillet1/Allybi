@@ -1,6 +1,6 @@
 // src/types/user.types.ts
 
-import type { DomainId } from './domains.types';
+import type { DomainId } from "./domains.types";
 
 /**
  * User types for Koda.
@@ -17,25 +17,20 @@ export type SessionId = string;
 // RBAC / Roles
 // ---------------------------------------------
 
-export type UserRole =
-  | 'owner'
-  | 'admin'
-  | 'member'
-  | 'viewer'
-  | 'support'; // optional internal role
+export type UserRole = "owner" | "admin" | "member" | "viewer" | "support"; // optional internal role
 
 export type Permission =
-  | 'chat:read'
-  | 'chat:write'
-  | 'docs:read'
-  | 'docs:write'
-  | 'docs:delete'
-  | 'folders:read'
-  | 'folders:write'
-  | 'billing:read'
-  | 'billing:write'
-  | 'admin:dashboard'
-  | 'admin:manage_users';
+  | "chat:read"
+  | "chat:write"
+  | "docs:read"
+  | "docs:write"
+  | "docs:delete"
+  | "folders:read"
+  | "folders:write"
+  | "billing:read"
+  | "billing:write"
+  | "admin:dashboard"
+  | "admin:manage_users";
 
 export interface RbacContext {
   role: UserRole;
@@ -48,7 +43,7 @@ export interface RbacContext {
 // Auth providers
 // ---------------------------------------------
 
-export type AuthProvider = 'password' | 'google' | 'apple' | 'github';
+export type AuthProvider = "password" | "google" | "apple" | "github";
 
 export interface AuthIdentity {
   provider: AuthProvider;
@@ -69,7 +64,7 @@ export interface AuthIdentity {
 // Plans / limits
 // ---------------------------------------------
 
-export type PlanTier = 'free' | 'pro' | 'team' | 'enterprise';
+export type PlanTier = "free" | "pro" | "team" | "enterprise";
 
 export interface UsageLimits {
   maxDocs: number;
@@ -99,16 +94,16 @@ export interface PlanInfo {
 // Preferences (UX / behavior)
 // ---------------------------------------------
 
-export type UiTheme = 'light' | 'dark' | 'system';
+export type UiTheme = "light" | "dark" | "system";
 
 export interface UserPreferences {
-  language?: 'en' | 'pt' | 'es' | string; // allow future locales
+  language?: "en" | "pt" | "es" | string; // allow future locales
   theme?: UiTheme;
 
   /**
    * Chat behavior preferences.
    */
-  defaultDomain?: DomainId | 'general';
+  defaultDomain?: DomainId | "general";
   preferShortAnswers?: boolean;
   allowFollowups?: boolean;
 
@@ -145,21 +140,21 @@ export interface UserProfile {
    * Keep it light; don’t store sensitive identity attributes here.
    */
   primaryUseCases?: Array<
-    | 'personal_docs'
-    | 'finance'
-    | 'accounting'
-    | 'legal'
-    | 'medical'
-    | 'education'
-    | 'operations'
-    | 'other'
+    | "personal_docs"
+    | "finance"
+    | "accounting"
+    | "legal"
+    | "medical"
+    | "education"
+    | "operations"
+    | "other"
   >;
 
   /**
    * Optional: user’s preferred doc conventions (helps disambiguation).
    */
-  preferredUnits?: 'metric' | 'imperial' | 'mixed';
-  preferredCurrency?: 'USD' | 'BRL' | 'EUR' | string;
+  preferredUnits?: "metric" | "imperial" | "mixed";
+  preferredCurrency?: "USD" | "BRL" | "EUR" | string;
 
   createdAt?: string;
   updatedAt?: string;
@@ -184,7 +179,10 @@ export interface PublicUser {
 
   profile?: UserProfile;
   preferences?: UserPreferences;
-  plan?: Pick<PlanInfo, 'tier' | 'isTrial' | 'trialEndsAt' | 'limits' | 'usage'>;
+  plan?: Pick<
+    PlanInfo,
+    "tier" | "isTrial" | "trialEndsAt" | "limits" | "usage"
+  >;
 
   createdAt: string; // ISO
   updatedAt: string; // ISO
@@ -200,7 +198,7 @@ export interface InternalUser extends PublicUser {
   /**
    * Security & account state.
    */
-  status: 'active' | 'suspended' | 'deleted';
+  status: "active" | "suspended" | "deleted";
   lastLoginAt?: string | null;
   twoFactorEnabled?: boolean;
 
@@ -282,9 +280,9 @@ export type UserSafeFields = keyof PublicUser;
 export function isPublicUser(u: any): u is PublicUser {
   return (
     u &&
-    typeof u.id === 'string' &&
-    typeof u.createdAt === 'string' &&
-    typeof u.updatedAt === 'string' &&
-    typeof u.role === 'string'
+    typeof u.id === "string" &&
+    typeof u.createdAt === "string" &&
+    typeof u.updatedAt === "string" &&
+    typeof u.role === "string"
   );
 }

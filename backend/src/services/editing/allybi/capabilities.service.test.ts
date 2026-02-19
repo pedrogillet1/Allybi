@@ -6,7 +6,8 @@ describe("buildDocumentCapabilities", () => {
     const out = buildDocumentCapabilities({
       documentId: "d1",
       filename: "a.docx",
-      mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      mimeType:
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     });
 
     expect(out.supports.docx).toBe(true);
@@ -18,7 +19,8 @@ describe("buildDocumentCapabilities", () => {
     const out = buildDocumentCapabilities({
       documentId: "d2",
       filename: "a.xlsx",
-      mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      mimeType:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
 
     expect(out.supports.sheets).toBe(true);

@@ -1,5 +1,5 @@
-import prisma from '../config/database';
-import crypto from 'crypto';
+import prisma from "../config/database";
+import crypto from "crypto";
 
 /**
  * Generate a 6-digit verification code
@@ -47,7 +47,7 @@ export const verifyPendingEmail = async (email: string, code: string) => {
   });
 
   if (!pendingUser) {
-    throw new Error('No pending registration found');
+    throw new Error("No pending registration found");
   }
 
   if (pendingUser.expiresAt < new Date()) {
@@ -55,11 +55,11 @@ export const verifyPendingEmail = async (email: string, code: string) => {
     await prisma.pendingUser.delete({
       where: { id: pendingUser.id },
     });
-    throw new Error('Registration expired. Please sign up again.');
+    throw new Error("Registration expired. Please sign up again.");
   }
 
   if (pendingUser.emailCode !== code) {
-    throw new Error('Invalid verification code');
+    throw new Error("Invalid verification code");
   }
 
   // Mark email as verified
@@ -83,7 +83,7 @@ export const resendEmailCode = async (email: string) => {
   });
 
   if (!pendingUser) {
-    throw new Error('No pending registration found');
+    throw new Error("No pending registration found");
   }
 
   if (pendingUser.expiresAt < new Date()) {
@@ -91,11 +91,11 @@ export const resendEmailCode = async (email: string) => {
     await prisma.pendingUser.delete({
       where: { id: pendingUser.id },
     });
-    throw new Error('Registration expired. Please sign up again.');
+    throw new Error("Registration expired. Please sign up again.");
   }
 
   if (pendingUser.emailVerified) {
-    throw new Error('Email already verified');
+    throw new Error("Email already verified");
   }
 
   // Generate new verification code
@@ -119,14 +119,14 @@ export const addPhoneToPending = async (email: string, phoneNumber: string) => {
   });
 
   if (!pendingUser) {
-    throw new Error('No pending registration found');
+    throw new Error("No pending registration found");
   }
 
   if (pendingUser.expiresAt < new Date()) {
     await prisma.pendingUser.delete({
       where: { id: pendingUser.id },
     });
-    throw new Error('Registration expired. Please sign up again.');
+    throw new Error("Registration expired. Please sign up again.");
   }
 
   const phoneCode = generateVerificationCode();
@@ -148,18 +148,18 @@ export const verifyPendingPhone = async (email: string, code: string) => {
   });
 
   if (!pendingUser) {
-    throw new Error('No pending registration found');
+    throw new Error("No pending registration found");
   }
 
   if (pendingUser.expiresAt < new Date()) {
     await prisma.pendingUser.delete({
       where: { id: pendingUser.id },
     });
-    throw new Error('Registration expired. Please sign up again.');
+    throw new Error("Registration expired. Please sign up again.");
   }
 
   if (pendingUser.phoneCode !== code) {
-    throw new Error('Invalid verification code');
+    throw new Error("Invalid verification code");
   }
 
   // Mark phone as verified

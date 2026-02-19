@@ -1,22 +1,31 @@
-import type { EditDomain, EditOperator, ResolvedTarget } from '../services/editing/editing.types';
-import type { EditPlanRequest, EditPreviewResult, EditApplyResult, EditReceipt } from '../services/editing';
+import type {
+  EditDomain,
+  EditOperator,
+  ResolvedTarget,
+} from "../services/editing/editing.types";
+import type {
+  EditPlanRequest,
+  EditPreviewResult,
+  EditApplyResult,
+  EditReceipt,
+} from "../services/editing";
 
 export type EditorSessionStatus =
-  | 'idle'
-  | 'planning'
-  | 'awaiting_confirmation'
-  | 'applying'
-  | 'applied'
-  | 'cancelled'
-  | 'error'
-  | 'expired';
+  | "idle"
+  | "planning"
+  | "awaiting_confirmation"
+  | "applying"
+  | "applied"
+  | "cancelled"
+  | "error"
+  | "expired";
 
 export interface EditorSessionContext {
   userId: string;
   conversationId: string;
   correlationId: string;
   clientMessageId: string;
-  language?: 'en' | 'pt' | 'es';
+  language?: "en" | "pt" | "es";
 }
 
 export interface EditorSessionStartRequest {
@@ -35,9 +44,25 @@ export interface EditorSessionStartRequest {
   target?: ResolvedTarget;
 
   // Optional candidates to allow server-side target resolution.
-  docxCandidates?: Array<{ paragraphId: string; text: string; sectionPath?: string[]; styleFingerprint?: string }>;
-  sheetsCandidates?: Array<{ targetId: string; a1: string; sheetName: string; text: string; header?: string }>;
-  slidesCandidates?: Array<{ objectId: string; slideNumber: number; label: string; text: string }>;
+  docxCandidates?: Array<{
+    paragraphId: string;
+    text: string;
+    sectionPath?: string[];
+    styleFingerprint?: string;
+  }>;
+  sheetsCandidates?: Array<{
+    targetId: string;
+    a1: string;
+    sheetName: string;
+    text: string;
+    header?: string;
+  }>;
+  slidesCandidates?: Array<{
+    objectId: string;
+    slideNumber: number;
+    label: string;
+    text: string;
+  }>;
 }
 
 export interface EditorSessionStartResponse {

@@ -7,13 +7,12 @@
  * Based on: pasted_content_21.txt Layer 6 specifications
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
 import {
   FallbackScenarioKey,
   FallbackStyleId,
   LanguageCode,
-} from '../../types/intents.types';
+} from "../../types/intents.types";
+import { getOptionalBank } from "../core/banks/bankLoader.service";
 
 /**
  * Fallback style definition
@@ -28,10 +27,13 @@ export interface FallbackStyle {
     showIcon?: boolean;
     icon?: string;
   };
-  languages: Record<LanguageCode, {
-    template: string;
-    placeholders?: string[];
-  }>;
+  languages: Record<
+    LanguageCode,
+    {
+      template: string;
+      placeholders?: string[];
+    }
+  >;
 }
 
 /**
@@ -71,14 +73,9 @@ export interface FallbackResponse {
 export class FallbackConfigService {
   private scenarios: Map<FallbackScenarioKey, FallbackScenario> = new Map();
   private isLoaded = false;
-  private readonly configPath: string;
   private readonly logger: any;
 
-  constructor(
-    configPath: string = path.join(__dirname, '../../data_banks/routing/fallback_router.any.json'),
-    logger?: any
-  ) {
-    this.configPath = configPath;
+  constructor(_configPath?: string, logger?: any) {
     this.logger = logger || console;
   }
 
@@ -88,38 +85,44 @@ export class FallbackConfigService {
    */
   async loadFallbacks(): Promise<void> {
     if (this.isLoaded) {
-      this.logger.warn('[FallbackConfig] Fallbacks already loaded, skipping');
+      this.logger.warn("[FallbackConfig] Fallbacks already loaded, skipping");
       return;
     }
 
     try {
-      this.logger.info('[FallbackConfig] Loading fallbacks from:', this.configPath);
+      this.logger.info("[FallbackConfig] Loading fallbacks from bank loader");
+      const raw = getOptionalBank<any>("fallback_router");
+      const config: FallbackConfig =
+        raw && typeof raw === "object"
+          ? (raw as FallbackConfig)
+          : { scenarios: [] };
+      const scenarios = Array.isArray(config?.scenarios)
+        ? config.scenarios
+        : [];
 
-      // Read JSON file
-      const rawData = fs.readFileSync(this.configPath, 'utf-8');
-      const config: FallbackConfig = JSON.parse(rawData);
+      if (!scenarios.length) {
+        this.logger.warn(
+          "[FallbackConfig] fallback_router has no scenarios[] contract; continuing with empty fallback scenarios",
+        );
+      }
 
       // Index scenarios by key
       let loadedCount = 0;
-      for (const scenario of config.scenarios) {
+      for (const scenario of scenarios) {
         this.scenarios.set(scenario.key, scenario);
         loadedCount++;
       }
 
       this.isLoaded = true;
-      this.logger.info(`[FallbackConfig] Loaded ${loadedCount} fallback scenarios`);
+      this.logger.info(
+        `[FallbackConfig] Loaded ${loadedCount} fallback scenarios`,
+      );
 
       // Validate critical scenarios exist
       this.validateCoverage();
-
     } catch (error: any) {
-      if (error?.code === 'ENOENT') {
-        this.logger.warn(`[FallbackConfig] Config file not found: ${this.configPath} — using defaults`);
-        this.isLoaded = true; // allow service to work with empty scenarios
-        return;
-      }
-      this.logger.error('[FallbackConfig] Failed to load fallbacks:', error);
-      throw new Error('Failed to initialize fallback configuration');
+      this.logger.error("[FallbackConfig] Failed to load fallbacks:", error);
+      throw new Error("Failed to initialize fallback configuration");
     }
   }
 
@@ -128,9 +131,9 @@ export class FallbackConfigService {
    */
   private validateCoverage(): void {
     const criticalScenarios: FallbackScenarioKey[] = [
-      'NO_DOCUMENTS',
-      'OUT_OF_SCOPE',
-      'AMBIGUOUS_QUESTION',
+      "NO_DOCUMENTS",
+      "OUT_OF_SCOPE",
+      "AMBIGUOUS_QUESTION",
     ];
 
     const missing: string[] = [];
@@ -142,7 +145,7 @@ export class FallbackConfigService {
 
     if (missing.length > 0) {
       this.logger.warn(
-        `[FallbackConfig] Missing critical fallback scenarios: ${missing.join(', ')}`
+        `[FallbackConfig] Missing critical fallback scenarios: ${missing.join(", ")}`,
       );
     }
   }
@@ -158,8 +161,8 @@ export class FallbackConfigService {
   getFallback(
     scenarioKey: FallbackScenarioKey,
     styleId?: FallbackStyleId,
-    language: LanguageCode = 'en',
-    placeholders?: Record<string, string>
+    language: LanguageCode = "en",
+    placeholders?: Record<string, string>,
   ): FallbackResponse {
     const scenario = this.scenarios.get(scenarioKey);
 
@@ -171,23 +174,25 @@ export class FallbackConfigService {
     // Find the requested style, or use the first one
     let style: FallbackStyle | undefined;
     if (styleId) {
-      style = scenario.styles.find(s => s.id === styleId);
+      style = scenario.styles.find((s) => s.id === styleId);
     }
     if (!style) {
       style = scenario.styles[0];
     }
 
     if (!style) {
-      this.logger.warn(`[FallbackConfig] No styles found for scenario: ${scenarioKey}`);
+      this.logger.warn(
+        `[FallbackConfig] No styles found for scenario: ${scenarioKey}`,
+      );
       return this.getDefaultFallback(language);
     }
 
     // Get template for the requested language, fallback to English
-    const langTemplate = style.languages[language] || style.languages['en'];
+    const langTemplate = style.languages[language] || style.languages["en"];
 
     if (!langTemplate) {
       this.logger.warn(
-        `[FallbackConfig] No template found for ${scenarioKey}/${language}, using default`
+        `[FallbackConfig] No template found for ${scenarioKey}/${language}, using default`,
       );
       return this.getDefaultFallback(language);
     }
@@ -210,16 +215,19 @@ export class FallbackConfigService {
    * Fill template with placeholder values
    * Replaces {{placeholder}} with actual values
    */
-  private fillTemplate(template: string, placeholders: Record<string, string>): string {
+  private fillTemplate(
+    template: string,
+    placeholders: Record<string, string>,
+  ): string {
     let filled = template;
 
     for (const [key, value] of Object.entries(placeholders)) {
-      const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+      const regex = new RegExp(`\\{\\{${key}\\}\\}`, "g");
       filled = filled.replace(regex, value);
     }
 
     // Remove any remaining unfilled placeholders
-    filled = filled.replace(/\{\{[^}]+\}\}/g, '');
+    filled = filled.replace(/\{\{[^}]+\}\}/g, "");
 
     return filled;
   }
@@ -235,15 +243,15 @@ export class FallbackConfigService {
     };
 
     return {
-      text: defaultMessages[language] || defaultMessages['en'],
+      text: defaultMessages[language] || defaultMessages["en"],
       renderHint: {
-        layout: 'simple',
+        layout: "simple",
         showIcon: true,
-        icon: 'warning',
+        icon: "warning",
       },
       metadata: {
-        scenario: 'UNSUPPORTED_INTENT',
-        style: 'one_liner',
+        scenario: "UNSUPPORTED_INTENT",
+        style: "one_liner",
         language,
       },
     };
@@ -293,7 +301,7 @@ export class FallbackConfigService {
 
       for (const style of scenario.styles) {
         for (const lang of Object.keys(style.languages)) {
-          if (lang === 'en' || lang === 'pt' || lang === 'es') {
+          if (lang === "en" || lang === "pt" || lang === "es") {
             stats.byLanguage[lang as LanguageCode]++;
           }
         }

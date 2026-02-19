@@ -1,27 +1,33 @@
-import { randomUUID } from 'crypto';
+import { randomUUID } from "crypto";
 
-export type EditorSessionStatus = 'active' | 'committing' | 'committed' | 'cancelled' | 'expired' | 'errored';
+export type EditorSessionStatus =
+  | "active"
+  | "committing"
+  | "committed"
+  | "cancelled"
+  | "expired"
+  | "errored";
 
 export type EditorStage =
-  | 'init'
-  | 'plan'
-  | 'resolve_target'
-  | 'draft'
-  | 'quality_gates'
-  | 'preview'
-  | 'apply'
-  | 'reindex'
-  | 'done';
+  | "init"
+  | "plan"
+  | "resolve_target"
+  | "draft"
+  | "quality_gates"
+  | "preview"
+  | "apply"
+  | "reindex"
+  | "done";
 
 export type EditorEventType =
-  | 'stage'
-  | 'delta'
-  | 'message'
-  | 'patch_proposed'
-  | 'patch_enqueued'
-  | 'patch_applied'
-  | 'warning'
-  | 'error';
+  | "stage"
+  | "delta"
+  | "message"
+  | "patch_proposed"
+  | "patch_enqueued"
+  | "patch_applied"
+  | "warning"
+  | "error";
 
 export interface EditorEvent {
   id: string;
@@ -33,7 +39,7 @@ export interface EditorEvent {
 
 export interface EditorPatch {
   patchId: string;
-  kind: 'docx_paragraph' | 'sheets_cell' | 'slides_text' | 'generic_text';
+  kind: "docx_paragraph" | "sheets_cell" | "slides_text" | "generic_text";
   target: Record<string, any>;
   before?: string | null;
   after: string;
@@ -92,7 +98,10 @@ export class EditorStateService {
 
   createSession(input: EditorSessionCreateInput): EditorSession {
     const now = Date.now();
-    const ttlMs = Math.max(30_000, Math.min(input.ttlMs ?? this.DEFAULT_TTL_MS, 12 * 60 * 60 * 1000));
+    const ttlMs = Math.max(
+      30_000,
+      Math.min(input.ttlMs ?? this.DEFAULT_TTL_MS, 12 * 60 * 60 * 1000),
+    );
 
     const session: EditorSession = {
       sessionId: randomUUID(),
@@ -104,8 +113,8 @@ export class EditorStateService {
       createdAt: now,
       updatedAt: now,
       expiresAt: now + ttlMs,
-      status: 'active',
-      stage: 'init',
+      status: "active",
+      stage: "init",
       draftText: null,
       lastError: null,
       patches: [],
@@ -152,7 +161,11 @@ export class EditorStateService {
     return s;
   }
 
-  addEvent(sessionId: string, type: EditorEventType, payload: Record<string, any>): EditorEvent {
+  addEvent(
+    sessionId: string,
+    type: EditorEventType,
+    payload: Record<string, any>,
+  ): EditorEvent {
     const s = this.assertSession(sessionId);
     const ev: EditorEvent = {
       id: randomUUID(),
@@ -172,10 +185,13 @@ export class EditorStateService {
   listEvents(sessionId: string, sinceSeq?: number): EditorEvent[] {
     const s = this.assertSession(sessionId);
     if (!sinceSeq) return [...s.events];
-    return s.events.filter(e => e.seq > sinceSeq);
+    return s.events.filter((e) => e.seq > sinceSeq);
   }
 
-  addPatch(sessionId: string, patch: Omit<EditorPatch, 'patchId'> & { patchId?: string }): EditorPatch {
+  addPatch(
+    sessionId: string,
+    patch: Omit<EditorPatch, "patchId"> & { patchId?: string },
+  ): EditorPatch {
     const s = this.assertSession(sessionId);
     const p: EditorPatch = {
       patchId: patch.patchId || randomUUID(),
@@ -199,9 +215,9 @@ export class EditorStateService {
   cancelSession(sessionId: string, reason?: string): void {
     const s = this.getSession(sessionId);
     if (!s) return;
-    s.status = 'cancelled';
-    s.stage = 'done';
-    s.lastError = reason ? { code: 'CANCELLED', message: reason } : s.lastError;
+    s.status = "cancelled";
+    s.stage = "done";
+    s.lastError = reason ? { code: "CANCELLED", message: reason } : s.lastError;
     s.updatedAt = Date.now();
   }
 
@@ -217,17 +233,16 @@ export class EditorStateService {
   }
 
   private isExpired(s: EditorSession): boolean {
-    return s.expiresAt <= Date.now() || s.status === 'expired';
+    return s.expiresAt <= Date.now() || s.status === "expired";
   }
 
   private expireSession(sessionId: string): void {
     const s = this.sessions.get(sessionId);
     if (!s) return;
-    s.status = 'expired';
-    s.stage = 'done';
+    s.status = "expired";
+    s.stage = "done";
     s.updatedAt = Date.now();
     // Keep record briefly for diagnostics; callers treat expired as missing.
     this.sessions.delete(sessionId);
   }
 }
-

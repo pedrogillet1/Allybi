@@ -12,7 +12,10 @@ import { UPLOAD_CONFIG } from "../config/upload.config";
 import { randomUUID } from "crypto";
 import { addDocumentJob } from "../queues/document.queue";
 import { env } from "../config/env";
-import { isPubSubAvailable, publishExtractJob } from "../services/jobs/pubsubPublisher.service";
+import {
+  isPubSubAvailable,
+  publishExtractJob,
+} from "../services/jobs/pubsubPublisher.service";
 import { logger } from "../utils/logger";
 
 const router = Router();
@@ -31,17 +34,21 @@ function sanitizeFileName(name: string): string {
 }
 
 function validateFileName(name: string): boolean {
-  if (!name || typeof name !== 'string') return false;
+  if (!name || typeof name !== "string") return false;
   // Reject path traversal
-  const parts = name.replace(/\\/g, '/').split('/');
-  if (parts.some(p => p === '..' || p === '.')) return false;
+  const parts = name.replace(/\\/g, "/").split("/");
+  if (parts.some((p) => p === ".." || p === ".")) return false;
   // Reject null bytes
-  if (name.includes('\0')) return false;
+  if (name.includes("\0")) return false;
   return true;
 }
 
-function buildStorageKey(userId: string, docId: string, fileName: string): string {
-  const ext = fileName.includes('.') ? '.' + fileName.split('.').pop() : '';
+function buildStorageKey(
+  userId: string,
+  docId: string,
+  fileName: string,
+): string {
+  const ext = fileName.includes(".") ? "." + fileName.split(".").pop() : "";
   return `users/${userId}/docs/${docId}/${docId}${ext}`;
 }
 
@@ -62,7 +69,10 @@ router.post(
   multipartUploadLimiter,
   async (req: any, res: Response): Promise<void> => {
     const userId = req.user?.id;
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const {
       fileName,
@@ -83,7 +93,9 @@ router.post(
     }
 
     if (fileSize > UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES) {
-      res.status(413).json({ error: `File too large. Maximum ${UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES / 1024 / 1024}MB.` });
+      res.status(413).json({
+        error: `File too large. Maximum ${UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES / 1024 / 1024}MB.`,
+      });
       return;
     }
 
@@ -93,7 +105,10 @@ router.post(
       const uploadId = randomUUID();
 
       // Chunk size is client guidance only (GCS resumable is sequential).
-      const chunkSize = Math.max(preferredChunkSize || UPLOAD_CONFIG.CHUNK_SIZE_BYTES, 256 * 1024);
+      const chunkSize = Math.max(
+        preferredChunkSize || UPLOAD_CONFIG.CHUNK_SIZE_BYTES,
+        256 * 1024,
+      );
       const totalParts = Math.ceil(fileSize / chunkSize);
 
       // Create document record
@@ -112,8 +127,16 @@ router.post(
       });
 
       // Start GCS resumable upload (pass browser origin for CORS)
-      const origin = req.headers.origin || req.headers.referer?.replace(/\/$/, '') || process.env.FRONTEND_URL || 'http://localhost:3000';
-      const { uploadUrl } = await gcs().createResumableUpload({ key: storageKey, mimeType, origin });
+      const origin =
+        req.headers.origin ||
+        req.headers.referer?.replace(/\/$/, "") ||
+        process.env.FRONTEND_URL ||
+        "http://localhost:3000";
+      const { uploadUrl } = await gcs().createResumableUpload({
+        key: storageKey,
+        mimeType,
+        origin,
+      });
 
       res.json({
         uploadId,
@@ -133,7 +156,7 @@ router.post(
       });
       res.status(500).json({ error: "Failed to initialize multipart upload" });
     }
-  }
+  },
 );
 
 /**
@@ -148,7 +171,10 @@ router.post(
   multipartUploadLimiter,
   async (req: any, res: Response): Promise<void> => {
     const userId = req.user?.id;
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const { documentId, storageKey, expectedSize } = req.body || {};
 
@@ -162,7 +188,10 @@ router.post(
       const doc = await prisma.document.findFirst({
         where: { id: documentId, userId },
       });
-      if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
+      if (!doc) {
+        res.status(404).json({ error: "Document not found" });
+        return;
+      }
 
       // Verify object exists in GCS (and size if provided)
       const meta = await gcs().getFileMetadata({ key: storageKey });
@@ -170,10 +199,16 @@ router.post(
         res.status(400).json({ error: "Upload not found in storage" });
         return;
       }
-      if (expectedSize && Number.isFinite(Number(expectedSize)) && Number(expectedSize) > 0) {
+      if (
+        expectedSize &&
+        Number.isFinite(Number(expectedSize)) &&
+        Number(expectedSize) > 0
+      ) {
         const exp = Number(expectedSize);
         if (meta.size !== exp) {
-          res.status(400).json({ error: `Upload size mismatch (expected ${exp}, got ${meta.size})` });
+          res.status(400).json({
+            error: `Upload size mismatch (expected ${exp}, got ${meta.size})`,
+          });
           return;
         }
       }
@@ -192,18 +227,22 @@ router.post(
             userId,
             doc.encryptedFilename || storageKey,
             doc.mimeType || "application/octet-stream",
-            doc.filename || undefined
+            doc.filename || undefined,
           );
-          logger.info("[MultipartUpload] published to GCP Pub/Sub", { documentId });
+          logger.info("[MultipartUpload] published to GCP Pub/Sub", {
+            documentId,
+          });
         } else {
           await addDocumentJob({
             documentId: doc.id,
             userId,
-            filename: doc.filename || 'unknown',
+            filename: doc.filename || "unknown",
             mimeType: doc.mimeType || "application/octet-stream",
             encryptedFilename: doc.encryptedFilename || undefined,
           });
-          logger.info("[MultipartUpload] queued for processing", { documentId });
+          logger.info("[MultipartUpload] queued for processing", {
+            documentId,
+          });
         }
       } catch (queueErr: any) {
         logger.error("[MultipartUpload] failed to queue", { documentId });
@@ -219,7 +258,7 @@ router.post(
       });
       res.status(500).json({ error: "Failed to complete multipart upload" });
     }
-  }
+  },
 );
 
 /**
@@ -234,7 +273,10 @@ router.post(
   multipartUploadLimiter,
   async (req: any, res: Response): Promise<void> => {
     const userId = req.user?.id;
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const { documentId, uploadId, storageKey } = req.body || {};
 
@@ -263,7 +305,7 @@ router.post(
       // Still return success — abort is best-effort cleanup
       res.json({ ok: true });
     }
-  }
+  },
 );
 
 /**
@@ -281,7 +323,7 @@ router.post(
   multipartUploadLimiter,
   async (req: any, res: Response): Promise<void> => {
     res.status(410).json({ error: "Not supported for GCS resumable uploads" });
-  }
+  },
 );
 
 /**
@@ -295,7 +337,10 @@ router.get(
   authMiddleware,
   async (req: any, res: Response): Promise<void> => {
     const userId = req.user?.id;
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const { documentId } = req.params;
 
@@ -312,7 +357,10 @@ router.get(
 
       // Check if upload session has expired (24 hours)
       const ageMs = Date.now() - new Date(doc.createdAt).getTime();
-      if (doc.status === "uploading" && ageMs > UPLOAD_CONFIG.UPLOAD_SESSION_EXPIRATION_HOURS * 3600000) {
+      if (
+        doc.status === "uploading" &&
+        ageMs > UPLOAD_CONFIG.UPLOAD_SESSION_EXPIRATION_HOURS * 3600000
+      ) {
         res.json({ status: "expired" });
         return;
       }
@@ -327,7 +375,7 @@ router.get(
       });
       res.status(500).json({ error: "Failed to check upload status" });
     }
-  }
+  },
 );
 
 export default router;

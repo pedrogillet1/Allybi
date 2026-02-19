@@ -117,16 +117,20 @@ function extractUsage(chunk: any): LlmUsage | undefined {
   const u = chunk?.usage;
   if (!u || typeof u !== "object") return undefined;
 
-  const inputTokens = Number.isFinite(u.inputTokens) ? Math.max(0, Math.floor(u.inputTokens)) : undefined;
-  const outputTokens = Number.isFinite(u.outputTokens) ? Math.max(0, Math.floor(u.outputTokens)) : undefined;
-  const totalTokens =
-    Number.isFinite(u.totalTokens)
-      ? Math.max(0, Math.floor(u.totalTokens))
-      : inputTokens != null && outputTokens != null
+  const inputTokens = Number.isFinite(u.inputTokens)
+    ? Math.max(0, Math.floor(u.inputTokens))
+    : undefined;
+  const outputTokens = Number.isFinite(u.outputTokens)
+    ? Math.max(0, Math.floor(u.outputTokens))
+    : undefined;
+  const totalTokens = Number.isFinite(u.totalTokens)
+    ? Math.max(0, Math.floor(u.totalTokens))
+    : inputTokens != null && outputTokens != null
       ? inputTokens + outputTokens
       : undefined;
 
-  if (inputTokens == null && outputTokens == null && totalTokens == null) return undefined;
+  if (inputTokens == null && outputTokens == null && totalTokens == null)
+    return undefined;
   return { inputTokens, outputTokens, totalTokens, providerUsage: u };
 }
 
@@ -141,7 +145,10 @@ export class LocalStreamAdapterService {
     signal?: AbortSignal;
     opts?: Partial<LocalStreamAdapterOptions>;
   }): AsyncIterable<LlmStreamEvent> {
-    const opts: LocalStreamAdapterOptions = { ...DEFAULT_OPTS, ...(args.opts || {}) };
+    const opts: LocalStreamAdapterOptions = {
+      ...DEFAULT_OPTS,
+      ...(args.opts || {}),
+    };
 
     // META early
     yield {
@@ -153,7 +160,9 @@ export class LocalStreamAdapterService {
       cached: false,
     };
 
-    let nextHeartbeatAt = opts.includeHeartbeat ? nowMs() + opts.heartbeatEveryMs : 0;
+    let nextHeartbeatAt = opts.includeHeartbeat
+      ? nowMs() + opts.heartbeatEveryMs
+      : 0;
 
     let accumulatedText = "";
     let finishReason: LlmFinishReason = "unknown";
@@ -201,9 +210,12 @@ export class LocalStreamAdapterService {
           yield {
             type: "error",
             code: "local_stream_error",
-            message: safeString(chunk.error?.message || chunk.error || "Local stream error"),
+            message: safeString(
+              chunk.error?.message || chunk.error || "Local stream error",
+            ),
             retryable: true,
-            detail: process.env.NODE_ENV === "production" ? undefined : chunk.error,
+            detail:
+              process.env.NODE_ENV === "production" ? undefined : chunk.error,
           };
           break;
         }
@@ -224,7 +236,10 @@ export class LocalStreamAdapterService {
         code: "local_stream_error",
         message: safeString(err?.message || "Stream failed"),
         retryable: true,
-        detail: process.env.NODE_ENV === "production" ? undefined : { stack: err?.stack },
+        detail:
+          process.env.NODE_ENV === "production"
+            ? undefined
+            : { stack: err?.stack },
       };
 
       // still emit final so pipeline can close cleanly

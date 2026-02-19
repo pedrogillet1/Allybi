@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 /**
  * Excel HTML Preview Service
@@ -24,13 +24,15 @@ interface ExcelPreviewResult {
  * Generate HTML preview from Excel buffer
  * Creates styled HTML tables for each sheet
  */
-export async function generateExcelHtmlPreview(buffer: Buffer): Promise<ExcelPreviewResult> {
+export async function generateExcelHtmlPreview(
+  buffer: Buffer,
+): Promise<ExcelPreviewResult> {
   try {
-    console.log('[ExcelHtmlPreview] Generating HTML preview...');
+    console.log("[ExcelHtmlPreview] Generating HTML preview...");
 
     // Load workbook
     const workbook = XLSX.read(buffer, {
-      type: 'buffer',
+      type: "buffer",
       cellStyles: true,
       cellDates: true,
       cellNF: true,
@@ -111,7 +113,7 @@ export async function generateExcelHtmlPreview(buffer: Buffer): Promise<ExcelPre
       const sheet = workbook.Sheets[sheetName];
 
       // Get range
-      const range = XLSX.utils.decode_range(sheet['!ref'] || 'A1');
+      const range = XLSX.utils.decode_range(sheet["!ref"] || "A1");
       const rowCount = range.e.r - range.s.r + 1;
       const colCount = range.e.c - range.s.c + 1;
 
@@ -125,25 +127,28 @@ export async function generateExcelHtmlPreview(buffer: Buffer): Promise<ExcelPre
       const sheetHtml = generateSheetHtml(sheet, sheetName, sheetIdx, range);
       htmlParts.push(sheetHtml);
 
-      console.log(`  [ExcelHtmlPreview] Sheet "${sheetName}": ${rowCount} rows x ${colCount} cols`);
+      console.log(
+        `  [ExcelHtmlPreview] Sheet "${sheetName}": ${rowCount} rows x ${colCount} cols`,
+      );
     }
 
     const fullHtml = `
       <div class="excel-preview-container">
-        ${htmlParts.join('\n')}
+        ${htmlParts.join("\n")}
       </div>
     `;
 
-    console.log(`[ExcelHtmlPreview] Generated HTML for ${sheetNames.length} sheets`);
+    console.log(
+      `[ExcelHtmlPreview] Generated HTML for ${sheetNames.length} sheets`,
+    );
 
     return {
       htmlContent: fullHtml,
       sheetCount: sheetNames.length,
       sheets,
     };
-
   } catch (error: any) {
-    console.error('[ExcelHtmlPreview] Error:', error);
+    console.error("[ExcelHtmlPreview] Error:", error);
     throw new Error(`Failed to generate Excel preview: ${error.message}`);
   }
 }
@@ -155,7 +160,7 @@ function generateSheetHtml(
   sheet: XLSX.WorkSheet,
   sheetName: string,
   sheetIndex: number,
-  range: XLSX.Range
+  range: XLSX.Range,
 ): string {
   const rows: string[] = [];
 
@@ -169,7 +174,7 @@ function generateSheetHtml(
     const colLetter = XLSX.utils.encode_col(range.s.c + col);
     headerCells.push(`<th>${colLetter}</th>`);
   }
-  rows.push(`<tr>${headerCells.join('')}</tr>`);
+  rows.push(`<tr>${headerCells.join("")}</tr>`);
 
   // Generate data rows
   for (let rowOffset = 0; rowOffset < maxRows; rowOffset++) {
@@ -181,20 +186,22 @@ function generateSheetHtml(
       const cellAddress = XLSX.utils.encode_cell({ r: rowNum, c: colNum });
       const cell = sheet[cellAddress];
 
-      if (!cell || cell.v === undefined || cell.v === null || cell.v === '') {
+      if (!cell || cell.v === undefined || cell.v === null || cell.v === "") {
         cells.push('<td class="empty"></td>');
       } else {
         const { value, className } = formatCellForHtml(cell);
         const formatAttrs = extractCellFormatAttrs(cell);
-        cells.push(`<td class="${className}"${formatAttrs}>${escapeHtml(value)}</td>`);
+        cells.push(
+          `<td class="${className}"${formatAttrs}>${escapeHtml(value)}</td>`,
+        );
       }
     }
 
-    rows.push(`<tr>${cells.join('')}</tr>`);
+    rows.push(`<tr>${cells.join("")}</tr>`);
   }
 
   // Add truncation notice if needed
-  let truncationNotice = '';
+  let truncationNotice = "";
   if (range.e.r - range.s.r + 1 > 500 || range.e.c - range.s.c + 1 > 50) {
     truncationNotice = `
       <div style="padding: 12px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; margin-top: 12px; font-size: 12px; color: #856404;">
@@ -211,7 +218,7 @@ function generateSheetHtml(
           ${rows[0]}
         </thead>
         <tbody>
-          ${rows.slice(1).join('\n')}
+          ${rows.slice(1).join("\n")}
         </tbody>
       </table>
       ${truncationNotice}
@@ -225,10 +232,11 @@ function generateSheetHtml(
  */
 function extractCellFormatAttrs(cell: XLSX.CellObject): string {
   const font = (cell as any)?.s?.font;
-  if (!font) return '';
+  if (!font) return "";
   const parts: string[] = [];
-  const name = String(font.name || '').trim();
-  if (name && name.toLowerCase() !== 'calibri') parts.push(`data-font="${escapeHtml(name)}"`);
+  const name = String(font.name || "").trim();
+  if (name && name.toLowerCase() !== "calibri")
+    parts.push(`data-font="${escapeHtml(name)}"`);
   const sz = Number(font.sz);
   if (Number.isFinite(sz) && sz !== 11) parts.push(`data-size="${sz}"`);
   if (font.bold) parts.push('data-bold="1"');
@@ -236,61 +244,67 @@ function extractCellFormatAttrs(cell: XLSX.CellObject): string {
   if (font.underline) parts.push('data-underline="1"');
   const color = font.color;
   if (color) {
-    const rgb = String(color.rgb || '').trim();
+    const rgb = String(color.rgb || "").trim();
     if (rgb && rgb.length >= 6) {
       const hex = `#${rgb.slice(-6)}`.toLowerCase();
-      if (hex !== '#000000') parts.push(`data-color="${hex}"`);
+      if (hex !== "#000000") parts.push(`data-color="${hex}"`);
     }
   }
-  return parts.length ? ' ' + parts.join(' ') : '';
+  return parts.length ? " " + parts.join(" ") : "";
 }
 
 /**
  * Format cell value for HTML display
  */
-function formatCellForHtml(cell: XLSX.CellObject): { value: string; className: string } {
+function formatCellForHtml(cell: XLSX.CellObject): {
+  value: string;
+  className: string;
+} {
   const cellType = cell.t;
 
   // Number
-  if (cellType === 'n') {
+  if (cellType === "n") {
     const num = cell.v as number;
 
     // Check if it's a date (Excel stores dates as numbers)
-    if (cell.t === 'n' && cell.w && isDateFormat(cell.z || '')) {
-      return { value: cell.w, className: 'date' };
+    if (cell.t === "n" && cell.w && isDateFormat(cell.z || "")) {
+      return { value: cell.w, className: "date" };
     }
 
     // Format number
     if (cell.w) {
-      return { value: cell.w, className: 'number' };
+      return { value: cell.w, className: "number" };
     }
 
     // Default number formatting
     if (Number.isInteger(num)) {
-      return { value: num.toLocaleString(), className: 'number' };
+      return { value: num.toLocaleString(), className: "number" };
     }
-    return { value: num.toLocaleString(undefined, { maximumFractionDigits: 4 }), className: 'number' };
+    return {
+      value: num.toLocaleString(undefined, { maximumFractionDigits: 4 }),
+      className: "number",
+    };
   }
 
   // Boolean
-  if (cellType === 'b') {
-    return { value: cell.v ? 'TRUE' : 'FALSE', className: '' };
+  if (cellType === "b") {
+    return { value: cell.v ? "TRUE" : "FALSE", className: "" };
   }
 
   // Date
-  if (cellType === 'd') {
+  if (cellType === "d") {
     const date = cell.v as Date;
-    return { value: date.toLocaleDateString(), className: 'date' };
+    return { value: date.toLocaleDateString(), className: "date" };
   }
 
   // Error
-  if (cellType === 'e') {
-    return { value: String(cell.v), className: 'error' };
+  if (cellType === "e") {
+    return { value: String(cell.v), className: "error" };
   }
 
   // String or other
-  const str = cell.w || String(cell.v || '');
-  return { value: str, className: '' };
+  const str = cell.w || String(cell.v || "");
+  return { value: str, className: "" };
 }
 
 /**
@@ -299,9 +313,9 @@ function formatCellForHtml(cell: XLSX.CellObject): { value: string; className: s
 function isDateFormat(format: string | number | undefined): boolean {
   if (!format) return false;
   const formatStr = String(format);
-  const datePatterns = ['d', 'm', 'y', 'h', 's', 'AM', 'PM', 'date', 'time'];
+  const datePatterns = ["d", "m", "y", "h", "s", "AM", "PM", "date", "time"];
   const lowerFormat = formatStr.toLowerCase();
-  return datePatterns.some(p => lowerFormat.includes(p.toLowerCase()));
+  return datePatterns.some((p) => lowerFormat.includes(p.toLowerCase()));
 }
 
 /**
@@ -309,13 +323,13 @@ function isDateFormat(format: string | number | undefined): boolean {
  */
 function escapeHtml(text: string): string {
   const map: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
   };
-  return text.replace(/[&<>"']/g, char => map[char] || char);
+  return text.replace(/[&<>"']/g, (char) => map[char] || char);
 }
 
 export default {

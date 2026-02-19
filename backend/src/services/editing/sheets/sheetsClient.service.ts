@@ -1,6 +1,6 @@
-import { google, sheets_v4 } from 'googleapis';
-import type { GoogleAuth } from 'google-auth-library';
-import { logger } from '../../../infra/logger';
+import { google, sheets_v4 } from "googleapis";
+import type { GoogleAuth } from "google-auth-library";
+import { logger } from "../../../infra/logger";
 
 export type SheetsValue = string | number | boolean | null;
 export type SheetsValueRow = SheetsValue[];
@@ -24,9 +24,12 @@ export class SheetsClientError extends Error {
   public readonly retryable: boolean;
   public readonly status?: number;
 
-  constructor(message: string, opts: { code: string; retryable: boolean; status?: number }) {
+  constructor(
+    message: string,
+    opts: { code: string; retryable: boolean; status?: number },
+  ) {
     super(message);
-    this.name = 'SheetsClientError';
+    this.name = "SheetsClientError";
     this.code = opts.code;
     this.retryable = opts.retryable;
     this.status = opts.status;
@@ -51,10 +54,10 @@ export class SheetsClientService {
     this.auth =
       auth ??
       new google.auth.GoogleAuth({
-        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        scopes: ["https://www.googleapis.com/auth/spreadsheets"],
       });
 
-    this.client = google.sheets({ version: 'v4', auth: this.auth });
+    this.client = google.sheets({ version: "v4", auth: this.auth });
     this.options = { ...DEFAULT_OPTIONS, ...(options ?? {}) };
   }
 
@@ -64,17 +67,20 @@ export class SheetsClientService {
   ): Promise<sheets_v4.Schema$Spreadsheet> {
     this.assertSpreadsheetId(spreadsheetId);
 
-    return this.withRetry('getSpreadsheet', ctx, async () => {
+    return this.withRetry("getSpreadsheet", ctx, async () => {
       const response = await this.client.spreadsheets.get({
         spreadsheetId,
         includeGridData: false,
       });
 
       if (!response.data) {
-        throw new SheetsClientError('Google Sheets API returned empty spreadsheet payload.', {
-          code: 'EMPTY_SPREADSHEET_PAYLOAD',
-          retryable: false,
-        });
+        throw new SheetsClientError(
+          "Google Sheets API returned empty spreadsheet payload.",
+          {
+            code: "EMPTY_SPREADSHEET_PAYLOAD",
+            retryable: false,
+          },
+        );
       }
 
       return response.data;
@@ -88,23 +94,29 @@ export class SheetsClientService {
   ): Promise<sheets_v4.Schema$BatchUpdateSpreadsheetResponse> {
     this.assertSpreadsheetId(spreadsheetId);
     if (!Array.isArray(requests) || requests.length === 0) {
-      throw new SheetsClientError('batchUpdate requires at least one request.', {
-        code: 'INVALID_BATCH_REQUESTS',
-        retryable: false,
-      });
+      throw new SheetsClientError(
+        "batchUpdate requires at least one request.",
+        {
+          code: "INVALID_BATCH_REQUESTS",
+          retryable: false,
+        },
+      );
     }
 
-    return this.withRetry('batchUpdate', ctx, async () => {
+    return this.withRetry("batchUpdate", ctx, async () => {
       const response = await this.client.spreadsheets.batchUpdate({
         spreadsheetId,
         requestBody: { requests },
       });
 
       if (!response.data) {
-        throw new SheetsClientError('Google Sheets API returned empty batchUpdate payload.', {
-          code: 'EMPTY_BATCH_UPDATE_PAYLOAD',
-          retryable: false,
-        });
+        throw new SheetsClientError(
+          "Google Sheets API returned empty batchUpdate payload.",
+          {
+            code: "EMPTY_BATCH_UPDATE_PAYLOAD",
+            retryable: false,
+          },
+        );
       }
 
       return response.data;
@@ -119,18 +131,21 @@ export class SheetsClientService {
     this.assertSpreadsheetId(spreadsheetId);
     this.assertRange(range);
 
-    return this.withRetry('getValues', ctx, async () => {
+    return this.withRetry("getValues", ctx, async () => {
       const response = await this.client.spreadsheets.values.get({
         spreadsheetId,
         range,
-        majorDimension: 'ROWS',
+        majorDimension: "ROWS",
       });
 
       if (!response.data) {
-        throw new SheetsClientError('Google Sheets API returned empty values payload.', {
-          code: 'EMPTY_VALUES_PAYLOAD',
-          retryable: false,
-        });
+        throw new SheetsClientError(
+          "Google Sheets API returned empty values payload.",
+          {
+            code: "EMPTY_VALUES_PAYLOAD",
+            retryable: false,
+          },
+        );
       }
 
       return response.data;
@@ -147,23 +162,26 @@ export class SheetsClientService {
     this.assertRange(range);
     this.assertGrid(values);
 
-    return this.withRetry('setValues', ctx, async () => {
+    return this.withRetry("setValues", ctx, async () => {
       const response = await this.client.spreadsheets.values.update({
         spreadsheetId,
         range,
-        valueInputOption: 'USER_ENTERED',
+        valueInputOption: "USER_ENTERED",
         requestBody: {
           range,
-          majorDimension: 'ROWS',
+          majorDimension: "ROWS",
           values,
         },
       });
 
       if (!response.data) {
-        throw new SheetsClientError('Google Sheets API returned empty update values payload.', {
-          code: 'EMPTY_SET_VALUES_PAYLOAD',
-          retryable: false,
-        });
+        throw new SheetsClientError(
+          "Google Sheets API returned empty update values payload.",
+          {
+            code: "EMPTY_SET_VALUES_PAYLOAD",
+            retryable: false,
+          },
+        );
       }
 
       return response.data;
@@ -218,45 +236,53 @@ export class SheetsClientService {
   private mapError(error: unknown): SheetsClientError {
     if (error instanceof SheetsClientError) return error;
 
-    const e = error as { message?: string; code?: string | number; status?: number; response?: { status?: number } };
+    const e = error as {
+      message?: string;
+      code?: string | number;
+      status?: number;
+      response?: { status?: number };
+    };
     const status = e?.status ?? e?.response?.status;
-    const code = String(e?.code ?? 'UNKNOWN');
-    const message = e?.message ?? 'Unknown Google Sheets error';
+    const code = String(e?.code ?? "UNKNOWN");
+    const message = e?.message ?? "Unknown Google Sheets error";
 
     if (status === 404) {
-      return new SheetsClientError('Spreadsheet or range not found.', {
-        code: 'NOT_FOUND',
+      return new SheetsClientError("Spreadsheet or range not found.", {
+        code: "NOT_FOUND",
         retryable: false,
         status,
       });
     }
 
     if (status === 401 || status === 403) {
-      return new SheetsClientError('Sheets authentication/authorization failed.', {
-        code: 'AUTH_ERROR',
-        retryable: false,
-        status,
-      });
+      return new SheetsClientError(
+        "Sheets authentication/authorization failed.",
+        {
+          code: "AUTH_ERROR",
+          retryable: false,
+          status,
+        },
+      );
     }
 
     if ([408, 429, 500, 502, 503, 504].includes(status ?? -1)) {
       return new SheetsClientError(message, {
-        code: 'TRANSIENT_API_ERROR',
+        code: "TRANSIENT_API_ERROR",
         retryable: true,
         status,
       });
     }
 
-    if (['ETIMEDOUT', 'ECONNRESET', 'ENOTFOUND'].includes(code)) {
+    if (["ETIMEDOUT", "ECONNRESET", "ENOTFOUND"].includes(code)) {
       return new SheetsClientError(message, {
-        code: 'NETWORK_ERROR',
+        code: "NETWORK_ERROR",
         retryable: true,
         status,
       });
     }
 
     return new SheetsClientError(message, {
-      code: 'API_ERROR',
+      code: "API_ERROR",
       retryable: false,
       status,
     });
@@ -274,8 +300,8 @@ export class SheetsClientService {
 
   private assertSpreadsheetId(spreadsheetId: string): void {
     if (!spreadsheetId || !spreadsheetId.trim()) {
-      throw new SheetsClientError('spreadsheetId is required.', {
-        code: 'INVALID_SPREADSHEET_ID',
+      throw new SheetsClientError("spreadsheetId is required.", {
+        code: "INVALID_SPREADSHEET_ID",
         retryable: false,
       });
     }
@@ -283,8 +309,8 @@ export class SheetsClientService {
 
   private assertRange(range: string): void {
     if (!range || !range.trim()) {
-      throw new SheetsClientError('range is required.', {
-        code: 'INVALID_RANGE',
+      throw new SheetsClientError("range is required.", {
+        code: "INVALID_RANGE",
         retryable: false,
       });
     }
@@ -292,24 +318,27 @@ export class SheetsClientService {
 
   private assertGrid(values: SheetsValueGrid): void {
     if (!Array.isArray(values) || values.length === 0) {
-      throw new SheetsClientError('values must contain at least one row.', {
-        code: 'INVALID_VALUES_GRID',
+      throw new SheetsClientError("values must contain at least one row.", {
+        code: "INVALID_VALUES_GRID",
         retryable: false,
       });
     }
 
     const width = values[0].length;
     if (width === 0) {
-      throw new SheetsClientError('values rows must contain at least one column.', {
-        code: 'INVALID_VALUES_ROW_WIDTH',
-        retryable: false,
-      });
+      throw new SheetsClientError(
+        "values rows must contain at least one column.",
+        {
+          code: "INVALID_VALUES_ROW_WIDTH",
+          retryable: false,
+        },
+      );
     }
 
     const inconsistent = values.some((row) => row.length !== width);
     if (inconsistent) {
-      throw new SheetsClientError('all values rows must have the same width.', {
-        code: 'INCONSISTENT_VALUES_GRID',
+      throw new SheetsClientError("all values rows must have the same width.", {
+        code: "INCONSISTENT_VALUES_GRID",
         retryable: false,
       });
     }

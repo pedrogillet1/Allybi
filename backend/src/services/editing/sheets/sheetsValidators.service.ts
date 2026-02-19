@@ -1,9 +1,9 @@
-import type { sheets_v4 } from 'googleapis';
+import type { sheets_v4 } from "googleapis";
 import {
   SheetsClientError,
   SheetsClientService,
   type SheetsRequestContext,
-} from './sheetsClient.service';
+} from "./sheetsClient.service";
 
 export interface SheetExistsResult {
   exists: boolean;
@@ -40,7 +40,9 @@ interface ParsedCell {
  * Range/sheet/header validations + ambiguous column resolution.
  */
 export class SheetsValidatorsService {
-  constructor(private readonly sheetsClient: SheetsClientService = new SheetsClientService()) {}
+  constructor(
+    private readonly sheetsClient: SheetsClientService = new SheetsClientService(),
+  ) {}
 
   async validateSheetExists(
     spreadsheetId: string,
@@ -48,10 +50,15 @@ export class SheetsValidatorsService {
     ctx?: SheetsRequestContext,
   ): Promise<SheetExistsResult> {
     const normalizedSheet = this.normalizeSheetName(sheetName);
-    const spreadsheet = await this.sheetsClient.getSpreadsheet(spreadsheetId, ctx);
+    const spreadsheet = await this.sheetsClient.getSpreadsheet(
+      spreadsheetId,
+      ctx,
+    );
 
-    const sheet = spreadsheet.sheets?.find((entry) => entry.properties?.title === normalizedSheet);
-    if (!sheet || typeof sheet.properties?.sheetId !== 'number') {
+    const sheet = spreadsheet.sheets?.find(
+      (entry) => entry.properties?.title === normalizedSheet,
+    );
+    if (!sheet || typeof sheet.properties?.sheetId !== "number") {
       return { exists: false };
     }
 
@@ -65,8 +72,13 @@ export class SheetsValidatorsService {
   ): Promise<RangeBoundsResult> {
     try {
       const parsed = this.parseRange(rangeA1);
-      const spreadsheet = await this.sheetsClient.getSpreadsheet(spreadsheetId, ctx);
-      const sheet = spreadsheet.sheets?.find((entry) => entry.properties?.title === parsed.sheetName);
+      const spreadsheet = await this.sheetsClient.getSpreadsheet(
+        spreadsheetId,
+        ctx,
+      );
+      const sheet = spreadsheet.sheets?.find(
+        (entry) => entry.properties?.title === parsed.sheetName,
+      );
 
       if (!sheet?.properties?.gridProperties) {
         return { valid: false, reason: `Sheet not found: ${parsed.sheetName}` };
@@ -76,26 +88,30 @@ export class SheetsValidatorsService {
       const columnCount = sheet.properties.gridProperties.columnCount ?? 0;
 
       if (parsed.startCell.row < 1 || parsed.endCell.row < 1) {
-        return { valid: false, reason: 'Row index must start at 1.' };
+        return { valid: false, reason: "Row index must start at 1." };
       }
 
       if (parsed.startCell.column < 1 || parsed.endCell.column < 1) {
-        return { valid: false, reason: 'Column index must start at 1.' };
+        return { valid: false, reason: "Column index must start at 1." };
       }
 
       if (parsed.startCell.row > rowCount || parsed.endCell.row > rowCount) {
-        return { valid: false, reason: 'Row index out of bounds.' };
+        return { valid: false, reason: "Row index out of bounds." };
       }
 
-      if (parsed.startCell.column > columnCount || parsed.endCell.column > columnCount) {
-        return { valid: false, reason: 'Column index out of bounds.' };
+      if (
+        parsed.startCell.column > columnCount ||
+        parsed.endCell.column > columnCount
+      ) {
+        return { valid: false, reason: "Column index out of bounds." };
       }
 
       return { valid: true };
     } catch (error) {
       return {
         valid: false,
-        reason: error instanceof Error ? error.message : 'Invalid range syntax.',
+        reason:
+          error instanceof Error ? error.message : "Invalid range syntax.",
       };
     }
   }
@@ -107,15 +123,21 @@ export class SheetsValidatorsService {
     ctx?: SheetsRequestContext,
   ): Promise<HeaderValidationResult> {
     if (!Number.isInteger(headerRow) || headerRow < 1) {
-      throw new SheetsClientError('headerRow must be an integer >= 1.', {
-        code: 'INVALID_HEADER_ROW',
+      throw new SheetsClientError("headerRow must be an integer >= 1.", {
+        code: "INVALID_HEADER_ROW",
         retryable: false,
       });
     }
 
     const normalizedSheet = this.normalizeSheetName(sheetName);
-    const row = await this.sheetsClient.getValues(spreadsheetId, `${normalizedSheet}!${headerRow}:${headerRow}`, ctx);
-    const headers = (row.values?.[0] ?? []).map((v) => String(v ?? '').trim()).filter(Boolean);
+    const row = await this.sheetsClient.getValues(
+      spreadsheetId,
+      `${normalizedSheet}!${headerRow}:${headerRow}`,
+      ctx,
+    );
+    const headers = (row.values?.[0] ?? [])
+      .map((v) => String(v ?? "").trim())
+      .filter(Boolean);
 
     return {
       valid: headers.length > 0,
@@ -123,7 +145,10 @@ export class SheetsValidatorsService {
     };
   }
 
-  resolveColumnCandidates(headerValues: string[], columnLabelQuery: string): ColumnCandidateResult {
+  resolveColumnCandidates(
+    headerValues: string[],
+    columnLabelQuery: string,
+  ): ColumnCandidateResult {
     const normalizedQuery = this.normalize(columnLabelQuery);
     if (!normalizedQuery) {
       return { candidates: [], ambiguous: false };
@@ -139,7 +164,8 @@ export class SheetsValidatorsService {
       .sort((a, b) => b.score - a.score)
       .slice(0, 3);
 
-    const ambiguous = ranked.length > 1 && ranked[0].score - ranked[1].score < 0.15;
+    const ambiguous =
+      ranked.length > 1 && ranked[0].score - ranked[1].score < 0.15;
 
     return {
       candidates: ranked,
@@ -152,14 +178,18 @@ export class SheetsValidatorsService {
     startCell: ParsedCell;
     endCell: ParsedCell;
   } {
-    const [sheetPartRaw, rawRange] = input.includes('!') ? input.split('!') : ['Sheet1', input];
+    const [sheetPartRaw, rawRange] = input.includes("!")
+      ? input.split("!")
+      : ["Sheet1", input];
 
     const sheetName = this.normalizeSheetName(sheetPartRaw);
     if (!rawRange || !rawRange.trim()) {
-      throw new Error('Range cells are required (e.g., A1:B10).');
+      throw new Error("Range cells are required (e.g., A1:B10).");
     }
 
-    const [startRaw, endRaw] = rawRange.includes(':') ? rawRange.split(':') : [rawRange, rawRange];
+    const [startRaw, endRaw] = rawRange.includes(":")
+      ? rawRange.split(":")
+      : [rawRange, rawRange];
 
     const startCell = this.parseCell(startRaw);
     const endCell = this.parseCell(endRaw);
@@ -178,7 +208,7 @@ export class SheetsValidatorsService {
   }
 
   private parseCell(cell: string): ParsedCell {
-    const normalized = cell.replace(/\$/g, '').toUpperCase().trim();
+    const normalized = cell.replace(/\$/g, "").toUpperCase().trim();
     const match = normalized.match(/^([A-Z]+)(\d+)$/);
     if (!match) {
       throw new Error(`Invalid A1 cell reference: ${cell}`);
@@ -201,17 +231,17 @@ export class SheetsValidatorsService {
   private normalize(input: string): string {
     return input
       .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9\s]/g, ' ')
-      .replace(/\s+/g, ' ')
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9\s]/g, " ")
+      .replace(/\s+/g, " ")
       .trim();
   }
 
   private normalizeSheetName(name: string): string {
-    const normalized = name.replace(/^'/, '').replace(/'$/, '').trim();
+    const normalized = name.replace(/^'/, "").replace(/'$/, "").trim();
     if (!normalized) {
-      throw new Error('Sheet name is required.');
+      throw new Error("Sheet name is required.");
     }
     return normalized;
   }
@@ -224,8 +254,8 @@ export class SheetsValidatorsService {
       return 0.85;
     }
 
-    const headerTokens = new Set(header.split(' ').filter(Boolean));
-    const queryTokens = query.split(' ').filter(Boolean);
+    const headerTokens = new Set(header.split(" ").filter(Boolean));
+    const queryTokens = query.split(" ").filter(Boolean);
 
     if (queryTokens.length === 0) return 0;
 

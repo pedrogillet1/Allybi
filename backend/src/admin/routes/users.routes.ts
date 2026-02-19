@@ -3,9 +3,9 @@
  * GET /api/admin/users
  */
 
-import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { listUsers, getUserDetail } from '../../services/admin';
+import { Router, Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
+import { listUsers, getUserDetail } from "../../services/admin";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -14,9 +14,9 @@ const prisma = new PrismaClient();
  * GET /api/admin/users
  * Returns paginated list of users with activity stats
  */
-router.get('/', async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
   try {
-    const range = (req.query.range as string) || '7d';
+    const range = (req.query.range as string) || "7d";
     const limit = parseInt(req.query.limit as string) || 50;
     const cursor = req.query.cursor as string | undefined;
 
@@ -31,18 +31,18 @@ router.get('/', async (req: Request, res: Response) => {
         users: result.items,
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
       ...(result.nextCursor && { nextCursor: result.nextCursor }),
     });
   } catch (error) {
-    console.error('[Admin] Users list error:', error);
+    console.error("[Admin] Users list error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch users',
-      code: 'USERS_ERROR',
+      error: "Failed to fetch users",
+      code: "USERS_ERROR",
     });
   }
 });
@@ -51,10 +51,10 @@ router.get('/', async (req: Request, res: Response) => {
  * GET /api/admin/users/:userId
  * Returns detailed stats for a specific user
  */
-router.get('/:userId', async (req: Request, res: Response) => {
+router.get("/:userId", async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const range = (req.query.range as string) || '7d';
+    const range = (req.query.range as string) || "7d";
 
     const result = await getUserDetail(prisma, { userId, range });
 
@@ -66,17 +66,17 @@ router.get('/:userId', async (req: Request, res: Response) => {
         user: result.user,
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
     });
   } catch (error) {
-    console.error('[Admin] User detail error:', error);
+    console.error("[Admin] User detail error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch user detail',
-      code: 'USER_DETAIL_ERROR',
+      error: "Failed to fetch user detail",
+      code: "USER_DETAIL_ERROR",
     });
   }
 });

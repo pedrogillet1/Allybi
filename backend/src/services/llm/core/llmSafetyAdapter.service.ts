@@ -10,29 +10,29 @@
  * This service should be called inside the Trust Gate stage, before final compose/output.
  */
 
-import type { LLMProvider } from './llmErrors.types';
+import type { LLMProvider } from "./llmErrors.types";
 
-export type SafetyAction = 'allow' | 'block' | 'redact' | 'escalate';
+export type SafetyAction = "allow" | "block" | "redact" | "escalate";
 
 /**
  * Stable safety reasons used for bank routing. Keep short + consistent.
  * Do not rename without migration.
  */
 export type SafetyReasonCode =
-  | 'SAFE'
-  | 'SELF_HARM'
-  | 'SEXUAL_CONTENT'
-  | 'MINORS'
-  | 'VIOLENCE'
-  | 'ILLEGAL'
-  | 'HATE'
-  | 'HARASSMENT'
-  | 'PRIVACY'
-  | 'MEDICAL'
-  | 'LEGAL'
-  | 'UNKNOWN';
+  | "SAFE"
+  | "SELF_HARM"
+  | "SEXUAL_CONTENT"
+  | "MINORS"
+  | "VIOLENCE"
+  | "ILLEGAL"
+  | "HATE"
+  | "HARASSMENT"
+  | "PRIVACY"
+  | "MEDICAL"
+  | "LEGAL"
+  | "UNKNOWN";
 
-export type SafetySeverity = 'low' | 'medium' | 'high' | 'critical';
+export type SafetySeverity = "low" | "medium" | "high" | "critical";
 
 export interface SafetySignal {
   provider: LLMProvider;
@@ -58,7 +58,7 @@ export interface SafetyContext {
   turnId: string;
 
   /** Age band if known (used by policy layers). */
-  userAgeBand?: 'child' | 'teen' | 'adult' | 'unknown';
+  userAgeBand?: "child" | "teen" | "adult" | "unknown";
 
   /** Whether the user asked for instructions or intent suggests harm */
   intentHints?: {
@@ -85,7 +85,7 @@ export interface SafetyDecision {
   /** Optional: mask strategy if action='redact' */
   redact?: {
     /** What to remove/obscure (policy-driven) */
-    mode: 'pii' | 'sensitive' | 'custom';
+    mode: "pii" | "sensitive" | "custom";
     /** Optional list of fields/patterns to redact */
     targets?: string[];
   };
@@ -165,7 +165,7 @@ export class LLMSafetyAdapterService {
     // 3) Apply policy buckets
     if (this.policy.hardBlockReasons.includes(tightened.reason)) {
       return {
-        action: 'block',
+        action: "block",
         reason: tightened.reason,
         severity: tightened.severity,
         meta: mkMeta(context, signal),
@@ -174,17 +174,17 @@ export class LLMSafetyAdapterService {
 
     if (this.policy.redactReasons.includes(tightened.reason)) {
       return {
-        action: 'redact',
+        action: "redact",
         reason: tightened.reason,
         severity: tightened.severity,
-        redact: { mode: tightened.reason === 'PRIVACY' ? 'pii' : 'sensitive' },
+        redact: { mode: tightened.reason === "PRIVACY" ? "pii" : "sensitive" },
         meta: mkMeta(context, signal),
       };
     }
 
     if (this.policy.escalateReasons.includes(tightened.reason)) {
       return {
-        action: 'escalate',
+        action: "escalate",
         reason: tightened.reason,
         severity: tightened.severity,
         meta: mkMeta(context, signal),
@@ -192,10 +192,10 @@ export class LLMSafetyAdapterService {
     }
 
     // 4) Unknown handling
-    if (tightened.reason === 'UNKNOWN') {
+    if (tightened.reason === "UNKNOWN") {
       return {
         action: this.policy.defaultOnUnknown,
-        reason: 'UNKNOWN',
+        reason: "UNKNOWN",
         severity: tightened.severity,
         meta: mkMeta(context, signal),
       };
@@ -203,7 +203,7 @@ export class LLMSafetyAdapterService {
 
     // 5) Otherwise allow
     return {
-      action: 'allow',
+      action: "allow",
       reason: tightened.reason,
       severity: tightened.severity,
       meta: mkMeta(context, signal),
@@ -212,9 +212,9 @@ export class LLMSafetyAdapterService {
 
   private allow(context: SafetyContext, signal?: SafetySignal): SafetyDecision {
     return {
-      action: 'allow',
-      reason: 'SAFE',
-      severity: 'low',
+      action: "allow",
+      reason: "SAFE",
+      severity: "low",
       meta: mkMeta(context, signal),
     };
   }
@@ -224,122 +224,160 @@ export class LLMSafetyAdapterService {
 
 function mapProviderSignalToReason(
   signal: SafetySignal | undefined,
-  context: SafetyContext
+  context: SafetyContext,
 ): { reason: SafetyReasonCode; severity: SafetySeverity } {
   // If no signal, fall back to intent hints as a minimal deterministic layer
   if (!signal) {
     const hinted = reasonFromHints(context);
-    return hinted ?? { reason: 'SAFE', severity: 'low' };
+    return hinted ?? { reason: "SAFE", severity: "low" };
   }
 
   // Provider said blocked: treat as high severity unless we have better detail
   const providerBlocked = !!signal.providerBlocked;
 
   // Normalize categories from provider strings + flags
-  const cats = (signal.providerCategories ?? []).map(s => s.toLowerCase());
+  const cats = (signal.providerCategories ?? []).map((s) => s.toLowerCase());
   const flags = signal.flags ?? {};
 
   // --- Self-harm ---
-  if (providerBlocked && (cats.some(c => c.includes('self')) || flags['self_harm'])) {
-    return { reason: 'SELF_HARM', severity: 'critical' };
+  if (
+    providerBlocked &&
+    (cats.some((c) => c.includes("self")) || flags["self_harm"])
+  ) {
+    return { reason: "SELF_HARM", severity: "critical" };
   }
 
   // --- Minors / sexual ---
   if (
-    cats.some(c => c.includes('minor') || c.includes('child')) ||
-    flags['minors'] ||
+    cats.some((c) => c.includes("minor") || c.includes("child")) ||
+    flags["minors"] ||
     context.intentHints?.minors
   ) {
     // If also sexual indicators
-    if (cats.some(c => c.includes('sex')) || flags['sexual'] || context.intentHints?.sexual) {
-      return { reason: 'MINORS', severity: 'critical' };
+    if (
+      cats.some((c) => c.includes("sex")) ||
+      flags["sexual"] ||
+      context.intentHints?.sexual
+    ) {
+      return { reason: "MINORS", severity: "critical" };
     }
-    return { reason: 'MINORS', severity: providerBlocked ? 'high' : 'medium' };
+    return { reason: "MINORS", severity: providerBlocked ? "high" : "medium" };
   }
 
-  if (cats.some(c => c.includes('sex')) || flags['sexual'] || context.intentHints?.sexual) {
-    return { reason: 'SEXUAL_CONTENT', severity: providerBlocked ? 'high' : 'medium' };
+  if (
+    cats.some((c) => c.includes("sex")) ||
+    flags["sexual"] ||
+    context.intentHints?.sexual
+  ) {
+    return {
+      reason: "SEXUAL_CONTENT",
+      severity: providerBlocked ? "high" : "medium",
+    };
   }
 
   // --- Violence ---
-  if (cats.some(c => c.includes('violence')) || flags['violence']) {
-    return { reason: 'VIOLENCE', severity: providerBlocked ? 'high' : 'medium' };
+  if (cats.some((c) => c.includes("violence")) || flags["violence"]) {
+    return {
+      reason: "VIOLENCE",
+      severity: providerBlocked ? "high" : "medium",
+    };
   }
 
   // --- Illegal ---
-  if (cats.some(c => c.includes('illegal')) || flags['illegal'] || context.intentHints?.illegal) {
-    return { reason: 'ILLEGAL', severity: providerBlocked ? 'high' : 'medium' };
+  if (
+    cats.some((c) => c.includes("illegal")) ||
+    flags["illegal"] ||
+    context.intentHints?.illegal
+  ) {
+    return { reason: "ILLEGAL", severity: providerBlocked ? "high" : "medium" };
   }
 
   // --- Hate/harassment ---
-  if (cats.some(c => c.includes('hate')) || flags['hate']) {
-    return { reason: 'HATE', severity: providerBlocked ? 'high' : 'medium' };
+  if (cats.some((c) => c.includes("hate")) || flags["hate"]) {
+    return { reason: "HATE", severity: providerBlocked ? "high" : "medium" };
   }
 
-  if (cats.some(c => c.includes('harass')) || flags['harassment']) {
-    return { reason: 'HARASSMENT', severity: providerBlocked ? 'high' : 'medium' };
+  if (cats.some((c) => c.includes("harass")) || flags["harassment"]) {
+    return {
+      reason: "HARASSMENT",
+      severity: providerBlocked ? "high" : "medium",
+    };
   }
 
   // --- Privacy ---
   if (
-    cats.some(c => c.includes('privacy') || c.includes('pii') || c.includes('dox')) ||
-    flags['privacy'] ||
+    cats.some(
+      (c) => c.includes("privacy") || c.includes("pii") || c.includes("dox"),
+    ) ||
+    flags["privacy"] ||
     context.intentHints?.doxing ||
     context.docHints?.piiLikely
   ) {
-    return { reason: 'PRIVACY', severity: providerBlocked ? 'high' : 'medium' };
+    return { reason: "PRIVACY", severity: providerBlocked ? "high" : "medium" };
   }
 
   // --- Domain risk flags (not necessarily block; used for escalation elsewhere) ---
-  if (cats.some(c => c.includes('medical')) || flags['medical']) {
-    return { reason: 'MEDICAL', severity: providerBlocked ? 'medium' : 'low' };
+  if (cats.some((c) => c.includes("medical")) || flags["medical"]) {
+    return { reason: "MEDICAL", severity: providerBlocked ? "medium" : "low" };
   }
-  if (cats.some(c => c.includes('legal')) || flags['legal']) {
-    return { reason: 'LEGAL', severity: providerBlocked ? 'medium' : 'low' };
+  if (cats.some((c) => c.includes("legal")) || flags["legal"]) {
+    return { reason: "LEGAL", severity: providerBlocked ? "medium" : "low" };
   }
 
   // If provider explicitly blocked but we can't map category
-  if (providerBlocked) return { reason: 'UNKNOWN', severity: 'high' };
+  if (providerBlocked) return { reason: "UNKNOWN", severity: "high" };
 
-  return { reason: reasonFromHints(context)?.reason ?? 'SAFE', severity: 'low' };
+  return {
+    reason: reasonFromHints(context)?.reason ?? "SAFE",
+    severity: "low",
+  };
 }
 
 function reasonFromHints(
-  context: SafetyContext
+  context: SafetyContext,
 ): { reason: SafetyReasonCode; severity: SafetySeverity } | null {
-  if (context.intentHints?.selfHarm) return { reason: 'SELF_HARM', severity: 'high' };
-  if (context.intentHints?.minors) return { reason: 'MINORS', severity: 'high' };
-  if (context.intentHints?.sexual) return { reason: 'SEXUAL_CONTENT', severity: 'medium' };
+  if (context.intentHints?.selfHarm)
+    return { reason: "SELF_HARM", severity: "high" };
+  if (context.intentHints?.minors)
+    return { reason: "MINORS", severity: "high" };
+  if (context.intentHints?.sexual)
+    return { reason: "SEXUAL_CONTENT", severity: "medium" };
   if (context.intentHints?.illegal || context.intentHints?.weapon)
-    return { reason: 'ILLEGAL', severity: 'medium' };
+    return { reason: "ILLEGAL", severity: "medium" };
   if (context.intentHints?.doxing || context.docHints?.piiLikely)
-    return { reason: 'PRIVACY', severity: 'medium' };
+    return { reason: "PRIVACY", severity: "medium" };
   return null;
 }
 
 function tightenForAge(
   mapped: { reason: SafetyReasonCode; severity: SafetySeverity },
   context: SafetyContext,
-  policy: SafetyAdapterPolicy
+  policy: SafetyAdapterPolicy,
 ): { reason: SafetyReasonCode; severity: SafetySeverity } {
   if (!policy.strictForTeens) return mapped;
 
-  if (context.userAgeBand === 'teen') {
+  if (context.userAgeBand === "teen") {
     // Teen strictness: elevate self-harm and minors to critical; lean toward block/escalate.
-    if (mapped.reason === 'SELF_HARM') return { reason: 'SELF_HARM', severity: 'critical' };
-    if (mapped.reason === 'MINORS') return { reason: 'MINORS', severity: 'critical' };
+    if (mapped.reason === "SELF_HARM")
+      return { reason: "SELF_HARM", severity: "critical" };
+    if (mapped.reason === "MINORS")
+      return { reason: "MINORS", severity: "critical" };
     // If ambiguous sexual content, raise severity
-    if (mapped.reason === 'SEXUAL_CONTENT') return { reason: 'SEXUAL_CONTENT', severity: 'high' };
+    if (mapped.reason === "SEXUAL_CONTENT")
+      return { reason: "SEXUAL_CONTENT", severity: "high" };
   }
 
   return mapped;
 }
 
-function mkMeta(context: SafetyContext, signal?: SafetySignal): SafetyDecision['meta'] {
+function mkMeta(
+  context: SafetyContext,
+  signal?: SafetySignal,
+): SafetyDecision["meta"] {
   return {
     traceId: context.traceId,
     turnId: context.turnId,
-    provider: signal?.provider ?? 'unknown',
+    provider: signal?.provider ?? "unknown",
     requestId: signal?.requestId,
     providerCategories: signal?.providerCategories,
     providerSeverity: signal?.providerSeverity,

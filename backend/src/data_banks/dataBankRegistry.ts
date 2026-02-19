@@ -10,8 +10,8 @@
  *   const triggers = registry.getTriggers('documents_qa', 'en');
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 // ============================================================================
 // TYPES
@@ -22,7 +22,7 @@ export interface TriggerPattern {
   pattern: string;
   regex?: string;
   priority?: number;
-  language: 'en' | 'pt';
+  language: "en" | "pt";
 }
 
 export interface NegativePattern {
@@ -30,7 +30,7 @@ export interface NegativePattern {
   pattern: string;
   blocks: string;
   priority?: number;
-  language: 'en' | 'pt';
+  language: "en" | "pt";
 }
 
 export interface FormattingConstraint {
@@ -38,14 +38,14 @@ export interface FormattingConstraint {
   pattern: string;
   regex?: string;
   extractCount?: boolean;
-  language: 'en' | 'pt';
+  language: "en" | "pt";
 }
 
 export interface NormalizerEntry {
   id: string;
   input: string[];
   output: string;
-  lang?: 'en' | 'pt' | 'both';
+  lang?: "en" | "pt" | "both";
 }
 
 export interface LexiconTerm {
@@ -59,7 +59,7 @@ export interface LexiconTerm {
 
 export interface OperatorVerbBank {
   bank_id: string;
-  language: 'en' | 'pt';
+  language: "en" | "pt";
   version: string;
   operators: {
     [operator: string]: {
@@ -165,7 +165,12 @@ export interface DomainScopeRule {
   boost_factor: number;
 }
 
-export type DomainType = 'finance' | 'accounting' | 'legal' | 'medical' | 'excel';
+export type DomainType =
+  | "finance"
+  | "accounting"
+  | "legal"
+  | "medical"
+  | "excel";
 
 export interface OperatorPriorityConfig {
   bank_id: string;
@@ -200,7 +205,7 @@ export interface OperatorPriorityConfig {
   };
 }
 
-export type LanguageCode = 'en' | 'pt';
+export type LanguageCode = "en" | "pt";
 
 // ============================================================================
 // REGISTRY
@@ -256,7 +261,7 @@ export class DataBankRegistry {
   loadAll(): void {
     if (this.loaded) return;
 
-    console.log('[DataBankRegistry] Loading data banks...');
+    console.log("[DataBankRegistry] Loading data banks...");
 
     this.loadTriggers();
     this.loadNegatives();
@@ -268,91 +273,101 @@ export class DataBankRegistry {
     this.loadDomainBanks();
 
     this.loaded = true;
-    console.log('[DataBankRegistry] All banks loaded');
+    console.log("[DataBankRegistry] All banks loaded");
   }
 
   private loadTriggers(): void {
-    const dir = path.join(this.basePath, 'triggers');
+    const dir = path.join(this.basePath, "triggers");
     if (!fs.existsSync(dir)) {
-      console.log('[DataBankRegistry] No triggers directory');
+      console.log("[DataBankRegistry] No triggers directory");
       return;
     }
 
-    const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+    const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json"));
     for (const file of files) {
-      const key = file.replace('.json', '');
+      const key = file.replace(".json", "");
       const data = this.loadJson<TriggerPattern[]>(path.join(dir, file));
       if (data) {
         this.triggers.set(key, data);
       }
     }
-    console.log(`[DataBankRegistry] Loaded ${this.triggers.size} trigger banks`);
+    console.log(
+      `[DataBankRegistry] Loaded ${this.triggers.size} trigger banks`,
+    );
   }
 
   private loadNegatives(): void {
-    const dir = path.join(this.basePath, 'negatives');
+    const dir = path.join(this.basePath, "negatives");
     if (!fs.existsSync(dir)) return;
 
-    const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+    const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json"));
     for (const file of files) {
-      const key = file.replace('.json', '');
+      const key = file.replace(".json", "");
       const data = this.loadJson<NegativePattern[]>(path.join(dir, file));
       if (data) {
         this.negatives.set(key, data);
       }
     }
-    console.log(`[DataBankRegistry] Loaded ${this.negatives.size} negative banks`);
+    console.log(
+      `[DataBankRegistry] Loaded ${this.negatives.size} negative banks`,
+    );
   }
 
   private loadFormatting(): void {
-    const dir = path.join(this.basePath, 'formatting');
+    const dir = path.join(this.basePath, "formatting");
     if (!fs.existsSync(dir)) return;
 
-    const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+    const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json"));
     for (const file of files) {
-      const key = file.replace('.json', '');
+      const key = file.replace(".json", "");
       const data = this.loadJson<FormattingConstraint[]>(path.join(dir, file));
       if (data) {
         this.formatting.set(key, data);
       }
     }
-    console.log(`[DataBankRegistry] Loaded ${this.formatting.size} formatting banks`);
+    console.log(
+      `[DataBankRegistry] Loaded ${this.formatting.size} formatting banks`,
+    );
   }
 
   private loadNormalizers(): void {
-    const dir = path.join(this.basePath, 'normalizers');
+    const dir = path.join(this.basePath, "normalizers");
     if (!fs.existsSync(dir)) return;
 
-    const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+    const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json"));
     for (const file of files) {
-      const key = file.replace('.json', '');
+      const key = file.replace(".json", "");
       const data = this.loadJson<NormalizerEntry[]>(path.join(dir, file));
       if (data) {
         this.normalizers.set(key, data);
       }
     }
-    console.log(`[DataBankRegistry] Loaded ${this.normalizers.size} normalizer banks`);
+    console.log(
+      `[DataBankRegistry] Loaded ${this.normalizers.size} normalizer banks`,
+    );
   }
 
   private loadLexicons(): void {
-    const dir = path.join(this.basePath, 'lexicons');
+    const dir = path.join(this.basePath, "lexicons");
     if (!fs.existsSync(dir)) return;
 
-    const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+    const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json"));
     for (const file of files) {
-      const key = file.replace('.json', '');
+      const key = file.replace(".json", "");
       const data = this.loadJson<LexiconTerm[]>(path.join(dir, file));
       if (data) {
         this.lexicons.set(key, data);
       }
     }
-    console.log(`[DataBankRegistry] Loaded ${this.lexicons.size} lexicon banks`);
+    console.log(
+      `[DataBankRegistry] Loaded ${this.lexicons.size} lexicon banks`,
+    );
   }
 
   private loadOperatorBackbone(): void {
     // Load operator verbs (source banks)
-    const normDir = path.join(this.basePath, 'normalizers');
-    for (const lang of ['en', 'pt'] as const) {
+    const normDir = path.join(this.basePath, "normalizers");
+    for (const lang of ["en", "pt"] as const) {
       const verbFile = path.join(normDir, `operator_verbs.${lang}.json`);
       if (fs.existsSync(verbFile)) {
         const data = this.loadJson<OperatorVerbBank>(verbFile);
@@ -363,8 +378,8 @@ export class DataBankRegistry {
     }
 
     // Load operator triggers (compiled)
-    const trigDir = path.join(this.basePath, 'triggers');
-    for (const lang of ['en', 'pt'] as const) {
+    const trigDir = path.join(this.basePath, "triggers");
+    for (const lang of ["en", "pt"] as const) {
       const trigFile = path.join(trigDir, `operator_triggers.${lang}.json`);
       if (fs.existsSync(trigFile)) {
         const data = this.loadJson<{ triggers: OperatorTrigger[] }>(trigFile);
@@ -375,8 +390,8 @@ export class DataBankRegistry {
     }
 
     // Load operator negatives (compiled)
-    const negDir = path.join(this.basePath, 'negatives');
-    for (const lang of ['en', 'pt'] as const) {
+    const negDir = path.join(this.basePath, "negatives");
+    for (const lang of ["en", "pt"] as const) {
       const negFile = path.join(negDir, `operator_negatives.${lang}.json`);
       if (fs.existsSync(negFile)) {
         const data = this.loadJson<{ negatives: OperatorNegative[] }>(negFile);
@@ -387,44 +402,64 @@ export class DataBankRegistry {
     }
 
     // Load preamble patterns
-    const fmtDir = path.join(this.basePath, 'formatting');
-    const forbiddenFile = path.join(fmtDir, 'preamble_forbidden.any.json');
+    const fmtDir = path.join(this.basePath, "formatting");
+    const forbiddenFile = path.join(fmtDir, "preamble_forbidden.any.json");
     if (fs.existsSync(forbiddenFile)) {
-      const data = this.loadJson<{ patterns: PreamblePattern[] }>(forbiddenFile);
+      const data = this.loadJson<{ patterns: PreamblePattern[] }>(
+        forbiddenFile,
+      );
       if (data?.patterns) {
         this.preambleForbidden = data.patterns;
       }
     }
-    const allowedFile = path.join(fmtDir, 'preamble_allowed.any.json');
+    const allowedFile = path.join(fmtDir, "preamble_allowed.any.json");
     if (fs.existsSync(allowedFile)) {
-      const data = this.loadJson<{ exceptions: PreamblePattern[] }>(allowedFile);
+      const data = this.loadJson<{ exceptions: PreamblePattern[] }>(
+        allowedFile,
+      );
       if (data?.exceptions) {
         this.preambleAllowed = data.exceptions;
       }
     }
 
     // Load operator priority config
-    const overlayDir = path.join(this.basePath, 'overlays');
-    const priorityFile = path.join(overlayDir, 'operator_priority.any.json');
+    const overlayDir = path.join(this.basePath, "overlays");
+    const priorityFile = path.join(overlayDir, "operator_priority.any.json");
     if (fs.existsSync(priorityFile)) {
-      this.operatorPriority = this.loadJson<OperatorPriorityConfig>(priorityFile);
+      this.operatorPriority =
+        this.loadJson<OperatorPriorityConfig>(priorityFile);
     }
 
-    const verbCount = Array.from(this.operatorVerbs.values()).reduce((sum, b) =>
-      sum + Object.values(b.operators || {}).reduce((s, o) => s + (o.verbs?.length || 0) + (o.phrases?.length || 0), 0), 0);
-    const trigCount = Array.from(this.operatorTriggers.values()).reduce((sum, t) => sum + t.length, 0);
-    const negCount = Array.from(this.operatorNegatives.values()).reduce((sum, n) => sum + n.length, 0);
+    const verbCount = Array.from(this.operatorVerbs.values()).reduce(
+      (sum, b) =>
+        sum +
+        Object.values(b.operators || {}).reduce(
+          (s, o) => s + (o.verbs?.length || 0) + (o.phrases?.length || 0),
+          0,
+        ),
+      0,
+    );
+    const trigCount = Array.from(this.operatorTriggers.values()).reduce(
+      (sum, t) => sum + t.length,
+      0,
+    );
+    const negCount = Array.from(this.operatorNegatives.values()).reduce(
+      (sum, n) => sum + n.length,
+      0,
+    );
 
-    console.log(`[DataBankRegistry] Loaded operator backbone: ${verbCount} verbs/phrases, ${trigCount} triggers, ${negCount} negatives`);
+    console.log(
+      `[DataBankRegistry] Loaded operator backbone: ${verbCount} verbs/phrases, ${trigCount} triggers, ${negCount} negatives`,
+    );
   }
 
   private loadOverlays(): void {
-    const dir = path.join(this.basePath, 'overlays');
+    const dir = path.join(this.basePath, "overlays");
     if (!fs.existsSync(dir)) return;
 
-    const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+    const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json"));
     for (const file of files) {
-      const key = file.replace('.json', '');
+      const key = file.replace(".json", "");
       const data = this.loadJson<any>(path.join(dir, file));
       if (data) {
         // Handle both array and object formats
@@ -439,15 +474,23 @@ export class DataBankRegistry {
         }
       }
     }
-    console.log(`[DataBankRegistry] Loaded ${this.overlays.size} overlay banks`);
+    console.log(
+      `[DataBankRegistry] Loaded ${this.overlays.size} overlay banks`,
+    );
   }
 
   private loadDomainBanks(): void {
-    const domains: DomainType[] = ['finance', 'accounting', 'legal', 'medical', 'excel'];
-    const languages = ['en', 'pt'] as const;
+    const domains: DomainType[] = [
+      "finance",
+      "accounting",
+      "legal",
+      "medical",
+      "excel",
+    ];
+    const languages = ["en", "pt"] as const;
 
     // Load domain lexicons
-    const lexDir = path.join(this.basePath, 'lexicons');
+    const lexDir = path.join(this.basePath, "lexicons");
     if (fs.existsSync(lexDir)) {
       for (const domain of domains) {
         for (const lang of languages) {
@@ -463,14 +506,16 @@ export class DataBankRegistry {
     }
 
     // Load domain headers (from triggers)
-    const trigDir = path.join(this.basePath, 'triggers');
+    const trigDir = path.join(this.basePath, "triggers");
     if (fs.existsSync(trigDir)) {
       for (const lang of languages) {
         const headerFile = path.join(trigDir, `domain_headers.${lang}.json`);
         if (fs.existsSync(headerFile)) {
           const data = this.loadJson<any>(headerFile);
           if (data?.families) {
-            for (const [familyId, family] of Object.entries(data.families as Record<string, any>)) {
+            for (const [familyId, family] of Object.entries(
+              data.families as Record<string, any>,
+            )) {
               const domain = family.domain as DomainType;
               if (domain && family.patterns) {
                 this.domainHeaders.set(`${domain}.${lang}`, family.patterns);
@@ -483,10 +528,10 @@ export class DataBankRegistry {
 
     // Load domain entity extractors
     const extractorPatterns = [
-      { domain: 'finance', file: 'finance_entity_extractors' },
-      { domain: 'accounting', file: 'accounting_entity_extractors' },
-      { domain: 'legal', file: 'legal_clause_extractors' },
-      { domain: 'medical', file: 'medical_extractors' },
+      { domain: "finance", file: "finance_entity_extractors" },
+      { domain: "accounting", file: "accounting_entity_extractors" },
+      { domain: "legal", file: "legal_clause_extractors" },
+      { domain: "medical", file: "medical_extractors" },
     ];
     for (const { domain, file } of extractorPatterns) {
       for (const lang of languages) {
@@ -501,10 +546,13 @@ export class DataBankRegistry {
     }
 
     // Load domain templates
-    const templatesDir = path.join(this.basePath, 'templates');
+    const templatesDir = path.join(this.basePath, "templates");
     if (fs.existsSync(templatesDir)) {
       for (const lang of languages) {
-        const templateFile = path.join(templatesDir, `domain_templates.${lang}.json`);
+        const templateFile = path.join(
+          templatesDir,
+          `domain_templates.${lang}.json`,
+        );
         if (fs.existsSync(templateFile)) {
           const data = this.loadJson<DomainTemplateBank>(templateFile);
           if (data) {
@@ -512,7 +560,10 @@ export class DataBankRegistry {
           }
         }
 
-        const clarifyFile = path.join(templatesDir, `domain_clarify_templates.${lang}.json`);
+        const clarifyFile = path.join(
+          templatesDir,
+          `domain_clarify_templates.${lang}.json`,
+        );
         if (fs.existsSync(clarifyFile)) {
           const data = this.loadJson<DomainTemplateBank>(clarifyFile);
           if (data) {
@@ -523,8 +574,8 @@ export class DataBankRegistry {
     }
 
     // Load domain scope rules
-    const overlayDir = path.join(this.basePath, 'overlays');
-    const scopeFile = path.join(overlayDir, 'domain_scope_rules.any.json');
+    const overlayDir = path.join(this.basePath, "overlays");
+    const scopeFile = path.join(overlayDir, "domain_scope_rules.any.json");
     if (fs.existsSync(scopeFile)) {
       const data = this.loadJson<{ rules?: DomainScopeRule[] }>(scopeFile);
       if (data?.rules) {
@@ -533,12 +584,12 @@ export class DataBankRegistry {
     }
 
     // Load domain negatives
-    const negDir = path.join(this.basePath, 'negatives');
+    const negDir = path.join(this.basePath, "negatives");
     const domainNegFiles = [
-      'not_domain_when_no_signal',
-      'not_legal_when_no_clause_signal',
-      'not_finance_when_no_metric_signal',
-      'not_medical_when_no_med_signal',
+      "not_domain_when_no_signal",
+      "not_legal_when_no_clause_signal",
+      "not_finance_when_no_metric_signal",
+      "not_medical_when_no_med_signal",
     ];
     for (const negType of domainNegFiles) {
       for (const lang of languages) {
@@ -553,10 +604,13 @@ export class DataBankRegistry {
     }
 
     // Load domain probes
-    const probeTypes = ['finance', 'legal', 'accounting', 'medical'];
+    const probeTypes = ["finance", "legal", "accounting", "medical"];
     for (const domain of probeTypes) {
       for (const lang of languages) {
-        const probeFile = path.join(overlayDir, `domain_probe_${domain}.${lang}.json`);
+        const probeFile = path.join(
+          overlayDir,
+          `domain_probe_${domain}.${lang}.json`,
+        );
         if (fs.existsSync(probeFile)) {
           const data = this.loadJson<DomainProbeBank>(probeFile);
           if (data) {
@@ -574,12 +628,14 @@ export class DataBankRegistry {
     const probeCount = this.domainProbes.size;
     const negCount = this.domainNegatives.size;
 
-    console.log(`[DataBankRegistry] Loaded domain banks: ${lexiconCount} lexicons, ${headerCount} header sets, ${extractorCount} extractors, ${templateCount} templates, ${probeCount} probes, ${negCount} negative sets`);
+    console.log(
+      `[DataBankRegistry] Loaded domain banks: ${lexiconCount} lexicons, ${headerCount} header sets, ${extractorCount} extractors, ${templateCount} templates, ${probeCount} probes, ${negCount} negative sets`,
+    );
   }
 
   private loadJson<T>(filePath: string): T | null {
     try {
-      const content = fs.readFileSync(filePath, 'utf-8');
+      const content = fs.readFileSync(filePath, "utf-8");
       return JSON.parse(content);
     } catch (e) {
       console.error(`[DataBankRegistry] Failed to load ${filePath}: ${e}`);
@@ -601,7 +657,7 @@ export class DataBankRegistry {
     const result = new Map<string, TriggerPattern[]>();
     for (const [key, patterns] of this.triggers) {
       if (key.endsWith(`.${lang}`)) {
-        const intent = key.replace(`.${lang}`, '');
+        const intent = key.replace(`.${lang}`, "");
         result.set(intent, patterns);
       }
     }
@@ -678,7 +734,10 @@ export class DataBankRegistry {
     this.ensureLoaded();
     const bank = this.operatorVerbs.get(lang);
     if (!bank?.operators?.[operator]) return [];
-    return [...(bank.operators[operator].verbs || []), ...(bank.operators[operator].phrases || [])];
+    return [
+      ...(bank.operators[operator].verbs || []),
+      ...(bank.operators[operator].phrases || []),
+    ];
   }
 
   /**
@@ -692,10 +751,13 @@ export class DataBankRegistry {
   /**
    * Get triggers for a specific operator
    */
-  getTriggersForOperator(operator: string, lang: LanguageCode): OperatorTrigger[] {
+  getTriggersForOperator(
+    operator: string,
+    lang: LanguageCode,
+  ): OperatorTrigger[] {
     this.ensureLoaded();
     const triggers = this.operatorTriggers.get(lang) || [];
-    return triggers.filter(t => t.operator === operator);
+    return triggers.filter((t) => t.operator === operator);
   }
 
   /**
@@ -709,10 +771,13 @@ export class DataBankRegistry {
   /**
    * Get negatives that block a specific operator
    */
-  getNegativesBlockingOperator(operator: string, lang: LanguageCode): OperatorNegative[] {
+  getNegativesBlockingOperator(
+    operator: string,
+    lang: LanguageCode,
+  ): OperatorNegative[] {
     this.ensureLoaded();
     const negs = this.operatorNegatives.get(lang) || [];
-    return negs.filter(n => n.blocked_operator === operator);
+    return negs.filter((n) => n.blocked_operator === operator);
   }
 
   /**
@@ -754,7 +819,10 @@ export class DataBankRegistry {
   /**
    * Get domain lexicon for a specific domain and language
    */
-  getDomainLexicon(domain: DomainType, lang: LanguageCode): DomainLexicon | null {
+  getDomainLexicon(
+    domain: DomainType,
+    lang: LanguageCode,
+  ): DomainLexicon | null {
     this.ensureLoaded();
     return this.domainLexicons.get(`${domain}.${lang}`) || null;
   }
@@ -808,7 +876,13 @@ export class DataBankRegistry {
   getAllDomainHeaders(lang: LanguageCode): Map<DomainType, string[]> {
     this.ensureLoaded();
     const result = new Map<DomainType, string[]>();
-    const domains: DomainType[] = ['finance', 'accounting', 'legal', 'medical', 'excel'];
+    const domains: DomainType[] = [
+      "finance",
+      "accounting",
+      "legal",
+      "medical",
+      "excel",
+    ];
     for (const domain of domains) {
       const headers = this.domainHeaders.get(`${domain}.${lang}`);
       if (headers && headers.length > 0) {
@@ -821,7 +895,10 @@ export class DataBankRegistry {
   /**
    * Get domain entity extractors
    */
-  getDomainExtractors(domain: DomainType, lang: LanguageCode): DomainExtractorBank | null {
+  getDomainExtractors(
+    domain: DomainType,
+    lang: LanguageCode,
+  ): DomainExtractorBank | null {
     this.ensureLoaded();
     return this.domainExtractors.get(`${domain}.${lang}`) || null;
   }
@@ -829,7 +906,11 @@ export class DataBankRegistry {
   /**
    * Get extractor patterns for a specific type
    */
-  getExtractorPatterns(domain: DomainType, extractorType: string, lang: LanguageCode): string[] {
+  getExtractorPatterns(
+    domain: DomainType,
+    extractorType: string,
+    lang: LanguageCode,
+  ): string[] {
     this.ensureLoaded();
     const bank = this.domainExtractors.get(`${domain}.${lang}`);
     if (!bank?.extractors?.[extractorType]) return [];
@@ -847,7 +928,11 @@ export class DataBankRegistry {
   /**
    * Get template variants for a domain and template type
    */
-  getTemplateVariants(domain: DomainType, templateType: string, lang: LanguageCode): string[] {
+  getTemplateVariants(
+    domain: DomainType,
+    templateType: string,
+    lang: LanguageCode,
+  ): string[] {
     this.ensureLoaded();
     const bank = this.domainTemplates.get(lang);
     if (!bank?.templates?.[domain]?.[templateType]) return [];
@@ -865,7 +950,11 @@ export class DataBankRegistry {
   /**
    * Get clarify template variants
    */
-  getClarifyVariants(domain: DomainType, clarifyType: string, lang: LanguageCode): string[] {
+  getClarifyVariants(
+    domain: DomainType,
+    clarifyType: string,
+    lang: LanguageCode,
+  ): string[] {
     this.ensureLoaded();
     const bank = this.domainClarifyTemplates.get(lang);
     if (!bank?.templates?.[domain]?.[clarifyType]) return [];
@@ -885,7 +974,7 @@ export class DataBankRegistry {
    */
   getScopeRuleForDomain(domain: DomainType): DomainScopeRule | null {
     this.ensureLoaded();
-    return this.domainScopeRules.find(r => r.domain === domain) || null;
+    return this.domainScopeRules.find((r) => r.domain === domain) || null;
   }
 
   /**
@@ -899,7 +988,10 @@ export class DataBankRegistry {
   /**
    * Get domain probes for validation
    */
-  getDomainProbes(domain: DomainType, lang: LanguageCode): DomainProbeBank | null {
+  getDomainProbes(
+    domain: DomainType,
+    lang: LanguageCode,
+  ): DomainProbeBank | null {
     this.ensureLoaded();
     return this.domainProbes.get(`${domain}.${lang}`) || null;
   }
@@ -907,12 +999,25 @@ export class DataBankRegistry {
   /**
    * Detect domain from query using domain headers and lexicon overlap
    */
-  detectDomain(query: string, lang: LanguageCode): { domain: DomainType; confidence: number; signals: string[] } | null {
+  detectDomain(
+    query: string,
+    lang: LanguageCode,
+  ): { domain: DomainType; confidence: number; signals: string[] } | null {
     this.ensureLoaded();
     const lowerQuery = query.toLowerCase();
-    const domains: DomainType[] = ['finance', 'accounting', 'legal', 'medical', 'excel'];
+    const domains: DomainType[] = [
+      "finance",
+      "accounting",
+      "legal",
+      "medical",
+      "excel",
+    ];
 
-    let bestMatch: { domain: DomainType; confidence: number; signals: string[] } | null = null;
+    let bestMatch: {
+      domain: DomainType;
+      confidence: number;
+      signals: string[];
+    } | null = null;
 
     for (const domain of domains) {
       const signals: string[] = [];
@@ -941,10 +1046,11 @@ export class DataBankRegistry {
       }
 
       // Check if blocked by domain negatives
-      const negatives = this.domainNegatives.get(`not_domain_when_no_signal.${lang}`) || [];
+      const negatives =
+        this.domainNegatives.get(`not_domain_when_no_signal.${lang}`) || [];
       let blocked = false;
       for (const neg of negatives) {
-        if (neg.pattern && new RegExp(neg.pattern, 'i').test(query)) {
+        if (neg.pattern && new RegExp(neg.pattern, "i").test(query)) {
           blocked = true;
           break;
         }
@@ -964,23 +1070,31 @@ export class DataBankRegistry {
   /**
    * Match query against operator triggers and return best match
    */
-  matchOperator(query: string, lang: LanguageCode): { operator: string; confidence: number; triggerId: string } | null {
+  matchOperator(
+    query: string,
+    lang: LanguageCode,
+  ): { operator: string; confidence: number; triggerId: string } | null {
     this.ensureLoaded();
     const triggers = this.operatorTriggers.get(lang) || [];
     const lowerQuery = query.toLowerCase();
 
-    let bestMatch: { operator: string; confidence: number; triggerId: string; priority: number } | null = null;
+    let bestMatch: {
+      operator: string;
+      confidence: number;
+      triggerId: string;
+      priority: number;
+    } | null = null;
 
     for (const trigger of triggers) {
       try {
-        const regex = new RegExp(trigger.pattern, 'i');
+        const regex = new RegExp(trigger.pattern, "i");
         if (regex.test(lowerQuery)) {
           // Check if blocked by negatives
           const negs = this.operatorNegatives.get(lang) || [];
           let blocked = false;
           for (const neg of negs) {
             if (neg.blocked_operator === trigger.operator) {
-              const negRegex = new RegExp(neg.pattern, 'i');
+              const negRegex = new RegExp(neg.pattern, "i");
               if (negRegex.test(lowerQuery)) {
                 blocked = true;
                 break;
@@ -990,12 +1104,15 @@ export class DataBankRegistry {
 
           if (!blocked) {
             const score = trigger.priority * trigger.confidence;
-            if (!bestMatch || score > bestMatch.priority * bestMatch.confidence) {
+            if (
+              !bestMatch ||
+              score > bestMatch.priority * bestMatch.confidence
+            ) {
               bestMatch = {
                 operator: trigger.operator,
                 confidence: trigger.confidence,
                 triggerId: trigger.id,
-                priority: trigger.priority
+                priority: trigger.priority,
               };
             }
           }
@@ -1009,7 +1126,7 @@ export class DataBankRegistry {
       return {
         operator: bestMatch.operator,
         confidence: bestMatch.confidence,
-        triggerId: bestMatch.triggerId
+        triggerId: bestMatch.triggerId,
       };
     }
     return null;
@@ -1018,12 +1135,15 @@ export class DataBankRegistry {
   /**
    * Check if text has forbidden preamble
    */
-  hasForbiddenPreamble(text: string, lang: 'en' | 'pt'): { pattern: PreamblePattern; match: string } | null {
+  hasForbiddenPreamble(
+    text: string,
+    lang: "en" | "pt",
+  ): { pattern: PreamblePattern; match: string } | null {
     this.ensureLoaded();
     for (const p of this.preambleForbidden) {
-      if (p.languages.includes(lang) || p.languages.includes('any')) {
+      if (p.languages.includes(lang) || p.languages.includes("any")) {
         try {
-          const regex = new RegExp(p.pattern, 'i');
+          const regex = new RegExp(p.pattern, "i");
           const match = text.match(regex);
           if (match) {
             return { pattern: p, match: match[0] };
@@ -1050,7 +1170,7 @@ export class DataBankRegistry {
     for (const trigger of triggers) {
       if (trigger.regex) {
         try {
-          const regex = new RegExp(trigger.regex, 'i');
+          const regex = new RegExp(trigger.regex, "i");
           if (regex.test(query)) return true;
         } catch {
           // Invalid regex, skip
@@ -1084,14 +1204,17 @@ export class DataBankRegistry {
   /**
    * Detect format request in query
    */
-  detectFormatRequest(query: string, lang: LanguageCode): FormattingConstraint | null {
+  detectFormatRequest(
+    query: string,
+    lang: LanguageCode,
+  ): FormattingConstraint | null {
     const constraints = this.getAllFormatting(lang);
     const lowerQuery = query.toLowerCase();
 
     for (const constraint of constraints) {
       if (constraint.regex) {
         try {
-          const regex = new RegExp(constraint.regex, 'i');
+          const regex = new RegExp(constraint.regex, "i");
           if (regex.test(query)) return constraint;
         } catch {
           // Invalid regex, skip
@@ -1116,7 +1239,7 @@ export class DataBankRegistry {
     for (const entry of entries) {
       for (const variant of entry.input) {
         if (lowerInput.includes(variant.toLowerCase())) {
-          return input.replace(new RegExp(variant, 'gi'), entry.output);
+          return input.replace(new RegExp(variant, "gi"), entry.output);
         }
       }
     }
@@ -1132,11 +1255,12 @@ export class DataBankRegistry {
     const lowerTerm = term.toLowerCase();
 
     for (const lexTerm of allTerms) {
-      const canonical = lang === 'en' ? lexTerm.canonical_en : lexTerm.canonical_pt;
-      const aliases = lang === 'en' ? lexTerm.aliases_en : lexTerm.aliases_pt;
+      const canonical =
+        lang === "en" ? lexTerm.canonical_en : lexTerm.canonical_pt;
+      const aliases = lang === "en" ? lexTerm.aliases_en : lexTerm.aliases_pt;
 
       if (canonical.toLowerCase() === lowerTerm) return lexTerm;
-      if (aliases.some(a => a.toLowerCase() === lowerTerm)) return lexTerm;
+      if (aliases.some((a) => a.toLowerCase() === lowerTerm)) return lexTerm;
     }
 
     return null;
@@ -1170,19 +1294,26 @@ export class DataBankRegistry {
     let opVerbCount = 0;
     let overlayCount = 0;
 
-    for (const patterns of this.triggers.values()) triggerCount += patterns.length;
-    for (const patterns of this.negatives.values()) negativeCount += patterns.length;
-    for (const patterns of this.formatting.values()) formattingCount += patterns.length;
-    for (const entries of this.normalizers.values()) normalizerCount += entries.length;
+    for (const patterns of this.triggers.values())
+      triggerCount += patterns.length;
+    for (const patterns of this.negatives.values())
+      negativeCount += patterns.length;
+    for (const patterns of this.formatting.values())
+      formattingCount += patterns.length;
+    for (const entries of this.normalizers.values())
+      normalizerCount += entries.length;
     for (const terms of this.lexicons.values()) lexiconCount += terms.length;
-    for (const triggers of this.operatorTriggers.values()) opTriggerCount += triggers.length;
-    for (const negs of this.operatorNegatives.values()) opNegativeCount += negs.length;
+    for (const triggers of this.operatorTriggers.values())
+      opTriggerCount += triggers.length;
+    for (const negs of this.operatorNegatives.values())
+      opNegativeCount += negs.length;
     for (const bank of this.operatorVerbs.values()) {
       for (const op of Object.values(bank.operators || {})) {
         opVerbCount += (op.verbs?.length || 0) + (op.phrases?.length || 0);
       }
     }
-    for (const overlay of this.overlays.values()) overlayCount += overlay.length;
+    for (const overlay of this.overlays.values())
+      overlayCount += overlay.length;
 
     return {
       triggers: triggerCount,
@@ -1193,7 +1324,8 @@ export class DataBankRegistry {
       operatorTriggers: opTriggerCount,
       operatorNegatives: opNegativeCount,
       operatorVerbs: opVerbCount,
-      preamblePatterns: this.preambleForbidden.length + this.preambleAllowed.length,
+      preamblePatterns:
+        this.preambleForbidden.length + this.preambleAllowed.length,
       overlays: overlayCount,
     };
   }
@@ -1209,7 +1341,7 @@ export class DataBankRegistry {
   // -------------------------------------------------------------------------
 
   reload(): void {
-    console.log('[DataBankRegistry] Reloading all banks...');
+    console.log("[DataBankRegistry] Reloading all banks...");
     this.triggers.clear();
     this.negatives.clear();
     this.formatting.clear();

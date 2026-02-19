@@ -1,13 +1,17 @@
 // src/services/app/chatApp.service.ts
-import type { Request } from 'express';
-import type { Attachment } from '../../types/handlerResult.types';
+import type { Request } from "express";
+import type { Attachment } from "../../types/handlerResult.types";
 
-import { KodaOrchestratorV3Service } from '../core/orchestration/kodaOrchestrator.service';
-import { ConversationContextService } from '../memory/conversationContext.service';
-import { ConversationMemoryService } from '../memory/conversationMemory.service';
+import { KodaOrchestratorV3Service } from "../core/orchestration/kodaOrchestrator.service";
+import { ConversationContextService } from "../memory/conversationContext.service";
+import { ConversationMemoryService } from "../memory/conversationMemory.service";
 
 // Alias for code expecting ComposedResponse
-type ComposedResponse = { text: string; attachments?: Attachment[]; meta?: Record<string, any> };
+type ComposedResponse = {
+  text: string;
+  attachments?: Attachment[];
+  meta?: Record<string, any>;
+};
 
 /**
  * ChatAppService
@@ -23,7 +27,7 @@ type ComposedResponse = { text: string; attachments?: Attachment[]; meta?: Recor
  * That belongs in core/orchestrator + data_banks.
  */
 
-export type ChatRole = 'user' | 'assistant';
+export type ChatRole = "user" | "assistant";
 
 export interface ChatMessageInput {
   role: ChatRole;
@@ -49,7 +53,7 @@ export interface ChatRequestBody {
   userRequestedShort?: boolean;
 
   // Optional: client-side language preference
-  language?: 'en' | 'pt' | 'es';
+  language?: "en" | "pt" | "es";
 }
 
 export interface ChatResponsePayload {
@@ -63,13 +67,7 @@ export interface ChatResponsePayload {
 }
 
 export interface ChatStreamChunk {
-  type:
-    | 'status'
-    | 'delta'
-    | 'done'
-    | 'error'
-    | 'meta'
-    | 'attachments';
+  type: "status" | "delta" | "done" | "error" | "meta" | "attachments";
   requestId?: string;
   messageId?: string;
   conversationId?: string;
@@ -86,8 +84,8 @@ function getActor(req: Request): { userId: string; isGuest: boolean } {
     anyReq.user?.userId ||
     anyReq.auth?.userId ||
     anyReq.session?.userId ||
-    'guest';
-  return { userId: String(userId), isGuest: userId === 'guest' };
+    "guest";
+  return { userId: String(userId), isGuest: userId === "guest" };
 }
 
 function nowIso(): string {
@@ -95,14 +93,16 @@ function nowIso(): string {
 }
 
 function sanitizeUserText(input: unknown, maxChars: number): string {
-  const s = String(input ?? '').replace(/\r\n/g, '\n').trim();
-  if (!s) return '';
+  const s = String(input ?? "")
+    .replace(/\r\n/g, "\n")
+    .trim();
+  if (!s) return "";
   if (s.length <= maxChars) return s;
   return s.slice(0, maxChars);
 }
 
-function normalizeLanguage(lang: any): 'en' | 'pt' | 'es' | undefined {
-  if (lang === 'en' || lang === 'pt' || lang === 'es') return lang;
+function normalizeLanguage(lang: any): "en" | "pt" | "es" | undefined {
+  if (lang === "en" || lang === "pt" || lang === "es") return lang;
   return undefined;
 }
 
@@ -114,21 +114,24 @@ export class ChatAppService {
   /**
    * Non-streaming chat call (controller returns JSON).
    */
-  async chat(req: Request, body: ChatRequestBody): Promise<ChatResponsePayload> {
+  async chat(
+    req: Request,
+    body: ChatRequestBody,
+  ): Promise<ChatResponsePayload> {
     const actor = getActor(req);
 
     const message = sanitizeUserText(body.message, 8000);
     if (!message) {
       return {
         messageId: cryptoRandomId(),
-        conversationId: body.conversationId || 'new',
+        conversationId: body.conversationId || "new",
         content: "I didn't get any text. What would you like to ask?",
-        answerMode: 'conversation',
+        answerMode: "conversation",
       };
     }
 
     const conversationId =
-      (body.conversationId && String(body.conversationId)) || 'new';
+      (body.conversationId && String(body.conversationId)) || "new";
 
     // Pull context (recent turns + lightweight state)
     const ctx = await this.conversationContext.build({
@@ -192,17 +195,20 @@ export class ChatAppService {
    * Streaming chat call.
    * The controller should wire this to SSE and write chunks returned by `stream()`.
    */
-  async *stream(req: Request, body: ChatRequestBody): AsyncGenerator<ChatStreamChunk> {
+  async *stream(
+    req: Request,
+    body: ChatRequestBody,
+  ): AsyncGenerator<ChatStreamChunk> {
     const actor = getActor(req);
 
     const message = sanitizeUserText(body.message, 8000);
     const conversationId =
-      (body.conversationId && String(body.conversationId)) || 'new';
+      (body.conversationId && String(body.conversationId)) || "new";
 
     if (!message) {
       yield {
-        type: 'error',
-        data: { code: 'EMPTY_MESSAGE', message: "I didn't get any text." },
+        type: "error",
+        data: { code: "EMPTY_MESSAGE", message: "I didn't get any text." },
       };
       return;
     }
@@ -222,10 +228,10 @@ export class ChatAppService {
     });
 
     yield {
-      type: 'status',
+      type: "status",
       requestId: ctx.requestId,
       conversationId: ctx.conversationId,
-      data: { stage: 'thinking', message: 'Thinking…' },
+      data: { stage: "thinking", message: "Thinking…" },
     };
 
     // Orchestrator streaming generator
@@ -255,28 +261,28 @@ export class ChatAppService {
 
     for await (const chunk of stream) {
       // Pass-through normalized chunk types to frontend
-      if (chunk.type === 'delta') {
+      if (chunk.type === "delta") {
         yield {
-          type: 'delta',
+          type: "delta",
           requestId: ctx.requestId,
           conversationId: ctx.conversationId,
           data: { text: chunk.text },
         };
-      } else if (chunk.type === 'meta') {
+      } else if (chunk.type === "meta") {
         yield {
-          type: 'meta',
+          type: "meta",
           requestId: ctx.requestId,
           conversationId: ctx.conversationId,
           data: chunk.data,
         };
-      } else if (chunk.type === 'attachments') {
+      } else if (chunk.type === "attachments") {
         yield {
-          type: 'attachments',
+          type: "attachments",
           requestId: ctx.requestId,
           conversationId: ctx.conversationId,
           data: chunk.attachments,
         };
-      } else if (chunk.type === 'done') {
+      } else if (chunk.type === "done") {
         final = {
           messageId: chunk.messageId,
           content: chunk.content,
@@ -286,7 +292,7 @@ export class ChatAppService {
         };
 
         yield {
-          type: 'done',
+          type: "done",
           requestId: ctx.requestId,
           messageId: chunk.messageId,
           conversationId: ctx.conversationId,
@@ -297,9 +303,9 @@ export class ChatAppService {
             meta: chunk.meta ?? {},
           },
         };
-      } else if (chunk.type === 'error') {
+      } else if (chunk.type === "error") {
         yield {
-          type: 'error',
+          type: "error",
           requestId: ctx.requestId,
           conversationId: ctx.conversationId,
           data: chunk.error,
@@ -313,7 +319,7 @@ export class ChatAppService {
         actor,
         conversationId: ctx.conversationId,
         requestId: ctx.requestId,
-        userMessage: { role: 'user', content: message, createdAt: nowIso() },
+        userMessage: { role: "user", content: message, createdAt: nowIso() },
         assistant: {
           id: final.messageId,
           content: final.content,

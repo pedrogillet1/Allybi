@@ -23,7 +23,8 @@ export function coerceScalarToTypedValue(input: unknown): TypedCellValue {
   const raw = String(input).trim();
   if (!raw) return { v: "", t: "s" };
   if (/^(null|empty|blank)$/i.test(raw)) return { v: null, t: "s" };
-  if (/^(true|false)$/i.test(raw)) return { v: raw.toLowerCase() === "true", t: "b" };
+  if (/^(true|false)$/i.test(raw))
+    return { v: raw.toLowerCase() === "true", t: "b" };
 
   const pct = raw.match(/^(-?[\d,.]+)\s*%$/);
   if (pct?.[1]) {

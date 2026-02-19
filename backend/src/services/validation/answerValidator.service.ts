@@ -3,7 +3,7 @@
  * Ensures responses meet formatting, content, and policy requirements
  */
 
-import { injectable } from 'tsyringe';
+import { injectable } from "tsyringe";
 
 export interface ValidationResult {
   valid: boolean;
@@ -19,7 +19,7 @@ export class AnswerValidatorService {
    */
   async validate(answer: string, context: unknown): Promise<ValidationResult> {
     // TODO: Implement comprehensive validation
-    throw new Error('AnswerValidatorService.validate not implemented');
+    throw new Error("AnswerValidatorService.validate not implemented");
   }
 
   /**
@@ -27,15 +27,18 @@ export class AnswerValidatorService {
    */
   async validateMarkdown(answer: string): Promise<ValidationResult> {
     // TODO: Implement markdown validation
-    throw new Error('AnswerValidatorService.validateMarkdown not implemented');
+    throw new Error("AnswerValidatorService.validateMarkdown not implemented");
   }
 
   /**
    * Validate language consistency
    */
-  async validateLanguage(answer: string, expectedLanguage: string): Promise<ValidationResult> {
+  async validateLanguage(
+    answer: string,
+    expectedLanguage: string,
+  ): Promise<ValidationResult> {
     // TODO: Implement language validation
-    throw new Error('AnswerValidatorService.validateLanguage not implemented');
+    throw new Error("AnswerValidatorService.validateLanguage not implemented");
   }
 
   /**
@@ -43,6 +46,6 @@ export class AnswerValidatorService {
    */
   async validatePolicy(answer: string): Promise<ValidationResult> {
     // TODO: Implement policy validation
-    throw new Error('AnswerValidatorService.validatePolicy not implemented');
+    throw new Error("AnswerValidatorService.validatePolicy not implemented");
   }
 }

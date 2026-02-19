@@ -9,7 +9,7 @@ export type LlmCallEvent = {
   outputTokens?: number;
   costUsd?: number;
   latencyMs?: number;
-  status?: 'ok' | 'error';
+  status?: "ok" | "error";
 };
 
 export type CostOptions = {
@@ -47,7 +47,7 @@ export type CostResult = {
  */
 export function calculateCost(
   llmCalls: LlmCallEvent[],
-  opts?: CostOptions
+  opts?: CostOptions,
 ): CostResult {
   const includeErrors = opts?.includeErrors === true; // Default false
 
@@ -75,12 +75,12 @@ export function calculateCost(
 
   for (const call of llmCalls) {
     // Skip errors unless includeErrors is true
-    if (!includeErrors && call.status === 'error') {
+    if (!includeErrors && call.status === "error") {
       continue;
     }
 
-    const provider = call.provider || 'unknown';
-    const model = call.model || 'unknown';
+    const provider = call.provider || "unknown";
+    const model = call.model || "unknown";
     const key = `${provider}::${model}`;
 
     if (!providerModelStats.has(key)) {
@@ -99,13 +99,22 @@ export function calculateCost(
     totalCalls++;
 
     // Add cost (handle missing/invalid values)
-    const cost = typeof call.costUsd === 'number' && !isNaN(call.costUsd) ? call.costUsd : 0;
+    const cost =
+      typeof call.costUsd === "number" && !isNaN(call.costUsd)
+        ? call.costUsd
+        : 0;
     stats.costUsd += cost;
     totalCostUsd += cost;
 
     // Add tokens (handle missing/invalid values)
-    const inputTokens = typeof call.inputTokens === 'number' && !isNaN(call.inputTokens) ? call.inputTokens : 0;
-    const outputTokens = typeof call.outputTokens === 'number' && !isNaN(call.outputTokens) ? call.outputTokens : 0;
+    const inputTokens =
+      typeof call.inputTokens === "number" && !isNaN(call.inputTokens)
+        ? call.inputTokens
+        : 0;
+    const outputTokens =
+      typeof call.outputTokens === "number" && !isNaN(call.outputTokens)
+        ? call.outputTokens
+        : 0;
 
     stats.inputTokens += inputTokens;
     stats.outputTokens += outputTokens;
@@ -114,14 +123,16 @@ export function calculateCost(
   }
 
   // Calculate derived metrics
-  const avgCostPerCallUsd = totalCalls > 0
-    ? Math.round((totalCostUsd / totalCalls) * 1000000) / 1000000  // 6 decimal places
-    : null;
+  const avgCostPerCallUsd =
+    totalCalls > 0
+      ? Math.round((totalCostUsd / totalCalls) * 1000000) / 1000000 // 6 decimal places
+      : null;
 
   const totalTokens = totalInputTokens + totalOutputTokens;
-  const costPer1kTokensUsd = totalTokens > 0
-    ? Math.round((totalCostUsd / totalTokens * 1000) * 1000000) / 1000000  // per 1k tokens, 6 decimal places
-    : null;
+  const costPer1kTokensUsd =
+    totalTokens > 0
+      ? Math.round((totalCostUsd / totalTokens) * 1000 * 1000000) / 1000000 // per 1k tokens, 6 decimal places
+      : null;
 
   // Build byProviderModel array
   const byProviderModel = Array.from(providerModelStats.values());
@@ -150,7 +161,7 @@ export function calculateCost(
  */
 export function calculateCostSeries(
   llmCalls: LlmCallEvent[],
-  opts?: CostOptions
+  opts?: CostOptions,
 ): Array<{ day: string; costUsd: number; calls: number; tokens: number }> {
   const includeErrors = opts?.includeErrors === true;
 
@@ -159,10 +170,13 @@ export function calculateCostSeries(
   }
 
   // Group by day
-  const byDay = new Map<string, { costUsd: number; calls: number; tokens: number }>();
+  const byDay = new Map<
+    string,
+    { costUsd: number; calls: number; tokens: number }
+  >();
 
   for (const call of llmCalls) {
-    if (!includeErrors && call.status === 'error') {
+    if (!includeErrors && call.status === "error") {
       continue;
     }
 
@@ -178,18 +192,27 @@ export function calculateCostSeries(
     const stats = byDay.get(day)!;
     stats.calls++;
 
-    const cost = typeof call.costUsd === 'number' && !isNaN(call.costUsd) ? call.costUsd : 0;
+    const cost =
+      typeof call.costUsd === "number" && !isNaN(call.costUsd)
+        ? call.costUsd
+        : 0;
     stats.costUsd += cost;
 
-    const inputTokens = typeof call.inputTokens === 'number' && !isNaN(call.inputTokens) ? call.inputTokens : 0;
-    const outputTokens = typeof call.outputTokens === 'number' && !isNaN(call.outputTokens) ? call.outputTokens : 0;
+    const inputTokens =
+      typeof call.inputTokens === "number" && !isNaN(call.inputTokens)
+        ? call.inputTokens
+        : 0;
+    const outputTokens =
+      typeof call.outputTokens === "number" && !isNaN(call.outputTokens)
+        ? call.outputTokens
+        : 0;
     stats.tokens += inputTokens + outputTokens;
   }
 
   // Build sorted series
   const days = Array.from(byDay.keys()).sort();
 
-  return days.map(day => {
+  return days.map((day) => {
     const stats = byDay.get(day)!;
     return {
       day,

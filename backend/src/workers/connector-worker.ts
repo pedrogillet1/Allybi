@@ -1,32 +1,39 @@
-import type { Job } from 'bullmq';
+import type { Job } from "bullmq";
 
-import { startConnectorWorker, stopConnectorWorker, type ConnectorSyncJobData } from '../queues/connector.queue';
-import { registerConnector, getConnector } from '../services/connectors/connectorsRegistry';
-import { GmailOAuthService } from '../services/connectors/gmail/gmailOAuth.service';
-import { GmailClientService } from '../services/connectors/gmail/gmailClient.service';
-import { GmailSyncService } from '../services/connectors/gmail/gmailSync.service';
-import { OutlookOAuthService } from '../services/connectors/outlook/outlookOAuth.service';
-import GraphClientService from '../services/connectors/outlook/graphClient.service';
-import { OutlookSyncService } from '../services/connectors/outlook/outlookSync.service';
-import { SlackOAuthService } from '../services/connectors/slack/slackOAuth.service';
-import { SlackClientService } from '../services/connectors/slack/slackClient.service';
-import { SlackSyncService } from '../services/connectors/slack/slackSync.service';
+import {
+  startConnectorWorker,
+  stopConnectorWorker,
+  type ConnectorSyncJobData,
+} from "../queues/connector.queue";
+import {
+  registerConnector,
+  getConnector,
+} from "../services/connectors/connectorsRegistry";
+import { GmailOAuthService } from "../services/connectors/gmail/gmailOAuth.service";
+import { GmailClientService } from "../services/connectors/gmail/gmailClient.service";
+import { GmailSyncService } from "../services/connectors/gmail/gmailSync.service";
+import { OutlookOAuthService } from "../services/connectors/outlook/outlookOAuth.service";
+import GraphClientService from "../services/connectors/outlook/graphClient.service";
+import { OutlookSyncService } from "../services/connectors/outlook/outlookSync.service";
+import { SlackOAuthService } from "../services/connectors/slack/slackOAuth.service";
+import { SlackClientService } from "../services/connectors/slack/slackClient.service";
+import { SlackSyncService } from "../services/connectors/slack/slackSync.service";
 
-registerConnector('gmail', {
+registerConnector("gmail", {
   capabilities: { oauth: true, sync: true, search: true },
   oauthService: new GmailOAuthService(),
   clientService: new GmailClientService(),
   syncService: new GmailSyncService(),
 });
 
-registerConnector('outlook', {
+registerConnector("outlook", {
   capabilities: { oauth: true, sync: true, search: true },
   oauthService: new OutlookOAuthService(),
   clientService: new GraphClientService(),
   syncService: new OutlookSyncService(),
 });
 
-registerConnector('slack', {
+registerConnector("slack", {
   capabilities: { oauth: true, sync: true, search: true, realtime: true },
   oauthService: new SlackOAuthService(),
   clientService: new SlackClientService(),
@@ -36,11 +43,18 @@ registerConnector('slack', {
 async function runJob(job: Job<ConnectorSyncJobData>): Promise<void> {
   try {
     const module = await getConnector(job.data.provider);
-    const syncService = module.syncService as { sync?: (input: any) => Promise<any>; runSync?: (input: any) => Promise<any> } | undefined;
+    const syncService = module.syncService as
+      | {
+          sync?: (input: any) => Promise<any>;
+          runSync?: (input: any) => Promise<any>;
+        }
+      | undefined;
 
     const fn = syncService?.sync || syncService?.runSync;
     if (!fn) {
-      throw new Error(`Sync service not available for provider ${job.data.provider}`);
+      throw new Error(
+        `Sync service not available for provider ${job.data.provider}`,
+      );
     }
 
     await fn.call(syncService, {
@@ -52,7 +66,9 @@ async function runJob(job: Job<ConnectorSyncJobData>): Promise<void> {
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error(`[ConnectorWorker] Sync job ${job.id} failed for ${job.data.provider}: ${msg}`);
+    console.error(
+      `[ConnectorWorker] Sync job ${job.id} failed for ${job.data.provider}: ${msg}`,
+    );
     throw err;
   }
 }
@@ -73,6 +89,6 @@ if (require.main === module) {
     process.exit(0);
   };
 
-  process.on('SIGINT', shutdown);
-  process.on('SIGTERM', shutdown);
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
 }

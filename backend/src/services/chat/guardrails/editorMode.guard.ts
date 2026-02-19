@@ -1,6 +1,7 @@
 import type { TurnContext } from "../chat.types";
 
-const EXPLICIT_CONNECTOR_PATTERN = /\b(email|gmail|outlook|calendar|slack|inbox|send|message\s+[\w.-]+)\b/i;
+const EXPLICIT_CONNECTOR_PATTERN =
+  /\b(email|gmail|outlook|calendar|slack|inbox|send|message\s+[\w.-]+)\b/i;
 
 export type EditorGuardResult = {
   routeForcedToEditor: boolean;
@@ -15,7 +16,9 @@ export class EditorModeGuard {
       return { routeForcedToEditor: false, allowConnectorEscape: true };
     }
 
-    const allowConnectorEscape = EXPLICIT_CONNECTOR_PATTERN.test(ctx.messageText || "");
+    const allowConnectorEscape = EXPLICIT_CONNECTOR_PATTERN.test(
+      ctx.messageText || "",
+    );
     if (allowConnectorEscape) {
       return { routeForcedToEditor: false, allowConnectorEscape: true };
     }

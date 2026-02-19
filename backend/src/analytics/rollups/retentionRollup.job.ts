@@ -1,17 +1,17 @@
 // file: src/analytics/rollups/retentionRollup.job.ts
 // Retention rollup job - computes cohort-based retention metrics
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────────────────────
 
 export interface RetentionRollupOptions {
-  backfillDays?: number;       // Default: 30 days of cohorts
-  windowsDays?: number[];      // Default: [1, 7, 30]
-  maxCohortsPerRun?: number;   // Default: 60 cohorts
-  dryRun?: boolean;            // Log only, don't write
+  backfillDays?: number; // Default: 30 days of cohorts
+  windowsDays?: number[]; // Default: [1, 7, 30]
+  maxCohortsPerRun?: number; // Default: 60 cohorts
+  dryRun?: boolean; // Log only, don't write
 }
 
 export interface CohortRetentionMetrics {
@@ -76,7 +76,7 @@ function generateDayBuckets(start: Date, end: Date): Date[] {
 // ADVISORY LOCK
 // ─────────────────────────────────────────────────────────────
 
-const LOCK_KEY = 'koda:analytics:retention';
+const LOCK_KEY = "koda:analytics:retention";
 
 async function tryAcquireLock(prisma: PrismaClient): Promise<boolean> {
   const result = await prisma.$queryRaw<{ locked: boolean }[]>`
@@ -101,7 +101,7 @@ async function releaseLock(prisma: PrismaClient): Promise<void> {
 async function getCohorts(
   prisma: PrismaClient,
   startDay: Date,
-  endDay: Date
+  endDay: Date,
 ): Promise<Map<string, string[]>> {
   const result = await prisma.$queryRaw<{ signupDay: Date; userId: string }[]>`
     SELECT
@@ -132,14 +132,16 @@ async function getUserActivityDays(
   prisma: PrismaClient,
   userIds: string[],
   startDay: Date,
-  endDay: Date
+  endDay: Date,
 ): Promise<Map<string, Set<string>>> {
   if (userIds.length === 0) {
     return new Map();
   }
 
   // Query activity from usage_events
-  const result = await prisma.$queryRaw<{ userId: string; activityDay: Date }[]>`
+  const result = await prisma.$queryRaw<
+    { userId: string; activityDay: Date }[]
+  >`
     SELECT DISTINCT
       "userId",
       DATE("at") as "activityDay"
@@ -173,7 +175,7 @@ function computeCohortRetention(
   cohortDay: Date,
   cohortUserIds: string[],
   windowDays: number,
-  userActivityDays: Map<string, Set<string>>
+  userActivityDays: Map<string, Set<string>>,
 ): CohortRetentionMetrics {
   const cohortSize = cohortUserIds.length;
   const targetDay = formatDay(addDays(cohortDay, windowDays));
@@ -202,7 +204,7 @@ function computeCohortRetention(
 
 async function upsertRetentionMetrics(
   prisma: PrismaClient,
-  metrics: CohortRetentionMetrics
+  metrics: CohortRetentionMetrics,
 ): Promise<void> {
   // Using raw SQL upsert - requires retention_metrics table
   await prisma.$executeRaw`
@@ -228,7 +230,7 @@ async function upsertRetentionMetrics(
 
 export async function runRetentionRollup(
   prisma: PrismaClient,
-  opts?: RetentionRollupOptions
+  opts?: RetentionRollupOptions,
 ): Promise<RollupResult> {
   const startTime = Date.now();
   const backfillDays = opts?.backfillDays ?? 30;
@@ -249,7 +251,9 @@ export async function runRetentionRollup(
   // Acquire advisory lock
   const gotLock = await tryAcquireLock(prisma);
   if (!gotLock) {
-    result.errors.push('Failed to acquire advisory lock - another instance may be running');
+    result.errors.push(
+      "Failed to acquire advisory lock - another instance may be running",
+    );
     result.durationMs = Date.now() - startTime;
     return result;
   }
@@ -284,7 +288,11 @@ export async function runRetentionRollup(
     result.endCohort = formatDay(cohortDays[cohortDays.length - 1]);
 
     // Get all cohorts (users by signup day)
-    const cohorts = await getCohorts(prisma, cohortDays[0], cohortDays[cohortDays.length - 1]);
+    const cohorts = await getCohorts(
+      prisma,
+      cohortDays[0],
+      cohortDays[cohortDays.length - 1],
+    );
 
     // Collect all user IDs for activity query
     const allUserIds: string[] = [];
@@ -298,7 +306,7 @@ export async function runRetentionRollup(
       prisma,
       allUserIds,
       cohortDays[0],
-      today
+      today,
     );
 
     // Process each cohort and window
@@ -323,7 +331,9 @@ export async function runRetentionRollup(
               result.rowsWritten++;
             }
           } catch (err: any) {
-            result.errors.push(`Cohort ${cohortDayStr} D+${windowDays}: ${err.message || 'unknown error'}`);
+            result.errors.push(
+              `Cohort ${cohortDayStr} D+${windowDays}: ${err.message || "unknown error"}`,
+            );
           }
         }
         result.cohortsProcessed++;
@@ -337,7 +347,7 @@ export async function runRetentionRollup(
             cohortDay,
             cohortUserIds,
             windowDays,
-            userActivityDays
+            userActivityDays,
           );
 
           if (!dryRun) {
@@ -345,7 +355,9 @@ export async function runRetentionRollup(
             result.rowsWritten++;
           }
         } catch (err: any) {
-          result.errors.push(`Cohort ${cohortDayStr} D+${windowDays}: ${err.message || 'unknown error'}`);
+          result.errors.push(
+            `Cohort ${cohortDayStr} D+${windowDays}: ${err.message || "unknown error"}`,
+          );
         }
       }
 

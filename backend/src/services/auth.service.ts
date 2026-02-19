@@ -1,15 +1,23 @@
-import crypto from 'crypto';
-import prisma from '../config/database';
-import { hashPassword, verifyPassword, validatePasswordStrength } from '../utils/password';
-import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
+import crypto from "crypto";
+import prisma from "../config/database";
+import {
+  hashPassword,
+  verifyPassword,
+  validatePasswordStrength,
+} from "../utils/password";
+import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
 
 // ---------------------------------------------------------------------------
 // HMAC-SHA256 session hashing (matching authBridge.ts pattern)
 // ---------------------------------------------------------------------------
-const REFRESH_TOKEN_PEPPER = process.env.KODA_REFRESH_PEPPER || process.env.JWT_REFRESH_SECRET || '';
+const REFRESH_TOKEN_PEPPER =
+  process.env.KODA_REFRESH_PEPPER || process.env.JWT_REFRESH_SECRET || "";
 
 function hmacSha256(input: string): string {
-  return crypto.createHmac('sha256', REFRESH_TOKEN_PEPPER).update(input).digest('hex');
+  return crypto
+    .createHmac("sha256", REFRESH_TOKEN_PEPPER)
+    .update(input)
+    .digest("hex");
 }
 
 // ---------------------------------------------------------------------------
@@ -65,7 +73,15 @@ export interface AuthTokens {
 // ---------------------------------------------------------------------------
 // Register (creates PendingUser, sends email code)
 // ---------------------------------------------------------------------------
-export const registerUser = async ({ email, password, firstName, lastName, name, recoveryKeyHash, masterKeyEncrypted }: RegisterInput) => {
+export const registerUser = async ({
+  email,
+  password,
+  firstName,
+  lastName,
+  name,
+  recoveryKeyHash,
+  masterKeyEncrypted,
+}: RegisterInput) => {
   let parsedFirstName = firstName;
   let parsedLastName = lastName;
 
@@ -76,7 +92,7 @@ export const registerUser = async ({ email, password, firstName, lastName, name,
       parsedLastName = undefined;
     } else {
       parsedFirstName = nameParts[0];
-      parsedLastName = nameParts.slice(1).join(' ');
+      parsedLastName = nameParts.slice(1).join(" ");
     }
   }
 
@@ -90,13 +106,13 @@ export const registerUser = async ({ email, password, firstName, lastName, name,
   // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    throw new Error('Invalid email format');
+    throw new Error("Invalid email format");
   }
 
   // Validate password strength
   const passwordValidation = validatePasswordStrength(password);
   if (!passwordValidation.valid) {
-    throw new Error(passwordValidation.message || 'Invalid password');
+    throw new Error(passwordValidation.message || "Invalid password");
   }
 
   // Check if user already exists
@@ -105,7 +121,7 @@ export const registerUser = async ({ email, password, firstName, lastName, name,
   });
 
   if (existingUser) {
-    throw new Error('User with this email already exists');
+    throw new Error("User with this email already exists");
   }
 
   // Hash password
@@ -117,7 +133,7 @@ export const registerUser = async ({ email, password, firstName, lastName, name,
   });
 
   // Generate email verification code
-  const emailService = await import('./email.service');
+  const emailService = await import("./email.service");
   const emailCode = emailService.generateVerificationCode();
 
   // Create pending user with 10-minute code expiry
@@ -142,17 +158,22 @@ export const registerUser = async ({ email, password, firstName, lastName, name,
 
   // Send verification email
   try {
-    await emailService.sendVerificationCodeEmail(email.toLowerCase(), emailCode);
+    await emailService.sendVerificationCodeEmail(
+      email.toLowerCase(),
+      emailCode,
+    );
     console.log(`Verification code sent to ${email.toLowerCase()}`);
   } catch (error) {
-    console.error('Failed to send verification email:', error);
-    console.log(`[DEV MODE] Verification code for ${email.toLowerCase()}: ${emailCode}`);
+    console.error("Failed to send verification email:", error);
+    console.log(
+      `[DEV MODE] Verification code for ${email.toLowerCase()}: ${emailCode}`,
+    );
   }
 
   return {
     requiresVerification: true,
     email: email.toLowerCase(),
-    message: 'Please verify your email or phone to complete registration',
+    message: "Please verify your email or phone to complete registration",
   };
 };
 
@@ -160,7 +181,7 @@ export const registerUser = async ({ email, password, firstName, lastName, name,
 // Verify email code for pending user -> create real user
 // ---------------------------------------------------------------------------
 export const verifyPendingUserEmail = async (email: string, code: string) => {
-  const pendingUserService = await import('./pendingUser.service');
+  const pendingUserService = await import("./pendingUser.service");
 
   const pendingUser = await pendingUserService.verifyPendingEmail(email, code);
 
@@ -188,7 +209,7 @@ export const verifyPendingUserEmail = async (email: string, code: string) => {
 
   return {
     success: true,
-    message: 'Email verified! Registration complete.',
+    message: "Email verified! Registration complete.",
     email: user.email,
     user: {
       id: user.id,
@@ -204,35 +225,41 @@ export const verifyPendingUserEmail = async (email: string, code: string) => {
 // Resend email verification code for pending user
 // ---------------------------------------------------------------------------
 export const resendPendingUserEmail = async (email: string) => {
-  const pendingUserService = await import('./pendingUser.service');
+  const pendingUserService = await import("./pendingUser.service");
 
-  const { pendingUser, emailCode } = await pendingUserService.resendEmailCode(email);
+  const { pendingUser, emailCode } =
+    await pendingUserService.resendEmailCode(email);
 
   try {
-    const emailService = await import('./email.service');
+    const emailService = await import("./email.service");
     await emailService.sendVerificationCodeEmail(email, emailCode);
     console.log(`Verification code resent to ${email}`);
   } catch (error) {
-    console.error('Failed to resend verification email:', error);
-    console.log(`[DEV MODE] Would resend verification code ${emailCode} to ${email}`);
+    console.error("Failed to resend verification email:", error);
+    console.log(
+      `[DEV MODE] Would resend verification code ${emailCode} to ${email}`,
+    );
   }
 
   return {
     success: true,
-    message: 'Verification code resent to your email',
+    message: "Verification code resent to your email",
   };
 };
 
 // ---------------------------------------------------------------------------
 // Add phone to pending user + send SMS code
 // ---------------------------------------------------------------------------
-export const addPhoneToPendingUser = async (email: string, phoneNumber: string) => {
-  const pendingUserService = await import('./pendingUser.service');
-  const smsService = await import('./sms.service');
+export const addPhoneToPendingUser = async (
+  email: string,
+  phoneNumber: string,
+) => {
+  const pendingUserService = await import("./pendingUser.service");
+  const smsService = await import("./sms.service");
 
   const formattedPhone = smsService.formatPhoneNumber(phoneNumber);
   if (!smsService.isValidPhoneNumber(formattedPhone)) {
-    throw new Error('Invalid phone number format');
+    throw new Error("Invalid phone number format");
   }
 
   // Check if phone is already in use
@@ -240,10 +267,13 @@ export const addPhoneToPendingUser = async (email: string, phoneNumber: string) 
     where: { phoneNumber: formattedPhone },
   });
   if (existingUser) {
-    throw new Error('Phone number already in use');
+    throw new Error("Phone number already in use");
   }
 
-  const { pendingUser, phoneCode } = await pendingUserService.addPhoneToPending(email, formattedPhone);
+  const { pendingUser, phoneCode } = await pendingUserService.addPhoneToPending(
+    email,
+    formattedPhone,
+  );
 
   console.log(`SMS Verification Code: ${phoneCode} for ${formattedPhone}`);
 
@@ -251,12 +281,15 @@ export const addPhoneToPendingUser = async (email: string, phoneNumber: string) 
     await smsService.sendVerificationSMS(formattedPhone, phoneCode);
     console.log(`SMS sent successfully to ${formattedPhone}`);
   } catch (error: any) {
-    console.error('Failed to send SMS (code still valid for testing):', error?.message || error);
+    console.error(
+      "Failed to send SMS (code still valid for testing):",
+      error?.message || error,
+    );
   }
 
   return {
     success: true,
-    message: 'Verification code sent to your phone',
+    message: "Verification code sent to your phone",
   };
 };
 
@@ -264,12 +297,12 @@ export const addPhoneToPendingUser = async (email: string, phoneNumber: string) 
 // Verify phone code for pending user -> create real user
 // ---------------------------------------------------------------------------
 export const verifyPendingUserPhone = async (email: string, code: string) => {
-  const pendingUserService = await import('./pendingUser.service');
+  const pendingUserService = await import("./pendingUser.service");
 
   const pendingUser = await pendingUserService.verifyPendingPhone(email, code);
 
   if (!pendingUser.phoneVerified) {
-    throw new Error('Phone verification required');
+    throw new Error("Phone verification required");
   }
 
   // Create the actual user
@@ -309,18 +342,24 @@ export const verifyPendingUserPhone = async (email: string, code: string) => {
 // ---------------------------------------------------------------------------
 export const sendEmailVerificationCode = async (userId: string) => {
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) throw new Error('User not found');
-  if (user.isEmailVerified) throw new Error('Email already verified');
+  if (!user) throw new Error("User not found");
+  if (user.isEmailVerified) throw new Error("Email already verified");
 
   const token = generateSecureToken();
   await storeEmailVerificationToken(token, userId);
 
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3001";
   const verificationLink = `${frontendUrl}/v/b8m3q6?token=${token}`;
 
-  const emailService = await import('./email.service');
-  const userName = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'User';
-  await emailService.sendVerificationEmail(user.email, userName, verificationLink);
+  const emailService = await import("./email.service");
+  const userName = user.firstName
+    ? `${user.firstName} ${user.lastName || ""}`.trim()
+    : "User";
+  await emailService.sendVerificationEmail(
+    user.email,
+    userName,
+    verificationLink,
+  );
 
   return { success: true };
 };
@@ -332,14 +371,15 @@ export const verifyEmailCode = async (userId: string, code: string) => {
   const verificationCode = await prisma.verificationCode.findFirst({
     where: {
       userId,
-      type: 'email',
+      type: "email",
       code,
       isUsed: false,
       expiresAt: { gte: new Date() },
     },
   });
 
-  if (!verificationCode) throw new Error('Invalid or expired verification code');
+  if (!verificationCode)
+    throw new Error("Invalid or expired verification code");
 
   await prisma.verificationCode.update({
     where: { id: verificationCode.id },
@@ -351,8 +391,8 @@ export const verifyEmailCode = async (userId: string, code: string) => {
     data: { isEmailVerified: true },
   });
 
-  const emailService = await import('./email.service');
-  await emailService.sendWelcomeEmail(user.email, user.email.split('@')[0]);
+  const emailService = await import("./email.service");
+  await emailService.sendWelcomeEmail(user.email, user.email.split("@")[0]);
 
   return { success: true };
 };
@@ -360,21 +400,24 @@ export const verifyEmailCode = async (userId: string, code: string) => {
 // ---------------------------------------------------------------------------
 // Send phone verification code (authenticated user)
 // ---------------------------------------------------------------------------
-export const sendPhoneVerificationCode = async (userId: string, phoneNumber: string) => {
+export const sendPhoneVerificationCode = async (
+  userId: string,
+  phoneNumber: string,
+) => {
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) throw new Error('User not found');
+  if (!user) throw new Error("User not found");
 
-  const smsService = await import('./sms.service');
+  const smsService = await import("./sms.service");
 
   const formattedPhone = smsService.formatPhoneNumber(phoneNumber);
   if (!smsService.isValidPhoneNumber(formattedPhone)) {
-    throw new Error('Invalid phone number format');
+    throw new Error("Invalid phone number format");
   }
 
   const existingUser = await prisma.user.findFirst({
     where: { phoneNumber: formattedPhone, id: { not: userId } },
   });
-  if (existingUser) throw new Error('Phone number already in use');
+  if (existingUser) throw new Error("Phone number already in use");
 
   // Save phone number (unverified)
   await prisma.user.update({
@@ -387,14 +430,14 @@ export const sendPhoneVerificationCode = async (userId: string, phoneNumber: str
 
   // Delete any existing unused phone verification codes for this user
   await prisma.verificationCode.deleteMany({
-    where: { userId, type: 'phone', isUsed: false },
+    where: { userId, type: "phone", isUsed: false },
   });
 
   // Store the verification code
   await prisma.verificationCode.create({
     data: {
       userId,
-      type: 'phone',
+      type: "phone",
       code,
       expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
     },
@@ -414,14 +457,15 @@ export const verifyPhoneCode = async (userId: string, code: string) => {
     const verificationCode = await tx.verificationCode.findFirst({
       where: {
         userId,
-        type: 'phone',
+        type: "phone",
         code,
         isUsed: false,
         expiresAt: { gte: new Date() },
       },
     });
 
-    if (!verificationCode) throw new Error('Invalid or expired verification code');
+    if (!verificationCode)
+      throw new Error("Invalid or expired verification code");
 
     await tx.verificationCode.update({
       where: { id: verificationCode.id },
@@ -437,7 +481,9 @@ export const verifyPhoneCode = async (userId: string, code: string) => {
     return updatedUser;
   });
 
-  console.log(`Phone verified successfully for user ${userId}: ${result.phoneNumber}`);
+  console.log(
+    `Phone verified successfully for user ${userId}: ${result.phoneNumber}`,
+  );
 
   return {
     success: true,
@@ -451,10 +497,10 @@ export const verifyPhoneCode = async (userId: string, code: string) => {
 // ---------------------------------------------------------------------------
 export const verifyEmailToken = async (token: string) => {
   const userId = await getUserFromEmailVerificationToken(token);
-  if (!userId) throw new Error('Invalid or expired verification link');
+  if (!userId) throw new Error("Invalid or expired verification link");
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) throw new Error('User not found');
+  if (!user) throw new Error("User not found");
   if (user.isEmailVerified) {
     await deleteEmailVerificationToken(token);
     return { success: true, alreadyVerified: true };
@@ -468,8 +514,8 @@ export const verifyEmailToken = async (token: string) => {
   await deleteEmailVerificationToken(token);
 
   // Send welcome email
-  const emailService = await import('./email.service');
-  await emailService.sendWelcomeEmail(user.email, user.email.split('@')[0]);
+  const emailService = await import("./email.service");
+  await emailService.sendWelcomeEmail(user.email, user.email.split("@")[0]);
 
   return { success: true };
 };
@@ -479,15 +525,15 @@ export const verifyEmailToken = async (token: string) => {
 // ---------------------------------------------------------------------------
 export const verifyPhoneToken = async (token: string) => {
   const data = await getPhoneVerificationData(token);
-  if (!data) throw new Error('Invalid or expired verification link');
+  if (!data) throw new Error("Invalid or expired verification link");
 
   const user = await prisma.user.findUnique({ where: { id: data.userId } });
-  if (!user) throw new Error('User not found');
+  if (!user) throw new Error("User not found");
 
   // Ensure phone still matches (user might have changed it since link was sent)
   if (user.phoneNumber !== data.phoneNumber) {
     await deletePhoneVerificationToken(token);
-    throw new Error('Phone number has changed since this link was sent');
+    throw new Error("Phone number has changed since this link was sent");
   }
 
   if (user.isPhoneVerified) {
@@ -519,21 +565,24 @@ export const requestPasswordReset = async ({
   });
 
   if (!user) {
-    return { success: true, message: 'If an account exists, a reset code will be sent' };
+    return {
+      success: true,
+      message: "If an account exists, a reset code will be sent",
+    };
   }
 
-  const emailService = await import('./email.service');
+  const emailService = await import("./email.service");
   const code = emailService.generateVerificationCode();
 
   const expiresAt = new Date();
   expiresAt.setMinutes(expiresAt.getMinutes() + 10);
 
   await prisma.verificationCode.deleteMany({
-    where: { userId: user.id, type: 'password_reset', isUsed: false },
+    where: { userId: user.id, type: "password_reset", isUsed: false },
   });
 
   await prisma.verificationCode.create({
-    data: { userId: user.id, type: 'password_reset', code, expiresAt },
+    data: { userId: user.id, type: "password_reset", code, expiresAt },
   });
 
   if (email && user.email) {
@@ -541,19 +590,22 @@ export const requestPasswordReset = async ({
       await emailService.sendPasswordResetEmail(user.email, code);
       console.log(`Password reset code sent to ${user.email}`);
     } catch (error) {
-      console.error('Failed to send password reset email:', error);
+      console.error("Failed to send password reset email:", error);
     }
   } else if (phoneNumber && user.phoneNumber) {
     try {
-      const smsService = await import('./sms.service');
+      const smsService = await import("./sms.service");
       await smsService.sendPasswordResetSMS(user.phoneNumber, code);
       console.log(`Password reset code sent to ${user.phoneNumber}`);
     } catch (error) {
-      console.error('Failed to send password reset SMS:', error);
+      console.error("Failed to send password reset SMS:", error);
     }
   }
 
-  return { success: true, message: 'If an account exists, a reset code will be sent' };
+  return {
+    success: true,
+    message: "If an account exists, a reset code will be sent",
+  };
 };
 
 // ---------------------------------------------------------------------------
@@ -572,21 +624,22 @@ export const verifyPasswordResetCode = async ({
     where: email ? { email: email.toLowerCase() } : { phoneNumber },
   });
 
-  if (!user) throw new Error('Invalid verification code');
+  if (!user) throw new Error("Invalid verification code");
 
   const verificationCode = await prisma.verificationCode.findFirst({
     where: {
       userId: user.id,
-      type: 'password_reset',
+      type: "password_reset",
       code,
       isUsed: false,
       expiresAt: { gte: new Date() },
     },
   });
 
-  if (!verificationCode) throw new Error('Invalid or expired verification code');
+  if (!verificationCode)
+    throw new Error("Invalid or expired verification code");
 
-  return { success: true, message: 'Code verified successfully' };
+  return { success: true, message: "Code verified successfully" };
 };
 
 // ---------------------------------------------------------------------------
@@ -605,26 +658,27 @@ export const resetPassword = async ({
 }) => {
   const passwordValidation = validatePasswordStrength(newPassword);
   if (!passwordValidation.valid) {
-    throw new Error(passwordValidation.message || 'Invalid password');
+    throw new Error(passwordValidation.message || "Invalid password");
   }
 
   const user = await prisma.user.findFirst({
     where: email ? { email: email.toLowerCase() } : { phoneNumber },
   });
 
-  if (!user) throw new Error('Invalid verification code');
+  if (!user) throw new Error("Invalid verification code");
 
   const verificationCode = await prisma.verificationCode.findFirst({
     where: {
       userId: user.id,
-      type: 'password_reset',
+      type: "password_reset",
       code,
       isUsed: false,
       expiresAt: { gte: new Date() },
     },
   });
 
-  if (!verificationCode) throw new Error('Invalid or expired verification code');
+  if (!verificationCode)
+    throw new Error("Invalid or expired verification code");
 
   const { hash, salt } = await hashPassword(newPassword);
 
@@ -644,15 +698,19 @@ export const resetPassword = async ({
     data: { isActive: false, revokedAt: new Date() },
   });
 
-  return { success: true, message: 'Password reset successfully' };
+  return { success: true, message: "Password reset successfully" };
 };
 
 // ---------------------------------------------------------------------------
 // Link-based Password Recovery
 // ---------------------------------------------------------------------------
-import { redisConnection } from '../config/redis';
-import { generateSecureToken, maskEmail, maskPhone } from '../utils/maskingUtils';
-import bcrypt from 'bcrypt';
+import { redisConnection } from "../config/redis";
+import {
+  generateSecureToken,
+  maskEmail,
+  maskPhone,
+} from "../utils/maskingUtils";
+import bcrypt from "bcrypt";
 
 // In-memory fallback when Redis is not available
 const memoryStore = new Map<string, { value: string; expiresAt: number }>();
@@ -666,13 +724,17 @@ setInterval(() => {
   }
 }, 60000);
 
-async function storeInCache(key: string, value: string, ttlSeconds: number): Promise<void> {
+async function storeInCache(
+  key: string,
+  value: string,
+  ttlSeconds: number,
+): Promise<void> {
   if (redisConnection) {
     try {
       await redisConnection.setex(key, ttlSeconds, value);
       return;
     } catch (error) {
-      console.warn('Redis error, falling back to memory store:', error);
+      console.warn("Redis error, falling back to memory store:", error);
     }
   }
   memoryStore.set(key, { value, expiresAt: Date.now() + ttlSeconds * 1000 });
@@ -683,7 +745,7 @@ async function getFromCache(key: string): Promise<string | null> {
     try {
       return await redisConnection.get(key);
     } catch (error) {
-      console.warn('Redis error, falling back to memory store:', error);
+      console.warn("Redis error, falling back to memory store:", error);
     }
   }
   const data = memoryStore.get(key);
@@ -700,11 +762,16 @@ async function deleteFromCache(key: string): Promise<void> {
   memoryStore.delete(key);
 }
 
-export async function storeResetToken(token: string, userId: string): Promise<void> {
+export async function storeResetToken(
+  token: string,
+  userId: string,
+): Promise<void> {
   await storeInCache(`pwd-reset:${token}`, userId, 900);
 }
 
-export async function getUserFromResetToken(token: string): Promise<string | null> {
+export async function getUserFromResetToken(
+  token: string,
+): Promise<string | null> {
   return getFromCache(`pwd-reset:${token}`);
 }
 
@@ -713,11 +780,16 @@ export async function deleteResetToken(token: string): Promise<void> {
 }
 
 // Email verification tokens (15 min TTL)
-async function storeEmailVerificationToken(token: string, userId: string): Promise<void> {
+async function storeEmailVerificationToken(
+  token: string,
+  userId: string,
+): Promise<void> {
   await storeInCache(`email-verify:${token}`, userId, 900);
 }
 
-async function getUserFromEmailVerificationToken(token: string): Promise<string | null> {
+async function getUserFromEmailVerificationToken(
+  token: string,
+): Promise<string | null> {
   return getFromCache(`email-verify:${token}`);
 }
 
@@ -726,25 +798,39 @@ async function deleteEmailVerificationToken(token: string): Promise<void> {
 }
 
 // Phone verification tokens (15 min TTL) — store userId + phoneNumber as JSON
-async function storePhoneVerificationToken(token: string, data: { userId: string; phoneNumber: string }): Promise<void> {
+async function storePhoneVerificationToken(
+  token: string,
+  data: { userId: string; phoneNumber: string },
+): Promise<void> {
   await storeInCache(`phone-verify:${token}`, JSON.stringify(data), 900);
 }
 
-async function getPhoneVerificationData(token: string): Promise<{ userId: string; phoneNumber: string } | null> {
+async function getPhoneVerificationData(
+  token: string,
+): Promise<{ userId: string; phoneNumber: string } | null> {
   const raw = await getFromCache(`phone-verify:${token}`);
   if (!raw) return null;
-  try { return JSON.parse(raw); } catch { return null; }
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
 }
 
 async function deletePhoneVerificationToken(token: string): Promise<void> {
   await deleteFromCache(`phone-verify:${token}`);
 }
 
-export async function storeResetSession(sessionToken: string, userId: string): Promise<void> {
+export async function storeResetSession(
+  sessionToken: string,
+  userId: string,
+): Promise<void> {
   await storeInCache(`reset-session:${sessionToken}`, userId, 300);
 }
 
-export async function getUserFromSessionToken(sessionToken: string): Promise<string | null> {
+export async function getUserFromSessionToken(
+  sessionToken: string,
+): Promise<string | null> {
   return getFromCache(`reset-session:${sessionToken}`);
 }
 
@@ -774,11 +860,13 @@ export async function initiateForgotPassword(email: string) {
   }
 
   if (!user.isEmailVerified && !user.isPhoneVerified) {
-    throw new Error('ACCOUNT_NOT_VERIFIED');
+    throw new Error("ACCOUNT_NOT_VERIFIED");
   }
 
   const maskedEmailValue = maskEmail(user.email);
-  const maskedPhoneValue = user.phoneNumber ? maskPhone(user.phoneNumber) : null;
+  const maskedPhoneValue = user.phoneNumber
+    ? maskPhone(user.phoneNumber)
+    : null;
 
   const canUseEmail = user.isEmailVerified;
   const canUsePhone = !!user.phoneNumber && user.isPhoneVerified;
@@ -802,9 +890,12 @@ export async function initiateForgotPassword(email: string) {
 // ---------------------------------------------------------------------------
 // Send reset link via email or SMS
 // ---------------------------------------------------------------------------
-export async function sendResetLink(sessionToken: string, method: 'email' | 'sms') {
+export async function sendResetLink(
+  sessionToken: string,
+  method: "email" | "sms",
+) {
   const userId = await getUserFromSessionToken(sessionToken);
-  if (!userId) throw new Error('INVALID_OR_EXPIRED_SESSION');
+  if (!userId) throw new Error("INVALID_OR_EXPIRED_SESSION");
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -818,42 +909,50 @@ export async function sendResetLink(sessionToken: string, method: 'email' | 'sms
     },
   });
 
-  if (!user) throw new Error('USER_NOT_FOUND');
+  if (!user) throw new Error("USER_NOT_FOUND");
 
   const resetToken = generateSecureToken();
   await storeResetToken(resetToken, userId);
 
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3001";
   const resetLink = `${frontendUrl}/r/s5n9p4?token=${resetToken}`;
 
-  if (method === 'email') {
-    const emailService = await import('./email.service');
-    await emailService.sendPasswordResetEmail(user.email, resetLink, user.firstName || 'User');
-    return { success: true, method: 'email' };
-  } else if (method === 'sms') {
+  if (method === "email") {
+    const emailService = await import("./email.service");
+    await emailService.sendPasswordResetEmail(
+      user.email,
+      resetLink,
+      user.firstName || "User",
+    );
+    return { success: true, method: "email" };
+  } else if (method === "sms") {
     if (!user.phoneNumber || !user.isPhoneVerified) {
-      throw new Error('NO_VERIFIED_PHONE');
+      throw new Error("NO_VERIFIED_PHONE");
     }
-    const smsService = await import('./sms.service');
+    const smsService = await import("./sms.service");
     await smsService.sendCustomSMS(
       user.phoneNumber,
       `KODA: Reset your password using this link:\n${resetLink}\n\nThis link expires in 15 minutes.`,
     );
-    return { success: true, method: 'sms' };
+    return { success: true, method: "sms" };
   } else {
-    throw new Error('INVALID_METHOD');
+    throw new Error("INVALID_METHOD");
   }
 }
 
 // ---------------------------------------------------------------------------
 // Reset password with token (from link)
 // ---------------------------------------------------------------------------
-export async function resetPasswordWithToken(token: string, newPassword: string) {
+export async function resetPasswordWithToken(
+  token: string,
+  newPassword: string,
+) {
   const userId = await getUserFromResetToken(token);
-  if (!userId) throw new Error('INVALID_OR_EXPIRED_TOKEN');
+  if (!userId) throw new Error("INVALID_OR_EXPIRED_TOKEN");
 
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  if (!passwordRegex.test(newPassword)) throw new Error('WEAK_PASSWORD');
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  if (!passwordRegex.test(newPassword)) throw new Error("WEAK_PASSWORD");
 
   const salt = await bcrypt.genSalt(12);
   const passwordHash = await bcrypt.hash(newPassword, salt);
@@ -868,14 +967,14 @@ export async function resetPasswordWithToken(token: string, newPassword: string)
   // Audit logging (optional, skip if service not available)
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const stubs = require('./securityStubs.service');
+    const stubs = require("./securityStubs.service");
     if (stubs?.auditLogService) {
       await stubs.auditLogService.log({
         userId,
-        action: 'PASSWORD_RESET',
-        status: 'SUCCESS',
+        action: "PASSWORD_RESET",
+        status: "SUCCESS",
         resourceId: userId,
-        document_metadata: { method: 'token' },
+        document_metadata: { method: "token" },
       });
     }
   } catch {

@@ -3,7 +3,13 @@ import path from "path";
 
 describe("creative operators databank", () => {
   it("parses and contains bilingual creative operators", async () => {
-    const p = path.join(__dirname, "..", "data_banks", "operators", "creative_operators.any.json");
+    const p = path.join(
+      __dirname,
+      "..",
+      "data_banks",
+      "operators",
+      "creative_operators.any.json",
+    );
     const raw = await fs.readFile(p, "utf8");
     const bank = JSON.parse(raw);
 

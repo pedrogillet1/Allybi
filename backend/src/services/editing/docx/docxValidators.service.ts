@@ -1,4 +1,4 @@
-export type ValidationRiskLevel = 'LOW' | 'MED' | 'HIGH';
+export type ValidationRiskLevel = "LOW" | "MED" | "HIGH";
 
 export interface DocxEditValidationInput {
   originalText: string;
@@ -13,12 +13,12 @@ export interface DocxEditValidationInput {
 
 export interface ValidationViolation {
   code:
-    | 'EMPTY_PROPOSED_TEXT'
-    | 'MISSING_REQUIRED_TOKEN'
-    | 'MISSING_PRESERVED_ENTITY'
-    | 'STRICT_NEW_FACT'
-    | 'STYLE_SIMILARITY_BELOW_THRESHOLD'
-    | 'STYLE_SENTENCE_DELTA_EXCEEDED';
+    | "EMPTY_PROPOSED_TEXT"
+    | "MISSING_REQUIRED_TOKEN"
+    | "MISSING_PRESERVED_ENTITY"
+    | "STRICT_NEW_FACT"
+    | "STYLE_SIMILARITY_BELOW_THRESHOLD"
+    | "STYLE_SENTENCE_DELTA_EXCEEDED";
   message: string;
   details?: Record<string, unknown>;
 }
@@ -56,13 +56,13 @@ const DEFAULT_SIMILARITY_THRESHOLD = 0.74;
 const DEFAULT_MAX_SENTENCE_DELTA = 2;
 
 function normalizeWhitespace(text: string): string {
-  return text.replace(/\s+/g, ' ').trim();
+  return text.replace(/\s+/g, " ").trim();
 }
 
 function tokenize(text: string): string[] {
   return normalizeWhitespace(text)
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/gi, ' ')
+    .replace(/[^a-z0-9\s]/gi, " ")
     .split(/\s+/)
     .filter(Boolean);
 }
@@ -128,22 +128,25 @@ function bigramJaccard(left: string, right: string): number {
 function sentenceCount(text: string): number {
   const matches = normalizeWhitespace(text).match(/[^.!?]+[.!?]?/g);
   if (!matches) return 0;
-  return matches.map(part => part.trim()).filter(Boolean).length;
+  return matches.map((part) => part.trim()).filter(Boolean).length;
 }
 
 function extractEntities(text: string): string[] {
   const entities: string[] = [];
 
-  const emailMatches = text.match(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi) ?? [];
-  entities.push(...emailMatches.map(m => m.toLowerCase()));
+  const emailMatches =
+    text.match(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi) ?? [];
+  entities.push(...emailMatches.map((m) => m.toLowerCase()));
 
   const moneyMatches =
     text.match(/\b(?:usd|eur|brl|r\$|\$)\s?\d+(?:[.,]\d+)?\b/gi) ?? [];
-  entities.push(...moneyMatches.map(m => normalizeWhitespace(m.toLowerCase())));
+  entities.push(
+    ...moneyMatches.map((m) => normalizeWhitespace(m.toLowerCase())),
+  );
 
   const properNounMatches =
     text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}\b/g) ?? [];
-  entities.push(...properNounMatches.map(m => normalizeWhitespace(m)));
+  entities.push(...properNounMatches.map((m) => normalizeWhitespace(m)));
 
   return dedupe(entities);
 }
@@ -166,7 +169,10 @@ function extractFacts(text: string): string[] {
   return dedupe(facts);
 }
 
-function buildSimilarity(originalText: string, proposedText: string): SimilarityBreakdown {
+function buildSimilarity(
+  originalText: string,
+  proposedText: string,
+): SimilarityBreakdown {
   const tokenScore = tokenDice(originalText, proposedText);
   const charScore = bigramJaccard(originalText, proposedText);
   const composite = tokenScore * 0.65 + charScore * 0.35;
@@ -178,16 +184,18 @@ function buildSimilarity(originalText: string, proposedText: string): Similarity
   };
 }
 
-function computeRiskLevel(violations: ValidationViolation[]): ValidationRiskLevel {
-  if (violations.length === 0) return 'LOW';
+function computeRiskLevel(
+  violations: ValidationViolation[],
+): ValidationRiskLevel {
+  if (violations.length === 0) return "LOW";
 
-  const highRiskCodes = new Set<ValidationViolation['code']>([
-    'STRICT_NEW_FACT',
-    'MISSING_REQUIRED_TOKEN',
-    'MISSING_PRESERVED_ENTITY',
+  const highRiskCodes = new Set<ValidationViolation["code"]>([
+    "STRICT_NEW_FACT",
+    "MISSING_REQUIRED_TOKEN",
+    "MISSING_PRESERVED_ENTITY",
   ]);
 
-  return violations.some(v => highRiskCodes.has(v.code)) ? 'HIGH' : 'MED';
+  return violations.some((v) => highRiskCodes.has(v.code)) ? "HIGH" : "MED";
 }
 
 export class DocxValidatorsService {
@@ -199,31 +207,45 @@ export class DocxValidatorsService {
 
     if (!proposedText) {
       violations.push({
-        code: 'EMPTY_PROPOSED_TEXT',
-        message: 'Proposed paragraph text cannot be empty.',
+        code: "EMPTY_PROPOSED_TEXT",
+        message: "Proposed paragraph text cannot be empty.",
       });
     }
 
-    const requiredTokens = dedupe((input.requiredTokens ?? []).map(token => normalizeWhitespace(token)).filter(Boolean));
-    const preservedTokens = requiredTokens.filter(token => proposedText.toLowerCase().includes(token.toLowerCase()));
-    const missingTokens = requiredTokens.filter(token => !proposedText.toLowerCase().includes(token.toLowerCase()));
+    const requiredTokens = dedupe(
+      (input.requiredTokens ?? [])
+        .map((token) => normalizeWhitespace(token))
+        .filter(Boolean),
+    );
+    const preservedTokens = requiredTokens.filter((token) =>
+      proposedText.toLowerCase().includes(token.toLowerCase()),
+    );
+    const missingTokens = requiredTokens.filter(
+      (token) => !proposedText.toLowerCase().includes(token.toLowerCase()),
+    );
 
     for (const token of missingTokens) {
       violations.push({
-        code: 'MISSING_REQUIRED_TOKEN',
+        code: "MISSING_REQUIRED_TOKEN",
         message: `Required token was not preserved: "${token}"`,
         details: { token },
       });
     }
 
-    const originalEntities = input.preserveEntities ? extractEntities(originalText) : [];
-    const preservedEntities = originalEntities.filter(entity => proposedText.toLowerCase().includes(entity.toLowerCase()));
-    const missingEntities = originalEntities.filter(entity => !proposedText.toLowerCase().includes(entity.toLowerCase()));
+    const originalEntities = input.preserveEntities
+      ? extractEntities(originalText)
+      : [];
+    const preservedEntities = originalEntities.filter((entity) =>
+      proposedText.toLowerCase().includes(entity.toLowerCase()),
+    );
+    const missingEntities = originalEntities.filter(
+      (entity) => !proposedText.toLowerCase().includes(entity.toLowerCase()),
+    );
 
     if (input.preserveEntities) {
       for (const entity of missingEntities) {
         violations.push({
-          code: 'MISSING_PRESERVED_ENTITY',
+          code: "MISSING_PRESERVED_ENTITY",
           message: `Entity preservation failed for "${entity}"`,
           details: { entity },
         });
@@ -233,12 +255,14 @@ export class DocxValidatorsService {
     const originalFacts = input.strictFacts ? extractFacts(originalText) : [];
     const proposedFacts = input.strictFacts ? extractFacts(proposedText) : [];
     const originalFactSet = new Set(originalFacts);
-    const introducedFacts = proposedFacts.filter(fact => !originalFactSet.has(fact));
+    const introducedFacts = proposedFacts.filter(
+      (fact) => !originalFactSet.has(fact),
+    );
 
     if (input.strictFacts) {
       for (const fact of introducedFacts) {
         violations.push({
-          code: 'STRICT_NEW_FACT',
+          code: "STRICT_NEW_FACT",
           message: `Strict mode blocked newly introduced fact "${fact}"`,
           details: { fact },
         });
@@ -248,10 +272,11 @@ export class DocxValidatorsService {
     const similarity = buildSimilarity(originalText, proposedText);
 
     if (input.styleOnly) {
-      const threshold = input.similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD;
+      const threshold =
+        input.similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD;
       if (similarity.composite < threshold) {
         violations.push({
-          code: 'STYLE_SIMILARITY_BELOW_THRESHOLD',
+          code: "STYLE_SIMILARITY_BELOW_THRESHOLD",
           message: `Style-only similarity ${similarity.composite.toFixed(3)} is below threshold ${threshold.toFixed(3)}.`,
           details: {
             composite: similarity.composite,
@@ -262,11 +287,14 @@ export class DocxValidatorsService {
         });
       }
 
-      const maxSentenceDelta = input.maxSentenceDelta ?? DEFAULT_MAX_SENTENCE_DELTA;
-      const sentenceDelta = Math.abs(sentenceCount(originalText) - sentenceCount(proposedText));
+      const maxSentenceDelta =
+        input.maxSentenceDelta ?? DEFAULT_MAX_SENTENCE_DELTA;
+      const sentenceDelta = Math.abs(
+        sentenceCount(originalText) - sentenceCount(proposedText),
+      );
       if (sentenceDelta > maxSentenceDelta) {
         violations.push({
-          code: 'STYLE_SENTENCE_DELTA_EXCEEDED',
+          code: "STYLE_SENTENCE_DELTA_EXCEEDED",
           message: `Style-only edit changed sentence count by ${sentenceDelta}, max allowed is ${maxSentenceDelta}.`,
           details: { sentenceDelta, maxSentenceDelta },
         });

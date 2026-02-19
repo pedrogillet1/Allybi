@@ -61,16 +61,16 @@ export interface GeminiProviderConfig {
   models: {
     defaultDraft: string; // gemini-2.5-flash
     defaultFinal: string; // gemini-2.5-flash
-    allowed: string[];    // strict allowlist
+    allowed: string[]; // strict allowlist
     strictAllowlist: boolean;
   };
 
   // Streaming behavior (server-side shaping; frontend still smooths)
   streaming: {
     enabled: boolean;
-    maxDeltaCharsSoft: number;     // prevent giant bursts
-    flushOnNewline: boolean;       // nicer cadence for markdown
-    heartbeatEveryMs: number;      // 0 disables
+    maxDeltaCharsSoft: number; // prevent giant bursts
+    flushOnNewline: boolean; // nicer cadence for markdown
+    heartbeatEveryMs: number; // 0 disables
   };
 
   // Generation defaults (adapter-level safety baselines)
@@ -102,7 +102,7 @@ export interface GeminiProviderConfig {
   // Safety posture (high-level knobs; detailed policy lives elsewhere)
   safety: {
     enabled: boolean;
-    blockUnsafe: boolean;          // if true, surface provider blocks to refusal path
+    blockUnsafe: boolean; // if true, surface provider blocks to refusal path
     redactPromptInternalIds: boolean;
     redactPromptSystemPaths: boolean;
     replacement: string;
@@ -139,10 +139,11 @@ const DEFAULTS: Omit<GeminiProviderConfig, "env" | "apiKey"> = {
   models: {
     defaultDraft: process.env.GEMINI_DRAFT_MODEL || "gemini-2.5-flash",
     defaultFinal: process.env.GEMINI_FINAL_MODEL || "gemini-2.5-flash",
-    allowed: (process.env.GEMINI_ALLOWED_MODELS
-      ? process.env.GEMINI_ALLOWED_MODELS.split(",").map((s) => s.trim()).filter(Boolean)
-      : ["gemini-2.5-flash"]
-    ),
+    allowed: process.env.GEMINI_ALLOWED_MODELS
+      ? process.env.GEMINI_ALLOWED_MODELS.split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : ["gemini-2.5-flash"],
     strictAllowlist: process.env.GEMINI_STRICT_ALLOWLIST !== "false",
   },
 
@@ -158,14 +159,18 @@ const DEFAULTS: Omit<GeminiProviderConfig, "env" | "apiKey"> = {
     draft: {
       temperature: Number(process.env.GEMINI_DRAFT_TEMPERATURE || 0.5),
       topP: Number(process.env.GEMINI_DRAFT_TOP_P || 0.9),
-      maxOutputTokens: Number(process.env.GEMINI_DRAFT_MAX_OUTPUT_TOKENS || 700),
+      maxOutputTokens: Number(
+        process.env.GEMINI_DRAFT_MAX_OUTPUT_TOKENS || 700,
+      ),
     },
 
     // Final: prioritize correctness + controlled wording
     final: {
       temperature: Number(process.env.GEMINI_FINAL_TEMPERATURE || 0.25),
       topP: Number(process.env.GEMINI_FINAL_TOP_P || 0.9),
-      maxOutputTokens: Number(process.env.GEMINI_FINAL_MAX_OUTPUT_TOKENS || 900),
+      maxOutputTokens: Number(
+        process.env.GEMINI_FINAL_MAX_OUTPUT_TOKENS || 900,
+      ),
     },
 
     // nav_pills: always short
@@ -177,13 +182,17 @@ const DEFAULTS: Omit<GeminiProviderConfig, "env" | "apiKey"> = {
     // disambiguation: one question, 2–4 options
     disambiguation: {
       temperature: Number(process.env.GEMINI_DISAMBIG_TEMPERATURE || 0.2),
-      maxOutputTokens: Number(process.env.GEMINI_DISAMBIG_MAX_OUTPUT_TOKENS || 220),
+      maxOutputTokens: Number(
+        process.env.GEMINI_DISAMBIG_MAX_OUTPUT_TOKENS || 220,
+      ),
     },
 
     // quote strict: keep output bounded (policy handles quote limits too)
     quoteStrict: {
       temperature: Number(process.env.GEMINI_QUOTE_TEMPERATURE || 0.2),
-      maxOutputTokens: Number(process.env.GEMINI_QUOTE_MAX_OUTPUT_TOKENS || 500),
+      maxOutputTokens: Number(
+        process.env.GEMINI_QUOTE_MAX_OUTPUT_TOKENS || 500,
+      ),
     },
   },
 
@@ -196,7 +205,8 @@ const DEFAULTS: Omit<GeminiProviderConfig, "env" | "apiKey"> = {
   },
 
   compat: {
-    supportsDeveloperRole: process.env.GEMINI_SUPPORTS_DEVELOPER_ROLE !== "false",
+    supportsDeveloperRole:
+      process.env.GEMINI_SUPPORTS_DEVELOPER_ROLE !== "false",
     supportsTools: process.env.GEMINI_SUPPORTS_TOOLS !== "false",
   },
 };

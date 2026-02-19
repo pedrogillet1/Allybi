@@ -7,10 +7,10 @@
  * - Robust retry/backoff for 429 + transient 5xx
  */
 
-import OpenAI from 'openai';
-import { config } from '../../config/env';
-import cacheService from '../cache.service';
-import pLimit from 'p-limit';
+import OpenAI from "openai";
+import { config } from "../../config/env";
+import cacheService from "../cache.service";
+import pLimit from "p-limit";
 
 export interface EmbeddingResult {
   text: string;
@@ -27,7 +27,11 @@ export interface BatchEmbeddingResult {
 }
 
 export interface EmbeddingOptions {
-  taskType?: 'RETRIEVAL_QUERY' | 'RETRIEVAL_DOCUMENT' | 'SEMANTIC_SIMILARITY' | 'CLASSIFICATION';
+  taskType?:
+    | "RETRIEVAL_QUERY"
+    | "RETRIEVAL_DOCUMENT"
+    | "SEMANTIC_SIMILARITY"
+    | "CLASSIFICATION";
   title?: string;
 }
 
@@ -64,14 +68,19 @@ function isRetryable(err: any) {
   if (status === 429) return true;
   if (status >= 500 && status <= 599) return true;
 
-  const msg = String(err?.message || '').toLowerCase();
-  if (msg.includes('timeout') || msg.includes('etimedout') || msg.includes('econnreset')) return true;
+  const msg = String(err?.message || "").toLowerCase();
+  if (
+    msg.includes("timeout") ||
+    msg.includes("etimedout") ||
+    msg.includes("econnreset")
+  )
+    return true;
 
   return false;
 }
 
 function preprocess(text: string, maxChars: number): string {
-  let t = (text || '').replace(/\s+/g, ' ').trim();
+  let t = (text || "").replace(/\s+/g, " ").trim();
   if (t.length > maxChars) t = t.slice(0, maxChars);
   return t;
 }
@@ -84,24 +93,30 @@ export class EmbeddingsService {
     if (!config.OPENAI_API_KEY) {
       // Don’t crash at import time in environments that won’t use embeddings
       // but do fail hard when actually invoked.
-      throw new Error('OPENAI_API_KEY is not configured');
+      throw new Error("OPENAI_API_KEY is not configured");
     }
 
     this.openai = new OpenAI({ apiKey: config.OPENAI_API_KEY });
 
     this.cfg = {
-      model: process.env.OPENAI_EMBEDDING_MODEL || 'text-embedding-3-small',
+      model: process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small",
       dimensions: Number(process.env.OPENAI_EMBEDDING_DIMENSIONS || 1536),
 
       // Keep conservative defaults; raise via env if you want
       maxCharsPerText: Number(process.env.OPENAI_EMBEDDING_MAX_CHARS || 12000),
-      maxBatchItems: Number(process.env.OPENAI_EMBEDDING_MAX_BATCH_ITEMS || 256),
+      maxBatchItems: Number(
+        process.env.OPENAI_EMBEDDING_MAX_BATCH_ITEMS || 256,
+      ),
 
       maxRetries: Number(process.env.OPENAI_EMBEDDING_MAX_RETRIES || 3),
-      baseBackoffMs: Number(process.env.OPENAI_EMBEDDING_BACKOFF_BASE_MS || 500),
+      baseBackoffMs: Number(
+        process.env.OPENAI_EMBEDDING_BACKOFF_BASE_MS || 500,
+      ),
       maxBackoffMs: Number(process.env.OPENAI_EMBEDDING_BACKOFF_MAX_MS || 8000),
 
-      enableCache: (process.env.OPENAI_EMBEDDING_CACHE_ENABLED || 'true').toLowerCase() === 'true',
+      enableCache:
+        (process.env.OPENAI_EMBEDDING_CACHE_ENABLED || "true").toLowerCase() ===
+        "true",
 
       ...(serviceCfg || {}),
     };
@@ -125,10 +140,13 @@ export class EmbeddingsService {
   /**
    * Single embedding (cache-first).
    */
-  async generateEmbedding(text: string, _options: EmbeddingOptions = {}): Promise<EmbeddingResult> {
+  async generateEmbedding(
+    text: string,
+    _options: EmbeddingOptions = {},
+  ): Promise<EmbeddingResult> {
     const processedText = preprocess(text, this.cfg.maxCharsPerText);
     if (!processedText) {
-      throw new Error('Cannot generate embedding for empty text');
+      throw new Error("Cannot generate embedding for empty text");
     }
 
     if (this.cfg.enableCache) {
@@ -143,7 +161,9 @@ export class EmbeddingsService {
       }
     }
 
-    const embedding = await this.callOpenAIEmbeddingWithRetry([processedText]).then((arr) => arr[0]);
+    const embedding = await this.callOpenAIEmbeddingWithRetry([
+      processedText,
+    ]).then((arr) => arr[0]);
 
     if (this.cfg.enableCache) {
       await cacheService.cacheEmbedding(processedText, embedding);
@@ -160,17 +180,27 @@ export class EmbeddingsService {
   /**
    * Batch embeddings (cache-first, preserves input order).
    */
-  async generateBatchEmbeddings(texts: string[], _options: EmbeddingOptions = {}): Promise<BatchEmbeddingResult> {
+  async generateBatchEmbeddings(
+    texts: string[],
+    _options: EmbeddingOptions = {},
+  ): Promise<BatchEmbeddingResult> {
     const start = Date.now();
 
     if (!texts || texts.length === 0) {
-      return { embeddings: [], totalProcessed: 0, failedCount: 0, processingTime: 0 };
+      return {
+        embeddings: [],
+        totalProcessed: 0,
+        failedCount: 0,
+        processingTime: 0,
+      };
     }
 
     const processed = texts.map((t) => preprocess(t, this.cfg.maxCharsPerText));
 
     // Stable slots (same order as input)
-    const out: Array<EmbeddingResult | null> = new Array(processed.length).fill(null);
+    const out: Array<EmbeddingResult | null> = new Array(processed.length).fill(
+      null,
+    );
 
     // 1) Cache pass
     const uncached: Array<{ idx: number; text: string }> = [];
@@ -180,7 +210,7 @@ export class EmbeddingsService {
           if (!t) return { idx, text: t, cached: null as number[] | null };
           const cached = await cacheService.getCachedEmbedding(t);
           return { idx, text: t, cached };
-        })
+        }),
       );
 
       for (const r of cachedResults) {
@@ -210,7 +240,9 @@ export class EmbeddingsService {
 
       // Concurrency matters here: each batch is a separate OpenAI API request.
       // Honor EMBEDDING_CONCURRENCY so operators can tune throughput vs rate-limit risk.
-      const embeddingConcurrency = Number(process.env.EMBEDDING_CONCURRENCY || 3);
+      const embeddingConcurrency = Number(
+        process.env.EMBEDDING_CONCURRENCY || 3,
+      );
       const limit = pLimit(Math.max(1, embeddingConcurrency));
 
       const batchResults = await Promise.all(
@@ -218,13 +250,14 @@ export class EmbeddingsService {
           limit(async () => {
             const inputs = batch.map((b) => b.text);
             try {
-              const embeddings = await this.callOpenAIEmbeddingWithRetry(inputs);
+              const embeddings =
+                await this.callOpenAIEmbeddingWithRetry(inputs);
               return { batch, embeddings, error: false };
             } catch {
               return { batch, embeddings: null, error: true };
             }
-          })
-        )
+          }),
+        ),
       );
 
       const cachePromises: Promise<void>[] = [];
@@ -288,15 +321,25 @@ export class EmbeddingsService {
   }
 
   async generateQueryEmbedding(query: string): Promise<EmbeddingResult> {
-    return this.generateEmbedding(query, { taskType: 'RETRIEVAL_QUERY', title: 'User Query' });
+    return this.generateEmbedding(query, {
+      taskType: "RETRIEVAL_QUERY",
+      title: "User Query",
+    });
   }
 
-  async generateDocumentEmbedding(text: string, title?: string): Promise<EmbeddingResult> {
-    return this.generateEmbedding(text, { taskType: 'RETRIEVAL_DOCUMENT', title });
+  async generateDocumentEmbedding(
+    text: string,
+    title?: string,
+  ): Promise<EmbeddingResult> {
+    return this.generateEmbedding(text, {
+      taskType: "RETRIEVAL_DOCUMENT",
+      title,
+    });
   }
 
   calculateSimilarity(a: number[], b: number[]): number {
-    if (a.length !== b.length) throw new Error('Embeddings must have the same dimensions');
+    if (a.length !== b.length)
+      throw new Error("Embeddings must have the same dimensions");
 
     let dot = 0;
     let na = 0;
@@ -315,7 +358,7 @@ export class EmbeddingsService {
   findTopKSimilar(
     queryEmbedding: number[],
     candidates: Array<{ id: string; embedding: number[]; metadata?: any }>,
-    k: number = 10
+    k: number = 10,
   ): Array<{ id: string; similarity: number; metadata?: any }> {
     return candidates
       .map((c) => ({
@@ -345,10 +388,12 @@ export class EmbeddingsService {
     return out;
   }
 
-  private async callOpenAIEmbeddingWithRetry(inputs: string[]): Promise<number[][]> {
+  private async callOpenAIEmbeddingWithRetry(
+    inputs: string[],
+  ): Promise<number[][]> {
     const cleaned = inputs.map((t) => preprocess(t, this.cfg.maxCharsPerText));
     if (cleaned.some((t) => !t)) {
-      throw new Error('Batch contains empty text after preprocessing');
+      throw new Error("Batch contains empty text after preprocessing");
     }
 
     let attempt = 0;
@@ -365,7 +410,7 @@ export class EmbeddingsService {
         const out = res.data.map((d) => d.embedding);
         // Basic sanity
         if (!out.length || out.some((e) => !e || e.length === 0)) {
-          throw new Error('OpenAI embeddings returned empty vectors');
+          throw new Error("OpenAI embeddings returned empty vectors");
         }
         return out;
       } catch (err: any) {
@@ -374,13 +419,18 @@ export class EmbeddingsService {
 
         if (attempt > this.cfg.maxRetries || !isRetryable(err)) break;
 
-        const backoff = Math.min(this.cfg.maxBackoffMs, this.cfg.baseBackoffMs * Math.pow(2, attempt - 1));
+        const backoff = Math.min(
+          this.cfg.maxBackoffMs,
+          this.cfg.baseBackoffMs * Math.pow(2, attempt - 1),
+        );
         await sleep(jitter(backoff));
       }
     }
 
-    const msg = String(lastErr?.message || lastErr || 'Unknown error');
-    throw new Error(`OpenAI embeddings failed after ${this.cfg.maxRetries + 1} attempts: ${msg}`);
+    const msg = String(lastErr?.message || lastErr || "Unknown error");
+    throw new Error(
+      `OpenAI embeddings failed after ${this.cfg.maxRetries + 1} attempts: ${msg}`,
+    );
   }
 }
 

@@ -1,1 +1,1 @@
-export * from './document-worker';
+export * from "./document-worker";

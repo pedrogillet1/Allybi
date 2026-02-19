@@ -1527,7 +1527,7 @@
       "triggers": {
         "regex_any": [
           "\\bconvert\\b.*\\bbullets?\\b.*\\bparagraphs?\\b",
-          "\\bbullets?\\b.*\\b(?:to|into)\\b.*\\bparagraphs?\\b",
+          "\\b(?:convert|turn|change|transform)\\b.*\\bbullets?\\b.*\\b(?:to|into)\\b.*\\bparagraphs?\\b",
           "\\b(?:turn|change|transform)\\b.*\\b(?:bullets?|list)\\b.*\\b(?:into|to)\\b.*\\bparagraphs?\\b"
         ]
       },
@@ -1574,7 +1574,7 @@
       "triggers": {
         "regex_any": [
           "\\b(?:heading|header)\\s*[1-6]\\b",
-          "\\b(?:make|set|apply|convert)\\b.*\\b(?:heading|header)\\b",
+          "^(?!.*\\b(?:underline|bold|italic|color|font)\\b)\\b(?:make|set|apply|convert)\\b.*\\b(?:as|to|into|a)\\b.*\\b(?:heading|header)\\b(?:\\s*[1-6])?",
           "\\b(?:h1|h2|h3|h4|h5|h6)\\b",
           "\\bset\\b.*\\b(?:as|to)\\b.*\\b(?:heading|header)\\b"
         ]
@@ -1681,7 +1681,7 @@
       "triggers": {
         "regex_any": [
           "\\b(?:insert|add)\\b.*\\bparagraph\\b.*\\b(?:after|below|beneath)\\b",
-          "\\b(?:insert|add)\\b.*\\b(?:after|below|beneath)\\b.*\\bparagraph\\b",
+          "\\b(?:insert|add)\\b.{0,20}\\b(?:a|an|new|blank)\\b.{0,10}\\bparagraph\\b.{0,20}\\b(?:after|below|beneath)\\b",
           "\\b(?:new|add)\\b.*\\bparagraph\\b.*\\b(?:after|below)\\b"
         ]
       },
@@ -1778,8 +1778,8 @@
       "priority": 78,
       "triggers": {
         "regex_any": [
-          "\\b(?:delete|remove|drop)\\b.*\\b(?:this|the|selected)?\\s*paragraph\\b",
-          "\\bparagraph\\b.*\\b(?:delete|remove|drop)\\b"
+          "\\b(?:delete|remove|drop)\\b(?!.*\\b(?:format(?:ting)?|style|styles?)\\b).*\\b(?:this|the|selected)?\\s*paragraph\\b",
+          "\\bparagraph\\b(?!.*\\b(?:format(?:ting)?|style|styles?)\\b).*\\b(?:delete|remove|drop)\\b"
         ]
       },
       "slotExtractors": [
@@ -1915,7 +1915,7 @@
         "regex_any": [
           "\\b(?:apply|set|use|change)\\b.*\\bstyle\\b",
           "\\bstyle\\b.*\\b(?:to|=)\\b",
-          "\\bapply\\b.*\\b(?:Title|Subtitle|Quote|Intense Quote|No Spacing|List Paragraph)\\b"
+          "\\bapply\\b.*\\b(?:Title|Subtitle|Quote|Intense Quote|No Spacing|List Paragraph)\\b.*\\bstyle\\b"
         ]
       },
       "slotExtractors": [
@@ -2306,10 +2306,9 @@
       "priority": 72,
       "triggers": {
         "regex_any": [
-          "\\b(?:fix|repair|correct|reset)\\b.*\\bnumbering\\b",
+          "\\b(?:fix|repair|correct)\\b.*\\bnumbering\\b",
           "\\bnumbering\\b.*\\b(?:fix|repair|broken|wrong|incorrect)\\b",
-          "\\b(?:renumber|re-number)\\b",
-          "\\brestart\\b.*\\bnumbering\\b"
+          "\\b(?:renumber|re-number)\\b"
         ]
       },
       "slotExtractors": [
@@ -2335,7 +2334,6 @@
           "Fix the numbering",
           "Repair the broken numbering",
           "Correct the numbered list sequence",
-          "Restart numbering from 1",
           "Renumber this section"
         ],
         "negative": [

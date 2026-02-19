@@ -15,15 +15,15 @@
  * - Keys validated before operations
  */
 
-import { Redis } from '@upstash/redis';
-import { config } from '../../config/env';
-import { isSafeKey } from './cacheKeys';
+import { Redis } from "@upstash/redis";
+import { config } from "../../config/env";
+import { isSafeKey } from "./cacheKeys";
 
 // ─────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────
 
-export type CacheStatus = 'hit' | 'miss' | 'stale';
+export type CacheStatus = "hit" | "miss" | "stale";
 
 export interface WrapOptions {
   /** Additional TTL for serving stale data while revalidating */
@@ -47,7 +47,7 @@ export interface AnalyticsCache {
     key: string,
     ttlSeconds: number,
     fn: () => Promise<T>,
-    opts?: WrapOptions
+    opts?: WrapOptions,
   ): Promise<WrapResult<T>>;
 }
 
@@ -71,7 +71,7 @@ const inflightRequests = new Map<string, Promise<unknown>>();
 async function singleflight<T>(
   key: string,
   fn: () => Promise<T>,
-  maxWaitMs = 5000
+  maxWaitMs = 5000,
 ): Promise<T> {
   const existing = inflightRequests.get(key);
   if (existing) {
@@ -79,7 +79,7 @@ async function singleflight<T>(
     return Promise.race([
       existing as Promise<T>,
       new Promise<T>((_, reject) =>
-        setTimeout(() => reject(new Error('Singleflight timeout')), maxWaitMs)
+        setTimeout(() => reject(new Error("Singleflight timeout")), maxWaitMs),
       ),
     ]);
   }
@@ -110,7 +110,10 @@ export class MemoryAnalyticsCache implements AnalyticsCache {
   private accessOrder: string[] = [];
 
   private evictIfNeeded(): void {
-    while (this.cache.size >= MAX_MEMORY_ENTRIES && this.accessOrder.length > 0) {
+    while (
+      this.cache.size >= MAX_MEMORY_ENTRIES &&
+      this.accessOrder.length > 0
+    ) {
       const oldest = this.accessOrder.shift();
       if (oldest) {
         this.cache.delete(oldest);
@@ -190,11 +193,11 @@ export class MemoryAnalyticsCache implements AnalyticsCache {
     key: string,
     ttlSeconds: number,
     fn: () => Promise<T>,
-    opts?: WrapOptions
+    opts?: WrapOptions,
   ): Promise<WrapResult<T>> {
     if (!isSafeKey(key)) {
       const value = await fn();
-      return { value, cache: 'miss' };
+      return { value, cache: "miss" };
     }
 
     const entry = this.cache.get(key);
@@ -207,22 +210,26 @@ export class MemoryAnalyticsCache implements AnalyticsCache {
 
       if (!isStale) {
         this.touch(key);
-        return { value: entry.envelope.value as T, cache: 'hit' };
+        return { value: entry.envelope.value as T, cache: "hit" };
       }
 
       // Stale value - return it and refresh in background if stale-while-revalidate enabled
       if (staleTtl > 0) {
         // Trigger background refresh (don't await)
-        singleflight(key, async () => {
-          try {
-            const freshValue = await fn();
-            await this.set(key, freshValue, totalTtl);
-          } catch {
-            // Silently fail background refresh
-          }
-        }, opts?.maxWaitMs).catch(() => {});
+        singleflight(
+          key,
+          async () => {
+            try {
+              const freshValue = await fn();
+              await this.set(key, freshValue, totalTtl);
+            } catch {
+              // Silently fail background refresh
+            }
+          },
+          opts?.maxWaitMs,
+        ).catch(() => {});
 
-        return { value: entry.envelope.value as T, cache: 'stale' };
+        return { value: entry.envelope.value as T, cache: "stale" };
       }
     }
 
@@ -235,14 +242,14 @@ export class MemoryAnalyticsCache implements AnalyticsCache {
           await this.set(key, freshValue, totalTtl > 0 ? totalTtl : ttlSeconds);
           return freshValue;
         },
-        opts?.maxWaitMs
+        opts?.maxWaitMs,
       );
 
-      return { value, cache: 'miss' };
+      return { value, cache: "miss" };
     } catch (error) {
       // If compute fails and we have stale data, serve it
       if (opts?.allowStaleOnError && entry) {
-        return { value: entry.envelope.value as T, cache: 'stale' };
+        return { value: entry.envelope.value as T, cache: "stale" };
       }
       throw error;
     }
@@ -276,7 +283,7 @@ export class RedisAnalyticsCache implements AnalyticsCache {
       // Parse envelope
       let envelope: CacheEnvelope<T>;
       try {
-        envelope = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        envelope = typeof raw === "string" ? JSON.parse(raw) : raw;
       } catch {
         // Corrupted data - delete and return miss
         await this.redis.del(key);
@@ -334,11 +341,11 @@ export class RedisAnalyticsCache implements AnalyticsCache {
     key: string,
     ttlSeconds: number,
     fn: () => Promise<T>,
-    opts?: WrapOptions
+    opts?: WrapOptions,
   ): Promise<WrapResult<T>> {
     if (!isSafeKey(key)) {
       const value = await fn();
-      return { value, cache: 'miss' };
+      return { value, cache: "miss" };
     }
 
     const staleTtl = opts?.staleTtlSeconds ?? 0;
@@ -352,7 +359,7 @@ export class RedisAnalyticsCache implements AnalyticsCache {
       const raw = await this.redis.get<string>(key);
       if (raw) {
         try {
-          envelope = typeof raw === 'string' ? JSON.parse(raw) : raw;
+          envelope = typeof raw === "string" ? JSON.parse(raw) : raw;
           if (!envelope || envelope.v !== 1) {
             envelope = null;
             await this.redis.del(key);
@@ -377,22 +384,26 @@ export class RedisAnalyticsCache implements AnalyticsCache {
       const isStale = age > envelope.ttlSeconds * 1000;
 
       if (!isStale) {
-        return { value: envelope.value, cache: 'hit' };
+        return { value: envelope.value, cache: "hit" };
       }
 
       // Stale value - serve and refresh in background
       if (staleTtl > 0 && age <= totalTtl * 1000) {
         // Background refresh
-        singleflight(key, async () => {
-          try {
-            const freshValue = await fn();
-            await this.set(key, freshValue, totalTtl);
-          } catch {
-            // Silently fail
-          }
-        }, opts?.maxWaitMs).catch(() => {});
+        singleflight(
+          key,
+          async () => {
+            try {
+              const freshValue = await fn();
+              await this.set(key, freshValue, totalTtl);
+            } catch {
+              // Silently fail
+            }
+          },
+          opts?.maxWaitMs,
+        ).catch(() => {});
 
-        return { value: envelope.value, cache: 'stale' };
+        return { value: envelope.value, cache: "stale" };
       }
     }
 
@@ -405,14 +416,14 @@ export class RedisAnalyticsCache implements AnalyticsCache {
           await this.set(key, freshValue, totalTtl > 0 ? totalTtl : ttlSeconds);
           return freshValue;
         },
-        opts?.maxWaitMs
+        opts?.maxWaitMs,
       );
 
-      return { value, cache: 'miss' };
+      return { value, cache: "miss" };
     } catch (error) {
       // If compute fails and we have stale data, serve it
       if (opts?.allowStaleOnError && envelope) {
-        return { value: envelope.value, cache: 'stale' };
+        return { value: envelope.value, cache: "stale" };
       }
       throw error;
     }
@@ -441,15 +452,17 @@ export function createAnalyticsCache(): AnalyticsCache {
         url: config.UPSTASH_REDIS_REST_URL,
         token: config.UPSTASH_REDIS_REST_TOKEN,
       });
-      console.log('📊 Analytics cache: Using Upstash Redis');
+      console.log("📊 Analytics cache: Using Upstash Redis");
       cacheInstance = new RedisAnalyticsCache(redis);
       return cacheInstance;
     } catch (error) {
-      console.warn('⚠️  Analytics cache: Redis init failed, using memory fallback');
+      console.warn(
+        "⚠️  Analytics cache: Redis init failed, using memory fallback",
+      );
     }
   }
 
-  console.log('📊 Analytics cache: Using in-memory fallback');
+  console.log("📊 Analytics cache: Using in-memory fallback");
   cacheInstance = new MemoryAnalyticsCache();
   return cacheInstance;
 }

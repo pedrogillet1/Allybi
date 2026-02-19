@@ -1,2 +1,2 @@
-export * from './answerValidator.service';
-export * from './outputContract.service';
+export * from "./answerValidator.service";
+export * from "./outputContract.service";

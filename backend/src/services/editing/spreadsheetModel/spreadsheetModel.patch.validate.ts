@@ -3,20 +3,31 @@ import type { PatchOp } from "./spreadsheetModel.patch.types";
 import type { SpreadsheetModel } from "./spreadsheetModel.types";
 
 function hasSheet(model: SpreadsheetModel, sheetName: string): boolean {
-  return model.sheets.some((sheet) => sheet.name.toLowerCase() === String(sheetName || "").trim().toLowerCase());
+  return model.sheets.some(
+    (sheet) =>
+      sheet.name.toLowerCase() ===
+      String(sheetName || "")
+        .trim()
+        .toLowerCase(),
+  );
 }
 
 function resolveSheetName(op: PatchOp): string | null {
-  if ("sheet" in op && typeof op.sheet === "string" && op.sheet.trim()) return op.sheet.trim();
+  if ("sheet" in op && typeof op.sheet === "string" && op.sheet.trim())
+    return op.sheet.trim();
   if ("range" in op) {
     const raw = String(op.range || "").trim();
     const bang = raw.indexOf("!");
-    if (bang > 0) return raw.slice(0, bang).replace(/^'/, "").replace(/'$/, "").trim();
+    if (bang > 0)
+      return raw.slice(0, bang).replace(/^'/, "").replace(/'$/, "").trim();
   }
   return null;
 }
 
-export function validatePatchOps(model: SpreadsheetModel, patchOps: PatchOp[]): {
+export function validatePatchOps(
+  model: SpreadsheetModel,
+  patchOps: PatchOp[],
+): {
   validOps: PatchOp[];
   rejectedOps: string[];
 } {

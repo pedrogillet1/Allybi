@@ -9,18 +9,22 @@
  * - No user-facing microcopy
  */
 
-import type { LLMProvider } from './llmErrors.types';
-import type { ToolRegistry, ProviderToolCall, ToolResult } from './llmTools.types';
+import type { LLMProvider } from "./llmErrors.types";
+import type {
+  ToolRegistry,
+  ProviderToolCall,
+  ToolResult,
+} from "./llmTools.types";
 import type {
   LLMStreamingConfig,
   StreamEvent,
   StreamSink,
   StreamState,
   StreamingHooks,
-} from './llmStreaming.types';
+} from "./llmStreaming.types";
 
 /** LLM role types (provider-neutral) */
-export type LLMRole = 'system' | 'developer' | 'user' | 'assistant' | 'tool';
+export type LLMRole = "system" | "developer" | "user" | "assistant" | "tool";
 
 /** A single chat message (normalized) */
 export interface LLMMessage {
@@ -80,11 +84,11 @@ export interface LLMRequestConstraints {
 
 /** High-level request intent (optional signal for routing) */
 export type LLMRequestPurpose =
-  | 'intent_routing'
-  | 'retrieval_planning'
-  | 'answer_compose'
-  | 'validation_pass'
-  | 'other';
+  | "intent_routing"
+  | "retrieval_planning"
+  | "answer_compose"
+  | "validation_pass"
+  | "other";
 
 /** Core request payload */
 export interface LLMRequest {

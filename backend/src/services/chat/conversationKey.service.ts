@@ -17,18 +17,31 @@ export class ConversationKeyService {
     private envelopes: EnvelopeService,
   ) {}
 
-  async getConversationKey(userId: string, conversationId: string): Promise<Buffer> {
+  async getConversationKey(
+    userId: string,
+    conversationId: string,
+  ): Promise<Buffer> {
     const convo = await this.prisma.conversation.findUnique({
       where: { id: conversationId },
-      select: { id: true, userId: true, dataKeyEncrypted: true, dataKeyMeta: true },
+      select: {
+        id: true,
+        userId: true,
+        dataKeyEncrypted: true,
+        dataKeyMeta: true,
+      },
     });
-    if (!convo || convo.userId !== userId) throw new Error("Conversation not found");
+    if (!convo || convo.userId !== userId)
+      throw new Error("Conversation not found");
 
     const tk = await this.tenantKeys.getTenantKey(userId);
 
     if (!convo.dataKeyEncrypted) {
       const ck = this.enc.randomKey32();
-      const wrapped = this.envelopes.wrapRecordKey(ck, tk, `wrap:conversation:${conversationId}`);
+      const wrapped = this.envelopes.wrapRecordKey(
+        ck,
+        tk,
+        `wrap:conversation:${conversationId}`,
+      );
 
       await this.prisma.conversation.update({
         where: { id: conversationId },

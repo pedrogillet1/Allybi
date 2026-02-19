@@ -34,7 +34,11 @@ function normalize(input: string): string {
 }
 
 function tokenSet(input: string): Set<string> {
-  return new Set(normalize(input).split(/[^a-z0-9]+/).filter(Boolean));
+  return new Set(
+    normalize(input)
+      .split(/[^a-z0-9]+/)
+      .filter(Boolean),
+  );
 }
 
 function similarity(before: string, after: string): number {
@@ -80,16 +84,21 @@ export class EditOrchestratorService {
   }) {
     this.planService = options?.planService || new EditPlanService();
     this.diffBuilder = options?.diffBuilder || new DiffBuilderService();
-    this.rationaleBuilder = options?.rationaleBuilder || new RationaleBuilderService();
+    this.rationaleBuilder =
+      options?.rationaleBuilder || new RationaleBuilderService();
     this.receiptBuilder = options?.receiptBuilder || new EditReceiptService();
-    this.applyVerification = options?.applyVerification || new ApplyVerificationService();
+    this.applyVerification =
+      options?.applyVerification || new ApplyVerificationService();
     this.policyService = options?.policyService || new EditingPolicyService();
     this.revisionStore = options?.revisionStore;
     this.telemetry = options?.telemetry;
     this.policy = this.policyService.resolvePolicy(options?.policy || {});
   }
 
-  async planEdit(ctx: EditExecutionContext, request: EditPlanRequest): Promise<EditPlanResult> {
+  async planEdit(
+    ctx: EditExecutionContext,
+    request: EditPlanRequest,
+  ): Promise<EditPlanResult> {
     const result = this.planService.plan(request);
     if (!result.ok) {
       await this.track("edit_failed", ctx, {
@@ -104,25 +113,45 @@ export class EditOrchestratorService {
     await this.track("edit_planned", ctx, {
       operator: request.operator,
       documentId: request.documentId,
-      missingRequiredEntities: result.plan?.missingRequiredEntities?.length || 0,
+      missingRequiredEntities:
+        result.plan?.missingRequiredEntities?.length || 0,
       checks: result.plan?.diagnostics.checks || [],
     });
     return result;
   }
 
-  async previewEdit(ctx: EditExecutionContext, request: EditPreviewRequest): Promise<EditPreviewResult> {
+  async previewEdit(
+    ctx: EditExecutionContext,
+    request: EditPreviewRequest,
+  ): Promise<EditPreviewResult> {
     try {
       const sim = similarity(request.beforeText, request.proposedText);
-      const preserveTokens = request.preserveTokens || request.plan.preserveTokens;
-      const preservePass = containsAllTokens(request.proposedText, preserveTokens);
+      const preserveTokens =
+        request.preserveTokens || request.plan.preserveTokens;
+      const preservePass = containsAllTokens(
+        request.proposedText,
+        preserveTokens,
+      );
       const diff =
         request.plan.operator === "ADD_PARAGRAPH"
-          ? this.diffBuilder.buildStructuralDiff("Insert new paragraph", request.proposedText)
+          ? this.diffBuilder.buildStructuralDiff(
+              "Insert new paragraph",
+              request.proposedText,
+            )
           : request.plan.domain === "sheets"
-            ? this.diffBuilder.buildCellDiff(request.beforeText, request.proposedText)
+            ? this.diffBuilder.buildCellDiff(
+                request.beforeText,
+                request.proposedText,
+              )
             : request.plan.domain === "slides"
-              ? this.diffBuilder.buildSlideTextDiff(request.beforeText, request.proposedText)
-              : this.diffBuilder.buildParagraphDiff(request.beforeText, request.proposedText);
+              ? this.diffBuilder.buildSlideTextDiff(
+                  request.beforeText,
+                  request.proposedText,
+                )
+              : this.diffBuilder.buildParagraphDiff(
+                  request.beforeText,
+                  request.proposedText,
+                );
 
       const blockedReasons = this.computeBlockedReasons(
         request.plan.operator,
@@ -132,7 +161,8 @@ export class EditOrchestratorService {
         preservePass,
         this.shouldEnforceSimilarity(request),
       );
-      const requiresConfirmation = blockedReasons.length > 0 || request.target.isAmbiguous;
+      const requiresConfirmation =
+        blockedReasons.length > 0 || request.target.isAmbiguous;
 
       const rationale = this.rationaleBuilder.build({
         constraints: request.plan.constraints,
@@ -186,7 +216,10 @@ export class EditOrchestratorService {
     }
   }
 
-  async applyEdit(ctx: EditExecutionContext, request: EditApplyRequest): Promise<EditApplyResult> {
+  async applyEdit(
+    ctx: EditExecutionContext,
+    request: EditApplyRequest,
+  ): Promise<EditApplyResult> {
     const preview = await this.previewEdit(ctx, {
       plan: request.plan,
       target: request.target,
@@ -194,9 +227,21 @@ export class EditOrchestratorService {
       proposedText: request.proposedText,
       preserveTokens: request.plan.preserveTokens,
     });
-    if (!preview.ok) return { ok: false, applied: false, outcomeType: "blocked", error: preview.error };
+    if (!preview.ok)
+      return {
+        ok: false,
+        applied: false,
+        outcomeType: "blocked",
+        error: preview.error,
+      };
     if (!this.revisionStore) {
-      return { ok: false, applied: false, outcomeType: "engine_unsupported", preview, error: "Revision store is not configured." };
+      return {
+        ok: false,
+        applied: false,
+        outcomeType: "engine_unsupported",
+        preview,
+        error: "Revision store is not configured.",
+      };
     }
 
     const mustConfirm =
@@ -224,7 +269,9 @@ export class EditOrchestratorService {
     try {
       const canUseRichDocx =
         request.plan.domain === "docx" &&
-        (request.plan.operator === "EDIT_PARAGRAPH" || request.plan.operator === "EDIT_SPAN" || request.plan.operator === "ADD_PARAGRAPH") &&
+        (request.plan.operator === "EDIT_PARAGRAPH" ||
+          request.plan.operator === "EDIT_SPAN" ||
+          request.plan.operator === "ADD_PARAGRAPH") &&
         typeof request.proposedHtml === "string" &&
         request.proposedHtml.trim().length > 0;
       const usesMarkdownDocxBundle =
@@ -232,7 +279,9 @@ export class EditOrchestratorService {
         request.plan.operator === "EDIT_DOCX_BUNDLE" &&
         looksLikeDocxAnnotatedMarkdown(request.proposedText);
 
-      const revisionContent = canUseRichDocx ? request.proposedHtml!.trim() : request.proposedText;
+      const revisionContent = canUseRichDocx
+        ? request.proposedHtml!.trim()
+        : request.proposedText;
       const created = await this.revisionStore.createRevision({
         documentId: request.plan.documentId,
         userId: ctx.userId,
@@ -268,25 +317,38 @@ export class EditOrchestratorService {
       });
 
       const hash = (value: string): string =>
-        crypto.createHash("sha256").update(String(value || ""), "utf8").digest("hex");
+        crypto
+          .createHash("sha256")
+          .update(String(value || ""), "utf8")
+          .digest("hex");
       const beforeMaterial = String(request.beforeText || "");
-      const afterMaterial = canUseRichDocx ? String(request.proposedHtml || "") : String(request.proposedText || "");
-      const fileHashBefore = String(created.fileHashBefore || "").trim() || hash(beforeMaterial);
-      const fileHashAfter = String(created.fileHashAfter || "").trim() || hash(afterMaterial);
-      const backendMetrics = (created as any).applyMetrics && typeof (created as any).applyMetrics === "object"
-        ? (created as any).applyMetrics
-        : null;
+      const afterMaterial = canUseRichDocx
+        ? String(request.proposedHtml || "")
+        : String(request.proposedText || "");
+      const fileHashBefore =
+        String(created.fileHashBefore || "").trim() || hash(beforeMaterial);
+      const fileHashAfter =
+        String(created.fileHashAfter || "").trim() || hash(afterMaterial);
+      const backendMetrics =
+        (created as any).applyMetrics &&
+        typeof (created as any).applyMetrics === "object"
+          ? (created as any).applyMetrics
+          : null;
       const derivedMetrics = this.deriveApplyMetrics({
         operator: request.plan.operator,
         targetId: request.target?.id || null,
         proposedText: request.proposedText,
       });
       const affectedRanges = this.uniqueStrings([
-        ...(Array.isArray((backendMetrics as any)?.affectedRanges) ? (backendMetrics as any).affectedRanges : []),
+        ...(Array.isArray((backendMetrics as any)?.affectedRanges)
+          ? (backendMetrics as any).affectedRanges
+          : []),
         ...derivedMetrics.affectedRanges,
       ]);
       const affectedParagraphIds = this.uniqueStrings([
-        ...(Array.isArray((backendMetrics as any)?.affectedParagraphIds) ? (backendMetrics as any).affectedParagraphIds : []),
+        ...(Array.isArray((backendMetrics as any)?.affectedParagraphIds)
+          ? (backendMetrics as any).affectedParagraphIds
+          : []),
         ...derivedMetrics.affectedParagraphIds,
       ]);
       const applyMetrics = backendMetrics
@@ -295,16 +357,27 @@ export class EditOrchestratorService {
               1,
               Number((backendMetrics as any).changedCellsCount || 0) > 0
                 ? Number((backendMetrics as any).changedCellsCount || 0)
-                : (affectedRanges.length || affectedParagraphIds.length || 1),
+                : affectedRanges.length || affectedParagraphIds.length || 1,
             ),
-            changedCellsCount: Math.max(0, Number((backendMetrics as any).changedCellsCount || 0)),
-            changedStructuresCount: Math.max(0, Number((backendMetrics as any).changedStructuresCount || 0)),
+            changedCellsCount: Math.max(
+              0,
+              Number((backendMetrics as any).changedCellsCount || 0),
+            ),
+            changedStructuresCount: Math.max(
+              0,
+              Number((backendMetrics as any).changedStructuresCount || 0),
+            ),
             affectedRanges,
             affectedParagraphIds,
             rejectedOps: Array.isArray((backendMetrics as any).rejectedOps)
-              ? (backendMetrics as any).rejectedOps.map((item: any) => String(item || "").trim()).filter(Boolean)
+              ? (backendMetrics as any).rejectedOps
+                  .map((item: any) => String(item || "").trim())
+                  .filter(Boolean)
               : [],
-            patchesApplied: Math.max(0, Number((backendMetrics as any).patchesApplied || 0)),
+            patchesApplied: Math.max(
+              0,
+              Number((backendMetrics as any).patchesApplied || 0),
+            ),
           }
         : {
             ...derivedMetrics,
@@ -315,16 +388,22 @@ export class EditOrchestratorService {
       const diff = preview.diff;
       const changeCount = (() => {
         if (backendMetrics) {
-          return Math.max(0, Number(applyMetrics.changedCellsCount || 0) + Number(applyMetrics.changedStructuresCount || 0));
+          return Math.max(
+            0,
+            Number(applyMetrics.changedCellsCount || 0) +
+              Number(applyMetrics.changedStructuresCount || 0),
+          );
         }
-        if (Array.isArray(diff?.changes) && diff!.changes.length > 0) return diff!.changes.length;
+        if (Array.isArray(diff?.changes) && diff!.changes.length > 0)
+          return diff!.changes.length;
         if (fileHashBefore !== fileHashAfter) return 1;
         return 0;
       })();
       const changesetKind: NonNullable<EditApplyResult["changeset"]>["kind"] =
-        request.plan.operator === "EDIT_DOCX_BUNDLE" || request.plan.operator === "COMPUTE_BUNDLE"
+        request.plan.operator === "EDIT_DOCX_BUNDLE" ||
+        request.plan.operator === "COMPUTE_BUNDLE"
           ? "bundle"
-          : (diff?.kind || "paragraph");
+          : diff?.kind || "paragraph";
       const targets = request.target?.id ? [String(request.target.id)] : [];
       const verification = this.applyVerification.verify({
         revisionId: created.revisionId || null,
@@ -337,12 +416,25 @@ export class EditOrchestratorService {
         verified: verification.verified,
         fileHashBefore,
         fileHashAfter,
-        affectedTargetsCount: Math.max(1, applyMetrics.affectedTargetsCount || targets.length),
-        ...(applyMetrics.changedCellsCount > 0 ? { changedCellsCount: applyMetrics.changedCellsCount } : {}),
-        ...(applyMetrics.changedStructuresCount > 0 ? { changedStructuresCount: applyMetrics.changedStructuresCount } : {}),
-        ...(applyMetrics.affectedRanges.length ? { affectedRanges: applyMetrics.affectedRanges } : {}),
-        ...(applyMetrics.affectedParagraphIds.length ? { affectedParagraphIds: applyMetrics.affectedParagraphIds } : {}),
-        ...(applyMetrics.rejectedOps.length ? { rejectedOps: applyMetrics.rejectedOps } : {}),
+        affectedTargetsCount: Math.max(
+          1,
+          applyMetrics.affectedTargetsCount || targets.length,
+        ),
+        ...(applyMetrics.changedCellsCount > 0
+          ? { changedCellsCount: applyMetrics.changedCellsCount }
+          : {}),
+        ...(applyMetrics.changedStructuresCount > 0
+          ? { changedStructuresCount: applyMetrics.changedStructuresCount }
+          : {}),
+        ...(applyMetrics.affectedRanges.length
+          ? { affectedRanges: applyMetrics.affectedRanges }
+          : {}),
+        ...(applyMetrics.affectedParagraphIds.length
+          ? { affectedParagraphIds: applyMetrics.affectedParagraphIds }
+          : {}),
+        ...(applyMetrics.rejectedOps.length
+          ? { rejectedOps: applyMetrics.rejectedOps }
+          : {}),
         metrics: {
           changedObjectsCount: Math.max(
             Number(applyMetrics.changedCellsCount || 0) +
@@ -350,8 +442,12 @@ export class EditOrchestratorService {
             applyMetrics.affectedParagraphIds.length,
           ),
           changedCellsCount: Number(applyMetrics.changedCellsCount || 0),
-          changedStructuresCount: Number(applyMetrics.changedStructuresCount || 0),
-          ...(Number(applyMetrics.patchesApplied || 0) > 0 ? { patchesApplied: Number(applyMetrics.patchesApplied || 0) } : {}),
+          changedStructuresCount: Number(
+            applyMetrics.changedStructuresCount || 0,
+          ),
+          ...(Number(applyMetrics.patchesApplied || 0) > 0
+            ? { patchesApplied: Number(applyMetrics.patchesApplied || 0) }
+            : {}),
         },
         targets: [
           ...applyMetrics.affectedParagraphIds.map((pid) => ({
@@ -366,7 +462,9 @@ export class EditOrchestratorService {
             beforeHash: fileHashBefore,
             afterHash: fileHashAfter,
           })),
-          ...(applyMetrics.affectedParagraphIds.length === 0 && applyMetrics.affectedRanges.length === 0 && targets.length
+          ...(applyMetrics.affectedParagraphIds.length === 0 &&
+          applyMetrics.affectedRanges.length === 0 &&
+          targets.length
             ? targets.map((targetId) => ({
                 kind: "target" as const,
                 id: targetId,
@@ -376,10 +474,16 @@ export class EditOrchestratorService {
             : []),
         ],
         highlights: {
-          ...(applyMetrics.affectedParagraphIds.length ? { docxParagraphIds: applyMetrics.affectedParagraphIds } : {}),
-          ...(applyMetrics.affectedRanges.length ? { xlsxRanges: applyMetrics.affectedRanges } : {}),
+          ...(applyMetrics.affectedParagraphIds.length
+            ? { docxParagraphIds: applyMetrics.affectedParagraphIds }
+            : {}),
+          ...(applyMetrics.affectedRanges.length
+            ? { xlsxRanges: applyMetrics.affectedRanges }
+            : {}),
         },
-        ...(verification.reasons.length ? { warnings: verification.reasons } : {}),
+        ...(verification.reasons.length
+          ? { warnings: verification.reasons }
+          : {}),
       };
 
       // If the document did not actually change, return noop instead of applied.
@@ -443,15 +547,20 @@ export class EditOrchestratorService {
       // Contract validation (warn-only, never blocks)
       const contractCheck = validateEditResult(applyResult);
       if (!contractCheck.ok) {
-        logger.warn("[Editing] applyEdit result failed contract validation", { error: contractCheck.error });
+        logger.warn("[Editing] applyEdit result failed contract validation", {
+          error: contractCheck.error,
+        });
       }
       return applyResult;
     } catch (error) {
       const message = error instanceof Error ? error.message : "Apply failed";
       const isNoop = message.startsWith("EDIT_NOOP");
-      const errorCode = typeof (error as any)?.code === "string" ? String((error as any).code) : null;
+      const errorCode =
+        typeof (error as any)?.code === "string"
+          ? String((error as any).code)
+          : null;
       const isOperatorNotImplemented = errorCode === "OPERATOR_NOT_IMPLEMENTED";
-      await this.track(isNoop ? "edit_noop" as any : "edit_failed", ctx, {
+      await this.track(isNoop ? ("edit_noop" as any) : "edit_failed", ctx, {
         stage: isNoop ? "noop" : "apply",
         documentId: request.plan.documentId,
         operator: request.plan.operator,
@@ -503,7 +612,13 @@ export class EditOrchestratorService {
         clientMessageId: ctx.clientMessageId,
         error: message,
       });
-      return { ok: false, applied: false, outcomeType: "blocked", preview, error: message };
+      return {
+        ok: false,
+        applied: false,
+        outcomeType: "blocked",
+        preview,
+        error: message,
+      };
     }
   }
 
@@ -527,7 +642,12 @@ export class EditOrchestratorService {
     const addRange = (value: unknown) => {
       const raw = String(value || "").trim();
       if (!raw) return;
-      if (/^[A-Za-z0-9_ ]+![A-Za-z]{1,3}\d{1,7}(?::[A-Za-z]{1,3}\d{1,7})?$/.test(raw) || /^[A-Za-z]{1,3}\d{1,7}(?::[A-Za-z]{1,3}\d{1,7})?$/.test(raw)) {
+      if (
+        /^[A-Za-z0-9_ ]+![A-Za-z]{1,3}\d{1,7}(?::[A-Za-z]{1,3}\d{1,7})?$/.test(
+          raw,
+        ) ||
+        /^[A-Za-z]{1,3}\d{1,7}(?::[A-Za-z]{1,3}\d{1,7})?$/.test(raw)
+      ) {
         affectedRanges.add(raw);
         changedCellsCount += this.estimateRangeCellCount(raw);
       }
@@ -546,13 +666,22 @@ export class EditOrchestratorService {
       const payload = JSON.parse(String(input.proposedText || "{}"));
       if (Array.isArray(payload?.patches)) {
         for (const patch of payload.patches) {
-          addRange((patch as any)?.rangeA1 || (patch as any)?.a1 || (patch as any)?.range);
+          addRange(
+            (patch as any)?.rangeA1 ||
+              (patch as any)?.a1 ||
+              (patch as any)?.range,
+          );
           addParagraph((patch as any)?.paragraphId);
         }
       }
       if (Array.isArray(payload?.ops)) {
         for (const op of payload.ops) {
-          addRange((op as any)?.rangeA1 || (op as any)?.a1 || (op as any)?.range || (op as any)?.sourceRange);
+          addRange(
+            (op as any)?.rangeA1 ||
+              (op as any)?.a1 ||
+              (op as any)?.range ||
+              (op as any)?.sourceRange,
+          );
         }
       }
     } catch {
@@ -560,7 +689,11 @@ export class EditOrchestratorService {
     }
 
     return {
-      affectedTargetsCount: Math.max(affectedRanges.size, affectedParagraphIds.size, input.targetId ? 1 : 0),
+      affectedTargetsCount: Math.max(
+        affectedRanges.size,
+        affectedParagraphIds.size,
+        input.targetId ? 1 : 0,
+      ),
       changedCellsCount,
       changedStructuresCount: 0,
       affectedRanges: Array.from(affectedRanges),
@@ -584,14 +717,25 @@ export class EditOrchestratorService {
   }
 
   private estimateRangeCellCount(a1: string): number {
-    const range = String(a1 || "").split("!").pop() || "";
-    const m = range.match(/^([A-Za-z]{1,3})(\d{1,7})(?::([A-Za-z]{1,3})(\d{1,7}))?$/);
+    const range =
+      String(a1 || "")
+        .split("!")
+        .pop() || "";
+    const m = range.match(
+      /^([A-Za-z]{1,3})(\d{1,7})(?::([A-Za-z]{1,3})(\d{1,7}))?$/,
+    );
     if (!m) return 0;
     const c1 = this.colToIndex(m[1]);
     const r1 = Number(m[2]);
     const c2 = m[3] ? this.colToIndex(m[3]) : c1;
     const r2 = m[4] ? Number(m[4]) : r1;
-    if (!Number.isFinite(c1) || !Number.isFinite(c2) || !Number.isFinite(r1) || !Number.isFinite(r2)) return 0;
+    if (
+      !Number.isFinite(c1) ||
+      !Number.isFinite(c2) ||
+      !Number.isFinite(r1) ||
+      !Number.isFinite(r2)
+    )
+      return 0;
     return Math.max(1, (Math.abs(c2 - c1) + 1) * (Math.abs(r2 - r1) + 1));
   }
 
@@ -606,8 +750,12 @@ export class EditOrchestratorService {
     return out;
   }
 
-  async undoEdit(ctx: EditExecutionContext, request: UndoRequest): Promise<UndoResult> {
-    if (!this.revisionStore) return { ok: false, error: "Revision store is not configured." };
+  async undoEdit(
+    ctx: EditExecutionContext,
+    request: UndoRequest,
+  ): Promise<UndoResult> {
+    if (!this.revisionStore)
+      return { ok: false, error: "Revision store is not configured." };
 
     try {
       const restored = await this.revisionStore.undoToRevision({
@@ -646,11 +794,20 @@ export class EditOrchestratorService {
     enforceSimilarity: boolean,
   ): string[] {
     const reasons: string[] = [];
-    if (this.policy.alwaysRequireConfirmation.includes(operator)) reasons.push("operator requires explicit confirmation");
-    if (confidence < this.policy.minConfidenceForAutoApply) reasons.push(`target confidence ${confidence.toFixed(2)} below threshold`);
+    if (this.policy.alwaysRequireConfirmation.includes(operator))
+      reasons.push("operator requires explicit confirmation");
+    if (confidence < this.policy.minConfidenceForAutoApply)
+      reasons.push(
+        `target confidence ${confidence.toFixed(2)} below threshold`,
+      );
     // Only enforce margin when there are multiple candidates (margin is meaningless with a single target)
-    if (margin < this.policy.minDecisionMarginForAutoApply && confidence < 1) reasons.push(`decision margin ${margin.toFixed(2)} below threshold`);
-    if (enforceSimilarity && similarityScore < this.policy.minSimilarityForAutoApply) reasons.push(`similarity ${similarityScore.toFixed(2)} below threshold`);
+    if (margin < this.policy.minDecisionMarginForAutoApply && confidence < 1)
+      reasons.push(`decision margin ${margin.toFixed(2)} below threshold`);
+    if (
+      enforceSimilarity &&
+      similarityScore < this.policy.minSimilarityForAutoApply
+    )
+      reasons.push(`similarity ${similarityScore.toFixed(2)} below threshold`);
     if (!preservePass) reasons.push("preserve token check failed");
     return reasons;
   }
@@ -670,7 +827,12 @@ export class EditOrchestratorService {
   }
 
   private async track(
-    event: "edit_planned" | "edit_previewed" | "edit_applied" | "edit_failed" | "edit_noop",
+    event:
+      | "edit_planned"
+      | "edit_previewed"
+      | "edit_applied"
+      | "edit_failed"
+      | "edit_noop",
     ctx: EditExecutionContext,
     payload: Record<string, unknown>,
   ): Promise<void> {

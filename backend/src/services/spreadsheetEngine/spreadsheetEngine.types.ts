@@ -65,8 +65,12 @@ export interface SpreadsheetEngineInsightResponse {
   warnings: string[];
 }
 
-export function coerceSpreadsheetEngineMode(raw: unknown): SpreadsheetEngineMode {
-  const mode = String(raw || "").trim().toLowerCase();
+export function coerceSpreadsheetEngineMode(
+  raw: unknown,
+): SpreadsheetEngineMode {
+  const mode = String(raw || "")
+    .trim()
+    .toLowerCase();
   if (mode === "enforced") return "enforced";
   if (mode === "shadow") return "shadow";
   return "off";

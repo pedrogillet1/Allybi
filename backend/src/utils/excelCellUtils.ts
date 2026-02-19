@@ -9,8 +9,8 @@
 import {
   isExcelDateSerial,
   formatExcelDate,
-  isDateFormat
-} from './excelDateUtils';
+  isDateFormat,
+} from "./excelDateUtils";
 
 /**
  * Result of extracting a cell value
@@ -36,7 +36,7 @@ export function getCellValue(cell: any): CellValueResult {
   if (cell === null || cell === undefined) {
     return {
       value: null,
-      formattedValue: '',
+      formattedValue: "",
       hasFormula: false,
     };
   }
@@ -48,13 +48,13 @@ export function getCellValue(cell: any): CellValueResult {
   if (cellValue === null || cellValue === undefined) {
     return {
       value: null,
-      formattedValue: '',
+      formattedValue: "",
       hasFormula: false,
     };
   }
 
   // ✅ FIX: Handle formula cells - return calculated result, not formula text
-  if (typeof cellValue === 'object' && cellValue.formula) {
+  if (typeof cellValue === "object" && cellValue.formula) {
     const formula = cellValue.formula;
 
     // Check if we have a calculated result
@@ -88,8 +88,8 @@ export function getCellValue(cell: any): CellValueResult {
   }
 
   // Handle rich text
-  if (typeof cellValue === 'object' && cellValue.richText) {
-    const text = cellValue.richText.map((rt: any) => rt.text || '').join('');
+  if (typeof cellValue === "object" && cellValue.richText) {
+    const text = cellValue.richText.map((rt: any) => rt.text || "").join("");
     return {
       value: text,
       formattedValue: text,
@@ -98,7 +98,7 @@ export function getCellValue(cell: any): CellValueResult {
   }
 
   // Handle hyperlinks
-  if (typeof cellValue === 'object' && cellValue.hyperlink) {
+  if (typeof cellValue === "object" && cellValue.hyperlink) {
     const text = cellValue.text || cellValue.hyperlink;
     return {
       value: text,
@@ -108,7 +108,7 @@ export function getCellValue(cell: any): CellValueResult {
   }
 
   // Handle Excel error values
-  if (typeof cellValue === 'object' && cellValue.error) {
+  if (typeof cellValue === "object" && cellValue.error) {
     return {
       value: cellValue.error,
       formattedValue: cellValue.error,
@@ -144,14 +144,14 @@ export function formatNumber(value: number): string {
     const decimals = Math.abs(value) < 1 ? 4 : 2;
 
     // Use toLocaleString to add thousand separators while preserving decimals
-    return value.toLocaleString('en-US', {
+    return value.toLocaleString("en-US", {
       minimumFractionDigits: 0,
       maximumFractionDigits: decimals,
     });
   }
 
   // Integer - add thousand separators
-  return value.toLocaleString('en-US');
+  return value.toLocaleString("en-US");
 }
 
 /**
@@ -164,28 +164,28 @@ export function formatNumber(value: number): string {
  */
 export function formatValue(value: any, numFmt?: string | null): string {
   if (value === null || value === undefined) {
-    return '';
+    return "";
   }
 
   // Date object
   if (value instanceof Date) {
-    return value.toLocaleDateString('en-US');
+    return value.toLocaleDateString("en-US");
   }
 
   // Boolean
-  if (typeof value === 'boolean') {
-    return value ? 'TRUE' : 'FALSE';
+  if (typeof value === "boolean") {
+    return value ? "TRUE" : "FALSE";
   }
 
   // Number
-  if (typeof value === 'number') {
+  if (typeof value === "number") {
     // Check for special values
-    if (isNaN(value)) return '#NUM!';
-    if (!isFinite(value)) return value > 0 ? '#DIV/0!' : '#DIV/0!';
+    if (isNaN(value)) return "#NUM!";
+    if (!isFinite(value)) return value > 0 ? "#DIV/0!" : "#DIV/0!";
 
     // ✅ FIX: Check if this number is an Excel date serial
     if (isExcelDateSerial(value, numFmt)) {
-      return formatExcelDate(value, { locale: 'en-US' });
+      return formatExcelDate(value, { locale: "en-US" });
     }
 
     // ✅ FIX: Use formatNumber for proper precision preservation
@@ -202,7 +202,7 @@ export function formatValue(value: any, numFmt?: string | null): string {
 export function hasFormula(cell: any): boolean {
   if (!cell) return false;
   const cellValue = cell.value !== undefined ? cell.value : cell;
-  return typeof cellValue === 'object' && !!cellValue?.formula;
+  return typeof cellValue === "object" && !!cellValue?.formula;
 }
 
 /**
@@ -211,7 +211,7 @@ export function hasFormula(cell: any): boolean {
 export function getFormula(cell: any): string | null {
   if (!cell) return null;
   const cellValue = cell.value !== undefined ? cell.value : cell;
-  if (typeof cellValue === 'object' && cellValue?.formula) {
+  if (typeof cellValue === "object" && cellValue?.formula) {
     return `=${cellValue.formula}`;
   }
   return null;
@@ -221,11 +221,19 @@ export function getFormula(cell: any): string | null {
  * Check if a cell value represents an Excel error
  */
 export function isErrorValue(value: any): boolean {
-  if (typeof value === 'string') {
-    const errorTypes = ['#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '#NUM!', '#N/A', '#NULL!'];
+  if (typeof value === "string") {
+    const errorTypes = [
+      "#DIV/0!",
+      "#VALUE!",
+      "#REF!",
+      "#NAME?",
+      "#NUM!",
+      "#N/A",
+      "#NULL!",
+    ];
     return errorTypes.includes(value);
   }
-  if (typeof value === 'object' && value?.error) {
+  if (typeof value === "object" && value?.error) {
     return true;
   }
   return false;
@@ -235,11 +243,19 @@ export function isErrorValue(value: any): boolean {
  * Get error type from a cell value
  */
 export function getErrorType(value: any): string | null {
-  if (typeof value === 'string') {
-    const errorTypes = ['#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '#NUM!', '#N/A', '#NULL!'];
+  if (typeof value === "string") {
+    const errorTypes = [
+      "#DIV/0!",
+      "#VALUE!",
+      "#REF!",
+      "#NAME?",
+      "#NUM!",
+      "#N/A",
+      "#NULL!",
+    ];
     if (errorTypes.includes(value)) return value;
   }
-  if (typeof value === 'object' && value?.error) {
+  if (typeof value === "object" && value?.error) {
     return value.error;
   }
   return null;

@@ -1,9 +1,9 @@
-import type { Request, Response } from 'express';
-import { randomUUID } from 'crypto';
+import type { Request, Response } from "express";
+import { randomUUID } from "crypto";
 import {
   ConnectorHandlerService,
   type ConnectorHandlerRequest,
-} from '../services/core/handlers/connectorHandler.service';
+} from "../services/core/handlers/connectorHandler.service";
 import {
   getConnector,
   getConnectorCapabilities,
@@ -11,9 +11,9 @@ import {
   listConnectorProviders,
   validateConnectorEnv,
   type ConnectorProvider,
-} from '../services/connectors/connectorsRegistry';
-import { addConnectorSyncJob } from '../queues/connector.queue';
-import { TokenVaultService } from '../services/connectors/tokenVault.service';
+} from "../services/connectors/connectorsRegistry";
+import { addConnectorSyncJob } from "../queues/connector.queue";
+import { TokenVaultService } from "../services/connectors/tokenVault.service";
 
 interface ApiError {
   code: string;
@@ -35,44 +35,58 @@ function sendOk<T>(res: Response, data: T, status = 200): Response<ApiOk<T>> {
   return res.status(status).json({ ok: true, data });
 }
 
-function sendErr(res: Response, code: string, message: string, status = 400, details?: Record<string, unknown>): Response<ApiFail> {
-  return res.status(status).json({ ok: false, error: { code, message, ...(details ? { details } : {}) } });
+function sendErr(
+  res: Response,
+  code: string,
+  message: string,
+  status = 400,
+  details?: Record<string, unknown>,
+): Response<ApiFail> {
+  return res.status(status).json({
+    ok: false,
+    error: { code, message, ...(details ? { details } : {}) },
+  });
 }
 
 function wantsHtml(req: Request): boolean {
-  const accept = String(req.headers.accept || '').toLowerCase();
-  return accept.includes('text/html');
+  const accept = String(req.headers.accept || "").toLowerCase();
+  return accept.includes("text/html");
 }
 
 function escapeHtml(value: string): string {
   return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function escapeJsString(value: string): string {
   return String(value)
-    .replace(/\\/g, '\\\\')
+    .replace(/\\/g, "\\\\")
     .replace(/'/g, "\\'")
-    .replace(/\n/g, '\\n')
-    .replace(/\r/g, '\\r')
-    .replace(/\u2028/g, '\\u2028')
-    .replace(/\u2029/g, '\\u2029');
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
 }
 
-function oauthResultHtml(opts: { provider: string; ok: boolean; title: string; detail?: string }): string {
-  const provider = String(opts.provider || '');
-  const title = String(opts.title || '');
-  const detail = String(opts.detail || '');
+function oauthResultHtml(opts: {
+  provider: string;
+  ok: boolean;
+  title: string;
+  detail?: string;
+}): string {
+  const provider = String(opts.provider || "");
+  const title = String(opts.title || "");
+  const detail = String(opts.detail || "");
   const providerSafe = escapeHtml(provider);
   const titleSafe = escapeHtml(title);
   const detailSafe = escapeHtml(detail);
   const providerJs = escapeJsString(provider);
-  const statusColor = opts.ok ? '#16A34A' : '#DC2626';
-  const statusText = opts.ok ? 'Connected' : 'Failed';
+  const statusColor = opts.ok ? "#16A34A" : "#DC2626";
+  const statusText = opts.ok ? "Connected" : "Failed";
 
   return `<!doctype html>
 <html lang="en">
@@ -116,7 +130,7 @@ function oauthResultHtml(opts: { provider: string; ok: boolean; title: string; d
       var sent = false;
       try {
         if (window.opener && !window.opener.closed) {
-          window.opener.postMessage({ type: 'koda_oauth_done', provider: '${providerJs}', ok: ${opts.ok ? 'true' : 'false'} }, '*');
+          window.opener.postMessage({ type: 'koda_oauth_done', provider: '${providerJs}', ok: ${opts.ok ? "true" : "false"} }, '*');
           try { window.opener.focus(); } catch (e) {}
           sent = true;
         }
@@ -124,7 +138,7 @@ function oauthResultHtml(opts: { provider: string; ok: boolean; title: string; d
       // Fallback: write to localStorage so the parent can detect via 'storage' event.
       // This works even when window.opener is null (cross-origin navigation kills it).
       try {
-        localStorage.setItem('koda_oauth_complete', JSON.stringify({ provider: '${providerJs}', ok: ${opts.ok ? 'true' : 'false'}, t: Date.now() }));
+        localStorage.setItem('koda_oauth_complete', JSON.stringify({ provider: '${providerJs}', ok: ${opts.ok ? "true" : "false"}, t: Date.now() }));
       } catch (e) {}
       function closeSelf() {
         try { window.close(); } catch (e) {}
@@ -139,25 +153,31 @@ function oauthResultHtml(opts: { provider: string; ok: boolean; title: string; d
 </html>`;
 }
 
-function sendOauthHtml(res: Response, statusCode: number, html: string): Response {
+function sendOauthHtml(
+  res: Response,
+  statusCode: number,
+  html: string,
+): Response {
   // OAuth popup callback must be allowed to execute inline completion script
   // and keep window.opener available so the parent can close the popup.
-  res.removeHeader('Content-Security-Policy');
-  res.removeHeader('Cross-Origin-Opener-Policy');
-  res.removeHeader('Cross-Origin-Embedder-Policy');
+  res.removeHeader("Content-Security-Policy");
+  res.removeHeader("Cross-Origin-Opener-Policy");
+  res.removeHeader("Cross-Origin-Embedder-Policy");
   res.setHeader(
-    'Content-Security-Policy',
+    "Content-Security-Policy",
     "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https:; img-src 'self' data: https:; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
   );
-  res.setHeader('Cross-Origin-Opener-Policy', 'unsafe-none');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
-  res.setHeader('Cache-Control', 'no-store, max-age=0');
-  res.status(statusCode).type('html').send(html);
+  res.setHeader("Cross-Origin-Opener-Policy", "unsafe-none");
+  res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
+  res.setHeader("Cache-Control", "no-store, max-age=0");
+  res.status(statusCode).type("html").send(html);
   return res as unknown as Response;
 }
 
 function asString(value: unknown): string | null {
-  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
+    : null;
 }
 
 function userIdFromReq(req: Request): string | null {
@@ -165,23 +185,31 @@ function userIdFromReq(req: Request): string | null {
   return asString(typedReq.user?.id);
 }
 
-function contextFromReq(req: Request): ConnectorHandlerRequest['context'] | null {
+function contextFromReq(
+  req: Request,
+): ConnectorHandlerRequest["context"] | null {
   const userId = userIdFromReq(req);
   if (!userId) return null;
 
   const correlationId =
-    asString(req.headers['x-correlation-id']) ||
-    asString((req.body as Record<string, unknown> | undefined)?.correlationId) ||
+    asString(req.headers["x-correlation-id"]) ||
+    asString(
+      (req.body as Record<string, unknown> | undefined)?.correlationId,
+    ) ||
     randomUUID();
 
   const clientMessageId =
-    asString(req.headers['x-client-message-id']) ||
-    asString((req.body as Record<string, unknown> | undefined)?.clientMessageId) ||
+    asString(req.headers["x-client-message-id"]) ||
+    asString(
+      (req.body as Record<string, unknown> | undefined)?.clientMessageId,
+    ) ||
     randomUUID();
 
   const conversationId =
-    asString(req.headers['x-conversation-id']) ||
-    asString((req.body as Record<string, unknown> | undefined)?.conversationId) ||
+    asString(req.headers["x-conversation-id"]) ||
+    asString(
+      (req.body as Record<string, unknown> | undefined)?.conversationId,
+    ) ||
     `integrations:${userId}`;
 
   return { userId, correlationId, clientMessageId, conversationId };
@@ -189,40 +217,61 @@ function contextFromReq(req: Request): ConnectorHandlerRequest['context'] | null
 
 function mapHandlerError(error: string): { code: string; status: number } {
   const e = error.toLowerCase();
-  if (e.includes('unsupported connector provider')) return { code: 'UNSUPPORTED_PROVIDER', status: 400 };
-  if (e.includes('oauth') && e.includes('not registered')) return { code: 'CONNECTOR_NOT_CONFIGURED', status: 503 };
-  if (e.includes('not registered')) return { code: 'CONNECTOR_NOT_REGISTERED', status: 503 };
-  if (e.includes('invalid connector context')) return { code: 'INVALID_CONTEXT', status: 400 };
-  if (e.includes('queue unavailable')) return { code: 'QUEUE_UNAVAILABLE', status: 503 };
-  if (e.includes('token') || e.includes('expired') || e.includes('refresh')) return { code: 'TOKEN_ERROR', status: 401 };
-  if (e.includes('not authenticated') || e.includes('unauthorized')) return { code: 'AUTH_ERROR', status: 401 };
+  if (e.includes("unsupported connector provider"))
+    return { code: "UNSUPPORTED_PROVIDER", status: 400 };
+  if (e.includes("oauth") && e.includes("not registered"))
+    return { code: "CONNECTOR_NOT_CONFIGURED", status: 503 };
+  if (e.includes("not registered"))
+    return { code: "CONNECTOR_NOT_REGISTERED", status: 503 };
+  if (e.includes("invalid connector context"))
+    return { code: "INVALID_CONTEXT", status: 400 };
+  if (e.includes("queue unavailable"))
+    return { code: "QUEUE_UNAVAILABLE", status: 503 };
+  if (e.includes("token") || e.includes("expired") || e.includes("refresh"))
+    return { code: "TOKEN_ERROR", status: 401 };
+  if (e.includes("not authenticated") || e.includes("unauthorized"))
+    return { code: "AUTH_ERROR", status: 401 };
   // Server-side failures (API errors, sync failures) should be 500, not 400
-  return { code: 'INTEGRATION_ERROR', status: 500 };
+  return { code: "INTEGRATION_ERROR", status: 500 };
 }
 
 export class IntegrationsController {
-  constructor(private readonly connectorHandler: ConnectorHandlerService = new ConnectorHandlerService()) {}
+  constructor(
+    private readonly connectorHandler: ConnectorHandlerService = new ConnectorHandlerService(),
+  ) {}
 
   startConnect = async (req: Request, res: Response): Promise<Response> => {
     const providerRaw = asString(req.params.provider);
     if (!providerRaw || !isConnectorProvider(providerRaw)) {
-      return sendErr(res, 'UNSUPPORTED_PROVIDER', 'Unsupported connector provider.', 400);
+      return sendErr(
+        res,
+        "UNSUPPORTED_PROVIDER",
+        "Unsupported connector provider.",
+        400,
+      );
     }
 
     const context = contextFromReq(req);
-    if (!context) return sendErr(res, 'AUTH_UNAUTHORIZED', 'Not authenticated.', 401);
+    if (!context)
+      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
-    const callbackUrl = asString(req.query.callbackUrl) || asString(req.query.redirectUri);
+    const callbackUrl =
+      asString(req.query.callbackUrl) || asString(req.query.redirectUri);
     const result = await this.connectorHandler.execute({
-      action: 'connect',
+      action: "connect",
       provider: providerRaw,
       context,
       callbackUrl: callbackUrl || undefined,
     });
 
     if (!result.ok) {
-      const mapped = mapHandlerError(result.error || 'integration error');
-      return sendErr(res, mapped.code, result.error || 'Failed to start connector flow.', mapped.status);
+      const mapped = mapHandlerError(result.error || "integration error");
+      return sendErr(
+        res,
+        mapped.code,
+        result.error || "Failed to start connector flow.",
+        mapped.status,
+      );
     }
 
     return sendOk(res, {
@@ -235,7 +284,12 @@ export class IntegrationsController {
   oauthCallback = async (req: Request, res: Response): Promise<Response> => {
     const providerRaw = asString(req.params.provider);
     if (!providerRaw || !isConnectorProvider(providerRaw)) {
-      return sendErr(res, 'UNSUPPORTED_PROVIDER', 'Unsupported connector provider.', 400);
+      return sendErr(
+        res,
+        "UNSUPPORTED_PROVIDER",
+        "Unsupported connector provider.",
+        400,
+      );
     }
 
     const code = asString(req.query.code);
@@ -248,20 +302,34 @@ export class IntegrationsController {
           oauthResultHtml({
             provider: providerRaw,
             ok: false,
-            title: 'Authorization code missing',
-            detail: 'Retry connecting from Allybi.',
+            title: "Authorization code missing",
+            detail: "Retry connecting from Allybi.",
           }),
         );
       }
-      return sendErr(res, 'MISSING_OAUTH_CODE', 'OAuth callback is missing code.', 400);
+      return sendErr(
+        res,
+        "MISSING_OAUTH_CODE",
+        "OAuth callback is missing code.",
+        400,
+      );
     }
 
     try {
-      const connectorModule = await getConnector(providerRaw as ConnectorProvider);
-      const oauthService = connectorModule.oauthService as Record<string, unknown> | undefined;
+      const connectorModule = await getConnector(
+        providerRaw as ConnectorProvider,
+      );
+      const oauthService = connectorModule.oauthService as
+        | Record<string, unknown>
+        | undefined;
 
       if (!oauthService) {
-        return sendErr(res, 'CONNECTOR_NOT_CONFIGURED', 'OAuth service is not configured for this provider.', 503);
+        return sendErr(
+          res,
+          "CONNECTOR_NOT_CONFIGURED",
+          "OAuth service is not configured for this provider.",
+          503,
+        );
       }
 
       const exchangeCode = oauthService.exchangeCode;
@@ -269,39 +337,53 @@ export class IntegrationsController {
       const finalize = oauthService.finalizeConnect;
 
       let callbackResult: unknown;
-      if (typeof handleCallback === 'function') {
+      if (typeof handleCallback === "function") {
         callbackResult = await Promise.resolve(
-          (handleCallback as (payload: Record<string, unknown>) => unknown).call(oauthService, {
+          (
+            handleCallback as (payload: Record<string, unknown>) => unknown
+          ).call(oauthService, {
             code,
             state,
             query: req.query,
           }),
         );
-      } else if (typeof exchangeCode === 'function') {
+      } else if (typeof exchangeCode === "function") {
         callbackResult = await Promise.resolve(
-          (exchangeCode as (payload: Record<string, unknown>) => unknown).call(oauthService, {
-            code,
-            state,
-            query: req.query,
-          }),
+          (exchangeCode as (payload: Record<string, unknown>) => unknown).call(
+            oauthService,
+            {
+              code,
+              state,
+              query: req.query,
+            },
+          ),
         );
 
-        if (typeof finalize === 'function') {
+        if (typeof finalize === "function") {
           callbackResult = await Promise.resolve(
-            (finalize as (payload: Record<string, unknown>) => unknown).call(oauthService, {
-              state,
-              exchange: callbackResult,
-              query: req.query,
-            }),
+            (finalize as (payload: Record<string, unknown>) => unknown).call(
+              oauthService,
+              {
+                state,
+                exchange: callbackResult,
+                query: req.query,
+              },
+            ),
           );
         }
       } else {
-        return sendErr(res, 'CONNECTOR_CALLBACK_NOT_IMPLEMENTED', 'OAuth callback handling is not implemented for this provider.', 501);
+        return sendErr(
+          res,
+          "CONNECTOR_CALLBACK_NOT_IMPLEMENTED",
+          "OAuth callback handling is not implemented for this provider.",
+          501,
+        );
       }
 
       // Auto-sync: enqueue initial email ingestion after successful OAuth connect
-      const callbackUserId = (callbackResult as Record<string, unknown>)?.userId;
-      if (typeof callbackUserId === 'string' && callbackUserId.trim()) {
+      const callbackUserId = (callbackResult as Record<string, unknown>)
+        ?.userId;
+      if (typeof callbackUserId === "string" && callbackUserId.trim()) {
         try {
           await addConnectorSyncJob({
             userId: callbackUserId,
@@ -321,15 +403,22 @@ export class IntegrationsController {
           oauthResultHtml({
             provider: providerRaw,
             ok: true,
-            title: 'You are connected',
-            detail: 'Allybi can now access this connector.',
+            title: "You are connected",
+            detail: "Allybi can now access this connector.",
           }),
         );
       }
 
-      return sendOk(res, { provider: providerRaw, connected: true, result: callbackResult ?? null });
+      return sendOk(res, {
+        provider: providerRaw,
+        connected: true,
+        result: callbackResult ?? null,
+      });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Connector OAuth callback failed.';
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Connector OAuth callback failed.";
       const mapped = mapHandlerError(message);
       if (wantsHtml(req)) {
         return sendOauthHtml(
@@ -338,8 +427,8 @@ export class IntegrationsController {
           oauthResultHtml({
             provider: providerRaw,
             ok: false,
-            title: 'Connection failed',
-            detail: message || 'Something went wrong when authorizing Allybi.',
+            title: "Connection failed",
+            detail: message || "Something went wrong when authorizing Allybi.",
           }),
         );
       }
@@ -349,14 +438,15 @@ export class IntegrationsController {
 
   status = async (req: Request, res: Response): Promise<Response> => {
     const context = contextFromReq(req);
-    if (!context) return sendErr(res, 'AUTH_UNAUTHORIZED', 'Not authenticated.', 401);
+    if (!context)
+      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const providers = listConnectorProviders();
     const providerStatuses = await Promise.all(
       providers.map(async (provider) => {
         try {
           const result = await this.connectorHandler.execute({
-            action: 'status',
+            action: "status",
             provider,
             context,
           });
@@ -377,7 +467,7 @@ export class IntegrationsController {
             capabilities: getConnectorCapabilities(provider),
             env,
             ok: false,
-            error: e instanceof Error ? e.message : 'Status check failed',
+            error: e instanceof Error ? e.message : "Status check failed",
           };
         }
       }),
@@ -389,32 +479,47 @@ export class IntegrationsController {
   sync = async (req: Request, res: Response): Promise<Response> => {
     const providerRaw = asString(req.params.provider);
     if (!providerRaw || !isConnectorProvider(providerRaw)) {
-      return sendErr(res, 'UNSUPPORTED_PROVIDER', 'Unsupported connector provider.', 400);
+      return sendErr(
+        res,
+        "UNSUPPORTED_PROVIDER",
+        "Unsupported connector provider.",
+        400,
+      );
     }
 
     const context = contextFromReq(req);
-    if (!context) return sendErr(res, 'AUTH_UNAUTHORIZED', 'Not authenticated.', 401);
+    if (!context)
+      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
-    const forceResync = Boolean((req.body as Record<string, unknown> | undefined)?.forceResync);
+    const forceResync = Boolean(
+      (req.body as Record<string, unknown> | undefined)?.forceResync,
+    );
 
     let result;
     try {
       result = await this.connectorHandler.execute({
-        action: 'sync',
+        action: "sync",
         provider: providerRaw,
         context,
         forceResync,
       });
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Sync failed unexpectedly';
+      const msg = e instanceof Error ? e.message : "Sync failed unexpectedly";
       console.error(`[Integrations] Sync error for ${providerRaw}:`, msg);
-      return sendErr(res, 'SYNC_FAILED', msg, 500);
+      return sendErr(res, "SYNC_FAILED", msg, 500);
     }
 
     if (!result.ok) {
-      const mapped = mapHandlerError(result.error || 'sync failed');
-      console.warn(`[Integrations] Sync failed for ${providerRaw}: ${result.error}`);
-      return sendErr(res, mapped.code, result.error || 'Failed to schedule sync.', mapped.status);
+      const mapped = mapHandlerError(result.error || "sync failed");
+      console.warn(
+        `[Integrations] Sync failed for ${providerRaw}: ${result.error}`,
+      );
+      return sendErr(
+        res,
+        mapped.code,
+        result.error || "Failed to schedule sync.",
+        mapped.status,
+      );
     }
 
     return sendOk(res, {
@@ -426,20 +531,34 @@ export class IntegrationsController {
   search = async (req: Request, res: Response): Promise<Response> => {
     const providerRaw = asString(req.params.provider);
     if (!providerRaw || !isConnectorProvider(providerRaw)) {
-      return sendErr(res, 'UNSUPPORTED_PROVIDER', 'Unsupported connector provider.', 400);
+      return sendErr(
+        res,
+        "UNSUPPORTED_PROVIDER",
+        "Unsupported connector provider.",
+        400,
+      );
     }
 
     const context = contextFromReq(req);
-    if (!context) return sendErr(res, 'AUTH_UNAUTHORIZED', 'Not authenticated.', 401);
+    if (!context)
+      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
-    const query = asString(req.query.q) || asString((req.body as Record<string, unknown> | undefined)?.query);
-    if (!query) return sendErr(res, 'QUERY_REQUIRED', 'Search query is required.', 400);
+    const query =
+      asString(req.query.q) ||
+      asString((req.body as Record<string, unknown> | undefined)?.query);
+    if (!query)
+      return sendErr(res, "QUERY_REQUIRED", "Search query is required.", 400);
 
-    const limitRaw = Number(asString(req.query.limit) || (req.body as Record<string, unknown> | undefined)?.limit);
-    const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(Math.floor(limitRaw), 1), 50) : 10;
+    const limitRaw = Number(
+      asString(req.query.limit) ||
+        (req.body as Record<string, unknown> | undefined)?.limit,
+    );
+    const limit = Number.isFinite(limitRaw)
+      ? Math.min(Math.max(Math.floor(limitRaw), 1), 50)
+      : 10;
 
     const result = await this.connectorHandler.execute({
-      action: 'search',
+      action: "search",
       provider: providerRaw,
       context,
       query,
@@ -447,8 +566,13 @@ export class IntegrationsController {
     });
 
     if (!result.ok) {
-      const mapped = mapHandlerError(result.error || 'search failed');
-      return sendErr(res, mapped.code, result.error || 'Connector search failed.', mapped.status);
+      const mapped = mapHandlerError(result.error || "search failed");
+      return sendErr(
+        res,
+        mapped.code,
+        result.error || "Connector search failed.",
+        mapped.status,
+      );
     }
 
     return sendOk(res, {
@@ -461,23 +585,35 @@ export class IntegrationsController {
   send = async (req: Request, res: Response): Promise<Response> => {
     const providerRaw = asString(req.params.provider);
     if (!providerRaw || !isConnectorProvider(providerRaw)) {
-      return sendErr(res, 'UNSUPPORTED_PROVIDER', 'Unsupported connector provider.', 400);
+      return sendErr(
+        res,
+        "UNSUPPORTED_PROVIDER",
+        "Unsupported connector provider.",
+        400,
+      );
     }
 
     const context = contextFromReq(req);
-    if (!context) return sendErr(res, 'AUTH_UNAUTHORIZED', 'Not authenticated.', 401);
+    if (!context)
+      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const body = (req.body || {}) as Record<string, unknown>;
     const to = asString(body.to);
-    const subject = asString(body.subject) || '';
-    const emailBody = asString(body.body) || '';
+    const subject = asString(body.subject) || "";
+    const emailBody = asString(body.body) || "";
     const cc = asString(body.cc) || undefined;
     const bcc = asString(body.bcc) || undefined;
 
-    if (!to) return sendErr(res, 'RECIPIENT_REQUIRED', 'Recipient (to) is required.', 400);
+    if (!to)
+      return sendErr(
+        res,
+        "RECIPIENT_REQUIRED",
+        "Recipient (to) is required.",
+        400,
+      );
 
     const result = await this.connectorHandler.execute({
-      action: 'send',
+      action: "send",
       provider: providerRaw,
       context,
       to,
@@ -488,8 +624,13 @@ export class IntegrationsController {
     });
 
     if (!result.ok) {
-      const mapped = mapHandlerError(result.error || 'send failed');
-      return sendErr(res, mapped.code, result.error || 'Failed to send email.', mapped.status);
+      const mapped = mapHandlerError(result.error || "send failed");
+      return sendErr(
+        res,
+        mapped.code,
+        result.error || "Failed to send email.",
+        mapped.status,
+      );
     }
 
     return sendOk(res, {
@@ -501,23 +642,34 @@ export class IntegrationsController {
   disconnect = async (req: Request, res: Response): Promise<Response> => {
     const providerRaw = asString(req.params.provider);
     if (!providerRaw || !isConnectorProvider(providerRaw)) {
-      return sendErr(res, 'UNSUPPORTED_PROVIDER', 'Unsupported connector provider.', 400);
+      return sendErr(
+        res,
+        "UNSUPPORTED_PROVIDER",
+        "Unsupported connector provider.",
+        400,
+      );
     }
 
     const context = contextFromReq(req);
-    if (!context) return sendErr(res, 'AUTH_UNAUTHORIZED', 'Not authenticated.', 401);
+    if (!context)
+      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     try {
       const vault = new TokenVaultService();
       await vault.deleteToken(context.userId, providerRaw as ConnectorProvider);
       return sendOk(res, { provider: providerRaw, disconnected: true });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to disconnect provider.';
-      return sendErr(res, 'DISCONNECT_FAILED', message, 500);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to disconnect provider.";
+      return sendErr(res, "DISCONNECT_FAILED", message, 500);
     }
   };
 }
 
-export function createIntegrationsController(handler?: ConnectorHandlerService): IntegrationsController {
+export function createIntegrationsController(
+  handler?: ConnectorHandlerService,
+): IntegrationsController {
   return new IntegrationsController(handler ?? new ConnectorHandlerService());
 }

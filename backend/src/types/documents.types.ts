@@ -5,38 +5,38 @@
  */
 
 export type DocumentType =
-  | 'pdf'
-  | 'docx'
-  | 'pptx'
-  | 'xlsx'
-  | 'csv'
-  | 'txt'
-  | 'image'
-  | 'unknown';
+  | "pdf"
+  | "docx"
+  | "pptx"
+  | "xlsx"
+  | "csv"
+  | "txt"
+  | "image"
+  | "unknown";
 
 export type DocMimeType =
-  | 'application/pdf'
-  | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-  | 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-  | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  | 'text/csv'
-  | 'text/plain'
-  | 'image/png'
-  | 'image/jpeg'
-  | 'image/webp'
+  | "application/pdf"
+  | "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  | "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+  | "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  | "text/csv"
+  | "text/plain"
+  | "image/png"
+  | "image/jpeg"
+  | "image/webp"
   | string;
 
 export type DocExtension =
-  | '.pdf'
-  | '.docx'
-  | '.pptx'
-  | '.xlsx'
-  | '.csv'
-  | '.txt'
-  | '.png'
-  | '.jpg'
-  | '.jpeg'
-  | '.webp';
+  | ".pdf"
+  | ".docx"
+  | ".pptx"
+  | ".xlsx"
+  | ".csv"
+  | ".txt"
+  | ".png"
+  | ".jpg"
+  | ".jpeg"
+  | ".webp";
 
 /**
  * Conversation State Types (ChatGPT-parity, stable runtime contract)
@@ -282,7 +282,9 @@ export interface ConversationState {
 /**
  * Create a minimal initialized state.
  */
-export function createInitialConversationState(env: EnvName): ConversationState {
+export function createInitialConversationState(
+  env: EnvName,
+): ConversationState {
   return {
     session: { env, sessionId: null, userLanguage: "any" },
     persistent: {

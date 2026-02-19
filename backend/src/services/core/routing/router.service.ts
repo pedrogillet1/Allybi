@@ -42,7 +42,7 @@ import type { LanguageCode } from "../../../types/intents.types";
 import queryRewriterModule from "./queryRewriter.service";
 const getQueryRewriter = (): any => ({
   rewrite: (input: any) => ({
-    rewrittenText: input?.text ?? '',
+    rewrittenText: input?.text ?? "",
     hints: {},
   }),
   ...queryRewriterModule,
@@ -103,7 +103,13 @@ export interface RoutingDecision {
 
   // Formatting / behavior constraints for composer and render policy
   constraints: {
-    outputShape?: "paragraph" | "bullets" | "numbered_list" | "table" | "file_list" | "button_only";
+    outputShape?:
+      | "paragraph"
+      | "bullets"
+      | "numbered_list"
+      | "table"
+      | "file_list"
+      | "button_only";
     exactBulletCount?: number;
     maxSentences?: number;
     requireTable?: boolean;
@@ -119,7 +125,11 @@ export interface RoutingDecision {
   trace?: {
     matchedIntentPatterns?: string[];
     matchedOperatorTriggers?: string[];
-    operatorScoreTop?: Array<{ operator: string; score: number; reasons: string[] }>;
+    operatorScoreTop?: Array<{
+      operator: string;
+      score: number;
+      reasons: string[];
+    }>;
     answerModeReason?: string;
   };
 }
@@ -132,7 +142,11 @@ type RegexEntry = { id: string; pattern: string; weight?: number };
 
 type IntentPatternsBank = {
   _meta: any;
-  config?: { enabled?: boolean; caseInsensitive?: boolean; stripDiacritics?: boolean };
+  config?: {
+    enabled?: boolean;
+    caseInsensitive?: boolean;
+    stripDiacritics?: boolean;
+  };
   families: Array<{
     id: string; // intent family
     weight?: number;
@@ -176,9 +190,13 @@ type TriggerBank = {
   }>;
 };
 
-function normalizeText(input: string, opts: { stripDiacritics: boolean; collapseWhitespace: boolean }): string {
+function normalizeText(
+  input: string,
+  opts: { stripDiacritics: boolean; collapseWhitespace: boolean },
+): string {
   let t = input ?? "";
-  if (opts.stripDiacritics) t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (opts.stripDiacritics)
+    t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   if (opts.collapseWhitespace) t = t.replace(/\s+/g, " ");
   return t.trim();
 }
@@ -187,7 +205,10 @@ function toLang(userPrefsLang?: LanguageCode): LanguageCode {
   return (userPrefsLang || "en") as LanguageCode;
 }
 
-function compileRegex(pattern: string, caseInsensitive: boolean): RegExp | null {
+function compileRegex(
+  pattern: string,
+  caseInsensitive: boolean,
+): RegExp | null {
   try {
     return new RegExp(pattern, caseInsensitive ? "i" : undefined);
   } catch {
@@ -248,22 +269,63 @@ export class RouterService {
 
     const language = toLang(input.userPrefs?.language);
     const raw = input.userText || "";
-    const normalized = normalizeText(raw, { stripDiacritics: true, collapseWhitespace: true });
+    const normalized = normalizeText(raw, {
+      stripDiacritics: true,
+      collapseWhitespace: true,
+    });
 
     // 1) Trigger signals (bank-driven, cheap)
     const signals: Record<string, any> = { ...(input.signals || {}) };
     const matchedTriggers: string[] = [];
 
-    this.applyTriggerBank(this.triggersLanguage, normalized, language, signals, matchedTriggers);
-    this.applyTriggerBank(this.triggersNav, normalized, language, signals, matchedTriggers);
-    this.applyTriggerBank(this.triggersFormat, normalized, language, signals, matchedTriggers);
-    this.applyTriggerBank(this.triggersOperator, normalized, language, signals, matchedTriggers);
-    this.applyTriggerBank(this.triggersIntent, normalized, language, signals, matchedTriggers);
-    this.applyTriggerBank(this.triggersDomain, normalized, language, signals, matchedTriggers);
+    this.applyTriggerBank(
+      this.triggersLanguage,
+      normalized,
+      language,
+      signals,
+      matchedTriggers,
+    );
+    this.applyTriggerBank(
+      this.triggersNav,
+      normalized,
+      language,
+      signals,
+      matchedTriggers,
+    );
+    this.applyTriggerBank(
+      this.triggersFormat,
+      normalized,
+      language,
+      signals,
+      matchedTriggers,
+    );
+    this.applyTriggerBank(
+      this.triggersOperator,
+      normalized,
+      language,
+      signals,
+      matchedTriggers,
+    );
+    this.applyTriggerBank(
+      this.triggersIntent,
+      normalized,
+      language,
+      signals,
+      matchedTriggers,
+    );
+    this.applyTriggerBank(
+      this.triggersDomain,
+      normalized,
+      language,
+      signals,
+      matchedTriggers,
+    );
 
     // 2) Follow-up detection (via state continuity signals)
     // Follow-up detection is handled by state signals from prior turns
-    signals.isFollowup = !!(input.state?.activeDocRef?.docId || input.signals?.isFollowup);
+    signals.isFollowup = !!(
+      input.state?.activeDocRef?.docId || input.signals?.isFollowup
+    );
     signals.followupConfidence = signals.isFollowup ? 0.7 : 0;
 
     // 3) Query rewrite (extract doc refs, time, numeric, format hints)
@@ -284,8 +346,10 @@ export class RouterService {
     }
 
     // Convenience signals from hints
-    signals.hasExplicitDocRef =
-      !!(query?.hints?.docRefs?.docIds?.length || query?.hints?.docRefs?.filenames?.length);
+    signals.hasExplicitDocRef = !!(
+      query?.hints?.docRefs?.docIds?.length ||
+      query?.hints?.docRefs?.filenames?.length
+    );
 
     // 4) Intent family detection (bank-driven)
     const intentFamily = this.detectIntentFamily(normalized, language, signals);
@@ -293,18 +357,18 @@ export class RouterService {
     // 5) Operator resolution (bank-driven, with negatives + priority)
     const operatorResolver = getOperatorResolver?.();
     let operator = "qa";
-    let operatorTrace: Array<{ operator: string; score: number; reasons: string[] }> | undefined;
+    let operatorTrace:
+      | Array<{ operator: string; score: number; reasons: string[] }>
+      | undefined;
 
     if (operatorResolver?.resolve) {
-      const resolved = operatorResolver.resolve(
-        query.rewrittenText,
-        language,
-      );
+      const resolved = operatorResolver.resolve(query.rewrittenText, language);
 
       operator = resolved?.operator || operator;
       operatorTrace = (resolved as any)?.trace;
       // merge in resolver signals if provided
-      if ((resolved as any)?.signals) Object.assign(signals, (resolved as any).signals);
+      if ((resolved as any)?.signals)
+        Object.assign(signals, (resolved as any).signals);
     } else {
       // minimal fallback if resolver service missing
       operator = this.minimalOperatorHeuristic(intentFamily, signals);
@@ -336,7 +400,10 @@ export class RouterService {
       if (this.isNavOperator(operator) || signals.navQuery) {
         answerMode = "nav_pills";
         answerModeReason = "nav_fallback";
-      } else if ((input.docContext?.docCount || 0) > 0 && intentFamily === "documents") {
+      } else if (
+        (input.docContext?.docCount || 0) > 0 &&
+        intentFamily === "documents"
+      ) {
         answerMode = "doc_grounded_single";
         answerModeReason = "docs_available";
       }
@@ -388,9 +455,16 @@ export class RouterService {
   // Intent family detection
   // ---------------------------------------------------------------------------
 
-  private detectIntentFamily(normalized: string, lang: LanguageCode, signals: Record<string, any>): string {
+  private detectIntentFamily(
+    normalized: string,
+    lang: LanguageCode,
+    signals: Record<string, any>,
+  ): string {
     // If triggers already pinned intent family, trust it
-    if (typeof signals.intentFamily === "string" && signals.intentFamily.length) {
+    if (
+      typeof signals.intentFamily === "string" &&
+      signals.intentFamily.length
+    ) {
       return signals.intentFamily;
     }
 
@@ -403,10 +477,16 @@ export class RouterService {
     }
 
     const caseInsensitive = bank.config?.caseInsensitive !== false;
-    const matches: Array<{ family: string; score: number; matchIds: string[] }> = [];
+    const matches: Array<{
+      family: string;
+      score: number;
+      matchIds: string[];
+    }> = [];
 
     for (const fam of bank.families) {
-      const triggers = (fam.triggers?.[lang] || fam.triggers?.en || []) as RegexEntry[];
+      const triggers = (fam.triggers?.[lang] ||
+        fam.triggers?.en ||
+        []) as RegexEntry[];
       let score = 0;
       const matchIds: string[] = [];
       for (const t of triggers) {
@@ -417,7 +497,12 @@ export class RouterService {
           matchIds.push(t.id);
         }
       }
-      if (score > 0) matches.push({ family: fam.id, score: score * (fam.weight ?? 1), matchIds });
+      if (score > 0)
+        matches.push({
+          family: fam.id,
+          score: score * (fam.weight ?? 1),
+          matchIds,
+        });
     }
 
     matches.sort((a, b) => b.score - a.score);
@@ -439,7 +524,7 @@ export class RouterService {
     normalized: string,
     lang: LanguageCode,
     signals: Record<string, any>,
-    matchedIds: string[]
+    matchedIds: string[],
   ): void {
     if (!bank?.config?.enabled && bank?.config?.enabled !== undefined) return;
     if (!bank?.triggers?.length) return;
@@ -475,7 +560,7 @@ export class RouterService {
     raw: string,
     signals: Record<string, any>,
     query: QueryRewriteOutput,
-    operator: string
+    operator: string,
   ): RoutingDecision["constraints"] {
     const constraints: RoutingDecision["constraints"] = {};
 
@@ -513,7 +598,10 @@ export class RouterService {
     }
 
     // Default followups (ChatGPT-like: 0–1)
-    constraints.maxFollowups = typeof constraints.maxFollowups === "number" ? constraints.maxFollowups : 1;
+    constraints.maxFollowups =
+      typeof constraints.maxFollowups === "number"
+        ? constraints.maxFollowups
+        : 1;
 
     return constraints;
   }
@@ -532,7 +620,10 @@ export class RouterService {
   // Minimal fallbacks
   // ---------------------------------------------------------------------------
 
-  private minimalOperatorHeuristic(intentFamily: string, signals: Record<string, any>): string {
+  private minimalOperatorHeuristic(
+    intentFamily: string,
+    signals: Record<string, any>,
+  ): string {
     if (signals.isConversationOnly) return "conversation";
     if (signals.discoveryQuery) return "locate_docs";
     if (signals.navQuery) return "open";
@@ -542,7 +633,12 @@ export class RouterService {
   }
 
   private isNavOperator(operator: string): boolean {
-    return operator === "open" || operator === "locate_file" || operator === "locate_docs" || operator === "where";
+    return (
+      operator === "open" ||
+      operator === "locate_file" ||
+      operator === "locate_docs" ||
+      operator === "where"
+    );
   }
 }
 

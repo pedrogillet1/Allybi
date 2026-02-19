@@ -63,7 +63,8 @@ const PATTERNS = {
   inlineCode: /`[^`]+`/g,
 
   // Unsafe content
-  rawHtml: /<(?:script|iframe|object|embed|form|input|button|select|textarea|style|link|meta|base)[^>]*>/gi,
+  rawHtml:
+    /<(?:script|iframe|object|embed|form|input|button|select|textarea|style|link|meta|base)[^>]*>/gi,
   htmlTags: /<\/?[a-z][^>]*>/gi,
 
   // Bold/italic
@@ -107,28 +108,28 @@ export class MarkdownNormalizerService {
     const beforeHtml = result;
     result = this.stripRawHtml(result);
     if (result !== beforeHtml) {
-      repairs.push('STRIPPED_RAW_HTML');
+      repairs.push("STRIPPED_RAW_HTML");
     }
 
     // 2. Normalize paragraph spacing
     const beforeSpacing = result;
     result = this.normalizeSpacing(result, maxConsecutiveNewlines);
     if (result !== beforeSpacing) {
-      repairs.push('NORMALIZED_SPACING');
+      repairs.push("NORMALIZED_SPACING");
     }
 
     // 3. Fix bullet format
     const beforeBullets = result;
     result = this.normalizeBullets(result);
     if (result !== beforeBullets) {
-      repairs.push('NORMALIZED_BULLETS');
+      repairs.push("NORMALIZED_BULLETS");
     }
 
     // 4. Fix numbered list format
     const beforeNumbered = result;
     result = this.normalizeNumberedLists(result);
     if (result !== beforeNumbered) {
-      repairs.push('NORMALIZED_NUMBERED_LISTS');
+      repairs.push("NORMALIZED_NUMBERED_LISTS");
     }
 
     // 5. Validate tables
@@ -136,7 +137,7 @@ export class MarkdownNormalizerService {
       const tableResult = this.validateTables(result);
       result = tableResult.text;
       if (tableResult.repaired) {
-        repairs.push('REPAIRED_TABLE');
+        repairs.push("REPAIRED_TABLE");
       }
       if (tableResult.warning) {
         warnings.push(tableResult.warning);
@@ -147,7 +148,7 @@ export class MarkdownNormalizerService {
     const beforeDashes = result;
     result = this.sanitizeExcessiveDashes(result);
     if (result !== beforeDashes) {
-      repairs.push('SANITIZED_EXCESSIVE_DASHES');
+      repairs.push("SANITIZED_EXCESSIVE_DASHES");
     }
 
     // 7. Check for unbalanced markers
@@ -157,28 +158,36 @@ export class MarkdownNormalizerService {
     }
     if (balanceResult.repaired) {
       result = balanceResult.text;
-      repairs.push('FIXED_UNBALANCED_MARKERS');
+      repairs.push("FIXED_UNBALANCED_MARKERS");
     }
 
     // 8. CHATGPT-PARITY: Enforce short paragraphs
-    const paraResult = this.enforceShortParagraphs(result, maxSentencesPerParagraph, maxCharsPerParagraph);
+    const paraResult = this.enforceShortParagraphs(
+      result,
+      maxSentencesPerParagraph,
+      maxCharsPerParagraph,
+    );
     if (paraResult.repaired) {
       result = paraResult.text;
-      repairs.push('SPLIT_LONG_PARAGRAPHS');
+      repairs.push("SPLIT_LONG_PARAGRAPHS");
     }
 
     // 9. CHATGPT-PARITY: Enforce bullet limits (1-3 sentences per bullet)
-    const bulletResult = this.enforceBulletLimits(result, maxSentencesPerBullet, maxCharsPerBullet);
+    const bulletResult = this.enforceBulletLimits(
+      result,
+      maxSentencesPerBullet,
+      maxCharsPerBullet,
+    );
     if (bulletResult.repaired) {
       result = bulletResult.text;
-      repairs.push('SPLIT_LONG_BULLETS');
+      repairs.push("SPLIT_LONG_BULLETS");
     }
 
     // 10. PROSE-FIRST: Convert excessive bullet blocks (4+ consecutive) into paragraphs
     const proseResult = this.collapseBulletsToProse(result);
     if (proseResult.repaired) {
       result = proseResult.text;
-      repairs.push('COLLAPSED_BULLETS_TO_PROSE');
+      repairs.push("COLLAPSED_BULLETS_TO_PROSE");
     }
 
     // Restore code blocks
@@ -199,13 +208,13 @@ export class MarkdownNormalizerService {
    */
   private stripRawHtml(text: string): string {
     // Remove dangerous tags entirely (script, iframe, etc.)
-    let result = text.replace(PATTERNS.rawHtml, '');
+    let result = text.replace(PATTERNS.rawHtml, "");
 
     // Convert <br> to newline (keeps natural layout)
-    result = result.replace(/<br\s*\/?>/gi, '\n');
+    result = result.replace(/<br\s*\/?>/gi, "\n");
 
     // Remove remaining tags but keep inner text (except <br> which is already handled)
-    result = result.replace(/<\/?(?!br\b)[a-z][^>]*>/gi, '');
+    result = result.replace(/<\/?(?!br\b)[a-z][^>]*>/gi, "");
 
     return result;
   }
@@ -216,7 +225,7 @@ export class MarkdownNormalizerService {
    */
   private normalizeSpacing(text: string, maxNewlines: number): string {
     // Remove trailing whitespace first
-    const lines = text.replace(PATTERNS.trailingWhitespace, '').split('\n');
+    const lines = text.replace(PATTERNS.trailingWhitespace, "").split("\n");
 
     const out: string[] = [];
     let blankRun = 0;
@@ -224,7 +233,7 @@ export class MarkdownNormalizerService {
 
     const isTableLine = (l: string) => {
       const t = l.trim();
-      return t.startsWith('|') && t.endsWith('|');
+      return t.startsWith("|") && t.endsWith("|");
     };
 
     for (const line of lines) {
@@ -232,19 +241,19 @@ export class MarkdownNormalizerService {
 
       // Track table blocks (keep their internal spacing intact)
       if (isTableLine(line)) inTable = true;
-      else if (inTable && trimmed === '') {
+      else if (inTable && trimmed === "") {
         // Allow blank line after a table, but exit table state
         inTable = false;
       }
 
-      if (trimmed === '') {
+      if (trimmed === "") {
         blankRun++;
 
         // Inside tables, preserve exactly one blank line max (don't collapse structure)
         if (inTable) {
-          if (blankRun <= 1) out.push('');
+          if (blankRun <= 1) out.push("");
         } else {
-          if (blankRun <= maxNewlines) out.push('');
+          if (blankRun <= maxNewlines) out.push("");
         }
         continue;
       }
@@ -254,10 +263,10 @@ export class MarkdownNormalizerService {
     }
 
     // Trim leading/trailing empty lines only
-    while (out.length && out[0].trim() === '') out.shift();
-    while (out.length && out[out.length - 1].trim() === '') out.pop();
+    while (out.length && out[0].trim() === "") out.shift();
+    while (out.length && out[out.length - 1].trim() === "") out.pop();
 
-    return out.join('\n');
+    return out.join("\n");
   }
 
   /**
@@ -267,28 +276,28 @@ export class MarkdownNormalizerService {
     let result = text;
 
     // Convert * bullets to - bullets
-    result = result.replace(PATTERNS.starBullet, '- ');
+    result = result.replace(PATTERNS.starBullet, "- ");
 
     // Convert + bullets to - bullets
-    result = result.replace(PATTERNS.plusBullet, '- ');
+    result = result.replace(PATTERNS.plusBullet, "- ");
 
     // Convert unicode bullet (•) to dash
-    result = result.replace(/^•\s+/gm, '- ');
-    result = result.replace(/^\s+•\s+/gm, '  - ');
+    result = result.replace(/^•\s+/gm, "- ");
+    result = result.replace(/^\s+•\s+/gm, "  - ");
 
     // FIX: Collapse nested/repeated bullet markers (• •, - -, * *, etc.)
     // This handles "• • item" -> "- item" and "- - item" -> "- item"
-    result = result.replace(/^[-•*+]\s+[-•*+]\s+/gm, '- ');
-    result = result.replace(/^\s+[-•*+]\s+[-•*+]\s+/gm, '  - ');
+    result = result.replace(/^[-•*+]\s+[-•*+]\s+/gm, "- ");
+    result = result.replace(/^\s+[-•*+]\s+[-•*+]\s+/gm, "  - ");
 
     // Also collapse triple or more nested markers
-    result = result.replace(/^([-•*+]\s+){2,}/gm, '- ');
+    result = result.replace(/^([-•*+]\s+){2,}/gm, "- ");
 
     // Remove empty bullets
-    result = result.replace(PATTERNS.emptyBullet, '');
+    result = result.replace(PATTERNS.emptyBullet, "");
 
     // Clean up resulting double newlines
-    result = result.replace(/\n{3,}/g, '\n\n');
+    result = result.replace(/\n{3,}/g, "\n\n");
 
     return result;
   }
@@ -300,9 +309,9 @@ export class MarkdownNormalizerService {
    */
   private normalizeNumberedLists(text: string): string {
     // Remove empty numbered items
-    let result = text.replace(PATTERNS.emptyNumbered, '');
+    let result = text.replace(PATTERNS.emptyNumbered, "");
 
-    const lines = result.split('\n');
+    const lines = result.split("\n");
 
     let i = 0;
     while (i < lines.length) {
@@ -328,7 +337,9 @@ export class MarkdownNormalizerService {
 
       // Decide whether to resequence (only if clearly inconsistent)
       // Strictly increasing = natural numbering, don't touch
-      const isStrictInc = nums.every((n, idx) => idx === 0 || n === nums[idx - 1] + 1);
+      const isStrictInc = nums.every(
+        (n, idx) => idx === 0 || n === nums[idx - 1] + 1,
+      );
       const hasWeirdJumps = nums.length >= 2 && !isStrictInc;
 
       if (hasWeirdJumps) {
@@ -340,7 +351,7 @@ export class MarkdownNormalizerService {
       // Continue scanning (i is already advanced)
     }
 
-    return lines.join('\n');
+    return lines.join("\n");
   }
 
   /**
@@ -348,8 +359,12 @@ export class MarkdownNormalizerService {
    * - Fixes malformed separators (em-dashes, spaced dashes)
    * - Ensures proper GFM table format
    */
-  private validateTables(text: string): { text: string; repaired: boolean; warning?: string } {
-    let lines = text.split('\n');
+  private validateTables(text: string): {
+    text: string;
+    repaired: boolean;
+    warning?: string;
+  } {
+    let lines = text.split("\n");
     let repaired = false;
     let warning: string | undefined;
 
@@ -361,29 +376,34 @@ export class MarkdownNormalizerService {
 
       // Pattern 1: "— — —" or "--- --- ---" (spaced dashes without pipes)
       // This appears after a table header line
-      const isMalformedSeparator = /^[-—–]+(\s+[-—–]+)+\s*$/.test(trimmed) ||
-                                    /^[\s|]*[-—–]{2,}[\s|]*$/.test(trimmed);
+      const isMalformedSeparator =
+        /^[-—–]+(\s+[-—–]+)+\s*$/.test(trimmed) ||
+        /^[\s|]*[-—–]{2,}[\s|]*$/.test(trimmed);
 
       if (isMalformedSeparator && i > 0) {
         // Check if previous line looks like a table header
         const prevLine = lines[i - 1].trim();
-        if (prevLine.startsWith('|') && prevLine.endsWith('|')) {
+        if (prevLine.startsWith("|") && prevLine.endsWith("|")) {
           // Count columns from header
           const colCount = (prevLine.match(/\|/g) || []).length - 1;
           // Replace with proper GFM separator
-          lines[i] = '|' + ' --- |'.repeat(colCount);
+          lines[i] = "|" + " --- |".repeat(colCount);
           repaired = true;
         }
       }
 
       // Pattern 2: "| — | — |" (em-dashes inside pipes)
       // Convert em-dashes and en-dashes to regular dashes in separator rows
-      if (trimmed.startsWith('|') && trimmed.endsWith('|') && /[—–]/.test(trimmed)) {
+      if (
+        trimmed.startsWith("|") &&
+        trimmed.endsWith("|") &&
+        /[—–]/.test(trimmed)
+      ) {
         // Check if this looks like a separator (mostly dashes, colons, pipes, spaces)
         const withoutPipes = trimmed.slice(1, -1);
         if (/^[\s—–:-]+$/.test(withoutPipes)) {
           // Replace em/en dashes with regular dashes
-          lines[i] = trimmed.replace(/[—–]/g, '-');
+          lines[i] = trimmed.replace(/[—–]/g, "-");
           repaired = true;
         }
       }
@@ -396,7 +416,7 @@ export class MarkdownNormalizerService {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
-      const isTableRow = line.startsWith('|') && line.endsWith('|');
+      const isTableRow = line.startsWith("|") && line.endsWith("|");
 
       if (isTableRow && !inTable) {
         // Start of table
@@ -404,7 +424,7 @@ export class MarkdownNormalizerService {
         tableStart = i;
         headerColCount = (line.match(/\|/g) || []).length - 1;
       } else if (inTable) {
-        if (!isTableRow && line !== '') {
+        if (!isTableRow && line !== "") {
           // End of table (non-empty non-table line)
           inTable = false;
           tableStart = -1;
@@ -412,12 +432,12 @@ export class MarkdownNormalizerService {
           // Check column count consistency
           const colCount = (line.match(/\|/g) || []).length - 1;
           if (colCount !== headerColCount) {
-            warning = 'TABLE_COLUMN_COUNT_MISMATCH';
+            warning = "TABLE_COLUMN_COUNT_MISMATCH";
             // Try to fix by adjusting pipes
             const diff = headerColCount - colCount;
             if (diff > 0) {
               // Add missing pipes
-              lines[i] = line.slice(0, -1) + ' |'.repeat(diff) + '|';
+              lines[i] = line.slice(0, -1) + " |".repeat(diff) + "|";
               repaired = true;
             }
           }
@@ -426,7 +446,7 @@ export class MarkdownNormalizerService {
           if (i === tableStart + 1) {
             if (!PATTERNS.tableSeparator.test(line)) {
               // Insert separator row
-              const separator = '|' + ' --- |'.repeat(headerColCount);
+              const separator = "|" + " --- |".repeat(headerColCount);
               lines.splice(i, 0, separator);
               repaired = true;
               i++; // Skip the inserted line
@@ -436,7 +456,7 @@ export class MarkdownNormalizerService {
       }
     }
 
-    return { text: lines.join('\n'), repaired, warning };
+    return { text: lines.join("\n"), repaired, warning };
   }
 
   /**
@@ -446,7 +466,7 @@ export class MarkdownNormalizerService {
    * - Removes >3 consecutive separator-like lines
    */
   private sanitizeExcessiveDashes(text: string): string {
-    const lines = text.split('\n');
+    const lines = text.split("\n");
     const result: string[] = [];
     let dashRunCount = 0;
     let lastWasDashLine = false;
@@ -468,7 +488,7 @@ export class MarkdownNormalizerService {
         // Only allow 1 dash separator line in a row, skip the rest
         if (dashRunCount <= 1) {
           // Convert to a simple HR (3 dashes) for consistency
-          result.push('---');
+          result.push("---");
         }
         lastWasDashLine = true;
         continue;
@@ -493,14 +513,18 @@ export class MarkdownNormalizerService {
       result.push(line);
     }
 
-    return result.join('\n');
+    return result.join("\n");
   }
 
   /**
    * Check for unbalanced markdown markers - SOFT REPAIR
    * Only repairs trailing orphan markers, lets regen handle complex cases
    */
-  private checkMarkerBalance(text: string): { text: string; repaired: boolean; warning?: string } {
+  private checkMarkerBalance(text: string): {
+    text: string;
+    repaired: boolean;
+    warning?: string;
+  } {
     let result = text;
     let repaired = false;
     let warning: string | undefined;
@@ -508,9 +532,9 @@ export class MarkdownNormalizerService {
     // Check bold markers (**)
     const boldCount = (result.match(PATTERNS.boldMarker) || []).length;
     if (boldCount % 2 !== 0) {
-      warning = 'UNBALANCED_BOLD_MARKERS';
+      warning = "UNBALANCED_BOLD_MARKERS";
       // Soft repair: only remove if it ends with an orphan marker
-      if (result.trim().endsWith('**')) {
+      if (result.trim().endsWith("**")) {
         result = result.trim().slice(0, -2);
         repaired = true;
       }
@@ -520,9 +544,11 @@ export class MarkdownNormalizerService {
     // Check code fence balance (```)
     const fenceCount = (result.match(PATTERNS.codeFence) || []).length;
     if (fenceCount % 2 !== 0) {
-      warning = warning ? `${warning}, UNBALANCED_CODE_FENCES` : 'UNBALANCED_CODE_FENCES';
+      warning = warning
+        ? `${warning}, UNBALANCED_CODE_FENCES`
+        : "UNBALANCED_CODE_FENCES";
       // Append closing fence (this is safe repair)
-      result = result + '\n```';
+      result = result + "\n```";
       repaired = true;
     }
 
@@ -532,19 +558,37 @@ export class MarkdownNormalizerService {
   /**
    * Protect dots in decimals and abbreviations from sentence splitting
    */
-  private protectDots(input: string): { text: string; restore: (s: string) => string } {
-    const placeholder = '__DOT__';
+  private protectDots(input: string): {
+    text: string;
+    restore: (s: string) => string;
+  } {
+    const placeholder = "__DOT__";
 
     // Protect decimals: 11.2, 900.000, 1.000.000,00 patterns
     let text = input.replace(/(\d)\.(\d)/g, `$1${placeholder}$2`);
 
     // Protect common abbreviations
     const abbrev = [
-      'e.g.', 'i.e.', 'etc.', 'vs.',
-      'Sr.', 'Sra.', 'Dr.', 'Dra.',
-      'Art.', 'Cap.', 'Fig.', 'Ex.',
-      'p.', 'pp.', 'No.', 'Inc.', 'Ltd.',
-      'R$', 'U$', 'US$',
+      "e.g.",
+      "i.e.",
+      "etc.",
+      "vs.",
+      "Sr.",
+      "Sra.",
+      "Dr.",
+      "Dra.",
+      "Art.",
+      "Cap.",
+      "Fig.",
+      "Ex.",
+      "p.",
+      "pp.",
+      "No.",
+      "Inc.",
+      "Ltd.",
+      "R$",
+      "U$",
+      "US$",
     ];
 
     for (const a of abbrev) {
@@ -552,7 +596,7 @@ export class MarkdownNormalizerService {
       text = text.split(a).join(safe);
     }
 
-    const restore = (s: string) => s.split(placeholder).join('.');
+    const restore = (s: string) => s.split(placeholder).join(".");
     return { text, restore };
   }
 
@@ -563,7 +607,10 @@ export class MarkdownNormalizerService {
     const { text, restore } = this.protectDots(input.trim());
 
     // Split on end punctuation followed by whitespace
-    const parts = text.split(/(?<=[.!?])\s+/g).map(p => p.trim()).filter(Boolean);
+    const parts = text
+      .split(/(?<=[.!?])\s+/g)
+      .map((p) => p.trim())
+      .filter(Boolean);
 
     return parts.map(restore);
   }
@@ -575,9 +622,9 @@ export class MarkdownNormalizerService {
   enforceBulletLimits(
     text: string,
     maxSentencesPerBullet: number = 3,
-    maxCharsPerBullet: number = 240
+    maxCharsPerBullet: number = 240,
   ): { text: string; repaired: boolean } {
-    const lines = text.split('\n');
+    const lines = text.split("\n");
     const out: string[] = [];
     let repaired = false;
 
@@ -588,7 +635,7 @@ export class MarkdownNormalizerService {
     const isContinuation = (line: string, indent: string) => {
       if (!line.trim()) return false;
       // Continuation line has more indent than bullet indent
-      return line.startsWith(indent + '  ') && !bulletRe.test(line);
+      return line.startsWith(indent + "  ") && !bulletRe.test(line);
     };
 
     for (let i = 0; i < lines.length; i++) {
@@ -603,7 +650,7 @@ export class MarkdownNormalizerService {
 
       // Capture continuation lines belonging to this bullet
       while (i + 1 < lines.length && isContinuation(lines[i + 1], indent)) {
-        content += ' ' + lines[i + 1].trim();
+        content += " " + lines[i + 1].trim();
         i++;
       }
 
@@ -622,18 +669,21 @@ export class MarkdownNormalizerService {
       // Split into multiple bullets: maxSentencesPerBullet sentences per bullet
       let idx = 0;
       while (idx < sentences.length) {
-        const chunk = sentences.slice(idx, idx + maxSentencesPerBullet).join(' ').trim();
+        const chunk = sentences
+          .slice(idx, idx + maxSentencesPerBullet)
+          .join(" ")
+          .trim();
 
         // If chunk still too long by chars, hard-split by words
         if (chunk.length > maxCharsPerBullet) {
           const words = chunk.split(/\s+/);
-          let current = '';
+          let current = "";
           for (const w of words) {
-            if ((current + ' ' + w).trim().length > maxCharsPerBullet) {
+            if ((current + " " + w).trim().length > maxCharsPerBullet) {
               if (current.trim()) out.push(`${indent}- ${current.trim()}`);
               current = w;
             } else {
-              current = (current + ' ' + w).trim();
+              current = (current + " " + w).trim();
             }
           }
           if (current.trim()) out.push(`${indent}- ${current.trim()}`);
@@ -645,7 +695,7 @@ export class MarkdownNormalizerService {
       }
     }
 
-    return { text: out.join('\n'), repaired };
+    return { text: out.join("\n"), repaired };
   }
 
   /**
@@ -658,19 +708,22 @@ export class MarkdownNormalizerService {
   enforceShortParagraphs(
     text: string,
     maxSentencesPerParagraph: number = 2,
-    maxCharsPerParagraph: number = 260
+    maxCharsPerParagraph: number = 260,
   ): { text: string; repaired: boolean } {
     let result = text;
     let repaired = false;
 
     // 1. Fix bullets glued to preceding text: "Here are the points:- First" → "Here are the points:\n- First"
     const beforeBullets = result;
-    result = result.replace(/([.:!?])(\s*)(-\s+)/g, (_, punct, space, bullet) => {
-      if (!space.includes('\n')) {
-        return `${punct}\n${bullet}`;
-      }
-      return _;
-    });
+    result = result.replace(
+      /([.:!?])(\s*)(-\s+)/g,
+      (_, punct, space, bullet) => {
+        if (!space.includes("\n")) {
+          return `${punct}\n${bullet}`;
+        }
+        return _;
+      },
+    );
     if (result !== beforeBullets) repaired = true;
 
     // 2. Split paragraphs by sentence boundaries
@@ -682,14 +735,21 @@ export class MarkdownNormalizerService {
       const trimmed = para.trim();
 
       // Skip special content (don't split these)
-      const isCodeBlock = trimmed.startsWith('```');
-      const isTableRow = trimmed.startsWith('|') && trimmed.endsWith('|');
+      const isCodeBlock = trimmed.startsWith("```");
+      const isTableRow = trimmed.startsWith("|") && trimmed.endsWith("|");
       const isBulletList = /^[-*•]\s/.test(trimmed);
       const isNumberedList = /^\d+\.\s/.test(trimmed);
       const isHeading = /^#{1,6}\s/.test(trimmed);
-      const isBlockquote = trimmed.startsWith('>');
+      const isBlockquote = trimmed.startsWith(">");
 
-      if (isCodeBlock || isTableRow || isBulletList || isNumberedList || isHeading || isBlockquote) {
+      if (
+        isCodeBlock ||
+        isTableRow ||
+        isBulletList ||
+        isNumberedList ||
+        isHeading ||
+        isBlockquote
+      ) {
         processedParagraphs.push(para);
         continue;
       }
@@ -698,7 +758,10 @@ export class MarkdownNormalizerService {
       const sentences = this.splitSentences(trimmed);
 
       // Check if already within limits
-      if (sentences.length <= maxSentencesPerParagraph && trimmed.length <= maxCharsPerParagraph) {
+      if (
+        sentences.length <= maxSentencesPerParagraph &&
+        trimmed.length <= maxCharsPerParagraph
+      ) {
         processedParagraphs.push(para);
         continue;
       }
@@ -706,15 +769,18 @@ export class MarkdownNormalizerService {
       // Split into chunks of maxSentencesPerParagraph
       const chunks: string[] = [];
       for (let i = 0; i < sentences.length; i += maxSentencesPerParagraph) {
-        const chunk = sentences.slice(i, i + maxSentencesPerParagraph).join(' ').trim();
+        const chunk = sentences
+          .slice(i, i + maxSentencesPerParagraph)
+          .join(" ")
+          .trim();
         if (!chunk) continue;
 
         // If chunk still too long by chars, split by words
         if (chunk.length > maxCharsPerParagraph) {
           const words = chunk.split(/\s+/);
-          let current = '';
+          let current = "";
           for (const w of words) {
-            const next = (current + ' ' + w).trim();
+            const next = (current + " " + w).trim();
             if (next.length > maxCharsPerParagraph) {
               if (current) chunks.push(current.trim());
               current = w;
@@ -738,16 +804,17 @@ export class MarkdownNormalizerService {
       }
     }
 
-    result = processedParagraphs.join('\n\n');
+    result = processedParagraphs.join("\n\n");
 
     // 3. Remove orphan colons (lead-in phrases with no list following)
     // Pattern: "Here are the points:" followed by paragraph text (not a list)
     const beforeColons = result;
-    result = result.replace(/([Hh]ere are|[Tt]he following|[Tt]hese include|[Bb]elow are|[Pp]oints|[Ii]tems|[Ss]teps)[^:]*:\s*\n(?!\s*[-*•\d])/g,
+    result = result.replace(
+      /([Hh]ere are|[Tt]he following|[Tt]hese include|[Bb]elow are|[Pp]oints|[Ii]tems|[Ss]teps)[^:]*:\s*\n(?!\s*[-*•\d])/g,
       (match) => {
         // Remove the colon, keep the rest
-        return match.replace(/:\s*\n/, '.\n');
-      }
+        return match.replace(/:\s*\n/, ".\n");
+      },
     );
     if (result !== beforeColons) repaired = true;
 
@@ -760,7 +827,7 @@ export class MarkdownNormalizerService {
    * Only collapses blocks where each bullet is a sentence/clause.
    */
   collapseBulletsToProse(text: string): { text: string; repaired: boolean } {
-    const lines = text.split('\n');
+    const lines = text.split("\n");
     const out: string[] = [];
     let repaired = false;
     let i = 0;
@@ -787,15 +854,16 @@ export class MarkdownNormalizerService {
       }
 
       // Only collapse if 4+ bullets AND they look like sentences (avg > 40 chars)
-      const avgLen = bulletItems.reduce((sum, b) => sum + b.length, 0) / bulletItems.length;
-      const hasSentences = bulletItems.some(b => /[.!?]$/.test(b));
+      const avgLen =
+        bulletItems.reduce((sum, b) => sum + b.length, 0) / bulletItems.length;
+      const hasSentences = bulletItems.some((b) => /[.!?]$/.test(b));
 
       if (bulletItems.length >= 4 && (avgLen > 40 || hasSentences)) {
         // Collapse into prose paragraph(s)
         // Strip leading bold labels like "**Label:** rest" → "Label: rest" for inline flow
-        const clauses = bulletItems.map(b => {
+        const clauses = bulletItems.map((b) => {
           // Remove trailing period for joining (we'll add proper punctuation)
-          let clause = b.replace(/\.\s*$/, '');
+          let clause = b.replace(/\.\s*$/, "");
           return clause;
         });
 
@@ -803,10 +871,10 @@ export class MarkdownNormalizerService {
         const paragraphs: string[] = [];
         for (let j = 0; j < clauses.length; j += 3) {
           const group = clauses.slice(j, j + 3);
-          paragraphs.push(group.join('. ') + '.');
+          paragraphs.push(group.join(". ") + ".");
         }
 
-        out.push(paragraphs.join('\n\n'));
+        out.push(paragraphs.join("\n\n"));
         repaired = true;
       } else {
         // Keep as bullets (short discrete items)
@@ -816,19 +884,19 @@ export class MarkdownNormalizerService {
       }
     }
 
-    return { text: out.join('\n'), repaired };
+    return { text: out.join("\n"), repaired };
   }
 
   /**
    * Check if text has valid table structure
    */
   isValidTable(text: string): boolean {
-    const lines = text.trim().split('\n');
+    const lines = text.trim().split("\n");
     if (lines.length < 2) return false;
 
     // Must have header row
     const header = lines[0].trim();
-    if (!header.startsWith('|') || !header.endsWith('|')) return false;
+    if (!header.startsWith("|") || !header.endsWith("|")) return false;
 
     // Must have separator row
     const separator = lines[1].trim();
@@ -838,8 +906,8 @@ export class MarkdownNormalizerService {
     const headerCols = (header.match(/\|/g) || []).length - 1;
     for (let i = 2; i < lines.length; i++) {
       const line = lines[i].trim();
-      if (line === '') continue;
-      if (!line.startsWith('|') || !line.endsWith('|')) return false;
+      if (line === "") continue;
+      if (!line.startsWith("|") || !line.endsWith("|")) return false;
       const cols = (line.match(/\|/g) || []).length - 1;
       if (cols !== headerCols) return false;
     }
@@ -851,7 +919,7 @@ export class MarkdownNormalizerService {
    * Escape pipe characters inside table cells
    */
   escapeTablePipes(cellContent: string): string {
-    return cellContent.replace(/\|/g, '\\|');
+    return cellContent.replace(/\|/g, "\\|");
   }
 }
 

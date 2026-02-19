@@ -1,5 +1,15 @@
-import { formatCellRef, formatRangeA1, parseCellKey, parseA1Range } from "./spreadsheetModel.range";
-import type { CellModel, SheetModel, SpreadsheetModel, SpreadsheetModelDiff } from "./spreadsheetModel.types";
+import {
+  formatCellRef,
+  formatRangeA1,
+  parseCellKey,
+  parseA1Range,
+} from "./spreadsheetModel.range";
+import type {
+  CellModel,
+  SheetModel,
+  SpreadsheetModel,
+  SpreadsheetModelDiff,
+} from "./spreadsheetModel.types";
 
 function stableCellSnapshot(cell: CellModel | undefined): string {
   if (!cell) return "";
@@ -29,7 +39,10 @@ function sheetIndex(model: SpreadsheetModel): Record<string, SheetModel> {
   return out;
 }
 
-function rangeFromCoords(sheetName: string, coords: Array<{ row: number; col: number }>): string {
+function rangeFromCoords(
+  sheetName: string,
+  coords: Array<{ row: number; col: number }>,
+): string {
   if (!coords.length) return `${sheetName}!A1`;
   let minRow = Number.MAX_SAFE_INTEGER;
   let minCol = Number.MAX_SAFE_INTEGER;
@@ -48,7 +61,10 @@ function rangeFromCoords(sheetName: string, coords: Array<{ row: number; col: nu
   });
 }
 
-function structureDelta(before: SheetModel | undefined, after: SheetModel | undefined): number {
+function structureDelta(
+  before: SheetModel | undefined,
+  after: SheetModel | undefined,
+): number {
   if (!before && after) return 1;
   if (before && !after) return 1;
   if (!before || !after) return 0;
@@ -56,18 +72,37 @@ function structureDelta(before: SheetModel | undefined, after: SheetModel | unde
   let changes = 0;
   if (before.grid.maxRow !== after.grid.maxRow) changes += 1;
   if (before.grid.maxCol !== after.grid.maxCol) changes += 1;
-  if (JSON.stringify(before.grid.freeze || {}) !== JSON.stringify(after.grid.freeze || {})) changes += 1;
-  if (String(before.grid.autoFilterRange || "") !== String(after.grid.autoFilterRange || "")) changes += 1;
-  if ((before.grid.merges || []).length !== (after.grid.merges || []).length) changes += 1;
-  if ((before.validations || []).length !== (after.validations || []).length) changes += 1;
-  if ((before.conditionalFormats || []).length !== (after.conditionalFormats || []).length) changes += 1;
+  if (
+    JSON.stringify(before.grid.freeze || {}) !==
+    JSON.stringify(after.grid.freeze || {})
+  )
+    changes += 1;
+  if (
+    String(before.grid.autoFilterRange || "") !==
+    String(after.grid.autoFilterRange || "")
+  )
+    changes += 1;
+  if ((before.grid.merges || []).length !== (after.grid.merges || []).length)
+    changes += 1;
+  if ((before.validations || []).length !== (after.validations || []).length)
+    changes += 1;
+  if (
+    (before.conditionalFormats || []).length !==
+    (after.conditionalFormats || []).length
+  )
+    changes += 1;
   return changes;
 }
 
-export function diffSpreadsheetModels(before: SpreadsheetModel, after: SpreadsheetModel): SpreadsheetModelDiff {
+export function diffSpreadsheetModels(
+  before: SpreadsheetModel,
+  after: SpreadsheetModel,
+): SpreadsheetModelDiff {
   const beforeSheets = sheetIndex(before);
   const afterSheets = sheetIndex(after);
-  const names = Array.from(new Set([...Object.keys(beforeSheets), ...Object.keys(afterSheets)])).sort();
+  const names = Array.from(
+    new Set([...Object.keys(beforeSheets), ...Object.keys(afterSheets)]),
+  ).sort();
 
   const affectedRanges: string[] = [];
   const changedSamples: SpreadsheetModelDiff["changedSamples"] = [];
@@ -85,7 +120,12 @@ export function diffSpreadsheetModels(before: SpreadsheetModel, after: Spreadshe
       continue;
     }
 
-    const cellKeys = Array.from(new Set([...Object.keys(beforeSheet.cells), ...Object.keys(afterSheet.cells)]));
+    const cellKeys = Array.from(
+      new Set([
+        ...Object.keys(beforeSheet.cells),
+        ...Object.keys(afterSheet.cells),
+      ]),
+    );
     const coords: Array<{ row: number; col: number }> = [];
 
     for (const cellKeyName of cellKeys) {
@@ -133,13 +173,17 @@ export function diffSpreadsheetModels(before: SpreadsheetModel, after: Spreadshe
     changedStructuresCount += Math.abs(afterNamedCount - beforeNamedCount);
   }
 
-  const normalizedRanges = Array.from(new Set(affectedRanges.map((item) => {
-    try {
-      return formatRangeA1(parseA1Range(item));
-    } catch {
-      return item;
-    }
-  })));
+  const normalizedRanges = Array.from(
+    new Set(
+      affectedRanges.map((item) => {
+        try {
+          return formatRangeA1(parseA1Range(item));
+        } catch {
+          return item;
+        }
+      }),
+    ),
+  );
 
   return {
     changed: changedCellsCount > 0 || changedStructuresCount > 0,

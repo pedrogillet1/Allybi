@@ -1,11 +1,11 @@
-import { createHash } from 'crypto';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { createHash } from "crypto";
+import { promises as fs } from "fs";
+import path from "path";
 
-import prisma from '../../config/database';
-import { EncryptionService } from '../security/encryption.service';
-import { EnvelopeService } from '../security/envelope.service';
-import type { ConnectorProvider } from './connectorsRegistry';
+import prisma from "../../config/database";
+import { EncryptionService } from "../security/encryption.service";
+import { EnvelopeService } from "../security/envelope.service";
+import type { ConnectorProvider } from "./connectorsRegistry";
 
 export interface ConnectorTokenPayload {
   accessToken: string;
@@ -30,7 +30,12 @@ interface StoredTokenFile {
   providers: Partial<Record<ConnectorProvider, StoredProviderToken>>;
 }
 
-const DEFAULT_STORAGE_ROOT = path.resolve(process.cwd(), 'storage', 'connectors', 'tokens');
+const DEFAULT_STORAGE_ROOT = path.resolve(
+  process.cwd(),
+  "storage",
+  "connectors",
+  "tokens",
+);
 
 /**
  * Encrypted token vault (envelope pattern, no plaintext tokens at rest).
@@ -39,15 +44,18 @@ export class TokenVaultService {
   private readonly enc: EncryptionService;
   private readonly envelope: EnvelopeService;
   private readonly storageRoot: string;
-  private readonly storageMode: 'file' | 'prisma';
+  private readonly storageMode: "file" | "prisma";
 
-  constructor(opts?: { storageRoot?: string; encryptionService?: EncryptionService }) {
+  constructor(opts?: {
+    storageRoot?: string;
+    encryptionService?: EncryptionService;
+  }) {
     this.enc = opts?.encryptionService ?? new EncryptionService();
     this.envelope = new EnvelopeService(this.enc);
     this.storageRoot = opts?.storageRoot ?? DEFAULT_STORAGE_ROOT;
     this.storageMode =
       (process.env.CONNECTOR_TOKEN_STORAGE as any) ||
-      (process.env.NODE_ENV === 'production' ? 'prisma' : 'file');
+      (process.env.NODE_ENV === "production" ? "prisma" : "file");
   }
 
   async storeToken(
@@ -63,12 +71,20 @@ export class TokenVaultService {
     const recordKey = this.enc.randomKey32();
     const aad = this.makeAad(userId, provider);
 
-    const encryptedPayloadJson = this.enc.encryptJsonToJson(parsedPayload, recordKey, aad);
-    const wrappedRecordKey = this.envelope.wrapRecordKey(recordKey, masterKey, aad);
+    const encryptedPayloadJson = this.enc.encryptJsonToJson(
+      parsedPayload,
+      recordKey,
+      aad,
+    );
+    const wrappedRecordKey = this.envelope.wrapRecordKey(
+      recordKey,
+      masterKey,
+      aad,
+    );
 
     const normalizedScopes = [...new Set(scopes)].filter(Boolean).sort();
 
-    if (this.storageMode === 'prisma') {
+    if (this.storageMode === "prisma") {
       try {
         await prisma.connectorToken.upsert({
           where: { userId_provider: { userId, provider } },
@@ -106,7 +122,10 @@ export class TokenVaultService {
     await this.writeFile(userId, file);
   }
 
-  async getValidAccessToken(userId: string, provider: ConnectorProvider): Promise<string> {
+  async getValidAccessToken(
+    userId: string,
+    provider: ConnectorProvider,
+  ): Promise<string> {
     const entry = await this.readProviderEntry(userId, provider);
 
     if (!entry) {
@@ -118,32 +137,43 @@ export class TokenVaultService {
     const expirySafetyWindowMs = 60_000;
 
     if (expiresAt <= now + expirySafetyWindowMs) {
-      throw new Error(`Token for ${provider} is expired or about to expire. Reconnect required.`);
+      throw new Error(
+        `Token for ${provider} is expired or about to expire. Reconnect required.`,
+      );
     }
 
     const payload = this.decryptEntry(userId, provider, entry);
 
-    if (!payload.accessToken || typeof payload.accessToken !== 'string') {
+    if (!payload.accessToken || typeof payload.accessToken !== "string") {
       throw new Error(`Stored token payload for ${provider} is invalid.`);
     }
 
     return payload.accessToken;
   }
 
-  async getDecryptedPayload(userId: string, provider: ConnectorProvider): Promise<ConnectorTokenPayload | null> {
+  async getDecryptedPayload(
+    userId: string,
+    provider: ConnectorProvider,
+  ): Promise<ConnectorTokenPayload | null> {
     const entry = await this.readProviderEntry(userId, provider);
     if (!entry) return null;
 
     const payload = this.decryptEntry(userId, provider, entry);
-    if (!payload.accessToken || typeof payload.accessToken !== 'string') return null;
+    if (!payload.accessToken || typeof payload.accessToken !== "string")
+      return null;
 
     return payload;
   }
 
-  async deleteToken(userId: string, provider: ConnectorProvider): Promise<void> {
-    if (this.storageMode === 'prisma') {
+  async deleteToken(
+    userId: string,
+    provider: ConnectorProvider,
+  ): Promise<void> {
+    if (this.storageMode === "prisma") {
       try {
-        await prisma.connectorToken.delete({ where: { userId_provider: { userId, provider } } });
+        await prisma.connectorToken.delete({
+          where: { userId_provider: { userId, provider } },
+        });
         return;
       } catch {
         // Fall back to file storage below.
@@ -172,14 +202,20 @@ export class TokenVaultService {
   async getProviderConnectionInfo(
     userId: string,
     provider: ConnectorProvider,
-  ): Promise<{ scopes: string[]; expiresAt: Date; updatedAt: Date; providerAccountId: string | null } | null> {
+  ): Promise<{
+    scopes: string[];
+    expiresAt: Date;
+    updatedAt: Date;
+    providerAccountId: string | null;
+  } | null> {
     const entry = await this.readProviderEntry(userId, provider);
     if (!entry) return null;
 
     // Decrypt but return only safe metadata (never return access/refresh tokens).
     const payload = this.decryptEntry(userId, provider, entry);
     const providerAccountId =
-      payload?.providerAccountId && typeof payload.providerAccountId === 'string'
+      payload?.providerAccountId &&
+      typeof payload.providerAccountId === "string"
         ? payload.providerAccountId
         : null;
 
@@ -197,12 +233,14 @@ export class TokenVaultService {
     try {
       parsed = JSON.parse(encryptedBlob);
     } catch {
-      throw new Error('encryptedBlob must be a JSON string containing at least accessToken.');
+      throw new Error(
+        "encryptedBlob must be a JSON string containing at least accessToken.",
+      );
     }
 
     const payload = parsed as ConnectorTokenPayload;
-    if (!payload.accessToken || typeof payload.accessToken !== 'string') {
-      throw new Error('Token payload must include accessToken:string.');
+    if (!payload.accessToken || typeof payload.accessToken !== "string") {
+      throw new Error("Token payload must include accessToken:string.");
     }
 
     return payload;
@@ -212,34 +250,51 @@ export class TokenVaultService {
     return `connector-token:${userId}:${provider}`;
   }
 
-  private decryptEntry(userId: string, provider: ConnectorProvider, entry: StoredProviderToken): ConnectorTokenPayload {
+  private decryptEntry(
+    userId: string,
+    provider: ConnectorProvider,
+    entry: StoredProviderToken,
+  ): ConnectorTokenPayload {
     const masterKey = this.getMasterKey();
     const aad = this.makeAad(userId, provider);
-    const recordKey = this.envelope.unwrapRecordKey(entry.wrappedRecordKey, masterKey, aad);
-    return this.enc.decryptJsonFromJson<ConnectorTokenPayload>(entry.encryptedPayloadJson, recordKey, aad);
+    const recordKey = this.envelope.unwrapRecordKey(
+      entry.wrappedRecordKey,
+      masterKey,
+      aad,
+    );
+    return this.enc.decryptJsonFromJson<ConnectorTokenPayload>(
+      entry.encryptedPayloadJson,
+      recordKey,
+      aad,
+    );
   }
 
   private getMasterKey(): Buffer {
     const base64 = process.env.KODA_MASTER_KEY_BASE64;
     if (base64) {
-      const decoded = Buffer.from(base64, 'base64');
+      const decoded = Buffer.from(base64, "base64");
       if (decoded.length === 32) return decoded;
     }
 
     const fallback = process.env.ENCRYPTION_KEY;
     if (!fallback) {
-      throw new Error('Missing encryption key (KODA_MASTER_KEY_BASE64 or ENCRYPTION_KEY).');
+      throw new Error(
+        "Missing encryption key (KODA_MASTER_KEY_BASE64 or ENCRYPTION_KEY).",
+      );
     }
 
-    return createHash('sha256').update(fallback).digest();
+    return createHash("sha256").update(fallback).digest();
   }
 
   private getUserFilePath(userId: string): string {
     return path.join(this.storageRoot, `${userId}.json`);
   }
 
-  private async readProviderEntry(userId: string, provider: ConnectorProvider): Promise<StoredProviderToken | null> {
-    if (this.storageMode === 'prisma') {
+  private async readProviderEntry(
+    userId: string,
+    provider: ConnectorProvider,
+  ): Promise<StoredProviderToken | null> {
+    if (this.storageMode === "prisma") {
       let row: {
         wrappedRecordKey: string;
         encryptedPayloadJson: string;
@@ -312,10 +367,14 @@ export class TokenVaultService {
     const filePath = this.getUserFilePath(userId);
 
     try {
-      const raw = await fs.readFile(filePath, 'utf8');
+      const raw = await fs.readFile(filePath, "utf8");
       const parsed = JSON.parse(raw) as StoredTokenFile;
 
-      if (parsed?.version !== 1 || parsed?.userId !== userId || !parsed.providers) {
+      if (
+        parsed?.version !== 1 ||
+        parsed?.userId !== userId ||
+        !parsed.providers
+      ) {
         return { version: 1, userId, providers: {} };
       }
 
@@ -325,13 +384,19 @@ export class TokenVaultService {
     }
   }
 
-  private async writeFile(userId: string, payload: StoredTokenFile): Promise<void> {
+  private async writeFile(
+    userId: string,
+    payload: StoredTokenFile,
+  ): Promise<void> {
     await fs.mkdir(this.storageRoot, { recursive: true });
 
     const filePath = this.getUserFilePath(userId);
     const tempPath = `${filePath}.tmp`;
 
-    await fs.writeFile(tempPath, JSON.stringify(payload), { encoding: 'utf8', mode: 0o600 });
+    await fs.writeFile(tempPath, JSON.stringify(payload), {
+      encoding: "utf8",
+      mode: 0o600,
+    });
     await fs.rename(tempPath, filePath);
   }
 }

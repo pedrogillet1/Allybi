@@ -9,17 +9,17 @@
  * runtimePatterns / triggers / intent engine / router.
  */
 
-export type LanguageCode = 'en' | 'pt' | 'es';
+export type LanguageCode = "en" | "pt" | "es";
 
 /** High-level family (used to choose routing branches + fallback style) */
 export type IntentFamily =
-  | 'documents'      // doc-grounded Q&A, summarize/extract/compute/compare/quote
-  | 'file_actions'   // list/filter/sort/group/count/stats across workspace
-  | 'navigation'     // open/where/discovery UI actions (nav_pills)
-  | 'help'           // product help/how-to
-  | 'conversation'   // greetings/thanks/ack/small talk (non-doc)
-  | 'account'        // profile/settings/auth flows (if used)
-  | 'unknown';
+  | "documents" // doc-grounded Q&A, summarize/extract/compute/compare/quote
+  | "file_actions" // list/filter/sort/group/count/stats across workspace
+  | "navigation" // open/where/discovery UI actions (nav_pills)
+  | "help" // product help/how-to
+  | "conversation" // greetings/thanks/ack/small talk (non-doc)
+  | "account" // profile/settings/auth flows (if used)
+  | "unknown";
 
 /**
  * Operators are the atomic "what to do" instructions.
@@ -29,91 +29,91 @@ export type IntentFamily =
  */
 export type Operator =
   // Document work
-  | 'summarize'
-  | 'extract'
-  | 'compute'
-  | 'compare'
-  | 'quote'
-  | 'locate_content'
-  | 'locate_docs'
+  | "summarize"
+  | "extract"
+  | "compute"
+  | "compare"
+  | "quote"
+  | "locate_content"
+  | "locate_docs"
   // File actions
-  | 'list'
-  | 'filter'
-  | 'sort'
-  | 'group'
-  | 'count'
-  | 'stats'
+  | "list"
+  | "filter"
+  | "sort"
+  | "group"
+  | "count"
+  | "stats"
   // Navigation actions (UI)
-  | 'open'
-  | 'where'
+  | "open"
+  | "where"
   // Meta/help/conversation
-  | 'help'
-  | 'capabilities'
-  | 'how_to'
-  | 'greeting'
-  | 'thanks'
-  | 'ack'
-  | 'goodbye'
+  | "help"
+  | "capabilities"
+  | "how_to"
+  | "greeting"
+  | "thanks"
+  | "ack"
+  | "goodbye"
   // Fallback
-  | 'fallback';
+  | "fallback";
 
 /** Output shape constraints requested/detected from the query */
 export type OutputShape =
-  | 'paragraph'
-  | 'bullets'
-  | 'numbered_list'
-  | 'table'
-  | 'file_list'
-  | 'button_only';
+  | "paragraph"
+  | "bullets"
+  | "numbered_list"
+  | "table"
+  | "file_list"
+  | "button_only";
 
 /** Domain ids should match data_banks/semantics/domain_ontology.any.json */
 export type DomainId =
-  | 'general'
+  | "general"
   // Finance family
-  | 'finance_corporate'
-  | 'finance_real_estate'
-  | 'finance_markets'
-  | 'finance_lending'
-  | 'finance_payments'
+  | "finance_corporate"
+  | "finance_real_estate"
+  | "finance_markets"
+  | "finance_lending"
+  | "finance_payments"
   // Accounting family
-  | 'accounting_gl'
-  | 'accounting_ap_ar'
-  | 'accounting_tax'
-  | 'accounting_audit'
+  | "accounting_gl"
+  | "accounting_ap_ar"
+  | "accounting_tax"
+  | "accounting_audit"
   // Excel family
-  | 'excel_modeling'
-  | 'excel_audit_tracing'
-  | 'excel_reporting'
+  | "excel_modeling"
+  | "excel_audit_tracing"
+  | "excel_reporting"
   // Legal family
-  | 'legal_contracts'
-  | 'legal_compliance'
-  | 'legal_disputes'
+  | "legal_contracts"
+  | "legal_compliance"
+  | "legal_disputes"
   // Medical family
-  | 'medical_labs'
-  | 'medical_clinical'
-  | 'medical_insurance'
+  | "medical_labs"
+  | "medical_clinical"
+  | "medical_insurance"
   // Personal documents family
-  | 'identity_docs'
-  | 'address_proof'
-  | 'vehicle_docs'
-  | 'housing_rent_mortgage'
-  | 'utilities_bills'
-  | 'invoices_billing';
+  | "identity_docs"
+  | "address_proof"
+  | "vehicle_docs"
+  | "housing_rent_mortgage"
+  | "utilities_bills"
+  | "invoices_billing";
 
 /** Confidence helper (0..1 values are used by rank + mode routing) */
 export interface ConfidenceInfo {
-  score: number;      // top score
-  margin?: number;    // score gap vs #2
-  level: 'low' | 'medium' | 'high';
+  score: number; // top score
+  margin?: number; // score gap vs #2
+  level: "low" | "medium" | "high";
   reasons?: string[];
 }
 
 /** Query-level signals computed from triggers/normalizers/semantics */
 export interface IntentSignals {
   // Intent family hints
-  navQuery?: boolean;          // open/where style
-  discoveryQuery?: boolean;    // "which file" / "find docs"
-  fileActionQuery?: boolean;   // list/filter/sort/count
+  navQuery?: boolean; // open/where style
+  discoveryQuery?: boolean; // "which file" / "find docs"
+  fileActionQuery?: boolean; // list/filter/sort/count
   helpQuery?: boolean;
   conversationOnly?: boolean;
 
@@ -122,7 +122,7 @@ export interface IntentSignals {
   userAskedForBullets?: boolean;
   userAskedForSteps?: boolean;
   userAskedForJson?: boolean;
-  shortOverview?: boolean;     // “2–3 sentences”
+  shortOverview?: boolean; // “2–3 sentences”
   userRequestedShort?: boolean;
   justAnswer?: boolean;
 
@@ -199,7 +199,7 @@ export interface IntentEngineInput {
 
   // Context hints
   activeDocId?: string | null;
-  activeDocLockType?: 'soft' | 'hard' | null;
+  activeDocLockType?: "soft" | "hard" | null;
 
   // Attached/selected docs in UI
   attachedDocumentIds?: string[];
@@ -219,35 +219,38 @@ export interface RuntimePatternMatch {
 }
 
 /** Utility: determine confidence level */
-export function confidenceLevel(score: number, margin: number = 0): ConfidenceInfo['level'] {
-  if (score >= 0.8 && margin >= 0.08) return 'high';
-  if (score >= 0.55) return 'medium';
-  return 'low';
+export function confidenceLevel(
+  score: number,
+  margin: number = 0,
+): ConfidenceInfo["level"] {
+  if (score >= 0.8 && margin >= 0.08) return "high";
+  if (score >= 0.55) return "medium";
+  return "low";
 }
 
 /** Fallback scenario keys (used by fallbackConfig.service) */
 export type FallbackScenarioKey =
-  | 'no_docs_indexed'
-  | 'no_relevant_chunks'
-  | 'scope_hard_empty'
-  | 'indexing_in_progress'
-  | 'extraction_failed'
-  | 'refusal'
-  | 'ambiguous_query'
-  | 'generic'
-  | 'NO_DOCUMENTS'
-  | 'OUT_OF_SCOPE'
-  | 'AMBIGUOUS_QUESTION'
-  | 'UNSUPPORTED_INTENT'
+  | "no_docs_indexed"
+  | "no_relevant_chunks"
+  | "scope_hard_empty"
+  | "indexing_in_progress"
+  | "extraction_failed"
+  | "refusal"
+  | "ambiguous_query"
+  | "generic"
+  | "NO_DOCUMENTS"
+  | "OUT_OF_SCOPE"
+  | "AMBIGUOUS_QUESTION"
+  | "UNSUPPORTED_INTENT"
   | string;
 
 /** Fallback style identifiers */
 export type FallbackStyleId =
-  | 'gentle_redirect'
-  | 'suggest_upload'
-  | 'suggest_rephrase'
-  | 'scope_hint'
-  | 'hard_block'
-  | 'default'
-  | 'one_liner'
+  | "gentle_redirect"
+  | "suggest_upload"
+  | "suggest_rephrase"
+  | "scope_hint"
+  | "hard_block"
+  | "default"
+  | "one_liner"
   | string;

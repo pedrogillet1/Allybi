@@ -8,35 +8,41 @@
  * - Document share notifications
  */
 
-import { config } from '../config/env';
+import { config } from "../config/env";
 
 const INFOBIP_BASE_URL = config.INFOBIP_BASE_URL;
 const INFOBIP_API_KEY = config.INFOBIP_API_KEY;
-const fromEmail = `Allybi <${config.EMAIL_FROM || 'info@allybi.co'}>`;
+const fromEmail = `Allybi <${config.EMAIL_FROM || "info@allybi.co"}>`;
 
 const emailServiceEnabled = !!(INFOBIP_BASE_URL && INFOBIP_API_KEY);
 
 if (!emailServiceEnabled) {
-  console.warn('⚠️ Infobip email service is disabled. Missing INFOBIP_API_KEY or INFOBIP_BASE_URL.');
+  console.warn(
+    "⚠️ Infobip email service is disabled. Missing INFOBIP_API_KEY or INFOBIP_BASE_URL.",
+  );
 } else {
-  console.log('✅ Infobip email service initialized');
+  console.log("✅ Infobip email service initialized");
 }
 
 /**
  * Sends an email using the Infobip Email API.
  */
-export const sendEmail = async (to: string, subject: string, html: string): Promise<boolean> => {
+export const sendEmail = async (
+  to: string,
+  subject: string,
+  html: string,
+): Promise<boolean> => {
   if (!emailServiceEnabled) {
-    console.error('Email service is disabled. Cannot send email.');
+    console.error("Email service is disabled. Cannot send email.");
     console.log(`--- EMAIL TO: ${to} ---`);
     console.log(`--- SUBJECT: ${subject} ---`);
-    console.log('----------------------');
+    console.log("----------------------");
     return false;
   }
 
   try {
     // Infobip Email API requires multipart/form-data
-    const boundary = '----InfobipBoundary' + Date.now();
+    const boundary = "----InfobipBoundary" + Date.now();
     const parts = [
       `--${boundary}\r\nContent-Disposition: form-data; name="from"\r\n\r\n${fromEmail}`,
       `--${boundary}\r\nContent-Disposition: form-data; name="to"\r\n\r\n${to}`,
@@ -44,21 +50,23 @@ export const sendEmail = async (to: string, subject: string, html: string): Prom
       `--${boundary}\r\nContent-Disposition: form-data; name="html"\r\n\r\n${html}`,
       `--${boundary}--`,
     ];
-    const body = parts.join('\r\n');
+    const body = parts.join("\r\n");
 
     const response = await fetch(`https://${INFOBIP_BASE_URL}/email/3/send`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `App ${INFOBIP_API_KEY}`,
-        'Content-Type': `multipart/form-data; boundary=${boundary}`,
-        'Accept': 'application/json',
+        Authorization: `App ${INFOBIP_API_KEY}`,
+        "Content-Type": `multipart/form-data; boundary=${boundary}`,
+        Accept: "application/json",
       },
       body,
     });
 
     if (!response.ok) {
       const errorBody = await response.text();
-      console.error(`❌ Failed to send email to ${to}: ${response.status} ${errorBody}`);
+      console.error(
+        `❌ Failed to send email to ${to}: ${response.status} ${errorBody}`,
+      );
       return false;
     }
 
@@ -73,8 +81,12 @@ export const sendEmail = async (to: string, subject: string, html: string): Prom
 /**
  * Sends a verification email to a new user.
  */
-export const sendVerificationEmail = async (to: string, name: string, verificationLink: string): Promise<void> => {
-  const subject = 'Verify Your Email Address for Allybi';
+export const sendVerificationEmail = async (
+  to: string,
+  name: string,
+  verificationLink: string,
+): Promise<void> => {
+  const subject = "Verify Your Email Address for Allybi";
   const html = `
     <div style="font-family: sans-serif; padding: 20px; color: #333;">
       <h2>Welcome to Allybi, ${name}!</h2>
@@ -95,9 +107,9 @@ export const sendVerificationEmail = async (to: string, name: string, verificati
 export async function sendPasswordResetEmail(
   email: string,
   resetLink: string,
-  firstName: string = 'User'
+  firstName: string = "User",
 ): Promise<void> {
-  const subject = 'Reset Your Password - Allybi';
+  const subject = "Reset Your Password - Allybi";
   const html = `
     <!DOCTYPE html>
     <html>
@@ -149,7 +161,7 @@ export async function sendPasswordResetEmail(
   const success = await sendEmail(email, subject, html);
 
   if (!success) {
-    throw new Error('Failed to send password reset email');
+    throw new Error("Failed to send password reset email");
   }
 
   console.log(`✅ Password reset email sent successfully to ${email}`);
@@ -158,14 +170,17 @@ export async function sendPasswordResetEmail(
 /**
  * Sends a welcome email to a newly verified user.
  */
-export const sendWelcomeEmail = async (to: string, name: string): Promise<void> => {
-  const subject = 'Welcome to Allybi!';
+export const sendWelcomeEmail = async (
+  to: string,
+  name: string,
+): Promise<void> => {
+  const subject = "Welcome to Allybi!";
   const html = `
     <div style="font-family: sans-serif; padding: 20px; color: #333;">
       <h2>Welcome to Allybi, ${name}!</h2>
       <p>Your account has been successfully created.</p>
       <p>You can now start uploading and managing your documents.</p>
-      <a href="${process.env.FRONTEND_URL || 'http://localhost:3001'}" style="background-color: #000; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+      <a href="${process.env.FRONTEND_URL || "http://localhost:3001"}" style="background-color: #000; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
         Get Started
       </a>
     </div>
@@ -179,13 +194,19 @@ class EmailService {
     return sendEmail(to, subject, body);
   }
   async sendBulkEmail(recipients: string[], subject: string, body: string) {
-    const promises = recipients.map(recipient => sendEmail(recipient, subject, body));
+    const promises = recipients.map((recipient) =>
+      sendEmail(recipient, subject, body),
+    );
     const results = await Promise.all(promises);
-    return results.every(result => result);
+    return results.every((result) => result);
   }
 }
 
-export const sendDocumentShareEmail = async (to: string, documentName: string, sharedBy: string) => {
+export const sendDocumentShareEmail = async (
+  to: string,
+  documentName: string,
+  sharedBy: string,
+) => {
   const subject = `${sharedBy} shared a document with you`;
   const html = `
     <div style="font-family: sans-serif; padding: 20px; color: #333;">
@@ -206,8 +227,11 @@ export const generateVerificationCode = () => {
 /**
  * Sends a verification CODE email (for pending user registration).
  */
-export const sendVerificationCodeEmail = async (to: string, code: string): Promise<void> => {
-  const subject = 'Your Allybi code';
+export const sendVerificationCodeEmail = async (
+  to: string,
+  code: string,
+): Promise<void> => {
+  const subject = "Your Allybi code";
   const html = `
     <div style="font-family: sans-serif; padding: 20px; color: #333;">
       <p>Your Allybi verification code is: <strong>${code}</strong></p>

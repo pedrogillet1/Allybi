@@ -22,11 +22,14 @@ export class ApplyVerificationService {
   verify(input: ApplyVerificationInput): ApplyVerificationResult {
     const reasons: string[] = [];
     const hasRevision = Boolean(String(input.revisionId || "").trim());
-    const hashesDiffer = String(input.fileHashBefore || "") !== String(input.fileHashAfter || "");
+    const hashesDiffer =
+      String(input.fileHashBefore || "") !== String(input.fileHashAfter || "");
     const diffChanged = Boolean(input.diff?.changed);
-    const hasDiffChanges = Array.isArray(input.diff?.changes) && input.diff!.changes.length > 0;
+    const hasDiffChanges =
+      Array.isArray(input.diff?.changes) && input.diff!.changes.length > 0;
     const hasChangeCount = Number(input.changeCount || 0) > 0;
-    const changed = hashesDiffer || diffChanged || hasDiffChanges || hasChangeCount;
+    const changed =
+      hashesDiffer || diffChanged || hasDiffChanges || hasChangeCount;
 
     if (!hasRevision) reasons.push("missing_revision_id");
     if (!changed) reasons.push("no_verified_mutation");
@@ -38,4 +41,3 @@ export class ApplyVerificationService {
     };
   }
 }
-

@@ -77,10 +77,30 @@ describe("ExcelSourceOfTruthService", () => {
       language: "en",
       viewerSheetName: "SUMMARY 1",
       cellFacts: [
-        { sheet: "SUMMARY 1", cell: "G5", rowLabel: "Bison Lodge", colHeader: "Return on Cost" },
-        { sheet: "SUMMARY 1", cell: "G6", rowLabel: "Ridgetop", colHeader: "Return on Cost" },
-        { sheet: "SUMMARY 1", cell: "G7", rowLabel: "Douglas Fir", colHeader: "Return on Cost" },
-        { sheet: "SUMMARY 1", cell: "G8", rowLabel: "Ranch Hall", colHeader: "Return on Cost" },
+        {
+          sheet: "SUMMARY 1",
+          cell: "G5",
+          rowLabel: "Bison Lodge",
+          colHeader: "Return on Cost",
+        },
+        {
+          sheet: "SUMMARY 1",
+          cell: "G6",
+          rowLabel: "Ridgetop",
+          colHeader: "Return on Cost",
+        },
+        {
+          sheet: "SUMMARY 1",
+          cell: "G7",
+          rowLabel: "Douglas Fir",
+          colHeader: "Return on Cost",
+        },
+        {
+          sheet: "SUMMARY 1",
+          cell: "G8",
+          rowLabel: "Ranch Hall",
+          colHeader: "Return on Cost",
+        },
       ],
     });
 
@@ -92,7 +112,8 @@ describe("ExcelSourceOfTruthService", () => {
 
   test("format command does not degrade into set_values", () => {
     const result = service.toComputeOps({
-      message: "Format F5:F20 as currency with zero decimals, keep existing values unchanged.",
+      message:
+        "Format F5:F20 as currency with zero decimals, keep existing values unchanged.",
       language: "en",
       viewerSheetName: "SUMMARY1",
     });
@@ -121,7 +142,8 @@ describe("ExcelSourceOfTruthService", () => {
 
   test("chart intent with two ranges maps to create_chart spec with label/value ranges", () => {
     const result = service.toComputeOps({
-      message: "Create a bar chart from SUMMARY1!C5:C12 and G5:G12 titled Return on Cost by Item",
+      message:
+        "Create a bar chart from SUMMARY1!C5:C12 and G5:G12 titled Return on Cost by Item",
       language: "en",
       viewerSheetName: "SUMMARY1",
     });
@@ -130,7 +152,11 @@ describe("ExcelSourceOfTruthService", () => {
     if (result.kind !== "plan") return;
     expect(result.ops[0]?.kind).toBe("create_chart");
     expect((result.ops[0] as any)?.rangeA1).toBe("SUMMARY1!C5:C12");
-    expect(((result.ops[0] as any)?.spec || {}).labelRange).toBe("SUMMARY1!C5:C12");
-    expect(((result.ops[0] as any)?.spec || {}).valueRange).toBe("SUMMARY1!G5:G12");
+    expect(((result.ops[0] as any)?.spec || {}).labelRange).toBe(
+      "SUMMARY1!C5:C12",
+    );
+    expect(((result.ops[0] as any)?.spec || {}).valueRange).toBe(
+      "SUMMARY1!G5:G12",
+    );
   });
 });

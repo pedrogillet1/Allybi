@@ -20,7 +20,11 @@ function safeEqual(a: string, b: string): boolean {
  * Middleware that requires X-KODA-ADMIN-KEY header to match KODA_ADMIN_KEY env var.
  * Should be applied to admin routes in production after authenticateAdmin.
  */
-export function requireAdminKey(req: Request, res: Response, next: NextFunction): void {
+export function requireAdminKey(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   const expected = process.env.KODA_ADMIN_KEY;
 
   if (!expected) {

@@ -2,7 +2,8 @@ import { detectBulkEditIntent } from "./bulkEditIntent";
 
 describe("detectBulkEditIntent", () => {
   test("does NOT misroute insertion below last bullet into bullets->paragraph bulk intent", () => {
-    const msg = 'add a paragraph below the last bullet point in the AI understanding section summarizing everything';
+    const msg =
+      "add a paragraph below the last bullet point in the AI understanding section summarizing everything";
     expect(detectBulkEditIntent(msg)).toBeNull();
   });
 
@@ -16,7 +17,8 @@ describe("detectBulkEditIntent", () => {
   });
 
   test("extracts heading with newline 'into one\\nparagraph' phrasing", () => {
-    const msg = "edit summarize all of the AI understanding bullet points into one\nparagraph";
+    const msg =
+      "edit summarize all of the AI understanding bullet points into one\nparagraph";
     expect(detectBulkEditIntent(msg)).toEqual({
       kind: "section_bullets_to_paragraph",
       heading: "AI understanding",
@@ -24,7 +26,8 @@ describe("detectBulkEditIntent", () => {
   });
 
   test("tolerates 'nparagraph' typo", () => {
-    const msg = "edit summarize all of the AI understanding bullet points into one nparagraph";
+    const msg =
+      "edit summarize all of the AI understanding bullet points into one nparagraph";
     expect(detectBulkEditIntent(msg)).toEqual({
       kind: "section_bullets_to_paragraph",
       heading: "AI understanding",
@@ -32,7 +35,8 @@ describe("detectBulkEditIntent", () => {
   });
 
   test("extracts quoted heading for bullets->paragraph", () => {
-    const msg = 'turn the bullet points under "AI understanding" into one paragraph';
+    const msg =
+      'turn the bullet points under "AI understanding" into one paragraph';
     expect(detectBulkEditIntent(msg)).toEqual({
       kind: "section_bullets_to_paragraph",
       heading: "AI understanding",
@@ -40,7 +44,8 @@ describe("detectBulkEditIntent", () => {
   });
 
   test("does not treat pointer-word 'selected' as a heading", () => {
-    const msg = "convert the selected bullets into one paragraph. if no bullets are selected, do not guess.";
+    const msg =
+      "convert the selected bullets into one paragraph. if no bullets are selected, do not guess.";
     expect(detectBulkEditIntent(msg)).toBeNull();
   });
 

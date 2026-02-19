@@ -3,7 +3,13 @@ import path from "path";
 
 describe("connector operators databank", () => {
   it("parses and contains bilingual operators", async () => {
-    const p = path.join(__dirname, "..", "data_banks", "operators", "connector_operators.any.json");
+    const p = path.join(
+      __dirname,
+      "..",
+      "data_banks",
+      "operators",
+      "connector_operators.any.json",
+    );
     const raw = await fs.readFile(p, "utf8");
     const bank = JSON.parse(raw);
 
@@ -21,7 +27,9 @@ describe("connector operators databank", () => {
 
     // Sample a few operators for EN/PT density (avoid iterating everything).
     const allOps = Object.values(bank.operators);
-    const sample = allOps.filter((o: any) => providers.has(o.provider || "gmail")).slice(0, 6);
+    const sample = allOps
+      .filter((o: any) => providers.has(o.provider || "gmail"))
+      .slice(0, 6);
     for (const op of sample as any[]) {
       expect(Array.isArray(op.patterns?.en)).toBe(true);
       expect(Array.isArray(op.patterns?.pt)).toBe(true);

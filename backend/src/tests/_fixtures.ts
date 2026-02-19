@@ -22,7 +22,9 @@ export function ensureFixtures(): { fixturesDir: string } {
 
   const stillMissing = expected.filter((p) => !fs.existsSync(p));
   if (stillMissing.length) {
-    throw new Error(`Test fixtures missing: ${stillMissing.map((p) => path.basename(p)).join(", ")}`);
+    throw new Error(
+      `Test fixtures missing: ${stillMissing.map((p) => path.basename(p)).join(", ")}`,
+    );
   }
   return { fixturesDir };
 }

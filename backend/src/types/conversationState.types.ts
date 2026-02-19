@@ -8,35 +8,35 @@
  * - metadata for routing / answer modes / sources UI
  */
 
-import type { Attachment } from './attachments.types';
+import type { Attachment } from "./attachments.types";
 
 // -----------------------------
 // Core enums / unions
 // -----------------------------
 
-export type ChatRole = 'user' | 'assistant' | 'system';
+export type ChatRole = "user" | "assistant" | "system";
 
 export type MessageStatus =
-  | 'queued'
-  | 'streaming'
-  | 'done'
-  | 'error'
-  | 'cancelled';
+  | "queued"
+  | "streaming"
+  | "done"
+  | "error"
+  | "cancelled";
 
 export type AnswerMode =
-  | 'no_docs'
-  | 'scoped_not_found'
-  | 'refusal'
-  | 'nav_pills'
-  | 'rank_disambiguate'
-  | 'rank_autopick'
-  | 'doc_grounded_single'
-  | 'doc_grounded_table'
-  | 'doc_grounded_quote'
-  | 'doc_grounded_multi'
-  | 'doc_discovery_list'
-  | 'help_steps'
-  | 'general_answer'
+  | "no_docs"
+  | "scoped_not_found"
+  | "refusal"
+  | "nav_pills"
+  | "rank_disambiguate"
+  | "rank_autopick"
+  | "doc_grounded_single"
+  | "doc_grounded_table"
+  | "doc_grounded_quote"
+  | "doc_grounded_multi"
+  | "doc_discovery_list"
+  | "help_steps"
+  | "general_answer"
   | string;
 
 // -----------------------------
@@ -193,12 +193,7 @@ export type ChatSendRequest = {
   requestId?: string;
 };
 
-export type ChatStreamEventType =
-  | 'meta'
-  | 'delta'
-  | 'done'
-  | 'error'
-  | 'stage';
+export type ChatStreamEventType = "meta" | "delta" | "done" | "error" | "stage";
 
 export type ChatStreamMeta = {
   threadId: string;
@@ -216,19 +211,28 @@ export type ChatStreamMeta = {
 
 export type ChatStreamEvent =
   | {
-      type: 'meta';
+      type: "meta";
       data: ChatStreamMeta;
     }
   | {
-      type: 'stage';
-      data: { stage: 'routing' | 'searching' | 'reading' | 'thinking' | 'writing' | string; message?: string };
+      type: "stage";
+      data: {
+        stage:
+          | "routing"
+          | "searching"
+          | "reading"
+          | "thinking"
+          | "writing"
+          | string;
+        message?: string;
+      };
     }
   | {
-      type: 'delta';
+      type: "delta";
       data: { text: string };
     }
   | {
-      type: 'done';
+      type: "done";
       data: {
         threadId: string;
         assistantMessageId: string;
@@ -238,7 +242,7 @@ export type ChatStreamEvent =
       };
     }
   | {
-      type: 'error';
+      type: "error";
       data: {
         threadId?: string;
         assistantMessageId?: string;
@@ -268,12 +272,20 @@ export type ChatThreadMessagesResponse = {
 // -----------------------------
 
 export function isAssistantMessage(m: ChatMessage): boolean {
-  return m.role === 'assistant';
+  return m.role === "assistant";
 }
 
 export function isNavPillsMessage(m: ChatMessage): boolean {
   const mode = m.meta?.answerMode || (m as any).answerMode;
-  const hasNavPillAttachment =
-    (m.attachments || []).some(a => a?.type === 'source_buttons' && (a as any).answerMode?.startsWith('nav_pill'));
-  return mode === 'nav_pills' || mode === 'nav_pill' || m.meta?.isNavPills === true || hasNavPillAttachment;
+  const hasNavPillAttachment = (m.attachments || []).some(
+    (a) =>
+      a?.type === "source_buttons" &&
+      (a as any).answerMode?.startsWith("nav_pill"),
+  );
+  return (
+    mode === "nav_pills" ||
+    mode === "nav_pill" ||
+    m.meta?.isNavPills === true ||
+    hasNavPillAttachment
+  );
 }

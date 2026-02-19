@@ -134,8 +134,7 @@
           "mescle"
         ],
         "regex_any": [
-          "\\b(?:defina|preencha|altere|substitua|troque|coloque)\\b.*\\b(?:toda|todo|todas|todos|cada|c[eé]lulas?|sele[cç][aã]o|c[eé]lulas?\\s+selecionadas?)\\b.*\\b(?:para|=|com)\\b",
-          "\\bdefina\\b.*\\bpara\\b\\s*\\d"
+          "\\b(?:defina|preencha|altere|substitua|troque|coloque)\\b.*\\b(?:toda|todo|todas|todos|cada|c[eé]lulas?|sele[cç][aã]o|c[eé]lulas?\\s+selecionadas?)\\b.*\\b(?:para|=|com)\\b"
         ]
       },
       "slotExtractors": [
@@ -1614,7 +1613,7 @@
       "priority": 76,
       "triggers": {
         "regex_any": [
-          "\\b(?:insira|inserir|adicione|adicionar)\\b.*\\blinhas?\\b",
+          "^(?!.*\\bgr[aá]fico\\b).*\\b(?:insira|inserir|adicione|adicionar)\\b.*\\blinhas?\\b",
           "\\blinhas?\\b.*\\b(?:insira|inserir|adicione|adicionar)\\b"
         ]
       },
@@ -2103,8 +2102,8 @@
           "some"
         ],
         "regex_any": [
-          "\\b(?:soma|total|some)\\b.*\\b(?:de|da|do|em|para|coluna|intervalo)\\b",
-          "\\bcalcul(?:e|ar)\\b.*\\bsoma\\b"
+          "^(?!.*\\bf[óo]rmula\\b)(?!.*=).*\\b(?:soma|total|some)\\b.*\\b(?:de|da|do|em|para|coluna|intervalo)\\b",
+          "^(?!.*\\bf[óo]rmula\\b)(?!.*=).*\\bcalcul(?:e|ar)\\b.*\\bsoma\\b"
         ]
       },
       "slotExtractors": [
@@ -2212,7 +2211,8 @@
           "contar"
         ],
         "regex_any": [
-          "\\bcont(?:e|ar|agem)\\b.*\\b(?:de|da|do|em|para|coluna|intervalo|células?|valores?)\\b"
+          "\\b(?:conte|contar|contagem)\\b\\s+(?:de|da|do|em|para|os|as|o|a)\\b.*\\b(?:coluna|intervalo|c[eé]lulas?|valores?|dados?)\\b",
+          "\\bquant(?:os|as)\\b.*\\bc[eé]lulas?\\b.*\\bdados?\\b"
         ]
       },
       "slotExtractors": [
@@ -2262,11 +2262,10 @@
         "tokens_any": [
           "máximo",
           "máxima",
-          "maior",
-          "maiores"
+          "maior"
         ],
         "regex_any": [
-          "\\b(?:máximo|máxima|maior|maiores)\\b.*\\b(?:de|da|do|em|para|valor)\\b"
+          "\\b(?:máximo|máxima|maior)\\b.*\\b(?:de|da|do|em|para|valor)\\b"
         ]
       },
       "slotExtractors": [

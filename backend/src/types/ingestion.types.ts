@@ -1,7 +1,11 @@
 // src/types/ingestion.types.ts
 
-import type { DocumentType, DocMimeType, DocExtension } from './documents.types';
-import type { DomainId } from './domains.types';
+import type {
+  DocumentType,
+  DocMimeType,
+  DocExtension,
+} from "./documents.types";
+import type { DomainId } from "./domains.types";
 
 /**
  * Ingestion = the pipeline that turns an uploaded file into:
@@ -16,25 +20,25 @@ import type { DomainId } from './domains.types';
 // Core identifiers
 // ---------------------------------------------
 
-export type UploadId = string;            // unique per upload attempt
-export type UploadSessionId = string;     // groups multiple parts or multi-file flow
-export type DocumentId = string;          // canonical doc id in your system
+export type UploadId = string; // unique per upload attempt
+export type UploadSessionId = string; // groups multiple parts or multi-file flow
+export type DocumentId = string; // canonical doc id in your system
 export type UserId = string;
 
 // ---------------------------------------------
 // Storage targets
 // ---------------------------------------------
 
-export type StorageBackend = 'local' | 's3';
+export type StorageBackend = "local" | "s3";
 
 export interface StoredObjectRef {
   backend: StorageBackend;
-  bucket?: string;          // required for s3
-  key?: string;             // required for s3
-  localPath?: string;       // required for local
-  publicUrl?: string;       // optional (if you ever expose)
+  bucket?: string; // required for s3
+  key?: string; // required for s3
+  localPath?: string; // required for local
+  publicUrl?: string; // optional (if you ever expose)
   sizeBytes: number;
-  checksumSha256?: string;  // optional but recommended
+  checksumSha256?: string; // optional but recommended
 }
 
 // ---------------------------------------------
@@ -130,21 +134,18 @@ export interface IngestionLimits {
   requireVirusScan?: boolean;
 }
 
-export type IngestionValidationStatus =
-  | 'ok'
-  | 'rejected'
-  | 'warn';
+export type IngestionValidationStatus = "ok" | "rejected" | "warn";
 
 export type IngestionRejectReason =
-  | 'file_too_large'
-  | 'unsupported_type'
-  | 'mime_mismatch'
-  | 'empty_file'
-  | 'corrupt_file'
-  | 'encrypted_pdf_unsupported'
-  | 'password_required'
-  | 'malware_suspected'
-  | 'policy_blocked';
+  | "file_too_large"
+  | "unsupported_type"
+  | "mime_mismatch"
+  | "empty_file"
+  | "corrupt_file"
+  | "encrypted_pdf_unsupported"
+  | "password_required"
+  | "malware_suspected"
+  | "policy_blocked";
 
 export interface IngestionValidationResult {
   status: IngestionValidationStatus;
@@ -162,27 +163,27 @@ export interface IngestionValidationResult {
 // ---------------------------------------------
 
 export type IngestionStage =
-  | 'received'
-  | 'validated'
-  | 'stored'
-  | 'converted'
-  | 'extracted'
-  | 'chunked'
-  | 'embedded'
-  | 'indexed'
-  | 'completed'
-  | 'failed';
+  | "received"
+  | "validated"
+  | "stored"
+  | "converted"
+  | "extracted"
+  | "chunked"
+  | "embedded"
+  | "indexed"
+  | "completed"
+  | "failed";
 
 export type IngestionErrorCode =
-  | 'validation_failed'
-  | 'storage_failed'
-  | 'conversion_failed'
-  | 'extraction_failed'
-  | 'chunking_failed'
-  | 'embedding_failed'
-  | 'index_failed'
-  | 'timeout'
-  | 'unknown';
+  | "validation_failed"
+  | "storage_failed"
+  | "conversion_failed"
+  | "extraction_failed"
+  | "chunking_failed"
+  | "embedding_failed"
+  | "index_failed"
+  | "timeout"
+  | "unknown";
 
 export interface IngestionProgress {
   stage: IngestionStage;
@@ -205,7 +206,7 @@ export interface IngestionProgress {
 
 export interface IngestionFailure {
   code: IngestionErrorCode;
-  message: string;         // user-safe message
+  message: string; // user-safe message
   retryable: boolean;
   details?: Record<string, any>; // internal / logs
 }
@@ -215,14 +216,14 @@ export interface IngestionFailure {
 // ---------------------------------------------
 
 export type ExtractionEngine =
-  | 'pdf_text'
-  | 'pdf_ocr'
-  | 'docx'
-  | 'xlsx'
-  | 'pptx'
-  | 'image_ocr'
-  | 'txt'
-  | 'unknown';
+  | "pdf_text"
+  | "pdf_ocr"
+  | "docx"
+  | "xlsx"
+  | "pptx"
+  | "image_ocr"
+  | "txt"
+  | "unknown";
 
 export interface ExtractionStats {
   engine: ExtractionEngine;
@@ -234,16 +235,16 @@ export interface ExtractionStats {
   /**
    * OCR quality if applicable
    */
-  ocrAvgConfidence?: number;  // 0..1
-  ocrLanguage?: string;       // e.g. "por", "eng"
-  gibberishScore?: number;    // 0..1 (optional)
+  ocrAvgConfidence?: number; // 0..1
+  ocrLanguage?: string; // e.g. "por", "eng"
+  gibberishScore?: number; // 0..1 (optional)
 }
 
 export interface ExtractedAnchor {
   /**
    * Used for precise citations in UI (page/sheet/cell/slide).
    */
-  type: 'page' | 'sheet' | 'slide' | 'cell' | 'section';
+  type: "page" | "sheet" | "slide" | "cell" | "section";
   value: string | number;
   label?: string; // e.g. "Page 3", "Sheet2!B12"
 }
@@ -381,7 +382,7 @@ export interface UploadCompleteResponse {
 
 export interface DocClassificationHint {
   domainHint?: DomainId | null;
-  languageHint?: 'en' | 'pt' | 'es' | string;
+  languageHint?: "en" | "pt" | "es" | string;
   isScanned?: boolean;
   isSpreadsheet?: boolean;
   containsTablesLikely?: boolean;

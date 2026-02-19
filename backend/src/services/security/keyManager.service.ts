@@ -3,7 +3,10 @@ import { KeyProvider, TenantKeyEnvelope } from "./crypto.types";
 
 export interface IKeyManager {
   provider: KeyProvider;
-  generateTenantKey(): Promise<{ plaintextKey: Buffer; envelope: TenantKeyEnvelope }>;
+  generateTenantKey(): Promise<{
+    plaintextKey: Buffer;
+    envelope: TenantKeyEnvelope;
+  }>;
   decryptTenantKey(envelope: TenantKeyEnvelope): Promise<Buffer>;
 }
 
@@ -39,7 +42,11 @@ export class LocalKeyManager implements IKeyManager {
   }
 
   async decryptTenantKey(envelope: TenantKeyEnvelope): Promise<Buffer> {
-    const b64 = this.enc.decryptStringFromJson(envelope.encryptedKey, this.masterKey, "tenantKey");
+    const b64 = this.enc.decryptStringFromJson(
+      envelope.encryptedKey,
+      this.masterKey,
+      "tenantKey",
+    );
     return Buffer.from(b64, "base64");
   }
 }

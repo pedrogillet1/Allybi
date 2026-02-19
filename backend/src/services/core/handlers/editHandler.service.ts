@@ -17,7 +17,10 @@ import {
   type SlidesTargetNode,
   type UndoResult,
 } from "../../editing";
-import { SupportContractService, type SupportContractResult } from "../../editing/allybi/supportContract.service";
+import {
+  SupportContractService,
+  type SupportContractResult,
+} from "../../editing/allybi/supportContract.service";
 
 type EditActionMode = "plan" | "preview" | "apply" | "undo";
 
@@ -74,7 +77,10 @@ export class EditHandlerService {
   private readonly targetResolver: TargetResolverService;
   private readonly supportContract: SupportContractService;
 
-  constructor(opts?: { revisionStore?: EditRevisionStore; telemetry?: EditTelemetry }) {
+  constructor(opts?: {
+    revisionStore?: EditRevisionStore;
+    telemetry?: EditTelemetry;
+  }) {
     this.orchestrator = new EditOrchestratorService({
       revisionStore: opts?.revisionStore,
       telemetry: opts?.telemetry,
@@ -84,34 +90,79 @@ export class EditHandlerService {
   }
 
   async execute(input: EditHandlerRequest): Promise<EditHandlerResponse> {
-    if (!input?.context?.userId || !input.context.conversationId || !input.context.correlationId || !input.context.clientMessageId) {
+    if (
+      !input?.context?.userId ||
+      !input.context.conversationId ||
+      !input.context.correlationId ||
+      !input.context.clientMessageId
+    ) {
       return { ok: false, mode: input.mode, error: "Invalid edit context." };
     }
 
     if (input.mode === "plan") {
-      if (!input.planRequest) return { ok: false, mode: "plan", error: "Missing plan request." };
-      const planned = await this.orchestrator.planEdit(input.context, input.planRequest);
-      return { ok: planned.ok, mode: "plan", result: planned, error: planned.ok ? undefined : planned.error };
+      if (!input.planRequest)
+        return { ok: false, mode: "plan", error: "Missing plan request." };
+      const planned = await this.orchestrator.planEdit(
+        input.context,
+        input.planRequest,
+      );
+      return {
+        ok: planned.ok,
+        mode: "plan",
+        result: planned,
+        error: planned.ok ? undefined : planned.error,
+      };
     }
 
     if (input.mode === "undo") {
-      if (!input.undo?.documentId) return { ok: false, mode: "undo", error: "Undo requires documentId." };
-      const undone = await this.orchestrator.undoEdit(input.context, input.undo);
-      return { ok: undone.ok, mode: "undo", result: undone, receipt: undone.receipt, error: undone.ok ? undefined : undone.error };
+      if (!input.undo?.documentId)
+        return { ok: false, mode: "undo", error: "Undo requires documentId." };
+      const undone = await this.orchestrator.undoEdit(
+        input.context,
+        input.undo,
+      );
+      return {
+        ok: undone.ok,
+        mode: "undo",
+        result: undone,
+        receipt: undone.receipt,
+        error: undone.ok ? undefined : undone.error,
+      };
     }
 
-    if (!input.planRequest || !isNonEmpty(input.beforeText) || !isNonEmpty(input.proposedText)) {
-      return { ok: false, mode: input.mode, error: "Preview/apply requires planRequest, beforeText, and proposedText." };
+    if (
+      !input.planRequest ||
+      !isNonEmpty(input.beforeText) ||
+      !isNonEmpty(input.proposedText)
+    ) {
+      return {
+        ok: false,
+        mode: input.mode,
+        error:
+          "Preview/apply requires planRequest, beforeText, and proposedText.",
+      };
     }
 
-    const planned = await this.orchestrator.planEdit(input.context, input.planRequest);
+    const planned = await this.orchestrator.planEdit(
+      input.context,
+      input.planRequest,
+    );
     if (!planned.ok || !planned.plan) {
-      return { ok: false, mode: input.mode, result: planned, error: planned.error || "Failed to build edit plan." };
+      return {
+        ok: false,
+        mode: input.mode,
+        result: planned,
+        error: planned.error || "Failed to build edit plan.",
+      };
     }
 
     const resolvedTarget =
       input.target ??
-      this.resolveTargetFromCandidates(planned.plan.domain, planned.plan.targetHint || planned.plan.normalizedInstruction, input) ??
+      this.resolveTargetFromCandidates(
+        planned.plan.domain,
+        planned.plan.targetHint || planned.plan.normalizedInstruction,
+        input,
+      ) ??
       // Operators that are not anchored to an existing paragraph/cell can use a synthetic target.
       (planned.plan.operator === "ADD_SHEET"
         ? syntheticTarget("New sheet")
@@ -123,10 +174,14 @@ export class EditHandlerService {
               ? syntheticTarget("Bulk DOCX edit")
               : planned.plan.operator === "COMPUTE_BUNDLE"
                 ? syntheticTarget("Bulk sheet edit")
-            : null);
+                : null);
 
     if (!resolvedTarget) {
-      return { ok: false, mode: input.mode, error: "Could not resolve edit target." };
+      return {
+        ok: false,
+        mode: input.mode,
+        error: "Could not resolve edit target.",
+      };
     }
 
     const contract = this.supportContract.evaluatePreApply({
@@ -173,7 +228,11 @@ export class EditHandlerService {
       };
     }
 
-    if (resolvedTarget.isAmbiguous && input.mode === "apply" && input.userConfirmed !== true) {
+    if (
+      resolvedTarget.isAmbiguous &&
+      input.mode === "apply" &&
+      input.userConfirmed !== true
+    ) {
       const preview = await this.orchestrator.previewEdit(input.context, {
         plan: planned.plan,
         target: resolvedTarget,
@@ -235,13 +294,22 @@ export class EditHandlerService {
     input: EditHandlerRequest,
   ): ResolvedTarget | null {
     if (domain === "docx" && input.docxCandidates?.length) {
-      return this.targetResolver.resolveDocxParagraphTarget(hint, input.docxCandidates);
+      return this.targetResolver.resolveDocxParagraphTarget(
+        hint,
+        input.docxCandidates,
+      );
     }
     if (domain === "sheets" && input.sheetsCandidates?.length) {
-      return this.targetResolver.resolveSheetsCellOrRangeTarget(hint, input.sheetsCandidates);
+      return this.targetResolver.resolveSheetsCellOrRangeTarget(
+        hint,
+        input.sheetsCandidates,
+      );
     }
     if (domain === "slides" && input.slidesCandidates?.length) {
-      return this.targetResolver.resolveSlidesTarget(hint, input.slidesCandidates);
+      return this.targetResolver.resolveSlidesTarget(
+        hint,
+        input.slidesCandidates,
+      );
     }
     return null;
   }
@@ -251,13 +319,19 @@ export class EditHandlerService {
     target: ResolvedTarget;
     contract: SupportContractResult;
   }): EditReceipt {
-    const note = input.contract.blockedReason?.message || "This edit is currently blocked by support checks.";
+    const note =
+      input.contract.blockedReason?.message ||
+      "This edit is currently blocked by support checks.";
     return {
       stage: "blocked",
       note,
       actions: [
         { kind: "cancel", label: "Cancel" },
-        { kind: "pick_target", label: "Pick different target", payload: { targetId: input.target.id } },
+        {
+          kind: "pick_target",
+          label: "Pick different target",
+          payload: { targetId: input.target.id },
+        },
       ],
     };
   }
@@ -267,7 +341,8 @@ export class EditHandlerService {
     receipt: EditReceipt;
     contract: SupportContractResult;
   }): EditApplyResult {
-    const outcomeType: EditOutcomeType = input.contract.outcomeType || "blocked";
+    const outcomeType: EditOutcomeType =
+      input.contract.outcomeType || "blocked";
     return {
       ok: true,
       applied: false,

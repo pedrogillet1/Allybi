@@ -90,7 +90,11 @@ function stripBom(s: string): string {
 }
 
 function normalizeWhitespace(s: string): string {
-  return stripBom(s).replace(/\r\n|\r/g, "\n").replace(/\t/g, "  ").replace(/[ \t]+$/gm, "").trim();
+  return stripBom(s)
+    .replace(/\r\n|\r/g, "\n")
+    .replace(/\t/g, "  ")
+    .replace(/[ \t]+$/gm, "")
+    .trim();
 }
 
 function normalizeForDetection(s: string): string {
@@ -137,7 +141,13 @@ function topTwo(scores: Record<"en" | "pt" | "es", number>) {
   entries.sort((a, b) => b[1] - a[1]);
   const top = entries[0];
   const second = entries[1];
-  return { topLang: top[0], topScore: top[1], secondLang: second[0], secondScore: second[1], gap: top[1] - second[1] };
+  return {
+    topLang: top[0],
+    topScore: top[1],
+    secondLang: second[0],
+    secondScore: second[1],
+    gap: top[1] - second[1],
+  };
 }
 
 // --------------------
@@ -158,28 +168,49 @@ export class LanguageDetectorService {
 
     // Defaults (from banks when present)
     const envCfg = triggers?.config ?? {};
-    const defaultLanguage: LangCode = (envCfg.defaultLanguage && isLang(envCfg.defaultLanguage)) ? envCfg.defaultLanguage : "any";
+    const defaultLanguage: LangCode =
+      envCfg.defaultLanguage && isLang(envCfg.defaultLanguage)
+        ? envCfg.defaultLanguage
+        : "any";
 
     const trigThresholds = triggers?.config?.actionsContract?.thresholds ?? {};
-    const explicitDirectiveConfidence = clamp01(Number(trigThresholds.explicitDirectiveConfidence ?? 0.95));
-    const minGapToForce = clamp01(Number(trigThresholds.minConfidenceGapToForce ?? 0.15));
-    const implicitCueConfidence = clamp01(Number(trigThresholds.implicitCueConfidence ?? 0.75));
+    const explicitDirectiveConfidence = clamp01(
+      Number(trigThresholds.explicitDirectiveConfidence ?? 0.95),
+    );
+    const minGapToForce = clamp01(
+      Number(trigThresholds.minConfidenceGapToForce ?? 0.15),
+    );
+    const implicitCueConfidence = clamp01(
+      Number(trigThresholds.implicitCueConfidence ?? 0.75),
+    );
 
     const indCfg = indicators?.config ?? {};
-    const supported: Array<"en" | "pt" | "es"> = Array.isArray(indCfg.supported) ? indCfg.supported.filter((x: any) => x === "en" || x === "pt" || x === "es") : ["en", "pt", "es"];
-    const minConfidenceToSelect = clamp01(Number(indCfg.minConfidenceToSelect ?? 0.75));
-    const minConfidenceGap = clamp01(Number(indCfg.actionsContract?.thresholds?.minConfidenceGap ?? 0.15));
+    const supported: Array<"en" | "pt" | "es"> = Array.isArray(indCfg.supported)
+      ? indCfg.supported.filter(
+          (x: any) => x === "en" || x === "pt" || x === "es",
+        )
+      : ["en", "pt", "es"];
+    const minConfidenceToSelect = clamp01(
+      Number(indCfg.minConfidenceToSelect ?? 0.75),
+    );
+    const minConfidenceGap = clamp01(
+      Number(indCfg.actionsContract?.thresholds?.minConfidenceGap ?? 0.15),
+    );
 
     const debug = {
       usedDirective: false,
       matchedDirectiveRuleIds: [] as string[],
       matchedIndicatorRuleIds: [] as string[],
-      normalizedTextSample: normalized.slice(0, 160)
+      normalizedTextSample: normalized.slice(0, 160),
     };
 
     // 1) Explicit language directives (language_triggers)
     const directive = this.applyLanguageTriggers(triggers, normalized, debug);
-    if (directive.languageRequested && directive.languageSelected && directive.languageSelected !== "any") {
+    if (
+      directive.languageRequested &&
+      directive.languageSelected &&
+      directive.languageSelected !== "any"
+    ) {
       // Directive wins over everything
       return {
         selectedLanguage: directive.languageSelected,
@@ -188,21 +219,34 @@ export class LanguageDetectorService {
         mixedLanguageDetected: directive.mixedLanguageDetected,
         languageRequested: true,
         directiveLanguage: directive.languageSelected,
-        scores: { en: directive.languageSelected === "en" ? 1 : 0, pt: directive.languageSelected === "pt" ? 1 : 0, es: directive.languageSelected === "es" ? 1 : 0 },
+        scores: {
+          en: directive.languageSelected === "en" ? 1 : 0,
+          pt: directive.languageSelected === "pt" ? 1 : 0,
+          es: directive.languageSelected === "es" ? 1 : 0,
+        },
         gap: 1,
-        debug: env === "production" ? undefined : { ...debug, usedDirective: true }
+        debug:
+          env === "production" ? undefined : { ...debug, usedDirective: true },
       };
     }
 
     // 2) If directive says "any" due to mixed-language detection, keep going with indicators
-    const directiveForcedAny = directive.languageRequested && directive.languageSelected === "any";
+    const directiveForcedAny =
+      directive.languageRequested && directive.languageSelected === "any";
 
     // 3) Score language indicators (language_indicators)
-    const scored = this.applyLanguageIndicators(indicators, normalized, supported, debug);
+    const scored = this.applyLanguageIndicators(
+      indicators,
+      normalized,
+      supported,
+      debug,
+    );
 
     // 4) Mixed-language detection heuristic:
     // If we detect strong evidence for 2+ languages, treat as mixed and return any unless directive forces a language.
-    const detectedLangCount = (["en", "pt", "es"] as const).filter(l => scored.scores[l] >= 0.6).length;
+    const detectedLangCount = (["en", "pt", "es"] as const).filter(
+      (l) => scored.scores[l] >= 0.6,
+    ).length;
     const mixedLanguageDetected = detectedLangCount >= 2;
 
     if (mixedLanguageDetected && !directive.languageRequested) {
@@ -215,13 +259,15 @@ export class LanguageDetectorService {
         directiveLanguage: null,
         scores: scored.scores,
         gap: scored.gap,
-        debug: env === "production" ? undefined : { ...debug, usedDirective: false }
+        debug:
+          env === "production" ? undefined : { ...debug, usedDirective: false },
       };
     }
 
     // 5) Decide language using indicators + ambiguity rules
     const { topLang, topScore, gap } = scored;
-    const ambiguous = topScore < minConfidenceToSelect || gap < minConfidenceGap;
+    const ambiguous =
+      topScore < minConfidenceToSelect || gap < minConfidenceGap;
 
     // If ambiguous, return any (ChatGPT-like: don't force wrong language)
     if (ambiguous) {
@@ -231,12 +277,14 @@ export class LanguageDetectorService {
         selectedLanguage: "any",
         confidence: clamp01(Math.max(0.4, topScore)),
         isAmbiguous: true,
-        mixedLanguageDetected: directive.mixedLanguageDetected || mixedLanguageDetected,
+        mixedLanguageDetected:
+          directive.mixedLanguageDetected || mixedLanguageDetected,
         languageRequested: Boolean(directive.languageRequested),
         directiveLanguage: directive.languageSelected ?? null,
         scores: scored.scores,
         gap,
-        debug: env === "production" ? undefined : { ...debug, usedDirective: false }
+        debug:
+          env === "production" ? undefined : { ...debug, usedDirective: false },
       };
     }
 
@@ -252,7 +300,8 @@ export class LanguageDetectorService {
         directiveLanguage: "any",
         scores: scored.scores,
         gap,
-        debug: env === "production" ? undefined : { ...debug, usedDirective: true }
+        debug:
+          env === "production" ? undefined : { ...debug, usedDirective: true },
       };
     }
 
@@ -260,12 +309,14 @@ export class LanguageDetectorService {
       selectedLanguage: topLang,
       confidence: clamp01(topScore),
       isAmbiguous: false,
-      mixedLanguageDetected: directive.mixedLanguageDetected || mixedLanguageDetected,
+      mixedLanguageDetected:
+        directive.mixedLanguageDetected || mixedLanguageDetected,
       languageRequested: Boolean(directive.languageRequested),
       directiveLanguage: directive.languageSelected ?? null,
       scores: scored.scores,
       gap,
-      debug: env === "production" ? undefined : { ...debug, usedDirective: false }
+      debug:
+        env === "production" ? undefined : { ...debug, usedDirective: false },
     };
   }
 
@@ -276,10 +327,23 @@ export class LanguageDetectorService {
   private applyLanguageTriggers(
     triggersBank: any | null,
     normalized: string,
-    debug: { matchedDirectiveRuleIds: string[]; matchedIndicatorRuleIds: string[]; usedDirective: boolean; normalizedTextSample: string }
-  ): { languageRequested: boolean; languageSelected: LangCode | null; mixedLanguageDetected: boolean } {
+    debug: {
+      matchedDirectiveRuleIds: string[];
+      matchedIndicatorRuleIds: string[];
+      usedDirective: boolean;
+      normalizedTextSample: string;
+    },
+  ): {
+    languageRequested: boolean;
+    languageSelected: LangCode | null;
+    mixedLanguageDetected: boolean;
+  } {
     if (!triggersBank?.config?.enabled) {
-      return { languageRequested: false, languageSelected: null, mixedLanguageDetected: false };
+      return {
+        languageRequested: false,
+        languageSelected: null,
+        mixedLanguageDetected: false,
+      };
     }
 
     const rules = Array.isArray(triggersBank.rules) ? triggersBank.rules : [];
@@ -295,7 +359,10 @@ export class LanguageDetectorService {
       const pt = safeRegExpList(pats.pt);
       const es = safeRegExpList(pats.es);
 
-      const hit = en.some(re => re.test(normalized)) || pt.some(re => re.test(normalized)) || es.some(re => re.test(normalized));
+      const hit =
+        en.some((re) => re.test(normalized)) ||
+        pt.some((re) => re.test(normalized)) ||
+        es.some((re) => re.test(normalized));
       if (!hit) continue;
 
       debug.matchedDirectiveRuleIds.push(String(rid));
@@ -306,26 +373,35 @@ export class LanguageDetectorService {
         const lang = action.language as LangCode;
         if (isLang(lang)) {
           const conf = clamp01(Number(action.confidence ?? 0.95));
-          if (!best || conf > best.conf) best = { lang, conf, ruleId: String(rid) };
+          if (!best || conf > best.conf)
+            best = { lang, conf, ruleId: String(rid) };
         }
       } else if (type === "bias_language") {
         const lang = action.language as LangCode;
         if (isLang(lang)) {
           const conf = clamp01(Number(action.confidence ?? 0.75));
-          if (!best || conf > best.conf) best = { lang, conf, ruleId: String(rid) };
+          if (!best || conf > best.conf)
+            best = { lang, conf, ruleId: String(rid) };
         }
       }
     }
 
     // Mixed-language detection rule might set language any
-    const mixed = debug.matchedDirectiveRuleIds.includes("mixed_language_detection") || /mixed/i.test(debug.matchedDirectiveRuleIds.join("|"));
+    const mixed =
+      debug.matchedDirectiveRuleIds.includes("mixed_language_detection") ||
+      /mixed/i.test(debug.matchedDirectiveRuleIds.join("|"));
 
-    if (!best) return { languageRequested: false, languageSelected: null, mixedLanguageDetected: mixed };
+    if (!best)
+      return {
+        languageRequested: false,
+        languageSelected: null,
+        mixedLanguageDetected: mixed,
+      };
 
     return {
       languageRequested: true,
       languageSelected: best.lang,
-      mixedLanguageDetected: mixed || best.lang === "any"
+      mixedLanguageDetected: mixed || best.lang === "any",
     };
   }
 
@@ -337,21 +413,42 @@ export class LanguageDetectorService {
     indicatorsBank: any | null,
     normalized: string,
     supported: Array<"en" | "pt" | "es">,
-    debug: { matchedDirectiveRuleIds: string[]; matchedIndicatorRuleIds: string[]; usedDirective: boolean; normalizedTextSample: string }
-  ): { scores: Record<"en" | "pt" | "es", number>; topLang: "en" | "pt" | "es"; topScore: number; gap: number } {
+    debug: {
+      matchedDirectiveRuleIds: string[];
+      matchedIndicatorRuleIds: string[];
+      usedDirective: boolean;
+      normalizedTextSample: string;
+    },
+  ): {
+    scores: Record<"en" | "pt" | "es", number>;
+    topLang: "en" | "pt" | "es";
+    topScore: number;
+    gap: number;
+  } {
     // Default: neutral scores
     const scores: Record<"en" | "pt" | "es", number> = { en: 0, pt: 0, es: 0 };
 
     if (!indicatorsBank?.config?.enabled) {
       // fallback heuristic: basic cues
       scores.en = /\b(the|and|please|summary)\b/.test(normalized) ? 0.7 : 0.4;
-      scores.pt = /\b(você|não|relatório|página)\b/.test(normalized) ? 0.7 : 0.4;
-      scores.es = /\b(¿|dónde|qué|ingresos|gastos)\b/.test(normalized) ? 0.7 : 0.4;
+      scores.pt = /\b(você|não|relatório|página)\b/.test(normalized)
+        ? 0.7
+        : 0.4;
+      scores.es = /\b(¿|dónde|qué|ingresos|gastos)\b/.test(normalized)
+        ? 0.7
+        : 0.4;
       const t = topTwo(scores);
-      return { scores, topLang: t.topLang, topScore: t.topScore, gap: clamp01(t.gap) };
+      return {
+        scores,
+        topLang: t.topLang,
+        topScore: t.topScore,
+        gap: clamp01(t.gap),
+      };
     }
 
-    const rules = Array.isArray(indicatorsBank.rules) ? indicatorsBank.rules : [];
+    const rules = Array.isArray(indicatorsBank.rules)
+      ? indicatorsBank.rules
+      : [];
 
     // Evaluate rule patterns. We interpret actions.score_language with weight.
     for (const r of rules) {
@@ -364,9 +461,9 @@ export class LanguageDetectorService {
       const es = safeRegExpList(pats.es);
 
       const hit =
-        en.some(re => re.test(normalized)) ||
-        pt.some(re => re.test(normalized)) ||
-        es.some(re => re.test(normalized));
+        en.some((re) => re.test(normalized)) ||
+        pt.some((re) => re.test(normalized)) ||
+        es.some((re) => re.test(normalized));
 
       // Only apply scoring rules if they hit
       if (!hit) continue;
@@ -379,7 +476,9 @@ export class LanguageDetectorService {
         const lang = action.language as string;
         const w = clamp01(Number(action.weight ?? 0.4));
         if (lang === "en" || lang === "pt" || lang === "es") {
-          scores[lang as keyof typeof scores] = clamp01(scores[lang as keyof typeof scores] + w);
+          scores[lang as keyof typeof scores] = clamp01(
+            scores[lang as keyof typeof scores] + w,
+          );
         }
       } else if (type === "set_language") {
         // Ambiguous guard may force "any" in indicators bank, but we treat that in decision phase.
@@ -400,7 +499,12 @@ export class LanguageDetectorService {
     }
 
     const t = topTwo(scores);
-    return { scores, topLang: t.topLang, topScore: clamp01(t.topScore), gap: clamp01(t.gap) };
+    return {
+      scores,
+      topLang: t.topLang,
+      topScore: clamp01(t.topScore),
+      gap: clamp01(t.gap),
+    };
   }
 
   // -------------------------

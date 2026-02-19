@@ -3,12 +3,18 @@ import { classifyAllybiIntent } from "./intentClassifier";
 
 describe("classifyAllybiIntent", () => {
   test("classifies whole-document translation requests via trigger bank", () => {
-    const out = classifyAllybiIntent("Translate the entire document to Portuguese.", "docx");
+    const out = classifyAllybiIntent(
+      "Translate the entire document to Portuguese.",
+      "docx",
+    );
     expect(out?.intentId).toBe("DOCX_TRANSLATE");
   });
 
   test("does not force a random fallback intent on unrelated text", () => {
-    const out = classifyAllybiIntent("What's the weather in Boston today?", "docx");
+    const out = classifyAllybiIntent(
+      "What's the weather in Boston today?",
+      "docx",
+    );
     expect(out).toBeNull();
   });
 
@@ -42,7 +48,11 @@ describe("classifyAllybiIntent", () => {
     );
     expect(out?.intentId).toBe("DOCX_LIST_CONVERT");
     expect(Array.isArray(out?.operatorCandidates)).toBe(true);
-    expect((out?.operatorCandidates || []).some((op) => String(op).startsWith("DOCX_LIST_"))).toBe(true);
+    expect(
+      (out?.operatorCandidates || []).some((op) =>
+        String(op).startsWith("DOCX_LIST_"),
+      ),
+    ).toBe(true);
   });
 
   test("classifies EN selected-bullets-to-one-paragraph requests", () => {
@@ -53,7 +63,11 @@ describe("classifyAllybiIntent", () => {
     );
     expect(out?.intentId).toBe("DOCX_LIST_CONVERT");
     expect(Array.isArray(out?.operatorCandidates)).toBe(true);
-    expect((out?.operatorCandidates || []).some((op) => String(op).startsWith("DOCX_LIST_"))).toBe(true);
+    expect(
+      (out?.operatorCandidates || []).some((op) =>
+        String(op).startsWith("DOCX_LIST_"),
+      ),
+    ).toBe(true);
   });
 
   test("matches intent from natural PT wording even when trigger phrase is not contiguous", () => {

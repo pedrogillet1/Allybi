@@ -16,14 +16,14 @@
  * - No retrieval logic
  */
 
-import type { LLMProvider } from './llmErrors.types';
+import type { LLMProvider } from "./llmErrors.types";
 import type {
   SafetySignal,
   SafetyContext,
   SafetyDecision,
   SafetyAdapterPolicy,
-} from './llmSafetyAdapter.service';
-import { LLMSafetyAdapterService } from './llmSafetyAdapter.service';
+} from "./llmSafetyAdapter.service";
+import { LLMSafetyAdapterService } from "./llmSafetyAdapter.service";
 
 /**
  * Gemini response safety shapes vary across versions.
@@ -66,7 +66,7 @@ export interface GeminiSafetyAdapterConfig {
   /**
    * Maps Gemini probability strings into a rough severity.
    */
-  probabilityToSeverity: Record<string, 'low' | 'medium' | 'high' | 'critical'>;
+  probabilityToSeverity: Record<string, "low" | "medium" | "high" | "critical">;
 
   /**
    * Optional: allow extra category mappings (extensible).
@@ -79,7 +79,7 @@ export class GeminiSafetyAdapterService {
 
   constructor(
     private readonly cfg: GeminiSafetyAdapterConfig,
-    safetyPolicy: SafetyAdapterPolicy
+    safetyPolicy: SafetyAdapterPolicy,
   ) {
     this.core = new LLMSafetyAdapterService(safetyPolicy);
   }
@@ -92,7 +92,10 @@ export class GeminiSafetyAdapterService {
     context: SafetyContext;
     requestId?: string;
   }): SafetyDecision {
-    const signal = this.extractSafetySignal(params.geminiResponse, params.requestId);
+    const signal = this.extractSafetySignal(
+      params.geminiResponse,
+      params.requestId,
+    );
     return this.core.decide({
       signal,
       context: params.context,
@@ -102,10 +105,13 @@ export class GeminiSafetyAdapterService {
   /**
    * Extract a provider-agnostic SafetySignal from Gemini response-like payload.
    */
-  extractSafetySignal(geminiResponse: unknown, requestId?: string): SafetySignal {
+  extractSafetySignal(
+    geminiResponse: unknown,
+    requestId?: string,
+  ): SafetySignal {
     const resp = geminiResponse as GeminiResponseLike;
 
-    const provider: LLMProvider = 'google';
+    const provider: LLMProvider = "google";
     const providerCategories: string[] = [];
     let providerBlocked = false;
 
@@ -121,7 +127,8 @@ export class GeminiSafetyAdapterService {
       }
     }
     if (this.cfg.promptFeedbackSafetyIsBlock && pf?.blockReason) {
-      if (String(pf.blockReason).toUpperCase().includes('SAFETY')) providerBlocked = true;
+      if (String(pf.blockReason).toUpperCase().includes("SAFETY"))
+        providerBlocked = true;
     }
 
     // 2) Candidate-level safety ratings
@@ -134,7 +141,8 @@ export class GeminiSafetyAdapterService {
       }
     }
     if (this.cfg.finishReasonSafetyIsBlock && c0?.finishReason) {
-      if (String(c0.finishReason).toUpperCase().includes('SAFETY')) providerBlocked = true;
+      if (String(c0.finishReason).toUpperCase().includes("SAFETY"))
+        providerBlocked = true;
     }
 
     // 3) Derive a rough providerSeverity from highest probability seen
@@ -145,7 +153,7 @@ export class GeminiSafetyAdapterService {
 
     return {
       provider,
-      providerCategories: dedupedCats.map(c => this.mapExtra(c)),
+      providerCategories: dedupedCats.map((c) => this.mapExtra(c)),
       providerSeverity,
       providerBlocked,
       flags,
@@ -167,10 +175,10 @@ export class GeminiSafetyAdapterService {
 
     if (!ratings.length) return undefined;
 
-    let best: 'low' | 'medium' | 'high' | 'critical' = 'low';
+    let best: "low" | "medium" | "high" | "critical" = "low";
 
     for (const r of ratings) {
-      const p = (r.probability ?? '').toUpperCase().trim();
+      const p = (r.probability ?? "").toUpperCase().trim();
       const sev = this.cfg.probabilityToSeverity[p];
       if (!sev) continue;
       best = maxSeverity(best, sev);
@@ -179,21 +187,25 @@ export class GeminiSafetyAdapterService {
     return best;
   }
 
-  private applyFlagForCategory(cat: string | null, flags: Record<string, boolean>): void {
+  private applyFlagForCategory(
+    cat: string | null,
+    flags: Record<string, boolean>,
+  ): void {
     if (!cat) return;
 
     // Map normalized categories to boolean flags used by LLMSafetyAdapterService
     // (Keep stable keys.)
-    if (cat.includes('SELF_HARM')) flags['self_harm'] = true;
-    if (cat.includes('SEXUAL')) flags['sexual'] = true;
-    if (cat.includes('MINORS') || cat.includes('CHILD')) flags['minors'] = true;
-    if (cat.includes('VIOLENCE')) flags['violence'] = true;
-    if (cat.includes('HATE')) flags['hate'] = true;
-    if (cat.includes('HARASSMENT')) flags['harassment'] = true;
-    if (cat.includes('ILLEGAL')) flags['illegal'] = true;
-    if (cat.includes('PRIVACY') || cat.includes('PII') || cat.includes('DOX')) flags['privacy'] = true;
-    if (cat.includes('MEDICAL')) flags['medical'] = true;
-    if (cat.includes('LEGAL')) flags['legal'] = true;
+    if (cat.includes("SELF_HARM")) flags["self_harm"] = true;
+    if (cat.includes("SEXUAL")) flags["sexual"] = true;
+    if (cat.includes("MINORS") || cat.includes("CHILD")) flags["minors"] = true;
+    if (cat.includes("VIOLENCE")) flags["violence"] = true;
+    if (cat.includes("HATE")) flags["hate"] = true;
+    if (cat.includes("HARASSMENT")) flags["harassment"] = true;
+    if (cat.includes("ILLEGAL")) flags["illegal"] = true;
+    if (cat.includes("PRIVACY") || cat.includes("PII") || cat.includes("DOX"))
+      flags["privacy"] = true;
+    if (cat.includes("MEDICAL")) flags["medical"] = true;
+    if (cat.includes("LEGAL")) flags["legal"] = true;
   }
 
   private mapExtra(cat: string): string {
@@ -217,23 +229,34 @@ function normalizeGeminiCategory(raw?: string): string | null {
 
   // Common known Gemini categories
   // (We keep them as normalized providerCategories; the core adapter maps them to Allybi reasons.)
-  if (upper.includes('SELF_HARM')) return 'HARM_CATEGORY_SELF_HARM';
-  if (upper.includes('SEXUAL')) return 'HARM_CATEGORY_SEXUAL_CONTENT';
-  if (upper.includes('HATE')) return 'HARM_CATEGORY_HATE_SPEECH';
-  if (upper.includes('HARASSMENT')) return 'HARM_CATEGORY_HARASSMENT';
-  if (upper.includes('VIOLENCE')) return 'HARM_CATEGORY_VIOLENCE';
-  if (upper.includes('DANGEROUS') || upper.includes('ILLEGAL')) return 'HARM_CATEGORY_ILLEGAL';
+  if (upper.includes("SELF_HARM")) return "HARM_CATEGORY_SELF_HARM";
+  if (upper.includes("SEXUAL")) return "HARM_CATEGORY_SEXUAL_CONTENT";
+  if (upper.includes("HATE")) return "HARM_CATEGORY_HATE_SPEECH";
+  if (upper.includes("HARASSMENT")) return "HARM_CATEGORY_HARASSMENT";
+  if (upper.includes("VIOLENCE")) return "HARM_CATEGORY_VIOLENCE";
+  if (upper.includes("DANGEROUS") || upper.includes("ILLEGAL"))
+    return "HARM_CATEGORY_ILLEGAL";
   // Privacy categories are not always present; keep generic when found
-  if (upper.includes('PRIVACY') || upper.includes('PII') || upper.includes('DOX')) return 'HARM_CATEGORY_PRIVACY';
+  if (
+    upper.includes("PRIVACY") ||
+    upper.includes("PII") ||
+    upper.includes("DOX")
+  )
+    return "HARM_CATEGORY_PRIVACY";
 
   // Fallback: keep original but normalized
-  return `HARM_CATEGORY_${upper.replace(/[^A-Z0-9]+/g, '_')}`;
+  return `HARM_CATEGORY_${upper.replace(/[^A-Z0-9]+/g, "_")}`;
 }
 
 function maxSeverity(
-  a: 'low' | 'medium' | 'high' | 'critical',
-  b: 'low' | 'medium' | 'high' | 'critical'
-): 'low' | 'medium' | 'high' | 'critical' {
-  const rank: Record<typeof a, number> = { low: 0, medium: 1, high: 2, critical: 3 };
+  a: "low" | "medium" | "high" | "critical",
+  b: "low" | "medium" | "high" | "critical",
+): "low" | "medium" | "high" | "critical" {
+  const rank: Record<typeof a, number> = {
+    low: 0,
+    medium: 1,
+    high: 2,
+    critical: 3,
+  };
   return rank[b] > rank[a] ? b : a;
 }

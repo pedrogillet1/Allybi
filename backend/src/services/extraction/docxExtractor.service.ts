@@ -13,9 +13,12 @@ import type {
   DocxExtractionResult,
   DocxSection,
   BaseExtractionResult,
-} from '../../types/extraction.types';
-import type { DocxHeadingAnchor, DocxParagraphAnchor } from '../../types/extraction.types';
-import { createDocxHeadingAnchor } from '../../types/extraction.types';
+} from "../../types/extraction.types";
+import type {
+  DocxHeadingAnchor,
+  DocxParagraphAnchor,
+} from "../../types/extraction.types";
+import { createDocxHeadingAnchor } from "../../types/extraction.types";
 
 // ============================================================================
 // Heading Detection
@@ -58,7 +61,9 @@ function detectHeadingLevel(styleName: string | undefined): number | null {
   }
 
   // Check pattern match (Heading N, Título N)
-  const headingMatch = styleName.match(/(?:heading|título|Heading|Título)[\s_-]?(\d)/i);
+  const headingMatch = styleName.match(
+    /(?:heading|título|Heading|Título)[\s_-]?(\d)/i,
+  );
   if (headingMatch) {
     const level = parseInt(headingMatch[1], 10);
     if (level >= 1 && level <= 6) {
@@ -87,7 +92,7 @@ function extractParagraphText(pNode: any): string {
   const textParts: string[] = [];
 
   function findText(node: any): void {
-    if (!node || typeof node !== 'object') return;
+    if (!node || typeof node !== "object") return;
 
     if (Array.isArray(node)) {
       for (const item of node) {
@@ -97,25 +102,25 @@ function extractParagraphText(pNode: any): string {
     }
 
     // w:t contains actual text
-    if (node['w:t']) {
-      const t = node['w:t'];
+    if (node["w:t"]) {
+      const t = node["w:t"];
       if (Array.isArray(t)) {
         for (const item of t) {
-          if (typeof item === 'string') {
+          if (typeof item === "string") {
             textParts.push(item);
-          } else if (item && item['_']) {
-            textParts.push(item['_']);
+          } else if (item && item["_"]) {
+            textParts.push(item["_"]);
           }
         }
-      } else if (typeof t === 'string') {
+      } else if (typeof t === "string") {
         textParts.push(t);
-      } else if (t && t['_']) {
-        textParts.push(t['_']);
+      } else if (t && t["_"]) {
+        textParts.push(t["_"]);
       }
     }
 
     // Recurse into runs (w:r) and other containers
-    for (const key of ['w:r', 'w:hyperlink', 'w:smartTag']) {
+    for (const key of ["w:r", "w:hyperlink", "w:smartTag"]) {
       if (node[key]) {
         findText(node[key]);
       }
@@ -123,51 +128,53 @@ function extractParagraphText(pNode: any): string {
   }
 
   findText(pNode);
-  return textParts.join('');
+  return textParts.join("");
 }
 
 /**
  * Get paragraph style name from w:p node
  */
 function getParagraphStyle(pNode: any): string | undefined {
-  const pPr = pNode['w:pPr'];
+  const pPr = pNode["w:pPr"];
   if (!pPr) return undefined;
 
   const pp = Array.isArray(pPr) ? pPr[0] : pPr;
   if (!pp) return undefined;
 
-  const pStyle = pp['w:pStyle'];
+  const pStyle = pp["w:pStyle"];
   if (!pStyle) return undefined;
 
   const style = Array.isArray(pStyle) ? pStyle[0] : pStyle;
   if (!style) return undefined;
 
   // Style name is in w:val attribute
-  return style.$?.['w:val'] || style['$']?.val;
+  return style.$?.["w:val"] || style["$"]?.val;
 }
 
 /**
  * Parse all paragraphs from document.xml
  */
-async function parseParagraphs(documentXml: string): Promise<ParsedParagraph[]> {
-  const xml2js = require('xml2js');
+async function parseParagraphs(
+  documentXml: string,
+): Promise<ParsedParagraph[]> {
+  const xml2js = require("xml2js");
   const parser = new xml2js.Parser();
 
   const result = await parser.parseStringPromise(documentXml);
   const paragraphs: ParsedParagraph[] = [];
 
   // Navigate to w:body
-  const document = result['w:document'];
+  const document = result["w:document"];
   if (!document) return paragraphs;
 
-  const body = document['w:body'];
+  const body = document["w:body"];
   if (!body) return paragraphs;
 
   const bodyContent = Array.isArray(body) ? body[0] : body;
   if (!bodyContent) return paragraphs;
 
   // Extract paragraphs (w:p)
-  const pNodes = bodyContent['w:p'] || [];
+  const pNodes = bodyContent["w:p"] || [];
   const pArray = Array.isArray(pNodes) ? pNodes : [pNodes];
 
   for (let i = 0; i < pArray.length; i++) {
@@ -221,7 +228,7 @@ function buildSectionTree(paragraphs: ParsedParagraph[]): {
       }
 
       // Update path
-      currentPath = stack.map(s => s.heading!).filter(Boolean) as string[];
+      currentPath = stack.map((s) => s.heading!).filter(Boolean) as string[];
       currentPath.push(text);
 
       // Create new section
@@ -229,7 +236,7 @@ function buildSectionTree(paragraphs: ParsedParagraph[]): {
         heading: text,
         level,
         path: [...currentPath],
-        content: '',
+        content: "",
         children: [],
         paragraphStart: para.index,
         paragraphEnd: para.index,
@@ -256,7 +263,7 @@ function buildSectionTree(paragraphs: ParsedParagraph[]): {
       // Add content to current section
       const currentSection = stack[stack.length - 1];
       if (currentSection.content) {
-        currentSection.content += '\n\n' + text;
+        currentSection.content += "\n\n" + text;
       } else {
         currentSection.content = text;
       }
@@ -292,26 +299,28 @@ function buildSectionTree(paragraphs: ParsedParagraph[]): {
  * ```
  */
 export async function extractDocxWithAnchors(
-  buffer: Buffer
+  buffer: Buffer,
 ): Promise<DocxExtractionResult> {
-  console.log(`📝 [DOCX] Starting heading-based extraction (${buffer.length} bytes)...`);
+  console.log(
+    `📝 [DOCX] Starting heading-based extraction (${buffer.length} bytes)...`,
+  );
 
-  const AdmZip = require('adm-zip');
+  const AdmZip = require("adm-zip");
 
   try {
     const zip = new AdmZip(buffer);
-    const entry = zip.getEntry('word/document.xml');
-    if (!entry) throw new Error('Invalid DOCX: missing word/document.xml');
-    const documentXml = entry.getData().toString('utf8');
+    const entry = zip.getEntry("word/document.xml");
+    if (!entry) throw new Error("Invalid DOCX: missing word/document.xml");
+    const documentXml = entry.getData().toString("utf8");
 
     // Parse paragraphs
     const paragraphs = await parseParagraphs(documentXml);
 
     if (paragraphs.length === 0) {
-      console.warn('⚠️ [DOCX] No paragraphs found');
+      console.warn("⚠️ [DOCX] No paragraphs found");
       return {
-        sourceType: 'docx',
-        text: '',
+        sourceType: "docx",
+        text: "",
         sections: [],
         headings: [],
         paragraphCount: 0,
@@ -326,26 +335,26 @@ export async function extractDocxWithAnchors(
 
     // Detect TOC (look for "Table of Contents" or "Sumário" in headings)
     const hasToc = headings.some(
-      h =>
-        h.text.toLowerCase().includes('table of contents') ||
-        h.text.toLowerCase().includes('sumário') ||
-        h.text.toLowerCase().includes('contents')
+      (h) =>
+        h.text.toLowerCase().includes("table of contents") ||
+        h.text.toLowerCase().includes("sumário") ||
+        h.text.toLowerCase().includes("contents"),
     );
 
     // Extract document title (first H1 or Title style)
     let documentTitle: string | undefined;
-    const titleHeading = headings.find(h => h.level === 1);
+    const titleHeading = headings.find((h) => h.level === 1);
     if (titleHeading) {
       documentTitle = titleHeading.text;
     }
 
     // Build full text (preserving structure)
-    let fullText = '';
+    let fullText = "";
     const appendSection = (section: DocxSection, depth: number = 0): void => {
-      const prefix = '#'.repeat(section.level ?? 1) + ' ';
-      fullText += prefix + (section.heading ?? '') + '\n\n';
+      const prefix = "#".repeat(section.level ?? 1) + " ";
+      fullText += prefix + (section.heading ?? "") + "\n\n";
       if (section.content) {
-        fullText += section.content + '\n\n';
+        fullText += section.content + "\n\n";
       }
       if (section.children) {
         for (const child of section.children) {
@@ -360,17 +369,17 @@ export async function extractDocxWithAnchors(
 
     // If no headings, just concatenate all paragraphs
     if (sections.length === 0) {
-      fullText = paragraphs.map(p => p.text).join('\n\n');
+      fullText = paragraphs.map((p) => p.text).join("\n\n");
     }
 
-    const wordCount = fullText.split(/\s+/).filter(w => w.length > 0).length;
+    const wordCount = fullText.split(/\s+/).filter((w) => w.length > 0).length;
 
     console.log(
-      `✅ [DOCX] Extracted ${paragraphs.length} paragraphs, ${headings.length} headings, ${wordCount} words`
+      `✅ [DOCX] Extracted ${paragraphs.length} paragraphs, ${headings.length} headings, ${wordCount} words`,
     );
 
     return {
-      sourceType: 'docx',
+      sourceType: "docx",
       text: fullText.trim(),
       sections,
       headings,
@@ -381,18 +390,20 @@ export async function extractDocxWithAnchors(
       confidence: 1.0,
     };
   } catch (error: any) {
-    console.error('❌ [DOCX] Extraction failed:', error.message);
+    console.error("❌ [DOCX] Extraction failed:", error.message);
 
     if (
-      error.message?.includes('zip file') ||
-      error.message?.includes('corrupted')
+      error.message?.includes("zip file") ||
+      error.message?.includes("corrupted")
     ) {
       throw new Error(
-        'Word document appears to be corrupted or incomplete. Please try re-uploading.'
+        "Word document appears to be corrupted or incomplete. Please try re-uploading.",
       );
     }
 
-    throw new Error(`Failed to extract text from Word document: ${error.message}`);
+    throw new Error(
+      `Failed to extract text from Word document: ${error.message}`,
+    );
   }
 }
 
@@ -405,7 +416,7 @@ export async function extractDocxWithAnchors(
  * Use extractDocxWithAnchors() for anchor support.
  */
 export async function extractTextFromWord(
-  buffer: Buffer
+  buffer: Buffer,
 ): Promise<BaseExtractionResult> {
   const result = await extractDocxWithAnchors(buffer);
   return {
@@ -423,7 +434,7 @@ export async function extractTextFromWord(
  * Create a DOCX heading anchor for a section.
  */
 export function createHeadingAnchorFromSection(
-  section: DocxSection
+  section: DocxSection,
 ): DocxHeadingAnchor {
   return createDocxHeadingAnchor(section.heading!, section.level!, {
     headingPath: section.path,
@@ -437,7 +448,7 @@ export function createHeadingAnchorFromSection(
  * Returns one anchor per section with content.
  */
 export function getHeadingAnchors(
-  result: DocxExtractionResult
+  result: DocxExtractionResult,
 ): DocxHeadingAnchor[] {
   const anchors: DocxHeadingAnchor[] = [];
 
@@ -462,7 +473,7 @@ export function getHeadingAnchors(
  */
 export function findSectionByHeading(
   result: DocxExtractionResult,
-  headingText: string
+  headingText: string,
 ): DocxSection | undefined {
   const searchLower = headingText.toLowerCase();
 

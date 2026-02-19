@@ -1,15 +1,15 @@
-export type ConnectorIntent = 'CONNECTORS';
+export type ConnectorIntent = "CONNECTORS";
 
-export type ConnectorProvider = 'gmail' | 'outlook' | 'slack';
+export type ConnectorProvider = "gmail" | "outlook" | "slack";
 
 export type ConnectorOperator =
-  | 'CONNECT_START'
-  | 'CONNECTOR_SYNC'
-  | 'CONNECTOR_SEARCH'
-  | 'CONNECTOR_STATUS'
-  | 'CONNECTOR_DISCONNECT';
+  | "CONNECT_START"
+  | "CONNECTOR_SYNC"
+  | "CONNECTOR_SEARCH"
+  | "CONNECTOR_STATUS"
+  | "CONNECTOR_DISCONNECT";
 
-export type ConnectorScope = 'connectors';
+export type ConnectorScope = "connectors";
 
 export interface ConnectorRequestContext {
   correlationId: string;
@@ -22,7 +22,7 @@ export interface ConnectorRequestContext {
 export interface ConnectorsRoutingDecision {
   intent: ConnectorIntent;
   operator: ConnectorOperator;
-  domain: 'connectors';
+  domain: "connectors";
   scope: ConnectorScope;
   provider: ConnectorProvider | null;
   confidence: number;

@@ -6,7 +6,11 @@
 //
 // These types intentionally mirror the aggregations layer outputs.
 
-import type { TelemetryRange, LLMProviderKey, PipelineStage } from "../services/telemetry/telemetry.types";
+import type {
+  TelemetryRange,
+  LLMProviderKey,
+  PipelineStage,
+} from "../services/telemetry/telemetry.types";
 
 /* ----------------------------- Common ----------------------------- */
 
@@ -22,7 +26,7 @@ export interface ApiPage<T> {
 
 export interface TelemetryWindow {
   from: string; // ISO
-  to: string;   // ISO
+  to: string; // ISO
 }
 
 /* ----------------------------- Overview ----------------------------- */

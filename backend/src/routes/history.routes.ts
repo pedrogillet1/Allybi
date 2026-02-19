@@ -11,7 +11,7 @@ router.get(
   "/conversations",
   authMiddleware,
   rateLimitMiddleware,
-  (req, res, next) => historyController.listConversations(req, res, next)
+  (req, res, next) => historyController.listConversations(req, res, next),
 );
 
 router.get(
@@ -22,7 +22,7 @@ router.get(
     // Map :id → :conversationId for controller
     (req.params as any).conversationId = req.params.id;
     historyController.getConversation(req, res, next);
-  }
+  },
 );
 
 router.get(
@@ -33,7 +33,7 @@ router.get(
     // Return the full conversation (includes messages)
     (req.params as any).conversationId = req.params.id;
     historyController.getConversation(req, res, next);
-  }
+  },
 );
 
 router.delete(
@@ -43,7 +43,7 @@ router.delete(
   (req, res, next) => {
     (req.params as any).conversationId = req.params.id;
     historyController.deleteConversation(req, res, next);
-  }
+  },
 );
 
 router.post(
@@ -52,9 +52,9 @@ router.post(
   rateLimitMiddleware,
   (req, res, next) => {
     (req.params as any).conversationId = req.params.id;
-    req.body = { ...req.body, visibility: 'active' };
+    req.body = { ...req.body, visibility: "active" };
     historyController.updateConversation(req, res, next);
-  }
+  },
 );
 
 export default router;

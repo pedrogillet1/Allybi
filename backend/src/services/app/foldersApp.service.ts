@@ -21,10 +21,10 @@
 import type { DocumentAppService, ClientDoc } from "./documentsApp.service";
 
 export type FolderNode = {
-  id: string;            // stable id (normalized path)
-  name: string;          // leaf name
-  path: string;          // full folderPath
-  count: number;         // number of docs in this folder subtree
+  id: string; // stable id (normalized path)
+  name: string; // leaf name
+  path: string; // full folderPath
+  count: number; // number of docs in this folder subtree
   children: FolderNode[];
 };
 
@@ -121,7 +121,8 @@ export class FoldersAppService {
       const parentPath = parts.slice(0, -1).join("/");
       const parent = ensureNode(parentPath);
       // add if not already present
-      if (!parent.children.find((c) => c.id === node.id)) parent.children.push(node);
+      if (!parent.children.find((c) => c.id === node.id))
+        parent.children.push(node);
     }
 
     // Sort children alphabetically, deterministic
@@ -137,12 +138,18 @@ export class FoldersAppService {
   /**
    * List docs in a specific folderPath (exact match).
    */
-  async listDocsInFolder(folderPath: string, opts?: { limit?: number }): Promise<ClientDoc[]> {
+  async listDocsInFolder(
+    folderPath: string,
+    opts?: { limit?: number },
+  ): Promise<ClientDoc[]> {
     const fp = normalizeFolderPath(folderPath);
     const all = await this.documentApp.listDocs({ limit: 20000 });
 
-    const docs = all.filter((d) => normalizeFolderPath(d.folderPath || "") === fp);
-    const limit = typeof opts?.limit === "number" ? Math.max(1, opts.limit) : 500;
+    const docs = all.filter(
+      (d) => normalizeFolderPath(d.folderPath || "") === fp,
+    );
+    const limit =
+      typeof opts?.limit === "number" ? Math.max(1, opts.limit) : 500;
     return docs.slice(0, limit);
   }
 }

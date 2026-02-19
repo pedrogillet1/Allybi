@@ -1,9 +1,9 @@
-import { google, slides_v1 } from 'googleapis';
-import type { GoogleAuth } from 'google-auth-library';
-import * as fs from 'fs';
-import * as path from 'path';
-import { Readable } from 'stream';
-import { logger } from '../../../infra/logger';
+import { google, slides_v1 } from "googleapis";
+import type { GoogleAuth } from "google-auth-library";
+import * as fs from "fs";
+import * as path from "path";
+import { Readable } from "stream";
+import { logger } from "../../../infra/logger";
 
 export interface SlidesRequestContext {
   correlationId?: string;
@@ -41,9 +41,17 @@ export class SlidesClientError extends Error {
   public readonly status?: number;
   public readonly retryAfterMs?: number;
 
-  constructor(message: string, options: { code: string; retryable: boolean; status?: number; retryAfterMs?: number }) {
+  constructor(
+    message: string,
+    options: {
+      code: string;
+      retryable: boolean;
+      status?: number;
+      retryAfterMs?: number;
+    },
+  ) {
     super(message);
-    this.name = 'SlidesClientError';
+    this.name = "SlidesClientError";
     this.code = options.code;
     this.retryable = options.retryable;
     this.status = options.status;
@@ -56,15 +64,18 @@ const DEFAULT_OPTIONS: Required<SlidesClientOptions> = {
   maxRetries: 8,
   baseBackoffMs: 1000,
   maxBackoffMs: 70000,
-  minWriteIntervalMs: Math.max(0, parseInt(process.env.KODA_SLIDES_WRITE_DELAY_MS || '1200', 10) || 0),
+  minWriteIntervalMs: Math.max(
+    0,
+    parseInt(process.env.KODA_SLIDES_WRITE_DELAY_MS || "1200", 10) || 0,
+  ),
 };
 
 const DEFAULT_SCOPES = [
-  'https://www.googleapis.com/auth/presentations',
-  'https://www.googleapis.com/auth/presentations.readonly',
+  "https://www.googleapis.com/auth/presentations",
+  "https://www.googleapis.com/auth/presentations.readonly",
   // Needed for copying template presentations (Drive files.copy) and basic file ops.
   // Keep broad scope to avoid drive.file limitations when templates are not app-owned.
-  'https://www.googleapis.com/auth/drive',
+  "https://www.googleapis.com/auth/drive",
 ] as const;
 
 /**
@@ -77,18 +88,18 @@ export class SlidesClientService {
   private readonly options: Required<SlidesClientOptions>;
   private static lastWriteAtMs = 0;
   private static writeOps = new Set<string>([
-    'createPresentation',
-    'copyPresentationFromTemplate',
-    'importPptxToPresentation',
-    'exportPresentationToPptx', // Drive export counts as a "read", but keep it in the same lane to avoid thrash.
-    'batchUpdate',
-    'deleteDriveFile',
+    "createPresentation",
+    "copyPresentationFromTemplate",
+    "importPptxToPresentation",
+    "exportPresentationToPptx", // Drive export counts as a "read", but keep it in the same lane to avoid thrash.
+    "batchUpdate",
+    "deleteDriveFile",
   ]);
 
   constructor(auth?: GoogleAuth, options?: SlidesClientOptions) {
     this.auth = auth ?? SlidesClientService.resolveAuth();
-    this.client = google.slides({ version: 'v1', auth: this.auth });
-    this.drive = google.drive({ version: 'v3', auth: this.auth });
+    this.client = google.slides({ version: "v1", auth: this.auth });
+    this.drive = google.drive({ version: "v3", auth: this.auth });
     this.options = { ...DEFAULT_OPTIONS, ...(options ?? {}) };
   }
 
@@ -99,18 +110,22 @@ export class SlidesClientService {
    */
   private static resolveAuth(): GoogleAuth {
     const adcPath = path.join(
-      process.env.HOME || '~',
-      '.config', 'gcloud', 'application_default_credentials.json',
+      process.env.HOME || "~",
+      ".config",
+      "gcloud",
+      "application_default_credentials.json",
     );
 
     if (fs.existsSync(adcPath)) {
       try {
-        const adc = JSON.parse(fs.readFileSync(adcPath, 'utf-8'));
-        if (adc.type === 'authorized_user' && adc.refresh_token) {
-          logger.info('[SlidesClient] Using ADC (authorized_user) for Slides auth');
+        const adc = JSON.parse(fs.readFileSync(adcPath, "utf-8"));
+        if (adc.type === "authorized_user" && adc.refresh_token) {
+          logger.info(
+            "[SlidesClient] Using ADC (authorized_user) for Slides auth",
+          );
           return new google.auth.GoogleAuth({
             credentials: {
-              type: 'authorized_user',
+              type: "authorized_user",
               client_id: adc.client_id,
               client_secret: adc.client_secret,
               refresh_token: adc.refresh_token,
@@ -118,7 +133,9 @@ export class SlidesClientService {
             scopes: [...DEFAULT_SCOPES],
           });
         }
-      } catch { /* fall through */ }
+      } catch {
+        /* fall through */
+      }
     }
 
     return new google.auth.GoogleAuth({ scopes: [...DEFAULT_SCOPES] });
@@ -130,13 +147,16 @@ export class SlidesClientService {
   ): Promise<slides_v1.Schema$Presentation> {
     this.assertPresentationId(presentationId);
 
-    return this.withRetry('getPresentation', ctx, async () => {
+    return this.withRetry("getPresentation", ctx, async () => {
       const response = await this.client.presentations.get({ presentationId });
       if (!response.data) {
-        throw new SlidesClientError('Google Slides API returned an empty presentation payload.', {
-          code: 'EMPTY_PRESENTATION_PAYLOAD',
-          retryable: false,
-        });
+        throw new SlidesClientError(
+          "Google Slides API returned an empty presentation payload.",
+          {
+            code: "EMPTY_PRESENTATION_PAYLOAD",
+            retryable: false,
+          },
+        );
       }
 
       return response.data;
@@ -147,19 +167,22 @@ export class SlidesClientService {
     title: string,
     ctx?: SlidesRequestContext,
   ): Promise<{ presentationId: string; url: string }> {
-    const normalizedTitle = String(title || '').trim() || 'Untitled';
+    const normalizedTitle = String(title || "").trim() || "Untitled";
 
-    return this.withRetry('createPresentation', ctx, async () => {
+    return this.withRetry("createPresentation", ctx, async () => {
       const response = await this.client.presentations.create({
         requestBody: { title: normalizedTitle },
       });
 
       const presentationId = response.data?.presentationId;
       if (!presentationId) {
-        throw new SlidesClientError('Google Slides API returned an empty create payload.', {
-          code: 'EMPTY_CREATE_PRESENTATION_PAYLOAD',
-          retryable: false,
-        });
+        throw new SlidesClientError(
+          "Google Slides API returned an empty create payload.",
+          {
+            code: "EMPTY_CREATE_PRESENTATION_PAYLOAD",
+            retryable: false,
+          },
+        );
       }
 
       return {
@@ -181,36 +204,41 @@ export class SlidesClientService {
     },
     ctx?: SlidesRequestContext,
   ): Promise<ImportPptxResult> {
-    const filename = String(params.filename || '').trim() || `deck-${Date.now()}.pptx`;
-    const parentFolderId = (params.parentFolderId || '').trim() || null;
+    const filename =
+      String(params.filename || "").trim() || `deck-${Date.now()}.pptx`;
+    const parentFolderId = (params.parentFolderId || "").trim() || null;
 
     if (!Buffer.isBuffer(params.pptxBuffer) || params.pptxBuffer.length === 0) {
-      throw new SlidesClientError('pptxBuffer must contain bytes.', {
-        code: 'INVALID_PPTX_BUFFER',
+      throw new SlidesClientError("pptxBuffer must contain bytes.", {
+        code: "INVALID_PPTX_BUFFER",
         retryable: false,
       });
     }
 
-    return this.withRetry('importPptxToPresentation', ctx, async () => {
+    return this.withRetry("importPptxToPresentation", ctx, async () => {
       const uploaded = await this.drive.files.create({
         requestBody: {
           name: `edit-${Date.now()}-${filename}`,
-          mimeType: 'application/vnd.google-apps.presentation',
+          mimeType: "application/vnd.google-apps.presentation",
           ...(parentFolderId ? { parents: [parentFolderId] } : {}),
         },
         media: {
-          mimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+          mimeType:
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
           body: Readable.from(params.pptxBuffer),
         },
-        fields: 'id',
+        fields: "id",
       });
 
       const presentationId = uploaded.data?.id;
       if (!presentationId) {
-        throw new SlidesClientError('Google Drive API returned an empty import payload.', {
-          code: 'EMPTY_DRIVE_IMPORT_PAYLOAD',
-          retryable: false,
-        });
+        throw new SlidesClientError(
+          "Google Drive API returned an empty import payload.",
+          {
+            code: "EMPTY_DRIVE_IMPORT_PAYLOAD",
+            retryable: false,
+          },
+        );
       }
 
       return {
@@ -229,21 +257,25 @@ export class SlidesClientService {
   ): Promise<Buffer> {
     this.assertPresentationId(presentationId);
 
-    return this.withRetry('exportPresentationToPptx', ctx, async () => {
+    return this.withRetry("exportPresentationToPptx", ctx, async () => {
       const exported = await this.drive.files.export(
         {
           fileId: presentationId,
-          mimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+          mimeType:
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         },
-        { responseType: 'arraybuffer' },
+        { responseType: "arraybuffer" },
       );
 
       const buf = Buffer.from(exported.data as ArrayBuffer);
       if (!buf.length) {
-        throw new SlidesClientError('Google Drive export returned empty PPTX bytes.', {
-          code: 'EMPTY_PPTX_EXPORT',
-          retryable: false,
-        });
+        throw new SlidesClientError(
+          "Google Drive export returned empty PPTX bytes.",
+          {
+            code: "EMPTY_PPTX_EXPORT",
+            retryable: false,
+          },
+        );
       }
       return buf;
     });
@@ -259,23 +291,26 @@ export class SlidesClientService {
     ctx?: SlidesRequestContext,
   ): Promise<{ presentationId: string; url: string }> {
     this.assertPresentationId(templatePresentationId);
-    const normalizedTitle = String(title || '').trim() || 'Untitled';
+    const normalizedTitle = String(title || "").trim() || "Untitled";
 
-    return this.withRetry('copyPresentationFromTemplate', ctx, async () => {
+    return this.withRetry("copyPresentationFromTemplate", ctx, async () => {
       const response = await this.drive.files.copy({
         fileId: templatePresentationId,
         requestBody: {
           name: normalizedTitle,
         },
-        fields: 'id',
+        fields: "id",
       });
 
       const presentationId = response.data?.id;
       if (!presentationId) {
-        throw new SlidesClientError('Google Drive API returned an empty copy payload.', {
-          code: 'EMPTY_COPY_PRESENTATION_PAYLOAD',
-          retryable: false,
-        });
+        throw new SlidesClientError(
+          "Google Drive API returned an empty copy payload.",
+          {
+            code: "EMPTY_COPY_PRESENTATION_PAYLOAD",
+            retryable: false,
+          },
+        );
       }
 
       return {
@@ -292,30 +327,39 @@ export class SlidesClientService {
   ): Promise<slides_v1.Schema$BatchUpdatePresentationResponse> {
     this.assertPresentationId(presentationId);
     if (!Array.isArray(requests) || requests.length === 0) {
-      throw new SlidesClientError('batchUpdate requires at least one request.', {
-        code: 'INVALID_BATCH_REQUESTS',
-        retryable: false,
-      });
+      throw new SlidesClientError(
+        "batchUpdate requires at least one request.",
+        {
+          code: "INVALID_BATCH_REQUESTS",
+          retryable: false,
+        },
+      );
     }
 
     if (requests.length > 500) {
-      throw new SlidesClientError('batchUpdate request count exceeds Google API limit (500).', {
-        code: 'BATCH_LIMIT_EXCEEDED',
-        retryable: false,
-      });
+      throw new SlidesClientError(
+        "batchUpdate request count exceeds Google API limit (500).",
+        {
+          code: "BATCH_LIMIT_EXCEEDED",
+          retryable: false,
+        },
+      );
     }
 
-    return this.withRetry('batchUpdate', ctx, async () => {
+    return this.withRetry("batchUpdate", ctx, async () => {
       const response = await this.client.presentations.batchUpdate({
         presentationId,
         requestBody: { requests },
       });
 
       if (!response.data) {
-        throw new SlidesClientError('Google Slides API returned an empty batchUpdate payload.', {
-          code: 'EMPTY_BATCH_UPDATE_PAYLOAD',
-          retryable: false,
-        });
+        throw new SlidesClientError(
+          "Google Slides API returned an empty batchUpdate payload.",
+          {
+            code: "EMPTY_BATCH_UPDATE_PAYLOAD",
+            retryable: false,
+          },
+        );
       }
 
       return response.data;
@@ -338,11 +382,13 @@ export class SlidesClientService {
     },
     ctx?: SlidesRequestContext,
   ): Promise<{ fileId: string; url: string }> {
-    const filename = String(params.filename || '').trim() || `asset-${Date.now()}`;
-    const mimeType = String(params.mimeType || '').trim() || 'application/octet-stream';
-    const parentFolderId = (params.parentFolderId || '').trim() || null;
+    const filename =
+      String(params.filename || "").trim() || `asset-${Date.now()}`;
+    const mimeType =
+      String(params.mimeType || "").trim() || "application/octet-stream";
+    const parentFolderId = (params.parentFolderId || "").trim() || null;
 
-    return this.withRetry('uploadPublicAsset', ctx, async () => {
+    return this.withRetry("uploadPublicAsset", ctx, async () => {
       const created = await this.drive.files.create({
         requestBody: {
           name: filename,
@@ -352,23 +398,26 @@ export class SlidesClientService {
           mimeType,
           body: Readable.from(params.buffer),
         },
-        fields: 'id',
+        fields: "id",
       });
 
       const fileId = created.data?.id;
       if (!fileId) {
-        throw new SlidesClientError('Google Drive API returned an empty upload payload.', {
-          code: 'EMPTY_DRIVE_UPLOAD_PAYLOAD',
-          retryable: false,
-        });
+        throw new SlidesClientError(
+          "Google Drive API returned an empty upload payload.",
+          {
+            code: "EMPTY_DRIVE_UPLOAD_PAYLOAD",
+            retryable: false,
+          },
+        );
       }
 
       // Make the file publicly readable so Slides can fetch it.
       await this.drive.permissions.create({
         fileId,
         requestBody: {
-          type: 'anyone',
-          role: 'reader',
+          type: "anyone",
+          role: "reader",
         },
       });
 
@@ -383,10 +432,10 @@ export class SlidesClientService {
     fileId: string,
     ctx?: SlidesRequestContext,
   ): Promise<void> {
-    const id = String(fileId || '').trim();
+    const id = String(fileId || "").trim();
     if (!id) return;
 
-    await this.withRetry('deleteDriveFile', ctx, async () => {
+    await this.withRetry("deleteDriveFile", ctx, async () => {
       await this.drive.files.delete({ fileId: id });
     });
   }
@@ -397,7 +446,9 @@ export class SlidesClientService {
     ctx?: SlidesRequestContext,
   ): Promise<SlideThumbnailResult[]> {
     this.assertPresentationId(presentationId);
-    const uniqueSlideIds = Array.from(new Set(slideObjectIds.map((value) => value.trim()).filter(Boolean)));
+    const uniqueSlideIds = Array.from(
+      new Set(slideObjectIds.map((value) => value.trim()).filter(Boolean)),
+    );
 
     if (uniqueSlideIds.length === 0) {
       return [];
@@ -406,30 +457,38 @@ export class SlidesClientService {
     const results: SlideThumbnailResult[] = [];
     for (const slideObjectId of uniqueSlideIds) {
       const thumbnail = await this.withRetry(
-        'getSlideThumbnail',
+        "getSlideThumbnail",
         ctx,
-        async (): Promise<{ contentUrl: string; width?: number; height?: number }> => {
-        const response = await this.client.presentations.pages.getThumbnail({
-          presentationId,
-          pageObjectId: slideObjectId,
-          'thumbnailProperties.thumbnailSize': 'LARGE',
-          'thumbnailProperties.mimeType': 'PNG',
-        });
-
-        const contentUrl = response.data?.contentUrl ?? undefined;
-        if (!contentUrl) {
-          throw new SlidesClientError(`Missing thumbnail URL for slide ${slideObjectId}.`, {
-            code: 'EMPTY_THUMBNAIL_PAYLOAD',
-            retryable: false,
+        async (): Promise<{
+          contentUrl: string;
+          width?: number;
+          height?: number;
+        }> => {
+          const response = await this.client.presentations.pages.getThumbnail({
+            presentationId,
+            pageObjectId: slideObjectId,
+            "thumbnailProperties.thumbnailSize": "LARGE",
+            "thumbnailProperties.mimeType": "PNG",
           });
-        }
 
-        return {
-          contentUrl,
-          width: response.data?.width ?? undefined,
-          height: response.data?.height ?? undefined,
-        };
-      });
+          const contentUrl = response.data?.contentUrl ?? undefined;
+          if (!contentUrl) {
+            throw new SlidesClientError(
+              `Missing thumbnail URL for slide ${slideObjectId}.`,
+              {
+                code: "EMPTY_THUMBNAIL_PAYLOAD",
+                retryable: false,
+              },
+            );
+          }
+
+          return {
+            contentUrl,
+            width: response.data?.width ?? undefined,
+            height: response.data?.height ?? undefined,
+          };
+        },
+      );
 
       results.push({
         slideObjectId,
@@ -508,69 +567,83 @@ export class SlidesClientService {
       message?: string;
       status?: number;
       code?: string | number;
-      response?: { status?: number; headers?: Record<string, string | string[] | undefined>; data?: any };
+      response?: {
+        status?: number;
+        headers?: Record<string, string | string[] | undefined>;
+        data?: any;
+      };
     };
 
     const status = e?.status ?? e?.response?.status;
-    const message = e?.message ?? 'Unknown Google Slides API error';
-    const code = String(e?.code ?? 'UNKNOWN');
-    const headers = (e as any)?.response?.headers as Record<string, any> | undefined;
-    const retryAfterRaw = headers?.['retry-after'] ?? headers?.['Retry-After'];
+    const message = e?.message ?? "Unknown Google Slides API error";
+    const code = String(e?.code ?? "UNKNOWN");
+    const headers = (e as any)?.response?.headers as
+      | Record<string, any>
+      | undefined;
+    const retryAfterRaw = headers?.["retry-after"] ?? headers?.["Retry-After"];
     const retryAfterSeconds = (() => {
       if (Array.isArray(retryAfterRaw)) return Number(retryAfterRaw[0]);
       const n = Number(retryAfterRaw);
       return Number.isFinite(n) ? n : null;
     })();
-    const retryAfterMsFromHeader = retryAfterSeconds != null ? Math.max(0, Math.floor(retryAfterSeconds * 1000)) : undefined;
+    const retryAfterMsFromHeader =
+      retryAfterSeconds != null
+        ? Math.max(0, Math.floor(retryAfterSeconds * 1000))
+        : undefined;
 
     // Slides "write requests per minute per user" quota is per API principal; header isn't always present.
-    const isWriteQuota = status === 429 && /write requests per minute per user/i.test(message);
+    const isWriteQuota =
+      status === 429 && /write requests per minute per user/i.test(message);
     const retryAfterMs = isWriteQuota
       ? Math.max(retryAfterMsFromHeader || 0, 65000)
       : retryAfterMsFromHeader;
 
     if (status === 404) {
-      return new SlidesClientError('Presentation or slide not found.', {
-        code: 'NOT_FOUND',
+      return new SlidesClientError("Presentation or slide not found.", {
+        code: "NOT_FOUND",
         retryable: false,
         status,
       });
     }
 
     if (status === 401 || status === 403) {
-      return new SlidesClientError('Slides authentication/authorization failed.', {
-        code: 'AUTH_ERROR',
-        retryable: false,
-        status,
-      });
+      return new SlidesClientError(
+        "Slides authentication/authorization failed.",
+        {
+          code: "AUTH_ERROR",
+          retryable: false,
+          status,
+        },
+      );
     }
 
     if ([408, 429, 500, 502, 503, 504].includes(status ?? -1)) {
       return new SlidesClientError(message, {
-        code: 'TRANSIENT_API_ERROR',
+        code: "TRANSIENT_API_ERROR",
         retryable: true,
         status,
         retryAfterMs,
       });
     }
 
-    if (['ETIMEDOUT', 'ECONNRESET', 'ENOTFOUND'].includes(code)) {
+    if (["ETIMEDOUT", "ECONNRESET", "ENOTFOUND"].includes(code)) {
       return new SlidesClientError(message, {
-        code: 'NETWORK_ERROR',
+        code: "NETWORK_ERROR",
         retryable: true,
         status,
       });
     }
 
     return new SlidesClientError(message, {
-      code: 'API_ERROR',
+      code: "API_ERROR",
       retryable: false,
       status,
     });
   }
 
   private computeBackoff(attempt: number, mapped?: SlidesClientError): number {
-    const exponential = this.options.baseBackoffMs * Math.pow(2, Math.max(0, attempt - 1));
+    const exponential =
+      this.options.baseBackoffMs * Math.pow(2, Math.max(0, attempt - 1));
     const jitter = Math.floor(Math.random() * 250);
     const base = Math.min(this.options.maxBackoffMs, exponential + jitter);
     const retryAfter = mapped?.retryAfterMs;
@@ -586,8 +659,8 @@ export class SlidesClientService {
 
   private assertPresentationId(presentationId: string): void {
     if (!presentationId || !presentationId.trim()) {
-      throw new SlidesClientError('presentationId is required.', {
-        code: 'INVALID_PRESENTATION_ID',
+      throw new SlidesClientError("presentationId is required.", {
+        code: "INVALID_PRESENTATION_ID",
         retryable: false,
       });
     }

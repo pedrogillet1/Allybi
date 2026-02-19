@@ -20,7 +20,11 @@
  */
 
 import * as path from "path";
-import { DataBankLoaderService, DataBankLoaderOptions, DataBankError } from "./dataBankLoader.service";
+import {
+  DataBankLoaderService,
+  DataBankLoaderOptions,
+  DataBankError,
+} from "./dataBankLoader.service";
 
 type EnvName = "production" | "staging" | "dev" | "local";
 
@@ -93,7 +97,7 @@ export class BankLoaderService {
   private readonly defaultLogger: BankLoaderLogger = {
     info: () => undefined,
     warn: () => undefined,
-    error: () => undefined
+    error: () => undefined,
   };
 
   /**
@@ -111,7 +115,8 @@ export class BankLoaderService {
     const validateSchemasDefault = opts.env !== "production" ? true : true; // you can flip if performance matters
     const validateSchemas = opts.validateSchemas ?? validateSchemasDefault;
 
-    const allowEmptyChecksumsInNonProd = opts.allowEmptyChecksumsInNonProd ?? true;
+    const allowEmptyChecksumsInNonProd =
+      opts.allowEmptyChecksumsInNonProd ?? true;
 
     const loaderOpts: DataBankLoaderOptions = {
       rootDir: opts.rootDir,
@@ -119,7 +124,7 @@ export class BankLoaderService {
       strict,
       validateSchemas,
       allowEmptyChecksumsInNonProd,
-      logger
+      logger,
     };
 
     this.loader = new DataBankLoaderService(loaderOpts);
@@ -133,11 +138,16 @@ export class BankLoaderService {
         strict,
         validateSchemas,
         rootDir: opts.rootDir,
-        loadedCount: this.loader.listLoadedIds().length
+        loadedCount: this.loader.listLoadedIds().length,
       });
     } catch (err: any) {
-      this.lastError = { name: err?.name ?? "Error", message: err?.message ?? String(err) };
-      logger.error("BankLoader failed to initialize", { error: this.lastError });
+      this.lastError = {
+        name: err?.name ?? "Error",
+        message: err?.message ?? String(err),
+      };
+      logger.error("BankLoader failed to initialize", {
+        error: this.lastError,
+      });
 
       // In strict mode, fail fast.
       if (strict) throw err;
@@ -167,10 +177,13 @@ export class BankLoaderService {
 
       logger.info("BankLoader reloaded", {
         env: this.initOpts.env,
-        loadedCount: this.loader.listLoadedIds().length
+        loadedCount: this.loader.listLoadedIds().length,
       });
     } catch (err: any) {
-      this.lastError = { name: err?.name ?? "Error", message: err?.message ?? String(err) };
+      this.lastError = {
+        name: err?.name ?? "Error",
+        message: err?.message ?? String(err),
+      };
       logger.error("BankLoader reload failed", { error: this.lastError });
 
       // Respect strictness configured at loader level: if strict, reload should throw.
@@ -246,9 +259,9 @@ export class BankLoaderService {
       "fallback_policy",
       "clarification_policy",
       "retrieval_ranker_config",
-      "semantic_search_config"
+      "semantic_search_config",
     ];
-    const missingCritical = critical.filter(id => !loadedIds.includes(id));
+    const missingCritical = critical.filter((id) => !loadedIds.includes(id));
 
     return {
       ok: ok && missingCritical.length === 0,
@@ -258,7 +271,7 @@ export class BankLoaderService {
       missingCritical: missingCritical.length ? missingCritical : undefined,
       lastLoadedAt: this.lastLoadedAt ?? undefined,
       lastReloadAt: this.lastReloadAt ?? undefined,
-      lastError: this.lastError ?? undefined
+      lastError: this.lastError ?? undefined,
     };
   }
 
@@ -267,10 +280,14 @@ export class BankLoaderService {
    */
   assertReady(): void {
     if (!this.loader) {
-      throw new DataBankError("BankLoaderService not initialized (call init() first)");
+      throw new DataBankError(
+        "BankLoaderService not initialized (call init() first)",
+      );
     }
     if (this.lastError) {
-      throw new DataBankError("BankLoaderService is in error state", { lastError: this.lastError });
+      throw new DataBankError("BankLoaderService is in error state", {
+        lastError: this.lastError,
+      });
     }
   }
 
@@ -307,23 +324,28 @@ export function getBankLoaderInstance(): BankLoaderService {
 /**
  * Initialize the singleton (call once at startup)
  */
-export async function initializeBanks(opts?: Partial<BankLoaderInitOptions>): Promise<void> {
+export async function initializeBanks(
+  opts?: Partial<BankLoaderInitOptions>,
+): Promise<void> {
   const instance = getBankLoaderInstance();
 
-  const env = (process.env.NODE_ENV || 'local') as EnvName;
-  const resolvedEnv = (opts?.env ?? ((env as string) === 'development' ? 'dev' : env)) as EnvName;
+  const env = (process.env.NODE_ENV || "local") as EnvName;
+  const resolvedEnv = (opts?.env ??
+    ((env as string) === "development" ? "dev" : env)) as EnvName;
   const strictEnv = resolvedEnv === "production" || resolvedEnv === "staging";
   const fullOpts: BankLoaderInitOptions = {
     env: resolvedEnv,
-    rootDir: opts?.rootDir ?? path.join(process.cwd(), 'backend/src/data_banks'),
+    rootDir:
+      opts?.rootDir ?? path.join(process.cwd(), "backend/src/data_banks"),
     strict: opts?.strict,
     validateSchemas: opts?.validateSchemas ?? strictEnv,
-    allowEmptyChecksumsInNonProd: opts?.allowEmptyChecksumsInNonProd ?? !strictEnv,
-    enableHotReload: opts?.enableHotReload ?? (env !== 'production'),
+    allowEmptyChecksumsInNonProd:
+      opts?.allowEmptyChecksumsInNonProd ?? !strictEnv,
+    enableHotReload: opts?.enableHotReload ?? env !== "production",
     logger: opts?.logger ?? {
-      info: (msg, meta) => console.log(`[BankLoader] ${msg}`, meta || ''),
-      warn: (msg, meta) => console.warn(`[BankLoader] ${msg}`, meta || ''),
-      error: (msg, meta) => console.error(`[BankLoader] ${msg}`, meta || ''),
+      info: (msg, meta) => console.log(`[BankLoader] ${msg}`, meta || ""),
+      warn: (msg, meta) => console.warn(`[BankLoader] ${msg}`, meta || ""),
+      error: (msg, meta) => console.error(`[BankLoader] ${msg}`, meta || ""),
     },
   };
 

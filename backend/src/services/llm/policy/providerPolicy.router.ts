@@ -86,10 +86,18 @@ function matchesWhen(when: any, ctx: any): boolean {
 
   const okProvider = !when.provider || when.provider === ctx.provider;
   const okModel = !when.model || when.model === ctx.model;
-  const okStreaming = when.needStreaming == null ? true : when.needStreaming === ctx.needStreaming;
-  const okTools = when.needTools == null ? true : when.needTools === ctx.needTools;
-  const okDev = when.needDeveloperRole == null ? true : when.needDeveloperRole === ctx.needDeveloperRole;
-  const okImages = when.needImages == null ? true : when.needImages === ctx.needImages;
+  const okStreaming =
+    when.needStreaming == null
+      ? true
+      : when.needStreaming === ctx.needStreaming;
+  const okTools =
+    when.needTools == null ? true : when.needTools === ctx.needTools;
+  const okDev =
+    when.needDeveloperRole == null
+      ? true
+      : when.needDeveloperRole === ctx.needDeveloperRole;
+  const okImages =
+    when.needImages == null ? true : when.needImages === ctx.needImages;
 
   return okProvider && okModel && okStreaming && okTools && okDev && okImages;
 }
@@ -100,12 +108,19 @@ export class ProviderPolicyRouter {
   /**
    * Enforce provider/model capability policy and apply deterministic fallbacks if needed.
    */
-  enforce(request: LlmRequest): { request: LlmRequest; changed: boolean; notes: string[] } {
+  enforce(request: LlmRequest): {
+    request: LlmRequest;
+    changed: boolean;
+    notes: string[];
+  } {
     const notes: string[] = [];
     let changed = false;
 
-    const caps = this.safeGetBank<ProviderCapabilitiesBank>("providerCapabilities");
-    const fallbacks = this.safeGetBank<ProviderFallbacksBank>("providerFallbacks");
+    const caps = this.safeGetBank<ProviderCapabilitiesBank>(
+      "providerCapabilities",
+    );
+    const fallbacks =
+      this.safeGetBank<ProviderFallbacksBank>("providerFallbacks");
     const flags = this.safeGetBank<FeatureFlagsBank>("feature_flags");
 
     const feature = flags?.flags ?? {};
@@ -115,8 +130,12 @@ export class ProviderPolicyRouter {
     const provider = request.route.provider;
     const model = request.route.model;
 
-    const needStreaming = bool(request.route.constraints?.requireStreaming) || request.options?.stream !== false;
-    const needTools = request.route.constraints?.disallowTools ? false : Array.isArray(request.tools) && request.tools.length > 0;
+    const needStreaming =
+      bool(request.route.constraints?.requireStreaming) ||
+      request.options?.stream !== false;
+    const needTools = request.route.constraints?.disallowTools
+      ? false
+      : Array.isArray(request.tools) && request.tools.length > 0;
     const needDeveloperRole = this.containsDeveloperRole(request.messages);
     const needImages = this.containsImages(request.messages);
 
@@ -127,7 +146,12 @@ export class ProviderPolicyRouter {
     }
 
     // Check capability for current target
-    const supported = this.isSupported(caps, provider, model, { needStreaming, needTools, needDeveloperRole, needImages });
+    const supported = this.isSupported(caps, provider, model, {
+      needStreaming,
+      needTools,
+      needDeveloperRole,
+      needImages,
+    });
 
     if (supported) {
       // Enforce constraints if needed (e.g. model does not support tools)
@@ -135,13 +159,19 @@ export class ProviderPolicyRouter {
       const modelCaps = this.getModelCaps(caps, provider, model);
 
       if (needTools && modelCaps && modelCaps.supportsTools === false) {
-        route.constraints = { ...(route.constraints ?? {}), disallowTools: true };
+        route.constraints = {
+          ...(route.constraints ?? {}),
+          disallowTools: true,
+        };
         notes.push("tools_disabled_by_capability");
         changed = true;
       }
 
       if (needImages && modelCaps && modelCaps.supportsImages === false) {
-        route.constraints = { ...(route.constraints ?? {}), disallowImages: true };
+        route.constraints = {
+          ...(route.constraints ?? {}),
+          disallowImages: true,
+        };
         notes.push("images_disabled_by_capability");
         changed = true;
       }
@@ -161,7 +191,10 @@ export class ProviderPolicyRouter {
     // Build fallback candidates from bank
     const candidates: Array<{ provider: string; model: string }> = [];
 
-    if (fallbacks?.config?.enabled !== false && Array.isArray(fallbacks.fallbacks)) {
+    if (
+      fallbacks?.config?.enabled !== false &&
+      Array.isArray(fallbacks.fallbacks)
+    ) {
       for (const rule of fallbacks.fallbacks) {
         if (
           matchesWhen(rule.when, {
@@ -173,7 +206,8 @@ export class ProviderPolicyRouter {
             needImages,
           })
         ) {
-          for (const t of rule.try ?? []) candidates.push({ provider: t.provider, model: t.model });
+          for (const t of rule.try ?? [])
+            candidates.push({ provider: t.provider, model: t.model });
         }
       }
     }
@@ -184,16 +218,23 @@ export class ProviderPolicyRouter {
         { provider: "gemini", model: "gemini-2.5-flash" },
         { provider: "openai", model: "gpt-5-mini" },
         { provider: "openai", model: "gpt-5.2" },
-        { provider: "local", model: "local-default" }
+        { provider: "local", model: "local-default" },
       );
     }
 
     // Choose first supported candidate
     for (const c of candidates) {
-      const ok = this.isSupported(caps, c.provider, c.model, { needStreaming, needTools, needDeveloperRole, needImages });
+      const ok = this.isSupported(caps, c.provider, c.model, {
+        needStreaming,
+        needTools,
+        needDeveloperRole,
+        needImages,
+      });
       if (!ok) continue;
 
-      notes.push(`fallback_applied:${provider}:${model}=>${c.provider}:${c.model}`);
+      notes.push(
+        `fallback_applied:${provider}:${model}=>${c.provider}:${c.model}`,
+      );
       changed = true;
 
       const nextRoute: LlmRoutePlan = {
@@ -224,7 +265,12 @@ export class ProviderPolicyRouter {
     caps: ProviderCapabilitiesBank | null,
     provider: string,
     model: string,
-    need: { needStreaming: boolean; needTools: boolean; needDeveloperRole: boolean; needImages: boolean }
+    need: {
+      needStreaming: boolean;
+      needTools: boolean;
+      needDeveloperRole: boolean;
+      needImages: boolean;
+    },
   ): boolean {
     if (!caps?.providers) return true;
 
@@ -238,13 +284,18 @@ export class ProviderPolicyRouter {
 
     if (need.needStreaming && m.supportsStreaming === false) return false;
     if (need.needTools && m.supportsTools === false) return false;
-    if (need.needDeveloperRole && m.supportsDeveloperRole === false) return false;
+    if (need.needDeveloperRole && m.supportsDeveloperRole === false)
+      return false;
     if (need.needImages && m.supportsImages === false) return false;
 
     return true;
   }
 
-  private getModelCaps(caps: ProviderCapabilitiesBank | null, provider: string, model: string): any | null {
+  private getModelCaps(
+    caps: ProviderCapabilitiesBank | null,
+    provider: string,
+    model: string,
+  ): any | null {
     if (!caps?.providers) return null;
     const p = caps.providers[provider];
     if (!p?.models) return null;
@@ -252,13 +303,19 @@ export class ProviderPolicyRouter {
   }
 
   private containsDeveloperRole(messages: any[]): boolean {
-    return Array.isArray(messages) && messages.some((m) => m?.role === "developer");
+    return (
+      Array.isArray(messages) && messages.some((m) => m?.role === "developer")
+    );
   }
 
   private containsImages(messages: any[]): boolean {
     if (!Array.isArray(messages)) return false;
     for (const m of messages) {
-      if (Array.isArray(m?.parts) && m.parts.some((p: any) => p?.type === "image_url")) return true;
+      if (
+        Array.isArray(m?.parts) &&
+        m.parts.some((p: any) => p?.type === "image_url")
+      )
+        return true;
     }
     return false;
   }

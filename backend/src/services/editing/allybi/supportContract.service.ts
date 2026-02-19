@@ -86,12 +86,16 @@ function makeBlocked(
   return { code, gate, message, ...(details ? { details } : {}) };
 }
 
-function hydrateClarificationMessage(missingSlots: string[], language: "en" | "pt" = "en"): string {
+function hydrateClarificationMessage(
+  missingSlots: string[],
+  language: "en" | "pt" = "en",
+): string {
   try {
     const microcopy = safeEditingBank<any>("editing_microcopy");
-    const template = microcopy?.copy?.clarifications?.[language]?.missing_entities
-      || microcopy?.copy?.clarifications?.en?.missing_entities
-      || "I need one more detail to continue: {{missing}}.";
+    const template =
+      microcopy?.copy?.clarifications?.[language]?.missing_entities ||
+      microcopy?.copy?.clarifications?.en?.missing_entities ||
+      "I need one more detail to continue: {{missing}}.";
     const slotList = missingSlots.join(", ");
     return template.replace(/\{\{missing\}\}/g, slotList);
   } catch {
@@ -125,18 +129,27 @@ export class SupportContractService {
       if (!runtime) {
         patternCovered = false;
         slotsSatisfied = false;
-        pushGate(gates, "pattern_coverage", false, "no matching intent pattern");
+        pushGate(
+          gates,
+          "pattern_coverage",
+          false,
+          "no matching intent pattern",
+        );
         pushGate(gates, "slot_fill", false, "no matched pattern to fill slots");
       } else if (runtime.kind === "clarification") {
         patternCovered = true;
         slotsSatisfied = false;
-        clarificationSlots = runtime.missingSlots.map((slot) => String(slot?.slot || "").trim()).filter(Boolean);
+        clarificationSlots = runtime.missingSlots
+          .map((slot) => String(slot?.slot || "").trim())
+          .filter(Boolean);
         pushGate(gates, "pattern_coverage", true);
         pushGate(
           gates,
           "slot_fill",
           false,
-          clarificationSlots.length ? `missing slots: ${clarificationSlots.join(", ")}` : "missing required slots",
+          clarificationSlots.length
+            ? `missing slots: ${clarificationSlots.join(", ")}`
+            : "missing required slots",
         );
       } else {
         patternCovered = true;
@@ -148,33 +161,49 @@ export class SupportContractService {
 
     const hasScope =
       TARGET_OPTIONAL_RUNTIME_OPS.has(input.runtimeOperator) ||
-      (typeof input.resolvedTargetId === "string" && input.resolvedTargetId.trim().length > 0);
-    pushGate(gates, "scope_resolution", hasScope, hasScope ? undefined : "target was not resolved");
+      (typeof input.resolvedTargetId === "string" &&
+        input.resolvedTargetId.trim().length > 0);
+    pushGate(
+      gates,
+      "scope_resolution",
+      hasScope,
+      hasScope ? undefined : "target was not resolved",
+    );
 
     const opEntries = Object.entries(operatorCatalog || {});
-    const normalizedCanonical = String(input.canonicalOperator || "").trim().toUpperCase() || null;
-    const matchedCanonicalById = normalizedCanonical && operatorCatalog[normalizedCanonical]
-      ? normalizedCanonical
-      : null;
-    const matchedCanonicalByRuntime = opEntries.find(([, entry]) => {
-      if (!entry || typeof entry !== "object") return false;
-      const entryRuntime = String((entry as any).runtimeOperator || "").trim();
-      const entryDomain = String((entry as any).domain || "").trim();
-      const domainMatches =
-        input.domain === "docx"
-          ? entryDomain === "docx"
-          : input.domain === "sheets"
-            ? entryDomain === "excel"
-            : true;
-      return domainMatches && entryRuntime === input.runtimeOperator;
-    })?.[0] || null;
-    const resolvedCanonicalOperator = matchedCanonicalById || matchedCanonicalByRuntime;
+    const normalizedCanonical =
+      String(input.canonicalOperator || "")
+        .trim()
+        .toUpperCase() || null;
+    const matchedCanonicalById =
+      normalizedCanonical && operatorCatalog[normalizedCanonical]
+        ? normalizedCanonical
+        : null;
+    const matchedCanonicalByRuntime =
+      opEntries.find(([, entry]) => {
+        if (!entry || typeof entry !== "object") return false;
+        const entryRuntime = String(
+          (entry as any).runtimeOperator || "",
+        ).trim();
+        const entryDomain = String((entry as any).domain || "").trim();
+        const domainMatches =
+          input.domain === "docx"
+            ? entryDomain === "docx"
+            : input.domain === "sheets"
+              ? entryDomain === "excel"
+              : true;
+        return domainMatches && entryRuntime === input.runtimeOperator;
+      })?.[0] || null;
+    const resolvedCanonicalOperator =
+      matchedCanonicalById || matchedCanonicalByRuntime;
     const catalogPass = Boolean(resolvedCanonicalOperator);
     pushGate(
       gates,
       "operator_catalog",
       catalogPass,
-      catalogPass ? undefined : `runtime operator ${input.runtimeOperator} is not mapped in operator_catalog`,
+      catalogPass
+        ? undefined
+        : `runtime operator ${input.runtimeOperator} is not mapped in operator_catalog`,
     );
 
     const executorPass = EXECUTOR_RUNTIME_OPS.has(input.runtimeOperator);
@@ -182,7 +211,9 @@ export class SupportContractService {
       gates,
       "executor_branch",
       executorPass,
-      executorPass ? undefined : `runtime operator ${input.runtimeOperator} is not supported by revision store`,
+      executorPass
+        ? undefined
+        : `runtime operator ${input.runtimeOperator} is not supported by revision store`,
     );
 
     if (!patternCovered && source !== "explicit_operator") {
@@ -209,7 +240,9 @@ export class SupportContractService {
           "slot_fill",
           "CLARIFICATION_REQUIRED",
           clarificationMessage,
-          clarificationSlots.length ? { missingSlots: clarificationSlots } : undefined,
+          clarificationSlots.length
+            ? { missingSlots: clarificationSlots }
+            : undefined,
         ),
         gates,
       };
@@ -238,7 +271,9 @@ export class SupportContractService {
           "This operation is recognized but not supported by the active editing engine.",
           {
             runtimeOperator: input.runtimeOperator,
-            ...(normalizedCanonical ? { canonicalOperator: normalizedCanonical } : {}),
+            ...(normalizedCanonical
+              ? { canonicalOperator: normalizedCanonical }
+              : {}),
           },
         ),
         gates,
@@ -252,4 +287,3 @@ export class SupportContractService {
     };
   }
 }
-

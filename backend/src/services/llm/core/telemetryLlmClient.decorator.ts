@@ -9,29 +9,43 @@ import type {
   LLMRequest,
   LLMCompletionResponse,
   LLMStreamResponse,
-} from './llmClient.interface';
-import type { LLMProvider } from './llmErrors.types';
-import type { StreamSink, LLMStreamingConfig, StreamingHooks, StreamState, StreamEvent } from './llmStreaming.types';
-import type { TelemetryService } from '../../telemetry/telemetry.service';
-import type { LLMProviderKey, PipelineStage } from '../../telemetry/telemetry.types';
+} from "./llmClient.interface";
+import type { LLMProvider } from "./llmErrors.types";
+import type {
+  StreamSink,
+  LLMStreamingConfig,
+  StreamingHooks,
+  StreamState,
+  StreamEvent,
+} from "./llmStreaming.types";
+import type { TelemetryService } from "../../telemetry/telemetry.service";
+import type {
+  LLMProviderKey,
+  PipelineStage,
+} from "../../telemetry/telemetry.types";
 
 function mapProvider(p: LLMProvider): LLMProviderKey {
-  if (typeof p === 'string') {
+  if (typeof p === "string") {
     const lower = p.toLowerCase();
-    if (lower.includes('google') || lower.includes('gemini')) return 'google';
-    if (lower.includes('openai') || lower.includes('gpt')) return 'openai';
-    if (lower.includes('local')) return 'local';
+    if (lower.includes("google") || lower.includes("gemini")) return "google";
+    if (lower.includes("openai") || lower.includes("gpt")) return "openai";
+    if (lower.includes("local")) return "local";
   }
-  return 'unknown';
+  return "unknown";
 }
 
 function mapStage(purpose?: string): PipelineStage {
   switch (purpose) {
-    case 'intent_routing': return 'intent_operator';
-    case 'retrieval_planning': return 'retrieval';
-    case 'answer_compose': return 'compose';
-    case 'validation_pass': return 'quality_gates';
-    default: return 'compose';
+    case "intent_routing":
+      return "intent_operator";
+    case "retrieval_planning":
+      return "retrieval";
+    case "answer_compose":
+      return "compose";
+    case "validation_pass":
+      return "quality_gates";
+    default:
+      return "compose";
   }
 }
 
@@ -46,7 +60,13 @@ export class TelemetryLLMClient implements LLMClient {
   }
 
   async ping() {
-    return this.inner.ping?.() ?? { ok: true, provider: this.provider, t: Date.now() };
+    return (
+      this.inner.ping?.() ?? {
+        ok: true,
+        provider: this.provider,
+        t: Date.now(),
+      }
+    );
   }
 
   async complete(req: LLMRequest): Promise<LLMCompletionResponse> {
@@ -58,18 +78,18 @@ export class TelemetryLLMClient implements LLMClient {
       response = await this.inner.complete(req);
       return response;
     } catch (err: any) {
-      errorCode = err.code || err.message?.slice(0, 100) || 'UNKNOWN';
+      errorCode = err.code || err.message?.slice(0, 100) || "UNKNOWN";
       throw err;
     } finally {
       const durationMs = Date.now() - startMs;
       this.telemetry.logModelCall({
-        userId: (req.meta?.userId as string) || 'system',
+        userId: (req.meta?.userId as string) || "system",
         traceId: req.traceId,
         turnId: req.turnId || null,
         provider: mapProvider(req.model.provider),
         model: req.model.model,
         stage: mapStage(req.purpose),
-        status: errorCode ? 'fail' : 'ok',
+        status: errorCode ? "fail" : "ok",
         errorCode: errorCode || null,
         promptTokens: response?.usage?.promptTokens ?? null,
         completionTokens: response?.usage?.completionTokens ?? null,
@@ -100,14 +120,20 @@ export class TelemetryLLMClient implements LLMClient {
     const wrappedSink: StreamSink = {
       transport: originalSink.transport,
       write(event: StreamEvent) {
-        if (firstTokenMs === null && event.event === 'delta') {
+        if (firstTokenMs === null && event.event === "delta") {
           firstTokenMs = Date.now() - startMs;
         }
         originalSink.write(event);
       },
-      flush() { originalSink.flush?.(); },
-      close() { originalSink.close(); },
-      isOpen() { return originalSink.isOpen(); },
+      flush() {
+        originalSink.flush?.();
+      },
+      close() {
+        originalSink.close();
+      },
+      isOpen() {
+        return originalSink.isOpen();
+      },
     };
 
     try {
@@ -117,18 +143,18 @@ export class TelemetryLLMClient implements LLMClient {
       });
       return response;
     } catch (err: any) {
-      errorCode = err.code || err.message?.slice(0, 100) || 'UNKNOWN';
+      errorCode = err.code || err.message?.slice(0, 100) || "UNKNOWN";
       throw err;
     } finally {
       const durationMs = Date.now() - startMs;
       this.telemetry.logModelCall({
-        userId: (params.req.meta?.userId as string) || 'system',
+        userId: (params.req.meta?.userId as string) || "system",
         traceId: params.req.traceId,
         turnId: params.req.turnId || null,
         provider: mapProvider(params.req.model.provider),
         model: params.req.model.model,
         stage: mapStage(params.req.purpose),
-        status: errorCode ? 'fail' : 'ok',
+        status: errorCode ? "fail" : "ok",
         errorCode: errorCode || null,
         promptTokens: response?.usage?.promptTokens ?? null,
         completionTokens: response?.usage?.completionTokens ?? null,

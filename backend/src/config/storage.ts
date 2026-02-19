@@ -11,22 +11,24 @@
  * errors surface only when an operation is actually called.
  */
 
-import { GcsStorageService } from '../services/retrieval/gcsStorage.service';
-import { UPLOAD_CONFIG } from './upload.config';
-import fs from 'fs/promises';
-import path from 'path';
+import { GcsStorageService } from "../services/retrieval/gcsStorage.service";
+import { UPLOAD_CONFIG } from "./upload.config";
+import fs from "fs/promises";
+import path from "path";
 
 // ---------------------------------------------------------------------------
 // Storage mode detection
 // ---------------------------------------------------------------------------
 
-const isLocalStorage = UPLOAD_CONFIG.STORAGE_PROVIDER === 'local';
+const isLocalStorage = UPLOAD_CONFIG.STORAGE_PROVIDER === "local";
 const localStoragePath = UPLOAD_CONFIG.LOCAL_STORAGE_PATH;
 
 if (isLocalStorage) {
   console.log(`📁 Storage: LOCAL mode (path: ${localStoragePath})`);
 } else {
-  console.log(`☁️  Storage: GCS mode (bucket: ${process.env.GCS_BUCKET_NAME || 'unset'})`);
+  console.log(
+    `☁️  Storage: GCS mode (bucket: ${process.env.GCS_BUCKET_NAME || "unset"})`,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -49,7 +51,7 @@ async function localDelete(key: string): Promise<void> {
   try {
     await fs.unlink(filePath);
   } catch (e: any) {
-    if (e.code !== 'ENOENT') throw e;
+    if (e.code !== "ENOENT") throw e;
   }
 }
 
@@ -63,7 +65,9 @@ async function localExists(key: string): Promise<boolean> {
   }
 }
 
-async function localMetadata(key: string): Promise<{ size?: number; mimeType?: string; lastModified?: Date } | null> {
+async function localMetadata(
+  key: string,
+): Promise<{ size?: number; mimeType?: string; lastModified?: Date } | null> {
   const filePath = path.join(localStoragePath, key);
   try {
     const stat = await fs.stat(filePath);
@@ -104,7 +108,7 @@ export const bucket = {
         await gcs().uploadFile({
           key: fileName,
           buffer,
-          mimeType: options.contentType || 'application/octet-stream',
+          mimeType: options.contentType || "application/octet-stream",
         });
       }
     },
@@ -136,8 +140,14 @@ export const bucket = {
         // For local storage, return a local file URL (for preview)
         return [`/api/storage/local/${encodeURIComponent(fileName)}`];
       }
-      const expiresIn = Math.max(1, Math.floor((options.expires - Date.now()) / 1000));
-      const { url } = await gcs().presignDownload({ key: fileName, expiresInSeconds: expiresIn });
+      const expiresIn = Math.max(
+        1,
+        Math.floor((options.expires - Date.now()) / 1000),
+      );
+      const { url } = await gcs().presignDownload({
+        key: fileName,
+        expiresInSeconds: expiresIn,
+      });
       return [url];
     },
   }),
@@ -177,7 +187,10 @@ export const getSignedUrl = async (
   if (isLocalStorage) {
     return `/api/storage/local/${encodeURIComponent(fileName)}`;
   }
-  const { url } = await gcs().presignDownload({ key: fileName, expiresInSeconds: expiresIn });
+  const { url } = await gcs().presignDownload({
+    key: fileName,
+    expiresInSeconds: expiresIn,
+  });
   return url;
 };
 
@@ -190,7 +203,11 @@ export const getSignedUploadUrl = async (
     // For local storage, return local upload endpoint
     return `/api/presigned-urls/local-upload/${encodeURIComponent(fileName)}`;
   }
-  const { url } = await gcs().presignUpload({ key: fileName, mimeType, expiresInSeconds: expiresIn });
+  const { url } = await gcs().presignUpload({
+    key: fileName,
+    mimeType,
+    expiresInSeconds: expiresIn,
+  });
   return url;
 };
 
@@ -213,7 +230,12 @@ export const fileExists = async (fileName: string): Promise<boolean> => {
 
 export const getFileMetadata = async (
   fileName: string,
-): Promise<{ size?: number; mimeType?: string; lastModified?: Date; etag?: string } | null> => {
+): Promise<{
+  size?: number;
+  mimeType?: string;
+  lastModified?: Date;
+  etag?: string;
+} | null> => {
   if (isLocalStorage) {
     return localMetadata(fileName);
   }

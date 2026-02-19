@@ -25,11 +25,16 @@ function normalizeHeadingHint(raw: string): string {
   // Strip leading instruction verbs/prefixes that often appear in natural requests.
   // Ex: "edit summarize all of the AI understanding ..." -> "AI understanding ..."
   let h = h0
-    .replace(/^(?:please\s+)?(?:edit|summarize|summarise|rewrite|rephrase|convert|turn|make|change|update|remove|delete)\b\s+/i, "")
+    .replace(
+      /^(?:please\s+)?(?:edit|summarize|summarise|rewrite|rephrase|convert|turn|make|change|update|remove|delete)\b\s+/i,
+      "",
+    )
     .trim();
 
   // Strip leading determiners / common prefixes.
-  h = h.replace(/^(?:all\s+of\s+the|all\s+the|all\s+of|the|a|an)\s+/i, "").trim();
+  h = h
+    .replace(/^(?:all\s+of\s+the|all\s+the|all\s+of|the|a|an)\s+/i, "")
+    .trim();
 
   // Common tail phrases from instructions, not headings.
   // Ex: "AI understanding section into one paragraph" -> "AI understanding"
@@ -58,7 +63,9 @@ function normalizeHeadingHint(raw: string): string {
   }
 
   // If the hint accidentally includes the word "bullet(s)" as part of the instruction, trim it off.
-  const kw = h.match(/\b(?:bullet[-\s]*points?|bullets?|list|t[oó]picos|itens)\b/i)?.[0];
+  const kw = h.match(
+    /\b(?:bullet[-\s]*points?|bullets?|list|t[oó]picos|itens)\b/i,
+  )?.[0];
   if (kw) {
     const idx = h.toLowerCase().indexOf(kw.toLowerCase());
     if (idx > 2) h = h.slice(0, idx).trim();
@@ -72,7 +79,10 @@ function normalizeHeadingHint(raw: string): string {
     .trim();
 
   // Cleanup trailing punctuation / quotes.
-  h = h.replace(/^[\"']/, "").replace(/[\"']$/, "").trim();
+  h = h
+    .replace(/^[\"']/, "")
+    .replace(/[\"']$/, "")
+    .trim();
   h = h.replace(/[.:;\-–—]+$/g, "").trim();
 
   // Guardrail: these are pointer words, not real heading hints.
@@ -116,7 +126,9 @@ export function detectBulkEditIntent(message: string): BulkEditIntent {
 
   if (wantsBullets) return { kind: "enhance_bullets" };
 
-  const wantsReplace = /\b(replace|change)\b/.test(low) && /\b(all|every|throughout|across)\b/.test(low);
+  const wantsReplace =
+    /\b(replace|change)\b/.test(low) &&
+    /\b(all|every|throughout|across)\b/.test(low);
   if (wantsReplace) {
     const segs = extractQuotedSegments(q);
     if (segs.length >= 2) {
@@ -131,7 +143,9 @@ export function detectBulkEditIntent(message: string): BulkEditIntent {
     }
   }
 
-  const wantsSection = /\b(section|heading|under|below)\b/.test(low) && /\b(rewrite|restructure|tighten|improve)\b/.test(low);
+  const wantsSection =
+    /\b(section|heading|under|below)\b/.test(low) &&
+    /\b(rewrite|restructure|tighten|improve)\b/.test(low);
   if (wantsSection) {
     const segs = extractQuotedSegments(q);
     if (segs.length >= 1) {
@@ -159,18 +173,17 @@ export function detectBulkEditIntent(message: string): BulkEditIntent {
 
   // Common request: bullets -> paragraph under a given heading/section.
   const wantsBulletsToParagraph =
-    (
-      (/\b(bullet|bullets|bullet points)\b/.test(low) && /\b(paragraph)\b/.test(low)) ||
-      (/\b(list)\b/.test(low) && /\b(paragraph)\b/.test(low)) ||
-      (/\b(remove|delete)\b/.test(low) && /\b(bullet|bullets|bullet points)\b/.test(low) && /\b(paragraph)\b/.test(low)) ||
-      (
-        // Keep this detector explicit. "add a paragraph" is not a bullets->paragraph convert.
-        /\b(convert|turn|make|summarize)\b/.test(low) &&
-        /\b(bullet|bullets|bullet points|list)\b/.test(low) &&
-        /\b(into|to)\b/.test(low) &&
-        /\b(paragraph)\b/.test(low)
-      )
-    );
+    (/\b(bullet|bullets|bullet points)\b/.test(low) &&
+      /\b(paragraph)\b/.test(low)) ||
+    (/\b(list)\b/.test(low) && /\b(paragraph)\b/.test(low)) ||
+    (/\b(remove|delete)\b/.test(low) &&
+      /\b(bullet|bullets|bullet points)\b/.test(low) &&
+      /\b(paragraph)\b/.test(low)) ||
+    // Keep this detector explicit. "add a paragraph" is not a bullets->paragraph convert.
+    (/\b(convert|turn|make|summarize)\b/.test(low) &&
+      /\b(bullet|bullets|bullet points|list)\b/.test(low) &&
+      /\b(into|to)\b/.test(low) &&
+      /\b(paragraph)\b/.test(low));
   if (wantsBulletsToParagraph) {
     const segs = extractQuotedSegments(q);
     if (segs.length >= 1) {
@@ -179,21 +192,27 @@ export function detectBulkEditIntent(message: string): BulkEditIntent {
     }
 
     // Strong extractor: "in the <heading> section ..."
-    const inSection = q.match(/\b(?:in|within)\b\s+(?:the\s+)?(.+?)\s+\bsection\b/i);
+    const inSection = q.match(
+      /\b(?:in|within)\b\s+(?:the\s+)?(.+?)\s+\bsection\b/i,
+    );
     if (inSection?.[1]) {
       const heading = normalizeHeadingHint(inSection[1]);
       if (heading) return { kind: "section_bullets_to_paragraph", heading };
     }
 
     // "under <heading> ... into a paragraph"
-    const m2 = q.match(/\b(?:under|below)\b\s+(.+?)\s+(?:into|to)\s+(?:a\s+)?paragraph\b/i);
+    const m2 = q.match(
+      /\b(?:under|below)\b\s+(.+?)\s+(?:into|to)\s+(?:a\s+)?paragraph\b/i,
+    );
     if (m2 && m2[1]) {
       const heading = normalizeHeadingHint(m2[1]);
       if (heading) return { kind: "section_bullets_to_paragraph", heading };
     }
 
     // "make/convert/turn/summarize <heading> bullet points into a paragraph"
-    const m = q.match(/\b(?:make|convert|turn|summarize)\b\s+(.+?)\s+(?:bullet|bullets|bullet points|list)\b/i);
+    const m = q.match(
+      /\b(?:make|convert|turn|summarize)\b\s+(.+?)\s+(?:bullet|bullets|bullet points|list)\b/i,
+    );
     if (m && m[1]) {
       const heading = normalizeHeadingHint(m[1]);
       if (heading) return { kind: "section_bullets_to_paragraph", heading };

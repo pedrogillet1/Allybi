@@ -37,7 +37,11 @@ export type Attachment =
         title: string;
         filename?: string;
         mimeType?: string;
-        location?: { type: "page" | "slide" | "sheet" | "cell" | "section"; value: string | number; label?: string };
+        location?: {
+          type: "page" | "slide" | "sheet" | "cell" | "section";
+          value: string | number;
+          label?: string;
+        };
       }>;
       seeAll?: { label: string; totalCount: number; remainingCount: number };
     }
@@ -94,12 +98,21 @@ export interface ChatService {
     signal?: AbortSignal;
   }): AsyncIterable<ChatStreamEvent>;
 
-  listConversations(input: { userId: string; limit?: number; cursor?: string }): Promise<{
+  listConversations(input: {
+    userId: string;
+    limit?: number;
+    cursor?: string;
+  }): Promise<{
     items: Array<{ conversationId: string; title: string; updatedAt: string }>;
     nextCursor?: string;
   }>;
 
-  listMessages(input: { userId: string; conversationId: string; limit?: number; cursor?: string }): Promise<{
+  listMessages(input: {
+    userId: string;
+    conversationId: string;
+    limit?: number;
+    cursor?: string;
+  }): Promise<{
     items: Array<{
       messageId: string;
       role: "user" | "assistant";
@@ -111,7 +124,11 @@ export interface ChatService {
     nextCursor?: string;
   }>;
 
-  setTitle(input: { userId: string; conversationId: string; title: string }): Promise<{ conversationId: string; title: string }>;
+  setTitle(input: {
+    userId: string;
+    conversationId: string;
+    title: string;
+  }): Promise<{ conversationId: string; title: string }>;
 }
 
 type ApiOk<T> = { ok: true; data: T };
@@ -122,7 +139,9 @@ function ok<T>(res: Response, data: T, status = 200) {
 }
 
 function err(res: Response, code: string, message: string, status = 400) {
-  return res.status(status).json({ ok: false, error: { code, message } } satisfies ApiErr);
+  return res
+    .status(status)
+    .json({ ok: false, error: { code, message } } satisfies ApiErr);
 }
 
 function asString(v: unknown): string | null {
@@ -156,18 +175,34 @@ function sseSend(res: Response, event: string, data: any) {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
 }
 
-function mapError(e: unknown): { code: string; message: string; status: number } {
+function mapError(e: unknown): {
+  code: string;
+  message: string;
+  status: number;
+} {
   const msg = e instanceof Error ? e.message : "Unknown error";
   const m = msg.toLowerCase();
 
   if (m.includes("unauthorized") || m.includes("not authenticated")) {
-    return { code: "AUTH_UNAUTHORIZED", message: "Not authenticated.", status: 401 };
+    return {
+      code: "AUTH_UNAUTHORIZED",
+      message: "Not authenticated.",
+      status: 401,
+    };
   }
   if (m.includes("rate limit")) {
-    return { code: "RATE_LIMITED", message: "Too many requests. Try again shortly.", status: 429 };
+    return {
+      code: "RATE_LIMITED",
+      message: "Too many requests. Try again shortly.",
+      status: 429,
+    };
   }
   if (m.includes("payload too large")) {
-    return { code: "PAYLOAD_TOO_LARGE", message: "Message too large.", status: 413 };
+    return {
+      code: "PAYLOAD_TOO_LARGE",
+      message: "Message too large.",
+      status: 413,
+    };
   }
   return { code: "CHAT_ERROR", message: msg || "Chat error.", status: 400 };
 }
@@ -177,15 +212,27 @@ export class ChatController {
 
   chat = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const message = asString((req.body as any)?.message);
-    if (!message) return err(res, "VALIDATION_MESSAGE_REQUIRED", "Message is required.", 400);
+    if (!message)
+      return err(
+        res,
+        "VALIDATION_MESSAGE_REQUIRED",
+        "Message is required.",
+        400,
+      );
 
-    const conversationId = asString((req.body as any)?.conversationId) ?? undefined;
-    const clientMessageId = asString((req.body as any)?.clientMessageId) ?? undefined;
+    const conversationId =
+      asString((req.body as any)?.conversationId) ?? undefined;
+    const clientMessageId =
+      asString((req.body as any)?.clientMessageId) ?? undefined;
     const regenCountRaw = (req.body as any)?.regenCount;
-    const regenCount = typeof regenCountRaw === "number" && regenCountRaw >= 0 ? regenCountRaw : 0;
+    const regenCount =
+      typeof regenCountRaw === "number" && regenCountRaw >= 0
+        ? regenCountRaw
+        : 0;
 
     try {
       const result = await this.chatService.chat({
@@ -205,15 +252,27 @@ export class ChatController {
 
   stream = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const message = asString((req.body as any)?.message);
-    if (!message) return err(res, "VALIDATION_MESSAGE_REQUIRED", "Message is required.", 400);
+    if (!message)
+      return err(
+        res,
+        "VALIDATION_MESSAGE_REQUIRED",
+        "Message is required.",
+        400,
+      );
 
-    const conversationId = asString((req.body as any)?.conversationId) ?? undefined;
-    const clientMessageId = asString((req.body as any)?.clientMessageId) ?? undefined;
+    const conversationId =
+      asString((req.body as any)?.conversationId) ?? undefined;
+    const clientMessageId =
+      asString((req.body as any)?.clientMessageId) ?? undefined;
     const regenCountRaw = (req.body as any)?.regenCount;
-    const regenCount = typeof regenCountRaw === "number" && regenCountRaw >= 0 ? regenCountRaw : 0;
+    const regenCount =
+      typeof regenCountRaw === "number" && regenCountRaw >= 0
+        ? regenCountRaw
+        : 0;
 
     const ac = new AbortController();
     req.on("close", () => ac.abort());
@@ -264,14 +323,21 @@ export class ChatController {
 
   listConversations = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const limitRaw = asString(req.query.limit);
-    const limit = limitRaw ? Math.min(Math.max(parseInt(limitRaw, 10) || 30, 1), 100) : 30;
+    const limit = limitRaw
+      ? Math.min(Math.max(parseInt(limitRaw, 10) || 30, 1), 100)
+      : 30;
     const cursor = asString(req.query.cursor) ?? undefined;
 
     try {
-      const result = await this.chatService.listConversations({ userId, limit, cursor });
+      const result = await this.chatService.listConversations({
+        userId,
+        limit,
+        cursor,
+      });
       return ok(res, result, 200);
     } catch (e) {
       const mapped = mapError(e);
@@ -281,17 +347,31 @@ export class ChatController {
 
   listMessages = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const conversationId = asString(req.params.conversationId);
-    if (!conversationId) return err(res, "VALIDATION_CONVERSATION_REQUIRED", "conversationId is required.", 400);
+    if (!conversationId)
+      return err(
+        res,
+        "VALIDATION_CONVERSATION_REQUIRED",
+        "conversationId is required.",
+        400,
+      );
 
     const limitRaw = asString(req.query.limit);
-    const limit = limitRaw ? Math.min(Math.max(parseInt(limitRaw, 10) || 50, 1), 200) : 50;
+    const limit = limitRaw
+      ? Math.min(Math.max(parseInt(limitRaw, 10) || 50, 1), 200)
+      : 50;
     const cursor = asString(req.query.cursor) ?? undefined;
 
     try {
-      const result = await this.chatService.listMessages({ userId, conversationId, limit, cursor });
+      const result = await this.chatService.listMessages({
+        userId,
+        conversationId,
+        limit,
+        cursor,
+      });
       return ok(res, result, 200);
     } catch (e) {
       const mapped = mapError(e);
@@ -301,16 +381,28 @@ export class ChatController {
 
   setTitle = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const conversationId = asString(req.params.conversationId);
-    if (!conversationId) return err(res, "VALIDATION_CONVERSATION_REQUIRED", "conversationId is required.", 400);
+    if (!conversationId)
+      return err(
+        res,
+        "VALIDATION_CONVERSATION_REQUIRED",
+        "conversationId is required.",
+        400,
+      );
 
     const title = asString((req.body as any)?.title);
-    if (!title) return err(res, "VALIDATION_TITLE_REQUIRED", "title is required.", 400);
+    if (!title)
+      return err(res, "VALIDATION_TITLE_REQUIRED", "title is required.", 400);
 
     try {
-      const result = await this.chatService.setTitle({ userId, conversationId, title });
+      const result = await this.chatService.setTitle({
+        userId,
+        conversationId,
+        title,
+      });
       return ok(res, result, 200);
     } catch (e) {
       const mapped = mapError(e);

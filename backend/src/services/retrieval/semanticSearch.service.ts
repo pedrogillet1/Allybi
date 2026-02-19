@@ -2,14 +2,18 @@
  * Semantic Search Service
  * Performs cosine similarity search over document chunks with embeddings.
  */
-import defaultLogger from '../../utils/logger';
-import { getEmbedding, getEmbeddings } from './embeddings.service';
+import defaultLogger from "../../utils/logger";
+import { getEmbedding, getEmbeddings } from "./embeddings.service";
 
 const logger = {
-  info: (msg: string, ...args: any[]) => defaultLogger.info(`[SemanticSearch] ${msg}`, ...args),
-  warn: (msg: string, ...args: any[]) => defaultLogger.warn(`[SemanticSearch] ${msg}`, ...args),
-  error: (msg: string, ...args: any[]) => defaultLogger.error(`[SemanticSearch] ${msg}`, ...args),
-  debug: (msg: string, ...args: any[]) => defaultLogger.debug(`[SemanticSearch] ${msg}`, ...args),
+  info: (msg: string, ...args: any[]) =>
+    defaultLogger.info(`[SemanticSearch] ${msg}`, ...args),
+  warn: (msg: string, ...args: any[]) =>
+    defaultLogger.warn(`[SemanticSearch] ${msg}`, ...args),
+  error: (msg: string, ...args: any[]) =>
+    defaultLogger.error(`[SemanticSearch] ${msg}`, ...args),
+  debug: (msg: string, ...args: any[]) =>
+    defaultLogger.debug(`[SemanticSearch] ${msg}`, ...args),
 };
 
 // ============================================================================
@@ -44,10 +48,10 @@ export interface SemanticSearchResult {
 }
 
 export interface SemanticSearchOptions {
-  topK?: number;           // Number of results to return (default: 10)
-  minScore?: number;       // Minimum similarity score (default: 0.5)
-  maxCharsPerChunk?: number;  // Truncate chunk text (default: 2000)
-  documentIds?: string[];  // Filter to specific documents
+  topK?: number; // Number of results to return (default: 10)
+  minScore?: number; // Minimum similarity score (default: 0.5)
+  maxCharsPerChunk?: number; // Truncate chunk text (default: 2000)
+  documentIds?: string[]; // Filter to specific documents
 }
 
 // ============================================================================
@@ -118,7 +122,9 @@ class InMemoryChunkIndex {
   getByDocument(documentId: string): IndexedChunk[] {
     const chunkIds = this.byDocument.get(documentId);
     if (!chunkIds) return [];
-    return Array.from(chunkIds).map((id) => this.chunks.get(id)!).filter(Boolean);
+    return Array.from(chunkIds)
+      .map((id) => this.chunks.get(id)!)
+      .filter(Boolean);
   }
 
   getAll(): IndexedChunk[] {
@@ -157,7 +163,7 @@ const globalIndex = new InMemoryChunkIndex();
  */
 export async function searchChunks(
   query: string,
-  options: SemanticSearchOptions = {}
+  options: SemanticSearchOptions = {},
 ): Promise<SemanticSearchResult[]> {
   const {
     topK = 10,
@@ -182,7 +188,7 @@ export async function searchChunks(
   }
 
   if (chunks.length === 0) {
-    logger.debug('[SemanticSearch] No chunks in index');
+    logger.debug("[SemanticSearch] No chunks in index");
     return [];
   }
 
@@ -209,17 +215,21 @@ export async function searchChunks(
   const topResults = scored.slice(0, topK);
 
   // Format results
-  const results: SemanticSearchResult[] = topResults.map(({ chunk, score }) => ({
-    chunkId: chunk.chunkId,
-    documentId: chunk.documentId,
-    documentName: chunk.documentName,
-    text: chunk.text.substring(0, maxCharsPerChunk),
-    score,
-    metadata: chunk.metadata,
-  }));
+  const results: SemanticSearchResult[] = topResults.map(
+    ({ chunk, score }) => ({
+      chunkId: chunk.chunkId,
+      documentId: chunk.documentId,
+      documentName: chunk.documentName,
+      text: chunk.text.substring(0, maxCharsPerChunk),
+      score,
+      metadata: chunk.metadata,
+    }),
+  );
 
   const elapsed = Date.now() - startTime;
-  logger.info(`[SemanticSearch] Found ${results.length} results in ${elapsed}ms (searched ${chunks.length} chunks)`);
+  logger.info(
+    `[SemanticSearch] Found ${results.length} results in ${elapsed}ms (searched ${chunks.length} chunks)`,
+  );
 
   return results;
 }
@@ -229,7 +239,7 @@ export async function searchChunks(
  */
 export async function hybridSearch(
   query: string,
-  options: SemanticSearchOptions & { keywordBoost?: number } = {}
+  options: SemanticSearchOptions & { keywordBoost?: number } = {},
 ): Promise<SemanticSearchResult[]> {
   const { keywordBoost = 0.1, ...searchOptions } = options;
 
@@ -237,7 +247,10 @@ export async function hybridSearch(
   const results = await searchChunks(query, searchOptions);
 
   // Boost scores for keyword matches
-  const queryTerms = query.toLowerCase().split(/\s+/).filter((t) => t.length > 2);
+  const queryTerms = query
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((t) => t.length > 2);
 
   for (const result of results) {
     const textLower = result.text.toLowerCase();
@@ -272,7 +285,7 @@ export async function indexDocumentChunks(
     chunkId: string;
     text: string;
     meta?: any;
-  }>
+  }>,
 ): Promise<number> {
   const startTime = Date.now();
 
@@ -294,7 +307,9 @@ export async function indexDocumentChunks(
   globalIndex.addBatch(indexedChunks);
 
   const elapsed = Date.now() - startTime;
-  logger.info(`[SemanticSearch] Indexed ${chunks.length} chunks for ${documentName} in ${elapsed}ms`);
+  logger.info(
+    `[SemanticSearch] Indexed ${chunks.length} chunks for ${documentName} in ${elapsed}ms`,
+  );
 
   return chunks.length;
 }
@@ -312,7 +327,7 @@ export function removeDocumentFromIndex(documentId: string): void {
  */
 export function clearIndex(): void {
   globalIndex.clear();
-  logger.info('[SemanticSearch] Cleared index');
+  logger.info("[SemanticSearch] Cleared index");
 }
 
 /**

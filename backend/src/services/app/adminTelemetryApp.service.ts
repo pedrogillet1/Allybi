@@ -70,7 +70,10 @@ function safeBigIntToNumber(x: any, max = Number.MAX_SAFE_INTEGER): number {
 export class AdminTelemetryAppService {
   private cfg: AdminTelemetryAppConfig;
 
-  constructor(private prisma: PrismaClient, config: Partial<AdminTelemetryAppConfig> = {}) {
+  constructor(
+    private prisma: PrismaClient,
+    config: Partial<AdminTelemetryAppConfig> = {},
+  ) {
     this.cfg = { ...DEFAULT_CFG, ...config };
   }
 
@@ -108,7 +111,10 @@ export class AdminTelemetryAppService {
         kpis: {
           dau: { value: dau, change: dauChange },
           totalQueries: { value: last.totalRagQueries, change: 0 },
-          totalTokens: { value: last.totalInputTokens + last.totalOutputTokens, change: 0 },
+          totalTokens: {
+            value: last.totalInputTokens + last.totalOutputTokens,
+            change: 0,
+          },
           totalCost: { value: last.totalTokenCost, change: 0 },
           errorRate: { value: last.errorRate, change: 0 },
           avgLatency: { value: last.avgResponseTime, change: 0 },
@@ -126,7 +132,9 @@ export class AdminTelemetryAppService {
     // Fallback to live counts
     const [users, queries, messages] = await Promise.all([
       this.prisma.user.count(),
-      this.prisma.queryTelemetry.count({ where: { timestamp: { gte: from, lt: to } } }),
+      this.prisma.queryTelemetry.count({
+        where: { timestamp: { gte: from, lt: to } },
+      }),
       this.prisma.message.count(),
     ]);
 
@@ -193,7 +201,12 @@ export class AdminTelemetryAppService {
 
   async users(params: { range: string; limit: number; cursor?: string }) {
     const { from, to } = this.getDateRange(params.range);
-    const limit = clampInt(params.limit, 1, this.cfg.maxLimit, this.cfg.defaultLimit);
+    const limit = clampInt(
+      params.limit,
+      1,
+      this.cfg.maxLimit,
+      this.cfg.defaultLimit,
+    );
 
     const users = await this.prisma.user.findMany({
       take: limit + 1,
@@ -247,7 +260,11 @@ export class AdminTelemetryAppService {
         id: u.id,
         email: u.email,
         name: [u.firstName, u.lastName].filter(Boolean).join(" ") || u.email,
-        status: act?.lastActiveAt && new Date(act.lastActiveAt) > addDays(new Date(), -7) ? "active" : "inactive",
+        status:
+          act?.lastActiveAt &&
+          new Date(act.lastActiveAt) > addDays(new Date(), -7)
+            ? "active"
+            : "inactive",
         lastActiveAt: act?.lastActiveAt || u.updatedAt,
         totalQueries: act?.messagesSent || 0,
         totalTokens: tok?._sum?.totalTokens || 0,
@@ -338,7 +355,8 @@ export class AdminTelemetryAppService {
     return {
       id: user.id,
       email: user.email,
-      name: [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email,
+      name:
+        [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email,
       workspaceName: null,
       status: "active",
       createdAt: user.createdAt.toISOString(),
@@ -346,8 +364,14 @@ export class AdminTelemetryAppService {
       totalQueries,
       conversationsCount,
       filesUploaded: filesCount,
-      totalTokens: tokenUsage.reduce((sum, t) => sum + (t._sum?.totalTokens || 0), 0),
-      totalCost: tokenUsage.reduce((sum, t) => sum + (t._sum?.totalCost || 0), 0),
+      totalTokens: tokenUsage.reduce(
+        (sum, t) => sum + (t._sum?.totalTokens || 0),
+        0,
+      ),
+      totalCost: tokenUsage.reduce(
+        (sum, t) => sum + (t._sum?.totalCost || 0),
+        0,
+      ),
       activityTimeline: activity.map((a) => ({
         timestamp: a.date.toISOString(),
         value: a.messagesSent,
@@ -363,7 +387,8 @@ export class AdminTelemetryAppService {
       topDomains,
       qualityMetrics: {
         weakRate: totalQueries > 0 ? (weakCount / totalQueries) * 100 : 0,
-        fallbackRate: totalQueries > 0 ? (fallbackCount / totalQueries) * 100 : 0,
+        fallbackRate:
+          totalQueries > 0 ? (fallbackCount / totalQueries) * 100 : 0,
         blockedRate: 0,
         avgEvidenceStrength: 0.85,
         reaskRate: 0,
@@ -378,7 +403,12 @@ export class AdminTelemetryAppService {
 
   async files(params: { range: string; limit: number; cursor?: string }) {
     const { from, to } = this.getDateRange(params.range);
-    const limit = clampInt(params.limit, 1, this.cfg.maxLimit, this.cfg.defaultLimit);
+    const limit = clampInt(
+      params.limit,
+      1,
+      this.cfg.maxLimit,
+      this.cfg.defaultLimit,
+    );
 
     const files = await this.prisma.document.findMany({
       where: { createdAt: { gte: from, lt: to } },
@@ -459,7 +489,8 @@ export class AdminTelemetryAppService {
       chunksCount: file.chunksCount || 0,
       tokensCount: 0,
       queriesCount: file.processingMetrics?.timesQueried || 0,
-      lastAccessedAt: file.processingMetrics?.lastQueriedAt?.toISOString() || null,
+      lastAccessedAt:
+        file.processingMetrics?.lastQueriedAt?.toISOString() || null,
       extractionMethod: file.processingMetrics?.textExtractionMethod || null,
       extractionDuration: file.processingMetrics?.textExtractionTime || null,
       indexingDuration: file.processingMetrics?.embeddingDuration || null,
@@ -484,9 +515,20 @@ export class AdminTelemetryAppService {
   // QUERIES
   // ============================================================================
 
-  async queries(params: { range: string; limit: number; cursor?: string; domain?: string; intent?: string }) {
+  async queries(params: {
+    range: string;
+    limit: number;
+    cursor?: string;
+    domain?: string;
+    intent?: string;
+  }) {
     const { from, to } = this.getDateRange(params.range);
-    const limit = clampInt(params.limit, 1, this.cfg.maxLimit, this.cfg.defaultLimit);
+    const limit = clampInt(
+      params.limit,
+      1,
+      this.cfg.maxLimit,
+      this.cfg.defaultLimit,
+    );
 
     const where: any = { timestamp: { gte: from, lt: to } };
     if (params.domain) where.domain = params.domain;
@@ -516,7 +558,11 @@ export class AdminTelemetryAppService {
       totalLatencyMs: q.totalMs || 0,
       totalTokens: q.totalTokens,
       totalCost: q.estimatedCostUsd,
-      qualityOutcome: q.isUseful ? "adequate" : q.hadFallback ? "weak" : "blocked",
+      qualityOutcome: q.isUseful
+        ? "adequate"
+        : q.hadFallback
+          ? "weak"
+          : "blocked",
       evidenceStrength: q.retrievalAdequate ? 0.85 : 0.4,
       sourcesCount: q.distinctDocs,
       providers: [q.model?.split("-")[0] || "unknown"],
@@ -541,7 +587,10 @@ export class AdminTelemetryAppService {
       _avg: { totalMs: true, estimatedCostUsd: true },
     });
 
-    const total = intentGroups.reduce((sum, g) => sum + ((g._count as number) || 0), 0);
+    const total = intentGroups.reduce(
+      (sum, g) => sum + ((g._count as number) || 0),
+      0,
+    );
 
     const items = intentGroups
       .sort((a, b) => ((b._count as number) || 0) - ((a._count as number) || 0))
@@ -575,9 +624,16 @@ export class AdminTelemetryAppService {
     return {
       intent: params.intent,
       count: queries.length,
-      avgLatency: queries.reduce((sum, q) => sum + (q.totalMs || 0), 0) / queries.length || 0,
-      avgCost: queries.reduce((sum, q) => sum + q.estimatedCostUsd, 0) / queries.length || 0,
-      domains: Object.entries(domainCounts).map(([domain, count]) => ({ domain, count })),
+      avgLatency:
+        queries.reduce((sum, q) => sum + (q.totalMs || 0), 0) /
+          queries.length || 0,
+      avgCost:
+        queries.reduce((sum, q) => sum + q.estimatedCostUsd, 0) /
+          queries.length || 0,
+      domains: Object.entries(domainCounts).map(([domain, count]) => ({
+        domain,
+        count,
+      })),
       recentQueries: queries.slice(0, 20).map((q) => ({
         query: q.queryText || "",
         timestamp: q.timestamp.toISOString(),
@@ -599,7 +655,10 @@ export class AdminTelemetryAppService {
       _avg: { totalMs: true, estimatedCostUsd: true },
     });
 
-    const total = domainGroups.reduce((sum, g) => sum + ((g._count as number) || 0), 0);
+    const total = domainGroups.reduce(
+      (sum, g) => sum + ((g._count as number) || 0),
+      0,
+    );
 
     const items = domainGroups
       .sort((a, b) => ((b._count as number) || 0) - ((a._count as number) || 0))
@@ -633,9 +692,16 @@ export class AdminTelemetryAppService {
     return {
       domain: params.domain,
       count: queries.length,
-      avgLatency: queries.reduce((sum, q) => sum + (q.totalMs || 0), 0) / queries.length || 0,
-      avgCost: queries.reduce((sum, q) => sum + q.estimatedCostUsd, 0) / queries.length || 0,
-      intents: Object.entries(intentCounts).map(([intent, count]) => ({ intent, count })),
+      avgLatency:
+        queries.reduce((sum, q) => sum + (q.totalMs || 0), 0) /
+          queries.length || 0,
+      avgCost:
+        queries.reduce((sum, q) => sum + q.estimatedCostUsd, 0) /
+          queries.length || 0,
+      intents: Object.entries(intentCounts).map(([intent, count]) => ({
+        intent,
+        count,
+      })),
       recentQueries: queries.slice(0, 20).map((q) => ({
         query: q.queryText || "",
         timestamp: q.timestamp.toISOString(),
@@ -675,7 +741,12 @@ export class AdminTelemetryAppService {
   // KEYWORDS
   // ============================================================================
 
-  async keywords(params: { range: string; limit: number; domain?: string; search?: string }) {
+  async keywords(params: {
+    range: string;
+    limit: number;
+    domain?: string;
+    search?: string;
+  }) {
     const { from, to } = this.getDateRange(params.range);
 
     const queries = await this.prisma.queryTelemetry.findMany({
@@ -686,12 +757,20 @@ export class AdminTelemetryAppService {
       select: { matchedKeywords: true, domain: true },
     });
 
-    const keywordCounts: Record<string, { count: number; domains: Set<string> }> = {};
+    const keywordCounts: Record<
+      string,
+      { count: number; domains: Set<string> }
+    > = {};
 
     queries.forEach((q) => {
       (q.matchedKeywords || []).forEach((kw) => {
-        if (params.search && !kw.toLowerCase().includes(params.search.toLowerCase())) return;
-        if (!keywordCounts[kw]) keywordCounts[kw] = { count: 0, domains: new Set() };
+        if (
+          params.search &&
+          !kw.toLowerCase().includes(params.search.toLowerCase())
+        )
+          return;
+        if (!keywordCounts[kw])
+          keywordCounts[kw] = { count: 0, domains: new Set() };
         keywordCounts[kw].count++;
         if (q.domain) keywordCounts[kw].domains.add(q.domain);
       });
@@ -732,11 +811,15 @@ export class AdminTelemetryAppService {
       select: { matchedPatterns: true, intent: true, isUseful: true },
     });
 
-    const patternCounts: Record<string, { count: number; intents: Set<string>; successful: number }> = {};
+    const patternCounts: Record<
+      string,
+      { count: number; intents: Set<string>; successful: number }
+    > = {};
 
     queries.forEach((q) => {
       (q.matchedPatterns || []).forEach((p) => {
-        if (!patternCounts[p]) patternCounts[p] = { count: 0, intents: new Set(), successful: 0 };
+        if (!patternCounts[p])
+          patternCounts[p] = { count: 0, intents: new Set(), successful: 0 };
         patternCounts[p].count++;
         if (q.intent) patternCounts[p].intents.add(q.intent);
         if (q.isUseful) patternCounts[p].successful++;
@@ -761,16 +844,33 @@ export class AdminTelemetryAppService {
   async patternDetail(params: { patternId: string; range: string }) {
     const patterns = await this.patterns({ range: params.range, limit: 100 });
     const pattern = patterns.items.find((p) => p.id === params.patternId);
-    return pattern || { id: params.patternId, pattern: "Unknown", count: 0, intents: [], successRate: 0 };
+    return (
+      pattern || {
+        id: params.patternId,
+        pattern: "Unknown",
+        count: 0,
+        intents: [],
+        successRate: 0,
+      }
+    );
   }
 
   // ============================================================================
   // INTERACTIONS
   // ============================================================================
 
-  async interactions(params: { range: string; limit: number; cursor?: string }) {
+  async interactions(params: {
+    range: string;
+    limit: number;
+    cursor?: string;
+  }) {
     const { from, to } = this.getDateRange(params.range);
-    const limit = clampInt(params.limit, 1, this.cfg.maxLimit, this.cfg.defaultLimit);
+    const limit = clampInt(
+      params.limit,
+      1,
+      this.cfg.maxLimit,
+      this.cfg.defaultLimit,
+    );
 
     const queries = await this.prisma.queryTelemetry.findMany({
       where: { timestamp: { gte: from, lt: to } },
@@ -794,7 +894,11 @@ export class AdminTelemetryAppService {
       totalLatencyMs: q.totalMs || 0,
       totalTokens: q.totalTokens,
       totalCost: q.estimatedCostUsd,
-      qualityOutcome: q.isUseful ? "adequate" : q.hadFallback ? "weak" : "blocked",
+      qualityOutcome: q.isUseful
+        ? "adequate"
+        : q.hadFallback
+          ? "weak"
+          : "blocked",
       evidenceStrength: q.retrievalAdequate ? 0.85 : 0.4,
       sourcesCount: q.distinctDocs,
       providers: [q.model?.split("-")[0] || "unknown"],
@@ -818,10 +922,38 @@ export class AdminTelemetryAppService {
 
     // Build stages from available timing data
     const stages = [];
-    if (query.embeddingMs) stages.push({ stage: "embedding", durationMs: query.embeddingMs, success: true, tokens: 0, cost: 0 });
-    if (query.retrievalMs) stages.push({ stage: "retrieval", durationMs: query.retrievalMs, success: query.retrievalAdequate, tokens: 0, cost: 0 });
-    if (query.llmMs) stages.push({ stage: "llm", durationMs: query.llmMs, success: true, tokens: query.totalTokens, cost: query.estimatedCostUsd });
-    if (query.formattingMs) stages.push({ stage: "formatting", durationMs: query.formattingMs, success: query.formattingPassed, tokens: 0, cost: 0 });
+    if (query.embeddingMs)
+      stages.push({
+        stage: "embedding",
+        durationMs: query.embeddingMs,
+        success: true,
+        tokens: 0,
+        cost: 0,
+      });
+    if (query.retrievalMs)
+      stages.push({
+        stage: "retrieval",
+        durationMs: query.retrievalMs,
+        success: query.retrievalAdequate,
+        tokens: 0,
+        cost: 0,
+      });
+    if (query.llmMs)
+      stages.push({
+        stage: "llm",
+        durationMs: query.llmMs,
+        success: true,
+        tokens: query.totalTokens,
+        cost: query.estimatedCostUsd,
+      });
+    if (query.formattingMs)
+      stages.push({
+        stage: "formatting",
+        durationMs: query.formattingMs,
+        success: query.formattingPassed,
+        tokens: 0,
+        cost: 0,
+      });
 
     return {
       traceId: query.queryId,
@@ -843,7 +975,12 @@ export class AdminTelemetryAppService {
 
   async quality(params: { range: string; limit: number; cursor?: string }) {
     const { from, to } = this.getDateRange(params.range);
-    const limit = clampInt(params.limit, 1, this.cfg.maxLimit, this.cfg.defaultLimit);
+    const limit = clampInt(
+      params.limit,
+      1,
+      this.cfg.maxLimit,
+      this.cfg.defaultLimit,
+    );
 
     const queries = await this.prisma.queryTelemetry.findMany({
       where: { timestamp: { gte: from, lt: to } },
@@ -893,15 +1030,23 @@ export class AdminTelemetryAppService {
       select: { domain: true, intent: true, isUseful: true, hadFallback: true },
     });
 
-    const byDomain: Record<string, { total: number; adequate: number; weak: number; blocked: number }> = {};
-    const byIntent: Record<string, { total: number; adequate: number; weak: number; blocked: number }> = {};
+    const byDomain: Record<
+      string,
+      { total: number; adequate: number; weak: number; blocked: number }
+    > = {};
+    const byIntent: Record<
+      string,
+      { total: number; adequate: number; weak: number; blocked: number }
+    > = {};
 
     queries.forEach((q) => {
       const domain = q.domain || "unknown";
       const intent = q.intent || "unknown";
 
-      if (!byDomain[domain]) byDomain[domain] = { total: 0, adequate: 0, weak: 0, blocked: 0 };
-      if (!byIntent[intent]) byIntent[intent] = { total: 0, adequate: 0, weak: 0, blocked: 0 };
+      if (!byDomain[domain])
+        byDomain[domain] = { total: 0, adequate: 0, weak: 0, blocked: 0 };
+      if (!byIntent[intent])
+        byIntent[intent] = { total: 0, adequate: 0, weak: 0, blocked: 0 };
 
       byDomain[domain].total++;
       byIntent[intent].total++;
@@ -938,7 +1083,9 @@ export class AdminTelemetryAppService {
     // Count conversations with multiple messages from same user in short time
     const conversations = await this.prisma.conversation.findMany({
       where: { updatedAt: { gte: from, lt: to }, isDeleted: false },
-      include: { messages: { where: { role: "user" }, orderBy: { createdAt: "asc" } } },
+      include: {
+        messages: { where: { role: "user" }, orderBy: { createdAt: "asc" } },
+      },
     });
 
     let reaskCount = 0;
@@ -958,7 +1105,8 @@ export class AdminTelemetryAppService {
     });
 
     return {
-      reaskRate: totalConversations > 0 ? (reaskCount / totalConversations) * 100 : 0,
+      reaskRate:
+        totalConversations > 0 ? (reaskCount / totalConversations) * 100 : 0,
       reaskCount,
       totalConversations,
     };
@@ -968,9 +1116,20 @@ export class AdminTelemetryAppService {
   // LLM / COST
   // ============================================================================
 
-  async llm(params: { range: string; limit: number; cursor?: string; provider?: string; model?: string }) {
+  async llm(params: {
+    range: string;
+    limit: number;
+    cursor?: string;
+    provider?: string;
+    model?: string;
+  }) {
     const { from, to } = this.getDateRange(params.range);
-    const limit = clampInt(params.limit, 1, this.cfg.maxLimit, this.cfg.defaultLimit);
+    const limit = clampInt(
+      params.limit,
+      1,
+      this.cfg.maxLimit,
+      this.cfg.defaultLimit,
+    );
 
     const where: any = { createdAt: { gte: from, lt: to } };
     if (params.provider) where.provider = params.provider;
@@ -1055,9 +1214,12 @@ export class AdminTelemetryAppService {
     });
 
     const total = queries.length;
-    const avgInput = queries.reduce((sum, q) => sum + q.inputTokens, 0) / total || 0;
-    const avgOutput = queries.reduce((sum, q) => sum + q.outputTokens, 0) / total || 0;
-    const avgTotal = queries.reduce((sum, q) => sum + q.totalTokens, 0) / total || 0;
+    const avgInput =
+      queries.reduce((sum, q) => sum + q.inputTokens, 0) / total || 0;
+    const avgOutput =
+      queries.reduce((sum, q) => sum + q.outputTokens, 0) / total || 0;
+    const avgTotal =
+      queries.reduce((sum, q) => sum + q.totalTokens, 0) / total || 0;
 
     return {
       avgInputTokens: Math.round(avgInput),
@@ -1073,7 +1235,12 @@ export class AdminTelemetryAppService {
 
   async errors(params: { range: string; limit: number; cursor?: string }) {
     const { from, to } = this.getDateRange(params.range);
-    const limit = clampInt(params.limit, 1, this.cfg.maxLimit, this.cfg.defaultLimit);
+    const limit = clampInt(
+      params.limit,
+      1,
+      this.cfg.maxLimit,
+      this.cfg.defaultLimit,
+    );
 
     const errors = await this.prisma.errorLog.findMany({
       where: { createdAt: { gte: from, lt: to } },
@@ -1126,9 +1293,18 @@ export class AdminTelemetryAppService {
     });
 
     return {
-      byType: byType.map((t) => ({ type: t.errorType, count: (t._count as number) || 0 })),
-      byService: byService.map((s) => ({ service: s.service, count: (s._count as number) || 0 })),
-      bySeverity: bySeverity.map((s) => ({ severity: s.severity, count: (s._count as number) || 0 })),
+      byType: byType.map((t) => ({
+        type: t.errorType,
+        count: (t._count as number) || 0,
+      })),
+      byService: byService.map((s) => ({
+        service: s.service,
+        count: (s._count as number) || 0,
+      })),
+      bySeverity: bySeverity.map((s) => ({
+        severity: s.severity,
+        count: (s._count as number) || 0,
+      })),
       total: byType.reduce((sum, t) => sum + ((t._count as number) || 0), 0),
     };
   }
@@ -1232,15 +1408,25 @@ export class AdminTelemetryAppService {
       loginAttempts,
       failedLogins,
       successfulLogins: loginAttempts - failedLogins,
-      failedLoginRate: loginAttempts > 0 ? (failedLogins / loginAttempts) * 100 : 0,
+      failedLoginRate:
+        loginAttempts > 0 ? (failedLogins / loginAttempts) * 100 : 0,
       mfaAdoption: 0, // Would need to track this
       blockedIPs: 0,
     };
   }
 
-  async securityEvents(params: { range: string; limit: number; cursor?: string }) {
+  async securityEvents(params: {
+    range: string;
+    limit: number;
+    cursor?: string;
+  }) {
     const { from, to } = this.getDateRange(params.range);
-    const limit = clampInt(params.limit, 1, this.cfg.maxLimit, this.cfg.defaultLimit);
+    const limit = clampInt(
+      params.limit,
+      1,
+      this.cfg.maxLimit,
+      this.cfg.defaultLimit,
+    );
 
     // Get suspicious sessions and failed logins
     const sessions = await this.prisma.session.findMany({
@@ -1265,7 +1451,12 @@ export class AdminTelemetryAppService {
 
   async auditLog(params: { range: string; limit: number; cursor?: string }) {
     const { from, to } = this.getDateRange(params.range);
-    const limit = clampInt(params.limit, 1, this.cfg.maxLimit, this.cfg.defaultLimit);
+    const limit = clampInt(
+      params.limit,
+      1,
+      this.cfg.maxLimit,
+      this.cfg.defaultLimit,
+    );
 
     const logs = await this.prisma.auditLog.findMany({
       where: { createdAt: { gte: from, lt: to } },
@@ -1319,7 +1510,9 @@ export class AdminTelemetryAppService {
 
     // Calculate totals
     const totalCalls = items.reduce((sum, i) => sum + i.callCount, 0);
-    const avgLatency = items.reduce((sum, i) => sum + i.avgLatency * i.callCount, 0) / totalCalls || 0;
+    const avgLatency =
+      items.reduce((sum, i) => sum + i.avgLatency * i.callCount, 0) /
+        totalCalls || 0;
 
     return {
       endpoints: items,
@@ -1339,7 +1532,9 @@ export class AdminTelemetryAppService {
       by: ["service"],
       where: {
         startedAt: { gte: from, lt: to },
-        service: { in: ["gemini", "openai", "pinecone", "s3", "google", "anthropic"] },
+        service: {
+          in: ["gemini", "openai", "pinecone", "s3", "google", "anthropic"],
+        },
       },
       _count: true,
       _avg: { latency: true },
@@ -1352,12 +1547,16 @@ export class AdminTelemetryAppService {
       where: {
         startedAt: { gte: from, lt: to },
         success: false,
-        service: { in: ["gemini", "openai", "pinecone", "s3", "google", "anthropic"] },
+        service: {
+          in: ["gemini", "openai", "pinecone", "s3", "google", "anthropic"],
+        },
       },
       _count: true,
     });
 
-    const errorMap = new Map(errorCounts.map((e) => [e.service, (e._count as number) || 0]));
+    const errorMap = new Map(
+      errorCounts.map((e) => [e.service, (e._count as number) || 0]),
+    );
 
     const items = providers.map((p) => {
       const callCount = (p._count as number) || 0;
@@ -1368,7 +1567,10 @@ export class AdminTelemetryAppService {
         totalTokens: p._sum?.tokensUsed || 0,
         totalCost: p._sum?.estimatedCost || 0,
         errorCount: errorMap.get(p.service) || 0,
-        errorRate: callCount > 0 ? ((errorMap.get(p.service) || 0) / callCount) * 100 : 0,
+        errorRate:
+          callCount > 0
+            ? ((errorMap.get(p.service) || 0) / callCount) * 100
+            : 0,
         status: "operational",
       };
     });

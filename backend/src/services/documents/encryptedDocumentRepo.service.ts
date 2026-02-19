@@ -13,9 +13,18 @@ export class EncryptedDocumentRepo {
     private docCrypto: DocumentCryptoService,
   ) {}
 
-  async setEncryptedFilename(userId: string, documentId: string, filenamePlain: string) {
+  async setEncryptedFilename(
+    userId: string,
+    documentId: string,
+    filenamePlain: string,
+  ) {
     const dk = await this.docKeys.getDocumentKey(userId, documentId);
-    const enc = this.docCrypto.encryptFilename(userId, documentId, filenamePlain, dk);
+    const enc = this.docCrypto.encryptFilename(
+      userId,
+      documentId,
+      filenamePlain,
+      dk,
+    );
 
     await this.prisma.document.update({
       where: { id: documentId },
@@ -26,7 +35,10 @@ export class EncryptedDocumentRepo {
     });
   }
 
-  async getDecryptedFilename(userId: string, documentId: string): Promise<string | null> {
+  async getDecryptedFilename(
+    userId: string,
+    documentId: string,
+  ): Promise<string | null> {
     const dk = await this.docKeys.getDocumentKey(userId, documentId);
 
     const doc = await this.prisma.document.findUnique({
@@ -36,14 +48,28 @@ export class EncryptedDocumentRepo {
     if (!doc) return null;
 
     if (doc.filenameEncrypted) {
-      return this.docCrypto.decryptFilename(userId, documentId, doc.filenameEncrypted, dk);
+      return this.docCrypto.decryptFilename(
+        userId,
+        documentId,
+        doc.filenameEncrypted,
+        dk,
+      );
     }
     return doc.filename ?? null;
   }
 
-  async storeEncryptedExtractedText(userId: string, documentId: string, textPlain: string) {
+  async storeEncryptedExtractedText(
+    userId: string,
+    documentId: string,
+    textPlain: string,
+  ) {
     const dk = await this.docKeys.getDocumentKey(userId, documentId);
-    const enc = this.docCrypto.encryptExtractedText(userId, documentId, textPlain, dk);
+    const enc = this.docCrypto.encryptExtractedText(
+      userId,
+      documentId,
+      textPlain,
+      dk,
+    );
 
     await this.prisma.document.update({
       where: { id: documentId },
@@ -54,7 +80,10 @@ export class EncryptedDocumentRepo {
     });
   }
 
-  async getDecryptedExtractedText(userId: string, documentId: string): Promise<string | null> {
+  async getDecryptedExtractedText(
+    userId: string,
+    documentId: string,
+  ): Promise<string | null> {
     const dk = await this.docKeys.getDocumentKey(userId, documentId);
 
     const doc = await this.prisma.document.findUnique({
@@ -64,14 +93,28 @@ export class EncryptedDocumentRepo {
     if (!doc) return null;
 
     if (doc.extractedTextEncrypted) {
-      return this.docCrypto.decryptExtractedText(userId, documentId, doc.extractedTextEncrypted, dk);
+      return this.docCrypto.decryptExtractedText(
+        userId,
+        documentId,
+        doc.extractedTextEncrypted,
+        dk,
+      );
     }
     return doc.rawText ?? null;
   }
 
-  async storeEncryptedPreviewText(userId: string, documentId: string, textPlain: string) {
+  async storeEncryptedPreviewText(
+    userId: string,
+    documentId: string,
+    textPlain: string,
+  ) {
     const dk = await this.docKeys.getDocumentKey(userId, documentId);
-    const enc = this.docCrypto.encryptPreviewText(userId, documentId, textPlain, dk);
+    const enc = this.docCrypto.encryptPreviewText(
+      userId,
+      documentId,
+      textPlain,
+      dk,
+    );
 
     await this.prisma.document.update({
       where: { id: documentId },
@@ -82,9 +125,18 @@ export class EncryptedDocumentRepo {
     });
   }
 
-  async storeEncryptedDisplayTitle(userId: string, documentId: string, titlePlain: string) {
+  async storeEncryptedDisplayTitle(
+    userId: string,
+    documentId: string,
+    titlePlain: string,
+  ) {
     const dk = await this.docKeys.getDocumentKey(userId, documentId);
-    const enc = this.docCrypto.encryptDisplayTitle(userId, documentId, titlePlain, dk);
+    const enc = this.docCrypto.encryptDisplayTitle(
+      userId,
+      documentId,
+      titlePlain,
+      dk,
+    );
 
     await this.prisma.document.update({
       where: { id: documentId },
@@ -119,12 +171,24 @@ export class EncryptedDocumentRepo {
           page: c.page ?? null,
           startChar: c.startChar ?? null,
           endChar: c.endChar ?? null,
-          embedding: c.embedding ? new Uint8Array(c.embedding.buffer, c.embedding.byteOffset, c.embedding.byteLength) as Uint8Array<ArrayBuffer> : null,
+          embedding: c.embedding
+            ? (new Uint8Array(
+                c.embedding.buffer,
+                c.embedding.byteOffset,
+                c.embedding.byteLength,
+              ) as Uint8Array<ArrayBuffer>)
+            : null,
         },
         select: { id: true },
       });
 
-      const textEnc = this.docCrypto.encryptChunkText(userId, documentId, row.id, c.text, dk);
+      const textEnc = this.docCrypto.encryptChunkText(
+        userId,
+        documentId,
+        row.id,
+        c.text,
+        dk,
+      );
 
       await this.prisma.documentChunk.update({
         where: { id: row.id },

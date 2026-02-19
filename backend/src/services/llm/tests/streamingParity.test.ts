@@ -40,7 +40,11 @@ class StubGeminiClient {
     async function* gen() {
       yield { candidates: [{ content: { parts: [{ text: "Hello" }] } }] };
       yield { candidates: [{ content: { parts: [{ text: " world\n" }] } }] };
-      yield { candidates: [{ content: { parts: [{ text: "" }] }, finishReason: "STOP" }] };
+      yield {
+        candidates: [
+          { content: { parts: [{ text: "" }] }, finishReason: "STOP" },
+        ],
+      };
     }
     return { stream: gen() };
   }
@@ -63,7 +67,10 @@ class StubLocalClient {
 // ---------------------------
 
 async function collectEvents(adapter: any, req: LlmRequest) {
-  const iterable = await adapter.stream(req, undefined, { maxDeltaChars: 8, flushOnNewline: true });
+  const iterable = await adapter.stream(req, undefined, {
+    maxDeltaChars: 8,
+    flushOnNewline: true,
+  });
   const events: LlmStreamEvent[] = [];
   for await (const e of iterable) events.push(e);
   return events;
@@ -80,10 +87,18 @@ function firstIndex(events: LlmStreamEvent[], type: LlmStreamEvent["type"]) {
 describe("Streaming parity across providers", () => {
   it("meta comes before delta and final exists (OpenAI)", async () => {
     const parser = new LlmResponseParserService();
-    const adapter = new LlmStreamAdapterService(new StubOpenAIClient() as any, parser);
+    const adapter = new LlmStreamAdapterService(
+      new StubOpenAIClient() as any,
+      parser,
+    );
 
     const events = await collectEvents(adapter, {
-      route: { provider: "openai", model: "gpt-5.2", reason: "quality_finish", stage: "final" } as any,
+      route: {
+        provider: "openai",
+        model: "gpt-5.2",
+        reason: "quality_finish",
+        stage: "final",
+      } as any,
       messages: [{ role: "user", content: "hi" }],
       options: { stream: true },
     });
@@ -95,10 +110,18 @@ describe("Streaming parity across providers", () => {
 
   it("meta comes before delta and final exists (Gemini)", async () => {
     const parser = new LlmResponseParserService();
-    const adapter = new LlmStreamAdapterService(new StubGeminiClient() as any, parser);
+    const adapter = new LlmStreamAdapterService(
+      new StubGeminiClient() as any,
+      parser,
+    );
 
     const events = await collectEvents(adapter, {
-      route: { provider: "gemini", model: "gemini-3-flash", reason: "fast_path", stage: "draft" } as any,
+      route: {
+        provider: "gemini",
+        model: "gemini-3-flash",
+        reason: "fast_path",
+        stage: "draft",
+      } as any,
       messages: [{ role: "user", content: "hi" }],
       options: { stream: true },
     });
@@ -110,10 +133,18 @@ describe("Streaming parity across providers", () => {
 
   it("meta comes before delta and final exists (Local)", async () => {
     const parser = new LlmResponseParserService();
-    const adapter = new LlmStreamAdapterService(new StubLocalClient() as any, parser);
+    const adapter = new LlmStreamAdapterService(
+      new StubLocalClient() as any,
+      parser,
+    );
 
     const events = await collectEvents(adapter, {
-      route: { provider: "local", model: "local-default", reason: "fallback_only", stage: "draft" } as any,
+      route: {
+        provider: "local",
+        model: "local-default",
+        reason: "fallback_only",
+        stage: "draft",
+      } as any,
       messages: [{ role: "user", content: "hi" }],
       options: { stream: true },
     });
@@ -125,10 +156,18 @@ describe("Streaming parity across providers", () => {
 
   it("delta chunks are small (no giant bursts)", async () => {
     const parser = new LlmResponseParserService();
-    const adapter = new LlmStreamAdapterService(new StubOpenAIClient() as any, parser);
+    const adapter = new LlmStreamAdapterService(
+      new StubOpenAIClient() as any,
+      parser,
+    );
 
     const events = await collectEvents(adapter, {
-      route: { provider: "openai", model: "gpt-5.2", reason: "quality_finish", stage: "final" } as any,
+      route: {
+        provider: "openai",
+        model: "gpt-5.2",
+        reason: "quality_finish",
+        stage: "final",
+      } as any,
       messages: [{ role: "user", content: "hi" }],
       options: { stream: true },
     });
@@ -149,7 +188,9 @@ describe("Streaming parity across providers", () => {
       provider = "openai";
       async stream(_req: LlmRequest) {
         async function* gen() {
-          yield { choices: [{ delta: { content: "No relevant information found." } }] };
+          yield {
+            choices: [{ delta: { content: "No relevant information found." } }],
+          };
           yield { choices: [{ finish_reason: "stop", delta: {} }] };
         }
         return { stream: gen() };
@@ -158,7 +199,12 @@ describe("Streaming parity across providers", () => {
 
     const adapter = new LlmStreamAdapterService(new BadClient() as any, parser);
     const events = await collectEvents(adapter, {
-      route: { provider: "openai", model: "gpt-5.2", reason: "quality_finish", stage: "final" } as any,
+      route: {
+        provider: "openai",
+        model: "gpt-5.2",
+        reason: "quality_finish",
+        stage: "final",
+      } as any,
       messages: [{ role: "user", content: "hi" }],
       options: { stream: true },
     });

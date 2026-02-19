@@ -82,7 +82,9 @@ function filetypeFromDomain(domain: string): "docx" | "xlsx" {
 
 describe("Multi-intent directives are NOT collapsed", () => {
   const allFixtures = [...loadFixtures("en"), ...loadFixtures("pt")];
-  const multiIntentFixtures = allFixtures.filter((f) => f.category === "multi_intent");
+  const multiIntentFixtures = allFixtures.filter(
+    (f) => f.category === "multi_intent",
+  );
 
   for (const fixture of multiIntentFixtures) {
     const testFn = isKnownGap(fixture.id) ? test.skip : test;
@@ -94,10 +96,14 @@ describe("Multi-intent directives are NOT collapsed", () => {
       });
 
       if (fixture.expectedDirectiveCount) {
-        expect(plan.directives.length).toBeGreaterThanOrEqual(fixture.expectedDirectiveCount);
+        expect(plan.directives.length).toBeGreaterThanOrEqual(
+          fixture.expectedDirectiveCount,
+        );
       }
       if (fixture.expectedMinSteps) {
-        expect(plan.steps.length).toBeGreaterThanOrEqual(fixture.expectedMinSteps);
+        expect(plan.steps.length).toBeGreaterThanOrEqual(
+          fixture.expectedMinSteps,
+        );
       }
       if (fixture.expectNotCollapsed) {
         // At least 2 distinct canonical operators in the plan
@@ -114,14 +120,18 @@ describe("Multi-intent directives are NOT collapsed", () => {
 
 describe("Viewer-mode connector hard-routing", () => {
   const allFixtures = [...loadFixtures("en"), ...loadFixtures("pt")];
-  const viewerFixtures = allFixtures.filter((f) => f.category === "viewer_mode");
+  const viewerFixtures = allFixtures.filter(
+    (f) => f.category === "viewer_mode",
+  );
 
   for (const fixture of viewerFixtures) {
     test(`[${fixture.id}] blocked in viewer: ${fixture.prompt.slice(0, 50)}`, () => {
       // Connector prompts should NOT route to any editing intent
       const intent = classifyAllybiIntent(fixture.prompt, "docx");
       // Intent should be null (not an editing intent) because this is a connector request
-      const isEditIntent = intent?.intentId?.startsWith("DOCX_") || intent?.intentId?.startsWith("XLSX_");
+      const isEditIntent =
+        intent?.intentId?.startsWith("DOCX_") ||
+        intent?.intentId?.startsWith("XLSX_");
       expect(isEditIntent).toBeFalsy();
     });
   }
@@ -158,19 +168,34 @@ describe("EN/PT parity — paired fixtures route to same operator", () => {
         // Both should be null
         expect(enIntent).toBeNull();
         expect(ptIntent).toBeNull();
-      } else if (enF.category !== "multi_intent" && enF.category !== "viewer_mode") {
+      } else if (
+        enF.category !== "multi_intent" &&
+        enF.category !== "viewer_mode"
+      ) {
         // For directly-classifiable intents, check they land on the same intent
         // Allow flexibility: either both classify to the same ID, or at least
         // both produce a non-null result with matching language fields.
         if (enIntent && ptIntent) {
           const sameIntentId = enIntent.intentId === ptIntent.intentId;
-          const enOps = new Set((enIntent.operatorCandidates || []).map((op) => String(op).toUpperCase()));
-          const ptOps = new Set((ptIntent.operatorCandidates || []).map((op) => String(op).toUpperCase()));
+          const enOps = new Set(
+            (enIntent.operatorCandidates || []).map((op) =>
+              String(op).toUpperCase(),
+            ),
+          );
+          const ptOps = new Set(
+            (ptIntent.operatorCandidates || []).map((op) =>
+              String(op).toUpperCase(),
+            ),
+          );
           const sharedOps = [...enOps].filter((op) => ptOps.has(op));
           const sameDomainFamily =
-            (enIntent.intentId.startsWith("DOCX_") && ptIntent.intentId.startsWith("DOCX_")) ||
-            (enIntent.intentId.startsWith("XLSX_") && ptIntent.intentId.startsWith("XLSX_"));
-          expect(sameIntentId || sharedOps.length > 0 || sameDomainFamily).toBe(true);
+            (enIntent.intentId.startsWith("DOCX_") &&
+              ptIntent.intentId.startsWith("DOCX_")) ||
+            (enIntent.intentId.startsWith("XLSX_") &&
+              ptIntent.intentId.startsWith("XLSX_"));
+          expect(sameIntentId || sharedOps.length > 0 || sameDomainFamily).toBe(
+            true,
+          );
         }
       }
 
@@ -201,26 +226,37 @@ describe("EN/PT parity — paired fixtures route to same operator", () => {
 
 describe("Allybi intent classification — EN fixtures", () => {
   const fixtures = loadFixtures("en").filter(
-    (f) => f.expectedIntent !== undefined && f.category !== "multi_intent" && f.category !== "viewer_mode",
+    (f) =>
+      f.expectedIntent !== undefined &&
+      f.category !== "multi_intent" &&
+      f.category !== "viewer_mode",
   );
 
   for (const f of fixtures) {
     const testFn = isKnownGap(f.id) ? test.skip : test;
     testFn(`[${f.id}] ${f.prompt.slice(0, 60)}`, () => {
       if (f.expectedIntent === null) {
-        const intent = classifyAllybiIntent(f.prompt, filetypeFromDomain(f.domain));
+        const intent = classifyAllybiIntent(
+          f.prompt,
+          filetypeFromDomain(f.domain),
+        );
         expect(intent).toBeNull();
         return;
       }
 
-      const intent = classifyAllybiIntent(f.prompt, filetypeFromDomain(f.domain));
+      const intent = classifyAllybiIntent(
+        f.prompt,
+        filetypeFromDomain(f.domain),
+      );
       if (f.expectedIntent) {
         // Allow soft match: intent is non-null and preferably matches expected
         if (intent) {
           // Font-related should have high confidence
           if (f.expectedFontFamily) {
             expect(intent.fontFamily).toBe(f.expectedFontFamily);
-            expect(intent.confidence).toBeGreaterThanOrEqual(f.minConfidence || 0.58);
+            expect(intent.confidence).toBeGreaterThanOrEqual(
+              f.minConfidence || 0.58,
+            );
           }
           // Clarification
           if (f.expectedClarificationRequired) {
@@ -234,24 +270,35 @@ describe("Allybi intent classification — EN fixtures", () => {
 
 describe("Allybi intent classification — PT fixtures", () => {
   const fixtures = loadFixtures("pt").filter(
-    (f) => f.expectedIntent !== undefined && f.category !== "multi_intent" && f.category !== "viewer_mode",
+    (f) =>
+      f.expectedIntent !== undefined &&
+      f.category !== "multi_intent" &&
+      f.category !== "viewer_mode",
   );
 
   for (const f of fixtures) {
     const testFn = isKnownGap(f.id) ? test.skip : test;
     testFn(`[${f.id}] ${f.prompt.slice(0, 60)}`, () => {
       if (f.expectedIntent === null) {
-        const intent = classifyAllybiIntent(f.prompt, filetypeFromDomain(f.domain));
+        const intent = classifyAllybiIntent(
+          f.prompt,
+          filetypeFromDomain(f.domain),
+        );
         expect(intent).toBeNull();
         return;
       }
 
-      const intent = classifyAllybiIntent(f.prompt, filetypeFromDomain(f.domain));
+      const intent = classifyAllybiIntent(
+        f.prompt,
+        filetypeFromDomain(f.domain),
+      );
       if (f.expectedIntent) {
         if (intent) {
           if (f.expectedFontFamily) {
             expect(intent.fontFamily).toBe(f.expectedFontFamily);
-            expect(intent.confidence).toBeGreaterThanOrEqual(f.minConfidence || 0.58);
+            expect(intent.confidence).toBeGreaterThanOrEqual(
+              f.minConfidence || 0.58,
+            );
           }
           if (f.expectedClarificationRequired) {
             expect(intent.clarificationRequired).toBe(true);
@@ -267,20 +314,68 @@ describe("Allybi intent classification — PT fixtures", () => {
 /* ------------------------------------------------------------------ */
 
 describe("Operator alias resolution for Allybi canonical IDs", () => {
-  const cases: { canonical: string; domain: EditDomain; instruction: string; expectedRuntime: string }[] = [
-    { canonical: "DOCX_SET_RUN_STYLE", domain: "docx", instruction: "make bold", expectedRuntime: "EDIT_DOCX_BUNDLE" },
-    { canonical: "DOCX_REPLACE_SPAN", domain: "docx", instruction: "replace word", expectedRuntime: "EDIT_SPAN" },
-    { canonical: "DOCX_REWRITE_PARAGRAPH", domain: "docx", instruction: "rewrite", expectedRuntime: "EDIT_PARAGRAPH" },
-    { canonical: "DOCX_INSERT_AFTER", domain: "docx", instruction: "insert paragraph", expectedRuntime: "ADD_PARAGRAPH" },
-    { canonical: "XLSX_SET_CELL_VALUE", domain: "sheets", instruction: "set cell", expectedRuntime: "EDIT_CELL" },
-    { canonical: "XLSX_SET_RANGE_VALUES", domain: "sheets", instruction: "set range", expectedRuntime: "EDIT_RANGE" },
-    { canonical: "XLSX_CHART_CREATE", domain: "sheets", instruction: "create chart", expectedRuntime: "CREATE_CHART" },
-    { canonical: "XLSX_SORT_RANGE", domain: "sheets", instruction: "sort by col", expectedRuntime: "COMPUTE_BUNDLE" },
+  const cases: {
+    canonical: string;
+    domain: EditDomain;
+    instruction: string;
+    expectedRuntime: string;
+  }[] = [
+    {
+      canonical: "DOCX_SET_RUN_STYLE",
+      domain: "docx",
+      instruction: "make bold",
+      expectedRuntime: "EDIT_DOCX_BUNDLE",
+    },
+    {
+      canonical: "DOCX_REPLACE_SPAN",
+      domain: "docx",
+      instruction: "replace word",
+      expectedRuntime: "EDIT_SPAN",
+    },
+    {
+      canonical: "DOCX_REWRITE_PARAGRAPH",
+      domain: "docx",
+      instruction: "rewrite",
+      expectedRuntime: "EDIT_PARAGRAPH",
+    },
+    {
+      canonical: "DOCX_INSERT_AFTER",
+      domain: "docx",
+      instruction: "insert paragraph",
+      expectedRuntime: "ADD_PARAGRAPH",
+    },
+    {
+      canonical: "XLSX_SET_CELL_VALUE",
+      domain: "sheets",
+      instruction: "set cell",
+      expectedRuntime: "EDIT_CELL",
+    },
+    {
+      canonical: "XLSX_SET_RANGE_VALUES",
+      domain: "sheets",
+      instruction: "set range",
+      expectedRuntime: "EDIT_RANGE",
+    },
+    {
+      canonical: "XLSX_CHART_CREATE",
+      domain: "sheets",
+      instruction: "create chart",
+      expectedRuntime: "CREATE_CHART",
+    },
+    {
+      canonical: "XLSX_SORT_RANGE",
+      domain: "sheets",
+      instruction: "sort by col",
+      expectedRuntime: "COMPUTE_BUNDLE",
+    },
   ];
 
   for (const c of cases) {
     test(`${c.canonical} -> ${c.expectedRuntime}`, () => {
-      const result = normalizeEditOperator(c.canonical, { domain: c.domain, instruction: c.instruction });
+      const result = normalizeEditOperator(c.canonical, {
+        domain: c.domain,
+        instruction: c.instruction,
+      });
       expect(result.operator).toBe(c.expectedRuntime);
       expect(result.canonicalOperator).toBe(c.canonical);
     });
@@ -367,7 +462,9 @@ describe("Validator blocks invalid payloads", () => {
 
 describe("Bulk edit intent edge cases", () => {
   const allFixtures = [...loadFixtures("en"), ...loadFixtures("pt")];
-  const edgeCases = allFixtures.filter((f) => f.expectedBulkEditKind !== undefined);
+  const edgeCases = allFixtures.filter(
+    (f) => f.expectedBulkEditKind !== undefined,
+  );
 
   for (const f of edgeCases) {
     test(`[${f.id}] ${f.prompt.slice(0, 60)}`, () => {
@@ -394,7 +491,8 @@ describe("Coverage summary", () => {
     const enWithPair = en.filter((f) => ptPairIds.has(f.id));
     const enWithoutPair = en.filter((f) => !ptPairIds.has(f.id));
 
-    const pairPct = en.length > 0 ? ((enWithPair.length / en.length) * 100).toFixed(1) : "0";
+    const pairPct =
+      en.length > 0 ? ((enWithPair.length / en.length) * 100).toFixed(1) : "0";
 
     // Categories
     const enCats = new Set(en.map((f) => f.category));
@@ -405,7 +503,9 @@ describe("Coverage summary", () => {
     console.log(`EN fixtures: ${en.length}`);
     console.log(`PT fixtures: ${pt.length}`);
     console.log(`Paired:      ${enWithPair.length}/${en.length} (${pairPct}%)`);
-    console.log(`Unpaired EN: ${enWithoutPair.map((f) => f.id).join(", ") || "none"}`);
+    console.log(
+      `Unpaired EN: ${enWithoutPair.map((f) => f.id).join(", ") || "none"}`,
+    );
     console.log(`Missing PT categories: ${missingCats.join(", ") || "none"}`);
 
     // Tag coverage

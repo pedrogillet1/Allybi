@@ -55,10 +55,13 @@ describe("normalizeEditOperator", () => {
     });
     expect(chart.operator).toBe("CREATE_CHART");
 
-    const conditional = normalizeEditOperator("sheets.apply_conditional_format", {
-      domain: "sheets",
-      instruction: "highlight values below zero",
-    });
+    const conditional = normalizeEditOperator(
+      "sheets.apply_conditional_format",
+      {
+        domain: "sheets",
+        instruction: "highlight values below zero",
+      },
+    );
     expect(conditional.operator).toBe("COMPUTE_BUNDLE");
 
     const sort = normalizeEditOperator("sheets.sort_filter_dedup", {

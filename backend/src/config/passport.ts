@@ -1,6 +1,6 @@
-import passport from 'passport';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { config } from './env';
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { config } from "./env";
 
 passport.use(
   new GoogleStrategy(
@@ -13,13 +13,13 @@ passport.use(
       // Extract user info
       const userProfile = {
         id: profile.id,
-        email: profile.emails?.[0]?.value || '',
+        email: profile.emails?.[0]?.value || "",
         displayName: profile.displayName,
       };
 
       return done(null, userProfile);
-    }
-  )
+    },
+  ),
 );
 
 // Serialize user (not used in stateless JWT auth, but required by Passport)

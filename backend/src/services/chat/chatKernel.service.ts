@@ -1,4 +1,7 @@
-import type { LLMStreamingConfig, StreamSink } from "../llm/types/llmStreaming.types";
+import type {
+  LLMStreamingConfig,
+  StreamSink,
+} from "../llm/types/llmStreaming.types";
 import { logger } from "../../utils/logger";
 import type { TurnExecutor } from "./handlers/types";
 import type { ChatRequest, ChatResult, TurnRouteDecision } from "./chat.types";
@@ -51,7 +54,13 @@ export class ChatKernelService {
     const guard = this.guard.enforce(ctx);
 
     if (guard.errorCode && ctx.viewer?.mode && params.sink.isOpen()) {
-      params.sink.write({ event: "worklog", data: { eventType: "STEP_ADD", label: guard.message || guard.errorCode } } as any);
+      params.sink.write({
+        event: "worklog",
+        data: {
+          eventType: "STEP_ADD",
+          label: guard.message || guard.errorCode,
+        },
+      } as any);
     }
 
     const route = this.router.decide(ctx);
@@ -90,7 +99,8 @@ export class ChatKernelService {
       normalizeTurnSuccess(result);
       return result;
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Chat turn failed";
+      const message =
+        error instanceof Error ? error.message : "Chat turn failed";
       const envelope = normalizeTurnError("CHAT_TURN_FAILED", message);
       throw new Error(envelope.message || "Chat turn failed");
     }

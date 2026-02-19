@@ -72,10 +72,7 @@ const DEFAULT_CONFIG: OpenAIConfig = {
   defaultModelDraft: "gpt-5-mini",
   defaultModelFinal: "gpt-5.2",
 
-  allowedModels: [
-    "gpt-5-mini",
-    "gpt-5.2",
-  ],
+  allowedModels: ["gpt-5-mini", "gpt-5.2"],
 
   includeUsageInStream: true,
   maxDeltaCharsSoft: 64,
@@ -127,7 +124,10 @@ function toOpenAIChatMessages(messages: LlmMessage[]): any[] {
       out.push({
         role: "tool",
         tool_call_id: m.toolCallId || "",
-        content: m.content ?? (m.parts?.find((p) => p.type === "text") as any)?.text ?? "",
+        content:
+          m.content ??
+          (m.parts?.find((p) => p.type === "text") as any)?.text ??
+          "",
       });
       continue;
     }
@@ -165,7 +165,9 @@ function toOpenAITools(tools: any[] | undefined): any[] | undefined {
 
     const name = t?.name || t?.function?.name;
     const description = t?.description || t?.function?.description || "";
-    const parameters = t?.parameters || t?.function?.parameters || t?.schema || { type: "object", properties: {} };
+    const parameters = t?.parameters ||
+      t?.function?.parameters ||
+      t?.schema || { type: "object", properties: {} };
 
     return {
       type: "function",
@@ -195,7 +197,11 @@ function toOpenAIToolChoice(toolChoice: any): any {
  * Build OpenAI chat completion payload.
  * We intentionally keep a provider-level payload small; Allybi behavior is in banks.
  */
-function buildChatCompletionPayload(request: LlmRequest, cfg: OpenAIConfig, streaming: boolean): any {
+function buildChatCompletionPayload(
+  request: LlmRequest,
+  cfg: OpenAIConfig,
+  streaming: boolean,
+): any {
   const model = pickModel(request.route?.model, cfg);
 
   const messages = toOpenAIChatMessages(request.messages);
@@ -207,7 +213,9 @@ function buildChatCompletionPayload(request: LlmRequest, cfg: OpenAIConfig, stre
   const maxOut = request.options?.maxOutputTokens;
 
   const tools = cfg.allowTools ? toOpenAITools(request.tools) : undefined;
-  const tool_choice = cfg.allowTools ? toOpenAIToolChoice(request.toolChoice) : "none";
+  const tool_choice = cfg.allowTools
+    ? toOpenAIToolChoice(request.toolChoice)
+    : "none";
 
   const payload: any = {
     model,
@@ -218,14 +226,18 @@ function buildChatCompletionPayload(request: LlmRequest, cfg: OpenAIConfig, stre
     stop,
 
     // GPT-5+ models require max_completion_tokens (max_tokens is deprecated for these models).
-    ...(typeof maxOut === "number" ? { max_completion_tokens: Math.max(1, Math.floor(maxOut)) } : {}),
+    ...(typeof maxOut === "number"
+      ? { max_completion_tokens: Math.max(1, Math.floor(maxOut)) }
+      : {}),
 
     // Tools (function calling)
     ...(tools ? { tools } : {}),
     ...(tool_choice ? { tool_choice } : {}),
 
     // Stream usage (if supported)
-    ...(streaming && cfg.includeUsageInStream ? { stream_options: { include_usage: true } } : {}),
+    ...(streaming && cfg.includeUsageInStream
+      ? { stream_options: { include_usage: true } }
+      : {}),
   };
 
   return payload;
@@ -233,7 +245,8 @@ function buildChatCompletionPayload(request: LlmRequest, cfg: OpenAIConfig, stre
 
 function buildRequestHeaders(request: LlmRequest): Record<string, string> {
   const headers: Record<string, string> = {};
-  if (request.correlationId) headers["X-Correlation-Id"] = request.correlationId;
+  if (request.correlationId)
+    headers["X-Correlation-Id"] = request.correlationId;
   return headers;
 }
 
@@ -244,7 +257,7 @@ function buildRequestHeaders(request: LlmRequest): Record<string, string> {
  */
 async function* normalizeOpenAIStreamChunks(
   rawStream: AsyncIterable<any>,
-  maxDeltaCharsSoft: number
+  maxDeltaCharsSoft: number,
 ): AsyncIterable<any> {
   for await (const chunk of rawStream) {
     const delta = chunk?.choices?.[0]?.delta?.content;
@@ -255,7 +268,7 @@ async function* normalizeOpenAIStreamChunks(
         const cloned = {
           ...chunk,
           choices: chunk.choices.map((c: any, idx: number) =>
-            idx === 0 ? { ...c, delta: { ...(c.delta || {}), content: p } } : c
+            idx === 0 ? { ...c, delta: { ...(c.delta || {}), content: p } } : c,
           ),
         };
         yield cloned;
@@ -296,7 +309,10 @@ export class OpenAIClientService implements LlmClient {
    * Non-streaming completion.
    * Downstream LlmResponseParserService will parse `raw`.
    */
-  async call(request: LlmRequest, signal?: AbortSignal): Promise<LlmCallResult> {
+  async call(
+    request: LlmRequest,
+    signal?: AbortSignal,
+  ): Promise<LlmCallResult> {
     const payload = buildChatCompletionPayload(request, this.cfg, false);
     const headers = buildRequestHeaders(request);
 
@@ -319,7 +335,10 @@ export class OpenAIClientService implements LlmClient {
    * Returns provider-native chunks (ChatCompletionChunk-like).
    * LlmStreamAdapterService will normalize into internal events.
    */
-  async stream(request: LlmRequest, signal?: AbortSignal): Promise<LlmStreamResult> {
+  async stream(
+    request: LlmRequest,
+    signal?: AbortSignal,
+  ): Promise<LlmStreamResult> {
     const payload = buildChatCompletionPayload(request, this.cfg, true);
     const headers = buildRequestHeaders(request);
 
@@ -330,7 +349,10 @@ export class OpenAIClientService implements LlmClient {
     } as any);
 
     // Normalize large deltas into smaller delta chunks (smoother frontend streaming)
-    const normalized = normalizeOpenAIStreamChunks(rawStream as any, this.cfg.maxDeltaCharsSoft);
+    const normalized = normalizeOpenAIStreamChunks(
+      rawStream as any,
+      this.cfg.maxDeltaCharsSoft,
+    );
 
     return {
       stream: normalized,

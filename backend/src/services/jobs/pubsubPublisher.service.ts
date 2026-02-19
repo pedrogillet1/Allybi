@@ -6,17 +6,22 @@
  * instead of local BullMQ workers.
  */
 
-import { PubSub, Topic } from '@google-cloud/pubsub';
-import { v4 as uuidv4 } from 'uuid';
-import pLimit from 'p-limit';
-import { env } from '../../config/env';
+import { PubSub, Topic } from "@google-cloud/pubsub";
+import { v4 as uuidv4 } from "uuid";
+import pLimit from "p-limit";
+import { env } from "../../config/env";
 
 // Job types
-export type JobType = 'extract' | 'extract_fanout' | 'embed' | 'preview' | 'ocr';
+export type JobType =
+  | "extract"
+  | "extract_fanout"
+  | "embed"
+  | "preview"
+  | "ocr";
 
 // Storage location — Cloud Run workers use GCS natively.
 export interface StorageLocation {
-  provider: 'gcs';
+  provider: "gcs";
   bucket: string;
   key: string;
 }
@@ -46,7 +51,7 @@ export interface DocumentJobInfo {
 // Fanout payload: publish one message containing many documents, then a fanout
 // worker publishes individual extract messages (so heavy processing can scale-out safely).
 export interface ExtractFanoutPayload {
-  jobType: 'extract_fanout';
+  jobType: "extract_fanout";
   jobId: string;
   requestId?: string;
   uploadSessionId?: string;
@@ -66,7 +71,10 @@ function getPubSub(): PubSub {
 
     // Support multiple credential methods
     if (env.GOOGLE_VISION_CREDENTIALS_B64) {
-      const decoded = Buffer.from(env.GOOGLE_VISION_CREDENTIALS_B64, 'base64').toString('utf8');
+      const decoded = Buffer.from(
+        env.GOOGLE_VISION_CREDENTIALS_B64,
+        "base64",
+      ).toString("utf8");
       const creds = JSON.parse(decoded);
       pubsubClient = new PubSub({
         projectId: projectId || creds.project_id,
@@ -102,7 +110,7 @@ function getTopic(topicName: string): Topic {
       topicName,
       pubsub.topic(topicName, {
         batching: { maxMessages, maxMilliseconds, maxBytes },
-      })
+      }),
     );
   }
   return topicCache.get(topicName)!;
@@ -113,7 +121,7 @@ function getTopic(topicName: string): Topic {
  */
 export async function publishJob(
   topicName: string,
-  payload: WorkerJobPayload | ExtractFanoutPayload
+  payload: WorkerJobPayload | ExtractFanoutPayload,
 ): Promise<string> {
   const topic = getTopic(topicName);
   const data = Buffer.from(JSON.stringify(payload));
@@ -122,8 +130,10 @@ export async function publishJob(
     jobType: payload.jobType,
   };
 
-  if ((payload as any).requestId) attributes.requestId = String((payload as any).requestId);
-  if ((payload as any).uploadSessionId) attributes.uploadSessionId = String((payload as any).uploadSessionId);
+  if ((payload as any).requestId)
+    attributes.requestId = String((payload as any).requestId);
+  if ((payload as any).uploadSessionId)
+    attributes.uploadSessionId = String((payload as any).uploadSessionId);
 
   if ((payload as any).documentId) {
     attributes.documentId = String((payload as any).documentId);
@@ -148,7 +158,7 @@ export async function publishJob(
  */
 function createStorageLocation(storageKey: string): StorageLocation {
   return {
-    provider: 'gcs',
+    provider: "gcs",
     bucket: env.GCS_BUCKET_NAME,
     key: storageKey,
   };
@@ -162,10 +172,10 @@ export async function publishExtractJob(
   userId: string,
   storageKey: string,
   mimeType: string,
-  filename?: string
+  filename?: string,
 ): Promise<string> {
   const payload: WorkerJobPayload = {
-    jobType: 'extract',
+    jobType: "extract",
     jobId: uuidv4(),
     userId,
     documentId,
@@ -174,7 +184,7 @@ export async function publishExtractJob(
     filename,
   };
 
-  const topicName = env.PUBSUB_EXTRACT_TOPIC || 'koda-doc-extract';
+  const topicName = env.PUBSUB_EXTRACT_TOPIC || "koda-doc-extract";
   return publishJob(topicName, payload);
 }
 
@@ -183,17 +193,18 @@ export async function publishExtractJob(
  */
 export async function publishExtractFanoutBatch(
   documents: DocumentJobInfo[],
-  opts?: { requestId?: string; uploadSessionId?: string }
+  opts?: { requestId?: string; uploadSessionId?: string },
 ): Promise<string> {
   const payload: ExtractFanoutPayload = {
-    jobType: 'extract_fanout',
+    jobType: "extract_fanout",
     jobId: uuidv4(),
     requestId: opts?.requestId,
     uploadSessionId: opts?.uploadSessionId,
     documents,
   };
 
-  const topicName = env.PUBSUB_EXTRACT_FANOUT_TOPIC || 'koda-doc-extract-fanout';
+  const topicName =
+    env.PUBSUB_EXTRACT_FANOUT_TOPIC || "koda-doc-extract-fanout";
   return publishJob(topicName, payload);
 }
 
@@ -202,18 +213,18 @@ export async function publishExtractFanoutBatch(
  */
 export async function publishEmbedJob(
   documentId: string,
-  userId: string
+  userId: string,
 ): Promise<string> {
   const payload: WorkerJobPayload = {
-    jobType: 'embed',
+    jobType: "embed",
     jobId: uuidv4(),
     userId,
     documentId,
-    mimeType: '', // Not needed for embed - chunks already in DB
-    storage: createStorageLocation(''), // Not needed for embed
+    mimeType: "", // Not needed for embed - chunks already in DB
+    storage: createStorageLocation(""), // Not needed for embed
   };
 
-  const topicName = env.PUBSUB_EMBED_TOPIC || 'koda-doc-embed';
+  const topicName = env.PUBSUB_EMBED_TOPIC || "koda-doc-embed";
   return publishJob(topicName, payload);
 }
 
@@ -225,10 +236,10 @@ export async function publishPreviewJob(
   userId: string,
   storageKey: string,
   mimeType: string,
-  filename?: string
+  filename?: string,
 ): Promise<string> {
   const payload: WorkerJobPayload = {
-    jobType: 'preview',
+    jobType: "preview",
     jobId: uuidv4(),
     userId,
     documentId,
@@ -237,7 +248,7 @@ export async function publishPreviewJob(
     filename,
   };
 
-  const topicName = env.PUBSUB_PREVIEW_TOPIC || 'koda-doc-preview';
+  const topicName = env.PUBSUB_PREVIEW_TOPIC || "koda-doc-preview";
   return publishJob(topicName, payload);
 }
 
@@ -249,10 +260,10 @@ export async function publishOcrJob(
   userId: string,
   storageKey: string,
   mimeType: string,
-  langHint?: string
+  langHint?: string,
 ): Promise<string> {
   const payload: WorkerJobPayload = {
-    jobType: 'ocr',
+    jobType: "ocr",
     jobId: uuidv4(),
     userId,
     documentId,
@@ -261,7 +272,7 @@ export async function publishOcrJob(
     langHint,
   };
 
-  const topicName = env.PUBSUB_OCR_TOPIC || 'koda-doc-ocr';
+  const topicName = env.PUBSUB_OCR_TOPIC || "koda-doc-ocr";
   return publishJob(topicName, payload);
 }
 
@@ -269,11 +280,13 @@ export async function publishOcrJob(
  * Publish extract jobs for multiple documents (bulk upload)
  */
 export async function publishExtractJobsBulk(
-  documents: DocumentJobInfo[]
+  documents: DocumentJobInfo[],
 ): Promise<Map<string, string>> {
   const results = new Map<string, string>();
 
-  const publishConcurrency = Number(process.env.PUBSUB_PUBLISH_CONCURRENCY || 25);
+  const publishConcurrency = Number(
+    process.env.PUBSUB_PUBLISH_CONCURRENCY || 25,
+  );
   const limit = pLimit(Math.max(1, publishConcurrency));
 
   await Promise.all(
@@ -285,15 +298,18 @@ export async function publishExtractJobsBulk(
             doc.userId,
             doc.storageKey,
             doc.mimeType,
-            doc.filename
+            doc.filename,
           );
           results.set(doc.documentId, messageId);
         } catch (error) {
-          console.error(`[PubSub] Failed to publish extract job for ${doc.documentId}:`, error);
-          results.set(doc.documentId, 'error');
+          console.error(
+            `[PubSub] Failed to publish extract job for ${doc.documentId}:`,
+            error,
+          );
+          results.set(doc.documentId, "error");
         }
-      })
-    )
+      }),
+    ),
   );
 
   return results;
@@ -305,12 +321,19 @@ export async function publishExtractJobsBulk(
  */
 export async function publishExtractFanoutJobsBulk(
   documents: DocumentJobInfo[],
-  opts?: { requestId?: string; uploadSessionId?: string }
-): Promise<{ publishedBatches: number; publishedDocs: number; messageIds: string[] }> {
-  if (documents.length === 0) return { publishedBatches: 0, publishedDocs: 0, messageIds: [] };
+  opts?: { requestId?: string; uploadSessionId?: string },
+): Promise<{
+  publishedBatches: number;
+  publishedDocs: number;
+  messageIds: string[];
+}> {
+  if (documents.length === 0)
+    return { publishedBatches: 0, publishedDocs: 0, messageIds: [] };
 
   const batchSize = Number(process.env.PUBSUB_FANOUT_BATCH_SIZE || 200);
-  const publishConcurrency = Number(process.env.PUBSUB_FANOUT_PUBLISH_CONCURRENCY || 10);
+  const publishConcurrency = Number(
+    process.env.PUBSUB_FANOUT_PUBLISH_CONCURRENCY || 10,
+  );
   const limit = pLimit(Math.max(1, publishConcurrency));
 
   const batches: DocumentJobInfo[][] = [];
@@ -319,12 +342,14 @@ export async function publishExtractFanoutJobsBulk(
   }
 
   const messageIds = await Promise.all(
-    batches.map((batch) =>
-      limit(() => publishExtractFanoutBatch(batch, opts))
-    )
+    batches.map((batch) => limit(() => publishExtractFanoutBatch(batch, opts))),
   );
 
-  return { publishedBatches: batches.length, publishedDocs: documents.length, messageIds };
+  return {
+    publishedBatches: batches.length,
+    publishedDocs: documents.length,
+    messageIds,
+  };
 }
 
 /**

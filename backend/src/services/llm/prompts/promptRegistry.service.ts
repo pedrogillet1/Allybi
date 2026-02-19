@@ -118,7 +118,11 @@ function localizedText(value: any, lang: LangCode): string {
   return value[lang] ?? value.any ?? value.en ?? value.pt ?? value.es ?? "";
 }
 
-function interpolate(template: string, slots: Record<string, any>, slotsFilled: string[]): string {
+function interpolate(
+  template: string,
+  slots: Record<string, any>,
+  slotsFilled: string[],
+): string {
   let out = template;
 
   out = out.replace(/\{\{(\w+)\}\}/g, (_m, k) => {
@@ -211,7 +215,9 @@ export class PromptRegistryService {
         .map((m: any) => {
           const role: LlmRole = (m.role ?? "system") as LlmRole;
           const contentRaw = localizedText(m.content, ctx.outputLanguage);
-          const content = normalizeWs(interpolate(contentRaw, slots, slotsFilled));
+          const content = normalizeWs(
+            interpolate(contentRaw, slots, slotsFilled),
+          );
           return { role, content };
         })
         .filter((m: PromptMessage) => m.content.length > 0);
@@ -223,12 +229,16 @@ export class PromptRegistryService {
         bankId,
         version: safeStr(bank?._meta?.version || "0.0.0"),
         templateId: selection.templateId,
-        hash: sha256(compiled.map((m) => `${m.role}:${m.content}`).join("\n\n")),
+        hash: sha256(
+          compiled.map((m) => `${m.role}:${m.content}`).join("\n\n"),
+        ),
       });
     }
 
     if (!messages.length) {
-      messages = [{ role: "system", content: this.minimalSafePrompt(kind, ctx) }];
+      messages = [
+        { role: "system", content: this.minimalSafePrompt(kind, ctx) },
+      ];
       orderedPrompts.push({
         bankId: "fallback_minimal",
         version: "0.0.0",
@@ -261,7 +271,9 @@ export class PromptRegistryService {
   }
 
   private assertNoUnreachableSelectionRules(registry: any): void {
-    const rules = Array.isArray(registry?.selectionRules?.rules) ? registry.selectionRules.rules : [];
+    const rules = Array.isArray(registry?.selectionRules?.rules)
+      ? registry.selectionRules.rules
+      : [];
     if (!rules.length) return;
 
     let sawCatchAll = false;
@@ -278,42 +290,75 @@ export class PromptRegistryService {
     }
 
     if (unreachable.length) {
-      throw new Error(`prompt_registry.any.json has unreachable selection rules: ${unreachable.join(", ")}`);
+      throw new Error(
+        `prompt_registry.any.json has unreachable selection rules: ${unreachable.join(", ")}`,
+      );
     }
   }
 
-  private resolveBankIdsForKind(kind: PromptKind, registry: any | null, _ctx: PromptContext): string[] {
+  private resolveBankIdsForKind(
+    kind: PromptKind,
+    registry: any | null,
+    _ctx: PromptContext,
+  ): string[] {
     const defaults: Record<PromptKind, string[]> = {
       system: ["system_base"],
       retrieval: ["system_base", "mode_chat", "rag_policy", "retrieval_prompt"],
-      compose_answer: ["system_base", "mode_chat", "rag_policy", "task_answer_with_sources", "policy_citations"],
+      compose_answer: [
+        "system_base",
+        "mode_chat",
+        "rag_policy",
+        "task_answer_with_sources",
+        "policy_citations",
+      ],
       disambiguation: ["system_base", "mode_chat", "disambiguation_prompt"],
       fallback: ["system_base", "mode_chat", "fallback_prompt"],
-      tool: ["system_base", "mode_editing", "editing_task_prompts", "task_plan_generation", "policy_citations", "tool_prompts"],
+      tool: [
+        "system_base",
+        "mode_editing",
+        "editing_task_prompts",
+        "task_plan_generation",
+        "policy_citations",
+        "tool_prompts",
+      ],
     };
 
     const fromRegistry = registry?.layersByKind?.[kind];
-    if (Array.isArray(fromRegistry) && fromRegistry.every((v: any) => typeof v === "string" && v.trim())) {
+    if (
+      Array.isArray(fromRegistry) &&
+      fromRegistry.every((v: any) => typeof v === "string" && v.trim())
+    ) {
       return uniq(fromRegistry.map((v: string) => v.trim()));
     }
 
-    if (registry?.map && typeof registry.map === "object" && typeof registry.map[kind] === "string") {
+    if (
+      registry?.map &&
+      typeof registry.map === "object" &&
+      typeof registry.map[kind] === "string"
+    ) {
       return [registry.map[kind]];
     }
 
     return defaults[kind];
   }
 
-  private selectTemplate(bank: any, kind: PromptKind, ctx: PromptContext): { templateId: string; messages: any[] } {
+  private selectTemplate(
+    bank: any,
+    kind: PromptKind,
+    ctx: PromptContext,
+  ): { templateId: string; messages: any[] } {
     if (Array.isArray(bank?.config?.messages)) {
-      return { templateId: `${safeStr(bank?._meta?.id || kind)}:config.messages`, messages: bank.config.messages };
+      return {
+        templateId: `${safeStr(bank?._meta?.id || kind)}:config.messages`,
+        messages: bank.config.messages,
+      };
     }
 
     const templates = Array.isArray(bank?.templates)
       ? bank.templates
       : Array.isArray(bank?.rules)
-      ? bank.rules
-      : null;
+        ? bank.rules
+        : null;
 
     if (templates && templates.length) {
       const candidates = templates
@@ -321,12 +366,14 @@ export class PromptRegistryService {
         .filter((t: any) => matchesWhen(t.when, ctx))
         .map((t: any) => ({
           id: safeStr(t.id || "template"),
-          priority: Number.isFinite(Number(t.priority)) ? Number(t.priority) : 50,
+          priority: Number.isFinite(Number(t.priority))
+            ? Number(t.priority)
+            : 50,
           messages: Array.isArray(t.messages)
             ? t.messages
             : Array.isArray(t.blocks)
-            ? this.blocksToMessages(t.blocks)
-            : [],
+              ? this.blocksToMessages(t.blocks)
+              : [],
         }))
         .filter((t: any) => t.messages.length > 0);
 
@@ -340,7 +387,10 @@ export class PromptRegistryService {
     }
 
     // templates locale shape: templates.{lang}.{system|developer|user}
-    const langBlock = bank?.templates?.[ctx.outputLanguage] ?? bank?.templates?.any ?? bank?.templates?.en;
+    const langBlock =
+      bank?.templates?.[ctx.outputLanguage] ??
+      bank?.templates?.any ??
+      bank?.templates?.en;
     if (langBlock && typeof langBlock === "object") {
       const out: PromptMessage[] = [];
       const roles: Array<{ key: string; role: LlmRole }> = [
@@ -357,12 +407,17 @@ export class PromptRegistryService {
         }
       }
       if (out.length) {
-        return { templateId: `${safeStr(bank?._meta?.id || kind)}:templates.${ctx.outputLanguage}`, messages: out };
+        return {
+          templateId: `${safeStr(bank?._meta?.id || kind)}:templates.${ctx.outputLanguage}`,
+          messages: out,
+        };
       }
     }
 
     // compose variants shape: variants.{variantId}.template[]
-    const defaultVariant = safeStr(bank?.config?.defaultVariant || bank?.defaultVariant || "");
+    const defaultVariant = safeStr(
+      bank?.config?.defaultVariant || bank?.defaultVariant || "",
+    );
     const variant = defaultVariant ? bank?.variants?.[defaultVariant] : null;
     if (variant && Array.isArray(variant?.template)) {
       return {
@@ -381,7 +436,12 @@ export class PromptRegistryService {
     const out: any[] = [];
     for (const b of blocks) {
       const role = b?.role ?? "system";
-      const text = typeof b?.text === "string" ? b.text : Array.isArray(b?.lines) ? b.lines.join("\n") : "";
+      const text =
+        typeof b?.text === "string"
+          ? b.text
+          : Array.isArray(b?.lines)
+            ? b.lines.join("\n")
+            : "";
       out.push({ role, content: text });
     }
     return out;
@@ -412,18 +472,32 @@ export class PromptRegistryService {
     };
   }
 
-  private applyGlobalGuards(messages: PromptMessage[], ctx: PromptContext, applied: string[]): PromptMessage[] {
+  private applyGlobalGuards(
+    messages: PromptMessage[],
+    ctx: PromptContext,
+    applied: string[],
+  ): PromptMessage[] {
     const guards: string[] = [];
 
     if (ctx.disallowJsonOutput !== false) {
-      guards.push("- Do NOT output raw JSON to the user. Use normal text, bullets, or tables instead.");
+      guards.push(
+        "- Do NOT output raw JSON to the user. Use normal text, bullets, or tables instead.",
+      );
     }
 
     const maxQ = clampInt(ctx.maxQuestions ?? 1, 0, 3, 1);
-    guards.push(`- Ask at most ${maxQ} question if you are blocked. Otherwise answer directly.`);
-    guards.push('- Never output the phrase "No relevant information found" (or equivalents).');
-    guards.push("- Use only the provided evidence/context. Do not invent sources or details.");
-    guards.push("- Citation contract: when evidence exists, append a `Sources` block with human-readable source names and stable locators; when no evidence exists, omit the `Sources` block.");
+    guards.push(
+      `- Ask at most ${maxQ} question if you are blocked. Otherwise answer directly.`,
+    );
+    guards.push(
+      '- Never output the phrase "No relevant information found" (or equivalents).',
+    );
+    guards.push(
+      "- Use only the provided evidence/context. Do not invent sources or details.",
+    );
+    guards.push(
+      "- Citation contract: when evidence exists, append a `Sources` block with human-readable source names and stable locators; when no evidence exists, omit the `Sources` block.",
+    );
 
     const guardMsg: PromptMessage = {
       role: "system",
@@ -434,13 +508,16 @@ export class PromptRegistryService {
     return [guardMsg, ...messages];
   }
 
-  private applyNavPillsGuard(messages: PromptMessage[], applied: string[]): PromptMessage[] {
+  private applyNavPillsGuard(
+    messages: PromptMessage[],
+    applied: string[],
+  ): PromptMessage[] {
     const guard: PromptMessage = {
       role: "system",
       content: [
-      "NAV_PILLS_MODE_CONTRACT:",
-      "- Output only ONE short intro line (max 1 sentence).",
-      "- Do NOT include a 'Sources:' label or inline citations.",
+        "NAV_PILLS_MODE_CONTRACT:",
+        "- Output only ONE short intro line (max 1 sentence).",
+        "- Do NOT include a 'Sources:' label or inline citations.",
         "- Do NOT include message actions or claim actions were executed.",
         "- Files are represented via attachments/buttons, not in the text.",
       ].join("\n"),
@@ -454,7 +531,7 @@ export class PromptRegistryService {
     const base: string[] = [
       "Assistant identity: Allybi.",
       "Refer to yourself in first person (I/me/my). Do not speak about yourself in third person.",
-      "Never output sentences like: \"Allybi's name is Allybi\" or \"How can Allybi assist you today?\"",
+      'Never output sentences like: "Allybi\'s name is Allybi" or "How can Allybi assist you today?"',
       "Use only the provided evidence/context.",
       "Never output the phrase 'No relevant information found'.",
       "Do not output raw JSON to the user.",
@@ -464,7 +541,9 @@ export class PromptRegistryService {
     ];
 
     if ((ctx.answerMode ?? "") === "nav_pills") {
-      base.push("NAV_PILLS: one short intro sentence only; no Sources label; no actions.");
+      base.push(
+        "NAV_PILLS: one short intro sentence only; no Sources label; no actions.",
+      );
     }
 
     base.push(`prompt_kind=${kind}`);

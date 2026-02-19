@@ -1,6 +1,6 @@
 // locationAwareRetrieval.service.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { normalizeWhitespace } from '../../utils';
+import { normalizeWhitespace } from "../../utils";
 
 /**
  * Koda Location-Aware Retrieval (ChatGPT-parity, doc-grounded)
@@ -156,11 +156,18 @@ export interface LocationAwareResponse {
 }
 
 export interface LexicalIndex {
-  search(opts: {
-    query: string;
-    docIds?: string[];
-    k: number;
-  }): Promise<Array<{ docId: string; location: ChunkLocation; snippet: string; score: number; locationKey?: string; chunkId?: string; title?: string; filename?: string }>>;
+  search(opts: { query: string; docIds?: string[]; k: number }): Promise<
+    Array<{
+      docId: string;
+      location: ChunkLocation;
+      snippet: string;
+      score: number;
+      locationKey?: string;
+      chunkId?: string;
+      title?: string;
+      filename?: string;
+    }>
+  >;
 }
 
 export interface StructuralIndex {
@@ -169,15 +176,33 @@ export interface StructuralIndex {
     docIds?: string[];
     k: number;
     anchors: string[];
-  }): Promise<Array<{ docId: string; location: ChunkLocation; snippet: string; score: number; locationKey?: string; chunkId?: string; title?: string; filename?: string }>>;
+  }): Promise<
+    Array<{
+      docId: string;
+      location: ChunkLocation;
+      snippet: string;
+      score: number;
+      locationKey?: string;
+      chunkId?: string;
+      title?: string;
+      filename?: string;
+    }>
+  >;
 }
 
 export interface SemanticIndex {
-  search(opts: {
-    query: string;
-    docIds?: string[];
-    k: number;
-  }): Promise<Array<{ docId: string; location: ChunkLocation; snippet: string; score: number; locationKey?: string; chunkId?: string; title?: string; filename?: string }>>;
+  search(opts: { query: string; docIds?: string[]; k: number }): Promise<
+    Array<{
+      docId: string;
+      location: ChunkLocation;
+      snippet: string;
+      score: number;
+      locationKey?: string;
+      chunkId?: string;
+      title?: string;
+      filename?: string;
+    }>
+  >;
 }
 
 // -------------------- helpers --------------------
@@ -198,13 +223,17 @@ function safeNumber(x: any, fallback: number): number {
 
 // normalizeWhitespace imported from ../../utils
 
-function stableLocationKey(docId: string, loc: ChunkLocation, fallbackId: string): string {
+function stableLocationKey(
+  docId: string,
+  loc: ChunkLocation,
+  fallbackId: string,
+): string {
   const parts = [
     `d:${docId}`,
     loc.page != null ? `p:${loc.page}` : "",
     loc.sheet ? `s:${loc.sheet}` : "",
     loc.slide != null ? `sl:${loc.slide}` : "",
-    loc.sectionKey ? `sec:${loc.sectionKey}` : ""
+    loc.sectionKey ? `sec:${loc.sectionKey}` : "",
   ].filter(Boolean);
 
   const base = parts.join("|");
@@ -225,7 +254,8 @@ function uniqueBy<T>(items: T[], keyFn: (x: T) => string): T[] {
 
 function sortStable(hits: LocationHit[]): LocationHit[] {
   return hits.sort((a, b) => {
-    if (b.score.finalScore !== a.score.finalScore) return b.score.finalScore - a.score.finalScore;
+    if (b.score.finalScore !== a.score.finalScore)
+      return b.score.finalScore - a.score.finalScore;
     if (a.docId !== b.docId) return a.docId.localeCompare(b.docId);
     const ak = a.locationKey ?? "";
     const bk = b.locationKey ?? "";
@@ -241,7 +271,7 @@ export class LocationAwareRetrievalService {
     private readonly bankLoader: BankLoader,
     private readonly lexicalIndex: LexicalIndex,
     private readonly structuralIndex: StructuralIndex,
-    private readonly semanticIndex?: SemanticIndex
+    private readonly semanticIndex?: SemanticIndex,
   ) {}
 
   async locate(req: LocationAwareRequest): Promise<LocationAwareResponse> {
@@ -262,7 +292,10 @@ export class LocationAwareRetrievalService {
 
     const minFinalScore =
       req.overrides?.minFinalScore ??
-      safeNumber(packaging?.config?.actionsContract?.thresholds?.minFinalScore, 0.58);
+      safeNumber(
+        packaging?.config?.actionsContract?.thresholds?.minFinalScore,
+        0.58,
+      );
 
     const queryOriginal = req.query ?? "";
     const queryNormalized = this.normalizeLocateQuery(queryOriginal);
@@ -272,28 +305,63 @@ export class LocationAwareRetrievalService {
 
     // Run phases (deterministic)
     const usedPhases: string[] = [];
-    const rawHits: Array<{ phase: "lexical" | "structural" | "semantic"; docId: string; location: ChunkLocation; snippet: string; score: number; locationKey?: string; chunkId?: string; title?: string; filename?: string }> = [];
+    const rawHits: Array<{
+      phase: "lexical" | "structural" | "semantic";
+      docId: string;
+      location: ChunkLocation;
+      snippet: string;
+      score: number;
+      locationKey?: string;
+      chunkId?: string;
+      title?: string;
+      filename?: string;
+    }> = [];
 
     // 1) Lexical (strong for "where mentioned")
     usedPhases.push("lexical");
-    const lex = await this.lexicalIndex.search({ query: queryNormalized, docIds: scopeDocIds, k: kLexical });
-    rawHits.push(...lex.map(h => ({ phase: "lexical" as const, ...h })));
+    const lex = await this.lexicalIndex.search({
+      query: queryNormalized,
+      docIds: scopeDocIds,
+      k: kLexical,
+    });
+    rawHits.push(...lex.map((h) => ({ phase: "lexical" as const, ...h })));
 
     // 2) Structural anchors (headings/table headers), especially if section hints exist
     const anchors = this.computeAnchors(req, headingPatterns);
     usedPhases.push("structural");
-    const str = await this.structuralIndex.search({ query: queryNormalized, docIds: scopeDocIds, k: kStructural, anchors });
-    rawHits.push(...str.map(h => ({ phase: "structural" as const, ...h })));
+    const str = await this.structuralIndex.search({
+      query: queryNormalized,
+      docIds: scopeDocIds,
+      k: kStructural,
+      anchors,
+    });
+    rawHits.push(...str.map((h) => ({ phase: "structural" as const, ...h })));
 
     // 3) Semantic recall (optional), only if semanticIndex provided and lexical is weak
-    if (this.semanticIndex && (lex.length < 6 || this.needsSemanticRecall(req))) {
+    if (
+      this.semanticIndex &&
+      (lex.length < 6 || this.needsSemanticRecall(req))
+    ) {
       usedPhases.push("semantic");
-      const sem = await this.semanticIndex.search({ query: queryNormalized, docIds: scopeDocIds, k: kSemantic });
-      rawHits.push(...sem.map(h => ({ phase: "semantic" as const, ...h })));
+      const sem = await this.semanticIndex.search({
+        query: queryNormalized,
+        docIds: scopeDocIds,
+        k: kSemantic,
+      });
+      rawHits.push(...sem.map((h) => ({ phase: "semantic" as const, ...h })));
     }
 
     // Merge into LocationHits with deterministic scoring
-    let hits = rawHits.map((h, idx) => this.toLocationHit(h, idx, rankerCfg, req, queryNormalized, keywordBoostRules));
+    let hits = rawHits.map((h, idx) =>
+      this.toLocationHit(
+        h,
+        idx,
+        rankerCfg,
+        req,
+        queryNormalized,
+        keywordBoostRules,
+      ),
+    );
 
     // Apply negatives: lock correctness + min relevance
     hits = this.applyNegatives(hits, req, negatives);
@@ -302,19 +370,22 @@ export class LocationAwareRetrievalService {
     hits = this.applyLocationHints(hits, req);
 
     // Provenance enforcement (strict)
-    hits = hits.filter(h => this.provenanceOk(h));
+    hits = hits.filter((h) => this.provenanceOk(h));
 
     // Filter low scores, then dedupe
-    hits = hits.filter(h => h.score.finalScore >= minFinalScore);
-    hits = uniqueBy(hits, h => `${h.docId}|${h.locationKey}`);
+    hits = hits.filter((h) => h.score.finalScore >= minFinalScore);
+    hits = uniqueBy(hits, (h) => `${h.docId}|${h.locationKey}`);
 
     // Per-doc caps + total caps
     hits = this.capPerDoc(hits, maxHitsPerDoc);
     hits = sortStable(hits).slice(0, maxHits);
 
-    const uniqueDocs = new Set(hits.map(h => h.docId)).size;
+    const uniqueDocs = new Set(hits.map((h) => h.docId)).size;
     const topScore = hits.length ? hits[0].score.finalScore : null;
-    const scoreGap = hits.length >= 2 ? clamp01(hits[0].score.finalScore - hits[1].score.finalScore) : null;
+    const scoreGap =
+      hits.length >= 2
+        ? clamp01(hits[0].score.finalScore - hits[1].score.finalScore)
+        : null;
 
     return {
       hits,
@@ -326,35 +397,43 @@ export class LocationAwareRetrievalService {
         uniqueDocs,
         usedPhases,
         topScore,
-        scoreGap
+        scoreGap,
       },
-      debug: req.env === "production"
-        ? undefined
-        : {
-            reasonCodes: [],
-            notes: [
-              `scopeDocs=${scopeDocIds.length}`,
-              `phases=${usedPhases.join(",")}`,
-              `anchors=${anchors.join(",")}`
-            ]
-          }
+      debug:
+        req.env === "production"
+          ? undefined
+          : {
+              reasonCodes: [],
+              notes: [
+                `scopeDocs=${scopeDocIds.length}`,
+                `phases=${usedPhases.join(",")}`,
+                `anchors=${anchors.join(",")}`,
+              ],
+            },
     };
   }
 
   // ---------------- scope resolution ----------------
 
-  private async resolveScopeDocIds(req: LocationAwareRequest): Promise<string[]> {
+  private async resolveScopeDocIds(
+    req: LocationAwareRequest,
+  ): Promise<string[]> {
     const explicitResolvedDoc = req.signals.resolvedDocId ?? null;
     const activeDocId = req.signals.activeDocId ?? null;
 
     const isDiscovery = req.signals.intentFamily === "doc_discovery";
-    const corpusAllowed = Boolean(req.signals.corpusSearchAllowed ?? isDiscovery);
+    const corpusAllowed = Boolean(
+      req.signals.corpusSearchAllowed ?? isDiscovery,
+    );
 
-    if (req.signals.explicitDocRef && explicitResolvedDoc) return [explicitResolvedDoc];
+    if (req.signals.explicitDocRef && explicitResolvedDoc)
+      return [explicitResolvedDoc];
 
-    if (req.signals.explicitDocLock && activeDocId && !corpusAllowed) return [activeDocId];
+    if (req.signals.explicitDocLock && activeDocId && !corpusAllowed)
+      return [activeDocId];
 
-    if (Array.isArray(req.scopeDocIds) && req.scopeDocIds.length) return req.scopeDocIds;
+    if (Array.isArray(req.scopeDocIds) && req.scopeDocIds.length)
+      return req.scopeDocIds;
 
     // If nothing else, allow corpus (callers should ideally pass scopeDocIds)
     return [];
@@ -381,14 +460,19 @@ export class LocationAwareRetrievalService {
 
   // ---------------- anchors and hints ----------------
 
-  private computeAnchors(req: LocationAwareRequest, headingPatterns: any | null): string[] {
+  private computeAnchors(
+    req: LocationAwareRequest,
+    headingPatterns: any | null,
+  ): string[] {
     const anchors: string[] = ["headings", "table_headers", "toc"];
 
     // If user referenced a section explicitly, emphasize section headings
-    if (req.signals.sectionRefPresent || req.signals.sectionName) anchors.push("section_headings");
+    if (req.signals.sectionRefPresent || req.signals.sectionName)
+      anchors.push("section_headings");
 
     // Spreadsheet hint -> include sheet/tab anchors
-    if (req.signals.sheetHintPresent || req.signals.rangeExplicit) anchors.push("sheet_names");
+    if (req.signals.sheetHintPresent || req.signals.rangeExplicit)
+      anchors.push("sheet_names");
 
     // If heading patterns bank provides categories, include them as tags (engine-side)
     const pats = headingPatterns?.patterns ?? headingPatterns?.rules ?? null;
@@ -397,25 +481,42 @@ export class LocationAwareRetrievalService {
     return Array.from(new Set(anchors));
   }
 
-  private applyLocationHints(hits: LocationHit[], req: LocationAwareRequest): LocationHit[] {
+  private applyLocationHints(
+    hits: LocationHit[],
+    req: LocationAwareRequest,
+  ): LocationHit[] {
     // Soft narrowing: increase scores for matches in hinted page/sheet/slide/section
     const page = req.signals.pageNumber ?? null;
     const slide = req.signals.slideNumber ?? null;
     const sheet = (req.signals.sheetName ?? "").trim() || null;
-    const section = (req.signals.sectionName ?? "").trim().toLowerCase() || null;
+    const section =
+      (req.signals.sectionName ?? "").trim().toLowerCase() || null;
 
-    return hits.map(h => {
+    return hits.map((h) => {
       let bonus = 0;
 
       if (page != null && h.location.page === page) bonus += 0.06;
       if (slide != null && h.location.slide === slide) bonus += 0.06;
-      if (sheet && h.location.sheet && h.location.sheet.toLowerCase() === sheet.toLowerCase()) bonus += 0.06;
+      if (
+        sheet &&
+        h.location.sheet &&
+        h.location.sheet.toLowerCase() === sheet.toLowerCase()
+      )
+        bonus += 0.06;
 
-      if (section && h.location.sectionKey && h.location.sectionKey.toLowerCase().includes(section)) bonus += 0.05;
+      if (
+        section &&
+        h.location.sectionKey &&
+        h.location.sectionKey.toLowerCase().includes(section)
+      )
+        bonus += 0.05;
 
       if (bonus > 0) {
         h.score.finalScore = clamp01(h.score.finalScore + bonus);
-        h.score.boosts = { ...(h.score.boosts ?? {}), location_hint_bonus: bonus };
+        h.score.boosts = {
+          ...(h.score.boosts ?? {}),
+          location_hint_bonus: bonus,
+        };
       }
 
       return h;
@@ -440,7 +541,7 @@ export class LocationAwareRetrievalService {
     rankerCfg: any | null,
     req: LocationAwareRequest,
     queryNormalized: string,
-    keywordBoostRules: any | null
+    keywordBoostRules: any | null,
   ): LocationHit {
     const docId = String(h.docId);
     const loc = h.location ?? {};
@@ -449,7 +550,10 @@ export class LocationAwareRetrievalService {
 
     const semanticW = safeNumber(rankerCfg?.config?.weights?.semantic, 0.52);
     const lexicalW = safeNumber(rankerCfg?.config?.weights?.lexical, 0.22);
-    const structuralW = safeNumber(rankerCfg?.config?.weights?.structural, 0.14);
+    const structuralW = safeNumber(
+      rankerCfg?.config?.weights?.structural,
+      0.14,
+    );
 
     const rawScore = clamp01(safeNumber(h.score, 0));
 
@@ -462,7 +566,11 @@ export class LocationAwareRetrievalService {
     if (h.phase === "semantic") semanticScore = rawScore;
 
     // Region-aware keyword boost (very light; locate_content should remain precise)
-    const keywordBoost = this.computeKeywordBoostForSnippet(queryNormalized, h.snippet, keywordBoostRules);
+    const keywordBoost = this.computeKeywordBoostForSnippet(
+      queryNormalized,
+      h.snippet,
+      keywordBoostRules,
+    );
 
     // Combine final score
     const base =
@@ -485,20 +593,27 @@ export class LocationAwareRetrievalService {
         structuralScore,
         semanticScore,
         boosts: keywordBoost > 0 ? { keywordBoost } : undefined,
-        penalties: undefined
+        penalties: undefined,
       },
-      evidenceType: "text"
+      evidenceType: "text",
     };
   }
 
-  private computeKeywordBoostForSnippet(query: string, snippet: string, keywordBoostRules: any | null): number {
+  private computeKeywordBoostForSnippet(
+    query: string,
+    snippet: string,
+    keywordBoostRules: any | null,
+  ): number {
     if (!keywordBoostRules?.config?.enabled) return 0;
 
     // Use the bank's cap if present, but keep locate boosts smaller than normal retrieval
-    const maxTotalBoost = safeNumber(keywordBoostRules?.config?.actionsContract?.thresholds?.maxTotalBoost, 0.22);
+    const maxTotalBoost = safeNumber(
+      keywordBoostRules?.config?.actionsContract?.thresholds?.maxTotalBoost,
+      0.22,
+    );
     const capForLocate = Math.min(0.06, maxTotalBoost);
 
-    const qTokens = new Set(query.split(/\s+/).filter(t => t.length >= 3));
+    const qTokens = new Set(query.split(/\s+/).filter((t) => t.length >= 3));
     const s = (snippet ?? "").toLowerCase();
 
     let hits = 0;
@@ -512,18 +627,26 @@ export class LocationAwareRetrievalService {
 
   // ---------------- negatives ----------------
 
-  private applyNegatives(hits: LocationHit[], req: LocationAwareRequest, negatives: any | null): LocationHit[] {
+  private applyNegatives(
+    hits: LocationHit[],
+    req: LocationAwareRequest,
+    negatives: any | null,
+  ): LocationHit[] {
     if (!negatives?.config?.enabled) return hits;
 
-    const minChunkRel = safeNumber(negatives?.config?.actionsContract?.thresholds?.minChunkRelevance, 0.55);
+    const minChunkRel = safeNumber(
+      negatives?.config?.actionsContract?.thresholds?.minChunkRelevance,
+      0.55,
+    );
 
     const locked = Boolean(req.signals.explicitDocLock);
     const activeDocId = req.signals.activeDocId ?? null;
     const isDiscovery = req.signals.intentFamily === "doc_discovery";
 
-    return hits.filter(h => {
+    return hits.filter((h) => {
       // Hard lock violation outside discovery
-      if (locked && activeDocId && h.docId !== activeDocId && !isDiscovery) return false;
+      if (locked && activeDocId && h.docId !== activeDocId && !isDiscovery)
+        return false;
 
       // Low relevance
       if (h.score.finalScore < minChunkRel) return false;

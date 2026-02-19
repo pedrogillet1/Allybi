@@ -35,6 +35,13 @@ const getCookieValue = (name) => {
   return null;
 };
 
+const unwrapEnvelope = (payload) => {
+  if (payload && typeof payload === 'object' && payload.ok === true && payload.data !== undefined) {
+    return payload.data;
+  }
+  return payload;
+};
+
 // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Get encryption password from AuthContext
 // This will be passed to functions that need encryption
 let encryptionPassword = null;
@@ -376,7 +383,7 @@ export const createConversation = async (title = 'New Chat') => {
   const response = await api.post('/conversations', requestData);
   // Invalidate conversations list cache so next fetch includes the new conversation
   _conversationsCache = { data: null, ts: 0 };
-  return response.data;
+  return unwrapEnvelope(response.data);
 };
 
 /**
@@ -407,7 +414,7 @@ export const getConversations = async () => {
     try {
       const response = await api.get('/conversations');
 
-      let data = response.data;
+      let data = unwrapEnvelope(response.data);
 
       // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Decrypt conversation titles
       if (encryptionPassword && data?.conversations) {
@@ -457,10 +464,11 @@ export const getConversations = async () => {
  */
 export const getConversation = async (conversationId) => {
   const response = await api.get(`/conversations/${conversationId}`);
+  const payload = unwrapEnvelope(response.data);
 
   // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Decrypt conversation title and messages
-  if (encryptionPassword && response.data) {
-    const conversation = response.data;
+  if (encryptionPassword && payload) {
+    const conversation = payload;
 
     // Decrypt conversation title
     if (conversation.titleEncrypted && conversation.encryptionSalt) {
@@ -502,7 +510,7 @@ export const getConversation = async (conversationId) => {
     }
   }
 
-  return response.data;
+  return payload;
 };
 
 /**
@@ -753,7 +761,7 @@ export const sendAdaptiveMessageStreaming = async (
  */
 export const deleteConversation = async (conversationId) => {
   const response = await api.delete(`/conversations/${conversationId}`);
-  return response.data;
+  return unwrapEnvelope(response.data);
 };
 
 /**
@@ -761,7 +769,7 @@ export const deleteConversation = async (conversationId) => {
  */
 export const updateConversationTitle = async (conversationId, title) => {
   const response = await api.patch(`/conversations/${conversationId}/title`, { title });
-  return response.data;
+  return unwrapEnvelope(response.data);
 };
 
 /**
@@ -769,7 +777,7 @@ export const updateConversationTitle = async (conversationId, title) => {
  */
 export const deleteAllConversations = async () => {
   const response = await api.delete('/conversations');
-  return response.data;
+  return unwrapEnvelope(response.data);
 };
 
 /**
@@ -777,7 +785,7 @@ export const deleteAllConversations = async () => {
  */
 export const deleteEmptyConversations = async () => {
   const response = await api.delete('/conversations/empty');
-  return response.data;
+  return unwrapEnvelope(response.data);
 };
 
 // WebSocket Functions

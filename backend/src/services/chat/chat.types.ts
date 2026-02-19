@@ -1,4 +1,7 @@
-import type { StreamSink, LLMStreamingConfig } from "../llm/types/llmStreaming.types";
+import type {
+  StreamSink,
+  LLMStreamingConfig,
+} from "../llm/types/llmStreaming.types";
 
 export type ChatRole = "user" | "assistant" | "system";
 
@@ -41,8 +44,20 @@ export interface ChatResult {
   assistantText: string;
   attachmentsPayload?: unknown;
   assistantTelemetry?: Record<string, unknown>;
-  sources?: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }>;
-  listing?: Array<{ kind: "file" | "folder"; id: string; title: string; mimeType?: string; itemCount?: number; depth?: number }>;
+  sources?: Array<{
+    documentId: string;
+    filename: string;
+    mimeType: string | null;
+    page: number | null;
+  }>;
+  listing?: Array<{
+    kind: "file" | "folder";
+    id: string;
+    title: string;
+    mimeType?: string;
+    itemCount?: number;
+    depth?: number;
+  }>;
   breadcrumb?: Array<{ id: string; name: string }>;
   answerMode?: AnswerMode;
   answerClass?: AnswerClass;
@@ -85,7 +100,12 @@ export type TurnContext = {
   request: ChatRequest;
 };
 
-export type TurnRouteDecision = "EDITOR" | "CONNECTOR" | "KNOWLEDGE" | "GENERAL" | "CLARIFY";
+export type TurnRouteDecision =
+  | "EDITOR"
+  | "CONNECTOR"
+  | "KNOWLEDGE"
+  | "GENERAL"
+  | "CLARIFY";
 
 export type TurnRequest = {
   req: ChatRequest;

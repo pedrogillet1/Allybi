@@ -1,25 +1,25 @@
-import { createHmac, randomUUID } from 'crypto';
-import { URLSearchParams } from 'url';
+import { createHmac, randomUUID } from "crypto";
+import { URLSearchParams } from "url";
 
-import type { ConnectorProvider } from '../connectorsRegistry';
-import { TokenVaultService } from '../tokenVault.service';
+import type { ConnectorProvider } from "../connectorsRegistry";
+import { TokenVaultService } from "../tokenVault.service";
 
-const PROVIDER: ConnectorProvider = 'slack';
-const AUTH_BASE = 'https://slack.com/oauth/v2/authorize';
-const TOKEN_BASE = 'https://slack.com/api/oauth.v2.access';
-const AUTH_TEST = 'https://slack.com/api/auth.test';
+const PROVIDER: ConnectorProvider = "slack";
+const AUTH_BASE = "https://slack.com/oauth/v2/authorize";
+const TOKEN_BASE = "https://slack.com/api/oauth.v2.access";
+const AUTH_TEST = "https://slack.com/api/auth.test";
 
 const DEFAULT_SCOPES = [
-  'channels:history',
-  'channels:read',
-  'groups:history',
-  'groups:read',
-  'im:history',
-  'im:read',
-  'mpim:read',
-  'mpim:history',
-  'users:read',
-  'users:read.email',
+  "channels:history",
+  "channels:read",
+  "groups:history",
+  "groups:read",
+  "im:history",
+  "im:read",
+  "mpim:read",
+  "mpim:history",
+  "users:read",
+  "users:read.email",
 ];
 
 export interface SlackStartConnectInput {
@@ -65,14 +65,16 @@ interface SlackOauthAccessResponse {
 }
 
 function asString(value: unknown): string | null {
-  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
+    : null;
 }
 
 function parseExtStateUserId(extState: string): string | null {
   try {
-    const decoded = Buffer.from(extState, 'base64url').toString('utf8');
-    const parts = decoded.split(':');
-    if (parts.length >= 2 && parts[0] === 'slack' && parts[1].trim()) {
+    const decoded = Buffer.from(extState, "base64url").toString("utf8");
+    const parts = decoded.split(":");
+    if (parts.length >= 2 && parts[0] === "slack" && parts[1].trim()) {
       return parts[1].trim();
     }
   } catch {
@@ -94,14 +96,14 @@ export class SlackOAuthService {
 
   getAuthorizationUrl(input: SlackStartConnectInput): string {
     if (!asString(input.userId)) {
-      throw new Error('userId is required to start Slack OAuth.');
+      throw new Error("userId is required to start Slack OAuth.");
     }
 
     const clientId = process.env.SLACK_CLIENT_ID;
     const callbackUrl = this.resolveRedirectUri(input.callbackUrl);
 
     if (!asString(clientId) || !asString(callbackUrl)) {
-      throw new Error('Slack OAuth environment is incomplete.');
+      throw new Error("Slack OAuth environment is incomplete.");
     }
 
     const signedState = this.signState({
@@ -116,10 +118,10 @@ export class SlackOAuthService {
 
     const params = new URLSearchParams({
       client_id: clientId as string,
-      scope: DEFAULT_SCOPES.join(','),
+      scope: DEFAULT_SCOPES.join(","),
       redirect_uri: callbackUrl as string,
       state: signedState,
-      user_scope: '',
+      user_scope: "",
     });
 
     return `${AUTH_BASE}?${params.toString()}`;
@@ -133,24 +135,36 @@ export class SlackOAuthService {
     return this.getAuthorizationUrl(input);
   }
 
-  async handleCallback(input: SlackCallbackInput): Promise<Record<string, unknown>> {
+  async handleCallback(
+    input: SlackCallbackInput,
+  ): Promise<Record<string, unknown>> {
     const code = asString(input.code);
-    if (!code) throw new Error('Slack callback is missing code.');
+    if (!code) throw new Error("Slack callback is missing code.");
 
-    const verified = this.verifyState(asString(input.state) || '');
+    const verified = this.verifyState(asString(input.state) || "");
     const userId = verified?.userId || this.deriveUserIdFromQuery(input.query);
-    if (!userId) throw new Error('Unable to resolve userId from Slack OAuth state.');
+    if (!userId)
+      throw new Error("Unable to resolve userId from Slack OAuth state.");
 
-    const token = await this.exchangeCode({ code, state: input.state, query: input.query });
+    const token = await this.exchangeCode({
+      code,
+      state: input.state,
+      query: input.query,
+    });
 
     const accessToken = asString(token.access_token);
     if (!accessToken) {
-      throw new Error('Slack OAuth exchange did not return an access token.');
+      throw new Error("Slack OAuth exchange did not return an access token.");
     }
 
     const scopes = [token.scope, token.authed_user?.scope]
       .filter((value): value is string => Boolean(asString(value)))
-      .flatMap((value) => value.split(/[,\s]+/).map((part) => part.trim()).filter(Boolean));
+      .flatMap((value) =>
+        value
+          .split(/[,\s]+/)
+          .map((part) => part.trim())
+          .filter(Boolean),
+      );
 
     // Slack tokens do not always provide explicit expiry. Persist with long TTL.
     const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
@@ -161,11 +175,16 @@ export class SlackOAuthService {
       PROVIDER,
       JSON.stringify({
         accessToken,
-        tokenType: token.token_type || 'Bearer',
-        providerAccountId: asString(authTest?.user_id) || asString(token.bot_user_id) || undefined,
+        tokenType: token.token_type || "Bearer",
+        providerAccountId:
+          asString(authTest?.user_id) ||
+          asString(token.bot_user_id) ||
+          undefined,
         metadata: {
-          teamId: asString(authTest?.team_id) || asString(token.team?.id) || null,
-          teamName: asString(authTest?.team) || asString(token.team?.name) || null,
+          teamId:
+            asString(authTest?.team_id) || asString(token.team?.id) || null,
+          teamName:
+            asString(authTest?.team) || asString(token.team?.name) || null,
           appId: asString(token.app_id) || null,
           authedUserId: asString(token.authed_user?.id) || null,
           scopes: Array.from(new Set(scopes)),
@@ -188,16 +207,22 @@ export class SlackOAuthService {
     };
   }
 
-  async exchangeCode(input: SlackCallbackInput): Promise<SlackOauthAccessResponse> {
+  async exchangeCode(
+    input: SlackCallbackInput,
+  ): Promise<SlackOauthAccessResponse> {
     const code = asString(input.code);
-    if (!code) throw new Error('OAuth code is required.');
+    if (!code) throw new Error("OAuth code is required.");
 
     const clientId = process.env.SLACK_CLIENT_ID;
     const clientSecret = process.env.SLACK_CLIENT_SECRET;
     const redirectUri = this.resolveRedirectUriFromCallback(input.state);
 
-    if (!asString(clientId) || !asString(clientSecret) || !asString(redirectUri)) {
-      throw new Error('Slack OAuth environment is incomplete.');
+    if (
+      !asString(clientId) ||
+      !asString(clientSecret) ||
+      !asString(redirectUri)
+    ) {
+      throw new Error("Slack OAuth environment is incomplete.");
     }
 
     const body = new URLSearchParams({
@@ -208,40 +233,53 @@ export class SlackOAuthService {
     });
 
     const response = await fetch(TOKEN_BASE, {
-      method: 'POST',
-      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
       body: body.toString(),
     });
 
     if (!response.ok) {
-      const err = await response.text().catch(() => 'Slack token exchange failed');
-      throw new Error(`Slack token exchange failed (${response.status}): ${err.slice(0, 240)}`);
+      const err = await response
+        .text()
+        .catch(() => "Slack token exchange failed");
+      throw new Error(
+        `Slack token exchange failed (${response.status}): ${err.slice(0, 240)}`,
+      );
     }
 
     const json = (await response.json()) as SlackOauthAccessResponse;
     if (!json.ok) {
-      throw new Error(`Slack token exchange returned error: ${json.error || 'unknown_error'}`);
+      throw new Error(
+        `Slack token exchange returned error: ${json.error || "unknown_error"}`,
+      );
     }
 
     return json;
   }
 
-  async refreshAccessToken(userId: string): Promise<{ accessToken: string; expiresAt: Date }> {
-    const accessToken = await this.tokenVault.getValidAccessToken(userId, PROVIDER);
+  async refreshAccessToken(
+    userId: string,
+  ): Promise<{ accessToken: string; expiresAt: Date }> {
+    const accessToken = await this.tokenVault.getValidAccessToken(
+      userId,
+      PROVIDER,
+    );
     const meta = await this.tokenVault.getProviderTokenMeta(userId, PROVIDER);
     if (!meta) {
-      throw new Error('No Slack token metadata found.');
+      throw new Error("No Slack token metadata found.");
     }
 
     return { accessToken, expiresAt: meta.expiresAt };
   }
 
-  private async authTest(accessToken: string): Promise<Record<string, unknown>> {
+  private async authTest(
+    accessToken: string,
+  ): Promise<Record<string, unknown>> {
     const response = await fetch(AUTH_TEST, {
-      method: 'POST',
+      method: "POST",
       headers: {
         authorization: `Bearer ${accessToken}`,
-        'content-type': 'application/x-www-form-urlencoded',
+        "content-type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams().toString(),
     });
@@ -252,13 +290,17 @@ export class SlackOAuthService {
 
     const json = (await response.json()) as Record<string, unknown>;
     if (json.ok !== true) {
-      throw new Error(`Slack auth.test returned error: ${String(json.error || 'unknown_error')}`);
+      throw new Error(
+        `Slack auth.test returned error: ${String(json.error || "unknown_error")}`,
+      );
     }
 
     return json;
   }
 
-  private deriveUserIdFromQuery(query?: Record<string, unknown>): string | null {
+  private deriveUserIdFromQuery(
+    query?: Record<string, unknown>,
+  ): string | null {
     if (!query) return null;
 
     const state = asString(query.state);
@@ -276,7 +318,8 @@ export class SlackOAuthService {
     // Prefer the redirectUri we used when creating the auth URL (embedded in signed state).
     const parsed = state ? this.verifyState(state) : null;
     const candidate = asString(parsed?.redirectUri);
-    if (candidate && this.isAllowedRedirectOverride(candidate)) return candidate;
+    if (candidate && this.isAllowedRedirectOverride(candidate))
+      return candidate;
 
     const envUri = asString(process.env.SLACK_REDIRECT_URI);
     if (envUri) return envUri;
@@ -300,10 +343,10 @@ export class SlackOAuthService {
     const csv = asString(process.env.SLACK_REDIRECT_URIS);
     const items = [
       ...(direct ? [direct] : []),
-      ...((csv || "")
+      ...(csv || "")
         .split(",")
         .map((x) => x.trim())
-        .filter(Boolean)),
+        .filter(Boolean),
     ];
     return Array.from(new Set(items));
   }
@@ -311,13 +354,13 @@ export class SlackOAuthService {
   private isAllowedRedirectOverride(candidate: string): boolean {
     try {
       const cand = new URL(candidate);
-      if (cand.protocol !== 'http:' && cand.protocol !== 'https:') return false;
-      if (cand.pathname !== '/api/integrations/slack/callback') return false;
+      if (cand.protocol !== "http:" && cand.protocol !== "https:") return false;
+      if (cand.pathname !== "/api/integrations/slack/callback") return false;
 
       // Dev ergonomics: allow localhost callback overrides without requiring env allowlist sync.
       if (
-        process.env.NODE_ENV === 'development' &&
-        (cand.hostname === 'localhost' || cand.hostname === '127.0.0.1')
+        process.env.NODE_ENV === "development" &&
+        (cand.hostname === "localhost" || cand.hostname === "127.0.0.1")
       ) {
         return true;
       }
@@ -337,40 +380,52 @@ export class SlackOAuthService {
   }
 
   private signState(payload: SignedStatePayload): string {
-    const secret = process.env.CONNECTOR_OAUTH_STATE_SECRET || process.env.ENCRYPTION_KEY;
+    const secret =
+      process.env.CONNECTOR_OAUTH_STATE_SECRET || process.env.ENCRYPTION_KEY;
     if (!asString(secret)) {
-      throw new Error('CONNECTOR_OAUTH_STATE_SECRET (or ENCRYPTION_KEY) is required for Slack OAuth state signing.');
+      throw new Error(
+        "CONNECTOR_OAUTH_STATE_SECRET (or ENCRYPTION_KEY) is required for Slack OAuth state signing.",
+      );
     }
 
-    const encoded = Buffer.from(JSON.stringify(payload), 'utf8').toString('base64url');
-    const signature = createHmac('sha256', secret as string).update(encoded).digest('base64url');
+    const encoded = Buffer.from(JSON.stringify(payload), "utf8").toString(
+      "base64url",
+    );
+    const signature = createHmac("sha256", secret as string)
+      .update(encoded)
+      .digest("base64url");
     return `${encoded}.${signature}`;
   }
 
   private verifyState(state: string): SignedStatePayload | null {
-    if (!state.includes('.')) {
+    if (!state.includes(".")) {
       const fallbackUserId = parseExtStateUserId(state);
       if (!fallbackUserId) return null;
       return {
         v: 1,
         provider: PROVIDER,
         userId: fallbackUserId,
-        nonce: 'external',
+        nonce: "external",
         iat: nowSec(),
       };
     }
 
-    const [encoded, signature] = state.split('.', 2);
+    const [encoded, signature] = state.split(".", 2);
     if (!encoded || !signature) return null;
 
-    const secret = process.env.CONNECTOR_OAUTH_STATE_SECRET || process.env.ENCRYPTION_KEY;
+    const secret =
+      process.env.CONNECTOR_OAUTH_STATE_SECRET || process.env.ENCRYPTION_KEY;
     if (!asString(secret)) return null;
 
-    const expected = createHmac('sha256', secret as string).update(encoded).digest('base64url');
+    const expected = createHmac("sha256", secret as string)
+      .update(encoded)
+      .digest("base64url");
     if (expected !== signature) return null;
 
     try {
-      const parsed = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8')) as SignedStatePayload;
+      const parsed = JSON.parse(
+        Buffer.from(encoded, "base64url").toString("utf8"),
+      ) as SignedStatePayload;
       if (parsed.provider !== PROVIDER || !asString(parsed.userId)) return null;
       if (Math.abs(nowSec() - parsed.iat) > 15 * 60) return null;
       return parsed;

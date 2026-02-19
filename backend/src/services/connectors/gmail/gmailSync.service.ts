@@ -1,10 +1,13 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+import { promises as fs } from "fs";
+import path from "path";
 
-import { GmailClientError, GmailClientService } from './gmailClient.service';
-import { GmailOAuthService } from './gmailOAuth.service';
-import { TokenVaultService } from '../tokenVault.service';
-import { ConnectorsIngestionService, type ConnectorDocument } from '../connectorsIngestion.service';
+import { GmailClientError, GmailClientService } from "./gmailClient.service";
+import { GmailOAuthService } from "./gmailOAuth.service";
+import { TokenVaultService } from "../tokenVault.service";
+import {
+  ConnectorsIngestionService,
+  type ConnectorDocument,
+} from "../connectorsIngestion.service";
 
 interface GmailSyncCursor {
   historyId?: string;
@@ -30,25 +33,31 @@ export interface GmailSyncInput {
 }
 
 export interface GmailSyncResult {
-  provider: 'gmail';
+  provider: "gmail";
   syncedCount: number;
   historyId?: string;
-  mode: 'initial' | 'incremental';
+  mode: "initial" | "incremental";
   lastSyncAt: string;
 }
 
-const CURSOR_ROOT = path.resolve(process.cwd(), 'storage', 'connectors', 'cursors');
+const CURSOR_ROOT = path.resolve(
+  process.cwd(),
+  "storage",
+  "connectors",
+  "cursors",
+);
 const BATCH_SIZE = 15;
 
 function decodeBase64Url(input?: string): string {
-  if (!input) return '';
-  const normalized = input.replace(/-/g, '+').replace(/_/g, '/');
-  const pad = normalized.length % 4 === 0 ? '' : '='.repeat(4 - (normalized.length % 4));
-  return Buffer.from(normalized + pad, 'base64').toString('utf8');
+  if (!input) return "";
+  const normalized = input.replace(/-/g, "+").replace(/_/g, "/");
+  const pad =
+    normalized.length % 4 === 0 ? "" : "=".repeat(4 - (normalized.length % 4));
+  return Buffer.from(normalized + pad, "base64").toString("utf8");
 }
 
 function textFromPayload(payload?: any): string {
-  if (!payload) return '';
+  if (!payload) return "";
 
   if (payload.body?.data) {
     const decoded = decodeBase64Url(payload.body.data).trim();
@@ -56,15 +65,18 @@ function textFromPayload(payload?: any): string {
   }
 
   const parts: any[] = payload.parts || [];
-  const preferredMimeOrder = ['text/plain', 'text/html'];
+  const preferredMimeOrder = ["text/plain", "text/html"];
 
   for (const mimeType of preferredMimeOrder) {
     const part = parts.find((p) => p.mimeType === mimeType && p.body?.data);
     if (part?.body?.data) {
       const decoded = decodeBase64Url(part.body.data).trim();
       if (decoded) {
-        if (mimeType === 'text/html') {
-          return decoded.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        if (mimeType === "text/html") {
+          return decoded
+            .replace(/<[^>]+>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
         }
         return decoded;
       }
@@ -76,15 +88,17 @@ function textFromPayload(payload?: any): string {
     if (nested) return nested;
   }
 
-  return '';
+  return "";
 }
 
 type HeaderLike = { name?: string | null; value?: string | null };
 
 function headerValue(headers: HeaderLike[] | undefined, name: string): string {
   const needle = name.toLowerCase();
-  const hit = (headers || []).find((h) => (h.name || '').toLowerCase() === needle);
-  return (hit?.value || '').trim();
+  const hit = (headers || []).find(
+    (h) => (h.name || "").toLowerCase() === needle,
+  );
+  return (hit?.value || "").trim();
 }
 
 export class GmailSyncService {
@@ -111,22 +125,33 @@ export class GmailSyncService {
       input.userId,
       accessToken,
       (token) => this.gmailClient.getProfile(token),
-      (newToken) => { accessToken = newToken; },
+      (newToken) => {
+        accessToken = newToken;
+      },
     );
 
     const cursorFile = await this.readCursorFile(input.userId);
     const prior = cursorFile.providers.gmail ?? {};
 
     const initialMode = input.forceResync || !prior.historyId;
-    const mode: 'initial' | 'incremental' = initialMode ? 'initial' : 'incremental';
+    const mode: "initial" | "incremental" = initialMode
+      ? "initial"
+      : "incremental";
 
     let messageIds: string[] = [];
 
-    if (mode === 'incremental' && prior.historyId) {
+    if (mode === "incremental" && prior.historyId) {
       try {
-        messageIds = await this.incrementalMessageIds(accessToken, prior.historyId, input.userId);
+        messageIds = await this.incrementalMessageIds(
+          accessToken,
+          prior.historyId,
+          input.userId,
+        );
       } catch (error) {
-        if (error instanceof GmailClientError && error.code === 'INVALID_HISTORY_CURSOR') {
+        if (
+          error instanceof GmailClientError &&
+          error.code === "INVALID_HISTORY_CURSOR"
+        ) {
           messageIds = await this.initialMessageIds(accessToken, input.userId);
         } else {
           throw error;
@@ -146,32 +171,36 @@ export class GmailSyncService {
             input.userId,
             accessToken,
             (token) => this.gmailClient.getMessage(token, messageId),
-            (newToken) => { accessToken = newToken; },
+            (newToken) => {
+              accessToken = newToken;
+            },
           ),
         ),
       );
 
       for (const result of results) {
-        if (result.status !== 'fulfilled') continue;
+        if (result.status !== "fulfilled") continue;
         const msg = result.value;
         const headers = msg.payload?.headers;
 
-        const subject = headerValue(headers, 'Subject') || '(no subject)';
-        const from = headerValue(headers, 'From');
-        const dateHeader = headerValue(headers, 'Date');
+        const subject = headerValue(headers, "Subject") || "(no subject)";
+        const from = headerValue(headers, "From");
+        const dateHeader = headerValue(headers, "Date");
 
-        const timestamp = dateHeader ? new Date(dateHeader) : new Date(msg.internalDate ? Number(msg.internalDate) : Date.now());
+        const timestamp = dateHeader
+          ? new Date(dateHeader)
+          : new Date(msg.internalDate ? Number(msg.internalDate) : Date.now());
         const body = textFromPayload(msg.payload);
         if (!body.trim()) continue;
 
         docs.push({
-          sourceType: 'gmail',
-          sourceId: msg.id || '',
+          sourceType: "gmail",
+          sourceId: msg.id || "",
           title: subject,
           body,
           timestamp: Number.isNaN(timestamp.getTime()) ? new Date() : timestamp,
           actors: [from].filter(Boolean),
-          labelsOrChannel: msg.labelIds || ['INBOX'],
+          labelsOrChannel: msg.labelIds || ["INBOX"],
           sourceMeta: {
             threadId: msg.threadId,
             historyId: msg.historyId,
@@ -200,11 +229,12 @@ export class GmailSyncService {
     await this.writeCursorFile(input.userId, cursorFile);
 
     return {
-      provider: 'gmail',
+      provider: "gmail",
       syncedCount: docs.length,
       historyId: cursorFile.providers.gmail.historyId,
       mode,
-      lastSyncAt: cursorFile.providers.gmail.lastSyncAt || new Date().toISOString(),
+      lastSyncAt:
+        cursorFile.providers.gmail.lastSyncAt || new Date().toISOString(),
     };
   }
 
@@ -212,7 +242,10 @@ export class GmailSyncService {
     return this.sync(input);
   }
 
-  private async initialMessageIds(accessToken: string, userId: string): Promise<string[]> {
+  private async initialMessageIds(
+    accessToken: string,
+    userId: string,
+  ): Promise<string[]> {
     const allIds: string[] = [];
     let pageToken: string | undefined;
     let currentToken = accessToken;
@@ -227,17 +260,25 @@ export class GmailSyncService {
             pageToken,
             includeSpamTrash: false,
           }),
-        (newToken) => { currentToken = newToken; },
+        (newToken) => {
+          currentToken = newToken;
+        },
       );
 
-      allIds.push(...(response.messages || []).map((m) => m.id || '').filter(Boolean));
+      allIds.push(
+        ...(response.messages || []).map((m) => m.id || "").filter(Boolean),
+      );
       pageToken = response.nextPageToken || undefined;
     } while (pageToken);
 
     return allIds;
   }
 
-  private async incrementalMessageIds(accessToken: string, startHistoryId: string, userId: string): Promise<string[]> {
+  private async incrementalMessageIds(
+    accessToken: string,
+    startHistoryId: string,
+    userId: string,
+  ): Promise<string[]> {
     const ids = new Set<string>();
     let pageToken: string | undefined;
     let currentToken = accessToken;
@@ -249,11 +290,13 @@ export class GmailSyncService {
         (token) =>
           this.gmailClient.listHistory(token, {
             startHistoryId,
-            historyTypes: ['messageAdded'],
+            historyTypes: ["messageAdded"],
             maxResults: 200,
             pageToken,
           }),
-        (newToken) => { currentToken = newToken; },
+        (newToken) => {
+          currentToken = newToken;
+        },
       );
 
       for (const entry of historyResp.history || []) {
@@ -270,13 +313,14 @@ export class GmailSyncService {
 
   private async getAccessToken(userId: string): Promise<string> {
     try {
-      return await this.tokenVault.getValidAccessToken(userId, 'gmail');
+      return await this.tokenVault.getValidAccessToken(userId, "gmail");
     } catch {
       try {
         const refreshed = await this.gmailOAuth.refreshAccessToken(userId);
         return refreshed.accessToken;
       } catch (refreshErr) {
-        const msg = refreshErr instanceof Error ? refreshErr.message : String(refreshErr);
+        const msg =
+          refreshErr instanceof Error ? refreshErr.message : String(refreshErr);
         throw new Error(`Gmail token refresh failed: ${msg}`);
       }
     }
@@ -292,8 +336,11 @@ export class GmailSyncService {
       return await fn(currentToken);
     } catch (err) {
       const isAuthError =
-        (err instanceof GmailClientError && (err.code === 'AUTH_ERROR' || err.status === 401)) ||
-        (err instanceof Error && (err.message.includes('401') || err.message.includes('invalid_grant')));
+        (err instanceof GmailClientError &&
+          (err.code === "AUTH_ERROR" || err.status === 401)) ||
+        (err instanceof Error &&
+          (err.message.includes("401") ||
+            err.message.includes("invalid_grant")));
 
       if (isAuthError) {
         const refreshed = await this.gmailOAuth.refreshAccessToken(userId);
@@ -309,7 +356,7 @@ export class GmailSyncService {
     const filePath = path.join(CURSOR_ROOT, `${userId}.json`);
 
     try {
-      const raw = await fs.readFile(filePath, 'utf8');
+      const raw = await fs.readFile(filePath, "utf8");
       const parsed = JSON.parse(raw) as ConnectorCursorFile;
       if (parsed?.version === 1 && parsed?.userId === userId) return parsed;
       return { version: 1, userId, providers: {} };
@@ -318,12 +365,18 @@ export class GmailSyncService {
     }
   }
 
-  private async writeCursorFile(userId: string, payload: ConnectorCursorFile): Promise<void> {
+  private async writeCursorFile(
+    userId: string,
+    payload: ConnectorCursorFile,
+  ): Promise<void> {
     await fs.mkdir(CURSOR_ROOT, { recursive: true });
     const filePath = path.join(CURSOR_ROOT, `${userId}.json`);
     const tmpPath = `${filePath}.tmp`;
 
-    await fs.writeFile(tmpPath, JSON.stringify(payload), { encoding: 'utf8', mode: 0o600 });
+    await fs.writeFile(tmpPath, JSON.stringify(payload), {
+      encoding: "utf8",
+      mode: 0o600,
+    });
     await fs.rename(tmpPath, filePath);
   }
 }

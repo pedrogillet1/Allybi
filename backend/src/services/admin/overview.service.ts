@@ -3,10 +3,15 @@
  * Dashboard KPIs and timeseries data
  */
 
-import type { PrismaClient } from '@prisma/client';
-import { parseRange, formatWindow, normalizeRange, type TimeWindow } from './_shared/rangeWindow';
-import { p50, p95 } from './_shared/percentiles';
-import { supportsModel } from './_shared/prismaAdapter';
+import type { PrismaClient } from "@prisma/client";
+import {
+  parseRange,
+  formatWindow,
+  normalizeRange,
+  type TimeWindow,
+} from "./_shared/rangeWindow";
+import { p50, p95 } from "./_shared/percentiles";
+import { supportsModel } from "./_shared/prismaAdapter";
 
 export interface OverviewKpis {
   dau: number;
@@ -44,28 +49,29 @@ export interface TimeseriesResult {
 }
 
 type MetricName =
-  | 'dau'
-  | 'messages'
-  | 'uploads'
-  | 'tokens'
-  | 'llm_errors'
-  | 'ingestion_failures'
-  | 'weak_evidence_rate'
-  | 'allybi_visits'
-  | 'allybi_clicks';
+  | "dau"
+  | "messages"
+  | "uploads"
+  | "tokens"
+  | "llm_errors"
+  | "ingestion_failures"
+  | "weak_evidence_rate"
+  | "allybi_visits"
+  | "allybi_clicks";
 
 const ALLYBI_CLICK_EVENT_TYPES = [
-  'ALLYBI_OPEN_CLICKED',
-  'ALLYBI_SUGGESTION_CLICKED',
-  'ALLYBI_MESSAGE_SENT',
-  'ALLYBI_APPLY_CLICKED',
-  'SOURCE_PILL_CLICKED',
-  'FILE_PILL_CLICKED',
+  "ALLYBI_AD_CLICKED",
+  "ALLYBI_OPEN_CLICKED",
+  "ALLYBI_SUGGESTION_CLICKED",
+  "ALLYBI_MESSAGE_SENT",
+  "ALLYBI_APPLY_CLICKED",
+  "SOURCE_PILL_CLICKED",
+  "FILE_PILL_CLICKED",
 ] as const;
 
 const ALLYBI_VISIT_EVENT_TYPES = [
-  'ALLYBI_VISIT_STARTED',
-  'ALLYBI_PUBLIC_VISIT_STARTED',
+  "ALLYBI_VISIT_STARTED",
+  "ALLYBI_PUBLIC_VISIT_STARTED",
 ] as const;
 
 /**
@@ -73,9 +79,9 @@ const ALLYBI_VISIT_EVENT_TYPES = [
  */
 export async function getOverview(
   prisma: PrismaClient,
-  params: { range?: string }
+  params: { range?: string },
 ): Promise<OverviewResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
 
   const kpis = await calculateKpis(prisma, window);
@@ -92,11 +98,11 @@ export async function getOverview(
  */
 export async function getTimeseries(
   prisma: PrismaClient,
-  params: { metric: string; range?: string }
+  params: { metric: string; range?: string },
 ): Promise<TimeseriesResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
-  const metric = (params.metric || 'dau') as MetricName;
+  const metric = (params.metric || "dau") as MetricName;
 
   const points = await calculateTimeseries(prisma, window, metric, rangeKey);
 
@@ -107,13 +113,16 @@ export async function getTimeseries(
   };
 }
 
-async function calculateKpis(prisma: PrismaClient, window: TimeWindow): Promise<OverviewKpis> {
+async function calculateKpis(
+  prisma: PrismaClient,
+  window: TimeWindow,
+): Promise<OverviewKpis> {
   const { from, to } = window;
   const safe = async <T>(query: () => Promise<T>, fallback: T): Promise<T> => {
     try {
       return await query();
     } catch (error) {
-      console.warn('[Admin][Overview] KPI query failed; using fallback value', {
+      console.warn("[Admin][Overview] KPI query failed; using fallback value", {
         error: error instanceof Error ? error.message : String(error),
       });
       return fallback;
@@ -134,114 +143,130 @@ async function calculateKpis(prisma: PrismaClient, window: TimeWindow): Promise<
     latencyData,
   ] = await Promise.all([
     // DAU: distinct users with activity
-    supportsModel(prisma, 'usageEvent')
+    supportsModel(prisma, "usageEvent")
       ? safe(
-          () => prisma.usageEvent.groupBy({
-            by: ['userId'],
-            where: {
-              at: { gte: from, lt: to },
-              eventType: { not: 'ALLYBI_PUBLIC_VISIT_STARTED' },
-            },
-          }),
-          []
+          () =>
+            prisma.usageEvent.groupBy({
+              by: ["userId"],
+              where: {
+                at: { gte: from, lt: to },
+                eventType: { not: "ALLYBI_PUBLIC_VISIT_STARTED" },
+              },
+            }),
+          [],
         )
       : [],
 
     // Messages count
-    supportsModel(prisma, 'message')
+    supportsModel(prisma, "message")
       ? safe(
-          () => prisma.message.count({
-            where: { createdAt: { gte: from, lt: to } },
-          }),
-          0
+          () =>
+            prisma.message.count({
+              where: { createdAt: { gte: from, lt: to } },
+            }),
+          0,
         )
       : 0,
 
     // Conversations created
-    supportsModel(prisma, 'conversation')
+    supportsModel(prisma, "conversation")
       ? safe(
-          () => prisma.conversation.count({
-            where: { createdAt: { gte: from, lt: to } },
-          }),
-          0
+          () =>
+            prisma.conversation.count({
+              where: { createdAt: { gte: from, lt: to } },
+            }),
+          0,
         )
       : 0,
 
     // Uploads (documents created)
-    supportsModel(prisma, 'document')
+    supportsModel(prisma, "document")
       ? safe(
-          () => prisma.document.count({
-            where: { createdAt: { gte: from, lt: to } },
-          }),
-          0
+          () =>
+            prisma.document.count({
+              where: { createdAt: { gte: from, lt: to } },
+            }),
+          0,
         )
       : 0,
 
     // Allybi visits (session start into Allybi surfaces)
-    supportsModel(prisma, 'usageEvent')
+    supportsModel(prisma, "usageEvent")
       ? safe(
-          () => prisma.usageEvent.count({
-            where: { at: { gte: from, lt: to }, eventType: { in: [...ALLYBI_VISIT_EVENT_TYPES] } },
-          }),
-          0
+          () =>
+            prisma.usageEvent.count({
+              where: {
+                at: { gte: from, lt: to },
+                eventType: { in: [...ALLYBI_VISIT_EVENT_TYPES] },
+              },
+            }),
+          0,
         )
       : 0,
 
     // Allybi clicks (core interactions)
-    supportsModel(prisma, 'usageEvent')
+    supportsModel(prisma, "usageEvent")
       ? safe(
-          () => prisma.usageEvent.count({
-            where: { at: { gte: from, lt: to }, eventType: { in: [...ALLYBI_CLICK_EVENT_TYPES] } },
-          }),
-          0
+          () =>
+            prisma.usageEvent.count({
+              where: {
+                at: { gte: from, lt: to },
+                eventType: { in: [...ALLYBI_CLICK_EVENT_TYPES] },
+              },
+            }),
+          0,
         )
       : 0,
 
     // LLM calls and tokens
-    supportsModel(prisma, 'modelCall')
+    supportsModel(prisma, "modelCall")
       ? safe(
-          () => prisma.modelCall.aggregate({
-            where: { at: { gte: from, lt: to } },
-            _count: { _all: true },
-            _sum: { totalTokens: true },
-          }),
-          null
+          () =>
+            prisma.modelCall.aggregate({
+              where: { at: { gte: from, lt: to } },
+              _count: { _all: true },
+              _sum: { totalTokens: true },
+            }),
+          null,
         )
       : null,
 
     // Retrieval events for evidence quality
-    supportsModel(prisma, 'retrievalEvent')
+    supportsModel(prisma, "retrievalEvent")
       ? safe(
-          () => prisma.retrievalEvent.findMany({
-            where: { at: { gte: from, lt: to } },
-            select: { evidenceStrength: true, fallbackReasonCode: true },
-            take: 100000,
-          }),
-          []
+          () =>
+            prisma.retrievalEvent.findMany({
+              where: { at: { gte: from, lt: to } },
+              select: { evidenceStrength: true, fallbackReasonCode: true },
+              take: 100000,
+            }),
+          [],
         )
       : [],
 
     // Ingestion events for failures
-    supportsModel(prisma, 'ingestionEvent')
+    supportsModel(prisma, "ingestionEvent")
       ? safe(
-          () => prisma.ingestionEvent.groupBy({
-            by: ['status'],
-            where: { at: { gte: from, lt: to } },
-            _count: true,
-          }),
-          []
+          () =>
+            prisma.ingestionEvent.groupBy({
+              by: ["status"],
+              where: { at: { gte: from, lt: to } },
+              _count: true,
+            }),
+          [],
         )
       : [],
 
     // Latency data from model calls
-    supportsModel(prisma, 'modelCall')
+    supportsModel(prisma, "modelCall")
       ? safe(
-          () => prisma.modelCall.findMany({
-            where: { at: { gte: from, lt: to }, durationMs: { not: null } },
-            select: { durationMs: true },
-            take: 10000,
-          }),
-          []
+          () =>
+            prisma.modelCall.findMany({
+              where: { at: { gte: from, lt: to }, durationMs: { not: null } },
+              select: { durationMs: true },
+              take: 10000,
+            }),
+          [],
         )
       : [],
   ]);
@@ -254,18 +279,18 @@ async function calculateKpis(prisma: PrismaClient, window: TimeWindow): Promise<
   const tokensTotal = llmCallsData?._sum?.totalTokens ?? 0;
   const allybiVisits = Number(allybiVisitsCount || 0);
   const allybiClicks = Number(allybiClicksCount || 0);
-  const allybiClickThroughRate = allybiVisits > 0
-    ? (allybiClicks / allybiVisits) * 100
-    : 0;
+  const allybiClickThroughRate =
+    allybiVisits > 0 ? (allybiClicks / allybiVisits) * 100 : 0;
 
   // Calculate LLM error rate
   let llmErrorRate = 0;
-  if (supportsModel(prisma, 'modelCall') && llmCalls > 0) {
+  if (supportsModel(prisma, "modelCall") && llmCalls > 0) {
     const errorCount = await safe(
-      () => prisma.modelCall.count({
-        where: { at: { gte: from, lt: to }, status: 'fail' },
-      }),
-      0
+      () =>
+        prisma.modelCall.count({
+          where: { at: { gte: from, lt: to }, status: "fail" },
+        }),
+      0,
     );
     llmErrorRate = (errorCount / llmCalls) * 100;
   }
@@ -276,11 +301,13 @@ async function calculateKpis(prisma: PrismaClient, window: TimeWindow): Promise<
   if (Array.isArray(retrievalData) && retrievalData.length > 0) {
     const total = retrievalData.length;
     const weakCount = retrievalData.filter(
-      r => (r.evidenceStrength !== null && r.evidenceStrength < 0.35) ||
-           r.fallbackReasonCode === 'WEAK_EVIDENCE'
+      (r) =>
+        (r.evidenceStrength !== null && r.evidenceStrength < 0.35) ||
+        r.fallbackReasonCode === "WEAK_EVIDENCE",
     ).length;
     const noCount = retrievalData.filter(
-      r => r.evidenceStrength === null || r.fallbackReasonCode === 'NO_EVIDENCE'
+      (r) =>
+        r.evidenceStrength === null || r.fallbackReasonCode === "NO_EVIDENCE",
     ).length;
     weakEvidenceRate = (weakCount / total) * 100;
     noEvidenceRate = (noCount / total) * 100;
@@ -289,13 +316,13 @@ async function calculateKpis(prisma: PrismaClient, window: TimeWindow): Promise<
   // Calculate ingestion failures
   let ingestionFailures = 0;
   if (Array.isArray(ingestionData)) {
-    const failGroup = ingestionData.find(g => g.status === 'fail');
+    const failGroup = ingestionData.find((g) => g.status === "fail");
     ingestionFailures = (failGroup?._count as number) ?? 0;
   }
 
   // Calculate latency percentiles
   const latencies = Array.isArray(latencyData)
-    ? latencyData.map(l => l.durationMs ?? 0).filter(v => v > 0)
+    ? latencyData.map((l) => l.durationMs ?? 0).filter((v) => v > 0)
     : [];
   const latencyMsP50 = p50(latencies);
   const latencyMsP95 = p95(latencies);
@@ -323,12 +350,12 @@ async function calculateTimeseries(
   prisma: PrismaClient,
   window: TimeWindow,
   metric: MetricName,
-  rangeKey: string
+  rangeKey: string,
 ): Promise<TimeseriesPoint[]> {
   const { from, to } = window;
 
   // Determine bucket size based on range
-  const bucketMs = rangeKey === '24h' ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000; // hourly for 24h, daily otherwise
+  const bucketMs = rangeKey === "24h" ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000; // hourly for 24h, daily otherwise
   const buckets: Map<string, number> = new Map();
 
   // Initialize buckets
@@ -341,8 +368,8 @@ async function calculateTimeseries(
 
   // Get data based on metric
   switch (metric) {
-    case 'dau': {
-      if (!supportsModel(prisma, 'usageEvent')) break;
+    case "dau": {
+      if (!supportsModel(prisma, "usageEvent")) break;
       const events = await prisma.usageEvent.findMany({
         where: { at: { gte: from, lt: to } },
         select: { userId: true, at: true },
@@ -352,8 +379,11 @@ async function calculateTimeseries(
       // Group by bucket and count distinct users
       const bucketUsers: Map<string, Set<string>> = new Map();
       for (const e of events) {
-        const bucketTime = new Date(Math.floor(e.at.getTime() / bucketMs) * bucketMs).toISOString();
-        if (!bucketUsers.has(bucketTime)) bucketUsers.set(bucketTime, new Set());
+        const bucketTime = new Date(
+          Math.floor(e.at.getTime() / bucketMs) * bucketMs,
+        ).toISOString();
+        if (!bucketUsers.has(bucketTime))
+          bucketUsers.set(bucketTime, new Set());
         bucketUsers.get(bucketTime)!.add(e.userId);
       }
       for (const [key, users] of bucketUsers) {
@@ -362,8 +392,8 @@ async function calculateTimeseries(
       break;
     }
 
-    case 'messages': {
-      if (!supportsModel(prisma, 'message')) break;
+    case "messages": {
+      if (!supportsModel(prisma, "message")) break;
       const messages = await prisma.message.findMany({
         where: { createdAt: { gte: from, lt: to } },
         select: { createdAt: true },
@@ -371,14 +401,16 @@ async function calculateTimeseries(
       });
 
       for (const m of messages) {
-        const bucketTime = new Date(Math.floor(m.createdAt.getTime() / bucketMs) * bucketMs).toISOString();
+        const bucketTime = new Date(
+          Math.floor(m.createdAt.getTime() / bucketMs) * bucketMs,
+        ).toISOString();
         buckets.set(bucketTime, (buckets.get(bucketTime) ?? 0) + 1);
       }
       break;
     }
 
-    case 'uploads': {
-      if (!supportsModel(prisma, 'document')) break;
+    case "uploads": {
+      if (!supportsModel(prisma, "document")) break;
       const docs = await prisma.document.findMany({
         where: { createdAt: { gte: from, lt: to } },
         select: { createdAt: true },
@@ -386,29 +418,36 @@ async function calculateTimeseries(
       });
 
       for (const d of docs) {
-        const bucketTime = new Date(Math.floor(d.createdAt.getTime() / bucketMs) * bucketMs).toISOString();
+        const bucketTime = new Date(
+          Math.floor(d.createdAt.getTime() / bucketMs) * bucketMs,
+        ).toISOString();
         buckets.set(bucketTime, (buckets.get(bucketTime) ?? 0) + 1);
       }
       break;
     }
 
-    case 'allybi_visits': {
-      if (!supportsModel(prisma, 'usageEvent')) break;
+    case "allybi_visits": {
+      if (!supportsModel(prisma, "usageEvent")) break;
       const visits = await prisma.usageEvent.findMany({
-        where: { at: { gte: from, lt: to }, eventType: { in: [...ALLYBI_VISIT_EVENT_TYPES] } },
+        where: {
+          at: { gte: from, lt: to },
+          eventType: { in: [...ALLYBI_VISIT_EVENT_TYPES] },
+        },
         select: { at: true },
         take: 100000,
       });
 
       for (const v of visits) {
-        const bucketTime = new Date(Math.floor(v.at.getTime() / bucketMs) * bucketMs).toISOString();
+        const bucketTime = new Date(
+          Math.floor(v.at.getTime() / bucketMs) * bucketMs,
+        ).toISOString();
         buckets.set(bucketTime, (buckets.get(bucketTime) ?? 0) + 1);
       }
       break;
     }
 
-    case 'allybi_clicks': {
-      if (!supportsModel(prisma, 'usageEvent')) break;
+    case "allybi_clicks": {
+      if (!supportsModel(prisma, "usageEvent")) break;
       const clicks = await prisma.usageEvent.findMany({
         where: {
           at: { gte: from, lt: to },
@@ -419,14 +458,16 @@ async function calculateTimeseries(
       });
 
       for (const c of clicks) {
-        const bucketTime = new Date(Math.floor(c.at.getTime() / bucketMs) * bucketMs).toISOString();
+        const bucketTime = new Date(
+          Math.floor(c.at.getTime() / bucketMs) * bucketMs,
+        ).toISOString();
         buckets.set(bucketTime, (buckets.get(bucketTime) ?? 0) + 1);
       }
       break;
     }
 
-    case 'tokens': {
-      if (!supportsModel(prisma, 'modelCall')) break;
+    case "tokens": {
+      if (!supportsModel(prisma, "modelCall")) break;
       const calls = await prisma.modelCall.findMany({
         where: { at: { gte: from, lt: to } },
         select: { at: true, totalTokens: true },
@@ -434,44 +475,53 @@ async function calculateTimeseries(
       });
 
       for (const c of calls) {
-        const bucketTime = new Date(Math.floor(c.at.getTime() / bucketMs) * bucketMs).toISOString();
-        buckets.set(bucketTime, (buckets.get(bucketTime) ?? 0) + (c.totalTokens ?? 0));
+        const bucketTime = new Date(
+          Math.floor(c.at.getTime() / bucketMs) * bucketMs,
+        ).toISOString();
+        buckets.set(
+          bucketTime,
+          (buckets.get(bucketTime) ?? 0) + (c.totalTokens ?? 0),
+        );
       }
       break;
     }
 
-    case 'llm_errors': {
-      if (!supportsModel(prisma, 'modelCall')) break;
+    case "llm_errors": {
+      if (!supportsModel(prisma, "modelCall")) break;
       const errors = await prisma.modelCall.findMany({
-        where: { at: { gte: from, lt: to }, status: 'fail' },
+        where: { at: { gte: from, lt: to }, status: "fail" },
         select: { at: true },
         take: 100000,
       });
 
       for (const e of errors) {
-        const bucketTime = new Date(Math.floor(e.at.getTime() / bucketMs) * bucketMs).toISOString();
+        const bucketTime = new Date(
+          Math.floor(e.at.getTime() / bucketMs) * bucketMs,
+        ).toISOString();
         buckets.set(bucketTime, (buckets.get(bucketTime) ?? 0) + 1);
       }
       break;
     }
 
-    case 'ingestion_failures': {
-      if (!supportsModel(prisma, 'ingestionEvent')) break;
+    case "ingestion_failures": {
+      if (!supportsModel(prisma, "ingestionEvent")) break;
       const failures = await prisma.ingestionEvent.findMany({
-        where: { at: { gte: from, lt: to }, status: 'fail' },
+        where: { at: { gte: from, lt: to }, status: "fail" },
         select: { at: true },
         take: 100000,
       });
 
       for (const f of failures) {
-        const bucketTime = new Date(Math.floor(f.at.getTime() / bucketMs) * bucketMs).toISOString();
+        const bucketTime = new Date(
+          Math.floor(f.at.getTime() / bucketMs) * bucketMs,
+        ).toISOString();
         buckets.set(bucketTime, (buckets.get(bucketTime) ?? 0) + 1);
       }
       break;
     }
 
-    case 'weak_evidence_rate': {
-      if (!supportsModel(prisma, 'retrievalEvent')) break;
+    case "weak_evidence_rate": {
+      if (!supportsModel(prisma, "retrievalEvent")) break;
       const events = await prisma.retrievalEvent.findMany({
         where: { at: { gte: from, lt: to } },
         select: { at: true, evidenceStrength: true, fallbackReasonCode: true },
@@ -479,18 +529,30 @@ async function calculateTimeseries(
       });
 
       // Group by bucket
-      const bucketData: Map<string, { total: number; weak: number }> = new Map();
+      const bucketData: Map<string, { total: number; weak: number }> =
+        new Map();
       for (const e of events) {
-        const bucketTime = new Date(Math.floor(e.at.getTime() / bucketMs) * bucketMs).toISOString();
-        if (!bucketData.has(bucketTime)) bucketData.set(bucketTime, { total: 0, weak: 0 });
+        const bucketTime = new Date(
+          Math.floor(e.at.getTime() / bucketMs) * bucketMs,
+        ).toISOString();
+        if (!bucketData.has(bucketTime))
+          bucketData.set(bucketTime, { total: 0, weak: 0 });
         const data = bucketData.get(bucketTime)!;
         data.total++;
-        if ((e.evidenceStrength !== null && e.evidenceStrength < 0.35) || e.fallbackReasonCode === 'WEAK_EVIDENCE') {
+        if (
+          (e.evidenceStrength !== null && e.evidenceStrength < 0.35) ||
+          e.fallbackReasonCode === "WEAK_EVIDENCE"
+        ) {
           data.weak++;
         }
       }
       for (const [key, data] of bucketData) {
-        buckets.set(key, data.total > 0 ? Math.round((data.weak / data.total) * 10000) / 100 : 0);
+        buckets.set(
+          key,
+          data.total > 0
+            ? Math.round((data.weak / data.total) * 10000) / 100
+            : 0,
+        );
       }
       break;
     }

@@ -26,7 +26,11 @@ const REQUIRED_ENTITY_BY_OPERATOR: Record<EditOperator, string[]> = {
   REPLACE_SLIDE_IMAGE: ["slide"],
 };
 
-const DESTRUCTIVE_OR_HINTED_OPS = new Set<EditOperator>(["EDIT_RANGE", "DELETE_SHEET", "REPLACE_SLIDE_IMAGE"]);
+const DESTRUCTIVE_OR_HINTED_OPS = new Set<EditOperator>([
+  "EDIT_RANGE",
+  "DELETE_SHEET",
+  "REPLACE_SLIDE_IMAGE",
+]);
 
 function normalize(input: string): string {
   return input.replace(/\s+/g, " ").trim();
@@ -59,16 +63,27 @@ function uniqueNormalized(tokens: string[]): string[] {
 export class EditPlanService {
   plan(request: EditPlanRequest): EditPlanResult {
     const normalizedInstruction = normalize(request.instruction);
-    if (!normalizedInstruction) return { ok: false, error: "Instruction is empty." };
-    if (!request.documentId?.trim()) return { ok: false, error: "Document id is required." };
+    if (!normalizedInstruction)
+      return { ok: false, error: "Instruction is empty." };
+    if (!request.documentId?.trim())
+      return { ok: false, error: "Document id is required." };
 
-    const constraints = this.extractConstraints(normalizedInstruction, request.operator);
+    const constraints = this.extractConstraints(
+      normalizedInstruction,
+      request.operator,
+    );
     const extractedEntities = this.extractEntityHints(normalizedInstruction);
-    const missingRequiredEntities = this.findMissingEntities(request, normalizedInstruction, extractedEntities);
+    const missingRequiredEntities = this.findMissingEntities(
+      request,
+      normalizedInstruction,
+      extractedEntities,
+    );
     // For selection edits (EDIT_SPAN), quoted text is usually *the thing being changed*
     // (e.g. replace "X" with "Y"), so treating quotes as "must preserve" causes false blocks.
     const autoQuotedPreserve =
-      request.operator === "EDIT_SPAN" || request.operator === "EDIT_DOCX_BUNDLE" || request.operator === "COMPUTE_BUNDLE"
+      request.operator === "EDIT_SPAN" ||
+      request.operator === "EDIT_DOCX_BUNDLE" ||
+      request.operator === "COMPUTE_BUNDLE"
         ? []
         : extractQuotedTokens(normalizedInstruction);
     const preserveTokens = uniqueNormalized([
@@ -85,12 +100,16 @@ export class EditPlanService {
         {
           id: "required_entities_satisfied",
           pass: missingRequiredEntities.length === 0,
-          detail: missingRequiredEntities.length ? `Missing: ${missingRequiredEntities.join(", ")}` : undefined,
+          detail: missingRequiredEntities.length
+            ? `Missing: ${missingRequiredEntities.join(", ")}`
+            : undefined,
         },
         {
           id: "operator_requires_caution",
           pass: !DESTRUCTIVE_OR_HINTED_OPS.has(request.operator),
-          detail: DESTRUCTIVE_OR_HINTED_OPS.has(request.operator) ? "Operator requires stronger confirmation gating." : undefined,
+          detail: DESTRUCTIVE_OR_HINTED_OPS.has(request.operator)
+            ? "Operator requires stronger confirmation gating."
+            : undefined,
         },
       ],
     };
@@ -116,11 +135,19 @@ export class EditPlanService {
     };
   }
 
-  private extractConstraints(instruction: string, operator: EditOperator): EditConstraintSet {
+  private extractConstraints(
+    instruction: string,
+    operator: EditOperator,
+  ): EditConstraintSet {
     const low = instruction.toLowerCase();
-    const preserveNumbers = /preserve (all )?numbers|keep (all )?numbers|manter (os )?n[úu]meros/.test(low);
-    const preserveEntities = /preserve entities|keep names|manter entidades|manter nomes/.test(low);
-    const strictNoNewFacts = /no new facts|do not add facts|sem fatos novos|n[ãa]o invente/.test(low);
+    const preserveNumbers =
+      /preserve (all )?numbers|keep (all )?numbers|manter (os )?n[úu]meros/.test(
+        low,
+      );
+    const preserveEntities =
+      /preserve entities|keep names|manter entidades|manter nomes/.test(low);
+    const strictNoNewFacts =
+      /no new facts|do not add facts|sem fatos novos|n[ãa]o invente/.test(low);
 
     return {
       preserveNumbers,
@@ -133,7 +160,8 @@ export class EditPlanService {
   }
 
   private detectTone(low: string): EditConstraintSet["tone"] {
-    if (/formal|professional|profissional|executive|executivo/.test(low)) return "formal";
+    if (/formal|professional|profissional|executive|executivo/.test(low))
+      return "formal";
     if (/casual|friendly|informal|leve|amig[aá]vel/.test(low)) return "casual";
     return "neutral";
   }
@@ -169,7 +197,10 @@ export class EditPlanService {
     normalizedInstruction: string,
     extractedEntities: string[],
   ): string[] {
-    const required = [...(REQUIRED_ENTITY_BY_OPERATOR[request.operator] || []), ...(request.requiredEntities || [])];
+    const required = [
+      ...(REQUIRED_ENTITY_BY_OPERATOR[request.operator] || []),
+      ...(request.requiredEntities || []),
+    ];
     const searchable = `${normalizedInstruction.toLowerCase()} ${extractedEntities.join(" ")}`;
     const missing: string[] = [];
     for (const token of required) {

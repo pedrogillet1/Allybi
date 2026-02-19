@@ -1,6 +1,6 @@
-import * as crypto from 'crypto';
-import { promises as fs } from 'fs';
-import path from 'path';
+import * as crypto from "crypto";
+import { promises as fs } from "fs";
+import path from "path";
 
 export interface ProvenanceContext {
   correlationId?: string;
@@ -56,10 +56,15 @@ export interface ListProvenanceFilter {
   limit?: number;
 }
 
-const DEFAULT_ROOT = path.resolve(process.cwd(), 'storage', 'creative', 'provenance');
+const DEFAULT_ROOT = path.resolve(
+  process.cwd(),
+  "storage",
+  "creative",
+  "provenance",
+);
 
 function hash(value: string): string {
-  return crypto.createHash('sha256').update(value).digest('hex');
+  return crypto.createHash("sha256").update(value).digest("hex");
 }
 
 function stableStringify(input: Record<string, unknown>): string {
@@ -72,7 +77,7 @@ function stableStringify(input: Record<string, unknown>): string {
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
 /**
@@ -81,13 +86,18 @@ function isObject(value: unknown): value is Record<string, unknown> {
 export class AssetProvenanceService {
   constructor(private readonly rootDir: string = DEFAULT_ROOT) {}
 
-  async logEvent(input: AssetProvenanceEventInput, ctx?: ProvenanceContext): Promise<AssetProvenanceEvent> {
+  async logEvent(
+    input: AssetProvenanceEventInput,
+    ctx?: ProvenanceContext,
+  ): Promise<AssetProvenanceEvent> {
     const userId = input.userId.trim();
     const assetId = input.assetId.trim();
     const tool = input.tool.trim();
 
     if (!userId || !assetId || !tool) {
-      throw new Error('userId, assetId, and tool are required for provenance logging.');
+      throw new Error(
+        "userId, assetId, and tool are required for provenance logging.",
+      );
     }
 
     const params = isObject(input.params) ? input.params : {};
@@ -113,7 +123,10 @@ export class AssetProvenanceService {
     return event;
   }
 
-  async listEvents(userId: string, filter: ListProvenanceFilter = {}): Promise<AssetProvenanceEvent[]> {
+  async listEvents(
+    userId: string,
+    filter: ListProvenanceFilter = {},
+  ): Promise<AssetProvenanceEvent[]> {
     const events = await this.readEvents(userId);
 
     const filtered = events.filter((event) => {
@@ -122,7 +135,9 @@ export class AssetProvenanceService {
       }
 
       if (filter.documentId) {
-        const matchesDoc = event.inserted.some((target) => target.documentId === filter.documentId);
+        const matchesDoc = event.inserted.some(
+          (target) => target.documentId === filter.documentId,
+        );
         if (!matchesDoc) {
           return false;
         }
@@ -140,26 +155,27 @@ export class AssetProvenanceService {
       .map((entry) => {
         const parts = [entry.documentId];
         if (entry.slideNumber) parts.push(`slide ${entry.slideNumber}`);
-        if (entry.slideObjectId) parts.push(`slideObjectId=${entry.slideObjectId}`);
+        if (entry.slideObjectId)
+          parts.push(`slideObjectId=${entry.slideObjectId}`);
         if (entry.blockId) parts.push(`block=${entry.blockId}`);
-        return parts.join(' | ');
+        return parts.join(" | ");
       })
-      .join('; ');
+      .join("; ");
 
     return {
       why: [
-        `Generated with tool ${event.tool}${event.model ? ` using model ${event.model}` : ''}.`,
+        `Generated with tool ${event.tool}${event.model ? ` using model ${event.model}` : ""}.`,
         `Parameter set hash ${event.paramsHash} ensures deterministic provenance reference.`,
         event.inserted.length > 0
           ? `Asset inserted into ${event.inserted.length} target location(s).`
-          : 'Asset has no insertion location recorded yet.',
+          : "Asset has no insertion location recorded yet.",
       ],
       proof: [
-        { label: 'eventId', value: event.id },
-        { label: 'promptHash', value: event.promptHash },
-        { label: 'paramsHash', value: event.paramsHash },
-        { label: 'tool', value: event.tool },
-        { label: 'inserted', value: targets || 'none' },
+        { label: "eventId", value: event.id },
+        { label: "promptHash", value: event.promptHash },
+        { label: "paramsHash", value: event.paramsHash },
+        { label: "tool", value: event.tool },
+        { label: "inserted", value: targets || "none" },
       ],
     };
   }
@@ -168,10 +184,16 @@ export class AssetProvenanceService {
     return path.join(this.rootDir, `${userId}.jsonl`);
   }
 
-  private async appendEvent(userId: string, event: AssetProvenanceEvent): Promise<void> {
+  private async appendEvent(
+    userId: string,
+    event: AssetProvenanceEvent,
+  ): Promise<void> {
     await fs.mkdir(this.rootDir, { recursive: true });
     const filePath = this.userFilePath(userId);
-    await fs.appendFile(filePath, `${JSON.stringify(event)}\n`, { encoding: 'utf8', mode: 0o600 });
+    await fs.appendFile(filePath, `${JSON.stringify(event)}\n`, {
+      encoding: "utf8",
+      mode: 0o600,
+    });
   }
 
   private async readEvents(userId: string): Promise<AssetProvenanceEvent[]> {
@@ -179,8 +201,11 @@ export class AssetProvenanceService {
     const filePath = this.userFilePath(userId);
 
     try {
-      const raw = await fs.readFile(filePath, 'utf8');
-      const lines = raw.split(/\n/).map((line) => line.trim()).filter(Boolean);
+      const raw = await fs.readFile(filePath, "utf8");
+      const lines = raw
+        .split(/\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
 
       const out: AssetProvenanceEvent[] = [];
       for (const line of lines) {

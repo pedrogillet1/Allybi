@@ -25,7 +25,9 @@ import fs from "fs/promises";
 import pLimit from "p-limit";
 
 // Limit concurrent DB operations to prevent connection pool exhaustion
-const dbConcurrencyLimit = pLimit(Number(process.env.DB_CONCURRENCY_LIMIT ?? 6));
+const dbConcurrencyLimit = pLimit(
+  Number(process.env.DB_CONCURRENCY_LIMIT ?? 6),
+);
 
 const router = Router();
 
@@ -69,7 +71,8 @@ async function getFromLocalStorage(key: string): Promise<Buffer> {
  * Infer MIME type from file extension when the browser-provided type is missing or generic.
  */
 function inferMimeType(fileName: string, providedType?: string): string {
-  if (providedType && providedType !== "application/octet-stream") return providedType;
+  if (providedType && providedType !== "application/octet-stream")
+    return providedType;
 
   const ext = fileName.split(".").pop()?.toLowerCase();
   if (!ext) return "application/octet-stream";
@@ -169,15 +172,39 @@ const SUPPORTED_MIME_TYPES = new Set([
 
 const UNSUPPORTED_EXTENSIONS = new Set([
   // Video - never supported
-  "mp4", "mov", "avi", "webm", "mkv", "flv", "wmv", "m4v", "3gp",
+  "mp4",
+  "mov",
+  "avi",
+  "webm",
+  "mkv",
+  "flv",
+  "wmv",
+  "m4v",
+  "3gp",
   // Audio - never supported
-  "mp3", "wav", "aac", "flac", "ogg", "wma", "m4a",
+  "mp3",
+  "wav",
+  "aac",
+  "flac",
+  "ogg",
+  "wma",
+  "m4a",
   // Vector/special formats - not useful for text extraction
-  "svg", "eps", "ai",
+  "svg",
+  "eps",
+  "ai",
   // Archives - not directly indexable
-  "zip", "rar", "7z", "gz", "tar",
+  "zip",
+  "rar",
+  "7z",
+  "gz",
+  "tar",
   // Executables/binaries
-  "exe", "dll", "so", "dmg", "app",
+  "exe",
+  "dll",
+  "so",
+  "dmg",
+  "app",
 ]);
 
 interface FileValidationResult {
@@ -185,7 +212,10 @@ interface FileValidationResult {
   reason?: string;
 }
 
-function validateFileForProcessing(fileName: string, mimeType: string): FileValidationResult {
+function validateFileForProcessing(
+  fileName: string,
+  mimeType: string,
+): FileValidationResult {
   const ext = fileName.split(".").pop()?.toLowerCase() || "";
 
   // Check unsupported extensions first (fast path)
@@ -201,7 +231,11 @@ function validateFileForProcessing(fileName: string, mimeType: string): FileVali
   // Allow generic image/* types (will use OCR)
   if (mimeType.startsWith("image/")) {
     // But reject SVG and GIF
-    if (mimeType === "image/svg+xml" || mimeType === "image/gif" || mimeType === "image/webp") {
+    if (
+      mimeType === "image/svg+xml" ||
+      mimeType === "image/gif" ||
+      mimeType === "image/webp"
+    ) {
       return { valid: false, reason: `Unsupported image format: ${mimeType}` };
     }
     return { valid: true };
@@ -216,7 +250,11 @@ function validateFileForProcessing(fileName: string, mimeType: string): FileVali
   return { valid: false, reason: `Unsupported file type: ${mimeType}` };
 }
 
-function buildStorageKey(userId: string, docId: string, fileName: string): string {
+function buildStorageKey(
+  userId: string,
+  docId: string,
+  fileName: string,
+): string {
   const safeName = sanitizeFileName(fileName);
   return `users/${userId}/docs/${docId}/${safeName}`;
 }
@@ -226,12 +264,13 @@ function buildStorageKey(userId: string, docId: string, fileName: string): strin
  * Normalises backslashes → forward slashes and strips leading slashes.
  */
 function resolveRelativePath(file: Record<string, any>): string | null {
-  const raw = file.relativePath || file.webkitRelativePath || file.relative_path || null;
+  const raw =
+    file.relativePath || file.webkitRelativePath || file.relative_path || null;
   if (!raw || typeof raw !== "string") return null;
   const normalized = raw.replace(/\\/g, "/").replace(/^\/+/, "");
   // Reject path traversal attempts
   const parts = normalized.split("/");
-  if (parts.some(p => p === ".." || p === ".")) return null;
+  if (parts.some((p) => p === ".." || p === ".")) return null;
   return normalized;
 }
 
@@ -275,8 +314,8 @@ async function createFolderHierarchy(
     new Set(
       Array.from(folderPaths)
         .map((folderPath) => folderPath.split("/").pop() || "")
-        .filter(Boolean)
-    )
+        .filter(Boolean),
+    ),
   );
 
   // OPTIMIZATION: Fetch ALL existing folders for this user in ONE query
@@ -290,7 +329,9 @@ async function createFolderHierarchy(
     },
     select: { id: true, name: true, parentFolderId: true },
   });
-  console.log(`[createFolderHierarchy] Fetched ${existingFolders.length} existing folders in ${Date.now() - t1}ms`);
+  console.log(
+    `[createFolderHierarchy] Fetched ${existingFolders.length} existing folders in ${Date.now() - t1}ms`,
+  );
 
   // Build lookup map: "parentId:name" → folderId
   const existingLookup = new Map<string, string>();
@@ -317,7 +358,12 @@ async function createFolderHierarchy(
   // Process each depth level
   for (const depth of Array.from(byDepth.keys()).sort((a, b) => a - b)) {
     const pathsAtDepth = byDepth.get(depth)!;
-    const toCreate: Array<{ folderPath: string; folderName: string; parentFolderId: string | null; dbPath: string }> = [];
+    const toCreate: Array<{
+      folderPath: string;
+      folderName: string;
+      parentFolderId: string | null;
+      dbPath: string;
+    }> = [];
 
     for (const folderPath of pathsAtDepth) {
       const parts = folderPath.split("/");
@@ -350,18 +396,20 @@ async function createFolderHierarchy(
     if (toCreate.length > 0) {
       // Use controlled concurrency to prevent DB connection pool exhaustion
       const created = await Promise.all(
-        toCreate.map((item) => dbConcurrencyLimit(async () => {
-          const folder = await prisma.folder.create({
-            data: {
-              userId,
-              name: item.folderName,
-              parentFolderId: item.parentFolderId,
-              path: item.dbPath,
-            },
-            select: { id: true, name: true, parentFolderId: true },
-          });
-          return { ...item, id: folder.id };
-        }))
+        toCreate.map((item) =>
+          dbConcurrencyLimit(async () => {
+            const folder = await prisma.folder.create({
+              data: {
+                userId,
+                name: item.folderName,
+                parentFolderId: item.parentFolderId,
+                path: item.dbPath,
+              },
+              select: { id: true, name: true, parentFolderId: true },
+            });
+            return { ...item, id: folder.id };
+          }),
+        ),
       );
 
       // Update maps with newly created folders
@@ -373,7 +421,9 @@ async function createFolderHierarchy(
     }
   }
 
-  console.log(`[createFolderHierarchy] Created ${folderMap.size} folder mappings in ${Date.now() - t2}ms (total: ${Date.now() - t0}ms)`);
+  console.log(
+    `[createFolderHierarchy] Created ${folderMap.size} folder mappings in ${Date.now() - t2}ms (total: ${Date.now() - t0}ms)`,
+  );
   return folderMap;
 }
 
@@ -393,9 +443,17 @@ router.post(
   async (req: any, res: Response): Promise<void> => {
     const t0 = Date.now();
     const userId = req.user?.id;
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
-    const { files = [], folderId = null, uploadSessionId = null, skipFolderHierarchy = false } = req.body || {};
+    const {
+      files = [],
+      folderId = null,
+      uploadSessionId = null,
+      skipFolderHierarchy = false,
+    } = req.body || {};
 
     if (!Array.isArray(files) || files.length === 0) {
       res.status(400).json({ error: "No files provided" });
@@ -403,7 +461,9 @@ router.post(
     }
 
     if (files.length > UPLOAD_CONFIG.MAX_BATCH_FILES) {
-      res.status(400).json({ error: `Too many files. Maximum ${UPLOAD_CONFIG.MAX_BATCH_FILES} per batch.` });
+      res.status(400).json({
+        error: `Too many files. Maximum ${UPLOAD_CONFIG.MAX_BATCH_FILES} per batch.`,
+      });
       return;
     }
 
@@ -415,7 +475,9 @@ router.post(
       // Diagnostic: log first file object to verify field names
       if (files.length > 0) {
         const sample = files[0];
-        console.log(`[presigned-urls/bulk] START ${files.length} files, batchFolderId=${folderId}`);
+        console.log(
+          `[presigned-urls/bulk] START ${files.length} files, batchFolderId=${folderId}`,
+        );
       }
 
       // Create folder hierarchy from relativePath values (server-side backup),
@@ -424,16 +486,19 @@ router.post(
         const rp = resolveRelativePath(file);
         return !!rp && rp.split("/").length > 1;
       });
-      const nestedFilesMissingFolderId = filesWithNestedRelativePath.filter((file: any) => !file?.folderId);
+      const nestedFilesMissingFolderId = filesWithNestedRelativePath.filter(
+        (file: any) => !file?.folderId,
+      );
       const canSkipFolderHierarchy = nestedFilesMissingFolderId.length === 0;
-      const shouldSkipFolderHierarchy = Boolean(skipFolderHierarchy) || canSkipFolderHierarchy;
+      const shouldSkipFolderHierarchy =
+        Boolean(skipFolderHierarchy) || canSkipFolderHierarchy;
 
       const tFolders = Date.now();
       const folderMap = shouldSkipFolderHierarchy
         ? new Map<string, string>()
         : await createFolderHierarchy(files, userId, folderId);
       console.log(
-        `[presigned-urls/bulk] FOLDERS: ${Date.now() - tFolders}ms (${shouldSkipFolderHierarchy ? "skipped" : "resolved"})`
+        `[presigned-urls/bulk] FOLDERS: ${Date.now() - tFolders}ms (${shouldSkipFolderHierarchy ? "skipped" : "resolved"})`,
       );
 
       // PHASE 1: Validate files and prepare document records (no DB calls yet)
@@ -464,9 +529,14 @@ router.post(
         }
 
         const resolvedMimeType = inferMimeType(fileName, fileType);
-        const validation = validateFileForProcessing(fileName, resolvedMimeType);
+        const validation = validateFileForProcessing(
+          fileName,
+          resolvedMimeType,
+        );
         if (!validation.valid) {
-          console.log(`[presigned-urls/bulk] Rejecting unsupported file: ${skipIdentifier} (${validation.reason})`);
+          console.log(
+            `[presigned-urls/bulk] Rejecting unsupported file: ${skipIdentifier} (${validation.reason})`,
+          );
           skippedFiles.push(skipIdentifier);
           continue;
         }
@@ -502,7 +572,7 @@ router.post(
       // PHASE 2: Bulk insert all documents in ONE query (avoids connection pool exhaustion)
       if (validFiles.length > 0) {
         await prisma.document.createMany({
-          data: validFiles.map(f => ({
+          data: validFiles.map((f) => ({
             id: f.docId,
             userId,
             folderId: f.targetFolderId,
@@ -521,28 +591,37 @@ router.post(
       // Increased from 10 to 50 for faster presigned URL generation
       // 1000 files: 100 batches → 20 batches (5s → 1s)
       const PRESIGN_CONCURRENCY = 50;
-      const results: Array<{ url: string; documentId: string; isLocal: boolean }> = [];
+      const results: Array<{
+        url: string;
+        documentId: string;
+        isLocal: boolean;
+      }> = [];
 
       for (let i = 0; i < validFiles.length; i += PRESIGN_CONCURRENCY) {
         const batch = validFiles.slice(i, i + PRESIGN_CONCURRENCY);
-        const batchResults = await Promise.all(batch.map(async (f) => {
-          let url: string;
-          if (isLocalStorage) {
-            url = `/api/presigned-urls/local-upload/${f.docId}`;
-          } else {
-            const presigned = await gcs().presignUpload({
-              key: f.storageKey,
-              mimeType: f.mimeType,
-              expiresInSeconds: UPLOAD_CONFIG.PRESIGNED_URL_EXPIRATION_SECONDS,
-            });
-            url = presigned.url;
-          }
-          return { url, documentId: f.docId, isLocal: isLocalStorage };
-        }));
+        const batchResults = await Promise.all(
+          batch.map(async (f) => {
+            let url: string;
+            if (isLocalStorage) {
+              url = `/api/presigned-urls/local-upload/${f.docId}`;
+            } else {
+              const presigned = await gcs().presignUpload({
+                key: f.storageKey,
+                mimeType: f.mimeType,
+                expiresInSeconds:
+                  UPLOAD_CONFIG.PRESIGNED_URL_EXPIRATION_SECONDS,
+              });
+              url = presigned.url;
+            }
+            return { url, documentId: f.docId, isLocal: isLocalStorage };
+          }),
+        );
         results.push(...batchResults);
       }
 
-      console.log(`[presigned-urls/bulk] FILES: ${Date.now() - tFiles}ms for ${validFiles.length} files (bulk DB + presigned URLs)`);
+      console.log(
+        `[presigned-urls/bulk] FILES: ${Date.now() - tFiles}ms for ${validFiles.length} files (bulk DB + presigned URLs)`,
+      );
 
       // Collect results (skipped files already handled in PHASE 1)
       for (const r of results) {
@@ -550,13 +629,20 @@ router.post(
         documentIds.push(r.documentId);
       }
 
-      console.log(`[presigned-urls/bulk] TOTAL: ${Date.now() - t0}ms — ${documentIds.length} docs, ${skippedFiles.length} skipped`);
-      res.json({ presignedUrls, documentIds, skippedFiles, storageMode: isLocalStorage ? "local" : "gcs" });
+      console.log(
+        `[presigned-urls/bulk] TOTAL: ${Date.now() - t0}ms — ${documentIds.length} docs, ${skippedFiles.length} skipped`,
+      );
+      res.json({
+        presignedUrls,
+        documentIds,
+        skippedFiles,
+        storageMode: isLocalStorage ? "local" : "gcs",
+      });
     } catch (e: any) {
       console.error("POST /presigned-urls/bulk error:", e);
       res.status(500).json({ error: "Failed to generate presigned URLs" });
     }
-  }
+  },
 );
 
 /**
@@ -583,7 +669,10 @@ router.post(
   presignedUrlLimiter,
   async (req: any, res: Response): Promise<void> => {
     const userId = req.user?.id;
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const { documentIds = [], uploadSessionId } = req.body || {};
 
@@ -592,7 +681,14 @@ router.post(
         confirmed: [],
         pending: [],
         failed: [],
-        stats: { confirmed: 0, pending: 0, failed: 0, skipped: 0, transitioned: 0, queued: 0 },
+        stats: {
+          confirmed: 0,
+          pending: 0,
+          failed: 0,
+          skipped: 0,
+          transitioned: 0,
+          queued: 0,
+        },
       });
       return;
     }
@@ -609,17 +705,29 @@ router.post(
       // 2) Fetch current truth for these docs (covers repeat calls, retries, and partial sessions)
       const docs = await prisma.document.findMany({
         where: { id: { in: documentIds }, userId },
-        select: { id: true, status: true, filename: true, mimeType: true, encryptedFilename: true },
+        select: {
+          id: true,
+          status: true,
+          filename: true,
+          mimeType: true,
+          encryptedFilename: true,
+        },
       });
 
       const byId = new Map(docs.map((d) => [d.id, d] as const));
       const missing = documentIds.filter((id) => !byId.has(id));
 
-      const pending = docs.filter((d) => d.status === "uploading").map((d) => d.id);
-      const failedStatus = docs.filter((d) => d.status === "failed").map((d) => d.id);
+      const pending = docs
+        .filter((d) => d.status === "uploading")
+        .map((d) => d.id);
+      const failedStatus = docs
+        .filter((d) => d.status === "failed")
+        .map((d) => d.id);
 
       const confirmedDocs = docs.filter((d) =>
-        ["uploaded", "enriching", "indexed", "ready", "skipped"].includes(d.status)
+        ["uploaded", "enriching", "indexed", "ready", "skipped"].includes(
+          d.status,
+        ),
       );
       const confirmedIds = confirmedDocs.map((d) => d.id);
 
@@ -629,9 +737,10 @@ router.post(
 
       const failed = [...new Set([...missing, ...failedStatus])];
 
-      const requestIdHeader = (req.headers["x-request-id"] as string | undefined) || undefined;
+      const requestIdHeader =
+        (req.headers["x-request-id"] as string | undefined) || undefined;
       console.log(
-        `[complete-bulk] transitioned=${updateResult.count} confirmed=${confirmedIds.length} pending=${pending.length} failed=${failed.length} queued=${queueCandidates.length} requestId=${requestIdHeader || "none"} uploadSessionId=${uploadSessionId || "none"}`
+        `[complete-bulk] transitioned=${updateResult.count} confirmed=${confirmedIds.length} pending=${pending.length} failed=${failed.length} queued=${queueCandidates.length} requestId=${requestIdHeader || "none"} uploadSessionId=${uploadSessionId || "none"}`,
       );
 
       // Return immediately - don't block HTTP response on job publishing
@@ -662,41 +771,55 @@ router.post(
               const pubsubItems = queueCandidates.map((doc) => ({
                 documentId: doc.id,
                 userId,
-                storageKey: doc.encryptedFilename || '',
+                storageKey: doc.encryptedFilename || "",
                 mimeType: doc.mimeType || "application/octet-stream",
                 filename: doc.filename || undefined,
               }));
 
-              const fanoutMinDocs = Number(process.env.PUBSUB_FANOUT_MIN_DOCS || 100);
+              const fanoutMinDocs = Number(
+                process.env.PUBSUB_FANOUT_MIN_DOCS || 100,
+              );
               const useFanout = pubsubItems.length >= fanoutMinDocs;
 
               if (useFanout) {
                 const out = await publishExtractFanoutJobsBulk(pubsubItems, {
                   requestId: requestIdHeader,
-                  uploadSessionId: typeof uploadSessionId === "string" ? uploadSessionId : undefined,
+                  uploadSessionId:
+                    typeof uploadSessionId === "string"
+                      ? uploadSessionId
+                      : undefined,
                 });
                 console.log(
-                  `[complete-bulk] Background: Published ${out.publishedDocs} docs in ${out.publishedBatches} fanout batches (messageIds=${out.messageIds.length})`
+                  `[complete-bulk] Background: Published ${out.publishedDocs} docs in ${out.publishedBatches} fanout batches (messageIds=${out.messageIds.length})`,
                 );
               } else {
                 const results = await publishExtractJobsBulk(pubsubItems);
-                const queued = Array.from(results.values()).filter((v) => v !== "error").length;
-                console.log(`[complete-bulk] Background: Published ${queued} extract jobs`);
+                const queued = Array.from(results.values()).filter(
+                  (v) => v !== "error",
+                ).length;
+                console.log(
+                  `[complete-bulk] Background: Published ${queued} extract jobs`,
+                );
               }
             } else {
               // Fall back to BullMQ for local development
               const bulkItems = queueCandidates.map((doc) => ({
                 documentId: doc.id,
                 userId,
-                filename: doc.filename || 'unknown',
+                filename: doc.filename || "unknown",
                 mimeType: doc.mimeType || "application/octet-stream",
                 encryptedFilename: doc.encryptedFilename || undefined,
               }));
               const bulkJobs = await addDocumentJobsBulk(bulkItems);
-              console.log(`[complete-bulk] Background: Enqueued ${bulkJobs.length} jobs to BullMQ`);
+              console.log(
+                `[complete-bulk] Background: Enqueued ${bulkJobs.length} jobs to BullMQ`,
+              );
             }
           } catch (err: any) {
-            console.error('[complete-bulk] Background enqueue failed:', err.message);
+            console.error(
+              "[complete-bulk] Background enqueue failed:",
+              err.message,
+            );
             // Jobs will be picked up by stuck document sweeper
           }
         });
@@ -705,7 +828,7 @@ router.post(
       console.error("POST /presigned-urls/complete-bulk error:", e);
       res.status(500).json({ error: "Failed to complete bulk uploads" });
     }
-  }
+  },
 );
 
 /**
@@ -723,12 +846,20 @@ router.post(
   presignedUrlLimiter,
   async (req: any, res: Response): Promise<void> => {
     const userId = req.user?.id;
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const { documentIds = [] } = req.body || {};
 
     if (!Array.isArray(documentIds) || documentIds.length === 0) {
-      res.json({ orphanedCount: 0, verifiedCount: 0, orphanedDocuments: [], verifiedDocuments: [] });
+      res.json({
+        orphanedCount: 0,
+        verifiedCount: 0,
+        orphanedDocuments: [],
+        verifiedDocuments: [],
+      });
       return;
     }
 
@@ -766,7 +897,7 @@ router.post(
       console.error("POST /presigned-urls/reconcile error:", e);
       res.status(500).json({ error: "Failed to reconcile uploads" });
     }
-  }
+  },
 );
 
 /**
@@ -786,12 +917,19 @@ router.post(
   presignedUrlLimiter,
   async (req: any, res: Response): Promise<void> => {
     const userId = req.user?.id;
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const { documentIds = [] } = req.body || {};
 
     if (!Array.isArray(documentIds) || documentIds.length === 0) {
-      res.json({ confirmed: [], failed: [], stats: { confirmed: 0, failed: 0, skipped: 0 } });
+      res.json({
+        confirmed: [],
+        failed: [],
+        stats: { confirmed: 0, failed: 0, skipped: 0 },
+      });
       return;
     }
 
@@ -803,11 +941,11 @@ router.post(
       for (const docId of documentIds) {
         try {
           const result = await prisma.document.updateMany({
-            where: { id: docId, userId, status: "uploading" },  // Only from uploading
+            where: { id: docId, userId, status: "uploading" }, // Only from uploading
             data: { status: "uploaded" },
           });
           if (result.count > 0) {
-            confirmed.push(docId);  // Only add if actually transitioned
+            confirmed.push(docId); // Only add if actually transitioned
           }
           // If count === 0, doc was already uploaded/enriching/ready - don't re-queue
         } catch {
@@ -819,35 +957,48 @@ router.post(
       if (confirmed.length > 0) {
         const docs = await prisma.document.findMany({
           where: { id: { in: confirmed }, userId, status: "uploaded" },
-          select: { id: true, filename: true, mimeType: true, encryptedFilename: true },
+          select: {
+            id: true,
+            filename: true,
+            mimeType: true,
+            encryptedFilename: true,
+          },
         });
 
         // Use GCP Pub/Sub workers if enabled, otherwise fall back to BullMQ
         if (env.USE_GCP_WORKERS && isPubSubAvailable()) {
-          const pubsubItems = docs.map(doc => ({
+          const pubsubItems = docs.map((doc) => ({
             documentId: doc.id,
             userId,
-            storageKey: doc.encryptedFilename || '',
+            storageKey: doc.encryptedFilename || "",
             mimeType: doc.mimeType || "application/octet-stream",
             filename: doc.filename || undefined,
           }));
           try {
             const results = await publishExtractJobsBulk(pubsubItems);
-            const queued = Array.from(results.values()).filter(v => v !== 'error').length;
-            const errors = Array.from(results.values()).filter(v => v === 'error').length;
-            console.log(`[complete] Published ${queued} jobs to GCP Pub/Sub (${errors} errors)`);
+            const queued = Array.from(results.values()).filter(
+              (v) => v !== "error",
+            ).length;
+            const errors = Array.from(results.values()).filter(
+              (v) => v === "error",
+            ).length;
+            console.log(
+              `[complete] Published ${queued} jobs to GCP Pub/Sub (${errors} errors)`,
+            );
           } catch (err: any) {
             console.error(`Failed to publish to Pub/Sub:`, err.message);
             // Don't fail the request - docs are uploaded, they just need manual reprocess
           }
         } else {
-          addDocumentJobsBulk(docs.map(doc => ({
-            documentId: doc.id,
-            userId,
-            filename: doc.filename || 'unknown',
-            mimeType: doc.mimeType || "application/octet-stream",
-            encryptedFilename: doc.encryptedFilename || undefined,
-          }))).catch(err => console.error(`Failed to bulk queue:`, err.message));
+          addDocumentJobsBulk(
+            docs.map((doc) => ({
+              documentId: doc.id,
+              userId,
+              filename: doc.filename || "unknown",
+              mimeType: doc.mimeType || "application/octet-stream",
+              encryptedFilename: doc.encryptedFilename || undefined,
+            })),
+          ).catch((err) => console.error(`Failed to bulk queue:`, err.message));
         }
       }
 
@@ -864,7 +1015,7 @@ router.post(
       console.error("POST /presigned-urls/complete error:", e);
       res.status(500).json({ error: "Failed to complete uploads" });
     }
-  }
+  },
 );
 
 /**
@@ -879,12 +1030,17 @@ router.post(
   localUpload.single("file"),
   async (req: any, res: Response): Promise<void> => {
     if (!isLocalStorage) {
-      res.status(400).json({ error: "Local uploads not enabled. Set STORAGE_PROVIDER=local" });
+      res.status(400).json({
+        error: "Local uploads not enabled. Set STORAGE_PROVIDER=local",
+      });
       return;
     }
 
     const userId = req.user?.id;
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const { documentId } = req.params;
     const file = req.file;
@@ -901,12 +1057,16 @@ router.post(
       });
 
       if (!doc) {
-        res.status(404).json({ error: "Document not found or not in uploading state" });
+        res
+          .status(404)
+          .json({ error: "Document not found or not in uploading state" });
         return;
       }
 
       // Save file to local storage
-      const storageKey = doc.encryptedFilename || `users/${userId}/docs/${documentId}/${doc.filename}`;
+      const storageKey =
+        doc.encryptedFilename ||
+        `users/${userId}/docs/${documentId}/${doc.filename}`;
       await saveToLocalStorage(storageKey, file.buffer);
 
       // Update document status
@@ -923,7 +1083,7 @@ router.post(
           userId,
           storageKey,
           doc.mimeType || "application/octet-stream",
-          doc.filename || undefined
+          doc.filename || undefined,
         );
         console.log(`[local-upload] Published job to GCP Pub/Sub`);
       } else {
@@ -936,13 +1096,15 @@ router.post(
         });
       }
 
-      console.log(`[local-upload] File saved: ${storageKey} (${file.size} bytes)`);
+      console.log(
+        `[local-upload] File saved: ${storageKey} (${file.size} bytes)`,
+      );
       res.json({ success: true, documentId, storageKey });
     } catch (e: any) {
       console.error("POST /local-upload error:", e);
       res.status(500).json({ error: "Failed to upload file" });
     }
-  }
+  },
 );
 
 /**

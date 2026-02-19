@@ -40,7 +40,8 @@ function main() {
 
   const contractsPath = path.join(operatorsDir, "operator_contracts.any.json");
   const contracts = readJson(contractsPath);
-  const ops: Array<{ id: string; family?: string; description?: string }> = safeArr(contracts?.operators ?? contracts);
+  const ops: Array<{ id: string; family?: string; description?: string }> =
+    safeArr(contracts?.operators ?? contracts);
 
   const byFamily = new Map<string, string[]>();
   for (const o of ops) {
@@ -54,9 +55,15 @@ function main() {
   // This prevents the generated output from being unreadable while still staying aligned.
   const groupOps = {
     docs_qa: uniq([...(byFamily.get("documents") ?? [])]),
-    search_nav: uniq([...(byFamily.get("navigation") ?? []), ...(byFamily.get("file_actions") ?? [])]),
+    search_nav: uniq([
+      ...(byFamily.get("navigation") ?? []),
+      ...(byFamily.get("file_actions") ?? []),
+    ]),
     editing: uniq([...(byFamily.get("editing") ?? [])]),
-    connectors_email: uniq([...(byFamily.get("connectors") ?? []), ...(byFamily.get("email") ?? [])]),
+    connectors_email: uniq([
+      ...(byFamily.get("connectors") ?? []),
+      ...(byFamily.get("email") ?? []),
+    ]),
     creative_slides: uniq([...(byFamily.get("creative") ?? [])]),
   };
 
@@ -72,128 +79,199 @@ function main() {
       compat: ">=1.0.0",
       derivedFrom: ["operators/operator_contracts.any.json"],
     },
-    config: { enabled: true, maxGroups: 6, maxBulletsPerGroup: 4, maxExamplePromptsPerGroup: 3 },
+    config: {
+      enabled: true,
+      maxGroups: 6,
+      maxBulletsPerGroup: 4,
+      maxExamplePromptsPerGroup: 3,
+    },
     groups: [
       {
         id: "docs_qa",
-        title: { en: "Answer From Your Documents", pt: "Responder a Partir dos Seus Documentos", es: "Responder Desde Tus Documentos" },
+        title: {
+          en: "Answer From Your Documents",
+          pt: "Responder a Partir dos Seus Documentos",
+          es: "Responder Desde Tus Documentos",
+        },
         bullets: {
           en: [
             "Summarize documents with short paragraphs or bullets.",
             "Extract key facts, numbers, and tables into clear formats.",
             "Quote exact text and point to where it appears (page/section/sheet/cell when available).",
-            "Compare two documents or sections side-by-side."
+            "Compare two documents or sections side-by-side.",
           ],
           pt: [
             "Resumir documentos com parágrafos curtos ou bullets.",
             "Extrair fatos, números e tabelas em formatos claros.",
             "Citar texto exato e indicar onde aparece (página/seção/aba/célula quando disponível).",
-            "Comparar dois documentos ou seções lado a lado."
+            "Comparar dois documentos ou seções lado a lado.",
           ],
           es: [
             "Resumir documentos con párrafos cortos o bullets.",
             "Extraer hechos, números y tablas en formatos claros.",
             "Citar texto exacto e indicar dónde aparece (página/sección/hoja/celda cuando esté disponible).",
-            "Comparar dos documentos o secciones lado a lado."
-          ]
+            "Comparar dos documentos o secciones lado a lado.",
+          ],
         },
         examplePrompts: {
-          en: ["Summarize this in 5 bullets.", "Pull the key numbers into a table.", "Quote the lines that support this claim."],
-          pt: ["Resuma em 5 bullets.", "Extraia os números principais em uma tabela.", "Cite as linhas que sustentam essa afirmação."],
-          es: ["Resume en 5 bullets.", "Extrae los números clave en una tabla.", "Cita las líneas que sustentan esta afirmación."]
+          en: [
+            "Summarize this in 5 bullets.",
+            "Pull the key numbers into a table.",
+            "Quote the lines that support this claim.",
+          ],
+          pt: [
+            "Resuma em 5 bullets.",
+            "Extraia os números principais em uma tabela.",
+            "Cite as linhas que sustentam essa afirmação.",
+          ],
+          es: [
+            "Resume en 5 bullets.",
+            "Extrae los números clave en una tabla.",
+            "Cita las líneas que sustentan esta afirmación.",
+          ],
         },
-        sourceOperators: groupOps.docs_qa
+        sourceOperators: groupOps.docs_qa,
       },
       {
         id: "search_nav",
-        title: { en: "Find and Navigate", pt: "Encontrar e Navegar", es: "Buscar y Navegar" },
+        title: {
+          en: "Find and Navigate",
+          pt: "Encontrar e Navegar",
+          es: "Buscar y Navegar",
+        },
         bullets: {
           en: [
             "Find the right file when you only remember a keyword.",
             "Open a document directly from the results.",
-            "List folders/files to explore your library."
+            "List folders/files to explore your library.",
           ],
           pt: [
             "Encontrar o arquivo certo mesmo com só uma palavra-chave.",
             "Abrir um documento diretamente a partir dos resultados.",
-            "Listar pastas/arquivos para explorar sua biblioteca."
+            "Listar pastas/arquivos para explorar sua biblioteca.",
           ],
           es: [
             "Encontrar el archivo correcto aunque solo recuerdes una palabra clave.",
             "Abrir un documento directamente desde los resultados.",
-            "Listar carpetas/archivos para explorar tu biblioteca."
-          ]
+            "Listar carpetas/archivos para explorar tu biblioteca.",
+          ],
         },
         examplePrompts: {
-          en: ["Where is the file about <topic>?", "Open the contract from last week.", "List my folders."],
-          pt: ["Onde está o arquivo sobre <tema>?", "Abra o contrato da semana passada.", "Liste minhas pastas."],
-          es: ["¿Dónde está el archivo sobre <tema>?", "Abre el contrato de la semana pasada.", "Lista mis carpetas."]
+          en: [
+            "Where is the file about <topic>?",
+            "Open the contract from last week.",
+            "List my folders.",
+          ],
+          pt: [
+            "Onde está o arquivo sobre <tema>?",
+            "Abra o contrato da semana passada.",
+            "Liste minhas pastas.",
+          ],
+          es: [
+            "¿Dónde está el archivo sobre <tema>?",
+            "Abre el contrato de la semana pasada.",
+            "Lista mis carpetas.",
+          ],
         },
-        sourceOperators: uniq(groupOps.search_nav)
+        sourceOperators: uniq(groupOps.search_nav),
       },
       {
         id: "editing",
-        title: { en: "Edit With Preview", pt: "Editar com Prévia", es: "Editar con Vista Previa" },
+        title: {
+          en: "Edit With Preview",
+          pt: "Editar com Prévia",
+          es: "Editar con Vista Previa",
+        },
         bullets: {
           en: [
             "Rewrite specific text with a draft preview before applying changes.",
             "Edit DOCX paragraphs or spans and confirm before creating a new revision.",
-            "Edit XLSX cells/ranges and add/rename sheets (with confirmation when needed)."
+            "Edit XLSX cells/ranges and add/rename sheets (with confirmation when needed).",
           ],
           pt: [
             "Reescrever textos específicos com prévia antes de aplicar.",
             "Editar parágrafos/trechos em DOCX e confirmar antes de criar uma nova revisão.",
-            "Editar células/intervalos em XLSX e adicionar/renomear abas (com confirmação quando necessário)."
+            "Editar células/intervalos em XLSX e adicionar/renomear abas (com confirmação quando necessário).",
           ],
           es: [
             "Reescribir texto específico con vista previa antes de aplicar cambios.",
             "Editar párrafos/fragmentos en DOCX y confirmar antes de crear una nueva revisión.",
-            "Editar celdas/rangos en XLSX y agregar/renombrar hojas (con confirmación cuando sea necesario)."
-          ]
+            "Editar celdas/rangos en XLSX y agregar/renombrar hojas (con confirmación cuando sea necesario).",
+          ],
         },
         examplePrompts: {
-          en: ["Fix grammar in the selected text.", "Rewrite this paragraph to be more concise.", "Rename the sheet to 'Summary'."],
-          pt: ["Corrija gramática no texto selecionado.", "Reescreva este parágrafo para ficar mais conciso.", "Renomeie a aba para 'Resumo'."],
-          es: ["Corrige la gramática en el texto seleccionado.", "Reescribe este párrafo para que sea más conciso.", "Renombra la hoja a 'Resumen'."]
+          en: [
+            "Fix grammar in the selected text.",
+            "Rewrite this paragraph to be more concise.",
+            "Rename the sheet to 'Summary'.",
+          ],
+          pt: [
+            "Corrija gramática no texto selecionado.",
+            "Reescreva este parágrafo para ficar mais conciso.",
+            "Renomeie a aba para 'Resumo'.",
+          ],
+          es: [
+            "Corrige la gramática en el texto seleccionado.",
+            "Reescribe este párrafo para que sea más conciso.",
+            "Renombra la hoja a 'Resumen'.",
+          ],
         },
-        sourceOperators: groupOps.editing
+        sourceOperators: groupOps.editing,
       },
       {
         id: "connectors_email",
-        title: { en: "Email and Connectors (When Connected)", pt: "Email e Conectores (Quando Conectado)", es: "Email y Conectores (Cuando Esté Conectado)" },
+        title: {
+          en: "Email and Connectors (When Connected)",
+          pt: "Email e Conectores (Quando Conectado)",
+          es: "Email y Conectores (Cuando Esté Conectado)",
+        },
         bullets: {
           en: [
             "Read and summarize connected email threads.",
             "Draft emails and show a preview before sending (permissions required).",
-            "Search connected Slack/email content when the connector is enabled."
+            "Search connected Slack/email content when the connector is enabled.",
           ],
           pt: [
             "Ler e resumir threads de email conectadas.",
             "Rascunhar emails e mostrar uma prévia antes de enviar (permissões necessárias).",
-            "Pesquisar conteúdo do Slack/email conectado quando o conector estiver habilitado."
+            "Pesquisar conteúdo do Slack/email conectado quando o conector estiver habilitado.",
           ],
           es: [
             "Leer y resumir hilos de email conectados.",
             "Redactar emails y mostrar una vista previa antes de enviar (se requieren permisos).",
-            "Buscar contenido conectado de Slack/email cuando el conector esté habilitado."
-          ]
+            "Buscar contenido conectado de Slack/email cuando el conector esté habilitado.",
+          ],
         },
         examplePrompts: {
-          en: ["Read my latest email and summarize the action items.", "Draft a reply that is short and polite.", "Search Slack for messages about <topic>."],
-          pt: ["Leia meu último email e resuma as ações.", "Rascunhe uma resposta curta e educada.", "Pesquise no Slack mensagens sobre <tema>."],
-          es: ["Lee mi último email y resume las acciones.", "Redacta una respuesta corta y educada.", "Busca en Slack mensajes sobre <tema>."]
+          en: [
+            "Read my latest email and summarize the action items.",
+            "Draft a reply that is short and polite.",
+            "Search Slack for messages about <topic>.",
+          ],
+          pt: [
+            "Leia meu último email e resuma as ações.",
+            "Rascunhe uma resposta curta e educada.",
+            "Pesquise no Slack mensagens sobre <tema>.",
+          ],
+          es: [
+            "Lee mi último email y resume las acciones.",
+            "Redacta una respuesta corta y educada.",
+            "Busca en Slack mensajes sobre <tema>.",
+          ],
         },
-        sourceOperators: uniq(groupOps.connectors_email)
-      }
-    ]
+        sourceOperators: uniq(groupOps.connectors_email),
+      },
+    ],
   };
 
-  if (!fs.existsSync(semanticsDir)) fs.mkdirSync(semanticsDir, { recursive: true });
+  if (!fs.existsSync(semanticsDir))
+    fs.mkdirSync(semanticsDir, { recursive: true });
   const outPath = path.join(semanticsDir, "capabilities_catalog.any.json");
   writeJson(outPath, out);
 
-  console.log(`Wrote ${path.relative(process.cwd(), outPath)} (${out.groups.length} groups)`);
+  console.log(
+    `Wrote ${path.relative(process.cwd(), outPath)} (${out.groups.length} groups)`,
+  );
 }
 
 main();
-

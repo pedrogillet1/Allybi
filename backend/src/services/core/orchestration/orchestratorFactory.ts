@@ -7,13 +7,13 @@
  * Each dep is clearly labeled so we can progressively replace stubs.
  */
 
-import prisma from '../../../config/database';
-import { getBankLoaderInstance } from '../banks/bankLoader.service';
-import { KodaIntentEngineV3Service } from '../routing/intentEngine.service';
-import { AnswerModeRouterService } from '../routing/answerModeRouter.service';
-import { AnswerComposerService } from '../compose/answerComposer.service';
-import { FallbackEngineService } from '../enforcement/fallbackEngine.service';
-import { MicrocopyPickerService } from '../compose/microcopyPicker.service';
+import prisma from "../../../config/database";
+import { getBankLoaderInstance } from "../banks/bankLoader.service";
+import { KodaIntentEngineV3Service } from "../routing/intentEngine.service";
+import { AnswerModeRouterService } from "../routing/answerModeRouter.service";
+import { AnswerComposerService } from "../compose/answerComposer.service";
+import { FallbackEngineService } from "../enforcement/fallbackEngine.service";
+import { MicrocopyPickerService } from "../compose/microcopyPicker.service";
 import {
   KodaOrchestratorV3Service,
   type OrchestratorDeps,
@@ -34,27 +34,27 @@ import {
   type LanguageCode,
   type AnswerMode,
   type Attachment,
-} from './kodaOrchestrator.service';
+} from "./kodaOrchestrator.service";
 
 // ---------------------------------------------------------------------------
 // Stub helpers (replace as real services become available)
 // ---------------------------------------------------------------------------
 
 /** STUB: docIndexService — queries Prisma for the user's doc inventory */
-function createDocIndexService(): OrchestratorDeps['docIndexService'] {
+function createDocIndexService(): OrchestratorDeps["docIndexService"] {
   return {
     async getSnapshot(userId: string): Promise<DocIndexSnapshot> {
       const docs = await prisma.document.findMany({
-        where: { userId, status: { in: ['ready', 'indexed'] } },
+        where: { userId, status: { in: ["ready", "indexed"] } },
         // Prisma model uses createdAt/updatedAt (no uploadedAt).
         select: { id: true, filename: true, mimeType: true, createdAt: true },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       });
       return {
         docCount: docs.length,
         candidates: docs.map((d) => ({
           docId: d.id,
-          fileName: d.filename ?? 'unknown',
+          fileName: d.filename ?? "unknown",
           docType: d.mimeType ?? undefined,
           uploadedAt: d.createdAt?.toISOString(),
         })),
@@ -64,16 +64,16 @@ function createDocIndexService(): OrchestratorDeps['docIndexService'] {
 }
 
 /** STUB: queryNormalizer — lightweight text cleanup */
-function createQueryNormalizer(): OrchestratorDeps['queryNormalizer'] {
+function createQueryNormalizer(): OrchestratorDeps["queryNormalizer"] {
   return {
     normalize(text: string): string {
-      return text.trim().replace(/\s+/g, ' ');
+      return text.trim().replace(/\s+/g, " ");
     },
   };
 }
 
 /** STUB: queryRewriter — pass-through (no rewriting yet) */
-function createQueryRewriter(): OrchestratorDeps['queryRewriter'] {
+function createQueryRewriter(): OrchestratorDeps["queryRewriter"] {
   return {
     async rewrite(input) {
       return {
@@ -94,7 +94,7 @@ function createQueryRewriter(): OrchestratorDeps['queryRewriter'] {
 }
 
 /** STUB: scopeResolver — no scoping yet */
-function createScopeResolver(): OrchestratorDeps['scopeResolver'] {
+function createScopeResolver(): OrchestratorDeps["scopeResolver"] {
   return {
     async resolve() {
       return { hard: {}, soft: {} };
@@ -103,7 +103,7 @@ function createScopeResolver(): OrchestratorDeps['scopeResolver'] {
 }
 
 /** STUB: candidateFilters — pass-through */
-function createCandidateFilters(): OrchestratorDeps['candidateFilters'] {
+function createCandidateFilters(): OrchestratorDeps["candidateFilters"] {
   return {
     async apply(input) {
       return {
@@ -117,7 +117,7 @@ function createCandidateFilters(): OrchestratorDeps['candidateFilters'] {
 }
 
 /** STUB: retrievalEngine — returns empty (no vector search wired yet) */
-function createRetrievalEngine(): OrchestratorDeps['retrievalEngine'] {
+function createRetrievalEngine(): OrchestratorDeps["retrievalEngine"] {
   return {
     async retrieve() {
       return {
@@ -136,7 +136,7 @@ function createRetrievalEngine(): OrchestratorDeps['retrievalEngine'] {
 }
 
 /** STUB: ranker — basic pass-through ranking from retrieval stats */
-function createRanker(): OrchestratorDeps['ranker'] {
+function createRanker(): OrchestratorDeps["ranker"] {
   return {
     async decide(input) {
       const top = input.retrieval.topDocs[0];
@@ -155,7 +155,7 @@ function createRanker(): OrchestratorDeps['ranker'] {
 }
 
 /** REAL: answerModeRouter — uses bank-driven routing */
-function createAnswerModeRouter(): OrchestratorDeps['answerModeRouter'] {
+function createAnswerModeRouter(): OrchestratorDeps["answerModeRouter"] {
   const router = new AnswerModeRouterService();
   return {
     async route(input) {
@@ -167,7 +167,10 @@ function createAnswerModeRouter(): OrchestratorDeps['answerModeRouter'] {
         signals: input.intent.signals ?? {},
         docContext: {
           docCount: input.docIndex.docCount ?? 0,
-          candidateCount: input.retrieval?.stats?.candidateCount ?? input.ranking?.candidateCount ?? 0,
+          candidateCount:
+            input.retrieval?.stats?.candidateCount ??
+            input.ranking?.candidateCount ??
+            0,
           topScore: input.ranking?.topScore ?? input.retrieval?.stats?.topScore,
           margin: input.ranking?.margin ?? input.retrieval?.stats?.margin,
         },
@@ -181,7 +184,12 @@ function createAnswerModeRouter(): OrchestratorDeps['answerModeRouter'] {
           },
         },
         state: input.state?.activeDocRef
-          ? { activeDocRef: { docId: input.state.activeDocRef.docId, lockType: input.state.activeDocRef.lockType } }
+          ? {
+              activeDocRef: {
+                docId: input.state.activeDocRef.docId,
+                lockType: input.state.activeDocRef.lockType,
+              },
+            }
           : undefined,
         policy: {
           refusalRequired: false,
@@ -189,8 +197,8 @@ function createAnswerModeRouter(): OrchestratorDeps['answerModeRouter'] {
         userPrefs: undefined,
       });
       return {
-        mode: (result.mode ?? 'general_answer') as AnswerMode,
-        reason: result.reason ?? 'router',
+        mode: (result.mode ?? "general_answer") as AnswerMode,
+        reason: result.reason ?? "router",
         navType: result.navType as any,
       };
     },
@@ -198,14 +206,14 @@ function createAnswerModeRouter(): OrchestratorDeps['answerModeRouter'] {
 }
 
 /** STUB: answerEngine — delegates to the LLM chat engine for now */
-function createAnswerEngine(): OrchestratorDeps['answerEngine'] {
+function createAnswerEngine(): OrchestratorDeps["answerEngine"] {
   return {
     async generate(input) {
       // The orchestrator pipeline reaches here for doc-grounded answers.
       // For now return a placeholder; the real LLM generation happens
       // via the ChatEngine path in prismaChat.service.ts.
       return {
-        draft: '',
+        draft: "",
         attachments: [],
         usedDocs: [],
       };
@@ -214,7 +222,7 @@ function createAnswerEngine(): OrchestratorDeps['answerEngine'] {
 }
 
 /** STUB: renderPolicy — pass-through */
-function createRenderPolicy(): OrchestratorDeps['renderPolicy'] {
+function createRenderPolicy(): OrchestratorDeps["renderPolicy"] {
   return {
     async apply(input) {
       return { text: input.text };
@@ -223,20 +231,20 @@ function createRenderPolicy(): OrchestratorDeps['renderPolicy'] {
 }
 
 /** STUB: docGroundingChecks — always pass */
-function createDocGroundingChecks(): OrchestratorDeps['docGroundingChecks'] {
+function createDocGroundingChecks(): OrchestratorDeps["docGroundingChecks"] {
   return {
     async check() {
       return {
-        verdict: 'pass' as const,
+        verdict: "pass" as const,
         reasons: [],
-        recommendedAction: 'proceed',
+        recommendedAction: "proceed",
       };
     },
   };
 }
 
 /** STUB: qualityGates — always pass */
-function createQualityGates(): OrchestratorDeps['qualityGates'] {
+function createQualityGates(): OrchestratorDeps["qualityGates"] {
   return {
     async run() {
       return {
@@ -248,7 +256,7 @@ function createQualityGates(): OrchestratorDeps['qualityGates'] {
 }
 
 /** ADAPTER: fallbackEngine — wraps FallbackEngineService.buildPlan into the emit() interface */
-function createFallbackEngine(): OrchestratorDeps['fallbackEngine'] {
+function createFallbackEngine(): OrchestratorDeps["fallbackEngine"] {
   let fallbackSvc: FallbackEngineService | null = null;
   try {
     const bankLoader = getBankLoaderInstance();
@@ -261,18 +269,27 @@ function createFallbackEngine(): OrchestratorDeps['fallbackEngine'] {
     async emit(input) {
       // Simple fallback messages by reason code
       const messages: Record<string, string> = {
-        no_docs_indexed: "You haven't uploaded any documents yet. Upload a PDF, DOCX, or other file to get started.",
-        indexing_in_progress: "Your documents are still being processed. Please try again in a moment.",
-        scope_hard_constraints_empty: input.context?.reasonShort as string ?? "No files matched your current scope.",
-        no_relevant_chunks_in_scoped_docs: "I couldn't find relevant information in the scoped documents. Try broadening your search.",
-        extraction_failed: "There was an issue processing this document. Try re-uploading it.",
+        no_docs_indexed:
+          "You haven't uploaded any documents yet. Upload a PDF, DOCX, or other file to get started.",
+        indexing_in_progress:
+          "Your documents are still being processed. Please try again in a moment.",
+        scope_hard_constraints_empty:
+          (input.context?.reasonShort as string) ??
+          "No files matched your current scope.",
+        no_relevant_chunks_in_scoped_docs:
+          "I couldn't find relevant information in the scoped documents. Try broadening your search.",
+        extraction_failed:
+          "There was an issue processing this document. Try re-uploading it.",
         permissions: "You don't have access to those documents.",
         unknown: "Something went wrong. Please try again.",
       };
 
       return {
         content: messages[input.reasonCode] ?? messages.unknown,
-        answerMode: input.reasonCode === 'no_docs_indexed' ? 'no_docs' as AnswerMode : 'scoped_not_found' as AnswerMode,
+        answerMode:
+          input.reasonCode === "no_docs_indexed"
+            ? ("no_docs" as AnswerMode)
+            : ("scoped_not_found" as AnswerMode),
         attachments: [],
       };
     },
@@ -280,7 +297,7 @@ function createFallbackEngine(): OrchestratorDeps['fallbackEngine'] {
 }
 
 /** STUB: stateUpdater — pass-through (no state mutation yet) */
-function createStateUpdater(): OrchestratorDeps['stateUpdater'] {
+function createStateUpdater(): OrchestratorDeps["stateUpdater"] {
   return {
     async apply(input) {
       return input.state ?? {};
@@ -289,7 +306,7 @@ function createStateUpdater(): OrchestratorDeps['stateUpdater'] {
 }
 
 /** REAL: answerComposer — wraps AnswerComposerService */
-function createAnswerComposer(): OrchestratorDeps['answerComposer'] {
+function createAnswerComposer(): OrchestratorDeps["answerComposer"] {
   let composerSvc: AnswerComposerService | null = null;
   try {
     composerSvc = new AnswerComposerService();
@@ -304,13 +321,13 @@ function createAnswerComposer(): OrchestratorDeps['answerComposer'] {
         try {
           const result = composerSvc.compose({
             ctx: {
-              conversationId: '',
-              turnId: '',
+              conversationId: "",
+              turnId: "",
               regenCount: 0,
               answerMode: meta.answerMode as any,
               operator: context.operator,
               intentFamily: context.intentFamily,
-              language: 'en',
+              language: "en",
               originalQuery: context.originalQuery,
               constraints: context.constraints as any,
             },
@@ -327,7 +344,7 @@ function createAnswerComposer(): OrchestratorDeps['answerComposer'] {
 }
 
 /** ADAPTER: conversationMessages — wraps MicrocopyPickerService */
-function createConversationMessages(): OrchestratorDeps['conversationMessages'] {
+function createConversationMessages(): OrchestratorDeps["conversationMessages"] {
   let microcopy: MicrocopyPickerService | null = null;
   try {
     const bankLoader = getBankLoaderInstance();
@@ -346,7 +363,7 @@ function createConversationMessages(): OrchestratorDeps['conversationMessages'] 
   return {
     async reply(input) {
       // Simple varied greeting based on seed
-      const idx = parseInt(input.variationSeed || '0', 16) % greetings.length;
+      const idx = parseInt(input.variationSeed || "0", 16) % greetings.length;
       return greetings[idx];
     },
   };
@@ -360,7 +377,9 @@ export function buildOrchestratorDeps(): OrchestratorDeps {
   return {
     docIndexService: createDocIndexService(),
     queryNormalizer: createQueryNormalizer(),
-    intentEngine: { resolve: (input) => new KodaIntentEngineV3Service().resolve(input as any) },
+    intentEngine: {
+      resolve: (input) => new KodaIntentEngineV3Service().resolve(input as any),
+    },
     queryRewriter: createQueryRewriter(),
     scopeResolver: createScopeResolver(),
     candidateFilters: createCandidateFilters(),

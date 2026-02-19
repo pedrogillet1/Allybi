@@ -59,7 +59,10 @@ export interface MonthNormalizationOutput {
 }
 
 function normalizeWhitespace(s: string): string {
-  return (s ?? "").replace(/\r\n|\r/g, "\n").replace(/[ \t]+/g, " ").trim();
+  return (s ?? "")
+    .replace(/\r\n|\r/g, "\n")
+    .replace(/[ \t]+/g, " ")
+    .trim();
 }
 
 function clamp01(x: number): number {
@@ -69,8 +72,18 @@ function clamp01(x: number): number {
 
 function monthNameEn(m: number): string {
   const names = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
   return names[m - 1] || "January";
 }
@@ -101,7 +114,11 @@ export class MonthNormalizationService {
 
     const textIn = normalizeWhitespace(input.text || "");
     if (!enabled || !textIn) {
-      return { normalizedText: textIn, matches: [], meta: { changed: false, outputFormat } };
+      return {
+        normalizedText: textIn,
+        matches: [],
+        meta: { changed: false, outputFormat },
+      };
     }
 
     const maps = bank?.maps ?? bank?.months ?? null;
@@ -145,7 +162,10 @@ export class MonthNormalizationService {
 
     // 2) Normalize numeric month patterns (month/year, year-month)
     //    Keep conservative: only map when pattern strongly indicates month.
-    const numericMatches = this.normalizeNumericMonthPatterns(out, outputFormat);
+    const numericMatches = this.normalizeNumericMonthPatterns(
+      out,
+      outputFormat,
+    );
     if (numericMatches.changed) {
       out = numericMatches.text;
       matches.push(...numericMatches.matches);
@@ -160,14 +180,22 @@ export class MonthNormalizationService {
     };
   }
 
-  private formatMonth(month: number, fmt: MonthNormalizationInput["outputFormat"]): string {
+  private formatMonth(
+    month: number,
+    fmt: MonthNormalizationInput["outputFormat"],
+  ): string {
     if (fmt === "month_iso") return monthIso(month);
     if (fmt === "month_name_en") return monthNameEn(month);
     return monthIndex(month);
   }
 
-  private buildDictionary(maps: any): Record<string, { month: number; lang: "en" | "pt" | "es" | "any" }> {
-    const dict: Record<string, { month: number; lang: "en" | "pt" | "es" | "any" }> = {};
+  private buildDictionary(
+    maps: any,
+  ): Record<string, { month: number; lang: "en" | "pt" | "es" | "any" }> {
+    const dict: Record<
+      string,
+      { month: number; lang: "en" | "pt" | "es" | "any" }
+    > = {};
 
     // If bank provides a structure like:
     // maps: { en: { january: 1, jan: 1, ... }, pt: {...}, es: {...} }
@@ -187,18 +215,54 @@ export class MonthNormalizationService {
     // Minimal fallback if bank is missing/empty
     if (Object.keys(dict).length === 0) {
       const fallback: Array<[string, number, "en" | "pt" | "es"]> = [
-        ["january", 1, "en"], ["jan", 1, "en"], ["janeiro", 1, "pt"], ["enero", 1, "es"],
-        ["february", 2, "en"], ["feb", 2, "en"], ["fevereiro", 2, "pt"], ["febrero", 2, "es"],
-        ["march", 3, "en"], ["mar", 3, "en"], ["março", 3, "pt"], ["marzo", 3, "es"],
-        ["april", 4, "en"], ["apr", 4, "en"], ["abril", 4, "pt"], ["abril", 4, "es"],
-        ["may", 5, "en"], ["maio", 5, "pt"], ["mayo", 5, "es"],
-        ["june", 6, "en"], ["jun", 6, "en"], ["junho", 6, "pt"], ["junio", 6, "es"],
-        ["july", 7, "en"], ["jul", 7, "en"], ["julho", 7, "pt"], ["julio", 7, "es"],
-        ["august", 8, "en"], ["aug", 8, "en"], ["agosto", 8, "pt"], ["agosto", 8, "es"],
-        ["september", 9, "en"], ["sep", 9, "en"], ["sept", 9, "en"], ["setembro", 9, "pt"], ["septiembre", 9, "es"],
-        ["october", 10, "en"], ["oct", 10, "en"], ["outubro", 10, "pt"], ["octubre", 10, "es"],
-        ["november", 11, "en"], ["nov", 11, "en"], ["novembro", 11, "pt"], ["noviembre", 11, "es"],
-        ["december", 12, "en"], ["dec", 12, "en"], ["dezembro", 12, "pt"], ["diciembre", 12, "es"],
+        ["january", 1, "en"],
+        ["jan", 1, "en"],
+        ["janeiro", 1, "pt"],
+        ["enero", 1, "es"],
+        ["february", 2, "en"],
+        ["feb", 2, "en"],
+        ["fevereiro", 2, "pt"],
+        ["febrero", 2, "es"],
+        ["march", 3, "en"],
+        ["mar", 3, "en"],
+        ["março", 3, "pt"],
+        ["marzo", 3, "es"],
+        ["april", 4, "en"],
+        ["apr", 4, "en"],
+        ["abril", 4, "pt"],
+        ["abril", 4, "es"],
+        ["may", 5, "en"],
+        ["maio", 5, "pt"],
+        ["mayo", 5, "es"],
+        ["june", 6, "en"],
+        ["jun", 6, "en"],
+        ["junho", 6, "pt"],
+        ["junio", 6, "es"],
+        ["july", 7, "en"],
+        ["jul", 7, "en"],
+        ["julho", 7, "pt"],
+        ["julio", 7, "es"],
+        ["august", 8, "en"],
+        ["aug", 8, "en"],
+        ["agosto", 8, "pt"],
+        ["agosto", 8, "es"],
+        ["september", 9, "en"],
+        ["sep", 9, "en"],
+        ["sept", 9, "en"],
+        ["setembro", 9, "pt"],
+        ["septiembre", 9, "es"],
+        ["october", 10, "en"],
+        ["oct", 10, "en"],
+        ["outubro", 10, "pt"],
+        ["octubre", 10, "es"],
+        ["november", 11, "en"],
+        ["nov", 11, "en"],
+        ["novembro", 11, "pt"],
+        ["noviembre", 11, "es"],
+        ["december", 12, "en"],
+        ["dec", 12, "en"],
+        ["dezembro", 12, "pt"],
+        ["diciembre", 12, "es"],
       ];
       for (const [k, m, lang] of fallback) dict[k] = { month: m, lang };
     }
@@ -206,7 +270,10 @@ export class MonthNormalizationService {
     return dict;
   }
 
-  private normalizeNumericMonthPatterns(text: string, fmt: MonthNormalizationInput["outputFormat"]) {
+  private normalizeNumericMonthPatterns(
+    text: string,
+    fmt: MonthNormalizationInput["outputFormat"],
+  ) {
     // Patterns:
     //  - 01/2024, 1/2024, 01-2024, 1-2024
     //  - 2024-01, 2024/1
@@ -221,7 +288,12 @@ export class MonthNormalizationService {
         const offset = args[args.length - 2] as number;
         const groups = args.slice(1, args.length - 2);
         // reconstruct a RegExpExecArray-like object
-        const fake = { 0: match, index: offset, groups: undefined, length: 1 } as any;
+        const fake = {
+          0: match,
+          index: offset,
+          groups: undefined,
+          length: 1,
+        } as any;
         // provide captured groups as numeric indices
         for (let i = 0; i < groups.length; i++) fake[i + 1] = groups[i];
         const replacement = fn(fake);

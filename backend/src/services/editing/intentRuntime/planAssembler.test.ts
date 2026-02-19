@@ -43,26 +43,17 @@ describe("substituteSlots", () => {
   });
 
   test("missing slot resolves to null for direct ref", () => {
-    const result = substituteSlots(
-      { targets: "$missing" },
-      {},
-    );
+    const result = substituteSlots({ targets: "$missing" }, {});
     expect(result).toEqual({ targets: null });
   });
 
   test("missing slot in embedded string resolves to empty", () => {
-    const result = substituteSlots(
-      { styleName: "Heading $level" },
-      {},
-    );
+    const result = substituteSlots({ styleName: "Heading $level" }, {});
     expect(result).toEqual({ styleName: "Heading " });
   });
 
   test("nested object slots are substituted recursively", () => {
-    const result = substituteSlots(
-      { outer: { inner: "$val" } },
-      { val: 42 },
-    );
+    const result = substituteSlots({ outer: { inner: "$val" } }, { val: 42 });
     expect(result).toEqual({ outer: { inner: 42 } });
   });
 
@@ -75,10 +66,7 @@ describe("substituteSlots", () => {
   });
 
   test("numeric and boolean values pass through unchanged", () => {
-    const result = substituteSlots(
-      { count: 5, flag: true },
-      {},
-    );
+    const result = substituteSlots({ count: 5, flag: true }, {});
     expect(result).toEqual({ count: 5, flag: true });
   });
 });

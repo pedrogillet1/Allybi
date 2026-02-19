@@ -19,10 +19,17 @@
  * - No user-facing microcopy
  */
 
-import crypto from 'crypto';
-import type { StreamSink, StreamEvent, StreamDelta, StreamMarker, StreamState, LLMStreamingConfig } from './llmStreaming.types';
-import type { ProviderToolCall } from './llmTools.types';
-import type { LLMProvider } from './llmErrors.types';
+import crypto from "crypto";
+import type {
+  StreamSink,
+  StreamEvent,
+  StreamDelta,
+  StreamMarker,
+  StreamState,
+  LLMStreamingConfig,
+} from "./llmStreaming.types";
+import type { ProviderToolCall } from "./llmTools.types";
+import type { LLMProvider } from "./llmErrors.types";
 
 /** Gemini stream chunk (best-effort minimal shape) */
 interface GeminiStreamChunk {
@@ -61,7 +68,7 @@ export interface GeminiStreamAdapterConfig {
    * - 'newline_json' expects JSON objects separated by newlines (common Gemini behavior)
    * - 'json_array' expects the body is a JSON array of objects (rare)
    */
-  framing: 'newline_json' | 'json_array';
+  framing: "newline_json" | "json_array";
 
   /**
    * Deterministic tool call ids:
@@ -88,7 +95,7 @@ export class GeminiStreamAdapterService {
     provider: LLMProvider; // should be 'google'
     model: string;
     traceId: string;
-    kind: 'answer' | 'nav_pills' | 'system';
+    kind: "answer" | "nav_pills" | "system";
 
     sink: StreamSink;
     streamingConfig: LLMStreamingConfig;
@@ -116,7 +123,7 @@ export class GeminiStreamAdapterService {
     } = params;
 
     const collected: GeminiStreamCollected = {
-      text: '',
+      text: "",
       toolCalls: [],
     };
 
@@ -124,13 +131,14 @@ export class GeminiStreamAdapterService {
     // We will only emit deltas and markers here.
 
     const reader = body.getReader();
-    const decoder = new TextDecoder('utf-8');
+    const decoder = new TextDecoder("utf-8");
 
-    let buffer = '';
+    let buffer = "";
     let firstToken = false;
 
     const maxCharsPerDelta = streamingConfig.chunking?.maxCharsPerDelta ?? 64;
-    const targetDeltaEveryMs = streamingConfig.chunking?.targetDeltaEveryMs ?? 0;
+    const targetDeltaEveryMs =
+      streamingConfig.chunking?.targetDeltaEveryMs ?? 0;
 
     // Marker hold
     const holdPolicy = streamingConfig.markerHold;
@@ -146,15 +154,15 @@ export class GeminiStreamAdapterService {
       buffer += decoder.decode(value, { stream: true });
 
       // Guard
-      if (Buffer.byteLength(buffer, 'utf8') > this.cfg.maxBufferBytes) {
+      if (Buffer.byteLength(buffer, "utf8") > this.cfg.maxBufferBytes) {
         // Hard stop: avoid runaway memory; caller will handle as error.
-        throw new Error('GEMINI_STREAM_BUFFER_OVERFLOW');
+        throw new Error("GEMINI_STREAM_BUFFER_OVERFLOW");
       }
 
-      if (this.cfg.framing === 'newline_json') {
+      if (this.cfg.framing === "newline_json") {
         // Parse line-by-line
-        const lines = buffer.split('\n');
-        buffer = lines.pop() ?? '';
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
 
         for (const line of lines) {
           const trimmed = line.trim();
@@ -190,7 +198,7 @@ export class GeminiStreamAdapterService {
               if (!sink.isOpen()) break;
 
               const delta: StreamDelta = { text: cText };
-              sink.write({ event: 'delta', data: delta });
+              sink.write({ event: "delta", data: delta });
 
               if (targetDeltaEveryMs > 0) await sleep(targetDeltaEveryMs);
             }
@@ -210,17 +218,22 @@ export class GeminiStreamAdapterService {
             if (markers.length) {
               for (const m of markers) {
                 if (shouldHoldMarkers) {
-                  if (state.heldMarkers.length < maxHeldMarkers) state.heldMarkers.push(m);
+                  if (state.heldMarkers.length < maxHeldMarkers)
+                    state.heldMarkers.push(m);
                 } else {
                   state.markers.push(m);
-                  sink.write({ event: 'marker', data: m });
+                  sink.write({ event: "marker", data: m });
                 }
               }
             }
           }
 
           // If marker holding is on + flushAt paragraph boundaries, flush when we see "\n\n"
-          if (shouldHoldMarkers && holdPolicy.flushAt === 'paragraph_boundary' && parsed.text.includes('\n\n')) {
+          if (
+            shouldHoldMarkers &&
+            holdPolicy.flushAt === "paragraph_boundary" &&
+            parsed.text.includes("\n\n")
+          ) {
             this.flushHeldMarkers(state, sink);
           }
         }
@@ -233,7 +246,8 @@ export class GeminiStreamAdapterService {
         for (const chunk of arr) {
           const parsed = this.extractFromChunk(chunk);
 
-          if (parsed.toolCalls.length) collected.toolCalls.push(...parsed.toolCalls);
+          if (parsed.toolCalls.length)
+            collected.toolCalls.push(...parsed.toolCalls);
 
           if (parsed.text) {
             if (!firstToken) {
@@ -248,7 +262,7 @@ export class GeminiStreamAdapterService {
             const chunks = chunkText(parsed.text, maxCharsPerDelta);
             for (const cText of chunks) {
               if (!sink.isOpen()) break;
-              sink.write({ event: 'delta', data: { text: cText } });
+              sink.write({ event: "delta", data: { text: cText } });
               if (targetDeltaEveryMs > 0) await sleep(targetDeltaEveryMs);
             }
           }
@@ -258,12 +272,12 @@ export class GeminiStreamAdapterService {
         }
 
         // consume buffer completely
-        buffer = '';
+        buffer = "";
       }
     }
 
     // Final marker flush if policy says flush at final
-    if (shouldHoldMarkers && holdPolicy.flushAt === 'final') {
+    if (shouldHoldMarkers && holdPolicy.flushAt === "final") {
       this.flushHeldMarkers(state, sink);
     }
 
@@ -282,20 +296,23 @@ export class GeminiStreamAdapterService {
     text: string;
     toolCalls: ProviderToolCall[];
     finishReason?: string;
-    usage?: GeminiStreamCollected['usage'];
+    usage?: GeminiStreamCollected["usage"];
   } {
     const candidates = chunk.candidates ?? [];
     const c0 = candidates[0];
     const parts = c0?.content?.parts ?? [];
 
-    let text = '';
+    let text = "";
     const toolCalls: ProviderToolCall[] = [];
 
     for (const p of parts) {
-      if (typeof (p as any)?.text === 'string') {
+      if (typeof (p as any)?.text === "string") {
         text += (p as any).text;
-      } else if (typeof (p as any)?.functionCall?.name === 'string') {
-        const fc = (p as any).functionCall as { name: string; args?: Record<string, unknown> };
+      } else if (typeof (p as any)?.functionCall?.name === "string") {
+        const fc = (p as any).functionCall as {
+          name: string;
+          args?: Record<string, unknown>;
+        };
         const normalized = this.normalizeToolCall(fc.name, fc.args ?? {});
         toolCalls.push(normalized);
       }
@@ -317,18 +334,25 @@ export class GeminiStreamAdapterService {
     };
   }
 
-  private normalizeToolCall(name: string, args: Record<string, unknown>): ProviderToolCall {
+  private normalizeToolCall(
+    name: string,
+    args: Record<string, unknown>,
+  ): ProviderToolCall {
     let safeArgs = args;
 
     if (this.cfg.deterministicToolCallIds) {
-      const callId = deterministicToolCallId(name, safeArgs, this.cfg.toolCallIdSalt ?? '');
-      if (!Object.prototype.hasOwnProperty.call(safeArgs, '__callId')) {
+      const callId = deterministicToolCallId(
+        name,
+        safeArgs,
+        this.cfg.toolCallIdSalt ?? "",
+      );
+      if (!Object.prototype.hasOwnProperty.call(safeArgs, "__callId")) {
         safeArgs = { ...safeArgs, __callId: callId };
       }
     }
 
     return {
-      provider: 'google',
+      provider: "google",
       name,
       args: safeArgs,
     };
@@ -342,7 +366,7 @@ export class GeminiStreamAdapterService {
     const toFlush = state.heldMarkers.splice(0, state.heldMarkers.length);
     for (const m of toFlush) {
       state.markers.push(m);
-      sink.write({ event: 'marker', data: m });
+      sink.write({ event: "marker", data: m });
     }
   }
 }
@@ -371,7 +395,7 @@ function chunkText(text: string, maxChars: number): string[] {
 }
 
 function sleep(ms: number): Promise<void> {
-  return new Promise(res => setTimeout(res, ms));
+  return new Promise((res) => setTimeout(res, ms));
 }
 
 /**
@@ -388,7 +412,7 @@ function detectBoldFilenameMarkers(deltaText: string): StreamMarker[] {
   while ((m = re.exec(deltaText)) !== null) {
     const filename = m[1];
     markers.push({
-      type: 'doc_ref',
+      type: "doc_ref",
       raw: `**${filename}**`,
       meta: { filename },
     });
@@ -396,19 +420,23 @@ function detectBoldFilenameMarkers(deltaText: string): StreamMarker[] {
   return markers;
 }
 
-function deterministicToolCallId(name: string, args: Record<string, unknown>, salt: string): string {
+function deterministicToolCallId(
+  name: string,
+  args: Record<string, unknown>,
+  salt: string,
+): string {
   const stableArgs = sortKeysDeep(args);
-  const h = crypto.createHash('sha256');
+  const h = crypto.createHash("sha256");
   h.update(salt);
-  h.update('|');
+  h.update("|");
   h.update(name);
-  h.update('|');
+  h.update("|");
   h.update(JSON.stringify(stableArgs));
-  return h.digest('hex').slice(0, 24);
+  return h.digest("hex").slice(0, 24);
 }
 
 function sortKeysDeep<T>(x: T): T {
-  if (x === null || typeof x !== 'object') return x;
+  if (x === null || typeof x !== "object") return x;
   if (Array.isArray(x)) return x.map(sortKeysDeep) as unknown as T;
 
   const obj = x as Record<string, unknown>;

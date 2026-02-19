@@ -23,9 +23,17 @@ export class TwoFactorCryptoService {
     return this.enc.encryptStringToJson(secret, key, `2fa:${userId}:secret`);
   }
 
-  decryptSecret(userId: string, payloadJson: string, tenantKey: Buffer): string {
+  decryptSecret(
+    userId: string,
+    payloadJson: string,
+    tenantKey: Buffer,
+  ): string {
     const key = this.keyFor(tenantKey, "secret");
-    return this.enc.decryptStringFromJson(payloadJson, key, `2fa:${userId}:secret`);
+    return this.enc.decryptStringFromJson(
+      payloadJson,
+      key,
+      `2fa:${userId}:secret`,
+    );
   }
 
   /**
@@ -33,11 +41,23 @@ export class TwoFactorCryptoService {
    */
   encryptBackupCodes(userId: string, codes: string, tenantKey: Buffer): string {
     const key = this.keyFor(tenantKey, "backupCodes");
-    return this.enc.encryptStringToJson(codes, key, `2fa:${userId}:backupCodes`);
+    return this.enc.encryptStringToJson(
+      codes,
+      key,
+      `2fa:${userId}:backupCodes`,
+    );
   }
 
-  decryptBackupCodes(userId: string, payloadJson: string, tenantKey: Buffer): string {
+  decryptBackupCodes(
+    userId: string,
+    payloadJson: string,
+    tenantKey: Buffer,
+  ): string {
     const key = this.keyFor(tenantKey, "backupCodes");
-    return this.enc.decryptStringFromJson(payloadJson, key, `2fa:${userId}:backupCodes`);
+    return this.enc.decryptStringFromJson(
+      payloadJson,
+      key,
+      `2fa:${userId}:backupCodes`,
+    );
   }
 }

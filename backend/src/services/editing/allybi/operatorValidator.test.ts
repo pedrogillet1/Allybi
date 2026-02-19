@@ -34,7 +34,9 @@ describe("validateAllybiOperatorPayload", () => {
     );
     expect(out.ok).toBe(false);
     expect(out.code).toBe("ALLYBI_FONT_UNSUPPORTED");
-    expect(String(out.message || "")).toContain("Font not available in this document engine");
+    expect(String(out.message || "")).toContain(
+      "Font not available in this document engine",
+    );
   });
 
   test("returns localized unsupported-font copy (PT)", () => {
@@ -52,7 +54,9 @@ describe("validateAllybiOperatorPayload", () => {
     );
     expect(out.ok).toBe(false);
     expect(out.code).toBe("ALLYBI_FONT_UNSUPPORTED");
-    expect(String(out.message || "")).toContain("Fonte não disponível neste mecanismo");
+    expect(String(out.message || "")).toContain(
+      "Fonte não disponível neste mecanismo",
+    );
   });
 
   test("blocks class mismatch between expected list op and rewrite op", () => {

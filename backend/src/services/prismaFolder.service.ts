@@ -5,14 +5,14 @@
  * Supports encrypted folder names when crypto services are provided.
  */
 
-import prisma from '../config/database';
+import prisma from "../config/database";
 import type {
   FolderService,
   FolderRecord,
   FolderTreeNode,
-} from '../controllers/folder.controller';
-import type { FolderKeyService } from './folders/folderKey.service';
-import type { FolderCryptoService } from './folders/folderCrypto.service';
+} from "../controllers/folder.controller";
+import type { FolderKeyService } from "./folders/folderKey.service";
+import type { FolderCryptoService } from "./folders/folderCrypto.service";
 
 interface CryptoServices {
   folderKeys: FolderKeyService;
@@ -25,9 +25,9 @@ interface CryptoServices {
  * Excludes: skipped docs, revision artifacts, connector-ingested artifacts.
  */
 const VISIBLE_DOC_FILTER = {
-  status: { not: 'skipped' },
+  status: { not: "skipped" },
   parentVersionId: null,
-  encryptedFilename: { not: { contains: '/connectors/' } },
+  encryptedFilename: { not: { contains: "/connectors/" } },
 } as const;
 
 function toRecord(f: any, decryptedName?: string): FolderRecord {
@@ -36,7 +36,7 @@ function toRecord(f: any, decryptedName?: string): FolderRecord {
   const subfolderCount = f._count?.subfolders ?? 0;
   return {
     id: f.id,
-    name: decryptedName ?? f.name ?? 'Unnamed',
+    name: decryptedName ?? f.name ?? "Unnamed",
     parentId,
     parentFolderId: parentId, // backward-compat alias used by frontend
     path: f.path ?? null,
@@ -77,7 +77,10 @@ function computeRecursiveTotals(items: FolderRecord[]): void {
     const f = byId.get(id);
     if (!f) return 0;
     const own = f._count?.documents ?? f.counts?.docs ?? 0;
-    const childSum = (children.get(id) || []).reduce((s, cid) => s + total(cid), 0);
+    const childSum = (children.get(id) || []).reduce(
+      (s, cid) => s + total(cid),
+      0,
+    );
     const t = own + childSum;
     cache.set(id, t);
     return t;
@@ -99,23 +102,34 @@ export class PrismaFolderService implements FolderService {
   /**
    * Decrypt folder name if encrypted, otherwise return plaintext name
    */
-  private async decryptName(userId: string, folder: { id: string; name: string | null; nameEncrypted: string | null }): Promise<string> {
+  private async decryptName(
+    userId: string,
+    folder: { id: string; name: string | null; nameEncrypted: string | null },
+  ): Promise<string> {
     if (folder.nameEncrypted && this.crypto) {
       try {
         const fk = await this.crypto.folderKeys.getFolderKey(userId, folder.id);
-        return this.crypto.folderCrypto.decryptName(userId, folder.id, folder.nameEncrypted, fk);
+        return this.crypto.folderCrypto.decryptName(
+          userId,
+          folder.id,
+          folder.nameEncrypted,
+          fk,
+        );
       } catch {
         // Fallback to plaintext if decryption fails
-        return folder.name ?? 'Unnamed';
+        return folder.name ?? "Unnamed";
       }
     }
-    return folder.name ?? 'Unnamed';
+    return folder.name ?? "Unnamed";
   }
 
   /**
    * Decrypt names for multiple folders
    */
-  private async decryptFolders(userId: string, folders: any[]): Promise<FolderRecord[]> {
+  private async decryptFolders(
+    userId: string,
+    folders: any[],
+  ): Promise<FolderRecord[]> {
     const results: FolderRecord[] = [];
     for (const f of folders) {
       const name = await this.decryptName(userId, f);
@@ -139,14 +153,14 @@ export class PrismaFolderService implements FolderService {
     // Note: search by name only works for unencrypted folders
     // For encrypted folders, search would need to be done client-side
     if (input.q) {
-      where.name = { contains: input.q, mode: 'insensitive' };
+      where.name = { contains: input.q, mode: "insensitive" };
     }
 
     const folders = await prisma.folder.findMany({
       where,
       take: limit + 1,
       ...(input.cursor ? { cursor: { id: input.cursor }, skip: 1 } : {}),
-      orderBy: { createdAt: 'desc' }, // Order by creation date since encrypted names can't be sorted
+      orderBy: { createdAt: "desc" }, // Order by creation date since encrypted names can't be sorted
       select: {
         id: true,
         userId: true,
@@ -157,7 +171,12 @@ export class PrismaFolderService implements FolderService {
         emoji: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } },
+        _count: {
+          select: {
+            documents: { where: VISIBLE_DOC_FILTER },
+            subfolders: true,
+          },
+        },
       },
     });
 
@@ -175,7 +194,7 @@ export class PrismaFolderService implements FolderService {
   async tree(input: { userId: string }): Promise<FolderTreeNode[]> {
     const folders = await prisma.folder.findMany({
       where: { userId: input.userId, isDeleted: false },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: "asc" },
       select: {
         id: true,
         userId: true,
@@ -186,7 +205,12 @@ export class PrismaFolderService implements FolderService {
         emoji: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } },
+        _count: {
+          select: {
+            documents: { where: VISIBLE_DOC_FILTER },
+            subfolders: true,
+          },
+        },
       },
     });
 
@@ -211,7 +235,10 @@ export class PrismaFolderService implements FolderService {
 
     // Walk tree bottom-up to compute recursive totalDocuments
     function walkTotal(node: FolderTreeNode): number {
-      const childTotal = (node.children || []).reduce((sum, c) => sum + walkTotal(c), 0);
+      const childTotal = (node.children || []).reduce(
+        (sum, c) => sum + walkTotal(c),
+        0,
+      );
       const own = node._count?.documents ?? node.counts?.docs ?? 0;
       const total = own + childTotal;
       if (node._count) node._count.totalDocuments = total;
@@ -222,7 +249,10 @@ export class PrismaFolderService implements FolderService {
     return roots;
   }
 
-  async get(input: { userId: string; folderId: string }): Promise<FolderRecord | null> {
+  async get(input: {
+    userId: string;
+    folderId: string;
+  }): Promise<FolderRecord | null> {
     const f = await prisma.folder.findFirst({
       where: { id: input.folderId, userId: input.userId, isDeleted: false },
       select: {
@@ -235,7 +265,12 @@ export class PrismaFolderService implements FolderService {
         emoji: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } },
+        _count: {
+          select: {
+            documents: { where: VISIBLE_DOC_FILTER },
+            subfolders: true,
+          },
+        },
       },
     });
     if (!f) return null;
@@ -244,14 +279,18 @@ export class PrismaFolderService implements FolderService {
     return toRecord(f, name);
   }
 
-  async create(input: { userId: string; name: string; parentId?: string | null }): Promise<FolderRecord> {
+  async create(input: {
+    userId: string;
+    name: string;
+    parentId?: string | null;
+  }): Promise<FolderRecord> {
     if (this.crypto) {
       // Create with encrypted name
       const f = await prisma.folder.create({
         data: {
           userId: input.userId,
           name: null, // Encrypted - no plaintext
-          nameEncrypted: '', // Placeholder, will update after getting key
+          nameEncrypted: "", // Placeholder, will update after getting key
           parentFolderId: input.parentId ?? null,
         },
         select: {
@@ -263,13 +302,23 @@ export class PrismaFolderService implements FolderService {
           path: true,
           createdAt: true,
           updatedAt: true,
-          _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } },
+          _count: {
+            select: {
+              documents: { where: VISIBLE_DOC_FILTER },
+              subfolders: true,
+            },
+          },
         },
       });
 
       // Now encrypt with folder key
       const fk = await this.crypto.folderKeys.getFolderKey(input.userId, f.id);
-      const enc = this.crypto.folderCrypto.encryptName(input.userId, f.id, input.name, fk);
+      const enc = this.crypto.folderCrypto.encryptName(
+        input.userId,
+        f.id,
+        input.name,
+        fk,
+      );
 
       await prisma.folder.update({
         where: { id: f.id },
@@ -287,16 +336,35 @@ export class PrismaFolderService implements FolderService {
         name: input.name, // SECURITY:PLAINTEXT_FALLBACK
         parentFolderId: input.parentId ?? null,
       },
-      include: { _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } } },
+      include: {
+        _count: {
+          select: {
+            documents: { where: VISIBLE_DOC_FILTER },
+            subfolders: true,
+          },
+        },
+      },
     });
     return toRecord(f);
   }
 
-  async rename(input: { userId: string; folderId: string; name: string }): Promise<FolderRecord> {
+  async rename(input: {
+    userId: string;
+    folderId: string;
+    name: string;
+  }): Promise<FolderRecord> {
     if (this.crypto) {
       // Encrypt the new name
-      const fk = await this.crypto.folderKeys.getFolderKey(input.userId, input.folderId);
-      const enc = this.crypto.folderCrypto.encryptName(input.userId, input.folderId, input.name, fk);
+      const fk = await this.crypto.folderKeys.getFolderKey(
+        input.userId,
+        input.folderId,
+      );
+      const enc = this.crypto.folderCrypto.encryptName(
+        input.userId,
+        input.folderId,
+        input.name,
+        fk,
+      );
 
       const f = await prisma.folder.update({
         where: { id: input.folderId },
@@ -313,7 +381,12 @@ export class PrismaFolderService implements FolderService {
           path: true,
           createdAt: true,
           updatedAt: true,
-          _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } },
+          _count: {
+            select: {
+              documents: { where: VISIBLE_DOC_FILTER },
+              subfolders: true,
+            },
+          },
         },
       });
       return toRecord(f, input.name);
@@ -324,12 +397,23 @@ export class PrismaFolderService implements FolderService {
     const f = await prisma.folder.update({
       where: { id: input.folderId },
       data: { name: input.name }, // SECURITY:PLAINTEXT_FALLBACK
-      include: { _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } } },
+      include: {
+        _count: {
+          select: {
+            documents: { where: VISIBLE_DOC_FILTER },
+            subfolders: true,
+          },
+        },
+      },
     });
     return toRecord(f);
   }
 
-  async move(input: { userId: string; folderId: string; newParentId?: string | null }): Promise<FolderRecord> {
+  async move(input: {
+    userId: string;
+    folderId: string;
+    newParentId?: string | null;
+  }): Promise<FolderRecord> {
     const f = await prisma.folder.update({
       where: { id: input.folderId },
       data: { parentFolderId: input.newParentId ?? null },
@@ -342,7 +426,12 @@ export class PrismaFolderService implements FolderService {
         path: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } },
+        _count: {
+          select: {
+            documents: { where: VISIBLE_DOC_FILTER },
+            subfolders: true,
+          },
+        },
       },
     });
 
@@ -353,11 +442,11 @@ export class PrismaFolderService implements FolderService {
   async delete(input: {
     userId: string;
     folderId: string;
-    mode?: 'soft' | 'hard' | 'cascade' | 'folderOnly';
+    mode?: "soft" | "hard" | "cascade" | "folderOnly";
   }): Promise<{ deleted: true; movedDocs?: number; movedToFolderId?: string }> {
-    const mode = input.mode || 'cascade';
+    const mode = input.mode || "cascade";
 
-    if (mode === 'folderOnly') {
+    if (mode === "folderOnly") {
       // Move documents out of the folder (and subfolders) to root level
       const movedDocs = await prisma.document.updateMany({
         where: { folderId: input.folderId, userId: input.userId },
@@ -368,7 +457,7 @@ export class PrismaFolderService implements FolderService {
       return { deleted: true, movedDocs: movedDocs.count };
     }
 
-    if (mode === 'hard' || mode === 'cascade') {
+    if (mode === "hard" || mode === "cascade") {
       // Hard delete — DB cascade automatically deletes documents and subfolders
       await prisma.folder.delete({ where: { id: input.folderId } });
     } else {

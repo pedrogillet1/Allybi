@@ -68,12 +68,15 @@ function isAllybiCanonicalOperator(value: string): boolean {
 }
 
 function runtimeFromAllybiCanonical(operator: string): EditOperator | null {
-  const op = String(operator || "").trim().toUpperCase();
+  const op = String(operator || "")
+    .trim()
+    .toUpperCase();
   if (!op) return null;
 
   if (op === "DOCX_REPLACE_SPAN") return "EDIT_SPAN";
   if (op === "DOCX_REWRITE_PARAGRAPH") return "EDIT_PARAGRAPH";
-  if (op === "DOCX_INSERT_AFTER" || op === "DOCX_INSERT_BEFORE") return "ADD_PARAGRAPH";
+  if (op === "DOCX_INSERT_AFTER" || op === "DOCX_INSERT_BEFORE")
+    return "ADD_PARAGRAPH";
   if (op.startsWith("DOCX_")) return "EDIT_DOCX_BUNDLE";
 
   if (op === "XLSX_SET_CELL_VALUE") return "EDIT_CELL";
@@ -91,10 +94,15 @@ export function normalizeEditOperator(
   options: { domain: EditDomain; instruction: string },
 ): NormalizedEditOperatorResult {
   const raw = normalizeToken(rawOperator);
-  if (!raw) return { operator: null, canonicalOperator: null, strictActionAlias: null };
+  if (!raw)
+    return { operator: null, canonicalOperator: null, strictActionAlias: null };
 
   if (CANONICAL_EDIT_OPERATORS.has(raw as EditOperator)) {
-    return { operator: raw as EditOperator, canonicalOperator: null, strictActionAlias: null };
+    return {
+      operator: raw as EditOperator,
+      canonicalOperator: null,
+      strictActionAlias: null,
+    };
   }
 
   const upper = raw.toUpperCase();
@@ -132,30 +140,90 @@ export function normalizeEditOperator(
 
   // Map non-canonical databank/operator IDs to canonical edit operators.
   const token = low.replace(/[.\s-]+/g, "_");
-  if (token.includes("create_chart") || token.includes("update_chart") || token.includes("change_chart_type") || token.includes("chart_from_")) {
-    return { operator: "CREATE_CHART", canonicalOperator: "XLSX_CHART_CREATE", strictActionAlias: null };
+  if (
+    token.includes("create_chart") ||
+    token.includes("update_chart") ||
+    token.includes("change_chart_type") ||
+    token.includes("chart_from_")
+  ) {
+    return {
+      operator: "CREATE_CHART",
+      canonicalOperator: "XLSX_CHART_CREATE",
+      strictActionAlias: null,
+    };
   }
   if (token.includes("set_run_style") || token.includes("format_inline")) {
-    return { operator: "EDIT_DOCX_BUNDLE", canonicalOperator: "DOCX_SET_RUN_STYLE", strictActionAlias: null };
+    return {
+      operator: "EDIT_DOCX_BUNDLE",
+      canonicalOperator: "DOCX_SET_RUN_STYLE",
+      strictActionAlias: null,
+    };
   }
   if (token.includes("clear_run_style")) {
-    return { operator: "EDIT_DOCX_BUNDLE", canonicalOperator: "DOCX_CLEAR_RUN_STYLE", strictActionAlias: null };
+    return {
+      operator: "EDIT_DOCX_BUNDLE",
+      canonicalOperator: "DOCX_CLEAR_RUN_STYLE",
+      strictActionAlias: null,
+    };
   }
   if (token.includes("rewrite_paragraph") || token.includes("docx_rewrite")) {
-    return { operator: "EDIT_PARAGRAPH", canonicalOperator: "DOCX_REWRITE_PARAGRAPH", strictActionAlias: null };
+    return {
+      operator: "EDIT_PARAGRAPH",
+      canonicalOperator: "DOCX_REWRITE_PARAGRAPH",
+      strictActionAlias: null,
+    };
   }
   if (token.includes("replace_span")) {
-    return { operator: "EDIT_SPAN", canonicalOperator: "DOCX_REPLACE_SPAN", strictActionAlias: null };
+    return {
+      operator: "EDIT_SPAN",
+      canonicalOperator: "DOCX_REPLACE_SPAN",
+      strictActionAlias: null,
+    };
   }
   if (token.includes("insert_after") || token.includes("insert_before")) {
-    return { operator: "ADD_PARAGRAPH", canonicalOperator: "DOCX_INSERT_AFTER", strictActionAlias: null };
+    return {
+      operator: "ADD_PARAGRAPH",
+      canonicalOperator: "DOCX_INSERT_AFTER",
+      strictActionAlias: null,
+    };
   }
-  if (token.includes("edit_cell")) return { operator: "EDIT_CELL", canonicalOperator: "XLSX_SET_CELL_VALUE", strictActionAlias: null };
-  if (token.includes("edit_range")) return { operator: "EDIT_RANGE", canonicalOperator: "XLSX_SET_RANGE_VALUES", strictActionAlias: null };
-  if (token.includes("rename_sheet")) return { operator: "RENAME_SHEET", canonicalOperator: "XLSX_RENAME_SHEET", strictActionAlias: null };
-  if (token.includes("add_sheet")) return { operator: "ADD_SHEET", canonicalOperator: "XLSX_ADD_SHEET", strictActionAlias: null };
-  if (token.includes("compute") || token.includes("sort") || token.includes("filter") || token.includes("format") || token.includes("validation") || token.includes("freeze")) {
-    return { operator: "COMPUTE_BUNDLE", canonicalOperator: "XLSX_FORMAT_RANGE", strictActionAlias: null };
+  if (token.includes("edit_cell"))
+    return {
+      operator: "EDIT_CELL",
+      canonicalOperator: "XLSX_SET_CELL_VALUE",
+      strictActionAlias: null,
+    };
+  if (token.includes("edit_range"))
+    return {
+      operator: "EDIT_RANGE",
+      canonicalOperator: "XLSX_SET_RANGE_VALUES",
+      strictActionAlias: null,
+    };
+  if (token.includes("rename_sheet"))
+    return {
+      operator: "RENAME_SHEET",
+      canonicalOperator: "XLSX_RENAME_SHEET",
+      strictActionAlias: null,
+    };
+  if (token.includes("add_sheet"))
+    return {
+      operator: "ADD_SHEET",
+      canonicalOperator: "XLSX_ADD_SHEET",
+      strictActionAlias: null,
+    };
+  if (
+    token.includes("compute") ||
+    token.includes("sort") ||
+    token.includes("filter") ||
+    token.includes("format") ||
+    token.includes("validation") ||
+    token.includes("freeze")
+  ) {
+    return {
+      operator: "COMPUTE_BUNDLE",
+      canonicalOperator: "XLSX_FORMAT_RANGE",
+      strictActionAlias: null,
+    };
   }
   if (token.startsWith("sheets_")) {
     // Most sheets.* operator IDs in databanks map to compute bundles.

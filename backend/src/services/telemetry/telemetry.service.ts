@@ -51,7 +51,10 @@ export class TelemetryService {
   private buffer: BufferedItem[] = [];
   private flushTimer?: NodeJS.Timeout;
 
-  constructor(private readonly prisma: PrismaClient, cfg: TelemetryServiceConfig) {
+  constructor(
+    private readonly prisma: PrismaClient,
+    cfg: TelemetryServiceConfig,
+  ) {
     this.cfg = {
       enabled: cfg.enabled,
       bufferWrites: cfg.bufferWrites ?? true,
@@ -81,11 +84,15 @@ export class TelemetryService {
     return this.write({ kind: "model", data: event });
   }
 
-  async logRetrieval(event: RetrievalEventCreate): Promise<TelemetryWriteResult> {
+  async logRetrieval(
+    event: RetrievalEventCreate,
+  ): Promise<TelemetryWriteResult> {
     return this.write({ kind: "retrieval", data: event });
   }
 
-  async logIngestion(event: IngestionEventCreate): Promise<TelemetryWriteResult> {
+  async logIngestion(
+    event: IngestionEventCreate,
+  ): Promise<TelemetryWriteResult> {
     return this.write({ kind: "ingestion", data: event });
   }
 
@@ -112,10 +119,18 @@ export class TelemetryService {
 
     // Best-effort createMany; each is isolated
     await Promise.all([
-      usage.length ? this.safeCreateMany("usageEvent", usage) : Promise.resolve(),
-      model.length ? this.safeCreateMany("modelCall", model) : Promise.resolve(),
-      retrieval.length ? this.safeCreateMany("retrievalEvent", retrieval) : Promise.resolve(),
-      ingestion.length ? this.safeCreateMany("ingestionEvent", ingestion) : Promise.resolve(),
+      usage.length
+        ? this.safeCreateMany("usageEvent", usage)
+        : Promise.resolve(),
+      model.length
+        ? this.safeCreateMany("modelCall", model)
+        : Promise.resolve(),
+      retrieval.length
+        ? this.safeCreateMany("retrievalEvent", retrieval)
+        : Promise.resolve(),
+      ingestion.length
+        ? this.safeCreateMany("ingestionEvent", ingestion)
+        : Promise.resolve(),
     ]);
   }
 

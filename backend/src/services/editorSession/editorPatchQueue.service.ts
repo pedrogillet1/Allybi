@@ -1,7 +1,7 @@
-import { Queue, Worker, type Job } from 'bullmq';
+import { Queue, Worker, type Job } from "bullmq";
 
-import { config } from '../../config/env';
-import type { EditorPatch } from './editorState.service';
+import { config } from "../../config/env";
+import type { EditorPatch } from "./editorState.service";
 
 export interface EditorPatchJobData {
   sessionId: string;
@@ -23,7 +23,7 @@ function buildConnection() {
         host: url.hostname,
         port: Number(url.port || 6379),
         password: url.password || undefined,
-        tls: url.protocol === 'rediss:' ? {} : undefined,
+        tls: url.protocol === "rediss:" ? {} : undefined,
         maxRetriesPerRequest: null,
       };
     } catch {
@@ -40,7 +40,9 @@ function buildConnection() {
 }
 
 const connection = buildConnection();
-const prefix = process.env.QUEUE_PREFIX || (process.env.NODE_ENV === 'production' ? '' : 'dev-');
+const prefix =
+  process.env.QUEUE_PREFIX ||
+  (process.env.NODE_ENV === "production" ? "" : "dev-");
 const queueName = `${prefix}editor-patch`;
 
 export class EditorPatchQueueService {
@@ -48,7 +50,7 @@ export class EditorPatchQueueService {
     connection,
     defaultJobOptions: {
       attempts: 3,
-      backoff: { type: 'exponential', delay: 1000 },
+      backoff: { type: "exponential", delay: 1000 },
       removeOnComplete: { count: 2000, age: 24 * 3600 },
       removeOnFail: { count: 500, age: 7 * 24 * 3600 },
     },
@@ -57,7 +59,7 @@ export class EditorPatchQueueService {
   private worker: Worker<EditorPatchJobData> | null = null;
 
   async enqueue(data: EditorPatchJobData): Promise<{ jobId: string }> {
-    const job = await this.queue.add('apply-editor-patch', data, {
+    const job = await this.queue.add("apply-editor-patch", data, {
       jobId: `editorPatch:${data.sessionId}:${data.patch.patchId}:${Date.now()}`,
     });
     return { jobId: job.id as string };
@@ -77,7 +79,12 @@ export class EditorPatchQueueService {
     this.worker = null;
   }
 
-  async getStats(): Promise<{ waiting: number; active: number; completed: number; failed: number }> {
+  async getStats(): Promise<{
+    waiting: number;
+    active: number;
+    completed: number;
+    failed: number;
+  }> {
     const [waiting, active, completed, failed] = await Promise.all([
       this.queue.getWaitingCount(),
       this.queue.getActiveCount(),
@@ -87,4 +94,3 @@ export class EditorPatchQueueService {
     return { waiting, active, completed, failed };
   }
 }
-

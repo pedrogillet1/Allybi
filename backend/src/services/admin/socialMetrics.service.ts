@@ -4,9 +4,9 @@
  * Provides follower counts, trends, and historical data
  */
 
-import type { PrismaClient } from '@prisma/client';
-import { supportsModel } from './_shared/prismaAdapter';
-import { config } from '../../config/env';
+import type { PrismaClient } from "@prisma/client";
+import { supportsModel } from "./_shared/prismaAdapter";
+import { config } from "../../config/env";
 
 // ============================================================================
 // Types
@@ -15,7 +15,7 @@ import { config } from '../../config/env';
 export interface SocialPresence {
   platform: string;
   followers: number;
-  trend: number;       // % change vs last period
+  trend: number; // % change vs last period
   lastUpdated: string;
 }
 
@@ -31,8 +31,14 @@ export interface SocialMetricsResult {
 }
 
 // Platform configuration
-const PLATFORMS = ['instagram', 'youtube', 'linkedin', 'twitter', 'tiktok'] as const;
-type Platform = typeof PLATFORMS[number];
+const PLATFORMS = [
+  "instagram",
+  "youtube",
+  "linkedin",
+  "twitter",
+  "tiktok",
+] as const;
+type Platform = (typeof PLATFORMS)[number];
 
 // ============================================================================
 // Main Functions
@@ -42,9 +48,9 @@ type Platform = typeof PLATFORMS[number];
  * Get current social metrics and historical data
  */
 export async function getSocialMetrics(
-  prisma: PrismaClient
+  prisma: PrismaClient,
 ): Promise<SocialMetricsResult> {
-  if (!supportsModel(prisma, 'socialSnapshot')) {
+  if (!supportsModel(prisma, "socialSnapshot")) {
     return { current: [], history: [] };
   }
 
@@ -53,10 +59,10 @@ export async function getSocialMetrics(
     PLATFORMS.map(async (platform) => {
       const latest = await prisma.socialSnapshot.findFirst({
         where: { platform },
-        orderBy: { capturedAt: 'desc' },
+        orderBy: { capturedAt: "desc" },
       });
       return { platform, snapshot: latest };
-    })
+    }),
   );
 
   // Get previous period snapshots for trend calculation (7 days ago)
@@ -68,21 +74,24 @@ export async function getSocialMetrics(
           platform,
           capturedAt: { lt: weekAgo },
         },
-        orderBy: { capturedAt: 'desc' },
+        orderBy: { capturedAt: "desc" },
       });
       return { platform, snapshot: previous };
-    })
+    }),
   );
 
   // Build current presence with trends
   const current: SocialPresence[] = latestSnapshots
     .filter(({ snapshot }) => snapshot !== null)
     .map(({ platform, snapshot }) => {
-      const prev = previousSnapshots.find(p => p.platform === platform)?.snapshot;
+      const prev = previousSnapshots.find(
+        (p) => p.platform === platform,
+      )?.snapshot;
       const prevFollowers = prev?.followers ?? snapshot!.followers;
-      const trend = prevFollowers > 0
-        ? ((snapshot!.followers - prevFollowers) / prevFollowers) * 100
-        : 0;
+      const trend =
+        prevFollowers > 0
+          ? ((snapshot!.followers - prevFollowers) / prevFollowers) * 100
+          : 0;
 
       return {
         platform,
@@ -98,7 +107,7 @@ export async function getSocialMetrics(
     where: {
       capturedAt: { gte: thirtyDaysAgo },
     },
-    orderBy: { capturedAt: 'asc' },
+    orderBy: { capturedAt: "asc" },
     select: {
       platform: true,
       followers: true,
@@ -106,8 +115,8 @@ export async function getSocialMetrics(
     },
   });
 
-  const history: SocialHistoryPoint[] = historyRaw.map(h => ({
-    date: h.capturedAt.toISOString().split('T')[0],
+  const history: SocialHistoryPoint[] = historyRaw.map((h) => ({
+    date: h.capturedAt.toISOString().split("T")[0],
     platform: h.platform,
     followers: h.followers,
   }));
@@ -126,9 +135,9 @@ export async function recordSocialSnapshot(
     followers: number;
     posts?: number;
     engagement?: number;
-  }
+  },
 ): Promise<void> {
-  if (!supportsModel(prisma, 'socialSnapshot')) {
+  if (!supportsModel(prisma, "socialSnapshot")) {
     return;
   }
 
@@ -153,14 +162,14 @@ export async function recordAllPlatformSnapshots(
     followers: number;
     posts?: number;
     engagement?: number;
-  }>
+  }>,
 ): Promise<void> {
-  if (!supportsModel(prisma, 'socialSnapshot')) {
+  if (!supportsModel(prisma, "socialSnapshot")) {
     return;
   }
 
   await prisma.socialSnapshot.createMany({
-    data: snapshots.map(s => ({
+    data: snapshots.map((s) => ({
       platform: s.platform,
       followers: s.followers,
       posts: s.posts ?? null,
@@ -178,18 +187,25 @@ export async function recordAllPlatformSnapshots(
  * Fetch Instagram followers via Facebook Graph API
  * Requires Instagram Business Account linked to Facebook Page
  */
-export async function fetchInstagramFollowers(accessToken: string, businessId: string): Promise<number | null> {
+export async function fetchInstagramFollowers(
+  accessToken: string,
+  businessId: string,
+): Promise<number | null> {
   try {
     const url = `https://graph.facebook.com/v18.0/${businessId}?fields=followers_count&access_token=${accessToken}`;
     const res = await fetch(url);
     if (!res.ok) {
-      console.warn('[SocialMetrics] Instagram API error:', res.status, await res.text());
+      console.warn(
+        "[SocialMetrics] Instagram API error:",
+        res.status,
+        await res.text(),
+      );
       return null;
     }
     const data = await res.json();
     return data.followers_count ?? null;
   } catch (err) {
-    console.error('[SocialMetrics] Instagram fetch error:', err);
+    console.error("[SocialMetrics] Instagram fetch error:", err);
     return null;
   }
 }
@@ -197,19 +213,26 @@ export async function fetchInstagramFollowers(accessToken: string, businessId: s
 /**
  * Fetch YouTube subscribers via YouTube Data API v3
  */
-export async function fetchYouTubeSubscribers(apiKey: string, channelId: string): Promise<number | null> {
+export async function fetchYouTubeSubscribers(
+  apiKey: string,
+  channelId: string,
+): Promise<number | null> {
   try {
     const url = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${apiKey}`;
     const res = await fetch(url);
     if (!res.ok) {
-      console.warn('[SocialMetrics] YouTube API error:', res.status, await res.text());
+      console.warn(
+        "[SocialMetrics] YouTube API error:",
+        res.status,
+        await res.text(),
+      );
       return null;
     }
     const data = await res.json();
     const count = data.items?.[0]?.statistics?.subscriberCount;
     return count ? parseInt(count, 10) : null;
   } catch (err) {
-    console.error('[SocialMetrics] YouTube fetch error:', err);
+    console.error("[SocialMetrics] YouTube fetch error:", err);
     return null;
   }
 }
@@ -217,18 +240,25 @@ export async function fetchYouTubeSubscribers(apiKey: string, channelId: string)
 /**
  * Fetch Facebook page followers via Graph API
  */
-export async function fetchFacebookFollowers(accessToken: string, pageId: string): Promise<number | null> {
+export async function fetchFacebookFollowers(
+  accessToken: string,
+  pageId: string,
+): Promise<number | null> {
   try {
     const url = `https://graph.facebook.com/v18.0/${pageId}?fields=followers_count,fan_count&access_token=${accessToken}`;
     const res = await fetch(url);
     if (!res.ok) {
-      console.warn('[SocialMetrics] Facebook API error:', res.status, await res.text());
+      console.warn(
+        "[SocialMetrics] Facebook API error:",
+        res.status,
+        await res.text(),
+      );
       return null;
     }
     const data = await res.json();
     return data.followers_count ?? data.fan_count ?? null;
   } catch (err) {
-    console.error('[SocialMetrics] Facebook fetch error:', err);
+    console.error("[SocialMetrics] Facebook fetch error:", err);
     return null;
   }
 }
@@ -237,21 +267,28 @@ export async function fetchFacebookFollowers(accessToken: string, pageId: string
  * Fetch LinkedIn followers
  * Requires LinkedIn Marketing API
  */
-export async function fetchLinkedInFollowers(accessToken: string, organizationId: string): Promise<number | null> {
+export async function fetchLinkedInFollowers(
+  accessToken: string,
+  organizationId: string,
+): Promise<number | null> {
   try {
     // LinkedIn requires Organization API access
     const url = `https://api.linkedin.com/v2/networkSizes/${organizationId}?edgeType=CompanyFollowedByMember`;
     const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` }
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
     if (!res.ok) {
-      console.warn('[SocialMetrics] LinkedIn API error:', res.status, await res.text());
+      console.warn(
+        "[SocialMetrics] LinkedIn API error:",
+        res.status,
+        await res.text(),
+      );
       return null;
     }
     const data = await res.json();
     return data.firstDegreeSize ?? null;
   } catch (err) {
-    console.error('[SocialMetrics] LinkedIn fetch error:', err);
+    console.error("[SocialMetrics] LinkedIn fetch error:", err);
     return null;
   }
 }
@@ -259,20 +296,27 @@ export async function fetchLinkedInFollowers(accessToken: string, organizationId
 /**
  * Fetch Twitter/X followers via X API v2
  */
-export async function fetchTwitterFollowers(bearerToken: string, userId: string): Promise<number | null> {
+export async function fetchTwitterFollowers(
+  bearerToken: string,
+  userId: string,
+): Promise<number | null> {
   try {
     const url = `https://api.twitter.com/2/users/${userId}?user.fields=public_metrics`;
     const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${bearerToken}` }
+      headers: { Authorization: `Bearer ${bearerToken}` },
     });
     if (!res.ok) {
-      console.warn('[SocialMetrics] Twitter API error:', res.status, await res.text());
+      console.warn(
+        "[SocialMetrics] Twitter API error:",
+        res.status,
+        await res.text(),
+      );
       return null;
     }
     const data = await res.json();
     return data.data?.public_metrics?.followers_count ?? null;
   } catch (err) {
-    console.error('[SocialMetrics] Twitter fetch error:', err);
+    console.error("[SocialMetrics] Twitter fetch error:", err);
     return null;
   }
 }
@@ -280,19 +324,28 @@ export async function fetchTwitterFollowers(bearerToken: string, userId: string)
 /**
  * Fetch TikTok followers via TikTok Display API
  */
-export async function fetchTikTokFollowers(accessToken: string): Promise<number | null> {
+export async function fetchTikTokFollowers(
+  accessToken: string,
+): Promise<number | null> {
   try {
-    const res = await fetch('https://open.tiktokapis.com/v2/user/info/?fields=follower_count', {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
+    const res = await fetch(
+      "https://open.tiktokapis.com/v2/user/info/?fields=follower_count",
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
     if (!res.ok) {
-      console.warn('[SocialMetrics] TikTok API error:', res.status, await res.text());
+      console.warn(
+        "[SocialMetrics] TikTok API error:",
+        res.status,
+        await res.text(),
+      );
       return null;
     }
     const data = await res.json();
     return data.data?.user?.follower_count ?? null;
   } catch (err) {
-    console.error('[SocialMetrics] TikTok fetch error:', err);
+    console.error("[SocialMetrics] TikTok fetch error:", err);
     return null;
   }
 }
@@ -306,10 +359,13 @@ export async function fetchTikTokFollowers(accessToken: string): Promise<number 
  */
 export function getConfiguredPlatforms(): string[] {
   const configured: string[] = [];
-  if (config.INSTAGRAM_ACCESS_TOKEN && config.INSTAGRAM_BUSINESS_ID) configured.push('instagram');
-  if (config.FACEBOOK_ACCESS_TOKEN && config.FACEBOOK_PAGE_ID) configured.push('facebook');
-  if (config.YOUTUBE_API_KEY && config.YOUTUBE_CHANNEL_ID) configured.push('youtube');
-  if (config.TIKTOK_ACCESS_TOKEN) configured.push('tiktok');
+  if (config.INSTAGRAM_ACCESS_TOKEN && config.INSTAGRAM_BUSINESS_ID)
+    configured.push("instagram");
+  if (config.FACEBOOK_ACCESS_TOKEN && config.FACEBOOK_PAGE_ID)
+    configured.push("facebook");
+  if (config.YOUTUBE_API_KEY && config.YOUTUBE_CHANNEL_ID)
+    configured.push("youtube");
+  if (config.TIKTOK_ACCESS_TOKEN) configured.push("tiktok");
   return configured;
 }
 
@@ -317,7 +373,7 @@ export function getConfiguredPlatforms(): string[] {
  * Get all supported platforms (for UI to show configured vs not)
  */
 export function getAllPlatforms(): string[] {
-  return ['instagram', 'facebook', 'youtube', 'tiktok', 'twitter', 'linkedin'];
+  return ["instagram", "facebook", "youtube", "tiktok", "twitter", "linkedin"];
 }
 
 // Track last refresh time
@@ -340,30 +396,30 @@ export function setLastRefreshTime(time: Date): void {
  * Called by scheduler every 5 minutes
  */
 export async function refreshAllSocialMetrics(
-  prisma: PrismaClient
+  prisma: PrismaClient,
 ): Promise<{ success: string[]; failed: string[] }> {
   const success: string[] = [];
   const failed: string[] = [];
 
   const configuredPlatforms = getConfiguredPlatforms();
   if (configuredPlatforms.length === 0) {
-    console.log('[SocialMetrics] No platforms configured, skipping refresh');
+    console.log("[SocialMetrics] No platforms configured, skipping refresh");
     return { success, failed };
   }
 
-  console.log('[SocialMetrics] Refreshing:', configuredPlatforms.join(', '));
+  console.log("[SocialMetrics] Refreshing:", configuredPlatforms.join(", "));
 
   // Instagram
   if (config.INSTAGRAM_ACCESS_TOKEN && config.INSTAGRAM_BUSINESS_ID) {
     const followers = await fetchInstagramFollowers(
       config.INSTAGRAM_ACCESS_TOKEN,
-      config.INSTAGRAM_BUSINESS_ID
+      config.INSTAGRAM_BUSINESS_ID,
     );
     if (followers !== null) {
-      await recordSocialSnapshot(prisma, { platform: 'instagram', followers });
-      success.push('instagram');
+      await recordSocialSnapshot(prisma, { platform: "instagram", followers });
+      success.push("instagram");
     } else {
-      failed.push('instagram');
+      failed.push("instagram");
     }
   }
 
@@ -371,13 +427,16 @@ export async function refreshAllSocialMetrics(
   if (config.FACEBOOK_ACCESS_TOKEN && config.FACEBOOK_PAGE_ID) {
     const followers = await fetchFacebookFollowers(
       config.FACEBOOK_ACCESS_TOKEN,
-      config.FACEBOOK_PAGE_ID
+      config.FACEBOOK_PAGE_ID,
     );
     if (followers !== null) {
-      await recordSocialSnapshot(prisma, { platform: 'facebook' as Platform, followers });
-      success.push('facebook');
+      await recordSocialSnapshot(prisma, {
+        platform: "facebook" as Platform,
+        followers,
+      });
+      success.push("facebook");
     } else {
-      failed.push('facebook');
+      failed.push("facebook");
     }
   }
 
@@ -385,13 +444,13 @@ export async function refreshAllSocialMetrics(
   if (config.YOUTUBE_API_KEY && config.YOUTUBE_CHANNEL_ID) {
     const followers = await fetchYouTubeSubscribers(
       config.YOUTUBE_API_KEY,
-      config.YOUTUBE_CHANNEL_ID
+      config.YOUTUBE_CHANNEL_ID,
     );
     if (followers !== null) {
-      await recordSocialSnapshot(prisma, { platform: 'youtube', followers });
-      success.push('youtube');
+      await recordSocialSnapshot(prisma, { platform: "youtube", followers });
+      success.push("youtube");
     } else {
-      failed.push('youtube');
+      failed.push("youtube");
     }
   }
 
@@ -399,15 +458,20 @@ export async function refreshAllSocialMetrics(
   if (config.TIKTOK_ACCESS_TOKEN) {
     const followers = await fetchTikTokFollowers(config.TIKTOK_ACCESS_TOKEN);
     if (followers !== null) {
-      await recordSocialSnapshot(prisma, { platform: 'tiktok', followers });
-      success.push('tiktok');
+      await recordSocialSnapshot(prisma, { platform: "tiktok", followers });
+      success.push("tiktok");
     } else {
-      failed.push('tiktok');
+      failed.push("tiktok");
     }
   }
 
   setLastRefreshTime(new Date());
-  console.log('[SocialMetrics] Refresh complete. Success:', success.join(', ') || 'none', '| Failed:', failed.join(', ') || 'none');
+  console.log(
+    "[SocialMetrics] Refresh complete. Success:",
+    success.join(", ") || "none",
+    "| Failed:",
+    failed.join(", ") || "none",
+  );
 
   return { success, failed };
 }
@@ -424,7 +488,7 @@ export async function refreshAllSocialMetricsWithCredentials(
     linkedin?: { accessToken: string; organizationId: string };
     twitter?: { bearerToken: string; userId: string };
     tiktok?: { accessToken: string };
-  }
+  },
 ): Promise<{ success: string[]; failed: string[] }> {
   const success: string[] = [];
   const failed: string[] = [];
@@ -433,13 +497,13 @@ export async function refreshAllSocialMetricsWithCredentials(
   if (credentials.instagram) {
     const followers = await fetchInstagramFollowers(
       credentials.instagram.accessToken,
-      credentials.instagram.businessId
+      credentials.instagram.businessId,
     );
     if (followers !== null) {
-      await recordSocialSnapshot(prisma, { platform: 'instagram', followers });
-      success.push('instagram');
+      await recordSocialSnapshot(prisma, { platform: "instagram", followers });
+      success.push("instagram");
     } else {
-      failed.push('instagram');
+      failed.push("instagram");
     }
   }
 
@@ -447,13 +511,16 @@ export async function refreshAllSocialMetricsWithCredentials(
   if (credentials.facebook) {
     const followers = await fetchFacebookFollowers(
       credentials.facebook.accessToken,
-      credentials.facebook.pageId
+      credentials.facebook.pageId,
     );
     if (followers !== null) {
-      await recordSocialSnapshot(prisma, { platform: 'facebook' as Platform, followers });
-      success.push('facebook');
+      await recordSocialSnapshot(prisma, {
+        platform: "facebook" as Platform,
+        followers,
+      });
+      success.push("facebook");
     } else {
-      failed.push('facebook');
+      failed.push("facebook");
     }
   }
 
@@ -461,13 +528,13 @@ export async function refreshAllSocialMetricsWithCredentials(
   if (credentials.youtube) {
     const followers = await fetchYouTubeSubscribers(
       credentials.youtube.apiKey,
-      credentials.youtube.channelId
+      credentials.youtube.channelId,
     );
     if (followers !== null) {
-      await recordSocialSnapshot(prisma, { platform: 'youtube', followers });
-      success.push('youtube');
+      await recordSocialSnapshot(prisma, { platform: "youtube", followers });
+      success.push("youtube");
     } else {
-      failed.push('youtube');
+      failed.push("youtube");
     }
   }
 
@@ -475,13 +542,13 @@ export async function refreshAllSocialMetricsWithCredentials(
   if (credentials.linkedin) {
     const followers = await fetchLinkedInFollowers(
       credentials.linkedin.accessToken,
-      credentials.linkedin.organizationId
+      credentials.linkedin.organizationId,
     );
     if (followers !== null) {
-      await recordSocialSnapshot(prisma, { platform: 'linkedin', followers });
-      success.push('linkedin');
+      await recordSocialSnapshot(prisma, { platform: "linkedin", followers });
+      success.push("linkedin");
     } else {
-      failed.push('linkedin');
+      failed.push("linkedin");
     }
   }
 
@@ -489,24 +556,26 @@ export async function refreshAllSocialMetricsWithCredentials(
   if (credentials.twitter) {
     const followers = await fetchTwitterFollowers(
       credentials.twitter.bearerToken,
-      credentials.twitter.userId
+      credentials.twitter.userId,
     );
     if (followers !== null) {
-      await recordSocialSnapshot(prisma, { platform: 'twitter', followers });
-      success.push('twitter');
+      await recordSocialSnapshot(prisma, { platform: "twitter", followers });
+      success.push("twitter");
     } else {
-      failed.push('twitter');
+      failed.push("twitter");
     }
   }
 
   // TikTok
   if (credentials.tiktok) {
-    const followers = await fetchTikTokFollowers(credentials.tiktok.accessToken);
+    const followers = await fetchTikTokFollowers(
+      credentials.tiktok.accessToken,
+    );
     if (followers !== null) {
-      await recordSocialSnapshot(prisma, { platform: 'tiktok', followers });
-      success.push('tiktok');
+      await recordSocialSnapshot(prisma, { platform: "tiktok", followers });
+      success.push("tiktok");
     } else {
-      failed.push('tiktok');
+      failed.push("tiktok");
     }
   }
 

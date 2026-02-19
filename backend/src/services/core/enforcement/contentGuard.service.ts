@@ -19,13 +19,13 @@
  *   (B) Document Object Signal: document, file, presentation, deck, report, slides
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
-export type LanguageCode = 'en' | 'pt' | 'es';
+export type LanguageCode = "en" | "pt" | "es";
 
 // Bank file paths
-const BANK_BASE = path.join(__dirname, '../../data_banks');
+const BANK_BASE = path.join(__dirname, "../../data_banks");
 
 interface ContentGuardBank {
   _meta: {
@@ -85,8 +85,8 @@ let bankLoadStatus = {
  */
 function foldDiacritics(str: string): string {
   return str
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
 }
 
@@ -94,7 +94,7 @@ function foldDiacritics(str: string): string {
  * Escape special regex characters for literal matching
  */
 function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 /**
@@ -107,10 +107,10 @@ function patternToRegex(pattern: string): RegExp {
   const hasRegexSyntax = /[.+*?^${}()|[\]\\]/.test(pattern);
 
   if (hasRegexSyntax) {
-    return new RegExp(pattern, 'i');
+    return new RegExp(pattern, "i");
   } else {
     const escaped = escapeRegex(pattern);
-    return new RegExp(escaped, 'i');
+    return new RegExp(escaped, "i");
   }
 }
 
@@ -124,7 +124,7 @@ function loadBankPatterns(bankPath: string): RegExp[] {
       return [];
     }
 
-    const bankData = JSON.parse(fs.readFileSync(bankPath, 'utf-8'));
+    const bankData = JSON.parse(fs.readFileSync(bankPath, "utf-8"));
     const patterns: RegExp[] = [];
 
     if (bankData.families) {
@@ -135,7 +135,9 @@ function loadBankPatterns(bankPath: string): RegExp[] {
             try {
               patterns.push(patternToRegex(pattern));
             } catch (e) {
-              console.warn(`[ContentGuard] Invalid pattern in ${bankPath}: ${pattern}`);
+              console.warn(
+                `[ContentGuard] Invalid pattern in ${bankPath}: ${pattern}`,
+              );
             }
           }
         }
@@ -154,27 +156,43 @@ function loadBankPatterns(bankPath: string): RegExp[] {
  */
 function initializePatterns(): void {
   if (contentPatternsEN === null) {
-    contentPatternsEN = loadBankPatterns(path.join(BANK_BASE, 'triggers/content_guard.en.json'));
+    contentPatternsEN = loadBankPatterns(
+      path.join(BANK_BASE, "triggers/content_guard.en.json"),
+    );
     bankLoadStatus.enContentLoaded = contentPatternsEN.length;
-    console.log(`[ContentGuard] Loaded ${contentPatternsEN.length} EN content patterns`);
+    console.log(
+      `[ContentGuard] Loaded ${contentPatternsEN.length} EN content patterns`,
+    );
   }
 
   if (contentPatternsPT === null) {
-    contentPatternsPT = loadBankPatterns(path.join(BANK_BASE, 'triggers/content_guard.pt.json'));
+    contentPatternsPT = loadBankPatterns(
+      path.join(BANK_BASE, "triggers/content_guard.pt.json"),
+    );
     bankLoadStatus.ptContentLoaded = contentPatternsPT.length;
-    console.log(`[ContentGuard] Loaded ${contentPatternsPT.length} PT content patterns`);
+    console.log(
+      `[ContentGuard] Loaded ${contentPatternsPT.length} PT content patterns`,
+    );
   }
 
   if (negativePatternsEN === null) {
-    negativePatternsEN = loadBankPatterns(path.join(BANK_BASE, 'negatives/not_content_guard.en.json'));
+    negativePatternsEN = loadBankPatterns(
+      path.join(BANK_BASE, "negatives/not_content_guard.en.json"),
+    );
     bankLoadStatus.enNegativeLoaded = negativePatternsEN.length;
-    console.log(`[ContentGuard] Loaded ${negativePatternsEN.length} EN negative patterns`);
+    console.log(
+      `[ContentGuard] Loaded ${negativePatternsEN.length} EN negative patterns`,
+    );
   }
 
   if (negativePatternsPT === null) {
-    negativePatternsPT = loadBankPatterns(path.join(BANK_BASE, 'negatives/not_content_guard.pt.json'));
+    negativePatternsPT = loadBankPatterns(
+      path.join(BANK_BASE, "negatives/not_content_guard.pt.json"),
+    );
     bankLoadStatus.ptNegativeLoaded = negativePatternsPT.length;
-    console.log(`[ContentGuard] Loaded ${negativePatternsPT.length} PT negative patterns`);
+    console.log(
+      `[ContentGuard] Loaded ${negativePatternsPT.length} PT negative patterns`,
+    );
   }
 }
 
@@ -184,138 +202,648 @@ function initializePatterns(): void {
 
 // Content intent signals - verbs and nouns that indicate asking ABOUT content
 const CONTENT_VERBS_EN = new Set([
-  'summarize', 'summarise', 'explain', 'describe', 'cover', 'discuss', 'mention',
-  'define', 'argue', 'claim', 'state', 'conclude', 'analyze', 'analyse', 'compare',
-  'contrast', 'extract', 'outline', 'detail', 'elaborate', 'clarify', 'interpret',
-  'review', 'recap', 'highlight', 'identify', 'address', 'talk about', 'go over',
-  'break down', 'walk through', 'point out', 'bring up', 'touch on', 'delve into'
+  "summarize",
+  "summarise",
+  "explain",
+  "describe",
+  "cover",
+  "discuss",
+  "mention",
+  "define",
+  "argue",
+  "claim",
+  "state",
+  "conclude",
+  "analyze",
+  "analyse",
+  "compare",
+  "contrast",
+  "extract",
+  "outline",
+  "detail",
+  "elaborate",
+  "clarify",
+  "interpret",
+  "review",
+  "recap",
+  "highlight",
+  "identify",
+  "address",
+  "talk about",
+  "go over",
+  "break down",
+  "walk through",
+  "point out",
+  "bring up",
+  "touch on",
+  "delve into",
 ]);
 
 const CONTENT_VERBS_PT = new Set([
-  'resumir', 'resuma', 'resumir', 'explicar', 'explique', 'descrever', 'descreva',
-  'cobrir', 'cobre', 'discutir', 'discute', 'mencionar', 'menciona', 'definir',
-  'defina', 'argumentar', 'argumenta', 'afirmar', 'afirma', 'concluir', 'conclui',
-  'analisar', 'analise', 'comparar', 'compare', 'extrair', 'extraia', 'detalhar',
-  'detalhe', 'elaborar', 'elabore', 'clarificar', 'clarifique', 'interpretar',
-  'interprete', 'revisar', 'revise', 'destacar', 'destaque', 'identificar',
-  'identifique', 'abordar', 'aborda', 'falar sobre', 'tratar de', 'dizer sobre'
+  "resumir",
+  "resuma",
+  "resumir",
+  "explicar",
+  "explique",
+  "descrever",
+  "descreva",
+  "cobrir",
+  "cobre",
+  "discutir",
+  "discute",
+  "mencionar",
+  "menciona",
+  "definir",
+  "defina",
+  "argumentar",
+  "argumenta",
+  "afirmar",
+  "afirma",
+  "concluir",
+  "conclui",
+  "analisar",
+  "analise",
+  "comparar",
+  "compare",
+  "extrair",
+  "extraia",
+  "detalhar",
+  "detalhe",
+  "elaborar",
+  "elabore",
+  "clarificar",
+  "clarifique",
+  "interpretar",
+  "interprete",
+  "revisar",
+  "revise",
+  "destacar",
+  "destaque",
+  "identificar",
+  "identifique",
+  "abordar",
+  "aborda",
+  "falar sobre",
+  "tratar de",
+  "dizer sobre",
 ]);
 
 const CONTENT_NOUNS_EN = new Set([
-  'topics', 'topic', 'themes', 'theme', 'points', 'point', 'takeaways', 'takeaway',
-  'findings', 'finding', 'conclusions', 'conclusion', 'arguments', 'argument',
-  'claims', 'claim', 'thesis', 'summary', 'overview', 'gist', 'essence', 'meaning',
-  'insights', 'insight', 'highlights', 'highlight', 'key points', 'main points',
-  'key takeaways', 'main takeaways', 'key findings', 'main findings', 'ideas', 'idea',
-  'concepts', 'concept', 'sections', 'section', 'chapters', 'chapter', 'analysis',
-  'content', 'message', 'messages', 'information', 'data', 'details', 'differences',
+  "topics",
+  "topic",
+  "themes",
+  "theme",
+  "points",
+  "point",
+  "takeaways",
+  "takeaway",
+  "findings",
+  "finding",
+  "conclusions",
+  "conclusion",
+  "arguments",
+  "argument",
+  "claims",
+  "claim",
+  "thesis",
+  "summary",
+  "overview",
+  "gist",
+  "essence",
+  "meaning",
+  "insights",
+  "insight",
+  "highlights",
+  "highlight",
+  "key points",
+  "main points",
+  "key takeaways",
+  "main takeaways",
+  "key findings",
+  "main findings",
+  "ideas",
+  "idea",
+  "concepts",
+  "concept",
+  "sections",
+  "section",
+  "chapters",
+  "chapter",
+  "analysis",
+  "content",
+  "message",
+  "messages",
+  "information",
+  "data",
+  "details",
+  "differences",
   // Domain-specific content nouns - FINANCE
-  'expense', 'expenses', 'revenue', 'revenues', 'categories', 'category',
-  'amount', 'amounts', 'profit', 'profits', 'loss', 'losses', 'margin', 'margins',
-  'budget', 'budgets', 'forecast', 'forecasts', 'ebitda', 'income', 'cost', 'costs',
-  'cash flow', 'balance', 'liabilities', 'assets', 'equity', 'roi', 'npv', 'irr',
+  "expense",
+  "expenses",
+  "revenue",
+  "revenues",
+  "categories",
+  "category",
+  "amount",
+  "amounts",
+  "profit",
+  "profits",
+  "loss",
+  "losses",
+  "margin",
+  "margins",
+  "budget",
+  "budgets",
+  "forecast",
+  "forecasts",
+  "ebitda",
+  "income",
+  "cost",
+  "costs",
+  "cash flow",
+  "balance",
+  "liabilities",
+  "assets",
+  "equity",
+  "roi",
+  "npv",
+  "irr",
   // Domain-specific content nouns - LEGAL
-  'clause', 'clauses', 'liability', 'termination', 'penalty', 'penalties',
-  'indemnity', 'warranty', 'warranties', 'obligation', 'obligations', 'provision', 'provisions',
-  'terms', 'conditions', 'force majeure', 'compliance', 'regulation', 'regulations',
+  "clause",
+  "clauses",
+  "liability",
+  "termination",
+  "penalty",
+  "penalties",
+  "indemnity",
+  "warranty",
+  "warranties",
+  "obligation",
+  "obligations",
+  "provision",
+  "provisions",
+  "terms",
+  "conditions",
+  "force majeure",
+  "compliance",
+  "regulation",
+  "regulations",
   // Domain-specific content nouns - MEDICAL
-  'diagnosis', 'diagnoses', 'treatment', 'treatments', 'symptom', 'symptoms',
-  'medication', 'medications', 'prescription', 'prescriptions', 'dosage', 'dosages',
+  "diagnosis",
+  "diagnoses",
+  "treatment",
+  "treatments",
+  "symptom",
+  "symptoms",
+  "medication",
+  "medications",
+  "prescription",
+  "prescriptions",
+  "dosage",
+  "dosages",
   // Domain-specific content nouns - PROJECT
-  'stakeholder', 'stakeholders', 'requirement', 'requirements', 'milestone', 'milestones',
-  'risk', 'risks', 'deliverable', 'deliverables', 'timeline', 'scope', 'sprint', 'sprints'
+  "stakeholder",
+  "stakeholders",
+  "requirement",
+  "requirements",
+  "milestone",
+  "milestones",
+  "risk",
+  "risks",
+  "deliverable",
+  "deliverables",
+  "timeline",
+  "scope",
+  "sprint",
+  "sprints",
 ]);
 
 const CONTENT_NOUNS_PT = new Set([
-  'tópicos', 'tópico', 'temas', 'tema', 'pontos', 'ponto', 'conclusões', 'conclusão',
-  'argumentos', 'argumento', 'afirmações', 'afirmação', 'tese', 'resumo', 'síntese',
-  'visão geral', 'essência', 'significado', 'insights', 'insight', 'destaques',
-  'destaque', 'pontos principais', 'pontos chave', 'pontos-chave', 'achados',
-  'achado', 'descobertas', 'descoberta', 'ideias', 'ideia', 'conceitos', 'conceito',
-  'seções', 'seção', 'capítulos', 'capítulo', 'análise', 'conteúdo', 'mensagens',
-  'mensagem', 'informações', 'informação', 'dados', 'detalhes', 'diferenças',
+  "tópicos",
+  "tópico",
+  "temas",
+  "tema",
+  "pontos",
+  "ponto",
+  "conclusões",
+  "conclusão",
+  "argumentos",
+  "argumento",
+  "afirmações",
+  "afirmação",
+  "tese",
+  "resumo",
+  "síntese",
+  "visão geral",
+  "essência",
+  "significado",
+  "insights",
+  "insight",
+  "destaques",
+  "destaque",
+  "pontos principais",
+  "pontos chave",
+  "pontos-chave",
+  "achados",
+  "achado",
+  "descobertas",
+  "descoberta",
+  "ideias",
+  "ideia",
+  "conceitos",
+  "conceito",
+  "seções",
+  "seção",
+  "capítulos",
+  "capítulo",
+  "análise",
+  "conteúdo",
+  "mensagens",
+  "mensagem",
+  "informações",
+  "informação",
+  "dados",
+  "detalhes",
+  "diferenças",
   // Domain-specific content nouns - FINANCE
-  'despesa', 'despesas', 'receita', 'receitas', 'categorias', 'categoria',
-  'valor', 'valores', 'lucro', 'lucros', 'prejuízo', 'prejuízos', 'margem', 'margens',
-  'orçamento', 'orçamentos', 'previsão', 'previsões', 'ebitda', 'renda', 'custo', 'custos',
-  'fluxo de caixa', 'balanço', 'passivo', 'passivos', 'ativo', 'ativos', 'patrimônio',
+  "despesa",
+  "despesas",
+  "receita",
+  "receitas",
+  "categorias",
+  "categoria",
+  "valor",
+  "valores",
+  "lucro",
+  "lucros",
+  "prejuízo",
+  "prejuízos",
+  "margem",
+  "margens",
+  "orçamento",
+  "orçamentos",
+  "previsão",
+  "previsões",
+  "ebitda",
+  "renda",
+  "custo",
+  "custos",
+  "fluxo de caixa",
+  "balanço",
+  "passivo",
+  "passivos",
+  "ativo",
+  "ativos",
+  "patrimônio",
   // Domain-specific content nouns - LEGAL
-  'cláusula', 'cláusulas', 'responsabilidade', 'rescisão', 'penalidade', 'penalidades',
-  'indenização', 'garantia', 'garantias', 'obrigação', 'obrigações', 'disposição', 'disposições',
-  'termos', 'condições', 'força maior', 'conformidade', 'regulamento', 'regulamentos',
+  "cláusula",
+  "cláusulas",
+  "responsabilidade",
+  "rescisão",
+  "penalidade",
+  "penalidades",
+  "indenização",
+  "garantia",
+  "garantias",
+  "obrigação",
+  "obrigações",
+  "disposição",
+  "disposições",
+  "termos",
+  "condições",
+  "força maior",
+  "conformidade",
+  "regulamento",
+  "regulamentos",
   // Domain-specific content nouns - MEDICAL
-  'diagnóstico', 'diagnósticos', 'tratamento', 'tratamentos', 'sintoma', 'sintomas',
-  'medicação', 'medicações', 'prescrição', 'prescrições', 'dosagem', 'dosagens',
+  "diagnóstico",
+  "diagnósticos",
+  "tratamento",
+  "tratamentos",
+  "sintoma",
+  "sintomas",
+  "medicação",
+  "medicações",
+  "prescrição",
+  "prescrições",
+  "dosagem",
+  "dosagens",
   // Domain-specific content nouns - PROJECT
-  'stakeholder', 'stakeholders', 'requisito', 'requisitos', 'marco', 'marcos',
-  'risco', 'riscos', 'entregável', 'entregáveis', 'cronograma', 'escopo', 'sprint', 'sprints'
+  "stakeholder",
+  "stakeholders",
+  "requisito",
+  "requisitos",
+  "marco",
+  "marcos",
+  "risco",
+  "riscos",
+  "entregável",
+  "entregáveis",
+  "cronograma",
+  "escopo",
+  "sprint",
+  "sprints",
 ]);
 
 // Anchor nouns - indicate asking about specific parts of document (content question)
 const ANCHOR_NOUNS_EN = new Set([
-  'page', 'pages', 'slide', 'slides', 'tab', 'tabs', 'sheet', 'sheets',
-  'cell', 'cells', 'section', 'sections', 'chapter', 'chapters', 'paragraph',
-  'paragraphs', 'row', 'rows', 'column', 'columns', 'table', 'tables',
-  'figure', 'figures', 'chart', 'charts', 'graph', 'graphs', 'appendix'
+  "page",
+  "pages",
+  "slide",
+  "slides",
+  "tab",
+  "tabs",
+  "sheet",
+  "sheets",
+  "cell",
+  "cells",
+  "section",
+  "sections",
+  "chapter",
+  "chapters",
+  "paragraph",
+  "paragraphs",
+  "row",
+  "rows",
+  "column",
+  "columns",
+  "table",
+  "tables",
+  "figure",
+  "figures",
+  "chart",
+  "charts",
+  "graph",
+  "graphs",
+  "appendix",
 ]);
 
 const ANCHOR_NOUNS_PT = new Set([
-  'página', 'páginas', 'slide', 'slides', 'aba', 'abas', 'planilha', 'planilhas',
-  'célula', 'células', 'seção', 'seções', 'capítulo', 'capítulos', 'parágrafo',
-  'parágrafos', 'linha', 'linhas', 'coluna', 'colunas', 'tabela', 'tabelas',
-  'figura', 'figuras', 'gráfico', 'gráficos', 'apêndice'
+  "página",
+  "páginas",
+  "slide",
+  "slides",
+  "aba",
+  "abas",
+  "planilha",
+  "planilhas",
+  "célula",
+  "células",
+  "seção",
+  "seções",
+  "capítulo",
+  "capítulos",
+  "parágrafo",
+  "parágrafos",
+  "linha",
+  "linhas",
+  "coluna",
+  "colunas",
+  "tabela",
+  "tabelas",
+  "figura",
+  "figuras",
+  "gráfico",
+  "gráficos",
+  "apêndice",
 ]);
 
 // Document object nouns - the "what" being asked about
 const DOCUMENT_OBJECTS_EN = new Set([
-  'document', 'documents', 'file', 'files', 'pdf', 'pdfs', 'presentation',
-  'presentations', 'spreadsheet', 'spreadsheets', 'report', 'reports',
-  'contract', 'contracts', 'paper', 'papers', 'article', 'articles',
-  'deck', 'decks', 'slides', 'slide', 'workbook', 'workbooks', 'memo',
-  'memos', 'letter', 'letters', 'proposal', 'proposals', 'agreement',
-  'agreements', 'invoice', 'invoices', 'statement', 'statements'
+  "document",
+  "documents",
+  "file",
+  "files",
+  "pdf",
+  "pdfs",
+  "presentation",
+  "presentations",
+  "spreadsheet",
+  "spreadsheets",
+  "report",
+  "reports",
+  "contract",
+  "contracts",
+  "paper",
+  "papers",
+  "article",
+  "articles",
+  "deck",
+  "decks",
+  "slides",
+  "slide",
+  "workbook",
+  "workbooks",
+  "memo",
+  "memos",
+  "letter",
+  "letters",
+  "proposal",
+  "proposals",
+  "agreement",
+  "agreements",
+  "invoice",
+  "invoices",
+  "statement",
+  "statements",
 ]);
 
 const DOCUMENT_OBJECTS_PT = new Set([
-  'documento', 'documentos', 'arquivo', 'arquivos', 'pdf', 'pdfs',
-  'apresentação', 'apresentações', 'planilha', 'planilhas', 'relatório',
-  'relatórios', 'contrato', 'contratos', 'artigo', 'artigos', 'proposta',
-  'propostas', 'acordo', 'acordos', 'fatura', 'faturas', 'extrato', 'extratos'
+  "documento",
+  "documentos",
+  "arquivo",
+  "arquivos",
+  "pdf",
+  "pdfs",
+  "apresentação",
+  "apresentações",
+  "planilha",
+  "planilhas",
+  "relatório",
+  "relatórios",
+  "contrato",
+  "contratos",
+  "artigo",
+  "artigos",
+  "proposta",
+  "propostas",
+  "acordo",
+  "acordos",
+  "fatura",
+  "faturas",
+  "extrato",
+  "extratos",
 ]);
 
 // File action signals - verbs that indicate file navigation/management
 const FILE_ACTION_VERBS_EN = new Set([
-  'open', 'show', 'list', 'display', 'view', 'preview', 'filter', 'sort',
-  'group', 'find', 'locate', 'search', 'look for', 'move', 'delete', 'rename',
-  'copy', 'download', 'upload', 'share', 'archive', 'remove', 'create',
-  'navigate', 'go to', 'back to', 'pull up', 'bring up', 'give me', 'get'
+  "open",
+  "show",
+  "list",
+  "display",
+  "view",
+  "preview",
+  "filter",
+  "sort",
+  "group",
+  "find",
+  "locate",
+  "search",
+  "look for",
+  "move",
+  "delete",
+  "rename",
+  "copy",
+  "download",
+  "upload",
+  "share",
+  "archive",
+  "remove",
+  "create",
+  "navigate",
+  "go to",
+  "back to",
+  "pull up",
+  "bring up",
+  "give me",
+  "get",
 ]);
 
 const FILE_ACTION_VERBS_PT = new Set([
-  'abrir', 'abra', 'mostrar', 'mostre', 'listar', 'liste', 'exibir', 'exiba',
-  'ver', 'veja', 'visualizar', 'visualize', 'filtrar', 'filtre', 'ordenar',
-  'ordene', 'agrupar', 'agrupe', 'encontrar', 'encontre', 'localizar', 'localize',
-  'procurar', 'procure', 'buscar', 'busque', 'mover', 'mova', 'deletar', 'delete',
-  'apagar', 'apague', 'renomear', 'renomeie', 'copiar', 'copie', 'baixar', 'baixe',
-  'enviar', 'envie', 'compartilhar', 'compartilhe', 'arquivar', 'arquive',
-  'remover', 'remova', 'criar', 'crie', 'navegar', 'navegue', 'ir para', 'vá para',
-  'voltar', 'puxar', 'puxe', 'trazer', 'traga', 'me dê', 'dê-me'
+  "abrir",
+  "abra",
+  "mostrar",
+  "mostre",
+  "listar",
+  "liste",
+  "exibir",
+  "exiba",
+  "ver",
+  "veja",
+  "visualizar",
+  "visualize",
+  "filtrar",
+  "filtre",
+  "ordenar",
+  "ordene",
+  "agrupar",
+  "agrupe",
+  "encontrar",
+  "encontre",
+  "localizar",
+  "localize",
+  "procurar",
+  "procure",
+  "buscar",
+  "busque",
+  "mover",
+  "mova",
+  "deletar",
+  "delete",
+  "apagar",
+  "apague",
+  "renomear",
+  "renomeie",
+  "copiar",
+  "copie",
+  "baixar",
+  "baixe",
+  "enviar",
+  "envie",
+  "compartilhar",
+  "compartilhe",
+  "arquivar",
+  "arquive",
+  "remover",
+  "remova",
+  "criar",
+  "crie",
+  "navegar",
+  "navegue",
+  "ir para",
+  "vá para",
+  "voltar",
+  "puxar",
+  "puxe",
+  "trazer",
+  "traga",
+  "me dê",
+  "dê-me",
 ]);
 
 // File/folder nouns - the "what" for file actions
 const FILE_NOUNS_EN = new Set([
-  'files', 'file', 'documents', 'document', 'pdfs', 'pdf', 'folder', 'folders',
-  'directory', 'directories', 'spreadsheets', 'spreadsheet', 'presentations',
-  'presentation', 'images', 'image', 'photos', 'photo', 'pictures', 'picture',
-  'uploads', 'upload', 'downloads', 'download', 'attachments', 'attachment',
-  'excel', 'word', 'powerpoint', 'pptx', 'xlsx', 'docx', 'csv', 'txt', 'png', 'jpg'
+  "files",
+  "file",
+  "documents",
+  "document",
+  "pdfs",
+  "pdf",
+  "folder",
+  "folders",
+  "directory",
+  "directories",
+  "spreadsheets",
+  "spreadsheet",
+  "presentations",
+  "presentation",
+  "images",
+  "image",
+  "photos",
+  "photo",
+  "pictures",
+  "picture",
+  "uploads",
+  "upload",
+  "downloads",
+  "download",
+  "attachments",
+  "attachment",
+  "excel",
+  "word",
+  "powerpoint",
+  "pptx",
+  "xlsx",
+  "docx",
+  "csv",
+  "txt",
+  "png",
+  "jpg",
 ]);
 
 const FILE_NOUNS_PT = new Set([
-  'arquivos', 'arquivo', 'documentos', 'documento', 'pdfs', 'pdf', 'pasta', 'pastas',
-  'diretório', 'diretórios', 'planilhas', 'planilha', 'apresentações', 'apresentação',
-  'imagens', 'imagem', 'fotos', 'foto', 'uploads', 'upload', 'downloads', 'download',
-  'anexos', 'anexo', 'excel', 'word', 'powerpoint', 'pptx', 'xlsx', 'docx', 'csv', 'txt'
+  "arquivos",
+  "arquivo",
+  "documentos",
+  "documento",
+  "pdfs",
+  "pdf",
+  "pasta",
+  "pastas",
+  "diretório",
+  "diretórios",
+  "planilhas",
+  "planilha",
+  "apresentações",
+  "apresentação",
+  "imagens",
+  "imagem",
+  "fotos",
+  "foto",
+  "uploads",
+  "upload",
+  "downloads",
+  "download",
+  "anexos",
+  "anexo",
+  "excel",
+  "word",
+  "powerpoint",
+  "pptx",
+  "xlsx",
+  "docx",
+  "csv",
+  "txt",
 ]);
 
 // Strong content frames - these are definitive content questions
@@ -455,16 +983,20 @@ function detectLanguage(query: string): LanguageCode {
   const q = query.toLowerCase();
 
   // PT indicators
-  if (/\b(quais?|qual|são|está|onde|você|voce|meus?|minha|documentos?|arquivos?|resuma|explique|analise|tópicos?|páginas?|planilhas?)\b/i.test(q)) {
-    return 'pt';
+  if (
+    /\b(quais?|qual|são|está|onde|você|voce|meus?|minha|documentos?|arquivos?|resuma|explique|analise|tópicos?|páginas?|planilhas?)\b/i.test(
+      q,
+    )
+  ) {
+    return "pt";
   }
 
   // ES indicators (minimal support)
   if (/\b(qué|cuál|cuáles|dónde|cómo|archivos?|presenta|explica)\b/i.test(q)) {
-    return 'es';
+    return "es";
   }
 
-  return 'en';
+  return "en";
 }
 
 /**
@@ -494,8 +1026,13 @@ function countSignals(
   verbs: Set<string>,
   nouns: Set<string>,
   anchors: Set<string>,
-  docObjects: Set<string>
-): { verbCount: number; nounCount: number; anchorCount: number; docObjCount: number } {
+  docObjects: Set<string>,
+): {
+  verbCount: number;
+  nounCount: number;
+  anchorCount: number;
+  docObjCount: number;
+} {
   const normalized = text.toLowerCase();
   const folded = foldDiacritics(text);
 
@@ -535,50 +1072,88 @@ function countSignals(
  * Two-signal fallback classification
  * Returns: 'content' | 'file_action' | 'unknown'
  */
-function twoSignalFallback(query: string, lang: LanguageCode): 'content' | 'file_action' | 'unknown' {
+function twoSignalFallback(
+  query: string,
+  lang: LanguageCode,
+): "content" | "file_action" | "unknown" {
   const normalized = query.toLowerCase().trim();
   const folded = foldDiacritics(query).trim();
 
   // Check strong content frames first
-  const contentFrames = lang === 'pt'
-    ? [...STRONG_CONTENT_FRAMES_PT, ...STRONG_CONTENT_FRAMES_EN]
-    : STRONG_CONTENT_FRAMES_EN;
+  const contentFrames =
+    lang === "pt"
+      ? [...STRONG_CONTENT_FRAMES_PT, ...STRONG_CONTENT_FRAMES_EN]
+      : STRONG_CONTENT_FRAMES_EN;
 
   for (const frame of contentFrames) {
     if (frame.test(normalized) || frame.test(folded)) {
-      return 'content';
+      return "content";
     }
   }
 
   // Check strong file action frames
-  const fileFrames = lang === 'pt'
-    ? [...STRONG_FILE_ACTION_FRAMES_PT, ...STRONG_FILE_ACTION_FRAMES_EN]
-    : STRONG_FILE_ACTION_FRAMES_EN;
+  const fileFrames =
+    lang === "pt"
+      ? [...STRONG_FILE_ACTION_FRAMES_PT, ...STRONG_FILE_ACTION_FRAMES_EN]
+      : STRONG_FILE_ACTION_FRAMES_EN;
 
   for (const frame of fileFrames) {
     if (frame.test(normalized) || frame.test(folded)) {
-      return 'file_action';
+      return "file_action";
     }
   }
 
   // Two-signal scoring
-  const contentVerbs = lang === 'pt' ? new Set([...CONTENT_VERBS_EN, ...CONTENT_VERBS_PT]) : CONTENT_VERBS_EN;
-  const contentNouns = lang === 'pt' ? new Set([...CONTENT_NOUNS_EN, ...CONTENT_NOUNS_PT]) : CONTENT_NOUNS_EN;
-  const anchorNouns = lang === 'pt' ? new Set([...ANCHOR_NOUNS_EN, ...ANCHOR_NOUNS_PT]) : ANCHOR_NOUNS_EN;
-  const docObjects = lang === 'pt' ? new Set([...DOCUMENT_OBJECTS_EN, ...DOCUMENT_OBJECTS_PT]) : DOCUMENT_OBJECTS_EN;
+  const contentVerbs =
+    lang === "pt"
+      ? new Set([...CONTENT_VERBS_EN, ...CONTENT_VERBS_PT])
+      : CONTENT_VERBS_EN;
+  const contentNouns =
+    lang === "pt"
+      ? new Set([...CONTENT_NOUNS_EN, ...CONTENT_NOUNS_PT])
+      : CONTENT_NOUNS_EN;
+  const anchorNouns =
+    lang === "pt"
+      ? new Set([...ANCHOR_NOUNS_EN, ...ANCHOR_NOUNS_PT])
+      : ANCHOR_NOUNS_EN;
+  const docObjects =
+    lang === "pt"
+      ? new Set([...DOCUMENT_OBJECTS_EN, ...DOCUMENT_OBJECTS_PT])
+      : DOCUMENT_OBJECTS_EN;
 
-  const fileVerbs = lang === 'pt' ? new Set([...FILE_ACTION_VERBS_EN, ...FILE_ACTION_VERBS_PT]) : FILE_ACTION_VERBS_EN;
-  const fileNouns = lang === 'pt' ? new Set([...FILE_NOUNS_EN, ...FILE_NOUNS_PT]) : FILE_NOUNS_EN;
+  const fileVerbs =
+    lang === "pt"
+      ? new Set([...FILE_ACTION_VERBS_EN, ...FILE_ACTION_VERBS_PT])
+      : FILE_ACTION_VERBS_EN;
+  const fileNouns =
+    lang === "pt"
+      ? new Set([...FILE_NOUNS_EN, ...FILE_NOUNS_PT])
+      : FILE_NOUNS_EN;
 
-  const contentSignals = countSignals(query, contentVerbs, contentNouns, anchorNouns, docObjects);
-  const fileSignals = countSignals(query, fileVerbs, fileNouns, new Set(), new Set());
+  const contentSignals = countSignals(
+    query,
+    contentVerbs,
+    contentNouns,
+    anchorNouns,
+    docObjects,
+  );
+  const fileSignals = countSignals(
+    query,
+    fileVerbs,
+    fileNouns,
+    new Set(),
+    new Set(),
+  );
 
   // Content: verb/noun + (doc object OR anchor OR strong content noun)
-  const hasContentIntent = contentSignals.verbCount > 0 || contentSignals.nounCount > 0;
-  const hasContentObject = contentSignals.docObjCount > 0 || contentSignals.anchorCount > 0;
+  const hasContentIntent =
+    contentSignals.verbCount > 0 || contentSignals.nounCount > 0;
+  const hasContentObject =
+    contentSignals.docObjCount > 0 || contentSignals.anchorCount > 0;
   // NEW: Domain-specific content nouns (expense, revenue, clause, etc.) are strong enough alone
   const hasStrongContentNoun = contentSignals.nounCount >= 2; // Multiple content nouns = strong content signal
-  const isContentQuestion = hasContentIntent && (hasContentObject || hasStrongContentNoun);
+  const isContentQuestion =
+    hasContentIntent && (hasContentObject || hasStrongContentNoun);
 
   // File action: file verb + file noun
   const hasFileIntent = fileSignals.verbCount > 0;
@@ -588,22 +1163,23 @@ function twoSignalFallback(query: string, lang: LanguageCode): 'content' | 'file
   // Tie-breaker rules
   if (isContentQuestion && isFileAction) {
     // If starts with file action verb, check for content signals
-    const startsWithFileVerb = /^(show|list|open|filter|sort|group|display|find|locate|mostre|liste|abra|filtre|ordene|agrupe|exiba|encontre|localize)\b/i;
+    const startsWithFileVerb =
+      /^(show|list|open|filter|sort|group|display|find|locate|mostre|liste|abra|filtre|ordene|agrupe|exiba|encontre|localize)\b/i;
     if (startsWithFileVerb.test(normalized)) {
       // If has anchor noun OR strong content nouns, it's content
       if (contentSignals.anchorCount > 0 || contentSignals.nounCount >= 2) {
-        return 'content';
+        return "content";
       }
-      return 'file_action';
+      return "file_action";
     }
     // Otherwise content wins
-    return 'content';
+    return "content";
   }
 
-  if (isContentQuestion) return 'content';
-  if (isFileAction) return 'file_action';
+  if (isContentQuestion) return "content";
+  if (isFileAction) return "file_action";
 
-  return 'unknown';
+  return "unknown";
 }
 
 /**
@@ -628,7 +1204,10 @@ function matchesPatterns(query: string, patterns: RegExp[]): boolean {
  * @param language - Language code (en, pt, es) - auto-detected if not provided
  * @returns true if this is a content question, false if it's a file action or unknown
  */
-export function isContentQuestion(query: string, language?: LanguageCode): boolean {
+export function isContentQuestion(
+  query: string,
+  language?: LanguageCode,
+): boolean {
   const q = query.toLowerCase().trim();
   if (!q || q.length < 3) return false;
 
@@ -637,18 +1216,20 @@ export function isContentQuestion(query: string, language?: LanguageCode): boole
   const lang = language || detectLanguage(q);
 
   // First check negatives - if negative matches, NOT a content question
-  const negativePatterns = lang === 'pt'
-    ? [...(negativePatternsPT || []), ...(negativePatternsEN || [])]
-    : (negativePatternsEN || []);
+  const negativePatterns =
+    lang === "pt"
+      ? [...(negativePatternsPT || []), ...(negativePatternsEN || [])]
+      : negativePatternsEN || [];
 
   if (matchesPatterns(query, negativePatterns)) {
     return false;
   }
 
   // Check content patterns from banks
-  const contentPatterns = lang === 'pt'
-    ? [...(contentPatternsPT || []), ...(contentPatternsEN || [])]
-    : (contentPatternsEN || []);
+  const contentPatterns =
+    lang === "pt"
+      ? [...(contentPatternsPT || []), ...(contentPatternsEN || [])]
+      : contentPatternsEN || [];
 
   if (matchesPatterns(query, contentPatterns)) {
     return true;
@@ -656,13 +1237,16 @@ export function isContentQuestion(query: string, language?: LanguageCode): boole
 
   // Two-signal fallback
   const fallbackResult = twoSignalFallback(query, lang);
-  return fallbackResult === 'content';
+  return fallbackResult === "content";
 }
 
 /**
  * Check if a query is explicitly a file action (navigation/listing)
  */
-export function isFileActionQuery(query: string, language?: LanguageCode): boolean {
+export function isFileActionQuery(
+  query: string,
+  language?: LanguageCode,
+): boolean {
   const q = query.toLowerCase().trim();
   if (!q || q.length < 3) return false;
 
@@ -676,9 +1260,10 @@ export function isFileActionQuery(query: string, language?: LanguageCode): boole
   const lang = language || detectLanguage(q);
 
   // Check negative patterns (which are file action indicators)
-  const negativePatterns = lang === 'pt'
-    ? [...(negativePatternsPT || []), ...(negativePatternsEN || [])]
-    : (negativePatternsEN || []);
+  const negativePatterns =
+    lang === "pt"
+      ? [...(negativePatternsPT || []), ...(negativePatternsEN || [])]
+      : negativePatternsEN || [];
 
   if (matchesPatterns(query, negativePatterns)) {
     return true;
@@ -686,7 +1271,7 @@ export function isFileActionQuery(query: string, language?: LanguageCode): boole
 
   // Two-signal fallback
   const fallbackResult = twoSignalFallback(query, lang);
-  return fallbackResult === 'file_action';
+  return fallbackResult === "file_action";
 }
 
 /**
@@ -697,8 +1282,8 @@ export interface ContentGuardResult {
   isFileAction: boolean;
   matchedPattern: string | null;
   matchedFamily: string | null;
-  confidence: 'high' | 'medium' | 'low';
-  recommendation: 'use_rag' | 'allow_file_action' | 'unknown';
+  confidence: "high" | "medium" | "low";
+  recommendation: "use_rag" | "allow_file_action" | "unknown";
   language: LanguageCode;
   debug?: {
     bankPatternsChecked: number;
@@ -706,7 +1291,10 @@ export interface ContentGuardResult {
   };
 }
 
-export function classifyQuery(query: string, language?: LanguageCode): ContentGuardResult {
+export function classifyQuery(
+  query: string,
+  language?: LanguageCode,
+): ContentGuardResult {
   const q = query.toLowerCase().trim();
   const lang = language || detectLanguage(q);
   const folded = foldDiacritics(q);
@@ -714,9 +1302,10 @@ export function classifyQuery(query: string, language?: LanguageCode): ContentGu
   initializePatterns();
 
   // Check negatives first (file actions)
-  const negativePatterns = lang === 'pt'
-    ? [...(negativePatternsPT || []), ...(negativePatternsEN || [])]
-    : (negativePatternsEN || []);
+  const negativePatterns =
+    lang === "pt"
+      ? [...(negativePatternsPT || []), ...(negativePatternsEN || [])]
+      : negativePatternsEN || [];
 
   for (let i = 0; i < negativePatterns.length; i++) {
     if (negativePatterns[i].test(q) || negativePatterns[i].test(folded)) {
@@ -725,18 +1314,22 @@ export function classifyQuery(query: string, language?: LanguageCode): ContentGu
         isFileAction: true,
         matchedPattern: negativePatterns[i].source.substring(0, 50),
         matchedFamily: `NG-${Math.floor(i / 40) + 1}`,
-        confidence: 'high',
-        recommendation: 'allow_file_action',
+        confidence: "high",
+        recommendation: "allow_file_action",
         language: lang,
-        debug: { bankPatternsChecked: negativePatterns.length, fallbackUsed: false },
+        debug: {
+          bankPatternsChecked: negativePatterns.length,
+          fallbackUsed: false,
+        },
       };
     }
   }
 
   // Check content patterns
-  const contentPatterns = lang === 'pt'
-    ? [...(contentPatternsPT || []), ...(contentPatternsEN || [])]
-    : (contentPatternsEN || []);
+  const contentPatterns =
+    lang === "pt"
+      ? [...(contentPatternsPT || []), ...(contentPatternsEN || [])]
+      : contentPatternsEN || [];
 
   for (let i = 0; i < contentPatterns.length; i++) {
     if (contentPatterns[i].test(q) || contentPatterns[i].test(folded)) {
@@ -745,10 +1338,13 @@ export function classifyQuery(query: string, language?: LanguageCode): ContentGu
         isFileAction: false,
         matchedPattern: contentPatterns[i].source.substring(0, 50),
         matchedFamily: `CG-${Math.floor(i / 80) + 1}`,
-        confidence: 'high',
-        recommendation: 'use_rag',
+        confidence: "high",
+        recommendation: "use_rag",
         language: lang,
-        debug: { bankPatternsChecked: contentPatterns.length, fallbackUsed: false },
+        debug: {
+          bankPatternsChecked: contentPatterns.length,
+          fallbackUsed: false,
+        },
       };
     }
   }
@@ -756,29 +1352,35 @@ export function classifyQuery(query: string, language?: LanguageCode): ContentGu
   // Two-signal fallback
   const fallbackResult = twoSignalFallback(query, lang);
 
-  if (fallbackResult === 'content') {
+  if (fallbackResult === "content") {
     return {
       isContentQuestion: true,
       isFileAction: false,
-      matchedPattern: 'two-signal-fallback',
-      matchedFamily: 'FALLBACK',
-      confidence: 'medium',
-      recommendation: 'use_rag',
+      matchedPattern: "two-signal-fallback",
+      matchedFamily: "FALLBACK",
+      confidence: "medium",
+      recommendation: "use_rag",
       language: lang,
-      debug: { bankPatternsChecked: contentPatterns.length + negativePatterns.length, fallbackUsed: true },
+      debug: {
+        bankPatternsChecked: contentPatterns.length + negativePatterns.length,
+        fallbackUsed: true,
+      },
     };
   }
 
-  if (fallbackResult === 'file_action') {
+  if (fallbackResult === "file_action") {
     return {
       isContentQuestion: false,
       isFileAction: true,
-      matchedPattern: 'two-signal-fallback',
-      matchedFamily: 'FALLBACK',
-      confidence: 'medium',
-      recommendation: 'allow_file_action',
+      matchedPattern: "two-signal-fallback",
+      matchedFamily: "FALLBACK",
+      confidence: "medium",
+      recommendation: "allow_file_action",
       language: lang,
-      debug: { bankPatternsChecked: contentPatterns.length + negativePatterns.length, fallbackUsed: true },
+      debug: {
+        bankPatternsChecked: contentPatterns.length + negativePatterns.length,
+        fallbackUsed: true,
+      },
     };
   }
 
@@ -788,10 +1390,13 @@ export function classifyQuery(query: string, language?: LanguageCode): ContentGu
     isFileAction: false,
     matchedPattern: null,
     matchedFamily: null,
-    confidence: 'low',
-    recommendation: 'unknown',
+    confidence: "low",
+    recommendation: "unknown",
     language: lang,
-    debug: { bankPatternsChecked: contentPatterns.length + negativePatterns.length, fallbackUsed: true },
+    debug: {
+      bankPatternsChecked: contentPatterns.length + negativePatterns.length,
+      fallbackUsed: true,
+    },
   };
 }
 
@@ -828,8 +1433,10 @@ export function getBankStats(): {
     ptContent: contentPatternsPT?.length || 0,
     enNegative: negativePatternsEN?.length || 0,
     ptNegative: negativePatternsPT?.length || 0,
-    fallbackContent: STRONG_CONTENT_FRAMES_EN.length + STRONG_CONTENT_FRAMES_PT.length,
-    fallbackFileAction: STRONG_FILE_ACTION_FRAMES_EN.length + STRONG_FILE_ACTION_FRAMES_PT.length,
+    fallbackContent:
+      STRONG_CONTENT_FRAMES_EN.length + STRONG_CONTENT_FRAMES_PT.length,
+    fallbackFileAction:
+      STRONG_FILE_ACTION_FRAMES_EN.length + STRONG_FILE_ACTION_FRAMES_PT.length,
   };
 }
 

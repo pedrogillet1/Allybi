@@ -1,4 +1,7 @@
-import type { StreamSink, LLMStreamingConfig } from "./llm/types/llmStreaming.types";
+import type {
+  StreamSink,
+  LLMStreamingConfig,
+} from "./llm/types/llmStreaming.types";
 
 export type ChatRole = "user" | "assistant" | "system";
 
@@ -83,8 +86,20 @@ export interface ChatResult {
   assistantText: string;
   attachmentsPayload?: unknown;
   assistantTelemetry?: Record<string, unknown>;
-  sources?: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }>;
-  listing?: Array<{ kind: "file" | "folder"; id: string; title: string; mimeType?: string; itemCount?: number; depth?: number }>;
+  sources?: Array<{
+    documentId: string;
+    filename: string;
+    mimeType: string | null;
+    page: number | null;
+  }>;
+  listing?: Array<{
+    kind: "file" | "folder";
+    id: string;
+    title: string;
+    mimeType?: string;
+    itemCount?: number;
+    depth?: number;
+  }>;
   breadcrumb?: Array<{ id: string; name: string }>;
   answerMode?: AnswerMode;
   answerClass?: AnswerClass;
@@ -103,7 +118,11 @@ export interface ChatEngine {
     traceId: string;
     userId: string;
     conversationId: string;
-    messages: Array<{ role: ChatRole; content: string; attachments?: unknown | null }>;
+    messages: Array<{
+      role: ChatRole;
+      content: string;
+      attachments?: unknown | null;
+    }>;
     context?: Record<string, unknown>;
     meta?: Record<string, unknown>;
   }): Promise<{
@@ -116,7 +135,11 @@ export interface ChatEngine {
     traceId: string;
     userId: string;
     conversationId: string;
-    messages: Array<{ role: ChatRole; content: string; attachments?: unknown | null }>;
+    messages: Array<{
+      role: ChatRole;
+      content: string;
+      attachments?: unknown | null;
+    }>;
     context?: Record<string, unknown>;
     meta?: Record<string, unknown>;
     sink: StreamSink;
@@ -139,18 +162,40 @@ export class ConversationNotFoundError extends Error {
 
 export interface PrismaChatServicePort {
   chat(req: ChatRequest): Promise<ChatResult>;
-  streamChat(params: { req: ChatRequest; sink: StreamSink; streamingConfig: LLMStreamingConfig }): Promise<ChatResult>;
-  createConversation(params: { userId: string; title?: string }): Promise<ConversationDTO>;
-  listConversations(userId: string, opts?: ConversationListOptions): Promise<ConversationDTO[]>;
-  getConversation(userId: string, conversationId: string): Promise<ConversationDTO | null>;
+  streamChat(params: {
+    req: ChatRequest;
+    sink: StreamSink;
+    streamingConfig: LLMStreamingConfig;
+  }): Promise<ChatResult>;
+  createConversation(params: {
+    userId: string;
+    title?: string;
+  }): Promise<ConversationDTO>;
+  listConversations(
+    userId: string,
+    opts?: ConversationListOptions,
+  ): Promise<ConversationDTO[]>;
+  getConversation(
+    userId: string,
+    conversationId: string,
+  ): Promise<ConversationDTO | null>;
   getConversationWithMessages(
     userId: string,
     conversationId: string,
     opts?: ConversationMessagesOptions,
   ): Promise<ConversationWithMessagesDTO | null>;
-  updateTitle(userId: string, conversationId: string, title: string): Promise<ConversationDTO | null>;
-  deleteConversation(userId: string, conversationId: string): Promise<{ ok: boolean }>;
-  deleteAllConversations(userId: string): Promise<{ ok: boolean; deleted: number }>;
+  updateTitle(
+    userId: string,
+    conversationId: string,
+    title: string,
+  ): Promise<ConversationDTO | null>;
+  deleteConversation(
+    userId: string,
+    conversationId: string,
+  ): Promise<{ ok: boolean }>;
+  deleteAllConversations(
+    userId: string,
+  ): Promise<{ ok: boolean; deleted: number }>;
   listMessages(
     userId: string,
     conversationId: string,

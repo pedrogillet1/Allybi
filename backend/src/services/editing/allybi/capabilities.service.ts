@@ -1,11 +1,21 @@
 import type { EditDomain } from "../editing.types";
 import { loadAllybiBanks } from "./loadBanks";
 
-function filetypeFromMime(mime: string): "docx" | "xlsx" | "pptx" | "pdf" | "image" | "unknown" {
+function filetypeFromMime(
+  mime: string,
+): "docx" | "xlsx" | "pptx" | "pdf" | "image" | "unknown" {
   const low = String(mime || "").toLowerCase();
-  if (low === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") return "docx";
-  if (low === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") return "xlsx";
-  if (low.includes("presentationml") || low === "application/vnd.ms-powerpoint") return "pptx";
+  if (
+    low ===
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  )
+    return "docx";
+  if (
+    low === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  )
+    return "xlsx";
+  if (low.includes("presentationml") || low === "application/vnd.ms-powerpoint")
+    return "pptx";
   if (low === "application/pdf") return "pdf";
   if (low.startsWith("image/")) return "image";
   return "unknown";
@@ -46,7 +56,10 @@ export function buildDocumentCapabilities(input: {
 }): DocumentCapabilities {
   const banks = loadAllybiBanks();
   const capsBank = banks.capabilities || {};
-  const allOps = capsBank.operators && typeof capsBank.operators === "object" ? capsBank.operators : {};
+  const allOps =
+    capsBank.operators && typeof capsBank.operators === "object"
+      ? capsBank.operators
+      : {};
 
   const filetype = filetypeFromMime(input.mimeType);
   const domain = domainFromFiletype(filetype);
@@ -60,11 +73,17 @@ export function buildDocumentCapabilities(input: {
     const isSupported = Boolean(info?.supported);
     if (isSupported) {
       supportedCanonical.push(opId);
-      if (typeof info?.runtimeOperator === "string" && info.runtimeOperator.trim()) {
+      if (
+        typeof info?.runtimeOperator === "string" &&
+        info.runtimeOperator.trim()
+      ) {
         runtimeOps.add(info.runtimeOperator.trim());
       }
     } else {
-      unsupported.push({ operator: opId, reason: String(info?.reason || "unsupported") });
+      unsupported.push({
+        operator: opId,
+        reason: String(info?.reason || "unsupported"),
+      });
     }
   }
 
@@ -73,7 +92,9 @@ export function buildDocumentCapabilities(input: {
     filename: input.filename,
     mimeType: input.mimeType,
     filetype,
-    saveMode: String(process.env.KODA_EDITING_SAVE_MODE || "overwrite").trim().toLowerCase(),
+    saveMode: String(process.env.KODA_EDITING_SAVE_MODE || "overwrite")
+      .trim()
+      .toLowerCase(),
     supports: {
       docx: domain === "docx",
       sheets: domain === "sheets",
@@ -88,8 +109,9 @@ export function buildDocumentCapabilities(input: {
     alwaysConfirmOperators: Array.isArray(capsBank.alwaysConfirmOperators)
       ? capsBank.alwaysConfirmOperators.map((x: any) => String(x))
       : [],
-    viewerModeRules: capsBank.viewerModeRules && typeof capsBank.viewerModeRules === "object"
-      ? capsBank.viewerModeRules
-      : {},
+    viewerModeRules:
+      capsBank.viewerModeRules && typeof capsBank.viewerModeRules === "object"
+        ? capsBank.viewerModeRules
+        : {},
   };
 }

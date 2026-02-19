@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { verifyAccessToken } from '../utils/jwt';
-import prisma from '../config/database';
+import { Request, Response, NextFunction } from "express";
+import { verifyAccessToken } from "../utils/jwt";
+import prisma from "../config/database";
 
 /**
  * Extended Request type with authenticated user
@@ -28,21 +28,21 @@ export interface AuthRequest extends Request {
 export const authenticateToken = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
 
     // Accept tokens from Authorization header (preferred) or HTTP-only cookie (Safari fallback)
     let token: string | undefined;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
+    if (authHeader && authHeader.startsWith("Bearer ")) {
       token = authHeader.substring(7);
     } else if ((req as any).cookies?.koda_at) {
       token = (req as any).cookies.koda_at;
     }
 
     if (!token) {
-      res.status(401).json({ error: 'No token provided' });
+      res.status(401).json({ error: "No token provided" });
       return;
     }
 
@@ -72,13 +72,13 @@ export const authenticateToken = async (
         session.expiresAt < new Date() ||
         (payload.sv !== undefined && session.tokenVersion !== payload.sv)
       ) {
-        res.status(401).json({ error: 'Session revoked or expired' });
+        res.status(401).json({ error: "Session revoked or expired" });
         return;
       }
 
       // Sanity: ensure the session belongs to the JWT user
       if (session.userId !== payload.userId) {
-        res.status(401).json({ error: 'Invalid token' });
+        res.status(401).json({ error: "Invalid token" });
         return;
       }
     }
@@ -94,7 +94,7 @@ export const authenticateToken = async (
     });
 
     if (!user) {
-      res.status(401).json({ error: 'User not found' });
+      res.status(401).json({ error: "User not found" });
       return;
     }
 
@@ -102,7 +102,7 @@ export const authenticateToken = async (
     req.user = user;
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Invalid or expired token' });
+    res.status(401).json({ error: "Invalid or expired token" });
   }
 };
 
@@ -116,13 +116,15 @@ export const requireAuth = authenticateToken;
 export const optionalAuth = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
 
     // Accept from Authorization header or cookie
-    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
+    const bearerToken = authHeader?.startsWith("Bearer ")
+      ? authHeader.substring(7)
+      : null;
     const cookieToken = (req as any).cookies?.koda_at || null;
     const token = bearerToken || cookieToken;
 
@@ -133,7 +135,13 @@ export const optionalAuth = async (
       if (payload.sid) {
         const session = await prisma.session.findUnique({
           where: { id: payload.sid },
-          select: { isActive: true, expiresAt: true, tokenVersion: true, revokedAt: true, userId: true },
+          select: {
+            isActive: true,
+            expiresAt: true,
+            tokenVersion: true,
+            revokedAt: true,
+            userId: true,
+          },
         });
 
         if (

@@ -3,11 +3,15 @@
  * File/document analytics and details
  */
 
-import type { PrismaClient } from '@prisma/client';
-import { parseRange, formatWindow, normalizeRange } from './_shared/rangeWindow';
-import { clampLimit } from './_shared/clamp';
-import { processPage, buildCursorClause } from './_shared/pagination';
-import { supportsModel } from './_shared/prismaAdapter';
+import type { PrismaClient } from "@prisma/client";
+import {
+  parseRange,
+  formatWindow,
+  normalizeRange,
+} from "./_shared/rangeWindow";
+import { clampLimit } from "./_shared/clamp";
+import { processPage, buildCursorClause } from "./_shared/pagination";
+import { supportsModel } from "./_shared/prismaAdapter";
 
 export interface FileRow {
   documentId: string;
@@ -56,9 +60,9 @@ export interface FileDetailResult {
  */
 export async function listFiles(
   prisma: PrismaClient,
-  params: { range?: string; limit?: number; cursor?: string }
+  params: { range?: string; limit?: number; cursor?: string },
 ): Promise<FileListResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
   const limit = clampLimit(params.limit, 50);
   const cursorClause = buildCursorClause(params.cursor);
@@ -66,18 +70,23 @@ export async function listFiles(
   const { from, to } = window;
 
   // Get aggregate counts for KPIs (all time, not filtered by range)
-  const [totalCount, readyCount, failedCount, processingCount] = await Promise.all([
-    prisma.document.count(),
-    prisma.document.count({ where: { status: { in: ['ready', 'available', 'indexed'] } } }),
-    prisma.document.count({ where: { status: 'failed' } }),
-    prisma.document.count({ where: { status: { in: ['uploaded', 'enriching'] } } }),
-  ]);
+  const [totalCount, readyCount, failedCount, processingCount] =
+    await Promise.all([
+      prisma.document.count(),
+      prisma.document.count({
+        where: { status: { in: ["ready", "available", "indexed"] } },
+      }),
+      prisma.document.count({ where: { status: "failed" } }),
+      prisma.document.count({
+        where: { status: { in: ["uploaded", "enriching"] } },
+      }),
+    ]);
 
   // Get documents with pagination (all documents, not filtered by range)
   const documents = await prisma.document.findMany({
     take: limit + 1,
     ...cursorClause,
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
     select: {
       id: true,
       filename: true,
@@ -90,12 +99,20 @@ export async function listFiles(
   });
 
   const { page, nextCursor } = processPage(documents, limit);
-  const docIds = page.map(d => d.id);
+  const docIds = page.map((d) => d.id);
 
   // Get ingestion events for these documents
-  let ingestionMap = new Map<string, { statusOk: boolean; statusFail: boolean; extractionMethod: string | null; durationMs: number | null }>();
+  let ingestionMap = new Map<
+    string,
+    {
+      statusOk: boolean;
+      statusFail: boolean;
+      extractionMethod: string | null;
+      durationMs: number | null;
+    }
+  >();
 
-  if (supportsModel(prisma, 'ingestionEvent') && docIds.length > 0) {
+  if (supportsModel(prisma, "ingestionEvent") && docIds.length > 0) {
     const events = await prisma.ingestionEvent.findMany({
       where: { documentId: { in: docIds } },
       select: {
@@ -104,15 +121,15 @@ export async function listFiles(
         extractionMethod: true,
         durationMs: true,
       },
-      orderBy: { at: 'desc' },
+      orderBy: { at: "desc" },
     });
 
     // Get latest event per document
     for (const e of events) {
       if (e.documentId && !ingestionMap.has(e.documentId)) {
         ingestionMap.set(e.documentId, {
-          statusOk: e.status === 'ok',
-          statusFail: e.status === 'fail',
+          statusOk: e.status === "ok",
+          statusFail: e.status === "fail",
           extractionMethod: e.extractionMethod,
           durationMs: e.durationMs,
         });
@@ -121,7 +138,7 @@ export async function listFiles(
   }
 
   // Build file rows
-  const items: FileRow[] = page.map(d => {
+  const items: FileRow[] = page.map((d) => {
     const ingestion = ingestionMap.get(d.id);
     return {
       documentId: d.id,
@@ -129,8 +146,10 @@ export async function listFiles(
       mimeType: d.mimeType,
       sizeBytes: d.fileSize,
       uploadedAt: d.createdAt.toISOString(),
-      statusOk: ingestion?.statusOk ?? (d.status === 'ready' || d.status === 'available'),
-      statusFail: ingestion?.statusFail ?? d.status === 'failed',
+      statusOk:
+        ingestion?.statusOk ??
+        (d.status === "ready" || d.status === "available"),
+      statusFail: ingestion?.statusFail ?? d.status === "failed",
       extractionMethod: ingestion?.extractionMethod ?? null,
       chunkCountAvg: d.chunksCount ?? 0,
       durationMsAvg: ingestion?.durationMs ?? 0,
@@ -155,9 +174,9 @@ export async function listFiles(
  */
 export async function getFileDetail(
   prisma: PrismaClient,
-  params: { fileId: string; range?: string }
+  params: { fileId: string; range?: string },
 ): Promise<FileDetailResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
   const { from, to } = window;
   const { fileId } = params;
@@ -186,7 +205,12 @@ export async function getFileDetail(
   }
 
   // Get ingestion events for this document
-  let events: Array<{ at: string; status: string; errorCode: string | null; durationMs: number | null }> = [];
+  let events: Array<{
+    at: string;
+    status: string;
+    errorCode: string | null;
+    durationMs: number | null;
+  }> = [];
   let stats = {
     totalEvents: 0,
     successCount: 0,
@@ -195,13 +219,13 @@ export async function getFileDetail(
     totalChunks: document.chunksCount ?? 0,
   };
 
-  if (supportsModel(prisma, 'ingestionEvent')) {
+  if (supportsModel(prisma, "ingestionEvent")) {
     const ingestionEvents = await prisma.ingestionEvent.findMany({
       where: {
         documentId: fileId,
         at: { gte: from, lt: to },
       },
-      orderBy: { at: 'desc' },
+      orderBy: { at: "desc" },
       take: 100,
       select: {
         at: true,
@@ -211,22 +235,30 @@ export async function getFileDetail(
       },
     });
 
-    events = ingestionEvents.map(e => ({
+    events = ingestionEvents.map((e) => ({
       at: e.at.toISOString(),
       status: e.status,
       errorCode: e.errorCode,
       durationMs: e.durationMs,
     }));
 
-    const successCount = ingestionEvents.filter(e => e.status === 'ok').length;
-    const failCount = ingestionEvents.filter(e => e.status === 'fail').length;
-    const totalDuration = ingestionEvents.reduce((sum, e) => sum + (e.durationMs ?? 0), 0);
+    const successCount = ingestionEvents.filter(
+      (e) => e.status === "ok",
+    ).length;
+    const failCount = ingestionEvents.filter((e) => e.status === "fail").length;
+    const totalDuration = ingestionEvents.reduce(
+      (sum, e) => sum + (e.durationMs ?? 0),
+      0,
+    );
 
     stats = {
       totalEvents: ingestionEvents.length,
       successCount,
       failCount,
-      avgDurationMs: ingestionEvents.length > 0 ? Math.round(totalDuration / ingestionEvents.length) : 0,
+      avgDurationMs:
+        ingestionEvents.length > 0
+          ? Math.round(totalDuration / ingestionEvents.length)
+          : 0,
       totalChunks: document.chunksCount ?? 0,
     };
   }

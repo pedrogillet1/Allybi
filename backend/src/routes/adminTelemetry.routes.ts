@@ -68,7 +68,7 @@ const router = Router();
 
 // Prevent caching of telemetry data
 router.use((_req, res, next) => {
-  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader("Cache-Control", "no-store");
   next();
 });
 
@@ -185,8 +185,10 @@ router.get("/live/events", adminTelemetryLiveFeed);
 // ============================================================================
 // ERROR BOUNDARY
 // ============================================================================
-router.use((err: unknown, _req: Request, _res: Response, next: NextFunction) => {
-  next(err);
-});
+router.use(
+  (err: unknown, _req: Request, _res: Response, next: NextFunction) => {
+    next(err);
+  },
+);
 
 export default router;

@@ -10,10 +10,10 @@
  * - Make token rotation + revocation explicit and testable
  */
 
-import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
-export type AuthRole = 'user' | 'admin';
+export type AuthRole = "user" | "admin";
 
 export interface PublicUser {
   id: string;
@@ -122,7 +122,12 @@ export interface IRefreshTokenStore {
     refreshToken: string;
     ip?: string;
     userAgent?: string;
-  }): Promise<{ valid: boolean; userId?: string; expiresAt?: Date; reason?: string }>;
+  }): Promise<{
+    valid: boolean;
+    userId?: string;
+    expiresAt?: Date;
+    reason?: string;
+  }>;
 
   /**
    * Rotate refresh token: revoke old and issue a new one.
@@ -146,11 +151,21 @@ export interface IRefreshTokenStore {
 }
 
 export interface IVerificationTokenStore {
-  issueEmailVerifyToken(params: { userId: string; expiresAt: Date }): Promise<string>;
-  consumeEmailVerifyToken(token: string): Promise<{ ok: boolean; userId?: string }>;
+  issueEmailVerifyToken(params: {
+    userId: string;
+    expiresAt: Date;
+  }): Promise<string>;
+  consumeEmailVerifyToken(
+    token: string,
+  ): Promise<{ ok: boolean; userId?: string }>;
 
-  issuePasswordResetToken(params: { userId: string; expiresAt: Date }): Promise<string>;
-  consumePasswordResetToken(token: string): Promise<{ ok: boolean; userId?: string }>;
+  issuePasswordResetToken(params: {
+    userId: string;
+    expiresAt: Date;
+  }): Promise<string>;
+  consumePasswordResetToken(
+    token: string,
+  ): Promise<{ ok: boolean; userId?: string }>;
 }
 
 export interface IEmailSender {
@@ -159,7 +174,10 @@ export interface IEmailSender {
 }
 
 export interface IJwtSigner {
-  signAccessToken(payload: { sub: string; email: string; role: AuthRole }, expiresInSeconds: number): string;
+  signAccessToken(
+    payload: { sub: string; email: string; role: AuthRole },
+    expiresInSeconds: number,
+  ): string;
 }
 
 export interface IClock {
@@ -181,16 +199,16 @@ export interface AuthAppConfig {
 
 export class AuthError extends Error {
   public readonly code:
-    | 'INVALID_CREDENTIALS'
-    | 'EMAIL_ALREADY_EXISTS'
-    | 'EMAIL_NOT_VERIFIED'
-    | 'WEAK_PASSWORD'
-    | 'INVALID_TOKEN'
-    | 'USER_NOT_FOUND'
-    | 'PASSWORD_NOT_SET';
+    | "INVALID_CREDENTIALS"
+    | "EMAIL_ALREADY_EXISTS"
+    | "EMAIL_NOT_VERIFIED"
+    | "WEAK_PASSWORD"
+    | "INVALID_TOKEN"
+    | "USER_NOT_FOUND"
+    | "PASSWORD_NOT_SET";
   public readonly status: number;
 
-  constructor(code: AuthError['code'], message: string, status = 400) {
+  constructor(code: AuthError["code"], message: string, status = 400) {
     super(message);
     this.code = code;
     this.status = status;
@@ -209,7 +227,7 @@ export class AuthAppService {
     private readonly emailSender: IEmailSender,
     private readonly jwt: IJwtSigner,
     private readonly clock: IClock,
-    private readonly cfg: AuthAppConfig
+    private readonly cfg: AuthAppConfig,
   ) {}
 
   async signup(input: SignupInput): Promise<AuthSession> {
@@ -220,7 +238,11 @@ export class AuthAppService {
 
     const existing = await this.users.findByEmail(email);
     if (existing) {
-      throw new AuthError('EMAIL_ALREADY_EXISTS', 'Email is already registered.', 409);
+      throw new AuthError(
+        "EMAIL_ALREADY_EXISTS",
+        "Email is already registered.",
+        409,
+      );
     }
 
     const passwordHash = await bcrypt.hash(password, this.cfg.bcryptCost);
@@ -228,7 +250,7 @@ export class AuthAppService {
       email,
       passwordHash,
       name: input.name ?? null,
-      role: 'user',
+      role: "user",
       emailVerified: false,
     });
 
@@ -239,19 +261,24 @@ export class AuthAppService {
     });
 
     // Fire and forget is okay *if* you have a queue; here we await for determinism.
-    await this.emailSender.sendEmailVerification({ to: created.email, token: verifyToken });
+    await this.emailSender.sendEmailVerification({
+      to: created.email,
+      token: verifyToken,
+    });
 
     // If product requires verification, return session without tokens (or limited token).
-    const requireVerify = input.requireEmailVerification ?? !this.cfg.allowLoginWithoutEmailVerification;
+    const requireVerify =
+      input.requireEmailVerification ??
+      !this.cfg.allowLoginWithoutEmailVerification;
     if (requireVerify) {
       // Return a "session" with empty tokens to keep the contract stable
       return {
         user: toPublicUser(created),
         tokens: {
-          accessToken: '',
-          refreshToken: '',
-          accessTokenExpiresAt: '',
-          refreshTokenExpiresAt: '',
+          accessToken: "",
+          refreshToken: "",
+          accessTokenExpiresAt: "",
+          refreshTokenExpiresAt: "",
         },
       };
     }
@@ -265,19 +292,34 @@ export class AuthAppService {
 
     // Do not leak whether account exists
     if (!user || !user.passwordHash) {
-      throw new AuthError('INVALID_CREDENTIALS', 'Invalid email or password.', 401);
+      throw new AuthError(
+        "INVALID_CREDENTIALS",
+        "Invalid email or password.",
+        401,
+      );
     }
 
     const ok = await bcrypt.compare(input.password, user.passwordHash);
     if (!ok) {
-      throw new AuthError('INVALID_CREDENTIALS', 'Invalid email or password.', 401);
+      throw new AuthError(
+        "INVALID_CREDENTIALS",
+        "Invalid email or password.",
+        401,
+      );
     }
 
     if (!user.emailVerified && !this.cfg.allowLoginWithoutEmailVerification) {
-      throw new AuthError('EMAIL_NOT_VERIFIED', 'Email must be verified before logging in.', 403);
+      throw new AuthError(
+        "EMAIL_NOT_VERIFIED",
+        "Email must be verified before logging in.",
+        403,
+      );
     }
 
-    return this.issueSession(user, { ip: input.ip, userAgent: input.userAgent });
+    return this.issueSession(user, {
+      ip: input.ip,
+      userAgent: input.userAgent,
+    });
   }
 
   async refresh(input: RefreshInput): Promise<AuthSession> {
@@ -288,25 +330,32 @@ export class AuthAppService {
     });
 
     if (!validation.valid || !validation.userId) {
-      throw new AuthError('INVALID_TOKEN', 'Refresh token is invalid or expired.', 401);
+      throw new AuthError(
+        "INVALID_TOKEN",
+        "Refresh token is invalid or expired.",
+        401,
+      );
     }
 
     const user = await this.users.findById(validation.userId);
     if (!user) {
-      throw new AuthError('USER_NOT_FOUND', 'User no longer exists.', 401);
+      throw new AuthError("USER_NOT_FOUND", "User no longer exists.", 401);
     }
 
     // Rotate refresh token (ChatGPT-like: refresh gives new access + refresh)
     const rotated = await this.refreshTokens.rotate({
       refreshToken: input.refreshToken,
-      newExpiresAt: addSeconds(this.clock.now(), this.cfg.refreshTokenTtlSeconds),
+      newExpiresAt: addSeconds(
+        this.clock.now(),
+        this.cfg.refreshTokenTtlSeconds,
+      ),
       ip: input.ip,
       userAgent: input.userAgent,
     });
 
     const access = this.jwt.signAccessToken(
       { sub: user.id, email: user.email, role: user.role },
-      this.cfg.accessTokenTtlSeconds
+      this.cfg.accessTokenTtlSeconds,
     );
 
     return {
@@ -314,18 +363,26 @@ export class AuthAppService {
       tokens: {
         accessToken: access,
         refreshToken: rotated.refreshToken,
-        accessTokenExpiresAt: addSeconds(this.clock.now(), this.cfg.accessTokenTtlSeconds).toISOString(),
+        accessTokenExpiresAt: addSeconds(
+          this.clock.now(),
+          this.cfg.accessTokenTtlSeconds,
+        ).toISOString(),
         refreshTokenExpiresAt: rotated.expiresAt.toISOString(),
       },
     };
   }
 
   async logout(input: LogoutInput): Promise<{ ok: true }> {
-    await this.refreshTokens.revoke({ refreshToken: input.refreshToken, reason: 'logout' });
+    await this.refreshTokens.revoke({
+      refreshToken: input.refreshToken,
+      reason: "logout",
+    });
     return { ok: true };
   }
 
-  async requestPasswordReset(input: RequestPasswordResetInput): Promise<{ ok: true }> {
+  async requestPasswordReset(
+    input: RequestPasswordResetInput,
+  ): Promise<{ ok: true }> {
     const email = normalizeEmail(input.email);
     const user = await this.users.findByEmail(email);
 
@@ -344,29 +401,44 @@ export class AuthAppService {
   async resetPassword(input: ResetPasswordInput): Promise<{ ok: true }> {
     enforcePasswordPolicy(input.newPassword);
 
-    const consumed = await this.verificationTokens.consumePasswordResetToken(input.token);
+    const consumed = await this.verificationTokens.consumePasswordResetToken(
+      input.token,
+    );
     if (!consumed.ok || !consumed.userId) {
-      throw new AuthError('INVALID_TOKEN', 'Reset token is invalid or expired.', 400);
+      throw new AuthError(
+        "INVALID_TOKEN",
+        "Reset token is invalid or expired.",
+        400,
+      );
     }
 
     const user = await this.users.findById(consumed.userId);
     if (!user) {
-      throw new AuthError('USER_NOT_FOUND', 'User no longer exists.', 404);
+      throw new AuthError("USER_NOT_FOUND", "User no longer exists.", 404);
     }
 
-    const passwordHash = await bcrypt.hash(input.newPassword, this.cfg.bcryptCost);
+    const passwordHash = await bcrypt.hash(
+      input.newPassword,
+      this.cfg.bcryptCost,
+    );
     await this.users.setPassword(user.id, passwordHash);
 
     // Invalidate all sessions after password reset
-    await this.refreshTokens.revokeAllForUser(user.id, 'password_reset');
+    await this.refreshTokens.revokeAllForUser(user.id, "password_reset");
 
     return { ok: true };
   }
 
   async verifyEmail(input: VerifyEmailInput): Promise<{ ok: true }> {
-    const consumed = await this.verificationTokens.consumeEmailVerifyToken(input.token);
+    const consumed = await this.verificationTokens.consumeEmailVerifyToken(
+      input.token,
+    );
     if (!consumed.ok || !consumed.userId) {
-      throw new AuthError('INVALID_TOKEN', 'Verification token is invalid or expired.', 400);
+      throw new AuthError(
+        "INVALID_TOKEN",
+        "Verification token is invalid or expired.",
+        400,
+      );
     }
 
     await this.users.setEmailVerified(consumed.userId, true);
@@ -379,11 +451,11 @@ export class AuthAppService {
 
   private async issueSession(
     user: IUserAuthRecord,
-    ctx: { ip?: string; userAgent?: string }
+    ctx: { ip?: string; userAgent?: string },
   ): Promise<AuthSession> {
     const accessToken = this.jwt.signAccessToken(
       { sub: user.id, email: user.email, role: user.role },
-      this.cfg.accessTokenTtlSeconds
+      this.cfg.accessTokenTtlSeconds,
     );
 
     const refresh = await this.refreshTokens.issue({
@@ -398,7 +470,10 @@ export class AuthAppService {
       tokens: {
         accessToken,
         refreshToken: refresh.refreshToken,
-        accessTokenExpiresAt: addSeconds(this.clock.now(), this.cfg.accessTokenTtlSeconds).toISOString(),
+        accessTokenExpiresAt: addSeconds(
+          this.clock.now(),
+          this.cfg.accessTokenTtlSeconds,
+        ).toISOString(),
         refreshTokenExpiresAt: refresh.expiresAt.toISOString(),
       },
     };
@@ -410,24 +485,32 @@ export class AuthAppService {
  * ----------------------------- */
 
 function normalizeEmail(email: string): string {
-  return (email || '').trim().toLowerCase();
+  return (email || "").trim().toLowerCase();
 }
 
 function enforcePasswordPolicy(password: string): void {
   // Keep it strict but not annoying.
   // Adjust rules in one place; controllers should never implement these checks.
-  const p = password ?? '';
+  const p = password ?? "";
   const min = 10;
 
   if (p.length < min) {
-    throw new AuthError('WEAK_PASSWORD', `Password must be at least ${min} characters.`, 400);
+    throw new AuthError(
+      "WEAK_PASSWORD",
+      `Password must be at least ${min} characters.`,
+      400,
+    );
   }
   const hasLetter = /[A-Za-z]/.test(p);
   const hasNumber = /\d/.test(p);
   const hasSymbol = /[^A-Za-z0-9]/.test(p);
 
   if (!(hasLetter && hasNumber)) {
-    throw new AuthError('WEAK_PASSWORD', 'Password must include letters and numbers.', 400);
+    throw new AuthError(
+      "WEAK_PASSWORD",
+      "Password must include letters and numbers.",
+      400,
+    );
   }
   // Symbol not required (reduces friction), but encourage via UI.
   // If you want: require hasSymbol as well.
@@ -453,5 +536,5 @@ function addSeconds(d: Date, seconds: number): Date {
  * (Stores should hash refresh tokens; never store raw.)
  */
 export function sha256(input: string): string {
-  return crypto.createHash('sha256').update(input).digest('hex');
+  return crypto.createHash("sha256").update(input).digest("hex");
 }

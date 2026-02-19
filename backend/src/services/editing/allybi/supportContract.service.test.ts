@@ -55,4 +55,3 @@ describe("SupportContractService", () => {
     expect(out.blockedReason?.code).toBe("ENGINE_UNSUPPORTED");
   });
 });
-

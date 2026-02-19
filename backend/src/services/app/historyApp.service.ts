@@ -1,9 +1,9 @@
 // src/services/app/historyApp.service.ts
-import type { Request } from 'express';
-import type { Attachment } from '../../types/handlerResult.types';
+import type { Request } from "express";
+import type { Attachment } from "../../types/handlerResult.types";
 
-import { ConversationContextService } from '../memory/conversationContext.service';
-import { ConversationMemoryService } from '../memory/conversationMemory.service';
+import { ConversationContextService } from "../memory/conversationContext.service";
+import { ConversationMemoryService } from "../memory/conversationMemory.service";
 
 /**
  * HistoryAppService
@@ -30,7 +30,7 @@ export interface HistoryThreadSummary {
 
 export interface HistoryMessage {
   id: string;
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
   createdAt: string;
   answerMode?: string | null;
@@ -64,7 +64,7 @@ export interface SearchHistoryHit {
   score: number;
   snippet: string;
   messageId?: string;
-  role?: 'user' | 'assistant';
+  role?: "user" | "assistant";
 }
 
 export interface SearchHistoryResult {
@@ -73,7 +73,10 @@ export interface SearchHistoryResult {
 }
 
 function sanitizeQuery(q: unknown, max = 300): string {
-  return String(q ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
+  return String(q ?? "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, max);
 }
 
 function getActor(req: Request): { userId: string } {
@@ -83,12 +86,13 @@ function getActor(req: Request): { userId: string } {
     anyReq.user?.userId ||
     anyReq.auth?.userId ||
     anyReq.session?.userId ||
-    'guest';
+    "guest";
   return { userId: String(userId) };
 }
 
 export class HistoryAppService {
-  private readonly conversationContext = new ConversationContextService() as any;
+  private readonly conversationContext =
+    new ConversationContextService() as any;
   private readonly memory = new ConversationMemoryService() as any;
 
   /**
@@ -96,7 +100,10 @@ export class HistoryAppService {
    * - If title missing: derive from first user message (or a memory-derived label).
    * - updatedAt = last message timestamp.
    */
-  async listThreads(req: Request, params: ListThreadsParams = {}): Promise<ListThreadsResult> {
+  async listThreads(
+    req: Request,
+    params: ListThreadsParams = {},
+  ): Promise<ListThreadsResult> {
     const actor = getActor(req);
 
     const limit = clampInt(params.limit ?? 30, 1, 100);
@@ -131,9 +138,12 @@ export class HistoryAppService {
    * - Returns in chronological order.
    * - Ensures each assistant message carries answerMode + attachments for UI rules.
    */
-  async getThreadMessages(req: Request, conversationId: string): Promise<HistoryMessage[]> {
+  async getThreadMessages(
+    req: Request,
+    conversationId: string,
+  ): Promise<HistoryMessage[]> {
     const actor = getActor(req);
-    const id = String(conversationId || '').trim();
+    const id = String(conversationId || "").trim();
     if (!id) return [];
 
     const thread = await this.conversationContext.getThread({
@@ -159,7 +169,10 @@ export class HistoryAppService {
    * - Uses ConversationMemoryService for search index if available.
    * - Falls back to ConversationContextService scan if memory index not built.
    */
-  async search(req: Request, params: SearchHistoryParams): Promise<SearchHistoryResult> {
+  async search(
+    req: Request,
+    params: SearchHistoryParams,
+  ): Promise<SearchHistoryResult> {
     const actor = getActor(req);
 
     const q = sanitizeQuery(params.query, 400);
@@ -197,9 +210,13 @@ export class HistoryAppService {
   /**
    * Pin/unpin a thread (ChatGPT-like).
    */
-  async setPinned(req: Request, conversationId: string, pinned: boolean): Promise<{ ok: true }> {
+  async setPinned(
+    req: Request,
+    conversationId: string,
+    pinned: boolean,
+  ): Promise<{ ok: true }> {
     const actor = getActor(req);
-    const id = String(conversationId || '').trim();
+    const id = String(conversationId || "").trim();
     if (!id) return { ok: true };
 
     await this.conversationContext.setPinned({
@@ -215,9 +232,13 @@ export class HistoryAppService {
    * Rename a thread (manual user rename).
    * ChatGPT-like: allow user override.
    */
-  async rename(req: Request, conversationId: string, title: string): Promise<{ ok: true }> {
+  async rename(
+    req: Request,
+    conversationId: string,
+    title: string,
+  ): Promise<{ ok: true }> {
     const actor = getActor(req);
-    const id = String(conversationId || '').trim();
+    const id = String(conversationId || "").trim();
     const t = sanitizeQuery(title, 90);
 
     if (!id || !t) return { ok: true };
@@ -234,9 +255,12 @@ export class HistoryAppService {
   /**
    * Delete a thread.
    */
-  async deleteThread(req: Request, conversationId: string): Promise<{ ok: true }> {
+  async deleteThread(
+    req: Request,
+    conversationId: string,
+  ): Promise<{ ok: true }> {
     const actor = getActor(req);
-    const id = String(conversationId || '').trim();
+    const id = String(conversationId || "").trim();
     if (!id) return { ok: true };
 
     await this.conversationContext.deleteThread({

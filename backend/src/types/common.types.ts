@@ -6,8 +6,8 @@
 
 export type ISODateString = string;
 
-export type LanguageCode = 'en' | 'pt' | 'es';
-export type EnvName = 'production' | 'staging' | 'dev' | 'local';
+export type LanguageCode = "en" | "pt" | "es";
+export type EnvName = "production" | "staging" | "dev" | "local";
 
 export type UUID = string;
 export type ID = string;
@@ -29,7 +29,7 @@ export interface PaginationOutput {
   hasMore?: boolean;
 }
 
-export type SortDirection = 'asc' | 'desc';
+export type SortDirection = "asc" | "desc";
 
 export interface SortInput {
   field: string;
@@ -52,9 +52,13 @@ export class ServiceError extends Error {
   public readonly details?: Dict;
   public readonly causeHint?: string;
 
-  constructor(code: string, message: string, opts?: { details?: Dict; causeHint?: string }) {
+  constructor(
+    code: string,
+    message: string,
+    opts?: { details?: Dict; causeHint?: string },
+  ) {
     super(message);
-    this.name = 'ServiceError';
+    this.name = "ServiceError";
     this.code = code;
     this.details = opts?.details;
     this.causeHint = opts?.causeHint;
@@ -70,7 +74,7 @@ export class ServiceError extends Error {
   }
 }
 
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export interface TraceContext {
   requestId?: string;
@@ -100,9 +104,9 @@ export function clamp01(n: number): number {
  * Avoid adding “business logic” here — keep it utilities-level.
  */
 export function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 export function isNonEmptyString(value: unknown): value is string {
-  return typeof value === 'string' && value.trim().length > 0;
+  return typeof value === "string" && value.trim().length > 0;
 }

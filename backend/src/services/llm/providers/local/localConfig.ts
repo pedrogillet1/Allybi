@@ -106,10 +106,11 @@ const DEFAULTS: Omit<LocalProviderConfig, "env"> = {
   models: {
     defaultDraft: process.env.LOCAL_LLM_DRAFT_MODEL || "local-default",
     defaultFinal: process.env.LOCAL_LLM_FINAL_MODEL || "local-default",
-    allowed: (process.env.LOCAL_LLM_ALLOWED_MODELS
-      ? process.env.LOCAL_LLM_ALLOWED_MODELS.split(",").map((s) => s.trim()).filter(Boolean)
-      : listLocalModels()
-    ),
+    allowed: process.env.LOCAL_LLM_ALLOWED_MODELS
+      ? process.env.LOCAL_LLM_ALLOWED_MODELS.split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : listLocalModels(),
     strictAllowlist: process.env.LOCAL_LLM_STRICT_ALLOWLIST !== "false",
   },
 
@@ -123,19 +124,27 @@ const DEFAULTS: Omit<LocalProviderConfig, "env"> = {
   generationDefaults: {
     draft: {
       temperature: Number(process.env.LOCAL_LLM_DRAFT_TEMPERATURE || 0.45),
-      maxOutputTokens: Number(process.env.LOCAL_LLM_DRAFT_MAX_OUTPUT_TOKENS || 550),
+      maxOutputTokens: Number(
+        process.env.LOCAL_LLM_DRAFT_MAX_OUTPUT_TOKENS || 550,
+      ),
     },
     final: {
       temperature: Number(process.env.LOCAL_LLM_FINAL_TEMPERATURE || 0.3),
-      maxOutputTokens: Number(process.env.LOCAL_LLM_FINAL_MAX_OUTPUT_TOKENS || 700),
+      maxOutputTokens: Number(
+        process.env.LOCAL_LLM_FINAL_MAX_OUTPUT_TOKENS || 700,
+      ),
     },
     navPills: {
       temperature: Number(process.env.LOCAL_LLM_NAV_TEMPERATURE || 0.2),
-      maxOutputTokens: Number(process.env.LOCAL_LLM_NAV_MAX_OUTPUT_TOKENS || 220),
+      maxOutputTokens: Number(
+        process.env.LOCAL_LLM_NAV_MAX_OUTPUT_TOKENS || 220,
+      ),
     },
     disambiguation: {
       temperature: Number(process.env.LOCAL_LLM_DISAMBIG_TEMPERATURE || 0.2),
-      maxOutputTokens: Number(process.env.LOCAL_LLM_DISAMBIG_MAX_OUTPUT_TOKENS || 220),
+      maxOutputTokens: Number(
+        process.env.LOCAL_LLM_DISAMBIG_MAX_OUTPUT_TOKENS || 220,
+      ),
     },
   },
 
@@ -148,7 +157,7 @@ const DEFAULTS: Omit<LocalProviderConfig, "env"> = {
 
 export function loadLocalProviderConfig(env?: EnvName): LocalProviderConfig {
   return {
-    env: env ?? (process.env.NODE_ENV as EnvName) ?? 'development',
+    env: env ?? (process.env.NODE_ENV as EnvName) ?? "development",
     ...DEFAULTS,
   };
 }
@@ -157,7 +166,7 @@ export function loadLocalProviderConfig(env?: EnvName): LocalProviderConfig {
 // LocalConfig — shape consumed by localClient.service.ts (newer client)
 // ---------------------------------------------------------------------------
 
-export type LocalApiFormat = 'ollama' | 'openai_compat';
+export type LocalApiFormat = "ollama" | "openai_compat";
 
 export interface LocalConfig {
   apiFormat: LocalApiFormat;
@@ -180,14 +189,16 @@ export interface LocalConfig {
  * Called without args from localClient.service.ts constructor.
  */
 export function loadLocalConfig(): LocalConfig {
-  const api = (process.env.LOCAL_LLM_API || 'ollama') as string;
-  const apiFormat: LocalApiFormat = api === 'openai_compat' ? 'openai_compat' : 'ollama';
+  const api = (process.env.LOCAL_LLM_API || "ollama") as string;
+  const apiFormat: LocalApiFormat =
+    api === "openai_compat" ? "openai_compat" : "ollama";
 
   return {
     apiFormat,
-    baseUrl: process.env.LOCAL_LLM_BASE_URL
-      || process.env.OLLAMA_URL
-      || 'http://localhost:11434',
+    baseUrl:
+      process.env.LOCAL_LLM_BASE_URL ||
+      process.env.OLLAMA_URL ||
+      "http://localhost:11434",
     apiKey: process.env.LOCAL_LLM_API_KEY || undefined,
     defaultModel: process.env.LOCAL_LLM_DEFAULT_MODEL || LOCAL_PRIMARY_MODEL,
     timeoutMs: Number(process.env.LOCAL_LLM_TIMEOUT_MS || 30000),
@@ -195,7 +206,7 @@ export function loadLocalConfig(): LocalConfig {
       timeoutMs: Number(process.env.LOCAL_LLM_HEALTH_TIMEOUT_MS || 5000),
     },
     ollama: {
-      keepAlive: process.env.OLLAMA_KEEP_ALIVE || '5m',
+      keepAlive: process.env.OLLAMA_KEEP_ALIVE || "5m",
       numThreads: process.env.OLLAMA_NUM_THREADS
         ? Number(process.env.OLLAMA_NUM_THREADS)
         : undefined,

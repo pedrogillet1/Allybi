@@ -7,11 +7,11 @@
  * 100% databank-driven - reads undo TTL and descriptions from file_action_operators.any.json.
  */
 
-import prisma from '../../../config/database';
-import { getOptionalBank } from '../banks/bankLoader.service';
-import type { FileActionOperatorsBank } from '../extraction/entityExtractor.service';
+import prisma from "../../../config/database";
+import { getOptionalBank } from "../banks/bankLoader.service";
+import type { FileActionOperatorsBank } from "../extraction/entityExtractor.service";
 
-export type LanguageCode = 'en' | 'pt' | 'es';
+export type LanguageCode = "en" | "pt" | "es";
 
 export interface UndoHistoryEntry {
   userId: string;
@@ -35,7 +35,9 @@ export class ActionHistoryService {
   }
 
   private loadBank(): void {
-    this.bank = getOptionalBank<FileActionOperatorsBank>('file_action_operators');
+    this.bank = getOptionalBank<FileActionOperatorsBank>(
+      "file_action_operators",
+    );
     if (this.bank?.config?.undoTtlSeconds) {
       this.undoTtlSeconds = this.bank.config.undoTtlSeconds;
     }
@@ -76,7 +78,7 @@ export class ActionHistoryService {
         canUndo: true,
         expiresAt: { gt: new Date() },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     if (!action) return null;
@@ -105,18 +107,19 @@ export class ActionHistoryService {
   getUndoDescription(
     operator: string,
     entities: Record<string, string>,
-    language: LanguageCode
+    language: LanguageCode,
   ): string {
-    if (!this.bank) return '';
+    if (!this.bank) return "";
 
     const undoOp = this.bank.operators.undo;
     if (!undoOp?.undoDescriptions?.[operator]) {
       return `reverted ${operator}`;
     }
 
-    const template = undoOp.undoDescriptions[operator][language] ||
-                     undoOp.undoDescriptions[operator].en ||
-                     `reverted ${operator}`;
+    const template =
+      undoOp.undoDescriptions[operator][language] ||
+      undoOp.undoDescriptions[operator].en ||
+      `reverted ${operator}`;
 
     return this.interpolate(template, entities);
   }
@@ -125,12 +128,12 @@ export class ActionHistoryService {
    * Get microcopy for undo results.
    */
   getMicrocopy(key: string, language: LanguageCode): string {
-    if (!this.bank) return '';
+    if (!this.bank) return "";
 
     const undoOp = this.bank.operators.undo;
-    if (!undoOp?.microcopy?.[key]) return '';
+    if (!undoOp?.microcopy?.[key]) return "";
 
-    return undoOp.microcopy[key][language] || undoOp.microcopy[key].en || '';
+    return undoOp.microcopy[key][language] || undoOp.microcopy[key].en || "";
   }
 
   /**
@@ -140,10 +143,7 @@ export class ActionHistoryService {
   async cleanupExpired(): Promise<number> {
     const result = await prisma.actionHistory.deleteMany({
       where: {
-        OR: [
-          { expiresAt: { lt: new Date() } },
-          { canUndo: false },
-        ],
+        OR: [{ expiresAt: { lt: new Date() } }, { canUndo: false }],
       },
     });
 
@@ -153,8 +153,14 @@ export class ActionHistoryService {
   /**
    * Interpolate template string with entity values.
    */
-  private interpolate(template: string, values: Record<string, string>): string {
-    return template.replace(/\{(\w+)\}/g, (_, key) => values[key] || `{${key}}`);
+  private interpolate(
+    template: string,
+    values: Record<string, string>,
+  ): string {
+    return template.replace(
+      /\{(\w+)\}/g,
+      (_, key) => values[key] || `{${key}}`,
+    );
   }
 }
 

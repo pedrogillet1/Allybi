@@ -22,7 +22,10 @@ export class SheetsBridgeError extends Error {
   public readonly retryable: boolean;
   public readonly status?: number;
 
-  constructor(message: string, opts: { code: string; retryable: boolean; status?: number }) {
+  constructor(
+    message: string,
+    opts: { code: string; retryable: boolean; status?: number },
+  ) {
     super(message);
     this.name = "SheetsBridgeError";
     this.code = opts.code;
@@ -53,13 +56,20 @@ export class SheetsBridgeService {
   }
 
   private static resolveAuth(): GoogleAuth {
-    const adcPath = path.join(process.env.HOME || "~", ".config", "gcloud", "application_default_credentials.json");
+    const adcPath = path.join(
+      process.env.HOME || "~",
+      ".config",
+      "gcloud",
+      "application_default_credentials.json",
+    );
 
     if (fs.existsSync(adcPath)) {
       try {
         const adc = JSON.parse(fs.readFileSync(adcPath, "utf-8"));
         if (adc.type === "authorized_user" && adc.refresh_token) {
-          logger.info("[SheetsBridge] Using ADC (authorized_user) for Drive/Sheets auth");
+          logger.info(
+            "[SheetsBridge] Using ADC (authorized_user) for Drive/Sheets auth",
+          );
           return new google.auth.GoogleAuth({
             credentials: {
               type: "authorized_user",
@@ -82,11 +92,15 @@ export class SheetsBridgeService {
     params: { xlsxBuffer: Buffer; filename: string; parentFolderId?: string },
     ctx?: SheetsBridgeContext,
   ): Promise<ImportXlsxResult> {
-    const filename = String(params.filename || "").trim() || `sheet-${Date.now()}.xlsx`;
+    const filename =
+      String(params.filename || "").trim() || `sheet-${Date.now()}.xlsx`;
     const parentFolderId = String(params.parentFolderId || "").trim() || null;
 
     if (!Buffer.isBuffer(params.xlsxBuffer) || params.xlsxBuffer.length === 0) {
-      throw new SheetsBridgeError("xlsxBuffer must contain bytes.", { code: "INVALID_XLSX_BUFFER", retryable: false });
+      throw new SheetsBridgeError("xlsxBuffer must contain bytes.", {
+        code: "INVALID_XLSX_BUFFER",
+        retryable: false,
+      });
     }
 
     try {
@@ -97,7 +111,8 @@ export class SheetsBridgeService {
           ...(parentFolderId ? { parents: [parentFolderId] } : {}),
         },
         media: {
-          mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          mimeType:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           body: Readable.from(params.xlsxBuffer),
         },
         fields: "id",
@@ -105,10 +120,13 @@ export class SheetsBridgeService {
 
       const spreadsheetId = uploaded.data?.id;
       if (!spreadsheetId) {
-        throw new SheetsBridgeError("Google Drive API returned an empty import payload.", {
-          code: "EMPTY_DRIVE_IMPORT_PAYLOAD",
-          retryable: false,
-        });
+        throw new SheetsBridgeError(
+          "Google Drive API returned an empty import payload.",
+          {
+            code: "EMPTY_DRIVE_IMPORT_PAYLOAD",
+            retryable: false,
+          },
+        );
       }
 
       return {
@@ -118,17 +136,23 @@ export class SheetsBridgeService {
     } catch (error: any) {
       const status = error?.status ?? error?.response?.status;
       if (status === 401 || status === 403) {
-        throw new SheetsBridgeError("Sheets authentication/authorization failed.", {
-          code: "AUTH_ERROR",
+        throw new SheetsBridgeError(
+          "Sheets authentication/authorization failed.",
+          {
+            code: "AUTH_ERROR",
+            retryable: false,
+            status,
+          },
+        );
+      }
+      throw new SheetsBridgeError(
+        error?.message || "Failed to import XLSX to Google Sheets.",
+        {
+          code: "IMPORT_ERROR",
           retryable: false,
           status,
-        });
-      }
-      throw new SheetsBridgeError(error?.message || "Failed to import XLSX to Google Sheets.", {
-        code: "IMPORT_ERROR",
-        retryable: false,
-        status,
-      });
+        },
+      );
     } finally {
       logger.info("[SheetsBridge] importXlsxToSpreadsheet", {
         correlationId: ctx?.correlationId,
@@ -139,43 +163,59 @@ export class SheetsBridgeService {
     }
   }
 
-  async exportSpreadsheetToXlsx(spreadsheetId: string, ctx?: SheetsBridgeContext): Promise<Buffer> {
+  async exportSpreadsheetToXlsx(
+    spreadsheetId: string,
+    ctx?: SheetsBridgeContext,
+  ): Promise<Buffer> {
     const id = String(spreadsheetId || "").trim();
     if (!id) {
-      throw new SheetsBridgeError("spreadsheetId is required.", { code: "INVALID_SPREADSHEET_ID", retryable: false });
+      throw new SheetsBridgeError("spreadsheetId is required.", {
+        code: "INVALID_SPREADSHEET_ID",
+        retryable: false,
+      });
     }
 
     try {
       const exported = await this.drive.files.export(
         {
           fileId: id,
-          mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          mimeType:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         },
         { responseType: "arraybuffer" },
       );
 
       const buf = Buffer.from(exported.data as ArrayBuffer);
       if (!buf.length) {
-        throw new SheetsBridgeError("Google Drive export returned empty XLSX bytes.", {
-          code: "EMPTY_XLSX_EXPORT",
-          retryable: false,
-        });
+        throw new SheetsBridgeError(
+          "Google Drive export returned empty XLSX bytes.",
+          {
+            code: "EMPTY_XLSX_EXPORT",
+            retryable: false,
+          },
+        );
       }
       return buf;
     } catch (error: any) {
       const status = error?.status ?? error?.response?.status;
       if (status === 401 || status === 403) {
-        throw new SheetsBridgeError("Sheets authentication/authorization failed.", {
-          code: "AUTH_ERROR",
+        throw new SheetsBridgeError(
+          "Sheets authentication/authorization failed.",
+          {
+            code: "AUTH_ERROR",
+            retryable: false,
+            status,
+          },
+        );
+      }
+      throw new SheetsBridgeError(
+        error?.message || "Failed to export Google Sheet to XLSX.",
+        {
+          code: "EXPORT_ERROR",
           retryable: false,
           status,
-        });
-      }
-      throw new SheetsBridgeError(error?.message || "Failed to export Google Sheet to XLSX.", {
-        code: "EXPORT_ERROR",
-        retryable: false,
-        status,
-      });
+        },
+      );
     } finally {
       logger.info("[SheetsBridge] exportSpreadsheetToXlsx", {
         correlationId: ctx?.correlationId,
@@ -188,4 +228,3 @@ export class SheetsBridgeService {
 }
 
 export default SheetsBridgeService;
-

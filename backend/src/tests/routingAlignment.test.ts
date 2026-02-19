@@ -16,7 +16,10 @@ function parseEditOperatorsFromTypesFile(repoRoot: string): Set<string> {
 }
 
 function parseViewerSafeAutoApplyOps(repoRoot: string): Set<string> {
-  const p = path.join(repoRoot, "../frontend/src/components/documents/DocumentViewer.jsx");
+  const p = path.join(
+    repoRoot,
+    "../frontend/src/components/documents/DocumentViewer.jsx",
+  );
   const text = fs.readFileSync(p, "utf8");
   const declIdx = text.indexOf("const safeAutoApplyOperators");
   const slice = declIdx >= 0 ? text.slice(declIdx) : text;
@@ -36,14 +39,32 @@ describe("Routing/Operator Alignment", () => {
     const editOps = parseEditOperatorsFromTypesFile(backendRoot);
     const viewerSafe = parseViewerSafeAutoApplyOps(backendRoot);
 
-    const editingRouting = readJson(path.join(banksRoot, "routing/editing_routing.any.json"));
-    const intentConfig = readJson(path.join(banksRoot, "routing/intent_config.any.json"));
-    const operatorFamilies = readJson(path.join(banksRoot, "routing/operator_families.any.json"));
-    const operatorContracts = readJson(path.join(banksRoot, "operators/operator_contracts.any.json"));
-    const operatorShapes = readJson(path.join(banksRoot, "operators/operator_output_shapes.any.json"));
+    const editingRouting = readJson(
+      path.join(banksRoot, "routing/editing_routing.any.json"),
+    );
+    const intentConfig = readJson(
+      path.join(banksRoot, "routing/intent_config.any.json"),
+    );
+    const operatorFamilies = readJson(
+      path.join(banksRoot, "routing/operator_families.any.json"),
+    );
+    const operatorContracts = readJson(
+      path.join(banksRoot, "operators/operator_contracts.any.json"),
+    );
+    const operatorShapes = readJson(
+      path.join(banksRoot, "operators/operator_output_shapes.any.json"),
+    );
 
-    const canonical = new Set<string>((editingRouting?.operators?.canonical || []).filter((s: any) => typeof s === "string"));
-    const alwaysConfirm = new Set<string>((editingRouting?.operators?.alwaysConfirm || []).filter((s: any) => typeof s === "string"));
+    const canonical = new Set<string>(
+      (editingRouting?.operators?.canonical || []).filter(
+        (s: any) => typeof s === "string",
+      ),
+    );
+    const alwaysConfirm = new Set<string>(
+      (editingRouting?.operators?.alwaysConfirm || []).filter(
+        (s: any) => typeof s === "string",
+      ),
+    );
 
     // canonical <-> EditOperator
     for (const op of editOps) expect(canonical.has(op)).toBe(true);
@@ -53,28 +74,42 @@ describe("Routing/Operator Alignment", () => {
     for (const op of alwaysConfirm) expect(editOps.has(op)).toBe(true);
 
     // rules only use supported operators
-    for (const r of (editingRouting?.rules || [])) {
+    for (const r of editingRouting?.rules || []) {
       const op = r?.then?.operator;
       if (typeof op === "string") expect(editOps.has(op)).toBe(true);
     }
 
     // intent_config includes editing family and matches
-    const fam = (intentConfig?.intentFamilies || []).find((f: any) => f?.id === "editing");
+    const fam = (intentConfig?.intentFamilies || []).find(
+      (f: any) => f?.id === "editing",
+    );
     expect(Boolean(fam)).toBe(true);
-    const allowed = new Set<string>((fam?.operatorsAllowed || []).filter((s: any) => typeof s === "string"));
+    const allowed = new Set<string>(
+      (fam?.operatorsAllowed || []).filter((s: any) => typeof s === "string"),
+    );
     for (const op of editOps) expect(allowed.has(op)).toBe(true);
     for (const op of allowed) expect(editOps.has(op)).toBe(true);
 
     // operator_families includes editing family and matches
-    const ofam = (operatorFamilies?.families || []).find((f: any) => f?.id === "editing");
+    const ofam = (operatorFamilies?.families || []).find(
+      (f: any) => f?.id === "editing",
+    );
     expect(Boolean(ofam)).toBe(true);
-    const fops = new Set<string>((ofam?.operators || []).filter((s: any) => typeof s === "string"));
+    const fops = new Set<string>(
+      (ofam?.operators || []).filter((s: any) => typeof s === "string"),
+    );
     for (const op of editOps) expect(fops.has(op)).toBe(true);
     for (const op of fops) expect(editOps.has(op)).toBe(true);
 
     // contracts + shapes exist for edit ops
-    const contractIds = new Set<string>((operatorContracts?.operators || []).map((o: any) => o?.id).filter((s: any) => typeof s === "string"));
-    const shapeIds = new Set<string>(Object.keys(operatorShapes?.mapping || {}));
+    const contractIds = new Set<string>(
+      (operatorContracts?.operators || [])
+        .map((o: any) => o?.id)
+        .filter((s: any) => typeof s === "string"),
+    );
+    const shapeIds = new Set<string>(
+      Object.keys(operatorShapes?.mapping || {}),
+    );
     for (const op of editOps) {
       expect(contractIds.has(op)).toBe(true);
       expect(shapeIds.has(op)).toBe(true);
@@ -89,22 +124,38 @@ describe("Routing/Operator Alignment", () => {
   test("intent_config and operator_families operators are covered by contracts + output shapes", () => {
     const editOps = parseEditOperatorsFromTypesFile(backendRoot);
 
-    const intentConfig = readJson(path.join(banksRoot, "routing/intent_config.any.json"));
-    const operatorFamilies = readJson(path.join(banksRoot, "routing/operator_families.any.json"));
-    const operatorContracts = readJson(path.join(banksRoot, "operators/operator_contracts.any.json"));
-    const operatorShapes = readJson(path.join(banksRoot, "operators/operator_output_shapes.any.json"));
+    const intentConfig = readJson(
+      path.join(banksRoot, "routing/intent_config.any.json"),
+    );
+    const operatorFamilies = readJson(
+      path.join(banksRoot, "routing/operator_families.any.json"),
+    );
+    const operatorContracts = readJson(
+      path.join(banksRoot, "operators/operator_contracts.any.json"),
+    );
+    const operatorShapes = readJson(
+      path.join(banksRoot, "operators/operator_output_shapes.any.json"),
+    );
 
-    const contractIds = new Set<string>((operatorContracts?.operators || []).map((o: any) => o?.id).filter((s: any) => typeof s === "string"));
-    const shapeIds = new Set<string>(Object.keys(operatorShapes?.mapping || {}));
+    const contractIds = new Set<string>(
+      (operatorContracts?.operators || [])
+        .map((o: any) => o?.id)
+        .filter((s: any) => typeof s === "string"),
+    );
+    const shapeIds = new Set<string>(
+      Object.keys(operatorShapes?.mapping || {}),
+    );
 
     const familyOps = new Set<string>();
-    for (const fam of (operatorFamilies?.families || [])) {
-      for (const op of (fam?.operators || [])) if (typeof op === "string") familyOps.add(op);
+    for (const fam of operatorFamilies?.families || []) {
+      for (const op of fam?.operators || [])
+        if (typeof op === "string") familyOps.add(op);
     }
 
     const intentAllowed = new Set<string>();
-    for (const fam of (intentConfig?.intentFamilies || [])) {
-      for (const op of (fam?.operatorsAllowed || [])) if (typeof op === "string") intentAllowed.add(op);
+    for (const fam of intentConfig?.intentFamilies || []) {
+      for (const op of fam?.operatorsAllowed || [])
+        if (typeof op === "string") intentAllowed.add(op);
     }
 
     // Any operator in operator_families must have contract+shape (unless it's an EditOperator).
@@ -125,12 +176,16 @@ describe("Routing/Operator Alignment", () => {
   });
 
   test("connectors_routing is enabled once it is authoritative", () => {
-    const connectorsRouting = readJson(path.join(banksRoot, "routing/connectors_routing.any.json"));
+    const connectorsRouting = readJson(
+      path.join(banksRoot, "routing/connectors_routing.any.json"),
+    );
     expect(connectorsRouting?.config?.enabled).toBe(true);
   });
 
   test("email_routing is enabled once it is authoritative", () => {
-    const emailRouting = readJson(path.join(banksRoot, "routing/email_routing.any.json"));
+    const emailRouting = readJson(
+      path.join(banksRoot, "routing/email_routing.any.json"),
+    );
     expect(emailRouting?.config?.enabled).toBe(true);
   });
 });

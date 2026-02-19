@@ -61,9 +61,7 @@ export function segmentMessage(
   const sorted = [...connectors].sort((a, b) => b.length - a.length);
 
   // Build a combined regex from connectors
-  const escaped = sorted.map((c) =>
-    c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-  );
+  const escaped = sorted.map((c) => c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   // Match: comma-space, semicolon-space, or a connector bounded by word boundaries
   const separatorParts = ["[;]\\s*", ",\\s+"];
   if (escaped.length > 0) {

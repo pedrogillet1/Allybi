@@ -1,9 +1,9 @@
-import type { slides_v1 } from 'googleapis';
+import type { slides_v1 } from "googleapis";
 import {
   SlidesClientError,
   SlidesClientService,
   type SlidesRequestContext,
-} from './slidesClient.service';
+} from "./slidesClient.service";
 
 export interface SlideTargetCandidate {
   objectId: string;
@@ -37,10 +37,10 @@ const MIN_GOOD_SCORE = 0.55;
 function normalize(input: string): string {
   return input
     .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -49,7 +49,9 @@ function asArray<T>(value: T | T[] | undefined | null): T[] {
   return Array.isArray(value) ? value : [value];
 }
 
-function extractTextFromShape(shape: slides_v1.Schema$Shape | undefined): string {
+function extractTextFromShape(
+  shape: slides_v1.Schema$Shape | undefined,
+): string {
   const textElements = asArray(shape?.text?.textElements);
   const chunks: string[] = [];
 
@@ -60,7 +62,7 @@ function extractTextFromShape(shape: slides_v1.Schema$Shape | undefined): string
     }
   }
 
-  return chunks.join(' ').replace(/\s+/g, ' ').trim();
+  return chunks.join(" ").replace(/\s+/g, " ").trim();
 }
 
 function extractSlideNumberHint(query: string): number | null {
@@ -79,8 +81,8 @@ function tokenOverlapScore(targetText: string, query: string): number {
   if (q === t) return 1;
   if (t.includes(q) || q.includes(t)) return 0.85;
 
-  const qTokens = q.split(' ').filter(Boolean);
-  const tTokens = new Set(t.split(' ').filter(Boolean));
+  const qTokens = q.split(" ").filter(Boolean);
+  const tTokens = new Set(t.split(" ").filter(Boolean));
 
   if (qTokens.length === 0) return 0;
   let overlap = 0;
@@ -97,14 +99,19 @@ function tokenOverlapScore(targetText: string, query: string): number {
  * Slides validation and target resolution for ambiguous user hints.
  */
 export class SlidesValidatorsService {
-  constructor(private readonly slidesClient: SlidesClientService = new SlidesClientService()) {}
+  constructor(
+    private readonly slidesClient: SlidesClientService = new SlidesClientService(),
+  ) {}
 
   async validateSlideExists(
     presentationId: string,
     slideObjectId: string,
     ctx?: SlidesRequestContext,
   ): Promise<boolean> {
-    const presentation = await this.slidesClient.getPresentation(presentationId, ctx);
+    const presentation = await this.slidesClient.getPresentation(
+      presentationId,
+      ctx,
+    );
     const slides = presentation.slides ?? [];
     return slides.some((slide) => slide.objectId === slideObjectId);
   }
@@ -121,11 +128,14 @@ export class SlidesValidatorsService {
         candidates: [],
         decisionMargin: 0,
         ambiguous: true,
-        reasonCodes: ['EMPTY_QUERY'],
+        reasonCodes: ["EMPTY_QUERY"],
       };
     }
 
-    const presentation = await this.slidesClient.getPresentation(presentationId, ctx);
+    const presentation = await this.slidesClient.getPresentation(
+      presentationId,
+      ctx,
+    );
     const index = this.buildIndex(presentation);
 
     if (index.length === 0) {
@@ -134,7 +144,7 @@ export class SlidesValidatorsService {
         candidates: [],
         decisionMargin: 0,
         ambiguous: true,
-        reasonCodes: ['NO_SLIDE_TEXT_INDEX'],
+        reasonCodes: ["NO_SLIDE_TEXT_INDEX"],
       };
     }
 
@@ -145,27 +155,30 @@ export class SlidesValidatorsService {
         const reasons: string[] = [];
         let score = 0;
 
-        const labelScore = tokenOverlapScore(node.pageElementLabel, normalizedQuery);
+        const labelScore = tokenOverlapScore(
+          node.pageElementLabel,
+          normalizedQuery,
+        );
         if (labelScore > 0) {
           score += labelScore * 0.45;
-          reasons.push('LABEL_MATCH');
+          reasons.push("LABEL_MATCH");
         }
 
         const textScore = tokenOverlapScore(node.text, normalizedQuery);
         if (textScore > 0) {
           score += textScore * 0.35;
-          reasons.push('TEXT_MATCH');
+          reasons.push("TEXT_MATCH");
         }
 
         const titleScore = tokenOverlapScore(node.slideTitle, normalizedQuery);
         if (titleScore > 0) {
           score += titleScore * 0.2;
-          reasons.push('TITLE_MATCH');
+          reasons.push("TITLE_MATCH");
         }
 
         if (slideNumberHint !== null && node.slideNumber === slideNumberHint) {
           score += 0.25;
-          reasons.push('SLIDE_NUMBER_MATCH');
+          reasons.push("SLIDE_NUMBER_MATCH");
         }
 
         score = Math.min(1, score);
@@ -189,7 +202,7 @@ export class SlidesValidatorsService {
         candidates: [],
         decisionMargin: 0,
         ambiguous: true,
-        reasonCodes: ['NO_TARGET_MATCH'],
+        reasonCodes: ["NO_TARGET_MATCH"],
       };
     }
 
@@ -197,11 +210,12 @@ export class SlidesValidatorsService {
     const second = ranked[1];
     const margin = second ? top.score - second.score : top.score;
 
-    const ambiguous = top.score < MIN_GOOD_SCORE || (Boolean(second) && margin < 0.15);
+    const ambiguous =
+      top.score < MIN_GOOD_SCORE || (Boolean(second) && margin < 0.15);
 
     const reasonCodes = [
-      ambiguous ? 'AMBIGUOUS_TARGET' : 'RESOLVED_TARGET',
-      top.reasons.length > 0 ? top.reasons[0] : 'SCORE_ONLY',
+      ambiguous ? "AMBIGUOUS_TARGET" : "RESOLVED_TARGET",
+      top.reasons.length > 0 ? top.reasons[0] : "SCORE_ONLY",
     ];
 
     return {
@@ -218,14 +232,16 @@ export class SlidesValidatorsService {
     const normalized = objectId.trim();
     if (!normalized) {
       throw new SlidesClientError(`${fieldName} is required.`, {
-        code: 'INVALID_OBJECT_ID',
+        code: "INVALID_OBJECT_ID",
         retryable: false,
       });
     }
     return normalized;
   }
 
-  private buildIndex(presentation: slides_v1.Schema$Presentation): SlideIndexNode[] {
+  private buildIndex(
+    presentation: slides_v1.Schema$Presentation,
+  ): SlideIndexNode[] {
     const slides = presentation.slides ?? [];
     const nodes: SlideIndexNode[] = [];
 
@@ -241,9 +257,14 @@ export class SlidesValidatorsService {
         .map((element) => ({
           objectId: element.objectId,
           shape: element.shape,
-          placeholderType: element.shape?.placeholder?.type ?? '',
+          placeholderType: element.shape?.placeholder?.type ?? "",
         }))
-        .find((entry) => entry.objectId && (entry.placeholderType === 'TITLE' || entry.placeholderType === 'CENTERED_TITLE'));
+        .find(
+          (entry) =>
+            entry.objectId &&
+            (entry.placeholderType === "TITLE" ||
+              entry.placeholderType === "CENTERED_TITLE"),
+        );
 
       const slideTitle = extractTextFromShape(titleShape?.shape);
 
@@ -278,11 +299,11 @@ export class SlidesValidatorsService {
     const placeholderType = element.shape?.placeholder?.type;
     const textProbe = text.slice(0, 80).trim();
 
-    if (placeholderType === 'TITLE' || placeholderType === 'CENTERED_TITLE') {
+    if (placeholderType === "TITLE" || placeholderType === "CENTERED_TITLE") {
       return `slide ${slideNumber} title ${slideTitle || textProbe}`.trim();
     }
 
-    if (placeholderType === 'BODY') {
+    if (placeholderType === "BODY") {
       return `slide ${slideNumber} body ${textProbe}`.trim();
     }
 
@@ -290,7 +311,7 @@ export class SlidesValidatorsService {
       return `slide ${slideNumber} text ${textProbe}`;
     }
 
-    return `slide ${slideNumber} element ${element.objectId ?? 'unknown'}`;
+    return `slide ${slideNumber} element ${element.objectId ?? "unknown"}`;
   }
 }
 

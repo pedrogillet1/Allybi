@@ -34,11 +34,11 @@ export type EnvName = "production" | "staging" | "dev" | "local";
 export type LanguageCode = "en" | "pt" | "es";
 
 export interface RouterCandidate {
-  intentId: string;     // e.g., "documents", "file_actions", "help"
-  operatorId?: string;  // e.g., "extract", "open", "locate_docs"
-  intentFamily?: string;// optional if router already emits
-  domainId?: string;    // optional
-  score: number;        // 0..1
+  intentId: string; // e.g., "documents", "file_actions", "help"
+  operatorId?: string; // e.g., "extract", "open", "locate_docs"
+  intentFamily?: string; // optional if router already emits
+  domainId?: string; // optional
+  score: number; // 0..1
   reasons?: string[];
 }
 
@@ -61,7 +61,11 @@ export interface IntentStateSnapshot {
     domainId?: string;
     confidence?: number;
   };
-  activeDocRef?: { docId?: string; filename?: string; lockType?: "hard" | "soft" | "none" };
+  activeDocRef?: {
+    docId?: string;
+    filename?: string;
+    lockType?: "hard" | "soft" | "none";
+  };
   activeDomain?: string;
 }
 
@@ -102,39 +106,42 @@ interface IntentConfigBank {
 
     // Core thresholds
     thresholds: {
-      minEmitScore: number;                 // minimum candidate score to be considered at all
-      autopickScoreGte: number;             // allow autopick
-      autopickMarginGte: number;            // top must beat #2 by this margin
-      forceClarifyTopBelow: number;         // if top score below, ask clarification instead of autopick
-      ambiguousMarginLt: number;            // if margin < this, prefer disambiguation
+      minEmitScore: number; // minimum candidate score to be considered at all
+      autopickScoreGte: number; // allow autopick
+      autopickMarginGte: number; // top must beat #2 by this margin
+      forceClarifyTopBelow: number; // if top score below, ask clarification instead of autopick
+      ambiguousMarginLt: number; // if margin < this, prefer disambiguation
     };
 
     // Follow-up stability rules
     followupStability: {
       enabled: boolean;
-      stickyMinFollowupConfidence: number;  // if followupConfidence >= this, prefer staying on prior intent
-      switchRequiresScoreGte: number;       // require this to switch on followup
+      stickyMinFollowupConfidence: number; // if followupConfidence >= this, prefer staying on prior intent
+      switchRequiresScoreGte: number; // require this to switch on followup
       switchRequiresImprovementGte: number; // require improvement over previous confidence
       allowSwitchIfExplicitDocRef: boolean; // explicit doc ref can override stickiness
       allowSwitchIfDiscoveryQuery: boolean; // discovery query can override stickiness
-      allowSwitchIfNavQuery: boolean;       // nav query can override stickiness
+      allowSwitchIfNavQuery: boolean; // nav query can override stickiness
     };
 
     // Env behavior
-    env: Record<EnvName, { strictness: "high" | "medium"; failClosed: boolean }>;
+    env: Record<
+      EnvName,
+      { strictness: "high" | "medium"; failClosed: boolean }
+    >;
 
     defaults: {
-      defaultIntentId: string;      // e.g. "documents"
-      defaultIntentFamily: string;  // e.g. "documents"
-      defaultOperatorId: string;    // e.g. "extract"
-      defaultDomainId: string;      // e.g. "general"
-      defaultConfidence: number;    // e.g. 0.55
+      defaultIntentId: string; // e.g. "documents"
+      defaultIntentFamily: string; // e.g. "documents"
+      defaultOperatorId: string; // e.g. "extract"
+      defaultDomainId: string; // e.g. "general"
+      defaultConfidence: number; // e.g. 0.55
     };
 
     operatorOverrides: {
       // hard overrides by signals (ChatGPT-like)
       discoveryQueryOperator: string; // "locate_docs"
-      navQueryOperator: string;       // "open" (or "locate_file")
+      navQueryOperator: string; // "open" (or "locate_file")
     };
 
     // Optional: mappings to keep families consistent
@@ -172,9 +179,9 @@ const FALLBACK_BANK: IntentConfigBank = {
     enabled: true,
     thresholds: {
       minEmitScore: 0.45,
-      autopickScoreGte: 0.70,
+      autopickScoreGte: 0.7,
       autopickMarginGte: 0.05,
-      forceClarifyTopBelow: 0.40,
+      forceClarifyTopBelow: 0.4,
       ambiguousMarginLt: 0.03,
     },
     followupStability: {
@@ -209,8 +216,16 @@ const FALLBACK_BANK: IntentConfigBank = {
       help: { id: "help", defaultOperator: "how_to" },
     },
     intents: {
-      documents: { id: "documents", family: "documents", defaultOperator: "extract" },
-      file_actions: { id: "file_actions", family: "file_actions", defaultOperator: "list" },
+      documents: {
+        id: "documents",
+        family: "documents",
+        defaultOperator: "extract",
+      },
+      file_actions: {
+        id: "file_actions",
+        family: "file_actions",
+        defaultOperator: "list",
+      },
       help: { id: "help", family: "help", defaultOperator: "how_to" },
     },
   },
@@ -229,7 +244,8 @@ export class IntentConfigService {
 
   getConfig(): IntentConfigBank {
     const now = Date.now();
-    if (this.cache && now - this.loadedAtMs < this.CACHE_TTL_MS) return this.cache;
+    if (this.cache && now - this.loadedAtMs < this.CACHE_TTL_MS)
+      return this.cache;
 
     const bank = getBank<IntentConfigBank>("intent_config");
     if (!bank?.config?.enabled) {
@@ -265,9 +281,10 @@ export class IntentConfigService {
     // 2) Hard signal overrides (ChatGPT-like)
     // discoveryQuery → locate_docs (documents family)
     if (signals.discoveryQuery) {
-      const domainId = input.candidates.find(c => c.domainId)?.domainId
-        ?? state.activeDomain
-        ?? cfg.defaults.defaultDomainId;
+      const domainId =
+        input.candidates.find((c) => c.domainId)?.domainId ??
+        state.activeDomain ??
+        cfg.defaults.defaultDomainId;
 
       notes.push("override:discoveryQuery");
       return this.makeOutput({
@@ -275,7 +292,7 @@ export class IntentConfigService {
         intentFamily: "documents",
         operatorId: cfg.operatorOverrides.discoveryQueryOperator,
         domainId,
-        confidence: Math.max(top?.score ?? 0.7, 0.80),
+        confidence: Math.max(top?.score ?? 0.7, 0.8),
         notes,
       });
     }
@@ -289,7 +306,7 @@ export class IntentConfigService {
         intentFamily: "file_actions",
         operatorId: cfg.operatorOverrides.navQueryOperator,
         domainId,
-        confidence: Math.max(top?.score ?? 0.7, 0.80),
+        confidence: Math.max(top?.score ?? 0.7, 0.8),
         notes,
       });
     }
@@ -321,16 +338,20 @@ export class IntentConfigService {
     // 5) Follow-up stability (ChatGPT-like)
     if (cfg.followupStability.enabled && signals.isFollowup && prev.intentId) {
       const followupConf = signals.followupConfidence ?? 0;
-      const sticky = followupConf >= cfg.followupStability.stickyMinFollowupConfidence;
+      const sticky =
+        followupConf >= cfg.followupStability.stickyMinFollowupConfidence;
 
       const allowSwitch =
-        (signals.hasExplicitDocRef && cfg.followupStability.allowSwitchIfExplicitDocRef) ||
-        (signals.discoveryQuery && cfg.followupStability.allowSwitchIfDiscoveryQuery) ||
+        (signals.hasExplicitDocRef &&
+          cfg.followupStability.allowSwitchIfExplicitDocRef) ||
+        (signals.discoveryQuery &&
+          cfg.followupStability.allowSwitchIfDiscoveryQuery) ||
         (signals.navQuery && cfg.followupStability.allowSwitchIfNavQuery);
 
       const newStrongEnough =
         top.score >= cfg.followupStability.switchRequiresScoreGte &&
-        (top.score - (prev.confidence ?? 0)) >= cfg.followupStability.switchRequiresImprovementGte;
+        top.score - (prev.confidence ?? 0) >=
+          cfg.followupStability.switchRequiresImprovementGte;
 
       if (sticky && !allowSwitch && !newStrongEnough) {
         notes.push("followup:sticky_keep_previous_intent");
@@ -338,7 +359,8 @@ export class IntentConfigService {
           intentId: prev.intentId ?? cfg.defaults.defaultIntentId,
           intentFamily: prev.intentFamily ?? cfg.defaults.defaultIntentFamily,
           operatorId: prev.operatorId ?? cfg.defaults.defaultOperatorId,
-          domainId: prev.domainId ?? state.activeDomain ?? cfg.defaults.defaultDomainId,
+          domainId:
+            prev.domainId ?? state.activeDomain ?? cfg.defaults.defaultDomainId,
           confidence: prev.confidence ?? cfg.defaults.defaultConfidence,
           notes,
         });
@@ -355,9 +377,19 @@ export class IntentConfigService {
     if (signals.hasExplicitDocRef && isFileActionsTop) {
       notes.push("bias:explicitDocRef_demotes_file_actions");
       // pick best non-file_actions candidate if exists and reasonable
-      const bestNonFile = sorted.find((c) => c.intentId !== "file_actions" && c.score >= cfg.thresholds.minEmitScore);
+      const bestNonFile = sorted.find(
+        (c) =>
+          c.intentId !== "file_actions" &&
+          c.score >= cfg.thresholds.minEmitScore,
+      );
       if (bestNonFile) {
-        return this.makeOutputFromCandidate(bestNonFile, cfg, state, notes, "picked_best_non_file_actions");
+        return this.makeOutputFromCandidate(
+          bestNonFile,
+          cfg,
+          state,
+          notes,
+          "picked_best_non_file_actions",
+        );
       }
       // otherwise continue; sometimes user really wants "open X" which is file_actions
     }
@@ -368,15 +400,20 @@ export class IntentConfigService {
       margin >= cfg.thresholds.autopickMarginGte;
 
     const ambiguous =
-      second &&
-      (margin < cfg.thresholds.ambiguousMarginLt || topBelowClarify);
+      second && (margin < cfg.thresholds.ambiguousMarginLt || topBelowClarify);
 
     if (ambiguous) notes.push("decision:ambiguous");
     else if (autopick) notes.push("decision:autopick");
     else notes.push("decision:default_pick_top");
 
     // 8) Build output from the top candidate (or fallback to family defaults)
-    return this.makeOutputFromCandidate(top, cfg, state, notes, "picked_top_candidate");
+    return this.makeOutputFromCandidate(
+      top,
+      cfg,
+      state,
+      notes,
+      "picked_top_candidate",
+    );
   }
 
   // -----------------------------
@@ -388,7 +425,7 @@ export class IntentConfigService {
     cfg: IntentConfigBank["config"],
     state: IntentStateSnapshot,
     notes: string[],
-    reason: string
+    reason: string,
   ): IntentDecisionOutput {
     notes.push(reason);
 
@@ -405,7 +442,8 @@ export class IntentConfigService {
       cfg.intentFamilies?.[family]?.defaultOperator ??
       cfg.defaults.defaultOperatorId;
 
-    const domainId = c.domainId ?? state.activeDomain ?? cfg.defaults.defaultDomainId;
+    const domainId =
+      c.domainId ?? state.activeDomain ?? cfg.defaults.defaultDomainId;
 
     return this.makeOutput({
       intentId,

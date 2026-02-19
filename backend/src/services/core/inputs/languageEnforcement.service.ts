@@ -88,7 +88,13 @@ export interface LanguageEnforcementInput {
 export interface LanguageEnforcementResult {
   outputLanguage: LangCode; // usually en/pt/es; may be "any" if allowed
   confidence: number; // 0..1
-  reason: "explicit_directive" | "detector_confident" | "user_preference" | "prior_language" | "ambiguous_any" | "forced_override";
+  reason:
+    | "explicit_directive"
+    | "detector_confident"
+    | "user_preference"
+    | "prior_language"
+    | "ambiguous_any"
+    | "forced_override";
   signals: {
     languageRequested: boolean;
     mixedLanguageDetected: boolean;
@@ -112,7 +118,12 @@ function clamp01(x: number): number {
 }
 
 function normalizeForDecision(s: string): string {
-  return (s ?? "").replace(/\r\n|\r/g, "\n").replace(/\t/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+  return (s ?? "")
+    .replace(/\r\n|\r/g, "\n")
+    .replace(/\t/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
 }
 
 function isProd(env: EnvName): boolean {
@@ -143,42 +154,70 @@ export class LanguageEnforcementService {
     const indicators = this.safeGetBank<any>("language_indicators");
 
     const policySteps: string[] = [];
-    const statePref: LangCode | null = (input.state?.persistent?.preferences?.language && isLang(input.state.persistent.preferences.language))
-      ? input.state.persistent.preferences.language
-      : (input.state?.session?.userLanguage && isLang(input.state.session.userLanguage) ? input.state.session.userLanguage : null);
+    const statePref: LangCode | null =
+      input.state?.persistent?.preferences?.language &&
+      isLang(input.state.persistent.preferences.language)
+        ? input.state.persistent.preferences.language
+        : input.state?.session?.userLanguage &&
+            isLang(input.state.session.userLanguage)
+          ? input.state.session.userLanguage
+          : null;
 
-    const priorLang: LangCode | null = (input.state?.ephemeral?.signals?.languageSelected && isLang(input.state.ephemeral.signals.languageSelected))
-      ? input.state.ephemeral.signals.languageSelected
-      : null;
+    const priorLang: LangCode | null =
+      input.state?.ephemeral?.signals?.languageSelected &&
+      isLang(input.state.ephemeral.signals.languageSelected)
+        ? input.state.ephemeral.signals.languageSelected
+        : null;
 
     // 0) Forced override (tests/admin/tools)
-    if (input.overrides?.forceLanguage && isLang(input.overrides.forceLanguage)) {
+    if (
+      input.overrides?.forceLanguage &&
+      isLang(input.overrides.forceLanguage)
+    ) {
       policySteps.push("forced_override");
-      return this.finalize(env, {
-        outputLanguage: input.overrides.forceLanguage,
-        confidence: 1,
-        reason: "forced_override",
-        signals: {
-          languageRequested: Boolean(detection.languageRequested),
-          mixedLanguageDetected: Boolean(detection.mixedLanguageDetected),
-          languageSelected: input.overrides.forceLanguage
-        }
-      }, policySteps, text, statePref, priorLang);
+      return this.finalize(
+        env,
+        {
+          outputLanguage: input.overrides.forceLanguage,
+          confidence: 1,
+          reason: "forced_override",
+          signals: {
+            languageRequested: Boolean(detection.languageRequested),
+            mixedLanguageDetected: Boolean(detection.mixedLanguageDetected),
+            languageSelected: input.overrides.forceLanguage,
+          },
+        },
+        policySteps,
+        text,
+        statePref,
+        priorLang,
+      );
     }
 
     // 1) Explicit directive wins (from detector/triggers)
-    if (detection.languageRequested && detection.directiveLanguage && detection.directiveLanguage !== "any") {
+    if (
+      detection.languageRequested &&
+      detection.directiveLanguage &&
+      detection.directiveLanguage !== "any"
+    ) {
       policySteps.push("explicit_directive");
-      return this.finalize(env, {
-        outputLanguage: detection.directiveLanguage,
-        confidence: clamp01(Math.max(0.9, detection.confidence)),
-        reason: "explicit_directive",
-        signals: {
-          languageRequested: true,
-          mixedLanguageDetected: Boolean(detection.mixedLanguageDetected),
-          languageSelected: detection.directiveLanguage
-        }
-      }, policySteps, text, statePref, priorLang);
+      return this.finalize(
+        env,
+        {
+          outputLanguage: detection.directiveLanguage,
+          confidence: clamp01(Math.max(0.9, detection.confidence)),
+          reason: "explicit_directive",
+          signals: {
+            languageRequested: true,
+            mixedLanguageDetected: Boolean(detection.mixedLanguageDetected),
+            languageSelected: detection.directiveLanguage,
+          },
+        },
+        policySteps,
+        text,
+        statePref,
+        priorLang,
+      );
     }
 
     // 2) Mixed-language without explicit directive: prefer "any" unless you want to force a stable language.
@@ -187,16 +226,23 @@ export class LanguageEnforcementService {
       policySteps.push("mixed_language_detected");
       const allowAny = input.overrides?.allowAnyOutputLanguage ?? true;
       if (allowAny) {
-        return this.finalize(env, {
-          outputLanguage: "any",
-          confidence: 0.7,
-          reason: "ambiguous_any",
-          signals: {
-            languageRequested: false,
-            mixedLanguageDetected: true,
-            languageSelected: "any"
-          }
-        }, policySteps, text, statePref, priorLang);
+        return this.finalize(
+          env,
+          {
+            outputLanguage: "any",
+            confidence: 0.7,
+            reason: "ambiguous_any",
+            signals: {
+              languageRequested: false,
+              mixedLanguageDetected: true,
+              languageSelected: "any",
+            },
+          },
+          policySteps,
+          text,
+          statePref,
+          priorLang,
+        );
       }
       // If caller disallows "any", fall back to detector top language if it's confident enough.
       // (Rare; usually allowAnyOutputLanguage should be true.)
@@ -205,60 +251,88 @@ export class LanguageEnforcementService {
     // 3) Detector confident: use it
     if (!detection.isAmbiguous && detection.selectedLanguage !== "any") {
       policySteps.push("detector_confident");
-      return this.finalize(env, {
-        outputLanguage: detection.selectedLanguage,
-        confidence: clamp01(detection.confidence),
-        reason: "detector_confident",
-        signals: {
-          languageRequested: Boolean(detection.languageRequested),
-          mixedLanguageDetected: Boolean(detection.mixedLanguageDetected),
-          languageSelected: detection.selectedLanguage
-        }
-      }, policySteps, text, statePref, priorLang);
+      return this.finalize(
+        env,
+        {
+          outputLanguage: detection.selectedLanguage,
+          confidence: clamp01(detection.confidence),
+          reason: "detector_confident",
+          signals: {
+            languageRequested: Boolean(detection.languageRequested),
+            mixedLanguageDetected: Boolean(detection.mixedLanguageDetected),
+            languageSelected: detection.selectedLanguage,
+          },
+        },
+        policySteps,
+        text,
+        statePref,
+        priorLang,
+      );
     }
 
     // 4) If ambiguous and user has a stored preference, use it (ChatGPT-like personalization)
     if (statePref && statePref !== "any") {
       policySteps.push("user_preference");
-      return this.finalize(env, {
-        outputLanguage: statePref,
-        confidence: 0.75,
-        reason: "user_preference",
-        signals: {
-          languageRequested: Boolean(detection.languageRequested),
-          mixedLanguageDetected: Boolean(detection.mixedLanguageDetected),
-          languageSelected: statePref
-        }
-      }, policySteps, text, statePref, priorLang);
+      return this.finalize(
+        env,
+        {
+          outputLanguage: statePref,
+          confidence: 0.75,
+          reason: "user_preference",
+          signals: {
+            languageRequested: Boolean(detection.languageRequested),
+            mixedLanguageDetected: Boolean(detection.mixedLanguageDetected),
+            languageSelected: statePref,
+          },
+        },
+        policySteps,
+        text,
+        statePref,
+        priorLang,
+      );
     }
 
     // 5) If ambiguous but prior turn language is stable, keep it (continuity)
     if (priorLang && priorLang !== "any") {
       policySteps.push("prior_language");
-      return this.finalize(env, {
-        outputLanguage: priorLang,
-        confidence: 0.7,
-        reason: "prior_language",
-        signals: {
-          languageRequested: Boolean(detection.languageRequested),
-          mixedLanguageDetected: Boolean(detection.mixedLanguageDetected),
-          languageSelected: priorLang
-        }
-      }, policySteps, text, statePref, priorLang);
+      return this.finalize(
+        env,
+        {
+          outputLanguage: priorLang,
+          confidence: 0.7,
+          reason: "prior_language",
+          signals: {
+            languageRequested: Boolean(detection.languageRequested),
+            mixedLanguageDetected: Boolean(detection.mixedLanguageDetected),
+            languageSelected: priorLang,
+          },
+        },
+        policySteps,
+        text,
+        statePref,
+        priorLang,
+      );
     }
 
     // 6) Ambiguous: return "any" (default) to let renderer choose minimal mixed-language-safe output.
     policySteps.push("ambiguous_any");
-    return this.finalize(env, {
-      outputLanguage: "any",
-      confidence: clamp01(Math.max(0.4, detection.confidence)),
-      reason: "ambiguous_any",
-      signals: {
-        languageRequested: Boolean(detection.languageRequested),
-        mixedLanguageDetected: Boolean(detection.mixedLanguageDetected),
-        languageSelected: "any"
-      }
-    }, policySteps, text, statePref, priorLang);
+    return this.finalize(
+      env,
+      {
+        outputLanguage: "any",
+        confidence: clamp01(Math.max(0.4, detection.confidence)),
+        reason: "ambiguous_any",
+        signals: {
+          languageRequested: Boolean(detection.languageRequested),
+          mixedLanguageDetected: Boolean(detection.mixedLanguageDetected),
+          languageSelected: "any",
+        },
+      },
+      policySteps,
+      text,
+      statePref,
+      priorLang,
+    );
   }
 
   private finalize(
@@ -267,7 +341,7 @@ export class LanguageEnforcementService {
     policySteps: string[],
     normalizedSample: string,
     statePref: LangCode | null,
-    priorLang: LangCode | null
+    priorLang: LangCode | null,
   ): LanguageEnforcementResult {
     const res: LanguageEnforcementResult = {
       ...base,
@@ -277,8 +351,8 @@ export class LanguageEnforcementService {
             policySteps,
             normalizedUserTextSample: normalizedSample.slice(0, 160),
             statePreference: statePref,
-            priorLanguage: priorLang
-          }
+            priorLanguage: priorLang,
+          },
     };
 
     // Ensure outputLanguage is always valid

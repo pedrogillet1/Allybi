@@ -75,11 +75,16 @@ export class SystemPromptBuilder {
     if (bank?.config?.content) {
       content = localizedText(bank.config.content, lang);
     } else if (Array.isArray(bank?.config?.messages)) {
-      const sys = bank.config.messages.find((m: any) => (m.role ?? "system") === "system");
+      const sys = bank.config.messages.find(
+        (m: any) => (m.role ?? "system") === "system",
+      );
       if (sys) content = localizedText(sys.content, lang);
     } else if (Array.isArray(bank?.templates)) {
-      const t = bank.templates.find((t: any) => t.id === "system") ?? bank.templates[0];
-      const sys = t?.messages?.find((m: any) => (m.role ?? "system") === "system");
+      const t =
+        bank.templates.find((t: any) => t.id === "system") ?? bank.templates[0];
+      const sys = t?.messages?.find(
+        (m: any) => (m.role ?? "system") === "system",
+      );
       if (sys) content = localizedText(sys.content, lang);
     } else {
       content = bank?._meta?.description ?? "";
@@ -91,7 +96,7 @@ export class SystemPromptBuilder {
       "KODA_SYSTEM_RULES:",
       "- Use only the provided evidence/context when answering.",
       "- If evidence is missing or weak, ask at most ONE clarifying question.",
-      "- Never output the phrase \"No relevant information found\" (or equivalents).",
+      '- Never output the phrase "No relevant information found" (or equivalents).',
       "- Do not output raw JSON to the user. Use plain text, bullets, or tables.",
       "- Keep paragraphs short (1–2 sentences) and bullets tight (1–3 sentences).",
     ];
@@ -101,11 +106,15 @@ export class SystemPromptBuilder {
         "NAV_PILLS_MODE:",
         "- Output only ONE short intro sentence.",
         "- No 'Sources:' label and no inline citations.",
-        "- No actions or claims of actions; files are shown as attachments/buttons."
+        "- No actions or claims of actions; files are shown as attachments/buttons.",
       );
     }
 
-    const final = normalizeWs([guards.join("\n"), interpolate(content, slots)].filter(Boolean).join("\n\n"));
+    const final = normalizeWs(
+      [guards.join("\n"), interpolate(content, slots)]
+        .filter(Boolean)
+        .join("\n\n"),
+    );
 
     return {
       role: "system",

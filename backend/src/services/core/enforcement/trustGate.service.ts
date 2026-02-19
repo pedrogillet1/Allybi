@@ -12,31 +12,31 @@
  * ```
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 // ============================================================================
 // Types
 // ============================================================================
 
 export type NoEvidenceType =
-  | 'not_in_document'
-  | 'not_in_documents'
-  | 'field_not_found'
-  | 'no_data_for_period'
-  | 'partial_data'
-  | 'no_match'
-  | 'ambiguous_no_evidence'
-  | 'calculation_impossible';
+  | "not_in_document"
+  | "not_in_documents"
+  | "field_not_found"
+  | "no_data_for_period"
+  | "partial_data"
+  | "no_match"
+  | "ambiguous_no_evidence"
+  | "calculation_impossible";
 
-export type ConfidenceLevel = 'high' | 'medium' | 'low' | 'none';
+export type ConfidenceLevel = "high" | "medium" | "low" | "none";
 
 export type LimitationType =
-  | 'cant_access'
-  | 'outside_docs'
-  | 'need_more_context'
-  | 'ambiguous_results'
-  | 'incomplete_extraction';
+  | "cant_access"
+  | "outside_docs"
+  | "need_more_context"
+  | "ambiguous_results"
+  | "incomplete_extraction";
 
 export interface TrustContext {
   filename?: string;
@@ -62,11 +62,16 @@ export interface ValidationResult {
   issues: TrustIssue[];
   groundedClaims: number;
   ungroundedClaims: number;
-  recommendedAction: 'pass' | 'add_citation' | 'hedge' | 'rewrite' | 'reject';
+  recommendedAction: "pass" | "add_citation" | "hedge" | "rewrite" | "reject";
 }
 
 export interface TrustIssue {
-  type: 'ungrounded_number' | 'ungrounded_date' | 'ungrounded_name' | 'ungrounded_claim' | 'forbidden_pattern';
+  type:
+    | "ungrounded_number"
+    | "ungrounded_date"
+    | "ungrounded_name"
+    | "ungrounded_claim"
+    | "forbidden_pattern";
   text: string;
   position: number;
   suggestion?: string;
@@ -83,7 +88,10 @@ interface TrustPolicy {
     always_cite: string[];
     citation_format: Record<string, string>;
   };
-  confidence_levels: Record<string, { min_score: number } & Record<string, string>>;
+  confidence_levels: Record<
+    string,
+    { min_score: number } & Record<string, string>
+  >;
   honest_limitations: Record<string, Record<string, string>>;
 }
 
@@ -98,7 +106,8 @@ export class TrustGateService {
 
   // Patterns for extracting claims
   private readonly numberPattern = /\$?[\d,]+(\.\d+)?%?/g;
-  private readonly datePattern = /\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b|\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{1,2},?\s*\d{2,4}\b|\b(Q[1-4])\s*\d{2,4}\b|\b\d{4}\b/gi;
+  private readonly datePattern =
+    /\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b|\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{1,2},?\s*\d{2,4}\b|\b(Q[1-4])\s*\d{2,4}\b|\b\d{4}\b/gi;
   private readonly namePattern = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b/g;
 
   constructor() {
@@ -109,18 +118,18 @@ export class TrustGateService {
     try {
       const policyPath = path.join(
         __dirname,
-        '../../data_banks/formatting/trust_policy.json'
+        "../../data_banks/formatting/trust_policy.json",
       );
 
       if (fs.existsSync(policyPath)) {
-        this.policy = JSON.parse(fs.readFileSync(policyPath, 'utf-8'));
+        this.policy = JSON.parse(fs.readFileSync(policyPath, "utf-8"));
         this.compilePatterns();
-        console.log('✅ [TrustGate] Policy loaded');
+        console.log("✅ [TrustGate] Policy loaded");
       } else {
-        console.warn('⚠️ [TrustGate] Policy not found');
+        console.warn("⚠️ [TrustGate] Policy not found");
       }
     } catch (error: any) {
-      console.error('❌ [TrustGate] Load failed:', error.message);
+      console.error("❌ [TrustGate] Load failed:", error.message);
     }
   }
 
@@ -129,12 +138,12 @@ export class TrustGateService {
 
     // Compile forbidden patterns
     this.forbiddenPatterns = this.policy.forbidden_patterns.patterns.map(
-      (p) => new RegExp(`\\b${p}\\b`, 'gi')
+      (p) => new RegExp(`\\b${p}\\b`, "gi"),
     );
 
     // Compile exception patterns
     this.exceptionPatterns = this.policy.forbidden_patterns.exceptions.map(
-      (p) => new RegExp(p, 'gi')
+      (p) => new RegExp(p, "gi"),
     );
   }
 
@@ -144,25 +153,25 @@ export class TrustGateService {
   public validate(
     answer: string,
     chunks: ChunkEvidence[],
-    language: 'en' | 'pt' = 'en'
+    language: "en" | "pt" = "en",
   ): ValidationResult {
     const issues: TrustIssue[] = [];
     let groundedClaims = 0;
     let ungroundedClaims = 0;
 
     // Build evidence corpus
-    const evidenceText = chunks.map((c) => c.text.toLowerCase()).join(' ');
+    const evidenceText = chunks.map((c) => c.text.toLowerCase()).join(" ");
 
     // Check numbers
     const numbers = answer.match(this.numberPattern) || [];
     for (const num of numbers) {
-      const cleanNum = num.replace(/[$,]/g, '');
+      const cleanNum = num.replace(/[$,]/g, "");
       if (evidenceText.includes(cleanNum) || this.isCommonNumber(cleanNum)) {
         groundedClaims++;
       } else {
         ungroundedClaims++;
         issues.push({
-          type: 'ungrounded_number',
+          type: "ungrounded_number",
           text: num,
           position: answer.indexOf(num),
           suggestion: `Add citation for ${num} or remove if not in documents`,
@@ -179,7 +188,7 @@ export class TrustGateService {
       } else {
         ungroundedClaims++;
         issues.push({
-          type: 'ungrounded_date',
+          type: "ungrounded_date",
           text: date,
           position: answer.indexOf(date),
           suggestion: `Verify ${date} is in the document`,
@@ -193,12 +202,17 @@ export class TrustGateService {
       for (const match of matches) {
         // Check if it's part of an exception
         const isException = this.exceptionPatterns.some((ep) =>
-          ep.test(answer.slice(Math.max(0, answer.indexOf(match) - 20), answer.indexOf(match) + match.length + 20))
+          ep.test(
+            answer.slice(
+              Math.max(0, answer.indexOf(match) - 20),
+              answer.indexOf(match) + match.length + 20,
+            ),
+          ),
         );
 
         if (!isException) {
           issues.push({
-            type: 'forbidden_pattern',
+            type: "forbidden_pattern",
             text: match,
             position: answer.indexOf(match),
             suggestion: `Replace "${match}" with evidence-based language`,
@@ -208,21 +222,28 @@ export class TrustGateService {
     }
 
     // Determine recommendation
-    let recommendedAction: 'pass' | 'add_citation' | 'hedge' | 'rewrite' | 'reject' = 'pass';
+    let recommendedAction:
+      | "pass"
+      | "add_citation"
+      | "hedge"
+      | "rewrite"
+      | "reject" = "pass";
 
     if (issues.length === 0) {
-      recommendedAction = 'pass';
-    } else if (issues.filter((i) => i.type === 'forbidden_pattern').length > 0) {
-      recommendedAction = 'hedge';
+      recommendedAction = "pass";
+    } else if (
+      issues.filter((i) => i.type === "forbidden_pattern").length > 0
+    ) {
+      recommendedAction = "hedge";
     } else if (ungroundedClaims > groundedClaims) {
-      recommendedAction = 'rewrite';
+      recommendedAction = "rewrite";
     } else if (ungroundedClaims > 0) {
-      recommendedAction = 'add_citation';
+      recommendedAction = "add_citation";
     }
 
     // Reject if too many issues
     if (issues.length > 5 || ungroundedClaims > 3) {
-      recommendedAction = 'reject';
+      recommendedAction = "reject";
     }
 
     return {
@@ -238,7 +259,7 @@ export class TrustGateService {
    * Check if number is common/not needing citation
    */
   private isCommonNumber(num: string): boolean {
-    const commonNumbers = ['1', '2', '3', '4', '5', '10', '100', '1000'];
+    const commonNumbers = ["1", "2", "3", "4", "5", "10", "100", "1000"];
     return commonNumbers.includes(num);
   }
 
@@ -256,13 +277,13 @@ export class TrustGateService {
    */
   public getNoEvidenceResponse(
     type: NoEvidenceType,
-    language: 'en' | 'pt' = 'en',
-    context?: TrustContext
+    language: "en" | "pt" = "en",
+    context?: TrustContext,
   ): string {
     const template = this.policy?.no_evidence_responses[language]?.[type];
     if (!template) {
-      return language === 'pt'
-        ? 'Não encontrei isso nos documentos.'
+      return language === "pt"
+        ? "Não encontrei isso nos documentos."
         : "I couldn't find this in the documents.";
     }
 
@@ -273,10 +294,10 @@ export class TrustGateService {
    * Get hedging phrase
    */
   public getHedgingPhrase(
-    type: 'uncertain' | 'limited_data' | 'inference' | 'outside_scope',
-    language: 'en' | 'pt' = 'en'
+    type: "uncertain" | "limited_data" | "inference" | "outside_scope",
+    language: "en" | "pt" = "en",
   ): string {
-    return this.policy?.hedging_phrases[language]?.[type] || '';
+    return this.policy?.hedging_phrases[language]?.[type] || "";
   }
 
   /**
@@ -284,12 +305,12 @@ export class TrustGateService {
    */
   public getConfidenceResponse(
     level: ConfidenceLevel,
-    language: 'en' | 'pt' = 'en',
-    context?: TrustContext
+    language: "en" | "pt" = "en",
+    context?: TrustContext,
   ): string {
     const levelConfig = this.policy?.confidence_levels[level];
     if (!levelConfig) {
-      return this.getNoEvidenceResponse('not_in_documents', language);
+      return this.getNoEvidenceResponse("not_in_documents", language);
     }
 
     const template = levelConfig[language];
@@ -301,19 +322,19 @@ export class TrustGateService {
    */
   public getLimitationResponse(
     type: LimitationType,
-    language: 'en' | 'pt' = 'en'
+    language: "en" | "pt" = "en",
   ): string {
-    return this.policy?.honest_limitations[language]?.[type] || '';
+    return this.policy?.honest_limitations[language]?.[type] || "";
   }
 
   /**
    * Get confidence level based on score
    */
   public getConfidenceLevel(score: number): ConfidenceLevel {
-    if (score >= 0.85) return 'high';
-    if (score >= 0.65) return 'medium';
-    if (score >= 0.45) return 'low';
-    return 'none';
+    if (score >= 0.85) return "high";
+    if (score >= 0.65) return "medium";
+    if (score >= 0.45) return "low";
+    return "none";
   }
 
   /**
@@ -322,14 +343,15 @@ export class TrustGateService {
   public formatCitation(
     value: string,
     source: string,
-    language: 'en' | 'pt' = 'en'
+    language: "en" | "pt" = "en",
   ): string {
-    const format = this.policy?.citation_requirements?.citation_format[language];
+    const format =
+      this.policy?.citation_requirements?.citation_format[language];
     if (!format) {
       return `${value} (${source})`;
     }
 
-    return format.replace('{value}', value).replace('{source}', source);
+    return format.replace("{value}", value).replace("{source}", source);
   }
 
   /**
@@ -399,8 +421,8 @@ export class TrustGateService {
   /**
    * Add hedge to uncertain claim
    */
-  public addHedge(claim: string, language: 'en' | 'pt' = 'en'): string {
-    const hedge = this.getHedgingPhrase('uncertain', language);
+  public addHedge(claim: string, language: "en" | "pt" = "en"): string {
+    const hedge = this.getHedgingPhrase("uncertain", language);
     return `${hedge} ${claim}`;
   }
 

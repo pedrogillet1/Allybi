@@ -22,53 +22,145 @@ export class DocumentCryptoService {
     return `doc:${userId}:${documentId}:${field}`;
   }
 
-  encryptFilename(userId: string, documentId: string, filename: string, dk: Buffer): string {
+  encryptFilename(
+    userId: string,
+    documentId: string,
+    filename: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "filename");
-    return this.enc.encryptStringToJson(filename, key, this.aad(userId, documentId, "filename"));
+    return this.enc.encryptStringToJson(
+      filename,
+      key,
+      this.aad(userId, documentId, "filename"),
+    );
   }
 
-  decryptFilename(userId: string, documentId: string, payloadJson: string, dk: Buffer): string {
+  decryptFilename(
+    userId: string,
+    documentId: string,
+    payloadJson: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "filename");
-    return this.enc.decryptStringFromJson(payloadJson, key, this.aad(userId, documentId, "filename"));
+    return this.enc.decryptStringFromJson(
+      payloadJson,
+      key,
+      this.aad(userId, documentId, "filename"),
+    );
   }
 
-  encryptExtractedText(userId: string, documentId: string, text: string, dk: Buffer): string {
+  encryptExtractedText(
+    userId: string,
+    documentId: string,
+    text: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "extractedText");
-    return this.enc.encryptStringToJson(text, key, this.aad(userId, documentId, "extractedText"));
+    return this.enc.encryptStringToJson(
+      text,
+      key,
+      this.aad(userId, documentId, "extractedText"),
+    );
   }
 
-  decryptExtractedText(userId: string, documentId: string, payloadJson: string, dk: Buffer): string {
+  decryptExtractedText(
+    userId: string,
+    documentId: string,
+    payloadJson: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "extractedText");
-    return this.enc.decryptStringFromJson(payloadJson, key, this.aad(userId, documentId, "extractedText"));
+    return this.enc.decryptStringFromJson(
+      payloadJson,
+      key,
+      this.aad(userId, documentId, "extractedText"),
+    );
   }
 
-  encryptPreviewText(userId: string, documentId: string, text: string, dk: Buffer): string {
+  encryptPreviewText(
+    userId: string,
+    documentId: string,
+    text: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "previewText");
-    return this.enc.encryptStringToJson(text, key, this.aad(userId, documentId, "previewText"));
+    return this.enc.encryptStringToJson(
+      text,
+      key,
+      this.aad(userId, documentId, "previewText"),
+    );
   }
 
-  decryptPreviewText(userId: string, documentId: string, payloadJson: string, dk: Buffer): string {
+  decryptPreviewText(
+    userId: string,
+    documentId: string,
+    payloadJson: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "previewText");
-    return this.enc.decryptStringFromJson(payloadJson, key, this.aad(userId, documentId, "previewText"));
+    return this.enc.decryptStringFromJson(
+      payloadJson,
+      key,
+      this.aad(userId, documentId, "previewText"),
+    );
   }
 
-  encryptDisplayTitle(userId: string, documentId: string, title: string, dk: Buffer): string {
+  encryptDisplayTitle(
+    userId: string,
+    documentId: string,
+    title: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "displayTitle");
-    return this.enc.encryptStringToJson(title, key, this.aad(userId, documentId, "displayTitle"));
+    return this.enc.encryptStringToJson(
+      title,
+      key,
+      this.aad(userId, documentId, "displayTitle"),
+    );
   }
 
-  decryptDisplayTitle(userId: string, documentId: string, payloadJson: string, dk: Buffer): string {
+  decryptDisplayTitle(
+    userId: string,
+    documentId: string,
+    payloadJson: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "displayTitle");
-    return this.enc.decryptStringFromJson(payloadJson, key, this.aad(userId, documentId, "displayTitle"));
+    return this.enc.decryptStringFromJson(
+      payloadJson,
+      key,
+      this.aad(userId, documentId, "displayTitle"),
+    );
   }
 
-  encryptChunkText(userId: string, documentId: string, chunkId: string, text: string, dk: Buffer): string {
+  encryptChunkText(
+    userId: string,
+    documentId: string,
+    chunkId: string,
+    text: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "chunkText");
-    return this.enc.encryptStringToJson(text, key, `doc:${userId}:${documentId}:chunk:${chunkId}`);
+    return this.enc.encryptStringToJson(
+      text,
+      key,
+      `doc:${userId}:${documentId}:chunk:${chunkId}`,
+    );
   }
 
-  decryptChunkText(userId: string, documentId: string, chunkId: string, payloadJson: string, dk: Buffer): string {
+  decryptChunkText(
+    userId: string,
+    documentId: string,
+    chunkId: string,
+    payloadJson: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "chunkText");
-    return this.enc.decryptStringFromJson(payloadJson, key, `doc:${userId}:${documentId}:chunk:${chunkId}`);
+    return this.enc.decryptStringFromJson(
+      payloadJson,
+      key,
+      `doc:${userId}:${documentId}:chunk:${chunkId}`,
+    );
   }
 }

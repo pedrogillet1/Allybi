@@ -3,11 +3,15 @@
  * Domain, intent, keyword, and pattern analytics for marketing insights
  */
 
-import type { PrismaClient } from '@prisma/client';
-import { parseRange, previousWindow, normalizeRange } from './_shared/rangeWindow';
-import { clampLimit } from './_shared/clamp';
-import { processPage, buildCursorClause } from './_shared/pagination';
-import { supportsModel } from './_shared/prismaAdapter';
+import type { PrismaClient } from "@prisma/client";
+import {
+  parseRange,
+  previousWindow,
+  normalizeRange,
+} from "./_shared/rangeWindow";
+import { clampLimit } from "./_shared/clamp";
+import { processPage, buildCursorClause } from "./_shared/pagination";
+import { supportsModel } from "./_shared/prismaAdapter";
 
 export interface DomainRow {
   domain: string;
@@ -78,26 +82,34 @@ export interface InteractionsResult {
  */
 export async function getDomains(
   prisma: PrismaClient,
-  params: { range?: string }
+  params: { range?: string },
 ): Promise<DomainsResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
 
   const { from, to } = window;
 
-  if (!supportsModel(prisma, 'retrievalEvent')) {
+  if (!supportsModel(prisma, "retrievalEvent")) {
     return { range: rangeKey, items: [] };
   }
 
   // Get all retrieval events grouped by domain
   const events = await prisma.retrievalEvent.findMany({
     where: { at: { gte: from, lt: to } },
-    select: { domain: true, evidenceStrength: true, fallbackReasonCode: true, traceId: true },
+    select: {
+      domain: true,
+      evidenceStrength: true,
+      fallbackReasonCode: true,
+      traceId: true,
+    },
     take: 100000,
   });
 
   // Group by domain
-  const domainMap = new Map<string, { count: number; weak: number; traceIds: Set<string> }>();
+  const domainMap = new Map<
+    string,
+    { count: number; weak: number; traceIds: Set<string> }
+  >();
   for (const e of events) {
     if (!domainMap.has(e.domain)) {
       domainMap.set(e.domain, { count: 0, weak: 0, traceIds: new Set() });
@@ -105,22 +117,27 @@ export async function getDomains(
     const data = domainMap.get(e.domain)!;
     data.count++;
     data.traceIds.add(e.traceId);
-    if ((e.evidenceStrength !== null && e.evidenceStrength < 0.35) || e.fallbackReasonCode === 'WEAK_EVIDENCE') {
+    if (
+      (e.evidenceStrength !== null && e.evidenceStrength < 0.35) ||
+      e.fallbackReasonCode === "WEAK_EVIDENCE"
+    ) {
       data.weak++;
     }
   }
 
   // Get token totals by domain (best effort)
   let tokensByTrace = new Map<string, number>();
-  if (supportsModel(prisma, 'modelCall')) {
-    const traceIds = Array.from(new Set(events.map(e => e.traceId)));
+  if (supportsModel(prisma, "modelCall")) {
+    const traceIds = Array.from(new Set(events.map((e) => e.traceId)));
     if (traceIds.length > 0 && traceIds.length <= 10000) {
       const tokenData = await prisma.modelCall.groupBy({
-        by: ['traceId'],
+        by: ["traceId"],
         where: { traceId: { in: traceIds } },
         _sum: { totalTokens: true },
       });
-      tokensByTrace = new Map(tokenData.map(t => [t.traceId, t._sum?.totalTokens ?? 0]));
+      tokensByTrace = new Map(
+        tokenData.map((t) => [t.traceId, t._sum?.totalTokens ?? 0]),
+      );
     }
   }
 
@@ -133,7 +150,10 @@ export async function getDomains(
       return {
         domain,
         count: data.count,
-        weakRate: data.count > 0 ? Math.round((data.weak / data.count) * 10000) / 100 : 0,
+        weakRate:
+          data.count > 0
+            ? Math.round((data.weak / data.count) * 10000) / 100
+            : 0,
         tokens,
       };
     })
@@ -147,24 +167,32 @@ export async function getDomains(
  */
 export async function getIntents(
   prisma: PrismaClient,
-  params: { range?: string }
+  params: { range?: string },
 ): Promise<IntentsResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
 
   const { from, to } = window;
 
-  if (!supportsModel(prisma, 'retrievalEvent')) {
+  if (!supportsModel(prisma, "retrievalEvent")) {
     return { range: rangeKey, items: [] };
   }
 
   const events = await prisma.retrievalEvent.findMany({
     where: { at: { gte: from, lt: to } },
-    select: { intent: true, evidenceStrength: true, fallbackReasonCode: true, traceId: true },
+    select: {
+      intent: true,
+      evidenceStrength: true,
+      fallbackReasonCode: true,
+      traceId: true,
+    },
     take: 100000,
   });
 
-  const intentMap = new Map<string, { count: number; weak: number; traceIds: Set<string> }>();
+  const intentMap = new Map<
+    string,
+    { count: number; weak: number; traceIds: Set<string> }
+  >();
   for (const e of events) {
     if (!intentMap.has(e.intent)) {
       intentMap.set(e.intent, { count: 0, weak: 0, traceIds: new Set() });
@@ -172,22 +200,27 @@ export async function getIntents(
     const data = intentMap.get(e.intent)!;
     data.count++;
     data.traceIds.add(e.traceId);
-    if ((e.evidenceStrength !== null && e.evidenceStrength < 0.35) || e.fallbackReasonCode === 'WEAK_EVIDENCE') {
+    if (
+      (e.evidenceStrength !== null && e.evidenceStrength < 0.35) ||
+      e.fallbackReasonCode === "WEAK_EVIDENCE"
+    ) {
       data.weak++;
     }
   }
 
   // Get token totals
   let tokensByTrace = new Map<string, number>();
-  if (supportsModel(prisma, 'modelCall')) {
-    const traceIds = Array.from(new Set(events.map(e => e.traceId)));
+  if (supportsModel(prisma, "modelCall")) {
+    const traceIds = Array.from(new Set(events.map((e) => e.traceId)));
     if (traceIds.length > 0 && traceIds.length <= 10000) {
       const tokenData = await prisma.modelCall.groupBy({
-        by: ['traceId'],
+        by: ["traceId"],
         where: { traceId: { in: traceIds } },
         _sum: { totalTokens: true },
       });
-      tokensByTrace = new Map(tokenData.map(t => [t.traceId, t._sum?.totalTokens ?? 0]));
+      tokensByTrace = new Map(
+        tokenData.map((t) => [t.traceId, t._sum?.totalTokens ?? 0]),
+      );
     }
   }
 
@@ -200,7 +233,10 @@ export async function getIntents(
       return {
         intent,
         count: data.count,
-        weakRate: data.count > 0 ? Math.round((data.weak / data.count) * 10000) / 100 : 0,
+        weakRate:
+          data.count > 0
+            ? Math.round((data.weak / data.count) * 10000) / 100
+            : 0,
         tokens,
       };
     })
@@ -214,14 +250,14 @@ export async function getIntents(
  */
 export async function getKeywords(
   prisma: PrismaClient,
-  params: { range?: string; domain?: string }
+  params: { range?: string; domain?: string },
 ): Promise<KeywordsResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const currentWindow = parseRange(rangeKey);
   const prevWindow = previousWindow(rangeKey);
 
   // Try QueryTelemetry first for keywords
-  if (supportsModel(prisma, 'queryTelemetry')) {
+  if (supportsModel(prisma, "queryTelemetry")) {
     const where: Record<string, unknown> = {
       timestamp: { gte: currentWindow.from, lt: currentWindow.to },
     };
@@ -263,7 +299,12 @@ export async function getKeywords(
     const keywordRows: KeywordRow[] = Array.from(currentCounts.entries())
       .map(([keyword, count]) => {
         const prevCount = prevCounts.get(keyword) ?? 0;
-        const delta = prevCount > 0 ? Math.round(((count - prevCount) / prevCount) * 100) : (count > 0 ? 100 : 0);
+        const delta =
+          prevCount > 0
+            ? Math.round(((count - prevCount) / prevCount) * 100)
+            : count > 0
+              ? 100
+              : 0;
         return {
           keyword,
           count,
@@ -275,7 +316,7 @@ export async function getKeywords(
 
     const top = keywordRows.slice(0, 20);
     const trending = keywordRows
-      .filter(k => k.trending)
+      .filter((k) => k.trending)
       .sort((a, b) => b.delta - a.delta)
       .slice(0, 10);
 
@@ -291,13 +332,13 @@ export async function getKeywords(
  */
 export async function getPatterns(
   prisma: PrismaClient,
-  params: { range?: string }
+  params: { range?: string },
 ): Promise<PatternsResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
 
   // Try QueryTelemetry for patterns
-  if (supportsModel(prisma, 'queryTelemetry')) {
+  if (supportsModel(prisma, "queryTelemetry")) {
     const events = await prisma.queryTelemetry.findMany({
       where: { timestamp: { gte: window.from, lt: window.to } },
       select: { matchedPatterns: true },
@@ -326,9 +367,9 @@ export async function getPatterns(
  */
 export async function listInteractions(
   prisma: PrismaClient,
-  params: { range?: string; limit?: number; cursor?: string }
+  params: { range?: string; limit?: number; cursor?: string },
 ): Promise<InteractionsResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
   const limit = clampLimit(params.limit, 50);
   const cursorClause = buildCursorClause(params.cursor);
@@ -336,12 +377,12 @@ export async function listInteractions(
   const { from, to } = window;
 
   // Try QueryTelemetry first (most complete)
-  if (supportsModel(prisma, 'queryTelemetry')) {
+  if (supportsModel(prisma, "queryTelemetry")) {
     const events = await prisma.queryTelemetry.findMany({
       where: { timestamp: { gte: from, lt: to } },
       take: limit + 1,
       ...cursorClause,
-      orderBy: { timestamp: 'desc' },
+      orderBy: { timestamp: "desc" },
       select: {
         id: true,
         timestamp: true,
@@ -357,13 +398,13 @@ export async function listInteractions(
 
     const { page, nextCursor } = processPage(events, limit);
 
-    const items: InteractionRow[] = page.map(e => ({
+    const items: InteractionRow[] = page.map((e) => ({
       at: e.timestamp.toISOString(),
       userId: e.userId,
       traceId: e.queryId,
       query: e.queryText,
       intent: e.intent,
-      domain: e.domain ?? 'unknown',
+      domain: e.domain ?? "unknown",
       evidenceStrength: e.avgRelevanceScore,
       tokensTotal: e.totalTokens,
     }));
@@ -376,12 +417,12 @@ export async function listInteractions(
   }
 
   // Fallback to RetrievalEvent + ModelCall join
-  if (supportsModel(prisma, 'retrievalEvent')) {
+  if (supportsModel(prisma, "retrievalEvent")) {
     const events = await prisma.retrievalEvent.findMany({
       where: { at: { gte: from, lt: to } },
       take: limit + 1,
       ...cursorClause,
-      orderBy: { at: 'desc' },
+      orderBy: { at: "desc" },
       select: {
         id: true,
         at: true,
@@ -397,17 +438,19 @@ export async function listInteractions(
 
     // Get tokens for these traces
     let tokensByTrace = new Map<string, number>();
-    if (supportsModel(prisma, 'modelCall') && page.length > 0) {
-      const traceIds = page.map(e => e.traceId);
+    if (supportsModel(prisma, "modelCall") && page.length > 0) {
+      const traceIds = page.map((e) => e.traceId);
       const tokenData = await prisma.modelCall.groupBy({
-        by: ['traceId'],
+        by: ["traceId"],
         where: { traceId: { in: traceIds } },
         _sum: { totalTokens: true },
       });
-      tokensByTrace = new Map(tokenData.map(t => [t.traceId, t._sum?.totalTokens ?? 0]));
+      tokensByTrace = new Map(
+        tokenData.map((t) => [t.traceId, t._sum?.totalTokens ?? 0]),
+      );
     }
 
-    const items: InteractionRow[] = page.map(e => ({
+    const items: InteractionRow[] = page.map((e) => ({
       at: e.at.toISOString(),
       userId: e.userId,
       traceId: e.traceId,

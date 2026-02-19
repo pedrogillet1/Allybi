@@ -9,36 +9,81 @@ import type { Request, Response, NextFunction } from "express";
 type AdminTelemetryAppService = {
   overview: (params: { range: string }) => Promise<any>;
   timeseries: (params: { metric: string; range: string }) => Promise<any>;
-  users: (params: { range: string; limit: number; cursor?: string }) => Promise<any>;
+  users: (params: {
+    range: string;
+    limit: number;
+    cursor?: string;
+  }) => Promise<any>;
   userDetail: (params: { userId: string; range: string }) => Promise<any>;
-  files: (params: { range: string; limit: number; cursor?: string }) => Promise<any>;
+  files: (params: {
+    range: string;
+    limit: number;
+    cursor?: string;
+  }) => Promise<any>;
   fileDetail: (params: { fileId: string; range: string }) => Promise<any>;
-  queries: (params: { range: string; limit: number; cursor?: string; domain?: string; intent?: string }) => Promise<any>;
+  queries: (params: {
+    range: string;
+    limit: number;
+    cursor?: string;
+    domain?: string;
+    intent?: string;
+  }) => Promise<any>;
   intents: (params: { range: string; limit: number }) => Promise<any>;
   intentDetail: (params: { intent: string; range: string }) => Promise<any>;
   domains: (params: { range: string; limit: number }) => Promise<any>;
   domainDetail: (params: { domain: string; range: string }) => Promise<any>;
   domainMatrix: (params: { range: string }) => Promise<any>;
-  keywords: (params: { range: string; limit: number; domain?: string; search?: string }) => Promise<any>;
+  keywords: (params: {
+    range: string;
+    limit: number;
+    domain?: string;
+    search?: string;
+  }) => Promise<any>;
   topKeywords: (params: { range: string; limit: number }) => Promise<any>;
   trendingKeywords: (params: { range: string; limit: number }) => Promise<any>;
   patterns: (params: { range: string; limit: number }) => Promise<any>;
   patternDetail: (params: { patternId: string; range: string }) => Promise<any>;
-  interactions: (params: { range: string; limit: number; cursor?: string }) => Promise<any>;
+  interactions: (params: {
+    range: string;
+    limit: number;
+    cursor?: string;
+  }) => Promise<any>;
   interactionDetail: (params: { traceId: string }) => Promise<any>;
-  quality: (params: { range: string; limit: number; cursor?: string }) => Promise<any>;
+  quality: (params: {
+    range: string;
+    limit: number;
+    cursor?: string;
+  }) => Promise<any>;
   qualityBreakdown: (params: { range: string }) => Promise<any>;
   reaskRate: (params: { range: string }) => Promise<any>;
-  llm: (params: { range: string; limit: number; cursor?: string; provider?: string; model?: string }) => Promise<any>;
+  llm: (params: {
+    range: string;
+    limit: number;
+    cursor?: string;
+    provider?: string;
+    model?: string;
+  }) => Promise<any>;
   llmProviders: (params: { range: string }) => Promise<any>;
   llmStages: (params: { range: string }) => Promise<any>;
   tokensPerQuery: (params: { range: string }) => Promise<any>;
-  errors: (params: { range: string; limit: number; cursor?: string }) => Promise<any>;
+  errors: (params: {
+    range: string;
+    limit: number;
+    cursor?: string;
+  }) => Promise<any>;
   errorSummary: (params: { range: string }) => Promise<any>;
   reliability: (params: { range: string }) => Promise<any>;
   security: (params: { range: string }) => Promise<any>;
-  securityEvents: (params: { range: string; limit: number; cursor?: string }) => Promise<any>;
-  auditLog: (params: { range: string; limit: number; cursor?: string }) => Promise<any>;
+  securityEvents: (params: {
+    range: string;
+    limit: number;
+    cursor?: string;
+  }) => Promise<any>;
+  auditLog: (params: {
+    range: string;
+    limit: number;
+    cursor?: string;
+  }) => Promise<any>;
   apiMetrics: (params: { range: string }) => Promise<any>;
   externalProviders: (params: { range: string }) => Promise<any>;
 };
@@ -61,7 +106,8 @@ function getSvc(req: Request): AdminTelemetryAppService {
 function parseRange(input: unknown, fallback = "7d"): string {
   const v = String(input ?? "").trim();
   if (!v) return fallback;
-  if (/^(1d|24h|7d|30d|90d)$/i.test(v)) return v.toLowerCase().replace("24h", "1d");
+  if (/^(1d|24h|7d|30d|90d)$/i.test(v))
+    return v.toLowerCase().replace("24h", "1d");
   return fallback;
 }
 
@@ -85,7 +131,11 @@ function parseOptionalString(input: unknown): string | undefined {
 // OVERVIEW + TIMESERIES
 // ============================================================================
 
-export async function adminTelemetryOverview(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryOverview(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -96,7 +146,11 @@ export async function adminTelemetryOverview(req: Request, res: Response, next: 
   }
 }
 
-export async function adminTelemetryTimeseries(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryTimeseries(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const metric = String(req.query.metric || "dau").trim();
@@ -112,7 +166,11 @@ export async function adminTelemetryTimeseries(req: Request, res: Response, next
 // USERS
 // ============================================================================
 
-export async function adminTelemetryUsers(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryUsers(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -125,7 +183,11 @@ export async function adminTelemetryUsers(req: Request, res: Response, next: Nex
   }
 }
 
-export async function adminTelemetryUserDetail(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryUserDetail(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const userId = String(req.params.userId);
@@ -141,7 +203,11 @@ export async function adminTelemetryUserDetail(req: Request, res: Response, next
 // FILES
 // ============================================================================
 
-export async function adminTelemetryFiles(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryFiles(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -154,7 +220,11 @@ export async function adminTelemetryFiles(req: Request, res: Response, next: Nex
   }
 }
 
-export async function adminTelemetryFileDetail(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryFileDetail(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const fileId = String(req.params.fileId);
@@ -170,7 +240,11 @@ export async function adminTelemetryFileDetail(req: Request, res: Response, next
 // QUERIES
 // ============================================================================
 
-export async function adminTelemetryQueries(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryQueries(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -189,7 +263,11 @@ export async function adminTelemetryQueries(req: Request, res: Response, next: N
 // INTENTS
 // ============================================================================
 
-export async function adminTelemetryIntents(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryIntents(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -201,7 +279,11 @@ export async function adminTelemetryIntents(req: Request, res: Response, next: N
   }
 }
 
-export async function adminTelemetryIntentDetail(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryIntentDetail(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const intent = String(req.params.intent);
@@ -217,7 +299,11 @@ export async function adminTelemetryIntentDetail(req: Request, res: Response, ne
 // DOMAINS
 // ============================================================================
 
-export async function adminTelemetryDomains(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryDomains(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -229,7 +315,11 @@ export async function adminTelemetryDomains(req: Request, res: Response, next: N
   }
 }
 
-export async function adminTelemetryDomainDetail(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryDomainDetail(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const domain = String(req.params.domain);
@@ -241,7 +331,11 @@ export async function adminTelemetryDomainDetail(req: Request, res: Response, ne
   }
 }
 
-export async function adminTelemetryDomainMatrix(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryDomainMatrix(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -256,7 +350,11 @@ export async function adminTelemetryDomainMatrix(req: Request, res: Response, ne
 // KEYWORDS
 // ============================================================================
 
-export async function adminTelemetryKeywords(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryKeywords(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -270,7 +368,11 @@ export async function adminTelemetryKeywords(req: Request, res: Response, next: 
   }
 }
 
-export async function adminTelemetryTopKeywords(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryTopKeywords(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -282,7 +384,11 @@ export async function adminTelemetryTopKeywords(req: Request, res: Response, nex
   }
 }
 
-export async function adminTelemetryTrendingKeywords(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryTrendingKeywords(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -298,7 +404,11 @@ export async function adminTelemetryTrendingKeywords(req: Request, res: Response
 // PATTERNS
 // ============================================================================
 
-export async function adminTelemetryPatterns(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryPatterns(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -310,7 +420,11 @@ export async function adminTelemetryPatterns(req: Request, res: Response, next: 
   }
 }
 
-export async function adminTelemetryPatternDetail(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryPatternDetail(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const patternId = String(req.params.patternId);
@@ -326,7 +440,11 @@ export async function adminTelemetryPatternDetail(req: Request, res: Response, n
 // INTERACTIONS
 // ============================================================================
 
-export async function adminTelemetryInteractions(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryInteractions(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -339,7 +457,11 @@ export async function adminTelemetryInteractions(req: Request, res: Response, ne
   }
 }
 
-export async function adminTelemetryInteractionDetail(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryInteractionDetail(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const traceId = String(req.params.traceId);
@@ -354,7 +476,11 @@ export async function adminTelemetryInteractionDetail(req: Request, res: Respons
 // QUALITY
 // ============================================================================
 
-export async function adminTelemetryQuality(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryQuality(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -367,7 +493,11 @@ export async function adminTelemetryQuality(req: Request, res: Response, next: N
   }
 }
 
-export async function adminTelemetryQualityBreakdown(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryQualityBreakdown(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -378,7 +508,11 @@ export async function adminTelemetryQualityBreakdown(req: Request, res: Response
   }
 }
 
-export async function adminTelemetryReaskRate(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryReaskRate(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -393,7 +527,11 @@ export async function adminTelemetryReaskRate(req: Request, res: Response, next:
 // LLM / COST
 // ============================================================================
 
-export async function adminTelemetryLLM(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryLLM(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -408,7 +546,11 @@ export async function adminTelemetryLLM(req: Request, res: Response, next: NextF
   }
 }
 
-export async function adminTelemetryLLMProviders(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryLLMProviders(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -419,7 +561,11 @@ export async function adminTelemetryLLMProviders(req: Request, res: Response, ne
   }
 }
 
-export async function adminTelemetryLLMStages(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryLLMStages(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -430,7 +576,11 @@ export async function adminTelemetryLLMStages(req: Request, res: Response, next:
   }
 }
 
-export async function adminTelemetryTokensPerQuery(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryTokensPerQuery(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -445,7 +595,11 @@ export async function adminTelemetryTokensPerQuery(req: Request, res: Response, 
 // ERRORS
 // ============================================================================
 
-export async function adminTelemetryErrors(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryErrors(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -458,7 +612,11 @@ export async function adminTelemetryErrors(req: Request, res: Response, next: Ne
   }
 }
 
-export async function adminTelemetryErrorSummary(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryErrorSummary(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -473,7 +631,11 @@ export async function adminTelemetryErrorSummary(req: Request, res: Response, ne
 // RELIABILITY
 // ============================================================================
 
-export async function adminTelemetryReliability(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryReliability(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -488,7 +650,11 @@ export async function adminTelemetryReliability(req: Request, res: Response, nex
 // SECURITY
 // ============================================================================
 
-export async function adminTelemetrySecurity(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetrySecurity(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -499,7 +665,11 @@ export async function adminTelemetrySecurity(req: Request, res: Response, next: 
   }
 }
 
-export async function adminTelemetrySecurityEvents(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetrySecurityEvents(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -512,7 +682,11 @@ export async function adminTelemetrySecurityEvents(req: Request, res: Response, 
   }
 }
 
-export async function adminTelemetryAuditLog(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryAuditLog(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -529,7 +703,11 @@ export async function adminTelemetryAuditLog(req: Request, res: Response, next: 
 // API METRICS
 // ============================================================================
 
-export async function adminTelemetryAPIMetrics(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryAPIMetrics(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -540,7 +718,11 @@ export async function adminTelemetryAPIMetrics(req: Request, res: Response, next
   }
 }
 
-export async function adminTelemetryExternalProviders(req: Request, res: Response, next: NextFunction) {
+export async function adminTelemetryExternalProviders(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const svc = getSvc(req);
     const range = parseRange(req.query.range, "7d");
@@ -555,7 +737,11 @@ export async function adminTelemetryExternalProviders(req: Request, res: Respons
 // LIVE FEED (Server-Sent Events)
 // ============================================================================
 
-export async function adminTelemetryLiveFeed(req: Request, res: Response, _next: NextFunction) {
+export async function adminTelemetryLiveFeed(
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+) {
   // Set SSE headers
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
@@ -564,11 +750,15 @@ export async function adminTelemetryLiveFeed(req: Request, res: Response, _next:
   res.flushHeaders();
 
   // Send initial connection event
-  res.write(`event: connected\ndata: ${JSON.stringify({ connected: true, timestamp: new Date().toISOString() })}\n\n`);
+  res.write(
+    `event: connected\ndata: ${JSON.stringify({ connected: true, timestamp: new Date().toISOString() })}\n\n`,
+  );
 
   // Keep-alive ping every 30 seconds
   const pingInterval = setInterval(() => {
-    res.write(`event: ping\ndata: ${JSON.stringify({ timestamp: new Date().toISOString() })}\n\n`);
+    res.write(
+      `event: ping\ndata: ${JSON.stringify({ timestamp: new Date().toISOString() })}\n\n`,
+    );
   }, 30000);
 
   // In a real implementation, you would subscribe to a message queue or pub/sub

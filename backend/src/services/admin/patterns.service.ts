@@ -3,9 +3,9 @@
  * Analyzes query patterns, keywords, and entities for gap detection
  */
 
-import type { PrismaClient } from '@prisma/client';
-import { parseRange, normalizeRange } from './_shared/rangeWindow';
-import { supportsModel } from './_shared/prismaAdapter';
+import type { PrismaClient } from "@prisma/client";
+import { parseRange, normalizeRange } from "./_shared/rangeWindow";
+import { supportsModel } from "./_shared/prismaAdapter";
 
 // ============================================================================
 // Types
@@ -56,9 +56,9 @@ export interface PatternsParams {
 
 export async function getPatterns(
   prisma: PrismaClient,
-  params: PatternsParams
+  params: PatternsParams,
 ): Promise<PatternsResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
   const limit = params.limit ?? 20;
   const { from, to } = window;
@@ -70,16 +70,30 @@ export async function getPatterns(
 
   // Get top keywords
   let topKeywords: TopKeyword[] = [];
-  if (supportsModel(prisma, 'queryKeyword')) {
-    topKeywords = await getTopKeywords(prisma, from, to, prevFrom, prevTo, limit);
+  if (supportsModel(prisma, "queryKeyword")) {
+    topKeywords = await getTopKeywords(
+      prisma,
+      from,
+      to,
+      prevFrom,
+      prevTo,
+      limit,
+    );
   } else {
     // Fallback: extract keywords from QueryTelemetry.matchedKeywords
-    topKeywords = await getKeywordsFromTelemetry(prisma, from, to, prevFrom, prevTo, limit);
+    topKeywords = await getKeywordsFromTelemetry(
+      prisma,
+      from,
+      to,
+      prevFrom,
+      prevTo,
+      limit,
+    );
   }
 
   // Get top entities
   let topEntities: TopEntity[] = [];
-  if (supportsModel(prisma, 'queryEntity')) {
+  if (supportsModel(prisma, "queryEntity")) {
     topEntities = await getTopEntities(prisma, from, to, limit);
   }
 
@@ -116,23 +130,23 @@ async function getTopKeywords(
   to: Date,
   prevFrom: Date,
   prevTo: Date,
-  limit: number
+  limit: number,
 ): Promise<TopKeyword[]> {
   // Current period keyword counts
   const currentCounts = await prisma.queryKeyword.groupBy({
-    by: ['keyword'],
+    by: ["keyword"],
     where: {
       createdAt: { gte: from, lt: to },
     },
     _count: { keyword: true },
-    orderBy: { _count: { keyword: 'desc' } },
+    orderBy: { _count: { keyword: "desc" } },
     take: limit,
   });
 
   // Previous period counts for trend
-  const prevKeywords = currentCounts.map(c => c.keyword);
+  const prevKeywords = currentCounts.map((c) => c.keyword);
   const prevCounts = await prisma.queryKeyword.groupBy({
-    by: ['keyword'],
+    by: ["keyword"],
     where: {
       keyword: { in: prevKeywords },
       createdAt: { gte: prevFrom, lt: prevTo },
@@ -140,13 +154,12 @@ async function getTopKeywords(
     _count: { keyword: true },
   });
 
-  const prevMap = new Map(prevCounts.map(p => [p.keyword, p._count.keyword]));
+  const prevMap = new Map(prevCounts.map((p) => [p.keyword, p._count.keyword]));
 
-  return currentCounts.map(c => {
+  return currentCounts.map((c) => {
     const prevCount = prevMap.get(c.keyword) ?? 0;
-    const trend = prevCount > 0
-      ? ((c._count.keyword - prevCount) / prevCount) * 100
-      : 100; // New keyword = 100% growth
+    const trend =
+      prevCount > 0 ? ((c._count.keyword - prevCount) / prevCount) * 100 : 100; // New keyword = 100% growth
 
     return {
       keyword: c.keyword,
@@ -162,9 +175,9 @@ async function getKeywordsFromTelemetry(
   to: Date,
   prevFrom: Date,
   prevTo: Date,
-  limit: number
+  limit: number,
 ): Promise<TopKeyword[]> {
-  if (!supportsModel(prisma, 'queryTelemetry')) {
+  if (!supportsModel(prisma, "queryTelemetry")) {
     return [];
   }
 
@@ -208,9 +221,7 @@ async function getKeywordsFromTelemetry(
 
   return sorted.map(([keyword, count]) => {
     const prevCount = prevCounts.get(keyword) ?? 0;
-    const trend = prevCount > 0
-      ? ((count - prevCount) / prevCount) * 100
-      : 100;
+    const trend = prevCount > 0 ? ((count - prevCount) / prevCount) * 100 : 100;
 
     return {
       keyword,
@@ -224,16 +235,16 @@ async function getTopEntities(
   prisma: PrismaClient,
   from: Date,
   to: Date,
-  limit: number
+  limit: number,
 ): Promise<TopEntity[]> {
   // Group by entity type
   const typeCounts = await prisma.queryEntity.groupBy({
-    by: ['entityType'],
+    by: ["entityType"],
     where: {
       createdAt: { gte: from, lt: to },
     },
     _count: { entityType: true },
-    orderBy: { _count: { entityType: 'desc' } },
+    orderBy: { _count: { entityType: "desc" } },
     take: limit,
   });
 
@@ -241,19 +252,19 @@ async function getTopEntities(
   const result: TopEntity[] = [];
   for (const tc of typeCounts) {
     const topValues = await prisma.queryEntity.groupBy({
-      by: ['value'],
+      by: ["value"],
       where: {
         entityType: tc.entityType,
         createdAt: { gte: from, lt: to },
       },
       _count: { value: true },
-      orderBy: { _count: { value: 'desc' } },
+      orderBy: { _count: { value: "desc" } },
       take: 5,
     });
 
     result.push({
       type: tc.entityType,
-      values: topValues.map(v => v.value),
+      values: topValues.map((v) => v.value),
       count: tc._count.entityType,
     });
   }
@@ -264,25 +275,25 @@ async function getTopEntities(
 async function getQuestionClusters(
   prisma: PrismaClient,
   from: Date,
-  to: Date
+  to: Date,
 ): Promise<QuestionCluster[]> {
   // Cluster by intent + operator combinations
-  if (!supportsModel(prisma, 'queryTelemetry')) {
+  if (!supportsModel(prisma, "queryTelemetry")) {
     return [];
   }
 
   const clusters = await prisma.queryTelemetry.groupBy({
-    by: ['intent', 'operatorFamily'],
+    by: ["intent", "operatorFamily"],
     where: {
       timestamp: { gte: from, lt: to },
     },
     _count: { intent: true },
-    orderBy: { _count: { intent: 'desc' } },
+    orderBy: { _count: { intent: "desc" } },
     take: 10,
   });
 
-  return clusters.map(c => ({
-    pattern: `${c.intent} + ${c.operatorFamily || 'qa'}`,
+  return clusters.map((c) => ({
+    pattern: `${c.intent} + ${c.operatorFamily || "qa"}`,
     examples: [], // Would need query text which is redacted
     count: c._count.intent,
   }));
@@ -291,30 +302,27 @@ async function getQuestionClusters(
 async function getWeakEvidenceClusters(
   prisma: PrismaClient,
   from: Date,
-  to: Date
+  to: Date,
 ): Promise<WeakEvidenceCluster[]> {
-  if (!supportsModel(prisma, 'queryTelemetry')) {
+  if (!supportsModel(prisma, "queryTelemetry")) {
     return [];
   }
 
   // Group weak evidence queries by domain
   const weakQueries = await prisma.queryTelemetry.groupBy({
-    by: ['domain'],
+    by: ["domain"],
     where: {
       timestamp: { gte: from, lt: to },
-      OR: [
-        { hadFallback: true },
-        { topRelevanceScore: { lt: 0.35 } },
-      ],
+      OR: [{ hadFallback: true }, { topRelevanceScore: { lt: 0.35 } }],
     },
     _count: { domain: true },
     _avg: { topRelevanceScore: true },
-    orderBy: { _count: { domain: 'desc' } },
+    orderBy: { _count: { domain: "desc" } },
     take: 10,
   });
 
-  return weakQueries.map(q => ({
-    pattern: q.domain || 'general',
+  return weakQueries.map((q) => ({
+    pattern: q.domain || "general",
     count: q._count.domain,
     avgScore: Math.round((q._avg.topRelevanceScore ?? 0) * 100) / 100,
   }));
@@ -323,23 +331,23 @@ async function getWeakEvidenceClusters(
 async function getDomainDistribution(
   prisma: PrismaClient,
   from: Date,
-  to: Date
+  to: Date,
 ): Promise<Array<{ domain: string; count: number; pct: number }>> {
-  if (!supportsModel(prisma, 'queryTelemetry')) {
+  if (!supportsModel(prisma, "queryTelemetry")) {
     // Fallback to RetrievalEvent
-    if (!supportsModel(prisma, 'retrievalEvent')) {
+    if (!supportsModel(prisma, "retrievalEvent")) {
       return [];
     }
 
     const counts = await prisma.retrievalEvent.groupBy({
-      by: ['domain'],
+      by: ["domain"],
       where: { at: { gte: from, lt: to } },
       _count: { domain: true },
-      orderBy: { _count: { domain: 'desc' } },
+      orderBy: { _count: { domain: "desc" } },
     });
 
     const total = counts.reduce((sum, c) => sum + c._count.domain, 0);
-    return counts.map(c => ({
+    return counts.map((c) => ({
       domain: c.domain,
       count: c._count.domain,
       pct: total > 0 ? Math.round((c._count.domain / total) * 100) : 0,
@@ -347,15 +355,15 @@ async function getDomainDistribution(
   }
 
   const counts = await prisma.queryTelemetry.groupBy({
-    by: ['domain'],
+    by: ["domain"],
     where: { timestamp: { gte: from, lt: to } },
     _count: { domain: true },
-    orderBy: { _count: { domain: 'desc' } },
+    orderBy: { _count: { domain: "desc" } },
   });
 
   const total = counts.reduce((sum, c) => sum + c._count.domain, 0);
-  return counts.map(c => ({
-    domain: c.domain || 'general',
+  return counts.map((c) => ({
+    domain: c.domain || "general",
     count: c._count.domain,
     pct: total > 0 ? Math.round((c._count.domain / total) * 100) : 0,
   }));
@@ -364,23 +372,23 @@ async function getDomainDistribution(
 async function getIntentDistribution(
   prisma: PrismaClient,
   from: Date,
-  to: Date
+  to: Date,
 ): Promise<Array<{ intent: string; count: number; pct: number }>> {
-  if (!supportsModel(prisma, 'queryTelemetry')) {
+  if (!supportsModel(prisma, "queryTelemetry")) {
     // Fallback to RetrievalEvent
-    if (!supportsModel(prisma, 'retrievalEvent')) {
+    if (!supportsModel(prisma, "retrievalEvent")) {
       return [];
     }
 
     const counts = await prisma.retrievalEvent.groupBy({
-      by: ['intent'],
+      by: ["intent"],
       where: { at: { gte: from, lt: to } },
       _count: { intent: true },
-      orderBy: { _count: { intent: 'desc' } },
+      orderBy: { _count: { intent: "desc" } },
     });
 
     const total = counts.reduce((sum, c) => sum + c._count.intent, 0);
-    return counts.map(c => ({
+    return counts.map((c) => ({
       intent: c.intent,
       count: c._count.intent,
       pct: total > 0 ? Math.round((c._count.intent / total) * 100) : 0,
@@ -388,14 +396,14 @@ async function getIntentDistribution(
   }
 
   const counts = await prisma.queryTelemetry.groupBy({
-    by: ['intent'],
+    by: ["intent"],
     where: { timestamp: { gte: from, lt: to } },
     _count: { intent: true },
-    orderBy: { _count: { intent: 'desc' } },
+    orderBy: { _count: { intent: "desc" } },
   });
 
   const total = counts.reduce((sum, c) => sum + c._count.intent, 0);
-  return counts.map(c => ({
+  return counts.map((c) => ({
     intent: c.intent,
     count: c._count.intent,
     pct: total > 0 ? Math.round((c._count.intent / total) * 100) : 0,

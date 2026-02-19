@@ -27,7 +27,9 @@ export class SpreadsheetEngineClientError extends Error {
 }
 
 function trimBaseUrl(input: string): string {
-  return String(input || "").trim().replace(/\/+$/, "");
+  return String(input || "")
+    .trim()
+    .replace(/\/+$/, "");
 }
 
 export class SpreadsheetEngineClient {
@@ -35,11 +37,20 @@ export class SpreadsheetEngineClient {
   private readonly timeoutMs: number;
 
   constructor(opts?: { baseUrl?: string; timeoutMs?: number }) {
-    this.baseUrl = trimBaseUrl(opts?.baseUrl || process.env.SPREADSHEET_ENGINE_URL || "http://127.0.0.1:8011");
-    this.timeoutMs = Number(opts?.timeoutMs || process.env.SPREADSHEET_ENGINE_TIMEOUT_MS || 12000);
+    this.baseUrl = trimBaseUrl(
+      opts?.baseUrl ||
+        process.env.SPREADSHEET_ENGINE_URL ||
+        "http://127.0.0.1:8011",
+    );
+    this.timeoutMs = Number(
+      opts?.timeoutMs || process.env.SPREADSHEET_ENGINE_TIMEOUT_MS || 12000,
+    );
   }
 
-  private async postJson<TResponse>(path: string, body: unknown): Promise<TResponse> {
+  private async postJson<TResponse>(
+    path: string,
+    body: unknown,
+  ): Promise<TResponse> {
     const ac = new AbortController();
     const timer = setTimeout(() => ac.abort(), Math.max(1000, this.timeoutMs));
 
@@ -66,50 +77,66 @@ export class SpreadsheetEngineClient {
       return (await response.json()) as TResponse;
     } catch (error: any) {
       if (error?.name === "AbortError") {
-        throw new SpreadsheetEngineClientError("Spreadsheet engine request timed out", {
-          code: "TIMEOUT",
-          retryable: true,
-        });
+        throw new SpreadsheetEngineClientError(
+          "Spreadsheet engine request timed out",
+          {
+            code: "TIMEOUT",
+            retryable: true,
+          },
+        );
       }
       if (error instanceof SpreadsheetEngineClientError) throw error;
-      throw new SpreadsheetEngineClientError(error?.message || "Spreadsheet engine request failed", {
-        code: "REQUEST_FAILED",
-        retryable: true,
-      });
+      throw new SpreadsheetEngineClientError(
+        error?.message || "Spreadsheet engine request failed",
+        {
+          code: "REQUEST_FAILED",
+          retryable: true,
+        },
+      );
     } finally {
       clearTimeout(timer);
     }
   }
 
-  async execute(req: SpreadsheetEngineExecuteRequest): Promise<SpreadsheetEngineExecuteResponse> {
-    return this.postJson<SpreadsheetEngineExecuteResponse>("/v1/spreadsheet/execute", {
-      request_id: req.requestId,
-      document_id: req.documentId,
-      user_id: req.userId,
-      correlation_id: req.correlationId,
-      spreadsheet_id: req.spreadsheetId,
-      ops: req.ops,
-      context: req.context
-        ? {
-            active_sheet_name: req.context.activeSheetName ?? null,
-            selection_range_a1: req.context.selectionRangeA1 ?? null,
-            language: req.context.language ?? null,
-            conversation_id: req.context.conversationId ?? null,
-          }
-        : undefined,
-      options: req.options || {},
-    });
+  async execute(
+    req: SpreadsheetEngineExecuteRequest,
+  ): Promise<SpreadsheetEngineExecuteResponse> {
+    return this.postJson<SpreadsheetEngineExecuteResponse>(
+      "/v1/spreadsheet/execute",
+      {
+        request_id: req.requestId,
+        document_id: req.documentId,
+        user_id: req.userId,
+        correlation_id: req.correlationId,
+        spreadsheet_id: req.spreadsheetId,
+        ops: req.ops,
+        context: req.context
+          ? {
+              active_sheet_name: req.context.activeSheetName ?? null,
+              selection_range_a1: req.context.selectionRangeA1 ?? null,
+              language: req.context.language ?? null,
+              conversation_id: req.context.conversationId ?? null,
+            }
+          : undefined,
+        options: req.options || {},
+      },
+    );
   }
 
-  async insight(req: SpreadsheetEngineInsightRequest): Promise<SpreadsheetEngineInsightResponse> {
-    return this.postJson<SpreadsheetEngineInsightResponse>("/v1/spreadsheet/insight", {
-      request_id: req.requestId,
-      document_id: req.documentId,
-      user_id: req.userId,
-      correlation_id: req.correlationId,
-      spreadsheet_id: req.spreadsheetId,
-      ranges: req.ranges,
-      language: req.language ?? null,
-    });
+  async insight(
+    req: SpreadsheetEngineInsightRequest,
+  ): Promise<SpreadsheetEngineInsightResponse> {
+    return this.postJson<SpreadsheetEngineInsightResponse>(
+      "/v1/spreadsheet/insight",
+      {
+        request_id: req.requestId,
+        document_id: req.documentId,
+        user_id: req.userId,
+        correlation_id: req.correlationId,
+        spreadsheet_id: req.spreadsheetId,
+        ranges: req.ranges,
+        language: req.language ?? null,
+      },
+    );
   }
 }

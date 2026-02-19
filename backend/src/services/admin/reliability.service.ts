@@ -3,11 +3,15 @@
  * Error tracking, ingestion failures, and reliability timeseries
  */
 
-import type { PrismaClient } from '@prisma/client';
-import { parseRange, normalizeRange, type TimeWindow } from './_shared/rangeWindow';
-import { clampLimit } from './_shared/clamp';
-import { processPage, buildCursorClause } from './_shared/pagination';
-import { supportsModel } from './_shared/prismaAdapter';
+import type { PrismaClient } from "@prisma/client";
+import {
+  parseRange,
+  normalizeRange,
+  type TimeWindow,
+} from "./_shared/rangeWindow";
+import { clampLimit } from "./_shared/clamp";
+import { processPage, buildCursorClause } from "./_shared/pagination";
+import { supportsModel } from "./_shared/prismaAdapter";
 
 export interface ErrorRow {
   at: string;
@@ -53,16 +57,16 @@ export interface ReliabilityTimeseriesResult {
   points: ReliabilityTimeseriesPoint[];
 }
 
-type ReliabilityMetric = 'llm_errors' | 'ingestion_failures' | 'error_rate';
+type ReliabilityMetric = "llm_errors" | "ingestion_failures" | "error_rate";
 
 /**
  * List LLM errors
  */
 export async function listErrors(
   prisma: PrismaClient,
-  params: { range?: string; limit?: number; cursor?: string }
+  params: { range?: string; limit?: number; cursor?: string },
 ): Promise<ErrorListResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
   const limit = clampLimit(params.limit, 50);
   const cursorClause = buildCursorClause(params.cursor);
@@ -70,7 +74,7 @@ export async function listErrors(
   const { from, to } = window;
 
   // Check if we have modelCall model
-  if (!supportsModel(prisma, 'modelCall')) {
+  if (!supportsModel(prisma, "modelCall")) {
     return { range: rangeKey, items: [] };
   }
 
@@ -78,11 +82,11 @@ export async function listErrors(
   const errors = await prisma.modelCall.findMany({
     where: {
       at: { gte: from, lt: to },
-      status: 'fail',
+      status: "fail",
     },
     take: limit + 1,
     ...cursorClause,
-    orderBy: { at: 'desc' },
+    orderBy: { at: "desc" },
     select: {
       id: true,
       at: true,
@@ -98,7 +102,7 @@ export async function listErrors(
 
   const { page, nextCursor } = processPage(errors, limit);
 
-  const items: ErrorRow[] = page.map(e => ({
+  const items: ErrorRow[] = page.map((e) => ({
     at: e.at.toISOString(),
     userId: e.userId,
     provider: e.provider,
@@ -121,9 +125,9 @@ export async function listErrors(
  */
 export async function listIngestionFailures(
   prisma: PrismaClient,
-  params: { range?: string; limit?: number; cursor?: string }
+  params: { range?: string; limit?: number; cursor?: string },
 ): Promise<IngestionFailureListResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
   const limit = clampLimit(params.limit, 50);
   const cursorClause = buildCursorClause(params.cursor);
@@ -131,7 +135,7 @@ export async function listIngestionFailures(
   const { from, to } = window;
 
   // Check if we have ingestionEvent model
-  if (!supportsModel(prisma, 'ingestionEvent')) {
+  if (!supportsModel(prisma, "ingestionEvent")) {
     return { range: rangeKey, items: [] };
   }
 
@@ -139,11 +143,11 @@ export async function listIngestionFailures(
   const failures = await prisma.ingestionEvent.findMany({
     where: {
       at: { gte: from, lt: to },
-      status: 'fail',
+      status: "fail",
     },
     take: limit + 1,
     ...cursorClause,
-    orderBy: { at: 'desc' },
+    orderBy: { at: "desc" },
     select: {
       id: true,
       at: true,
@@ -158,7 +162,7 @@ export async function listIngestionFailures(
 
   const { page, nextCursor } = processPage(failures, limit);
 
-  const items: IngestionFailureRow[] = page.map(f => ({
+  const items: IngestionFailureRow[] = page.map((f) => ({
     at: f.at.toISOString(),
     userId: f.userId,
     documentId: f.documentId,
@@ -180,13 +184,18 @@ export async function listIngestionFailures(
  */
 export async function getReliabilityTimeseries(
   prisma: PrismaClient,
-  params: { metric: string; range?: string }
+  params: { metric: string; range?: string },
 ): Promise<ReliabilityTimeseriesResult> {
-  const rangeKey = normalizeRange(params.range, '7d');
+  const rangeKey = normalizeRange(params.range, "7d");
   const window = parseRange(rangeKey);
-  const metric = (params.metric || 'llm_errors') as ReliabilityMetric;
+  const metric = (params.metric || "llm_errors") as ReliabilityMetric;
 
-  const points = await calculateReliabilityTimeseries(prisma, window, metric, rangeKey);
+  const points = await calculateReliabilityTimeseries(
+    prisma,
+    window,
+    metric,
+    rangeKey,
+  );
 
   return {
     metric,
@@ -199,12 +208,12 @@ async function calculateReliabilityTimeseries(
   prisma: PrismaClient,
   window: TimeWindow,
   metric: ReliabilityMetric,
-  rangeKey: string
+  rangeKey: string,
 ): Promise<ReliabilityTimeseriesPoint[]> {
   const { from, to } = window;
 
   // Determine bucket size based on range
-  const bucketMs = rangeKey === '24h' ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+  const bucketMs = rangeKey === "24h" ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
   const buckets: Map<string, number> = new Map();
 
   // Initialize buckets
@@ -216,38 +225,42 @@ async function calculateReliabilityTimeseries(
   }
 
   switch (metric) {
-    case 'llm_errors': {
-      if (!supportsModel(prisma, 'modelCall')) break;
+    case "llm_errors": {
+      if (!supportsModel(prisma, "modelCall")) break;
       const errors = await prisma.modelCall.findMany({
-        where: { at: { gte: from, lt: to }, status: 'fail' },
+        where: { at: { gte: from, lt: to }, status: "fail" },
         select: { at: true },
         take: 100000,
       });
 
       for (const e of errors) {
-        const bucketTime = new Date(Math.floor(e.at.getTime() / bucketMs) * bucketMs).toISOString();
+        const bucketTime = new Date(
+          Math.floor(e.at.getTime() / bucketMs) * bucketMs,
+        ).toISOString();
         buckets.set(bucketTime, (buckets.get(bucketTime) ?? 0) + 1);
       }
       break;
     }
 
-    case 'ingestion_failures': {
-      if (!supportsModel(prisma, 'ingestionEvent')) break;
+    case "ingestion_failures": {
+      if (!supportsModel(prisma, "ingestionEvent")) break;
       const failures = await prisma.ingestionEvent.findMany({
-        where: { at: { gte: from, lt: to }, status: 'fail' },
+        where: { at: { gte: from, lt: to }, status: "fail" },
         select: { at: true },
         take: 100000,
       });
 
       for (const f of failures) {
-        const bucketTime = new Date(Math.floor(f.at.getTime() / bucketMs) * bucketMs).toISOString();
+        const bucketTime = new Date(
+          Math.floor(f.at.getTime() / bucketMs) * bucketMs,
+        ).toISOString();
         buckets.set(bucketTime, (buckets.get(bucketTime) ?? 0) + 1);
       }
       break;
     }
 
-    case 'error_rate': {
-      if (!supportsModel(prisma, 'modelCall')) break;
+    case "error_rate": {
+      if (!supportsModel(prisma, "modelCall")) break;
       const calls = await prisma.modelCall.findMany({
         where: { at: { gte: from, lt: to } },
         select: { at: true, status: true },
@@ -255,17 +268,26 @@ async function calculateReliabilityTimeseries(
       });
 
       // Group by bucket
-      const bucketData: Map<string, { total: number; errors: number }> = new Map();
+      const bucketData: Map<string, { total: number; errors: number }> =
+        new Map();
       for (const c of calls) {
-        const bucketTime = new Date(Math.floor(c.at.getTime() / bucketMs) * bucketMs).toISOString();
-        if (!bucketData.has(bucketTime)) bucketData.set(bucketTime, { total: 0, errors: 0 });
+        const bucketTime = new Date(
+          Math.floor(c.at.getTime() / bucketMs) * bucketMs,
+        ).toISOString();
+        if (!bucketData.has(bucketTime))
+          bucketData.set(bucketTime, { total: 0, errors: 0 });
         const data = bucketData.get(bucketTime)!;
         data.total++;
-        if (c.status === 'fail') data.errors++;
+        if (c.status === "fail") data.errors++;
       }
 
       for (const [key, data] of bucketData) {
-        buckets.set(key, data.total > 0 ? Math.round((data.errors / data.total) * 10000) / 100 : 0);
+        buckets.set(
+          key,
+          data.total > 0
+            ? Math.round((data.errors / data.total) * 10000) / 100
+            : 0,
+        );
       }
       break;
     }

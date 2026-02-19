@@ -34,7 +34,9 @@ export type WeakEvidenceResult = {
  * @param queries - Array of query quality events
  * @returns Weak evidence statistics overall and by domain
  */
-export function calculateWeakEvidence(queries: QueryQualityEvent[]): WeakEvidenceResult {
+export function calculateWeakEvidence(
+  queries: QueryQualityEvent[],
+): WeakEvidenceResult {
   const emptyResult: WeakEvidenceResult = {
     total: 0,
     weak: 0,
@@ -52,7 +54,7 @@ export function calculateWeakEvidence(queries: QueryQualityEvent[]): WeakEvidenc
   let totalWeak = 0;
 
   for (const query of queries) {
-    const domain = query.domain || 'unknown';
+    const domain = query.domain || "unknown";
 
     if (!domainStats.has(domain)) {
       domainStats.set(domain, { total: 0, weak: 0 });
@@ -95,7 +97,7 @@ export function calculateWeakEvidence(queries: QueryQualityEvent[]): WeakEvidenc
  * Calculate weak evidence rate over time series (by day)
  */
 export function calculateWeakEvidenceSeries(
-  queries: QueryQualityEvent[]
+  queries: QueryQualityEvent[],
 ): Array<{ day: string; total: number; weak: number; rate: number }> {
   if (!queries || queries.length === 0) {
     return [];
@@ -125,7 +127,7 @@ export function calculateWeakEvidenceSeries(
   // Build sorted series
   const days = Array.from(byDay.keys()).sort();
 
-  return days.map(day => {
+  return days.map((day) => {
     const stats = byDay.get(day)!;
     return {
       day,

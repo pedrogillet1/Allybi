@@ -1,9 +1,16 @@
 import * as crypto from "crypto";
 import prisma from "../../config/database";
 import { downloadFile, uploadFile } from "../../config/storage";
-import { addDocumentJob, processDocumentJobData, type ProcessDocumentJobData } from "../../queues/document.queue";
+import {
+  addDocumentJob,
+  processDocumentJobData,
+  type ProcessDocumentJobData,
+} from "../../queues/document.queue";
 import { env } from "../../config/env";
-import { isPubSubAvailable, publishExtractJob } from "../jobs/pubsubPublisher.service";
+import {
+  isPubSubAvailable,
+  publishExtractJob,
+} from "../jobs/pubsubPublisher.service";
 import RevisionService from "../documents/revision.service";
 import { logger } from "../../infra/logger";
 import cacheService from "../cache.service";
@@ -30,33 +37,51 @@ function asString(v: unknown): string | null {
   return typeof v === "string" && v.trim() ? v.trim() : null;
 }
 
-function assertMime(actual: string | null | undefined, expected: string, label: string): void {
+function assertMime(
+  actual: string | null | undefined,
+  expected: string,
+  label: string,
+): void {
   if (!actual || actual !== expected) {
-    throw new Error(`${label} requires ${expected}. Current MIME: ${actual || "unknown"}`);
+    throw new Error(
+      `${label} requires ${expected}. Current MIME: ${actual || "unknown"}`,
+    );
   }
 }
 
-function assertPptxMime(actual: string | null | undefined, label: string): void {
+function assertPptxMime(
+  actual: string | null | undefined,
+  label: string,
+): void {
   const mime = String(actual || "").toLowerCase();
   const ok =
-    mime === "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+    mime ===
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
     mime === "application/vnd.ms-powerpoint" ||
     mime.includes("presentationml");
   if (!ok) {
-    throw new Error(`${label} requires a PPTX document. Current MIME: ${actual || "unknown"}`);
+    throw new Error(
+      `${label} requires a PPTX document. Current MIME: ${actual || "unknown"}`,
+    );
   }
 }
 
 type EditingSaveMode = "overwrite" | "revision";
 
 function editingSaveMode(): EditingSaveMode {
-  const raw = String(process.env.KODA_EDITING_SAVE_MODE || "overwrite").trim().toLowerCase();
+  const raw = String(process.env.KODA_EDITING_SAVE_MODE || "overwrite")
+    .trim()
+    .toLowerCase();
   return raw === "revision" ? "revision" : "overwrite";
 }
 
 function keepUndoHistory(): boolean {
   // Keep history by default (stored as hidden revisions). Set to "false" to disable.
-  return String(process.env.KODA_EDITING_KEEP_UNDO_HISTORY || "true").trim().toLowerCase() !== "false";
+  return (
+    String(process.env.KODA_EDITING_KEEP_UNDO_HISTORY || "true")
+      .trim()
+      .toLowerCase() !== "false"
+  );
 }
 
 function sha256(buffer: Buffer): string {
@@ -87,19 +112,27 @@ function safeJsonParseObject(value: unknown): Record<string, any> {
   if (typeof value !== "string" || !value.trim()) return {};
   try {
     const parsed = JSON.parse(value);
-    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? (parsed as any) : {};
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? (parsed as any)
+      : {};
   } catch {
     return {};
   }
 }
 
-function getSlidesLinkFromPptxMetadata(pptxMetadata: unknown): { presentationId: string; url: string } | null {
+function getSlidesLinkFromPptxMetadata(
+  pptxMetadata: unknown,
+): { presentationId: string; url: string } | null {
   const obj = safeJsonParseObject(pptxMetadata);
   const link = obj?.editingSlides;
-  const id = typeof link?.presentationId === "string" ? link.presentationId.trim() : "";
+  const id =
+    typeof link?.presentationId === "string" ? link.presentationId.trim() : "";
   const url = typeof link?.url === "string" ? link.url.trim() : "";
   if (!id) return null;
-  return { presentationId: id, url: url || `https://docs.google.com/presentation/d/${id}/edit` };
+  return {
+    presentationId: id,
+    url: url || `https://docs.google.com/presentation/d/${id}/edit`,
+  };
 }
 
 function setSlidesLinkInPptxMetadata(
@@ -111,16 +144,25 @@ function setSlidesLinkInPptxMetadata(
   return JSON.stringify(obj);
 }
 
-function getSheetsLinkFromPptxMetadata(pptxMetadata: unknown): { spreadsheetId: string; url: string } | null {
+function getSheetsLinkFromPptxMetadata(
+  pptxMetadata: unknown,
+): { spreadsheetId: string; url: string } | null {
   const obj = safeJsonParseObject(pptxMetadata);
   const link = obj?.editingSheets;
-  const id = typeof link?.spreadsheetId === "string" ? link.spreadsheetId.trim() : "";
+  const id =
+    typeof link?.spreadsheetId === "string" ? link.spreadsheetId.trim() : "";
   const url = typeof link?.url === "string" ? link.url.trim() : "";
   if (!id) return null;
-  return { spreadsheetId: id, url: url || `https://docs.google.com/spreadsheets/d/${id}/edit` };
+  return {
+    spreadsheetId: id,
+    url: url || `https://docs.google.com/spreadsheets/d/${id}/edit`,
+  };
 }
 
-function setSheetsLinkInPptxMetadata(pptxMetadata: unknown, link: { spreadsheetId: string; url: string }): string {
+function setSheetsLinkInPptxMetadata(
+  pptxMetadata: unknown,
+  link: { spreadsheetId: string; url: string },
+): string {
   const obj = safeJsonParseObject(pptxMetadata);
   obj.editingSheets = { spreadsheetId: link.spreadsheetId, url: link.url };
   return JSON.stringify(obj);
@@ -134,25 +176,35 @@ function getSheetsChartsFromPptxMetadata(pptxMetadata: unknown): any[] {
 
 function addSheetsChartToPptxMetadata(
   pptxMetadata: unknown,
-  entry: { chartId?: number; type: string; range: string; title?: string; settings?: Record<string, unknown>; createdAtIso?: string },
+  entry: {
+    chartId?: number;
+    type: string;
+    range: string;
+    title?: string;
+    settings?: Record<string, unknown>;
+    createdAtIso?: string;
+  },
 ): string {
   const obj = safeJsonParseObject(pptxMetadata);
-  const existing = Array.isArray(obj.editingSheetsCharts) ? obj.editingSheetsCharts : [];
-  const cleanSettings = entry.settings && typeof entry.settings === "object"
-    ? Object.fromEntries(
-        Object.entries(entry.settings)
-          .filter(([k, v]) => {
+  const existing = Array.isArray(obj.editingSheetsCharts)
+    ? obj.editingSheetsCharts
+    : [];
+  const cleanSettings =
+    entry.settings && typeof entry.settings === "object"
+      ? Object.fromEntries(
+          Object.entries(entry.settings).filter(([k, v]) => {
             if (!k || typeof k !== "string") return false;
             if (v == null) return false;
             if (typeof v === "number") return Number.isFinite(v);
             if (typeof v === "string") return v.trim().length > 0;
             if (typeof v === "boolean") return true;
             if (Array.isArray(v)) return v.length > 0;
-            if (typeof v === "object") return Object.keys(v as Record<string, unknown>).length > 0;
+            if (typeof v === "object")
+              return Object.keys(v as Record<string, unknown>).length > 0;
             return false;
           }),
-      )
-    : undefined;
+        )
+      : undefined;
   const next = [
     ...(existing as any[]),
     {
@@ -177,12 +229,19 @@ function addSheetsTableToPptxMetadata(
     sheetName?: string;
     hasHeader?: boolean;
     style?: string;
-    colors?: { header?: string; stripe?: string; totals?: string; border?: string };
+    colors?: {
+      header?: string;
+      stripe?: string;
+      totals?: string;
+      border?: string;
+    };
     createdAtIso?: string;
   },
 ): string {
   const obj = safeJsonParseObject(pptxMetadata);
-  const existing = Array.isArray(obj.editingSheetsTables) ? obj.editingSheetsTables : [];
+  const existing = Array.isArray(obj.editingSheetsTables)
+    ? obj.editingSheetsTables
+    : [];
   const range = String(entry.range || "").trim();
   if (!range) return JSON.stringify(obj);
   const colorHex = (raw: unknown): string | undefined => {
@@ -190,7 +249,9 @@ function addSheetsTableToPptxMetadata(
     if (!/^#?[0-9a-fA-F]{6}$/.test(s)) return undefined;
     return s.startsWith("#") ? s.toUpperCase() : `#${s.toUpperCase()}`;
   };
-  const style = String(entry.style || "").trim().toLowerCase();
+  const style = String(entry.style || "")
+    .trim()
+    .toLowerCase();
   const cleanStyle = style || undefined;
   const colors = {
     header: colorHex(entry.colors?.header),
@@ -210,7 +271,11 @@ function addSheetsTableToPptxMetadata(
   const merged = [...(existing as any[]), normalized];
   const byKey = new Map<string, any>();
   for (const item of merged) {
-    const key = `${String(item?.sheetName || "").trim().toLowerCase()}|${String(item?.range || "").trim().toUpperCase()}`;
+    const key = `${String(item?.sheetName || "")
+      .trim()
+      .toLowerCase()}|${String(item?.range || "")
+      .trim()
+      .toUpperCase()}`;
     if (!key) continue;
     byKey.set(key, item);
   }
@@ -236,7 +301,10 @@ type EditOperatorLike =
   | "REPLACE_SLIDE_IMAGE";
 
 export class DocumentRevisionStoreService implements EditRevisionStore {
-  private readonly idempotencyResults = new Map<string, { revisionId: string; createdAtMs: number }>();
+  private readonly idempotencyResults = new Map<
+    string,
+    { revisionId: string; createdAtMs: number }
+  >();
   private readonly revisionService: RevisionService;
   private readonly docxEditor: DocxEditorService;
   private readonly slidesClient: SlidesClientService;
@@ -257,7 +325,8 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     this.slidesClient = opts?.slidesClient ?? new SlidesClientService();
     this.slidesEditor = opts?.slidesEditor ?? new SlidesEditorService();
     this.sheetsBridge = opts?.sheetsBridge ?? new SheetsBridgeService();
-    this.spreadsheetEngine = opts?.spreadsheetEngine ?? new SpreadsheetEngineService();
+    this.spreadsheetEngine =
+      opts?.spreadsheetEngine ?? new SpreadsheetEngineService();
   }
 
   private async reprocessEditedDocument(input: {
@@ -289,17 +358,22 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       }
       return;
     } catch (enqueueError: any) {
-      logger.warn("[Editing] Reprocess enqueue failed, running direct processing fallback", {
-        documentId: payload.documentId,
-        userId: payload.userId,
-        error: enqueueError?.message || String(enqueueError || "unknown"),
-      });
+      logger.warn(
+        "[Editing] Reprocess enqueue failed, running direct processing fallback",
+        {
+          documentId: payload.documentId,
+          userId: payload.userId,
+          error: enqueueError?.message || String(enqueueError || "unknown"),
+        },
+      );
     }
 
     try {
       await processDocumentJobData(payload);
     } catch (fallbackError: any) {
-      const msg = String(fallbackError?.message || "Auto-processing failed after apply");
+      const msg = String(
+        fallbackError?.message || "Auto-processing failed after apply",
+      );
       logger.error("[Editing] Direct processing fallback failed", {
         documentId: payload.documentId,
         userId: payload.userId,
@@ -327,7 +401,11 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     expectedDocumentUpdatedAtIso?: string;
     expectedDocumentFileHash?: string;
     metadata?: Record<string, unknown>;
-  }): Promise<{ revisionId: string; fileHashBefore?: string; fileHashAfter?: string }> {
+  }): Promise<{
+    revisionId: string;
+    fileHashBefore?: string;
+    fileHashAfter?: string;
+  }> {
     const docId = input.documentId.trim();
     const userId = input.userId.trim();
     const meta = input.metadata ?? {};
@@ -348,9 +426,15 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       op = "COMPUTE_BUNDLE";
     }
     const beforeText = asString(meta.beforeText) ?? null;
-    const rawContentFormat = String(asString(meta.contentFormat) || "").trim().toLowerCase();
+    const rawContentFormat = String(asString(meta.contentFormat) || "")
+      .trim()
+      .toLowerCase();
     const contentFormat: "plain" | "html" | "markdown" =
-      rawContentFormat === "html" ? "html" : rawContentFormat === "markdown" ? "markdown" : "plain";
+      rawContentFormat === "html"
+        ? "html"
+        : rawContentFormat === "markdown"
+          ? "markdown"
+          : "plain";
     const paragraphContentFormat = contentFormat === "html" ? "html" : "plain";
     // Defensive routing: if a DOCX edit payload contains bundle patches but the
     // caller sent a non-bundle operator, force bundle apply to avoid writing raw
@@ -358,19 +442,32 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     if (op !== "EDIT_DOCX_BUNDLE") {
       try {
         const parsed = JSON.parse(String(input.content || "{}"));
-        if (Array.isArray((parsed as any)?.patches) && (parsed as any).patches.length > 0) {
+        if (
+          Array.isArray((parsed as any)?.patches) &&
+          (parsed as any).patches.length > 0
+        ) {
           const docxPatchKinds = new Set([
-            "docx_paragraph", "docx_delete_paragraph",
-            "docx_set_run_style", "docx_clear_run_style",
-            "docx_set_alignment", "docx_set_indentation",
-            "docx_set_line_spacing", "docx_set_para_spacing",
-            "docx_set_para_style", "docx_set_text_case",
-            "docx_merge_paragraphs", "docx_split_to_list",
-            "docx_list_promote_demote", "docx_delete_section",
+            "docx_paragraph",
+            "docx_delete_paragraph",
+            "docx_set_run_style",
+            "docx_clear_run_style",
+            "docx_set_alignment",
+            "docx_set_indentation",
+            "docx_set_line_spacing",
+            "docx_set_para_spacing",
+            "docx_set_para_style",
+            "docx_set_text_case",
+            "docx_merge_paragraphs",
+            "docx_split_to_list",
+            "docx_list_promote_demote",
+            "docx_delete_section",
             "docx_insert_before",
-            "docx_list_apply_bullets", "docx_list_apply_numbering",
-            "docx_list_remove", "docx_list_restart_numbering",
-            "docx_split_paragraph", "docx_update_toc",
+            "docx_list_apply_bullets",
+            "docx_list_apply_numbering",
+            "docx_list_remove",
+            "docx_list_restart_numbering",
+            "docx_split_paragraph",
+            "docx_update_toc",
           ]);
           const bundleLike = (parsed as any).patches.every((p: any) => {
             const kind = String(p?.kind || "").trim();
@@ -385,16 +482,28 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
     const doc = await prisma.document.findFirst({
       where: { id: docId, userId },
-      select: { id: true, encryptedFilename: true, filename: true, mimeType: true, updatedAt: true, fileHash: true },
+      select: {
+        id: true,
+        encryptedFilename: true,
+        filename: true,
+        mimeType: true,
+        updatedAt: true,
+        fileHash: true,
+      },
     });
     if (!doc) throw new Error("Document not found or not accessible.");
-    if (!doc.encryptedFilename) throw new Error("Document storage key missing.");
+    if (!doc.encryptedFilename)
+      throw new Error("Document storage key missing.");
 
     // Optimistic lock checks (plan -> apply safety).
     if (input.expectedDocumentUpdatedAtIso) {
       const expectedMs = Date.parse(String(input.expectedDocumentUpdatedAtIso));
       const actualMs = Date.parse(String(doc.updatedAt));
-      if (Number.isFinite(expectedMs) && Number.isFinite(actualMs) && actualMs > expectedMs) {
+      if (
+        Number.isFinite(expectedMs) &&
+        Number.isFinite(actualMs) &&
+        actualMs > expectedMs
+      ) {
         throw new Error("REPLAN_REQUIRED: document changed since plan.");
       }
     }
@@ -431,30 +540,55 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     }
 
     const original = await downloadFile(doc.encryptedFilename);
-    const fileHashBefore = String(doc.fileHash || "").trim() || sha256(original);
+    const fileHashBefore =
+      String(doc.fileHash || "").trim() || sha256(original);
 
     let edited: Buffer;
 
     if (op === "EDIT_PARAGRAPH") {
-      assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "EDIT_PARAGRAPH");
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "EDIT_PARAGRAPH",
+      );
       if (!targetId) throw new Error("EDIT_PARAGRAPH requires targetId.");
-      edited = await this.docxEditor.applyParagraphEdit(original, targetId, input.content, { format: paragraphContentFormat });
+      edited = await this.docxEditor.applyParagraphEdit(
+        original,
+        targetId,
+        input.content,
+        { format: paragraphContentFormat },
+      );
     } else if (op === "EDIT_SPAN") {
-      assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "EDIT_SPAN");
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "EDIT_SPAN",
+      );
       if (!targetId) throw new Error("EDIT_SPAN requires targetId.");
       // EDIT_SPAN still commits a full paragraph payload (plain or html), but the
       // intent/operator is used for auditability and policy.
       if (contentFormat !== "html") {
         const beforeMeta = asString(meta.beforeText) || "";
-        if (looksLikeTruncatedSpanPayload(beforeMeta, String(input.content || ""))) {
+        if (
+          looksLikeTruncatedSpanPayload(beforeMeta, String(input.content || ""))
+        ) {
           throw new Error(
             "EDIT_SPAN received span-only content. Please retry the edit; the full sentence/paragraph must be preserved.",
           );
         }
       }
-      edited = await this.docxEditor.applyParagraphEdit(original, targetId, input.content, { format: paragraphContentFormat });
+      edited = await this.docxEditor.applyParagraphEdit(
+        original,
+        targetId,
+        input.content,
+        { format: paragraphContentFormat },
+      );
     } else if (op === "EDIT_DOCX_BUNDLE") {
-      assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "EDIT_DOCX_BUNDLE");
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "EDIT_DOCX_BUNDLE",
+      );
       const rawContent = String(input.content || "").trim();
       let patches: any[] = [];
 
@@ -466,13 +600,21 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       }
 
       if (patches.length === 0 && rawContent) {
-        const shouldUseMarkdownBridge = contentFormat === "markdown" || looksLikeDocxAnnotatedMarkdown(rawContent);
+        const shouldUseMarkdownBridge =
+          contentFormat === "markdown" ||
+          looksLikeDocxAnnotatedMarkdown(rawContent);
         if (shouldUseMarkdownBridge) {
           const markdownParagraphMap = Array.isArray((meta as any).paragraphMap)
             ? (meta as any).paragraphMap
             : undefined;
-          const markdownPlan = await buildDocxBundlePatchesFromMarkdown(original, rawContent, markdownParagraphMap);
-          patches = Array.isArray(markdownPlan.bundlePatches) ? markdownPlan.bundlePatches : [];
+          const markdownPlan = await buildDocxBundlePatchesFromMarkdown(
+            original,
+            rawContent,
+            markdownParagraphMap,
+          );
+          patches = Array.isArray(markdownPlan.bundlePatches)
+            ? markdownPlan.bundlePatches
+            : [];
         }
       }
 
@@ -494,21 +636,36 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         const afterHtml = String((p as any).afterHtml || "").trim();
         const removeNumbering = Boolean((p as any).removeNumbering);
         const applyNumbering = Boolean((p as any).applyNumbering);
-        const applyNumberingType = String((p as any).applyNumberingType || "").trim().toLowerCase() === "numbered"
-          ? "numbered"
-          : (String((p as any).applyNumberingType || "").trim().toLowerCase() === "bulleted" ? "bulleted" : undefined);
+        const applyNumberingType =
+          String((p as any).applyNumberingType || "")
+            .trim()
+            .toLowerCase() === "numbered"
+            ? "numbered"
+            : String((p as any).applyNumberingType || "")
+                  .trim()
+                  .toLowerCase() === "bulleted"
+              ? "bulleted"
+              : undefined;
         if (!pid || !afterHtml) continue;
         const before = buf;
         try {
           // eslint-disable-next-line no-await-in-loop
-          buf = await this.docxEditor.applyParagraphEdit(buf, pid, afterHtml, { format: "html", removeNumbering, applyNumbering, applyNumberingType });
+          buf = await this.docxEditor.applyParagraphEdit(buf, pid, afterHtml, {
+            format: "html",
+            removeNumbering,
+            applyNumbering,
+            applyNumberingType,
+          });
           if (!buf.equals(before)) patchesApplied++;
         } catch (error) {
           if (isParagraphTargetNotFoundError(error)) {
-            logger.warn("[Editing][DOCX_BUNDLE] Skipping stale paragraph patch target", {
-              kind,
-              paragraphId: pid,
-            });
+            logger.warn(
+              "[Editing][DOCX_BUNDLE] Skipping stale paragraph patch target",
+              {
+                kind,
+                paragraphId: pid,
+              },
+            );
             continue;
           }
           throw error;
@@ -523,178 +680,278 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         const before = buf;
         try {
           switch (kind) {
-          // --- Run-level formatting ---
-          case "docx_set_run_style": {
-            if (!pid) continue;
-            const style: Record<string, unknown> = {};
-            if ((p as any).bold != null) style.bold = Boolean((p as any).bold);
-            if ((p as any).italic != null) style.italic = Boolean((p as any).italic);
-            if ((p as any).underline != null) style.underline = Boolean((p as any).underline);
-            if ((p as any).color) style.color = String((p as any).color);
-            if ((p as any).fontFamily) style.fontFamily = String((p as any).fontFamily);
-            if ((p as any).fontSizePt) style.fontSizePt = Number((p as any).fontSizePt);
-            buf = await this.docxEditor.applyRunStyle(buf, pid, style as any);
-            break;
-          }
-          case "docx_clear_run_style": {
-            if (!pid) continue;
-            buf = await this.docxEditor.clearRunStyle(buf, pid);
-            break;
-          }
-          // --- Paragraph-level formatting ---
-          case "docx_set_alignment": {
-            if (!pid) continue;
-            const alignment = String((p as any).alignment || "").trim().toLowerCase();
-            if (!alignment) continue;
-            buf = await this.docxEditor.setAlignment(buf, pid, alignment);
-            break;
-          }
-          case "docx_set_indentation": {
-            if (!pid) continue;
-            const opts: Record<string, number> = {};
-            if ((p as any).leftPt != null) opts.leftPt = Number((p as any).leftPt);
-            if ((p as any).rightPt != null) opts.rightPt = Number((p as any).rightPt);
-            if ((p as any).firstLinePt != null) opts.firstLinePt = Number((p as any).firstLinePt);
-            buf = await this.docxEditor.setIndentation(buf, pid, opts as any);
-            break;
-          }
-          case "docx_set_line_spacing": {
-            if (!pid) continue;
-            const multiplier = Number((p as any).lineSpacing || (p as any).multiplier);
-            if (!Number.isFinite(multiplier) || multiplier <= 0) continue;
-            buf = await this.docxEditor.setLineSpacing(buf, pid, multiplier);
-            break;
-          }
-          case "docx_set_para_spacing": {
-            if (!pid) continue;
-            const opts: Record<string, number> = {};
-            if ((p as any).beforePt != null) opts.beforePt = Number((p as any).beforePt);
-            if ((p as any).afterPt != null) opts.afterPt = Number((p as any).afterPt);
-            buf = await this.docxEditor.setParagraphSpacing(buf, pid, opts as any);
-            break;
-          }
-          case "docx_set_para_style": {
-            if (!pid) continue;
-            const styleName = String((p as any).styleName || "").trim();
-            if (!styleName) continue;
-            buf = await this.docxEditor.setParagraphStyle(buf, pid, styleName);
-            break;
-          }
-          // --- Text case ---
-          case "docx_set_text_case": {
-            if (!pid) continue;
-            const targetCase = String((p as any).targetCase || (p as any).caseType || "").trim().toLowerCase();
-            if (!targetCase) continue;
-            buf = await this.docxEditor.setTextCase(buf, pid, targetCase);
-            break;
-          }
-          // --- List structural ---
-          case "docx_merge_paragraphs": {
-            const pids = Array.isArray((p as any).paragraphIds)
-              ? (p as any).paragraphIds.map((id: any) => String(id || "").trim()).filter(Boolean)
-              : [];
-            if (pids.length < 2) continue;
-            const separator = typeof (p as any).joinSeparator === "string" ? (p as any).joinSeparator : " ";
-            buf = await this.docxEditor.mergeParagraphs(buf, pids, separator);
-            break;
-          }
-          case "docx_split_to_list": {
-            if (!pid) continue;
-            const items = Array.isArray((p as any).items)
-              ? (p as any).items
-                .map((i: any) => String(i || ""))
-                .map((line: string) => line
-                  .replace(/^[\s"'`“”‘’\u200B-\u200D\uFEFF]+/, "")
-                  .replace(/^(?:&bull;|&#8226;|&#x2022;)\s*/i, "")
-                  .replace(/^[\s]*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25AB\u25CF\u25CB\u25C9\u2765\u2767]|[\-\*\+]|□)\s*/, "")
-                  .replace(/^\(?\d{1,3}\)?[.)\-:]\s*/, "")
-                  .replace(/^[a-zA-Z][.)\-:]\s+/, "")
-                  .replace(/\s+/g, " ")
-                  .trim())
-                .filter(Boolean)
-              : [];
-            if (!items.length) continue;
-            const listType = String((p as any).listType || "bulleted").trim().toLowerCase() === "numbered" ? "numbered" : "bulleted";
-            buf = await this.docxEditor.splitParagraphToList(buf, pid, items, listType as any);
-            break;
-          }
-          case "docx_list_promote_demote": {
-            if (!pid) continue;
-            const direction = String((p as any).direction || "").trim().toLowerCase();
-            if (direction !== "promote" && direction !== "demote") continue;
-            buf = await this.docxEditor.promoteOrDemoteListLevel(buf, pid, direction as any);
-            break;
-          }
-          case "docx_list_apply_bullets": {
-            if (!pid) continue;
-            buf = await this.docxEditor.applyListFormatting(buf, pid, "bulleted");
-            break;
-          }
-          case "docx_list_apply_numbering": {
-            if (!pid) continue;
-            buf = await this.docxEditor.applyListFormatting(buf, pid, "numbered");
-            break;
-          }
-          case "docx_list_remove": {
-            if (!pid) continue;
-            buf = await this.docxEditor.removeListFormatting(buf, pid);
-            break;
-          }
-          case "docx_list_restart_numbering": {
-            if (!pid) continue;
-            const startAt = (p as any).startAt != null ? Number((p as any).startAt) : 1;
-            buf = await this.docxEditor.restartListNumbering(buf, pid, startAt);
-            break;
-          }
-          case "docx_split_paragraph": {
-            if (!pid) continue;
-            const splitItems = Array.isArray((p as any).items)
-              ? (p as any).items
-                .map((i: any) => String(i || ""))
-                .map((line: string) => line
-                  .replace(/^[\s"'`“”‘’\u200B-\u200D\uFEFF]+/, "")
-                  .replace(/^(?:&bull;|&#8226;|&#x2022;)\s*/i, "")
-                  .replace(/^[\s]*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25AB\u25CF\u25CB\u25C9\u2765\u2767]|[\-\*\+]|□)\s*/, "")
-                  .replace(/^\(?\d{1,3}\)?[.)\-:]\s*/, "")
-                  .replace(/^[a-zA-Z][.)\-:]\s+/, "")
-                  .replace(/\s+/g, " ")
-                  .trim())
-                .filter(Boolean)
-              : [];
-            const splitListType = String((p as any).listType || "bulleted").trim().toLowerCase() === "numbered" ? "numbered" : "bulleted";
-            if (!splitItems.length) continue;
-            buf = await this.docxEditor.splitParagraphToList(buf, pid, splitItems, splitListType as any);
-            break;
-          }
-          case "docx_update_toc": {
-            buf = await this.docxEditor.updateTableOfContents(buf);
-            break;
-          }
-          // --- Section operations ---
-          case "docx_delete_section": {
-            const headingPid = String((p as any).headingParagraphId || pid || "").trim();
-            if (!headingPid) continue;
-            buf = await this.docxEditor.deleteSection(buf, headingPid);
-            break;
-          }
-          case "docx_insert_before": {
-            if (!pid) continue;
-            const content = String((p as any).content || (p as any).afterText || (p as any).afterHtml || "").trim();
-            if (!content) continue;
-            const format = String((p as any).format || "plain").trim().toLowerCase() === "html" ? "html" : "plain";
-            buf = await this.docxEditor.insertParagraphBefore(buf, pid, content, { format: format as any });
-            break;
-          }
-          default:
-            // Unknown patch kind — skip (docx_paragraph and docx_delete_paragraph handled in other phases)
-            continue;
+            // --- Run-level formatting ---
+            case "docx_set_run_style": {
+              if (!pid) continue;
+              const style: Record<string, unknown> = {};
+              if ((p as any).bold != null)
+                style.bold = Boolean((p as any).bold);
+              if ((p as any).italic != null)
+                style.italic = Boolean((p as any).italic);
+              if ((p as any).underline != null)
+                style.underline = Boolean((p as any).underline);
+              if ((p as any).color) style.color = String((p as any).color);
+              if ((p as any).fontFamily)
+                style.fontFamily = String((p as any).fontFamily);
+              if ((p as any).fontSizePt)
+                style.fontSizePt = Number((p as any).fontSizePt);
+              buf = await this.docxEditor.applyRunStyle(buf, pid, style as any);
+              break;
+            }
+            case "docx_clear_run_style": {
+              if (!pid) continue;
+              buf = await this.docxEditor.clearRunStyle(buf, pid);
+              break;
+            }
+            // --- Paragraph-level formatting ---
+            case "docx_set_alignment": {
+              if (!pid) continue;
+              const alignment = String((p as any).alignment || "")
+                .trim()
+                .toLowerCase();
+              if (!alignment) continue;
+              buf = await this.docxEditor.setAlignment(buf, pid, alignment);
+              break;
+            }
+            case "docx_set_indentation": {
+              if (!pid) continue;
+              const opts: Record<string, number> = {};
+              if ((p as any).leftPt != null)
+                opts.leftPt = Number((p as any).leftPt);
+              if ((p as any).rightPt != null)
+                opts.rightPt = Number((p as any).rightPt);
+              if ((p as any).firstLinePt != null)
+                opts.firstLinePt = Number((p as any).firstLinePt);
+              buf = await this.docxEditor.setIndentation(buf, pid, opts as any);
+              break;
+            }
+            case "docx_set_line_spacing": {
+              if (!pid) continue;
+              const multiplier = Number(
+                (p as any).lineSpacing || (p as any).multiplier,
+              );
+              if (!Number.isFinite(multiplier) || multiplier <= 0) continue;
+              buf = await this.docxEditor.setLineSpacing(buf, pid, multiplier);
+              break;
+            }
+            case "docx_set_para_spacing": {
+              if (!pid) continue;
+              const opts: Record<string, number> = {};
+              if ((p as any).beforePt != null)
+                opts.beforePt = Number((p as any).beforePt);
+              if ((p as any).afterPt != null)
+                opts.afterPt = Number((p as any).afterPt);
+              buf = await this.docxEditor.setParagraphSpacing(
+                buf,
+                pid,
+                opts as any,
+              );
+              break;
+            }
+            case "docx_set_para_style": {
+              if (!pid) continue;
+              const styleName = String((p as any).styleName || "").trim();
+              if (!styleName) continue;
+              buf = await this.docxEditor.setParagraphStyle(
+                buf,
+                pid,
+                styleName,
+              );
+              break;
+            }
+            // --- Text case ---
+            case "docx_set_text_case": {
+              if (!pid) continue;
+              const targetCase = String(
+                (p as any).targetCase || (p as any).caseType || "",
+              )
+                .trim()
+                .toLowerCase();
+              if (!targetCase) continue;
+              buf = await this.docxEditor.setTextCase(buf, pid, targetCase);
+              break;
+            }
+            // --- List structural ---
+            case "docx_merge_paragraphs": {
+              const pids = Array.isArray((p as any).paragraphIds)
+                ? (p as any).paragraphIds
+                    .map((id: any) => String(id || "").trim())
+                    .filter(Boolean)
+                : [];
+              if (pids.length < 2) continue;
+              const separator =
+                typeof (p as any).joinSeparator === "string"
+                  ? (p as any).joinSeparator
+                  : " ";
+              buf = await this.docxEditor.mergeParagraphs(buf, pids, separator);
+              break;
+            }
+            case "docx_split_to_list": {
+              if (!pid) continue;
+              const items = Array.isArray((p as any).items)
+                ? (p as any).items
+                    .map((i: any) => String(i || ""))
+                    .map((line: string) =>
+                      line
+                        .replace(/^[\s"'`“”‘’\u200B-\u200D\uFEFF]+/, "")
+                        .replace(/^(?:&bull;|&#8226;|&#x2022;)\s*/i, "")
+                        .replace(
+                          /^[\s]*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25AB\u25CF\u25CB\u25C9\u2765\u2767]|[\-\*\+]|□)\s*/,
+                          "",
+                        )
+                        .replace(/^\(?\d{1,3}\)?[.)\-:]\s*/, "")
+                        .replace(/^[a-zA-Z][.)\-:]\s+/, "")
+                        .replace(/\s+/g, " ")
+                        .trim(),
+                    )
+                    .filter(Boolean)
+                : [];
+              if (!items.length) continue;
+              const listType =
+                String((p as any).listType || "bulleted")
+                  .trim()
+                  .toLowerCase() === "numbered"
+                  ? "numbered"
+                  : "bulleted";
+              buf = await this.docxEditor.splitParagraphToList(
+                buf,
+                pid,
+                items,
+                listType as any,
+              );
+              break;
+            }
+            case "docx_list_promote_demote": {
+              if (!pid) continue;
+              const direction = String((p as any).direction || "")
+                .trim()
+                .toLowerCase();
+              if (direction !== "promote" && direction !== "demote") continue;
+              buf = await this.docxEditor.promoteOrDemoteListLevel(
+                buf,
+                pid,
+                direction as any,
+              );
+              break;
+            }
+            case "docx_list_apply_bullets": {
+              if (!pid) continue;
+              buf = await this.docxEditor.applyListFormatting(
+                buf,
+                pid,
+                "bulleted",
+              );
+              break;
+            }
+            case "docx_list_apply_numbering": {
+              if (!pid) continue;
+              buf = await this.docxEditor.applyListFormatting(
+                buf,
+                pid,
+                "numbered",
+              );
+              break;
+            }
+            case "docx_list_remove": {
+              if (!pid) continue;
+              buf = await this.docxEditor.removeListFormatting(buf, pid);
+              break;
+            }
+            case "docx_list_restart_numbering": {
+              if (!pid) continue;
+              const startAt =
+                (p as any).startAt != null ? Number((p as any).startAt) : 1;
+              buf = await this.docxEditor.restartListNumbering(
+                buf,
+                pid,
+                startAt,
+              );
+              break;
+            }
+            case "docx_split_paragraph": {
+              if (!pid) continue;
+              const splitItems = Array.isArray((p as any).items)
+                ? (p as any).items
+                    .map((i: any) => String(i || ""))
+                    .map((line: string) =>
+                      line
+                        .replace(/^[\s"'`“”‘’\u200B-\u200D\uFEFF]+/, "")
+                        .replace(/^(?:&bull;|&#8226;|&#x2022;)\s*/i, "")
+                        .replace(
+                          /^[\s]*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25AB\u25CF\u25CB\u25C9\u2765\u2767]|[\-\*\+]|□)\s*/,
+                          "",
+                        )
+                        .replace(/^\(?\d{1,3}\)?[.)\-:]\s*/, "")
+                        .replace(/^[a-zA-Z][.)\-:]\s+/, "")
+                        .replace(/\s+/g, " ")
+                        .trim(),
+                    )
+                    .filter(Boolean)
+                : [];
+              const splitListType =
+                String((p as any).listType || "bulleted")
+                  .trim()
+                  .toLowerCase() === "numbered"
+                  ? "numbered"
+                  : "bulleted";
+              if (!splitItems.length) continue;
+              buf = await this.docxEditor.splitParagraphToList(
+                buf,
+                pid,
+                splitItems,
+                splitListType as any,
+              );
+              break;
+            }
+            case "docx_update_toc": {
+              buf = await this.docxEditor.updateTableOfContents(buf);
+              break;
+            }
+            // --- Section operations ---
+            case "docx_delete_section": {
+              const headingPid = String(
+                (p as any).headingParagraphId || pid || "",
+              ).trim();
+              if (!headingPid) continue;
+              buf = await this.docxEditor.deleteSection(buf, headingPid);
+              break;
+            }
+            case "docx_insert_before": {
+              if (!pid) continue;
+              const content = String(
+                (p as any).content ||
+                  (p as any).afterText ||
+                  (p as any).afterHtml ||
+                  "",
+              ).trim();
+              if (!content) continue;
+              const format =
+                String((p as any).format || "plain")
+                  .trim()
+                  .toLowerCase() === "html"
+                  ? "html"
+                  : "plain";
+              buf = await this.docxEditor.insertParagraphBefore(
+                buf,
+                pid,
+                content,
+                { format: format as any },
+              );
+              break;
+            }
+            default:
+              // Unknown patch kind — skip (docx_paragraph and docx_delete_paragraph handled in other phases)
+              continue;
           }
         } catch (error) {
           if (isParagraphTargetNotFoundError(error)) {
-            logger.warn("[Editing][DOCX_BUNDLE] Skipping stale structural/format patch target", {
-              kind,
-              paragraphId: pid || null,
-            });
+            logger.warn(
+              "[Editing][DOCX_BUNDLE] Skipping stale structural/format patch target",
+              {
+                kind,
+                paragraphId: pid || null,
+              },
+            );
             continue;
           }
           throw error;
@@ -705,7 +962,11 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
       // Phase 2: Batch all deletions in a single pass (reverse order preserves indices)
       const deletePids = patches
-        .filter((p: any) => p && String((p as any).kind || "").trim() === "docx_delete_paragraph")
+        .filter(
+          (p: any) =>
+            p &&
+            String((p as any).kind || "").trim() === "docx_delete_paragraph",
+        )
         .map((p: any) => String((p as any).paragraphId || "").trim())
         .filter(Boolean);
       if (deletePids.length) {
@@ -715,7 +976,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       }
 
       if (patchesApplied === 0) {
-        throw new Error("EDIT_NOOP: All patches resulted in no changes to the document.");
+        throw new Error(
+          "EDIT_NOOP: All patches resulted in no changes to the document.",
+        );
       }
 
       // Propagate apply metrics so the orchestrator can report real counts.
@@ -723,14 +986,22 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         new Set(
           [
             ...patches
-              .map((patch: any) => String((patch as any)?.paragraphId || "").trim())
+              .map((patch: any) =>
+                String((patch as any)?.paragraphId || "").trim(),
+              )
               .filter(Boolean),
             ...deletePids,
             ...patches
-              .filter((patch: any) => String((patch as any)?.kind || "").trim() === "docx_merge_paragraphs")
+              .filter(
+                (patch: any) =>
+                  String((patch as any)?.kind || "").trim() ===
+                  "docx_merge_paragraphs",
+              )
               .flatMap((patch: any) =>
                 Array.isArray((patch as any)?.paragraphIds)
-                  ? (patch as any).paragraphIds.map((id: any) => String(id || "").trim()).filter(Boolean)
+                  ? (patch as any).paragraphIds
+                      .map((id: any) => String(id || "").trim())
+                      .filter(Boolean)
                   : [],
               ),
           ].filter(Boolean),
@@ -744,9 +1015,12 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
       // Verification gate: re-parse output and check structural invariants
       try {
-        const { DocxAnchorsService } = await import("./docx/docxAnchors.service");
+        const { DocxAnchorsService } = await import(
+          "./docx/docxAnchors.service"
+        );
         const verifyAnchors = new DocxAnchorsService();
-        const originalAnchors = await verifyAnchors.extractParagraphNodes(original);
+        const originalAnchors =
+          await verifyAnchors.extractParagraphNodes(original);
         const editedAnchors = await verifyAnchors.extractParagraphNodes(buf);
         const origCount = originalAnchors.length;
         const editCount = editedAnchors.length;
@@ -754,19 +1028,30 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         if (editCount < Math.ceil(origCount * 0.3) && origCount > 4) {
           throw new Error(
             `EDIT_VERIFY_FAIL: Document shrank from ${origCount} to ${editCount} paragraphs (>70% loss). ` +
-            `Rolling back to prevent data loss.`
+              `Rolling back to prevent data loss.`,
           );
         }
         // Check merge invariant: if docx_merge_paragraphs was used, verify the merge target still exists
-        const mergePatch = patches.find((p: any) => String(p?.kind || "") === "docx_merge_paragraphs");
+        const mergePatch = patches.find(
+          (p: any) => String(p?.kind || "") === "docx_merge_paragraphs",
+        );
         if (mergePatch) {
-          const mergedPids: string[] = Array.isArray((mergePatch as any).paragraphIds) ? (mergePatch as any).paragraphIds : [];
+          const mergedPids: string[] = Array.isArray(
+            (mergePatch as any).paragraphIds,
+          )
+            ? (mergePatch as any).paragraphIds
+            : [];
           const removedCount = mergedPids.length - 1; // all but first should be removed
           const expectedCount = origCount - removedCount;
           if (editCount > expectedCount + 1 || editCount < expectedCount - 1) {
-            logger.warn("[Editing][DOCX_BUNDLE] Merge paragraph count mismatch", {
-              expected: expectedCount, actual: editCount, mergedPids: mergedPids.length,
-            });
+            logger.warn(
+              "[Editing][DOCX_BUNDLE] Merge paragraph count mismatch",
+              {
+                expected: expectedCount,
+                actual: editCount,
+                mergedPids: mergedPids.length,
+              },
+            );
           }
         }
       } catch (verifyErr: any) {
@@ -774,21 +1059,38 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
           throw verifyErr;
         }
         // Non-fatal verification errors: log but don't block the edit
-        logger.warn("[Editing][DOCX_BUNDLE] Post-apply verification failed (non-fatal)", {
-          error: String(verifyErr?.message || verifyErr),
-        });
+        logger.warn(
+          "[Editing][DOCX_BUNDLE] Post-apply verification failed (non-fatal)",
+          {
+            error: String(verifyErr?.message || verifyErr),
+          },
+        );
       }
 
       edited = buf;
     } else if (op === "ADD_PARAGRAPH") {
-      assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "ADD_PARAGRAPH");
-      if (!targetId) throw new Error("ADD_PARAGRAPH requires targetId (insert after).");
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "ADD_PARAGRAPH",
+      );
+      if (!targetId)
+        throw new Error("ADD_PARAGRAPH requires targetId (insert after).");
       // If inserting after a list item, default to a normal paragraph (not another bullet).
       // Callers can override by setting meta.keepNumbering=true.
       const keepNumbering = Boolean((meta as any)?.keepNumbering);
-      edited = await this.docxEditor.insertParagraphAfter(original, targetId, input.content, { format: paragraphContentFormat, removeNumbering: !keepNumbering });
+      edited = await this.docxEditor.insertParagraphAfter(
+        original,
+        targetId,
+        input.content,
+        { format: paragraphContentFormat, removeNumbering: !keepNumbering },
+      );
     } else if (op === "EDIT_CELL") {
-      assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "EDIT_CELL");
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "EDIT_CELL",
+      );
       if (!targetId) throw new Error("EDIT_CELL requires targetId.");
       edited = await this.applyXlsxEdit(original, {
         op,
@@ -806,7 +1108,11 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         },
       });
     } else if (op === "EDIT_RANGE") {
-      assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "EDIT_RANGE");
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "EDIT_RANGE",
+      );
       if (!targetId) throw new Error("EDIT_RANGE requires targetId.");
       edited = await this.applyXlsxEdit(original, {
         op,
@@ -824,7 +1130,11 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         },
       });
     } else if (op === "ADD_SHEET") {
-      assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ADD_SHEET");
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "ADD_SHEET",
+      );
       edited = await this.applyXlsxEdit(original, {
         op,
         documentId: docId,
@@ -841,10 +1151,17 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         },
       });
     } else if (op === "RENAME_SHEET") {
-      assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "RENAME_SHEET");
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "RENAME_SHEET",
+      );
       const fromName = beforeText ?? asString(meta.fromSheetName) ?? null;
       const toName = input.content;
-      if (!fromName) throw new Error("RENAME_SHEET requires beforeText (old sheet name) or fromSheetName in metadata.");
+      if (!fromName)
+        throw new Error(
+          "RENAME_SHEET requires beforeText (old sheet name) or fromSheetName in metadata.",
+        );
       (meta as any).fromSheetName = fromName;
       edited = await this.applyXlsxEdit(original, {
         op,
@@ -862,9 +1179,18 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         },
       });
     } else if (op === "DELETE_SHEET") {
-      assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "DELETE_SHEET");
-      const sheetName = String(input.content || asString(meta.sheetName) || "").trim();
-      if (!sheetName) throw new Error("DELETE_SHEET requires content (sheet name to delete).");
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "DELETE_SHEET",
+      );
+      const sheetName = String(
+        input.content || asString(meta.sheetName) || "",
+      ).trim();
+      if (!sheetName)
+        throw new Error(
+          "DELETE_SHEET requires content (sheet name to delete).",
+        );
       edited = await this.applyXlsxEdit(original, {
         op,
         documentId: docId,
@@ -881,7 +1207,11 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         },
       });
     } else if (op === "CREATE_CHART") {
-      assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "CREATE_CHART");
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "CREATE_CHART",
+      );
       // Expect JSON in content: { "type": "PIE", "range": "Sheet1!A1:B10", "title": "...", "placement": {...} }
       edited = await this.applyXlsxEdit(original, {
         op,
@@ -899,7 +1229,11 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         },
       });
     } else if (op === "COMPUTE") {
-      assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "COMPUTE");
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "COMPUTE",
+      );
       edited = await this.applyXlsxEdit(original, {
         op,
         documentId: docId,
@@ -916,7 +1250,11 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         },
       });
     } else if (op === "COMPUTE_BUNDLE") {
-      assertMime(doc.mimeType, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "COMPUTE_BUNDLE");
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "COMPUTE_BUNDLE",
+      );
       edited = await this.applyXlsxEdit(original, {
         op: "COMPUTE",
         documentId: docId,
@@ -934,31 +1272,43 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       });
     } else if (op === "REWRITE_SLIDE_TEXT") {
       assertPptxMime(doc.mimeType, "REWRITE_SLIDE_TEXT");
-      if (!targetId) throw new Error("REWRITE_SLIDE_TEXT requires targetId (Slides objectId).");
+      if (!targetId)
+        throw new Error(
+          "REWRITE_SLIDE_TEXT requires targetId (Slides objectId).",
+        );
 
-      const { presentationId, url } = await this.ensureSlidesPresentationForDocument({
-        documentId: docId,
-        userId,
-        pptxBytes: original,
-        filename: doc.filename || "deck.pptx",
-        correlationId: input.correlationId,
-        conversationId: input.conversationId,
-        clientMessageId: input.clientMessageId,
-      });
+      const { presentationId, url } =
+        await this.ensureSlidesPresentationForDocument({
+          documentId: docId,
+          userId,
+          pptxBytes: original,
+          filename: doc.filename || "deck.pptx",
+          correlationId: input.correlationId,
+          conversationId: input.conversationId,
+          clientMessageId: input.clientMessageId,
+        });
 
-      await this.slidesEditor.replaceText(presentationId, targetId, input.content, {
-        correlationId: input.correlationId,
-        userId: input.userId,
-        conversationId: input.conversationId,
-        clientMessageId: input.clientMessageId,
-      });
+      await this.slidesEditor.replaceText(
+        presentationId,
+        targetId,
+        input.content,
+        {
+          correlationId: input.correlationId,
+          userId: input.userId,
+          conversationId: input.conversationId,
+          clientMessageId: input.clientMessageId,
+        },
+      );
 
-      edited = await this.slidesClient.exportPresentationToPptx(presentationId, {
-        correlationId: input.correlationId,
-        userId: input.userId,
-        conversationId: input.conversationId,
-        clientMessageId: input.clientMessageId,
-      });
+      edited = await this.slidesClient.exportPresentationToPptx(
+        presentationId,
+        {
+          correlationId: input.correlationId,
+          userId: input.userId,
+          conversationId: input.conversationId,
+          clientMessageId: input.clientMessageId,
+        },
+      );
 
       // Persist presentation linkage in revision metadata (useful for debugging).
       (meta as any).slidesPresentationId = presentationId;
@@ -966,37 +1316,50 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     } else if (op === "ADD_SLIDE") {
       assertPptxMime(doc.mimeType, "ADD_SLIDE");
 
-      const { presentationId, url } = await this.ensureSlidesPresentationForDocument({
-        documentId: docId,
-        userId,
-        pptxBytes: original,
-        filename: doc.filename || "deck.pptx",
-        correlationId: input.correlationId,
-        conversationId: input.conversationId,
-        clientMessageId: input.clientMessageId,
-      });
+      const { presentationId, url } =
+        await this.ensureSlidesPresentationForDocument({
+          documentId: docId,
+          userId,
+          pptxBytes: original,
+          filename: doc.filename || "deck.pptx",
+          correlationId: input.correlationId,
+          conversationId: input.conversationId,
+          clientMessageId: input.clientMessageId,
+        });
 
       // Input content can optionally specify a Slides predefined layout.
-      const requestedLayout = String(input.content || "").trim() || "TITLE_AND_BODY";
-      await this.slidesEditor.addSlide(presentationId, requestedLayout as any, undefined, {
-        correlationId: input.correlationId,
-        userId: input.userId,
-        conversationId: input.conversationId,
-        clientMessageId: input.clientMessageId,
-      });
+      const requestedLayout =
+        String(input.content || "").trim() || "TITLE_AND_BODY";
+      await this.slidesEditor.addSlide(
+        presentationId,
+        requestedLayout as any,
+        undefined,
+        {
+          correlationId: input.correlationId,
+          userId: input.userId,
+          conversationId: input.conversationId,
+          clientMessageId: input.clientMessageId,
+        },
+      );
 
-      edited = await this.slidesClient.exportPresentationToPptx(presentationId, {
-        correlationId: input.correlationId,
-        userId: input.userId,
-        conversationId: input.conversationId,
-        clientMessageId: input.clientMessageId,
-      });
+      edited = await this.slidesClient.exportPresentationToPptx(
+        presentationId,
+        {
+          correlationId: input.correlationId,
+          userId: input.userId,
+          conversationId: input.conversationId,
+          clientMessageId: input.clientMessageId,
+        },
+      );
 
       (meta as any).slidesPresentationId = presentationId;
       (meta as any).slidesPresentationUrl = url;
     } else if (op === "REPLACE_SLIDE_IMAGE") {
       assertPptxMime(doc.mimeType, "REPLACE_SLIDE_IMAGE");
-      if (!targetId) throw new Error("REPLACE_SLIDE_IMAGE requires targetId (Slides image objectId).");
+      if (!targetId)
+        throw new Error(
+          "REPLACE_SLIDE_IMAGE requires targetId (Slides image objectId).",
+        );
       const url = String(input.content || "").trim();
       if (!/^https:\/\//i.test(url)) {
         throw new Error("REPLACE_SLIDE_IMAGE requires an HTTPS image URL.");
@@ -1012,19 +1375,27 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         clientMessageId: input.clientMessageId,
       });
 
-      await this.slidesEditor.replaceImage(ensured.presentationId, targetId, url, {
-        correlationId: input.correlationId,
-        userId: input.userId,
-        conversationId: input.conversationId,
-        clientMessageId: input.clientMessageId,
-      });
+      await this.slidesEditor.replaceImage(
+        ensured.presentationId,
+        targetId,
+        url,
+        {
+          correlationId: input.correlationId,
+          userId: input.userId,
+          conversationId: input.conversationId,
+          clientMessageId: input.clientMessageId,
+        },
+      );
 
-      edited = await this.slidesClient.exportPresentationToPptx(ensured.presentationId, {
-        correlationId: input.correlationId,
-        userId: input.userId,
-        conversationId: input.conversationId,
-        clientMessageId: input.clientMessageId,
-      });
+      edited = await this.slidesClient.exportPresentationToPptx(
+        ensured.presentationId,
+        {
+          correlationId: input.correlationId,
+          userId: input.userId,
+          conversationId: input.conversationId,
+          clientMessageId: input.clientMessageId,
+        },
+      );
 
       (meta as any).slidesPresentationId = ensured.presentationId;
       (meta as any).slidesPresentationUrl = ensured.url;
@@ -1063,7 +1434,11 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       }
 
       // Overwrite content at the same storage key.
-      await uploadFile(doc.encryptedFilename, edited, doc.mimeType || "application/octet-stream");
+      await uploadFile(
+        doc.encryptedFilename,
+        edited,
+        doc.mimeType || "application/octet-stream",
+      );
 
       const editedHash = sha256(edited);
       logger.info("[Editing] File saved to storage", {
@@ -1076,11 +1451,23 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       });
 
       // Invalidate any cached document buffer so subsequent reads fetch the fresh file.
-      try { await cacheService.del(`document_buffer:${docId}`); } catch {}
+      try {
+        await cacheService.del(`document_buffer:${docId}`);
+      } catch {}
 
       // Clear derived artifacts so re-indexing doesn't mix old and new chunks.
-      const isSlidesEdit = op === "REWRITE_SLIDE_TEXT" || op === "ADD_SLIDE" || op === "REPLACE_SLIDE_IMAGE";
-      const isSheetsEdit = op === "EDIT_CELL" || op === "EDIT_RANGE" || op === "ADD_SHEET" || op === "RENAME_SHEET" || op === "CREATE_CHART" || op === "COMPUTE" || op === "COMPUTE_BUNDLE";
+      const isSlidesEdit =
+        op === "REWRITE_SLIDE_TEXT" ||
+        op === "ADD_SLIDE" ||
+        op === "REPLACE_SLIDE_IMAGE";
+      const isSheetsEdit =
+        op === "EDIT_CELL" ||
+        op === "EDIT_RANGE" ||
+        op === "ADD_SHEET" ||
+        op === "RENAME_SHEET" ||
+        op === "CREATE_CHART" ||
+        op === "COMPUTE" ||
+        op === "COMPUTE_BUNDLE";
 
       await prisma.$transaction(async (tx) => {
         await tx.documentChunk.deleteMany({ where: { documentId: docId } });
@@ -1088,30 +1475,29 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
         if (isSlidesEdit || isSheetsEdit) {
           const base = (meta as any).pptxMetadata ?? null;
-          let nextPptxMetadata: string | null = typeof base === "string" ? base : (base == null ? null : String(base));
+          let nextPptxMetadata: string | null =
+            typeof base === "string"
+              ? base
+              : base == null
+                ? null
+                : String(base);
 
           if ((meta as any).slidesPresentationId) {
-            nextPptxMetadata = setSlidesLinkInPptxMetadata(
-              nextPptxMetadata,
-              {
-                presentationId: String((meta as any).slidesPresentationId),
-                url:
-                  String((meta as any).slidesPresentationUrl || "").trim() ||
-                  `https://docs.google.com/presentation/d/${String((meta as any).slidesPresentationId)}/edit`,
-              },
-            );
+            nextPptxMetadata = setSlidesLinkInPptxMetadata(nextPptxMetadata, {
+              presentationId: String((meta as any).slidesPresentationId),
+              url:
+                String((meta as any).slidesPresentationUrl || "").trim() ||
+                `https://docs.google.com/presentation/d/${String((meta as any).slidesPresentationId)}/edit`,
+            });
           }
 
           if ((meta as any).sheetsSpreadsheetId) {
-            nextPptxMetadata = setSheetsLinkInPptxMetadata(
-              nextPptxMetadata,
-              {
-                spreadsheetId: String((meta as any).sheetsSpreadsheetId),
-                url:
-                  String((meta as any).sheetsSpreadsheetUrl || "").trim() ||
-                  `https://docs.google.com/spreadsheets/d/${String((meta as any).sheetsSpreadsheetId)}/edit`,
-              },
-            );
+            nextPptxMetadata = setSheetsLinkInPptxMetadata(nextPptxMetadata, {
+              spreadsheetId: String((meta as any).sheetsSpreadsheetId),
+              url:
+                String((meta as any).sheetsSpreadsheetUrl || "").trim() ||
+                `https://docs.google.com/spreadsheets/d/${String((meta as any).sheetsSpreadsheetId)}/edit`,
+            });
           }
 
           const chartEntries = Array.isArray((meta as any).__sheetsChartEntries)
@@ -1121,12 +1507,17 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
             const range = String(entry?.range || "").trim();
             if (!range) continue;
             nextPptxMetadata = addSheetsChartToPptxMetadata(nextPptxMetadata, {
-              chartId: typeof entry?.chartId === "number" ? entry.chartId : undefined,
+              chartId:
+                typeof entry?.chartId === "number" ? entry.chartId : undefined,
               type: String(entry?.type || "LINE"),
               range,
               ...(entry?.title ? { title: String(entry.title) } : {}),
-              ...(entry?.settings && typeof entry.settings === "object" ? { settings: entry.settings } : {}),
-              ...(entry?.createdAtIso ? { createdAtIso: String(entry.createdAtIso) } : {}),
+              ...(entry?.settings && typeof entry.settings === "object"
+                ? { settings: entry.settings }
+                : {}),
+              ...(entry?.createdAtIso
+                ? { createdAtIso: String(entry.createdAtIso) }
+                : {}),
             });
           }
 
@@ -1138,11 +1529,17 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
             if (!range) continue;
             nextPptxMetadata = addSheetsTableToPptxMetadata(nextPptxMetadata, {
               range,
-              ...(entry?.sheetName ? { sheetName: String(entry.sheetName) } : {}),
+              ...(entry?.sheetName
+                ? { sheetName: String(entry.sheetName) }
+                : {}),
               hasHeader: entry?.hasHeader !== false,
               ...(entry?.style ? { style: String(entry.style) } : {}),
-              ...(entry?.colors && typeof entry.colors === "object" ? { colors: entry.colors } : {}),
-              ...(entry?.createdAtIso ? { createdAtIso: String(entry.createdAtIso) } : {}),
+              ...(entry?.colors && typeof entry.colors === "object"
+                ? { colors: entry.colors }
+                : {}),
+              ...(entry?.createdAtIso
+                ? { createdAtIso: String(entry.createdAtIso) }
+                : {}),
             });
           }
 
@@ -1171,10 +1568,14 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
             } as any,
           });
         } else {
-          await tx.documentMetadata.deleteMany({ where: { documentId: docId } });
+          await tx.documentMetadata.deleteMany({
+            where: { documentId: docId },
+          });
         }
 
-        await tx.documentProcessingMetrics.deleteMany({ where: { documentId: docId } });
+        await tx.documentProcessingMetrics.deleteMany({
+          where: { documentId: docId },
+        });
         await tx.document.update({
           where: { id: docId },
           data: {
@@ -1205,13 +1606,22 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
       if (idempotencyKey) {
         const dedupeKey = `${userId}:${docId}:${idempotencyKey}`;
-        this.idempotencyResults.set(dedupeKey, { revisionId: docId, createdAtMs: Date.now() });
+        this.idempotencyResults.set(dedupeKey, {
+          revisionId: docId,
+          createdAtMs: Date.now(),
+        });
       }
       const applyMetrics =
-        (meta as any).__applyMetrics && typeof (meta as any).__applyMetrics === "object"
+        (meta as any).__applyMetrics &&
+        typeof (meta as any).__applyMetrics === "object"
           ? (meta as any).__applyMetrics
           : undefined;
-      return { revisionId: docId, fileHashBefore, fileHashAfter: sha256(edited), ...(applyMetrics ? { applyMetrics } : {}) };
+      return {
+        revisionId: docId,
+        fileHashBefore,
+        fileHashAfter: sha256(edited),
+        ...(applyMetrics ? { applyMetrics } : {}),
+      };
     }
 
     const created = await this.revisionService.createRevision(
@@ -1234,18 +1644,27 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         userId: input.userId,
         conversationId: input.conversationId,
         clientMessageId: input.clientMessageId,
-      }
+      },
     );
 
     if (idempotencyKey) {
       const dedupeKey = `${userId}:${docId}:${idempotencyKey}`;
-      this.idempotencyResults.set(dedupeKey, { revisionId: created.id, createdAtMs: Date.now() });
+      this.idempotencyResults.set(dedupeKey, {
+        revisionId: created.id,
+        createdAtMs: Date.now(),
+      });
     }
     const applyMetrics =
-      (meta as any).__applyMetrics && typeof (meta as any).__applyMetrics === "object"
+      (meta as any).__applyMetrics &&
+      typeof (meta as any).__applyMetrics === "object"
         ? (meta as any).__applyMetrics
         : undefined;
-    return { revisionId: created.id, fileHashBefore, fileHashAfter: sha256(edited), ...(applyMetrics ? { applyMetrics } : {}) };
+    return {
+      revisionId: created.id,
+      fileHashBefore,
+      fileHashAfter: sha256(edited),
+      ...(applyMetrics ? { applyMetrics } : {}),
+    };
   }
 
   private sweepIdempotency(): void {
@@ -1272,28 +1691,51 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     conversationId?: string;
     clientMessageId?: string;
     metadata?: Record<string, unknown>;
-  }): Promise<{ revisionId: string; fileHashBefore: string; fileHashAfter: string }> {
+  }): Promise<{
+    revisionId: string;
+    fileHashBefore: string;
+    fileHashAfter: string;
+  }> {
     const docId = input.documentId.trim();
     const userId = input.userId.trim();
 
     const doc = await prisma.document.findFirst({
       where: { id: docId, userId },
-      select: { id: true, encryptedFilename: true, filename: true, mimeType: true, fileHash: true },
+      select: {
+        id: true,
+        encryptedFilename: true,
+        filename: true,
+        mimeType: true,
+        fileHash: true,
+      },
     });
     if (!doc) throw new Error("Document not found or not accessible.");
-    if (!doc.encryptedFilename) throw new Error("Document storage key missing.");
+    if (!doc.encryptedFilename)
+      throw new Error("Document storage key missing.");
 
     const original = await downloadFile(doc.encryptedFilename);
-    const fileHashBefore = String(doc.fileHash || "").trim() || sha256(original);
+    const fileHashBefore =
+      String(doc.fileHash || "").trim() || sha256(original);
     const fileHashAfter = sha256(input.editedBuffer);
 
     // Overwrite content at the same storage key.
-    await uploadFile(doc.encryptedFilename, input.editedBuffer, doc.mimeType || "application/octet-stream");
-    try { await cacheService.del(`document_buffer:${docId}`); } catch {}
+    await uploadFile(
+      doc.encryptedFilename,
+      input.editedBuffer,
+      doc.mimeType || "application/octet-stream",
+    );
+    try {
+      await cacheService.del(`document_buffer:${docId}`);
+    } catch {}
 
     const op = String(input.operator || "").trim();
     const isSlidesEdit = op.includes("SLIDE") || op === "EXPORT_SLIDES";
-    const isSheetsEdit = op.includes("SHEET") || op.includes("CELL") || op.includes("RANGE") || op.includes("CHART") || op.includes("COMPUTE");
+    const isSheetsEdit =
+      op.includes("SHEET") ||
+      op.includes("CELL") ||
+      op.includes("RANGE") ||
+      op.includes("CHART") ||
+      op.includes("COMPUTE");
 
     await prisma.$transaction(async (tx) => {
       await tx.documentChunk.deleteMany({ where: { documentId: docId } });
@@ -1328,7 +1770,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         await tx.documentMetadata.deleteMany({ where: { documentId: docId } });
       }
 
-      await tx.documentProcessingMetrics.deleteMany({ where: { documentId: docId } });
+      await tx.documentProcessingMetrics.deleteMany({
+        where: { documentId: docId },
+      });
       await tx.document.update({
         where: { id: docId },
         data: {
@@ -1371,10 +1815,17 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       // Undo in overwrite mode restores the original document in-place.
       const target = await prisma.document.findFirst({
         where: { id: docId, userId },
-        select: { id: true, encryptedFilename: true, filename: true, mimeType: true, parentVersionId: true },
+        select: {
+          id: true,
+          encryptedFilename: true,
+          filename: true,
+          mimeType: true,
+          parentVersionId: true,
+        },
       });
       if (!target) throw new Error("Document not found or not accessible.");
-      if (!target.encryptedFilename) throw new Error("Document storage key missing.");
+      if (!target.encryptedFilename)
+        throw new Error("Document storage key missing.");
 
       const rootDocumentId = await this.resolveRootDocumentId(target.id);
       const chain = await prisma.document.findMany({
@@ -1383,17 +1834,27 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
           OR: [{ id: rootDocumentId }, { parentVersionId: rootDocumentId }],
         },
         orderBy: { createdAt: "asc" },
-        select: { id: true, encryptedFilename: true, filename: true, mimeType: true, createdAt: true },
+        select: {
+          id: true,
+          encryptedFilename: true,
+          filename: true,
+          mimeType: true,
+          createdAt: true,
+        },
       });
 
       // Chain includes the root document itself; backups are additional items with parentVersionId set.
       const backups = chain.filter((d) => d.id !== rootDocumentId);
-      if (backups.length === 0) throw new Error("No previous revision to undo to.");
+      if (backups.length === 0)
+        throw new Error("No previous revision to undo to.");
 
       const requested = input.revisionId?.trim() || null;
-      const restoreFromId = requested ? requested : backups[backups.length - 1]!.id;
+      const restoreFromId = requested
+        ? requested
+        : backups[backups.length - 1]!.id;
       const restoreDoc = chain.find((d) => d.id === restoreFromId);
-      if (!restoreDoc?.encryptedFilename) throw new Error("Restore revision storage key missing.");
+      if (!restoreDoc?.encryptedFilename)
+        throw new Error("Restore revision storage key missing.");
 
       // Optional: backup current state before undo (kept hidden) so repeated undo doesn't destroy history.
       if (keepUndoHistory()) {
@@ -1414,13 +1875,19 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       }
 
       const bytes = await downloadFile(restoreDoc.encryptedFilename);
-      await uploadFile(target.encryptedFilename, bytes, target.mimeType || "application/octet-stream");
+      await uploadFile(
+        target.encryptedFilename,
+        bytes,
+        target.mimeType || "application/octet-stream",
+      );
 
       await prisma.$transaction([
         prisma.documentChunk.deleteMany({ where: { documentId: docId } }),
         prisma.documentEmbedding.deleteMany({ where: { documentId: docId } }),
         prisma.documentMetadata.deleteMany({ where: { documentId: docId } }),
-        prisma.documentProcessingMetrics.deleteMany({ where: { documentId: docId } }),
+        prisma.documentProcessingMetrics.deleteMany({
+          where: { documentId: docId },
+        }),
         prisma.document.update({
           where: { id: docId },
           data: {
@@ -1465,7 +1932,13 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         OR: [{ id: rootDocumentId }, { parentVersionId: rootDocumentId }],
       },
       orderBy: { createdAt: "asc" },
-      select: { id: true, encryptedFilename: true, filename: true, mimeType: true, createdAt: true },
+      select: {
+        id: true,
+        encryptedFilename: true,
+        filename: true,
+        mimeType: true,
+        createdAt: true,
+      },
     });
 
     if (chain.length <= 1) throw new Error("No previous revision to undo to.");
@@ -1473,14 +1946,18 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     let restoreFromId: string | null = input.revisionId?.trim() || null;
     if (restoreFromId) {
       const ok = chain.some((d) => d.id === restoreFromId);
-      if (!ok) throw new Error("Requested revisionId is not in this document's revision chain.");
+      if (!ok)
+        throw new Error(
+          "Requested revisionId is not in this document's revision chain.",
+        );
     } else {
       // Restore to the previous item in the chain (second last).
       restoreFromId = chain[chain.length - 2]!.id;
     }
 
     const restoreDoc = chain.find((d) => d.id === restoreFromId);
-    if (!restoreDoc?.encryptedFilename) throw new Error("Restore revision storage key missing.");
+    if (!restoreDoc?.encryptedFilename)
+      throw new Error("Restore revision storage key missing.");
 
     const bytes = await downloadFile(restoreDoc.encryptedFilename);
 
@@ -1495,7 +1972,7 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         reason: `undo`,
         metadata: { undoFrom: restoreDoc.id, rootDocumentId },
       },
-      { userId }
+      { userId },
     );
 
     return { restoredRevisionId: created.id };
@@ -1507,11 +1984,13 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
     while (currentId && safety < 20) {
       safety += 1;
-      const row: { id: string; parentVersionId: string | null } | null = await prisma.document.findUnique({
-        where: { id: currentId },
-        select: { id: true, parentVersionId: true },
-      });
-      if (!row) throw new Error(`Revision chain broken for document ${documentId}.`);
+      const row: { id: string; parentVersionId: string | null } | null =
+        await prisma.document.findUnique({
+          where: { id: currentId },
+          select: { id: true, parentVersionId: true },
+        });
+      if (!row)
+        throw new Error(`Revision chain broken for document ${documentId}.`);
       if (!row.parentVersionId) return row.id;
       currentId = row.parentVersionId;
     }
@@ -1536,7 +2015,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       select: { pptxMetadata: true },
     });
 
-    const cached = getSlidesLinkFromPptxMetadata((existing as any)?.pptxMetadata);
+    const cached = getSlidesLinkFromPptxMetadata(
+      (existing as any)?.pptxMetadata,
+    );
     if (cached?.presentationId) {
       return {
         presentationId: cached.presentationId,
@@ -1561,8 +2042,16 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
     await prisma.documentMetadata.upsert({
       where: { documentId },
-      update: { pptxMetadata: setSlidesLinkInPptxMetadata((existing as any)?.pptxMetadata, imported) } as any,
-      create: { documentId, pptxMetadata: setSlidesLinkInPptxMetadata(null, imported) } as any,
+      update: {
+        pptxMetadata: setSlidesLinkInPptxMetadata(
+          (existing as any)?.pptxMetadata,
+          imported,
+        ),
+      } as any,
+      create: {
+        documentId,
+        pptxMetadata: setSlidesLinkInPptxMetadata(null, imported),
+      } as any,
     });
 
     return imported;
@@ -1585,7 +2074,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       select: { pptxMetadata: true },
     });
 
-    const cached = getSheetsLinkFromPptxMetadata((existing as any)?.pptxMetadata);
+    const cached = getSheetsLinkFromPptxMetadata(
+      (existing as any)?.pptxMetadata,
+    );
     if (cached?.spreadsheetId) {
       return { spreadsheetId: cached.spreadsheetId, url: cached.url };
     }
@@ -1607,8 +2098,16 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
     await prisma.documentMetadata.upsert({
       where: { documentId },
-      update: { pptxMetadata: setSheetsLinkInPptxMetadata((existing as any)?.pptxMetadata, imported) } as any,
-      create: { documentId, pptxMetadata: setSheetsLinkInPptxMetadata(null, imported) } as any,
+      update: {
+        pptxMetadata: setSheetsLinkInPptxMetadata(
+          (existing as any)?.pptxMetadata,
+          imported,
+        ),
+      } as any,
+      create: {
+        documentId,
+        pptxMetadata: setSheetsLinkInPptxMetadata(null, imported),
+      } as any,
     });
 
     return imported;
@@ -1624,47 +2123,76 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       targetId: string | null;
       content: string;
       meta: Record<string, unknown>;
-      ctx: { correlationId: string; userId: string; conversationId: string; clientMessageId: string };
+      ctx: {
+        correlationId: string;
+        userId: string;
+        conversationId: string;
+        clientMessageId: string;
+      };
     },
   ): Promise<Buffer> {
     const parseTsvOrCsvGrid = (text: string): Array<Array<string>> => {
       const raw = String(text || "").trim();
       if (!raw) throw new Error("range values are empty");
-      const lines = raw.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+      const lines = raw
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter(Boolean);
       const delimiter = lines.some((l) => l.includes("\t")) ? "\t" : ",";
       return lines.map((l) => l.split(delimiter).map((c) => c.trim()));
     };
 
-    const rememberChart = (entry: { chartId?: number; type: string; range: string; title?: string; settings?: Record<string, unknown> }) => {
+    const rememberChart = (entry: {
+      chartId?: number;
+      type: string;
+      range: string;
+      title?: string;
+      settings?: Record<string, unknown>;
+    }) => {
       const range = String(entry.range || "").trim();
       if (!range) return;
       const list = Array.isArray((input.meta as any).__sheetsChartEntries)
         ? (input.meta as any).__sheetsChartEntries
         : [];
       list.push({
-        ...(typeof entry.chartId === "number" ? { chartId: entry.chartId } : {}),
+        ...(typeof entry.chartId === "number"
+          ? { chartId: entry.chartId }
+          : {}),
         type: String(entry.type || "LINE"),
         range,
         ...(entry.title ? { title: String(entry.title) } : {}),
-        ...(entry.settings && typeof entry.settings === "object" ? { settings: entry.settings } : {}),
+        ...(entry.settings && typeof entry.settings === "object"
+          ? { settings: entry.settings }
+          : {}),
         createdAtIso: new Date().toISOString(),
       });
       (input.meta as any).__sheetsChartEntries = list;
     };
 
-    const rememberTable = (
-      entry: {
-        range: string;
-        hasHeader?: boolean;
-        style?: string;
-        colors?: { header?: string; stripe?: string; totals?: string; border?: string };
-      },
-    ) => {
+    const rememberTable = (entry: {
+      range: string;
+      hasHeader?: boolean;
+      style?: string;
+      colors?: {
+        header?: string;
+        stripe?: string;
+        totals?: string;
+        border?: string;
+      };
+    }) => {
       const range = String(entry.range || "").trim();
       if (!range) return;
       const bang = range.indexOf("!");
-      const sheetName = bang > 0 ? String(range.slice(0, bang)).replace(/^'/, "").replace(/'$/, "").trim() : "";
-      const style = String(entry.style || "").trim().toLowerCase();
+      const sheetName =
+        bang > 0
+          ? String(range.slice(0, bang))
+              .replace(/^'/, "")
+              .replace(/'$/, "")
+              .trim()
+          : "";
+      const style = String(entry.style || "")
+        .trim()
+        .toLowerCase();
       const colorHex = (raw: unknown): string | undefined => {
         const s = String(raw || "").trim();
         if (!/^#?[0-9a-fA-F]{6}$/.test(s)) return undefined;
@@ -1676,7 +2204,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         totals: colorHex(entry.colors?.totals),
         border: colorHex(entry.colors?.border),
       };
-      const cleanColors = Object.values(colors).some(Boolean) ? colors : undefined;
+      const cleanColors = Object.values(colors).some(Boolean)
+        ? colors
+        : undefined;
       const list = Array.isArray((input.meta as any).__sheetsTableEntries)
         ? (input.meta as any).__sheetsTableEntries
         : [];
@@ -1691,16 +2221,24 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       (input.meta as any).__sheetsTableEntries = list;
     };
 
-    const extractChartSettings = (spec: any): Record<string, unknown> | undefined => {
+    const extractChartSettings = (
+      spec: any,
+    ): Record<string, unknown> | undefined => {
       if (!spec || typeof spec !== "object") return undefined;
       const out: Record<string, unknown> = {};
-      const type = String(spec.type || "").trim().toUpperCase();
+      const type = String(spec.type || "")
+        .trim()
+        .toUpperCase();
       if (type) out.type = type;
-      if (Number.isInteger(spec.headerCount)) out.headerCount = Number(spec.headerCount);
+      if (Number.isInteger(spec.headerCount))
+        out.headerCount = Number(spec.headerCount);
       if (typeof spec.stacked === "boolean") out.stacked = spec.stacked;
-      if (spec.comboSeries && typeof spec.comboSeries === "object") out.comboSeries = spec.comboSeries;
-      if (spec.bubble && typeof spec.bubble === "object") out.bubble = spec.bubble;
-      if (spec.histogram && typeof spec.histogram === "object") out.histogram = spec.histogram;
+      if (spec.comboSeries && typeof spec.comboSeries === "object")
+        out.comboSeries = spec.comboSeries;
+      if (spec.bubble && typeof spec.bubble === "object")
+        out.bubble = spec.bubble;
+      if (spec.histogram && typeof spec.histogram === "object")
+        out.histogram = spec.histogram;
       return Object.keys(out).length ? out : undefined;
     };
 
@@ -1712,19 +2250,34 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         throw new Error('COMPUTE requires JSON content like {"ops":[...]}');
       }
       const ops = Array.isArray(payload?.ops) ? payload.ops : [];
-      return ops.filter((item: any) => item && typeof item === "object") as SpreadsheetEngineOp[];
+      return ops.filter(
+        (item: any) => item && typeof item === "object",
+      ) as SpreadsheetEngineOp[];
     };
 
     const buildSpreadsheetEngineOps = (): SpreadsheetEngineOp[] => {
       if (input.op === "EDIT_CELL") {
         const [sheetName, a1] = String(input.targetId || "").split("!");
-        if (!sheetName || !a1) throw new Error("EDIT_CELL requires targetId like Sheet1!B2");
-        return [{ kind: "set_values", rangeA1: `${sheetName}!${a1}`, values: [[String(input.content ?? "")]] }];
+        if (!sheetName || !a1)
+          throw new Error("EDIT_CELL requires targetId like Sheet1!B2");
+        return [
+          {
+            kind: "set_values",
+            rangeA1: `${sheetName}!${a1}`,
+            values: [[String(input.content ?? "")]],
+          },
+        ];
       }
       if (input.op === "EDIT_RANGE") {
         const rangeA1 = String(input.targetId || "").trim();
         if (!rangeA1) throw new Error("EDIT_RANGE requires targetId.");
-        return [{ kind: "set_values", rangeA1, values: parseTsvOrCsvGrid(input.content) }];
+        return [
+          {
+            kind: "set_values",
+            rangeA1,
+            values: parseTsvOrCsvGrid(input.content),
+          },
+        ];
       }
       if (input.op === "ADD_SHEET") {
         const title = String(input.content || "").trim();
@@ -1734,12 +2287,14 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       if (input.op === "RENAME_SHEET") {
         const fromName = asString((input.meta as any).fromSheetName);
         const toName = String(input.content || "").trim();
-        if (!fromName || !toName) throw new Error("RENAME_SHEET requires fromSheetName and content.");
+        if (!fromName || !toName)
+          throw new Error("RENAME_SHEET requires fromSheetName and content.");
         return [{ kind: "rename_sheet", fromName, toName }];
       }
       if (input.op === "DELETE_SHEET") {
         const sheetName = String(input.content || "").trim();
-        if (!sheetName) throw new Error("DELETE_SHEET requires content (sheet name).");
+        if (!sheetName)
+          throw new Error("DELETE_SHEET requires content (sheet name).");
         return [{ kind: "delete_sheet", sheetName }];
       }
       if (input.op === "CREATE_CHART") {
@@ -1748,7 +2303,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         try {
           spec = JSON.parse(raw);
         } catch {
-          throw new Error('CREATE_CHART requires JSON content like {"type":"PIE","range":"Sheet1!A1:B10"}');
+          throw new Error(
+            'CREATE_CHART requires JSON content like {"type":"PIE","range":"Sheet1!A1:B10"}',
+          );
         }
         if (!spec || typeof spec !== "object") {
           throw new Error("CREATE_CHART requires a JSON object payload.");
@@ -1758,15 +2315,21 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       if (input.op === "COMPUTE") {
         return parseComputePayloadOps();
       }
-      throw new Error(`Unsupported XLSX operator for Python spreadsheet engine: ${input.op}`);
+      throw new Error(
+        `Unsupported XLSX operator for Python spreadsheet engine: ${input.op}`,
+      );
     };
 
     const persistSpreadsheetEngineArtifacts = (response: any): void => {
       if (response?.artifacts && typeof response.artifacts === "object") {
         (input.meta as any).__pythonSpreadsheetArtifacts = response.artifacts;
       }
-      if (response?.answer_context && typeof response.answer_context === "object") {
-        (input.meta as any).__pythonSpreadsheetAnswerContext = response.answer_context;
+      if (
+        response?.answer_context &&
+        typeof response.answer_context === "object"
+      ) {
+        (input.meta as any).__pythonSpreadsheetAnswerContext =
+          response.answer_context;
       }
       if (response?.proof && typeof response.proof === "object") {
         (input.meta as any).__pythonSpreadsheetProof = response.proof;
@@ -1777,9 +2340,10 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
           .filter(Boolean);
       }
 
-      const artifacts = response?.artifacts && typeof response.artifacts === "object"
-        ? response.artifacts
-        : {};
+      const artifacts =
+        response?.artifacts && typeof response.artifacts === "object"
+          ? response.artifacts
+          : {};
 
       const chartEntries = Array.isArray((artifacts as any).chartEntries)
         ? (artifacts as any).chartEntries
@@ -1788,11 +2352,15 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         const range = String(entry?.range || "").trim();
         if (!range) continue;
         rememberChart({
-          ...(typeof entry?.chartId === "number" ? { chartId: entry.chartId } : {}),
+          ...(typeof entry?.chartId === "number"
+            ? { chartId: entry.chartId }
+            : {}),
           type: String(entry?.type || "LINE"),
           range,
           ...(entry?.title ? { title: String(entry.title) } : {}),
-          ...(entry?.settings && typeof entry.settings === "object" ? { settings: entry.settings } : {}),
+          ...(entry?.settings && typeof entry.settings === "object"
+            ? { settings: entry.settings }
+            : {}),
         });
       }
 
@@ -1806,7 +2374,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
           range,
           hasHeader: entry?.hasHeader !== false,
           ...(entry?.style ? { style: String(entry.style) } : {}),
-          ...(entry?.colors && typeof entry.colors === "object" ? { colors: entry.colors } : {}),
+          ...(entry?.colors && typeof entry.colors === "object"
+            ? { colors: entry.colors }
+            : {}),
         });
       }
     };
@@ -1814,10 +2384,17 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     const spreadsheetEngineOps = buildSpreadsheetEngineOps();
     const spreadsheetEngineMode = this.spreadsheetEngine.mode();
     const requiresRemotePython = spreadsheetEngineOps.some((op) => {
-      const kind = String((op as any)?.kind || "").trim().toLowerCase();
-      return kind.startsWith("python_") || kind === "insight" || kind === "analysis";
+      const kind = String((op as any)?.kind || "")
+        .trim()
+        .toLowerCase();
+      return (
+        kind.startsWith("python_") || kind === "insight" || kind === "analysis"
+      );
     });
-    const shouldCallPythonEngine = input.op === "COMPUTE" && this.spreadsheetEngine.enabled() && requiresRemotePython;
+    const shouldCallPythonEngine =
+      input.op === "COMPUTE" &&
+      this.spreadsheetEngine.enabled() &&
+      requiresRemotePython;
 
     if (shouldCallPythonEngine) {
       try {
@@ -1842,7 +2419,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
           spreadsheetId: ensured.spreadsheetId,
           ops: spreadsheetEngineOps,
           context: {
-            activeSheetName: asString((input.meta as any).activeSheetName) || asString((input.meta as any).sheetName),
+            activeSheetName:
+              asString((input.meta as any).activeSheetName) ||
+              asString((input.meta as any).sheetName),
             selectionRangeA1:
               asString((input.meta as any).selectionRangeA1) ||
               asString((input.meta as any).rangeA1) ||
@@ -1858,27 +2437,47 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
         persistSpreadsheetEngineArtifacts(response);
 
-        const statuses = Array.isArray(response?.applied_ops) ? response.applied_ops : [];
-        const failed = statuses.filter((status: any) => String(status?.status || "").toLowerCase() === "failed");
+        const statuses = Array.isArray(response?.applied_ops)
+          ? response.applied_ops
+          : [];
+        const failed = statuses.filter(
+          (status: any) =>
+            String(status?.status || "").toLowerCase() === "failed",
+        );
         if (failed.length > 0 && spreadsheetEngineMode === "enforced") {
           const failedSummary = failed
-            .map((item: any) => `${String(item?.kind || "unknown")}${item?.message ? ` (${String(item.message)})` : ""}`)
+            .map(
+              (item: any) =>
+                `${String(item?.kind || "unknown")}${item?.message ? ` (${String(item.message)})` : ""}`,
+            )
             .join("; ");
-          throw new Error(`PYTHON_SPREADSHEET_ENGINE_FAILED: ${failedSummary || "operation failed"}`);
+          throw new Error(
+            `PYTHON_SPREADSHEET_ENGINE_FAILED: ${failedSummary || "operation failed"}`,
+          );
         }
       } catch (error: any) {
         const message = String(error?.message || error || "");
         const isInfraDisabled =
-          /service_disabled|sheets\.googleapis\.com|google sheets api has not been used|auth_error|permission denied|403/i.test(message);
+          /service_disabled|sheets\.googleapis\.com|google sheets api has not been used|auth_error|permission denied|403/i.test(
+            message,
+          );
 
         if (spreadsheetEngineMode === "enforced" && !isInfraDisabled) {
-          throw new Error(`PYTHON_SPREADSHEET_ENGINE_FAILED: ${String(error?.message || error)}`);
+          throw new Error(
+            `PYTHON_SPREADSHEET_ENGINE_FAILED: ${String(error?.message || error)}`,
+          );
         }
-        const warningList = Array.isArray((input.meta as any).__pythonSpreadsheetWarnings)
+        const warningList = Array.isArray(
+          (input.meta as any).__pythonSpreadsheetWarnings,
+        )
           ? (input.meta as any).__pythonSpreadsheetWarnings
           : [];
-        warningList.push(`python_engine_bypassed:${message || "python engine failed"}`);
-        (input.meta as any).__pythonSpreadsheetWarnings = warningList.filter(Boolean).slice(-20);
+        warningList.push(
+          `python_engine_bypassed:${message || "python engine failed"}`,
+        );
+        (input.meta as any).__pythonSpreadsheetWarnings = warningList
+          .filter(Boolean)
+          .slice(-20);
       }
     }
 
@@ -1886,7 +2485,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     const semanticIndex = buildSemanticIndex(modelBefore);
     const translated = computeOpsToPatchPlan({
       ops: spreadsheetEngineOps as Array<Record<string, unknown>>,
-      activeSheetName: asString((input.meta as any).activeSheetName) || asString((input.meta as any).sheetName),
+      activeSheetName:
+        asString((input.meta as any).activeSheetName) ||
+        asString((input.meta as any).sheetName),
       semanticIndex,
     });
 
@@ -1894,12 +2495,21 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       throw new Error(`PATCH_REJECTED: ${translated.rejectedOps.join("; ")}`);
     }
 
-    const applyResult = applyPatchOpsToSpreadsheetModel(modelBefore, translated.patchOps);
+    const applyResult = applyPatchOpsToSpreadsheetModel(
+      modelBefore,
+      translated.patchOps,
+    );
     const statusSummary = summarizePatchStatuses(applyResult.statuses);
     const diff = diffSpreadsheetModels(modelBefore, applyResult.model);
-    const rejectedOps = [...translated.rejectedOps, ...statusSummary.rejectedOps];
+    const rejectedOps = [
+      ...translated.rejectedOps,
+      ...statusSummary.rejectedOps,
+    ];
 
-    if (!diff.changed || (diff.changedCellsCount === 0 && diff.changedStructuresCount === 0)) {
+    if (
+      !diff.changed ||
+      (diff.changedCellsCount === 0 && diff.changedStructuresCount === 0)
+    ) {
       // Ensure doc stays "ready" — don't leave it in an intermediate status
       try {
         await prisma.document.update({
@@ -1917,14 +2527,18 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
           type: String(op.chart?.type || "BAR"),
           range: String(op.range || ""),
           ...(op.chart?.title ? { title: String(op.chart.title) } : {}),
-          ...(op.chart?.settings && typeof op.chart.settings === "object" ? { settings: op.chart.settings } : {}),
+          ...(op.chart?.settings && typeof op.chart.settings === "object"
+            ? { settings: op.chart.settings }
+            : {}),
         });
       } else if (op.op === "CREATE_TABLE") {
         rememberTable({
           range: String(op.range || ""),
           hasHeader: op.hasHeader !== false,
           ...(op.style?.style ? { style: String(op.style.style) } : {}),
-          ...(op.style?.colors && typeof op.style.colors === "object" ? { colors: op.style.colors } : {}),
+          ...(op.style?.colors && typeof op.style.colors === "object"
+            ? { colors: op.style.colors }
+            : {}),
         });
       }
     }
@@ -1948,11 +2562,16 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     };
 
     if (rejectedOps.length) {
-      const warningList = Array.isArray((input.meta as any).__pythonSpreadsheetWarnings)
+      const warningList = Array.isArray(
+        (input.meta as any).__pythonSpreadsheetWarnings,
+      )
         ? (input.meta as any).__pythonSpreadsheetWarnings
         : [];
-      for (const rejected of rejectedOps) warningList.push(`PATCH_REJECTED:${rejected}`);
-      (input.meta as any).__pythonSpreadsheetWarnings = warningList.filter(Boolean).slice(-50);
+      for (const rejected of rejectedOps)
+        warningList.push(`PATCH_REJECTED:${rejected}`);
+      (input.meta as any).__pythonSpreadsheetWarnings = warningList
+        .filter(Boolean)
+        .slice(-50);
     }
 
     return compileSpreadsheetModelToXlsx(applyResult.model);

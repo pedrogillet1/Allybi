@@ -3,17 +3,21 @@
  * Generates embeddings using Ollama (local) or OpenAI (cloud).
  * Supports caching to avoid recomputation.
  */
-import axios from 'axios';
-import crypto from 'crypto';
-import fs from 'fs';
-import path from 'path';
-import defaultLogger from '../../utils/logger';
+import axios from "axios";
+import crypto from "crypto";
+import fs from "fs";
+import path from "path";
+import defaultLogger from "../../utils/logger";
 
 const logger = {
-  info: (msg: string, ...args: any[]) => defaultLogger.info(`[EmbeddingsService] ${msg}`, ...args),
-  warn: (msg: string, ...args: any[]) => defaultLogger.warn(`[EmbeddingsService] ${msg}`, ...args),
-  error: (msg: string, ...args: any[]) => defaultLogger.error(`[EmbeddingsService] ${msg}`, ...args),
-  debug: (msg: string, ...args: any[]) => defaultLogger.debug(`[EmbeddingsService] ${msg}`, ...args),
+  info: (msg: string, ...args: any[]) =>
+    defaultLogger.info(`[EmbeddingsService] ${msg}`, ...args),
+  warn: (msg: string, ...args: any[]) =>
+    defaultLogger.warn(`[EmbeddingsService] ${msg}`, ...args),
+  error: (msg: string, ...args: any[]) =>
+    defaultLogger.error(`[EmbeddingsService] ${msg}`, ...args),
+  debug: (msg: string, ...args: any[]) =>
+    defaultLogger.debug(`[EmbeddingsService] ${msg}`, ...args),
 };
 
 // ============================================================================
@@ -36,17 +40,20 @@ export interface BatchEmbeddingResult {
 // Configuration
 // ============================================================================
 
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
-const OLLAMA_MODEL = process.env.OLLAMA_EMBED_MODEL || 'nomic-embed-text';
+const OLLAMA_URL = process.env.OLLAMA_URL || "http://localhost:11434";
+const OLLAMA_MODEL = process.env.OLLAMA_EMBED_MODEL || "nomic-embed-text";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_EMBED_MODEL = process.env.OPENAI_EMBED_MODEL || 'text-embedding-3-small';
+const OPENAI_EMBED_MODEL =
+  process.env.OPENAI_EMBED_MODEL || "text-embedding-3-small";
 
 // Embedding provider: 'ollama' (default), 'openai'
-const EMBEDDING_PROVIDER = process.env.EMBEDDING_PROVIDER || 'ollama';
+const EMBEDDING_PROVIDER = process.env.EMBEDDING_PROVIDER || "ollama";
 
 // Cache settings
-const EMBEDDING_CACHE_ENABLED = process.env.EMBEDDING_CACHE_ENABLED !== 'false';
-const EMBEDDING_CACHE_DIR = process.env.EMBEDDING_CACHE_DIR || path.resolve(process.cwd(), 'storage/embeddings-cache');
+const EMBEDDING_CACHE_ENABLED = process.env.EMBEDDING_CACHE_ENABLED !== "false";
+const EMBEDDING_CACHE_DIR =
+  process.env.EMBEDDING_CACHE_DIR ||
+  path.resolve(process.cwd(), "storage/embeddings-cache");
 
 // Ensure cache directory exists
 if (EMBEDDING_CACHE_ENABLED) {
@@ -58,7 +65,10 @@ if (EMBEDDING_CACHE_ENABLED) {
 // ============================================================================
 
 function getCacheKey(text: string, model: string): string {
-  const hash = crypto.createHash('sha256').update(`${model}:${text}`).digest('hex');
+  const hash = crypto
+    .createHash("sha256")
+    .update(`${model}:${text}`)
+    .digest("hex");
   return hash.substring(0, 32);
 }
 
@@ -79,7 +89,7 @@ function getFromCache(text: string, model: string): number[] | null {
     const cachePath = getCachePath(key);
 
     if (fs.existsSync(cachePath)) {
-      const cached = JSON.parse(fs.readFileSync(cachePath, 'utf-8'));
+      const cached = JSON.parse(fs.readFileSync(cachePath, "utf-8"));
       return cached.embedding;
     }
   } catch (error) {
@@ -94,9 +104,12 @@ function saveToCache(text: string, model: string, embedding: number[]): void {
   try {
     const key = getCacheKey(text, model);
     const cachePath = getCachePath(key);
-    fs.writeFileSync(cachePath, JSON.stringify({ embedding, model, timestamp: Date.now() }));
+    fs.writeFileSync(
+      cachePath,
+      JSON.stringify({ embedding, model, timestamp: Date.now() }),
+    );
   } catch (error) {
-    logger.warn('[EmbeddingsCache] Failed to save:', error);
+    logger.warn("[EmbeddingsCache] Failed to save:", error);
   }
 }
 
@@ -105,7 +118,10 @@ function saveToCache(text: string, model: string, embedding: number[]): void {
 // ============================================================================
 
 // Configurable timeout for VPS deployments with network latency
-const EMBEDDING_TIMEOUT_MS = parseInt(process.env.EMBEDDING_TIMEOUT_MS || '60000', 10);
+const EMBEDDING_TIMEOUT_MS = parseInt(
+  process.env.EMBEDDING_TIMEOUT_MS || "60000",
+  10,
+);
 
 async function getOllamaEmbedding(text: string): Promise<number[]> {
   const response = await axios.post(
@@ -116,11 +132,11 @@ async function getOllamaEmbedding(text: string): Promise<number[]> {
     },
     {
       timeout: EMBEDDING_TIMEOUT_MS,
-    }
+    },
   );
 
   if (!response.data?.embedding) {
-    throw new Error('Ollama returned no embedding');
+    throw new Error("Ollama returned no embedding");
   }
 
   return response.data.embedding;
@@ -144,11 +160,11 @@ async function getOllamaEmbeddings(texts: string[]): Promise<number[][]> {
 
 async function getOpenAIEmbedding(text: string): Promise<number[]> {
   if (!OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY not configured');
+    throw new Error("OPENAI_API_KEY not configured");
   }
 
   const response = await axios.post(
-    'https://api.openai.com/v1/embeddings',
+    "https://api.openai.com/v1/embeddings",
     {
       model: OPENAI_EMBED_MODEL,
       input: text,
@@ -156,14 +172,14 @@ async function getOpenAIEmbedding(text: string): Promise<number[]> {
     {
       headers: {
         Authorization: `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       timeout: EMBEDDING_TIMEOUT_MS,
-    }
+    },
   );
 
   if (!response.data?.data?.[0]?.embedding) {
-    throw new Error('OpenAI returned no embedding');
+    throw new Error("OpenAI returned no embedding");
   }
 
   return response.data.data[0].embedding;
@@ -171,13 +187,16 @@ async function getOpenAIEmbedding(text: string): Promise<number[]> {
 
 async function getOpenAIEmbeddings(texts: string[]): Promise<number[][]> {
   if (!OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY not configured');
+    throw new Error("OPENAI_API_KEY not configured");
   }
 
   // OpenAI supports batch embeddings - use longer timeout for batches
-  const batchTimeout = parseInt(process.env.EMBEDDING_BATCH_TIMEOUT_MS || '120000', 10);
+  const batchTimeout = parseInt(
+    process.env.EMBEDDING_BATCH_TIMEOUT_MS || "120000",
+    10,
+  );
   const response = await axios.post(
-    'https://api.openai.com/v1/embeddings',
+    "https://api.openai.com/v1/embeddings",
     {
       model: OPENAI_EMBED_MODEL,
       input: texts,
@@ -185,14 +204,14 @@ async function getOpenAIEmbeddings(texts: string[]): Promise<number[][]> {
     {
       headers: {
         Authorization: `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       timeout: batchTimeout,
-    }
+    },
   );
 
   if (!response.data?.data) {
-    throw new Error('OpenAI returned no embeddings');
+    throw new Error("OpenAI returned no embeddings");
   }
 
   // Sort by index to ensure correct order
@@ -208,7 +227,8 @@ async function getOpenAIEmbeddings(texts: string[]): Promise<number[][]> {
  * Get embedding for a single text.
  */
 export async function getEmbedding(text: string): Promise<EmbeddingResult> {
-  const model = EMBEDDING_PROVIDER === 'openai' ? OPENAI_EMBED_MODEL : OLLAMA_MODEL;
+  const model =
+    EMBEDDING_PROVIDER === "openai" ? OPENAI_EMBED_MODEL : OLLAMA_MODEL;
 
   // Check cache first
   const cached = getFromCache(text, model);
@@ -219,7 +239,7 @@ export async function getEmbedding(text: string): Promise<EmbeddingResult> {
   // Generate new embedding
   let embedding: number[];
 
-  if (EMBEDDING_PROVIDER === 'openai') {
+  if (EMBEDDING_PROVIDER === "openai") {
     embedding = await getOpenAIEmbedding(text);
   } else {
     embedding = await getOllamaEmbedding(text);
@@ -234,8 +254,11 @@ export async function getEmbedding(text: string): Promise<EmbeddingResult> {
 /**
  * Get embeddings for multiple texts (batch).
  */
-export async function getEmbeddings(texts: string[]): Promise<BatchEmbeddingResult> {
-  const model = EMBEDDING_PROVIDER === 'openai' ? OPENAI_EMBED_MODEL : OLLAMA_MODEL;
+export async function getEmbeddings(
+  texts: string[],
+): Promise<BatchEmbeddingResult> {
+  const model =
+    EMBEDDING_PROVIDER === "openai" ? OPENAI_EMBED_MODEL : OLLAMA_MODEL;
   const embeddings: number[][] = [];
   const cached: boolean[] = [];
   const textsToEmbed: { index: number; text: string }[] = [];
@@ -254,14 +277,20 @@ export async function getEmbeddings(texts: string[]): Promise<BatchEmbeddingResu
 
   // Generate embeddings for uncached texts
   if (textsToEmbed.length > 0) {
-    logger.info(`[Embeddings] Generating ${textsToEmbed.length} new embeddings (${texts.length - textsToEmbed.length} cached)`);
+    logger.info(
+      `[Embeddings] Generating ${textsToEmbed.length} new embeddings (${texts.length - textsToEmbed.length} cached)`,
+    );
 
     let newEmbeddings: number[][];
 
-    if (EMBEDDING_PROVIDER === 'openai') {
-      newEmbeddings = await getOpenAIEmbeddings(textsToEmbed.map((t) => t.text));
+    if (EMBEDDING_PROVIDER === "openai") {
+      newEmbeddings = await getOpenAIEmbeddings(
+        textsToEmbed.map((t) => t.text),
+      );
     } else {
-      newEmbeddings = await getOllamaEmbeddings(textsToEmbed.map((t) => t.text));
+      newEmbeddings = await getOllamaEmbeddings(
+        textsToEmbed.map((t) => t.text),
+      );
     }
 
     // Place new embeddings in correct positions and cache them
@@ -280,11 +309,13 @@ export async function getEmbeddings(texts: string[]): Promise<BatchEmbeddingResu
  */
 export async function isEmbeddingServiceAvailable(): Promise<boolean> {
   try {
-    if (EMBEDDING_PROVIDER === 'openai') {
+    if (EMBEDDING_PROVIDER === "openai") {
       return !!OPENAI_API_KEY;
     } else {
       // Try to connect to Ollama
-      const response = await axios.get(`${OLLAMA_URL}/api/tags`, { timeout: 5000 });
+      const response = await axios.get(`${OLLAMA_URL}/api/tags`, {
+        timeout: 5000,
+      });
       return response.status === 200;
     }
   } catch {

@@ -1,7 +1,7 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Request, Response } from "express";
 
-const CSRF_HEADER = 'x-csrf-token';
-const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
+const CSRF_HEADER = "x-csrf-token";
+const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
 /**
  * Auth endpoints that establish/reset sessions — these must be exempt from
@@ -9,22 +9,22 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
  * logout and would otherwise block fresh login/register attempts.
  */
 const CSRF_EXEMPT_PREFIXES = [
-  '/api/auth/login',
-  '/api/auth/register',
-  '/api/auth/signup',
-  '/api/auth/refresh',
-  '/api/auth/pending/',
-  '/api/auth/forgot-password',
-  '/api/auth/reset-password',
-  '/api/auth/send-reset-link',
-  '/api/auth/verify-reset-code',
-  '/api/auth/google',
-  '/api/auth/apple',
-  '/api/auth/2fa/verify-login',
+  "/api/auth/login",
+  "/api/auth/register",
+  "/api/auth/signup",
+  "/api/auth/refresh",
+  "/api/auth/pending/",
+  "/api/auth/forgot-password",
+  "/api/auth/reset-password",
+  "/api/auth/send-reset-link",
+  "/api/auth/verify-reset-code",
+  "/api/auth/google",
+  "/api/auth/apple",
+  "/api/auth/2fa/verify-login",
 ];
 
 function isExempt(url: string): boolean {
-  const path = url.split('?')[0];
+  const path = url.split("?")[0];
   return CSRF_EXEMPT_PREFIXES.some((prefix) => path.startsWith(prefix));
 }
 
@@ -33,7 +33,11 @@ function isExempt(url: string): boolean {
  * We only enforce when an authenticated cookie session is present
  * AND the endpoint is not in the exempt list.
  */
-export function csrfProtection(req: Request, res: Response, next: NextFunction): void {
+export function csrfProtection(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   if (SAFE_METHODS.has(req.method.toUpperCase())) {
     next();
     return;
@@ -46,7 +50,9 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
     return;
   }
 
-  const hasSessionCookie = Boolean((req as any).cookies?.koda_at || (req as any).cookies?.koda_rt);
+  const hasSessionCookie = Boolean(
+    (req as any).cookies?.koda_at || (req as any).cookies?.koda_rt,
+  );
   if (!hasSessionCookie) {
     next();
     return;
@@ -58,8 +64,8 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
     res.status(403).json({
       ok: false,
       error: {
-        code: 'CSRF_INVALID',
-        message: 'CSRF token missing or invalid.',
+        code: "CSRF_INVALID",
+        message: "CSRF token missing or invalid.",
       },
     });
     return;
@@ -67,4 +73,3 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
 
   next();
 }
-

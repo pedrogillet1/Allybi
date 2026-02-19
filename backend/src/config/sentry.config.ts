@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/node';
+import * as Sentry from "@sentry/node";
 
 /**
  * Sentry Error Monitoring Configuration
@@ -9,36 +9,38 @@ import * as Sentry from '@sentry/node';
 
 export const initSentry = (app: any) => {
   // Skip Sentry in test environment
-  if (process.env.NODE_ENV === 'test') {
-    console.log('⚠️  Sentry: Skipped in test environment');
+  if (process.env.NODE_ENV === "test") {
+    console.log("⚠️  Sentry: Skipped in test environment");
     return;
   }
 
   // Check if Sentry DSN is configured
   if (!process.env.SENTRY_DSN) {
-    console.log('⚠️  Sentry: DSN not configured, error monitoring disabled');
-    console.log('   Set SENTRY_DSN environment variable to enable Sentry');
+    console.log("⚠️  Sentry: DSN not configured, error monitoring disabled");
+    console.log("   Set SENTRY_DSN environment variable to enable Sentry");
     return;
   }
 
   try {
     Sentry.init({
       dsn: process.env.SENTRY_DSN,
-      environment: process.env.NODE_ENV || 'development',
+      environment: process.env.NODE_ENV || "development",
 
       // Performance Monitoring
-      tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+      tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
 
       // Release tracking for deploy notifications
-      release: process.env.SENTRY_RELEASE || `backend@${process.env.npm_package_version}`,
+      release:
+        process.env.SENTRY_RELEASE ||
+        `backend@${process.env.npm_package_version}`,
 
       // Filter sensitive data
       beforeSend(event, hint) {
         // Remove sensitive headers
         if (event.request?.headers) {
-          delete event.request.headers['authorization'];
-          delete event.request.headers['cookie'];
-          delete event.request.headers['x-api-key'];
+          delete event.request.headers["authorization"];
+          delete event.request.headers["cookie"];
+          delete event.request.headers["x-api-key"];
         }
 
         // Remove sensitive data from extra context
@@ -56,18 +58,18 @@ export const initSentry = (app: any) => {
       // Ignore certain errors
       ignoreErrors: [
         // Ignore rate limit errors (expected behavior)
-        'Rate limit exceeded',
+        "Rate limit exceeded",
         // Ignore auth errors (not bugs)
-        'Unauthorized',
-        'Forbidden',
+        "Unauthorized",
+        "Forbidden",
         // Ignore validation errors
-        'Validation failed',
+        "Validation failed",
       ],
     });
 
-    console.log('✅ Sentry error monitoring initialized');
+    console.log("✅ Sentry error monitoring initialized");
   } catch (error) {
-    console.error('❌ Failed to initialize Sentry:', error);
+    console.error("❌ Failed to initialize Sentry:", error);
   }
 };
 
@@ -94,7 +96,10 @@ export const captureError = (error: Error, context?: Record<string, any>) => {
 /**
  * Manual message capture (use for important events)
  */
-export const captureMessage = (message: string, level: 'info' | 'warning' | 'error' = 'info') => {
+export const captureMessage = (
+  message: string,
+  level: "info" | "warning" | "error" = "info",
+) => {
   if (!process.env.SENTRY_DSN) return;
 
   Sentry.captureMessage(message, level);
@@ -124,14 +129,18 @@ export const clearUserContext = () => {
 /**
  * Add custom context to errors
  */
-export const addBreadcrumb = (message: string, category: string, data?: Record<string, any>) => {
+export const addBreadcrumb = (
+  message: string,
+  category: string,
+  data?: Record<string, any>,
+) => {
   if (!process.env.SENTRY_DSN) return;
 
   Sentry.addBreadcrumb({
     message,
     category,
     data,
-    level: 'info',
+    level: "info",
   });
 };
 

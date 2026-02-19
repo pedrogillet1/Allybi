@@ -54,7 +54,11 @@ describe("computeOpsToPatchPlan", () => {
 
     expect(out.patchOps.length).toBe(1);
     expect(out.patchOps[0]?.op).toBe("CREATE_CHART_CARD");
-    expect(((out.patchOps[0] as any)?.chart || {}).settings?.labelRange).toBe("SUMMARY1!C5:C12");
-    expect(((out.patchOps[0] as any)?.chart || {}).settings?.valueRange).toBe("SUMMARY1!G5:G12");
+    expect(((out.patchOps[0] as any)?.chart || {}).settings?.labelRange).toBe(
+      "SUMMARY1!C5:C12",
+    );
+    expect(((out.patchOps[0] as any)?.chart || {}).settings?.valueRange).toBe(
+      "SUMMARY1!G5:G12",
+    );
   });
 });

@@ -37,7 +37,10 @@ type DocIndexFile = {
   docs: DocIndexRecord[];
 };
 
-const DEFAULT_DOC_INDEX_PATH = path.resolve(process.cwd(), "storage/doc-index.json");
+const DEFAULT_DOC_INDEX_PATH = path.resolve(
+  process.cwd(),
+  "storage/doc-index.json",
+);
 const DEFAULT_STORAGE_DIR = path.resolve(process.cwd(), "storage/uploads");
 
 function safeString(x: any, max = 260): string | null {
@@ -72,7 +75,8 @@ async function readDocIndex(filePath: string): Promise<DocIndexFile> {
   try {
     const raw = await fs.readFile(filePath, "utf8");
     const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") throw new Error("invalid doc index");
+    if (!parsed || typeof parsed !== "object")
+      throw new Error("invalid doc index");
     if (!Array.isArray(parsed.docs)) parsed.docs = [];
     if (typeof parsed.version !== "string") parsed.version = "1.0.0";
     return parsed as DocIndexFile;
@@ -91,7 +95,10 @@ async function atomicWriteJson(filePath: string, data: any): Promise<void> {
 
 function requireAuth(req: AuthenticatedRequest, res: Response): boolean {
   if (!req.user?.id) {
-    res.status(401).json({ ok: false, error: { code: "unauthorized", message: "Unauthorized" } });
+    res.status(401).json({
+      ok: false,
+      error: { code: "unauthorized", message: "Unauthorized" },
+    });
     return false;
   }
   return true;
@@ -132,136 +139,192 @@ export function createStorageRouter(opts?: {
 
     const db = await readDocIndex(docIndexPath);
     const docs = db.docs.slice().sort((a, b) => {
-      const au = typeof a.updatedAt === "number" ? a.updatedAt : Date.parse(String(a.updatedAt ?? 0)) || 0;
-      const bu = typeof b.updatedAt === "number" ? b.updatedAt : Date.parse(String(b.updatedAt ?? 0)) || 0;
+      const au =
+        typeof a.updatedAt === "number"
+          ? a.updatedAt
+          : Date.parse(String(a.updatedAt ?? 0)) || 0;
+      const bu =
+        typeof b.updatedAt === "number"
+          ? b.updatedAt
+          : Date.parse(String(b.updatedAt ?? 0)) || 0;
       return bu - au;
     });
 
     return res.json({ ok: true, docs: docs.map(sanitizeDocForClient) });
   });
 
-  router.get("/docs/:docId", async (req: AuthenticatedRequest, res: Response) => {
-    if (authRequired && !requireAuth(req, res)) return;
+  router.get(
+    "/docs/:docId",
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (authRequired && !requireAuth(req, res)) return;
 
-    const docId = String(req.params.docId || "").trim();
-    if (!docId) {
-      return res.status(400).json({ ok: false, error: { code: "bad_request", message: "docId required" } });
-    }
+      const docId = String(req.params.docId || "").trim();
+      if (!docId) {
+        return res.status(400).json({
+          ok: false,
+          error: { code: "bad_request", message: "docId required" },
+        });
+      }
 
-    const db = await readDocIndex(docIndexPath);
-    const doc = db.docs.find((d) => d.docId === docId);
-    if (!doc) {
-      return res.status(404).json({ ok: false, error: { code: "not_found", message: "Document not found" } });
-    }
-
-    return res.json({
-      ok: true,
-      doc: {
-        ...sanitizeDocForClient(doc),
-        openUrl: `/api/storage/open/${encodeURIComponent(docId)}`,
-        whereUrl: `/api/storage/where/${encodeURIComponent(docId)}`,
-      },
-    });
-  });
-
-  router.get("/open/:docId", async (req: AuthenticatedRequest, res: Response) => {
-    if (authRequired && !requireAuth(req, res)) return;
-
-    const docId = String(req.params.docId || "").trim();
-    const db = await readDocIndex(docIndexPath);
-    const doc = db.docs.find((d) => d.docId === docId);
-    if (!doc) {
-      return res.status(404).json({ ok: false, error: { code: "not_found", message: "Document not found" } });
-    }
-
-    const rel = safeString(doc.relativePath, 500) || safeString(doc.storageKey, 500);
-    if (!rel) {
-      return res.status(500).json({ ok: false, error: { code: "missing_storage_pointer", message: "Storage pointer missing" } });
-    }
-
-    let fullPath: string;
-    try {
-      fullPath = safeJoinStorage(storageDir, rel);
-    } catch {
-      return res.status(400).json({ ok: false, error: { code: "invalid_path", message: "Invalid document path" } });
-    }
-
-    try {
-      const mime = safeString(doc.mimeType, 120) || "application/octet-stream";
-      res.setHeader("Content-Type", mime);
-      res.setHeader("Content-Disposition", `inline; filename="${guessDownloadName(doc).replace(/"/g, "")}"`);
-
-      const fileHandle = await fs.open(fullPath, "r");
-      const stream = fileHandle.createReadStream();
-      stream.on("close", async () => {
-        try {
-          await fileHandle.close();
-        } catch {}
-      });
-      stream.pipe(res);
-      return;
-    } catch {
-      return res.status(500).json({ ok: false, error: { code: "read_failed", message: "Unable to open document" } });
-    }
-  });
-
-  router.get("/where/:docId", async (req: AuthenticatedRequest, res: Response) => {
-    if (authRequired && !requireAuth(req, res)) return;
-
-    const docId = String(req.params.docId || "").trim();
-    const db = await readDocIndex(docIndexPath);
-    const doc = db.docs.find((d) => d.docId === docId);
-    if (!doc) {
-      return res.status(404).json({ ok: false, error: { code: "not_found", message: "Document not found" } });
-    }
-
-    return res.json({
-      ok: true,
-      docId: doc.docId,
-      folderPath: safeString(doc.folderPath, 260) || null,
-      filename: safeString(doc.filename, 260) || null,
-      title: safeString(doc.title, 260) || null,
-    });
-  });
-
-  router.delete("/docs/:docId", async (req: AuthenticatedRequest, res: Response) => {
-    if (authRequired && !requireAuth(req, res)) return;
-
-    const docId = String(req.params.docId || "").trim();
-    const hardDelete = req.query.hard === "true";
-
-    await fs.mkdir(path.dirname(docIndexPath), { recursive: true });
-
-    const updated = await (async () => {
       const db = await readDocIndex(docIndexPath);
-      const idx = db.docs.findIndex((d) => d.docId === docId);
-      if (idx === -1) return null;
+      const doc = db.docs.find((d) => d.docId === docId);
+      if (!doc) {
+        return res.status(404).json({
+          ok: false,
+          error: { code: "not_found", message: "Document not found" },
+        });
+      }
 
-      const doc = db.docs[idx];
-      db.docs.splice(idx, 1);
-      await atomicWriteJson(docIndexPath, db);
+      return res.json({
+        ok: true,
+        doc: {
+          ...sanitizeDocForClient(doc),
+          openUrl: `/api/storage/open/${encodeURIComponent(docId)}`,
+          whereUrl: `/api/storage/where/${encodeURIComponent(docId)}`,
+        },
+      });
+    },
+  );
 
-      return doc;
-    })();
+  router.get(
+    "/open/:docId",
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (authRequired && !requireAuth(req, res)) return;
 
-    if (!updated) {
-      return res.status(404).json({ ok: false, error: { code: "not_found", message: "Document not found" } });
-    }
+      const docId = String(req.params.docId || "").trim();
+      const db = await readDocIndex(docIndexPath);
+      const doc = db.docs.find((d) => d.docId === docId);
+      if (!doc) {
+        return res.status(404).json({
+          ok: false,
+          error: { code: "not_found", message: "Document not found" },
+        });
+      }
 
-    if (hardDelete) {
-      const rel = safeString(updated.relativePath, 500) || safeString(updated.storageKey, 500);
-      if (rel) {
-        try {
-          const fullPath = safeJoinStorage(storageDir, rel);
-          await fs.unlink(fullPath);
-        } catch {
-          // ignore file deletion errors (record already removed)
+      const rel =
+        safeString(doc.relativePath, 500) || safeString(doc.storageKey, 500);
+      if (!rel) {
+        return res.status(500).json({
+          ok: false,
+          error: {
+            code: "missing_storage_pointer",
+            message: "Storage pointer missing",
+          },
+        });
+      }
+
+      let fullPath: string;
+      try {
+        fullPath = safeJoinStorage(storageDir, rel);
+      } catch {
+        return res.status(400).json({
+          ok: false,
+          error: { code: "invalid_path", message: "Invalid document path" },
+        });
+      }
+
+      try {
+        const mime =
+          safeString(doc.mimeType, 120) || "application/octet-stream";
+        res.setHeader("Content-Type", mime);
+        res.setHeader(
+          "Content-Disposition",
+          `inline; filename="${guessDownloadName(doc).replace(/"/g, "")}"`,
+        );
+
+        const fileHandle = await fs.open(fullPath, "r");
+        const stream = fileHandle.createReadStream();
+        stream.on("close", async () => {
+          try {
+            await fileHandle.close();
+          } catch {}
+        });
+        stream.pipe(res);
+        return;
+      } catch {
+        return res.status(500).json({
+          ok: false,
+          error: { code: "read_failed", message: "Unable to open document" },
+        });
+      }
+    },
+  );
+
+  router.get(
+    "/where/:docId",
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (authRequired && !requireAuth(req, res)) return;
+
+      const docId = String(req.params.docId || "").trim();
+      const db = await readDocIndex(docIndexPath);
+      const doc = db.docs.find((d) => d.docId === docId);
+      if (!doc) {
+        return res.status(404).json({
+          ok: false,
+          error: { code: "not_found", message: "Document not found" },
+        });
+      }
+
+      return res.json({
+        ok: true,
+        docId: doc.docId,
+        folderPath: safeString(doc.folderPath, 260) || null,
+        filename: safeString(doc.filename, 260) || null,
+        title: safeString(doc.title, 260) || null,
+      });
+    },
+  );
+
+  router.delete(
+    "/docs/:docId",
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (authRequired && !requireAuth(req, res)) return;
+
+      const docId = String(req.params.docId || "").trim();
+      const hardDelete = req.query.hard === "true";
+
+      await fs.mkdir(path.dirname(docIndexPath), { recursive: true });
+
+      const updated = await (async () => {
+        const db = await readDocIndex(docIndexPath);
+        const idx = db.docs.findIndex((d) => d.docId === docId);
+        if (idx === -1) return null;
+
+        const doc = db.docs[idx];
+        db.docs.splice(idx, 1);
+        await atomicWriteJson(docIndexPath, db);
+
+        return doc;
+      })();
+
+      if (!updated) {
+        return res.status(404).json({
+          ok: false,
+          error: { code: "not_found", message: "Document not found" },
+        });
+      }
+
+      if (hardDelete) {
+        const rel =
+          safeString(updated.relativePath, 500) ||
+          safeString(updated.storageKey, 500);
+        if (rel) {
+          try {
+            const fullPath = safeJoinStorage(storageDir, rel);
+            await fs.unlink(fullPath);
+          } catch {
+            // ignore file deletion errors (record already removed)
+          }
         }
       }
-    }
 
-    return res.json({ ok: true, deleted: sanitizeDocForClient(updated), hardDeleted: hardDelete });
-  });
+      return res.json({
+        ok: true,
+        deleted: sanitizeDocForClient(updated),
+        hardDeleted: hardDelete,
+      });
+    },
+  );
 
   return router;
 }

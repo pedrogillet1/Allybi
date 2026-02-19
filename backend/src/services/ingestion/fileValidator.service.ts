@@ -13,8 +13,8 @@
  * Impact: Only readable files accepted, clear error messages
  */
 
-import * as XLSX from 'xlsx';
-import mammoth from 'mammoth';
+import * as XLSX from "xlsx";
+import mammoth from "mammoth";
 
 export interface ValidationResult {
   isValid: boolean;
@@ -24,62 +24,76 @@ export interface ValidationResult {
 }
 
 export enum ValidationErrorCode {
-  UNSUPPORTED_TYPE = 'UNSUPPORTED_TYPE',
-  FILE_TOO_LARGE = 'FILE_TOO_LARGE',
-  FILE_CORRUPTED = 'FILE_CORRUPTED',
-  FILE_EMPTY = 'FILE_EMPTY',
-  HEADER_MISMATCH = 'HEADER_MISMATCH',
-  PASSWORD_PROTECTED = 'PASSWORD_PROTECTED',
-  OCR_QUALITY_LOW = 'OCR_QUALITY_LOW',
-  NO_TEXT_CONTENT = 'NO_TEXT_CONTENT',
+  UNSUPPORTED_TYPE = "UNSUPPORTED_TYPE",
+  FILE_TOO_LARGE = "FILE_TOO_LARGE",
+  FILE_CORRUPTED = "FILE_CORRUPTED",
+  FILE_EMPTY = "FILE_EMPTY",
+  HEADER_MISMATCH = "HEADER_MISMATCH",
+  PASSWORD_PROTECTED = "PASSWORD_PROTECTED",
+  OCR_QUALITY_LOW = "OCR_QUALITY_LOW",
+  NO_TEXT_CONTENT = "NO_TEXT_CONTENT",
 }
 
 /**
  * Magic bytes (file signatures) for common formats
  * Used for early detection of corrupt/misnamed files
  */
-const MAGIC_BYTES: Record<string, { signature: number[]; offset?: number }[]> = {
-  'application/pdf': [{ signature: [0x25, 0x50, 0x44, 0x46] }], // %PDF
-  'application/zip': [{ signature: [0x50, 0x4B, 0x03, 0x04] }], // PK..
-  // DOCX, XLSX, PPTX are ZIP-based
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [{ signature: [0x50, 0x4B, 0x03, 0x04] }],
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [{ signature: [0x50, 0x4B, 0x03, 0x04] }],
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation': [{ signature: [0x50, 0x4B, 0x03, 0x04] }],
-  // Legacy Office formats (OLE Compound Document)
-  'application/msword': [{ signature: [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1] }],
-  'application/vnd.ms-excel': [{ signature: [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1] }],
-  'application/vnd.ms-powerpoint': [{ signature: [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1] }],
-  // Images
-  'image/jpeg': [
-    { signature: [0xFF, 0xD8, 0xFF, 0xE0] }, // JFIF
-    { signature: [0xFF, 0xD8, 0xFF, 0xE1] }, // EXIF
-    { signature: [0xFF, 0xD8, 0xFF, 0xDB] }, // Raw JPEG
-  ],
-  'image/png': [{ signature: [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A] }], // PNG
-  'image/gif': [
-    { signature: [0x47, 0x49, 0x46, 0x38, 0x37, 0x61] }, // GIF87a
-    { signature: [0x47, 0x49, 0x46, 0x38, 0x39, 0x61] }, // GIF89a
-  ],
-};
+const MAGIC_BYTES: Record<string, { signature: number[]; offset?: number }[]> =
+  {
+    "application/pdf": [{ signature: [0x25, 0x50, 0x44, 0x46] }], // %PDF
+    "application/zip": [{ signature: [0x50, 0x4b, 0x03, 0x04] }], // PK..
+    // DOCX, XLSX, PPTX are ZIP-based
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [
+      { signature: [0x50, 0x4b, 0x03, 0x04] },
+    ],
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
+      { signature: [0x50, 0x4b, 0x03, 0x04] },
+    ],
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+      [{ signature: [0x50, 0x4b, 0x03, 0x04] }],
+    // Legacy Office formats (OLE Compound Document)
+    "application/msword": [
+      { signature: [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1] },
+    ],
+    "application/vnd.ms-excel": [
+      { signature: [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1] },
+    ],
+    "application/vnd.ms-powerpoint": [
+      { signature: [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1] },
+    ],
+    // Images
+    "image/jpeg": [
+      { signature: [0xff, 0xd8, 0xff, 0xe0] }, // JFIF
+      { signature: [0xff, 0xd8, 0xff, 0xe1] }, // EXIF
+      { signature: [0xff, 0xd8, 0xff, 0xdb] }, // Raw JPEG
+    ],
+    "image/png": [
+      { signature: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] },
+    ], // PNG
+    "image/gif": [
+      { signature: [0x47, 0x49, 0x46, 0x38, 0x37, 0x61] }, // GIF87a
+      { signature: [0x47, 0x49, 0x46, 0x38, 0x39, 0x61] }, // GIF89a
+    ],
+  };
 
 class FileValidatorService {
   // Supported file types (aligned with text extraction service)
   private supportedTypes = [
-    'application/pdf',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-    'application/msword', // .doc
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-    'application/vnd.ms-excel', // .xls
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
-    'application/vnd.ms-powerpoint', // .ppt
-    'text/plain', // .txt
-    'text/html', // .html
-    'text/csv', // .csv
-    'application/csv', // alternate CSV mime
-    'image/jpeg',
-    'image/png',
-    'image/jpg',
-    'image/gif',
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+    "application/msword", // .doc
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+    "application/vnd.ms-excel", // .xls
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
+    "application/vnd.ms-powerpoint", // .ppt
+    "text/plain", // .txt
+    "text/html", // .html
+    "text/csv", // .csv
+    "application/csv", // alternate CSV mime
+    "image/jpeg",
+    "image/png",
+    "image/jpg",
+    "image/gif",
   ];
 
   /**
@@ -96,32 +110,43 @@ class FileValidatorService {
   validateFileHeader(
     buffer: Buffer,
     mimeType: string,
-    documentId?: string
+    documentId?: string,
   ): ValidationResult {
     // Check for empty/zero-byte files
     if (!buffer || buffer.length === 0) {
-      console.error(`[FileValidator] Corrupt upload detected: zero-byte file${documentId ? ` (docId=${documentId})` : ''}`);
+      console.error(
+        `[FileValidator] Corrupt upload detected: zero-byte file${documentId ? ` (docId=${documentId})` : ""}`,
+      );
       return {
         isValid: false,
-        error: 'File is empty (0 bytes)',
+        error: "File is empty (0 bytes)",
         errorCode: ValidationErrorCode.FILE_EMPTY,
-        suggestion: 'The uploaded file appears to be empty. Please check the file and try again.',
+        suggestion:
+          "The uploaded file appears to be empty. Please check the file and try again.",
       };
     }
 
     // Check for very small files (likely corrupt)
     if (buffer.length < 10) {
-      console.error(`[FileValidator] Corrupt upload detected: file too small (${buffer.length} bytes)${documentId ? ` (docId=${documentId})` : ''}`);
+      console.error(
+        `[FileValidator] Corrupt upload detected: file too small (${buffer.length} bytes)${documentId ? ` (docId=${documentId})` : ""}`,
+      );
       return {
         isValid: false,
         error: `File is too small (${buffer.length} bytes)`,
         errorCode: ValidationErrorCode.FILE_CORRUPTED,
-        suggestion: 'The uploaded file appears to be corrupted. Please check the file and try again.',
+        suggestion:
+          "The uploaded file appears to be corrupted. Please check the file and try again.",
       };
     }
 
     // Text-based formats don't have magic bytes - skip header check
-    if (mimeType === 'text/plain' || mimeType === 'text/html' || mimeType === 'text/csv' || mimeType === 'application/csv') {
+    if (
+      mimeType === "text/plain" ||
+      mimeType === "text/html" ||
+      mimeType === "text/csv" ||
+      mimeType === "application/csv"
+    ) {
       return { isValid: true };
     }
 
@@ -134,12 +159,15 @@ class FileValidatorService {
       });
 
       if (!matchesAny) {
-        console.error(`[FileValidator] Header mismatch: expected ${mimeType} but magic bytes don't match${documentId ? ` (docId=${documentId})` : ''}`);
+        console.error(
+          `[FileValidator] Header mismatch: expected ${mimeType} but magic bytes don't match${documentId ? ` (docId=${documentId})` : ""}`,
+        );
         return {
           isValid: false,
           error: `File header doesn't match expected format (${mimeType})`,
           errorCode: ValidationErrorCode.HEADER_MISMATCH,
-          suggestion: 'The file may be corrupted or renamed with wrong extension. Please verify the file and try again.',
+          suggestion:
+            "The file may be corrupted or renamed with wrong extension. Please verify the file and try again.",
         };
       }
     }
@@ -159,14 +187,19 @@ class FileValidatorService {
    * @param file - File object from input
    * @returns Validation result
    */
-  validateClientSide(file: { type: string; size: number; name: string }): ValidationResult {
+  validateClientSide(file: {
+    type: string;
+    size: number;
+    name: string;
+  }): ValidationResult {
     // Check file type
     if (!this.supportedTypes.includes(file.type)) {
       return {
         isValid: false,
         error: `File type not supported: ${file.type}`,
         errorCode: ValidationErrorCode.UNSUPPORTED_TYPE,
-        suggestion: 'Please convert to PDF, DOCX, XLSX, PPTX, TXT, or image format.',
+        suggestion:
+          "Please convert to PDF, DOCX, XLSX, PPTX, TXT, or image format.",
       };
     }
 
@@ -199,7 +232,7 @@ class FileValidatorService {
   async validateServerSide(
     buffer: Buffer,
     mimeType: string,
-    filename: string
+    filename: string,
   ): Promise<ValidationResult> {
     try {
       // Check file type again (don't trust client)
@@ -208,7 +241,8 @@ class FileValidatorService {
           isValid: false,
           error: `Unsupported file type: ${mimeType}`,
           errorCode: ValidationErrorCode.UNSUPPORTED_TYPE,
-          suggestion: 'Please convert to a supported format (PDF, DOCX, XLSX, etc.).',
+          suggestion:
+            "Please convert to a supported format (PDF, DOCX, XLSX, etc.).",
         };
       }
 
@@ -216,9 +250,9 @@ class FileValidatorService {
       if (buffer.length > this.maxFileSize) {
         return {
           isValid: false,
-          error: 'File too large',
+          error: "File too large",
           errorCode: ValidationErrorCode.FILE_TOO_LARGE,
-          suggestion: 'Please reduce file size to under 50MB.',
+          suggestion: "Please reduce file size to under 50MB.",
         };
       }
 
@@ -229,19 +263,23 @@ class FileValidatorService {
       }
 
       // Check for password protection
-      const passwordResult = await this.checkPasswordProtection(buffer, mimeType);
+      const passwordResult = await this.checkPasswordProtection(
+        buffer,
+        mimeType,
+      );
       if (!passwordResult.isValid) {
         return passwordResult;
       }
 
       return { isValid: true };
     } catch (error: any) {
-      console.error('Server-side validation error:', error);
+      console.error("Server-side validation error:", error);
       return {
         isValid: false,
-        error: 'File validation failed',
+        error: "File validation failed",
         errorCode: ValidationErrorCode.FILE_CORRUPTED,
-        suggestion: 'The file may be corrupted. Please try re-downloading or re-saving the file.',
+        suggestion:
+          "The file may be corrupted. Please try re-downloading or re-saving the file.",
       };
     }
   }
@@ -257,43 +295,47 @@ class FileValidatorService {
    */
   async validateContentExtraction(
     buffer: Buffer,
-    mimeType: string
+    mimeType: string,
   ): Promise<ValidationResult> {
     try {
-      let extractedText = '';
+      let extractedText = "";
       let confidence = 1.0;
 
       // Extract text based on file type
-      if (mimeType === 'application/pdf') {
+      if (mimeType === "application/pdf") {
         const result = await this.extractPDFText(buffer);
         extractedText = result.text;
         confidence = result.confidence || 1.0;
-      } else if (mimeType.includes('wordprocessingml')) {
+      } else if (mimeType.includes("wordprocessingml")) {
         const result = await mammoth.extractRawText({ buffer });
         extractedText = result.value;
-      } else if (mimeType.includes('spreadsheetml')) {
+      } else if (mimeType.includes("spreadsheetml")) {
         const workbook = XLSX.read(buffer);
-        const sheets = workbook.SheetNames.map(name =>
-          XLSX.utils.sheet_to_txt(workbook.Sheets[name])
+        const sheets = workbook.SheetNames.map((name) =>
+          XLSX.utils.sheet_to_txt(workbook.Sheets[name]),
         );
-        extractedText = sheets.join('\n');
-      } else if (mimeType === 'text/plain') {
-        extractedText = buffer.toString('utf-8');
-      } else if (mimeType.startsWith('image/')) {
+        extractedText = sheets.join("\n");
+      } else if (mimeType === "text/plain") {
+        extractedText = buffer.toString("utf-8");
+      } else if (mimeType.startsWith("image/")) {
         // For images, OCR will be performed later
         // Just validate that it's a valid image
         return { isValid: true };
       }
 
       // Check if any text was extracted
-      const wordCount = extractedText.trim().split(/\s+/).filter(w => w.length > 0).length;
+      const wordCount = extractedText
+        .trim()
+        .split(/\s+/)
+        .filter((w) => w.length > 0).length;
 
       if (wordCount < 10) {
         return {
           isValid: false,
-          error: 'No readable text found in document',
+          error: "No readable text found in document",
           errorCode: ValidationErrorCode.NO_TEXT_CONTENT,
-          suggestion: 'This file appears to be empty or contains only images. If it\'s a scanned document, please ensure the scan quality is high (minimum 300 DPI).',
+          suggestion:
+            "This file appears to be empty or contains only images. If it's a scanned document, please ensure the scan quality is high (minimum 300 DPI).",
         };
       }
 
@@ -301,20 +343,22 @@ class FileValidatorService {
       if (confidence < 0.7) {
         return {
           isValid: false,
-          error: 'Scan quality too low for reliable text extraction',
+          error: "Scan quality too low for reliable text extraction",
           errorCode: ValidationErrorCode.OCR_QUALITY_LOW,
-          suggestion: 'Please re-scan the document at higher quality (minimum 300 DPI, good lighting, clear text).',
+          suggestion:
+            "Please re-scan the document at higher quality (minimum 300 DPI, good lighting, clear text).",
         };
       }
 
       return { isValid: true };
     } catch (error: any) {
-      console.error('Content extraction validation error:', error);
+      console.error("Content extraction validation error:", error);
       return {
         isValid: false,
-        error: 'Failed to extract text from document',
+        error: "Failed to extract text from document",
         errorCode: ValidationErrorCode.FILE_CORRUPTED,
-        suggestion: 'The file may be corrupted or in an unsupported format. Please try re-saving the file.',
+        suggestion:
+          "The file may be corrupted or in an unsupported format. Please try re-saving the file.",
       };
     }
   }
@@ -322,17 +366,20 @@ class FileValidatorService {
   /**
    * Check file integrity (not corrupted)
    */
-  private async checkFileIntegrity(buffer: Buffer, mimeType: string): Promise<ValidationResult> {
+  private async checkFileIntegrity(
+    buffer: Buffer,
+    mimeType: string,
+  ): Promise<ValidationResult> {
     try {
-      if (mimeType === 'application/pdf') {
+      if (mimeType === "application/pdf") {
         // Try to parse PDF
-        const { PDFParse } = require('pdf-parse');
+        const { PDFParse } = require("pdf-parse");
         const parser = new PDFParse({ data: buffer });
         await parser.getText();
-      } else if (mimeType.includes('spreadsheetml')) {
+      } else if (mimeType.includes("spreadsheetml")) {
         // Try to parse Excel
         XLSX.read(buffer);
-      } else if (mimeType.includes('wordprocessingml')) {
+      } else if (mimeType.includes("wordprocessingml")) {
         // Try to parse Word
         await mammoth.extractRawText({ buffer });
       }
@@ -341,9 +388,9 @@ class FileValidatorService {
     } catch (error: any) {
       return {
         isValid: false,
-        error: 'File appears to be corrupted',
+        error: "File appears to be corrupted",
         errorCode: ValidationErrorCode.FILE_CORRUPTED,
-        suggestion: 'Please try re-downloading or re-saving the file.',
+        suggestion: "Please try re-downloading or re-saving the file.",
       };
     }
   }
@@ -351,19 +398,22 @@ class FileValidatorService {
   /**
    * Check for password protection
    */
-  private async checkPasswordProtection(buffer: Buffer, mimeType: string): Promise<ValidationResult> {
+  private async checkPasswordProtection(
+    buffer: Buffer,
+    mimeType: string,
+  ): Promise<ValidationResult> {
     try {
-      if (mimeType === 'application/pdf') {
+      if (mimeType === "application/pdf") {
         // PDF password detection
-        const pdfString = buffer.toString('latin1');
+        const pdfString = buffer.toString("latin1");
 
         // Check for encryption dictionary
-        if (pdfString.includes('/Encrypt')) {
+        if (pdfString.includes("/Encrypt")) {
           return {
             isValid: false,
-            error: 'PDF is password-protected',
+            error: "PDF is password-protected",
             errorCode: ValidationErrorCode.PASSWORD_PROTECTED,
-            suggestion: 'Please remove the password protection and try again.',
+            suggestion: "Please remove the password protection and try again.",
           };
         }
       }
@@ -381,9 +431,11 @@ class FileValidatorService {
   /**
    * Extract text from PDF (helper method)
    */
-  private async extractPDFText(buffer: Buffer): Promise<{ text: string; confidence?: number }> {
+  private async extractPDFText(
+    buffer: Buffer,
+  ): Promise<{ text: string; confidence?: number }> {
     try {
-      const { PDFParse } = require('pdf-parse');
+      const { PDFParse } = require("pdf-parse");
       const parser = new PDFParse({ data: buffer });
       const data = await parser.getText();
 
@@ -391,7 +443,7 @@ class FileValidatorService {
       if (!data.text || data.text.trim().length < 100) {
         // OCR will be performed later
         // For now, just return empty with low confidence
-        return { text: '', confidence: 0.5 };
+        return { text: "", confidence: 0.5 };
       }
 
       return { text: data.text, confidence: 1.0 };

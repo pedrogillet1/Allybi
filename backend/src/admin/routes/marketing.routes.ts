@@ -3,9 +3,15 @@
  * GET /api/admin/marketing
  */
 
-import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { getDomains, getIntents, getKeywords, getPatterns, listInteractions } from '../../services/admin';
+import { Router, Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
+import {
+  getDomains,
+  getIntents,
+  getKeywords,
+  getPatterns,
+  listInteractions,
+} from "../../services/admin";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -14,9 +20,9 @@ const prisma = new PrismaClient();
  * GET /api/admin/marketing/domains
  * Returns domain analytics
  */
-router.get('/domains', async (req: Request, res: Response) => {
+router.get("/domains", async (req: Request, res: Response) => {
   try {
-    const range = (req.query.range as string) || '7d';
+    const range = (req.query.range as string) || "7d";
 
     const result = await getDomains(prisma, { range });
 
@@ -28,17 +34,17 @@ router.get('/domains', async (req: Request, res: Response) => {
         domains: result.items,
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
     });
   } catch (error) {
-    console.error('[Admin] Domains error:', error);
+    console.error("[Admin] Domains error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch domains',
-      code: 'DOMAINS_ERROR',
+      error: "Failed to fetch domains",
+      code: "DOMAINS_ERROR",
     });
   }
 });
@@ -47,9 +53,9 @@ router.get('/domains', async (req: Request, res: Response) => {
  * GET /api/admin/marketing/intents
  * Returns intent analytics
  */
-router.get('/intents', async (req: Request, res: Response) => {
+router.get("/intents", async (req: Request, res: Response) => {
   try {
-    const range = (req.query.range as string) || '7d';
+    const range = (req.query.range as string) || "7d";
 
     const result = await getIntents(prisma, { range });
 
@@ -61,17 +67,17 @@ router.get('/intents', async (req: Request, res: Response) => {
         intents: result.items,
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
     });
   } catch (error) {
-    console.error('[Admin] Intents error:', error);
+    console.error("[Admin] Intents error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch intents',
-      code: 'INTENTS_ERROR',
+      error: "Failed to fetch intents",
+      code: "INTENTS_ERROR",
     });
   }
 });
@@ -80,9 +86,9 @@ router.get('/intents', async (req: Request, res: Response) => {
  * GET /api/admin/marketing/keywords
  * Returns keyword analytics with trending
  */
-router.get('/keywords', async (req: Request, res: Response) => {
+router.get("/keywords", async (req: Request, res: Response) => {
   try {
-    const range = (req.query.range as string) || '7d';
+    const range = (req.query.range as string) || "7d";
     const domain = req.query.domain as string | undefined;
 
     const result = await getKeywords(prisma, { range, domain });
@@ -96,17 +102,17 @@ router.get('/keywords', async (req: Request, res: Response) => {
         trending: result.trending,
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
     });
   } catch (error) {
-    console.error('[Admin] Keywords error:', error);
+    console.error("[Admin] Keywords error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch keywords',
-      code: 'KEYWORDS_ERROR',
+      error: "Failed to fetch keywords",
+      code: "KEYWORDS_ERROR",
     });
   }
 });
@@ -115,9 +121,9 @@ router.get('/keywords', async (req: Request, res: Response) => {
  * GET /api/admin/marketing/patterns
  * Returns pattern analytics
  */
-router.get('/patterns', async (req: Request, res: Response) => {
+router.get("/patterns", async (req: Request, res: Response) => {
   try {
-    const range = (req.query.range as string) || '7d';
+    const range = (req.query.range as string) || "7d";
 
     const result = await getPatterns(prisma, { range });
 
@@ -129,17 +135,17 @@ router.get('/patterns', async (req: Request, res: Response) => {
         patterns: result.items,
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
     });
   } catch (error) {
-    console.error('[Admin] Patterns error:', error);
+    console.error("[Admin] Patterns error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch patterns',
-      code: 'PATTERNS_ERROR',
+      error: "Failed to fetch patterns",
+      code: "PATTERNS_ERROR",
     });
   }
 });
@@ -148,9 +154,9 @@ router.get('/patterns', async (req: Request, res: Response) => {
  * GET /api/admin/marketing/interactions
  * Returns query→answer interaction feed
  */
-router.get('/interactions', async (req: Request, res: Response) => {
+router.get("/interactions", async (req: Request, res: Response) => {
   try {
-    const range = (req.query.range as string) || '7d';
+    const range = (req.query.range as string) || "7d";
     const limit = parseInt(req.query.limit as string) || 50;
     const cursor = req.query.cursor as string | undefined;
 
@@ -165,18 +171,18 @@ router.get('/interactions', async (req: Request, res: Response) => {
         interactions: result.items,
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
       ...(result.nextCursor && { nextCursor: result.nextCursor }),
     });
   } catch (error) {
-    console.error('[Admin] Interactions error:', error);
+    console.error("[Admin] Interactions error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch interactions',
-      code: 'INTERACTIONS_ERROR',
+      error: "Failed to fetch interactions",
+      code: "INTERACTIONS_ERROR",
     });
   }
 });

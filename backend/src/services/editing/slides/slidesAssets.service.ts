@@ -1,10 +1,10 @@
-import * as crypto from 'crypto';
-import type { slides_v1 } from 'googleapis';
+import * as crypto from "crypto";
+import type { slides_v1 } from "googleapis";
 import {
   SlidesClientError,
   SlidesClientService,
   type SlidesRequestContext,
-} from './slidesClient.service';
+} from "./slidesClient.service";
 
 export interface SlidesAssetMeta {
   prompt?: string;
@@ -35,7 +35,9 @@ export interface SlidesAssetAttachment {
 }
 
 export interface SlidesAssetRepository {
-  create(record: Omit<SlidesAssetRecord, 'id' | 'createdAt' | 'updatedAt'>): Promise<SlidesAssetRecord>;
+  create(
+    record: Omit<SlidesAssetRecord, "id" | "createdAt" | "updatedAt">,
+  ): Promise<SlidesAssetRecord>;
   appendAttachment(
     assetId: string,
     attachment: SlidesAssetAttachment,
@@ -53,7 +55,7 @@ export interface AttachAssetInput {
     scaleY?: number;
     translateX?: number;
     translateY?: number;
-    unit?: 'PT' | 'EMU';
+    unit?: "PT" | "EMU";
   };
 }
 
@@ -65,7 +67,9 @@ export interface AttachAssetResult {
 class InMemorySlidesAssetRepository implements SlidesAssetRepository {
   private readonly records = new Map<string, SlidesAssetRecord>();
 
-  async create(record: Omit<SlidesAssetRecord, 'id' | 'createdAt' | 'updatedAt'>): Promise<SlidesAssetRecord> {
+  async create(
+    record: Omit<SlidesAssetRecord, "id" | "createdAt" | "updatedAt">,
+  ): Promise<SlidesAssetRecord> {
     const now = new Date();
     const id = `asset_${crypto.randomUUID()}`;
 
@@ -81,11 +85,14 @@ class InMemorySlidesAssetRepository implements SlidesAssetRepository {
     return next;
   }
 
-  async appendAttachment(assetId: string, attachment: SlidesAssetAttachment): Promise<SlidesAssetRecord> {
+  async appendAttachment(
+    assetId: string,
+    attachment: SlidesAssetAttachment,
+  ): Promise<SlidesAssetRecord> {
     const existing = this.records.get(assetId);
     if (!existing) {
       throw new SlidesClientError(`Asset not found: ${assetId}`, {
-        code: 'ASSET_NOT_FOUND',
+        code: "ASSET_NOT_FOUND",
         retryable: false,
       });
     }
@@ -108,8 +115,8 @@ class InMemorySlidesAssetRepository implements SlidesAssetRepository {
 function ensureHttpsUrl(url: string): string {
   const normalized = url.trim();
   if (!/^https:\/\//i.test(normalized)) {
-    throw new SlidesClientError('Asset URL must be an HTTPS URL.', {
-      code: 'INVALID_ASSET_URL',
+    throw new SlidesClientError("Asset URL must be an HTTPS URL.", {
+      code: "INVALID_ASSET_URL",
       retryable: false,
     });
   }
@@ -136,14 +143,17 @@ export class SlidesAssetsService {
   ): Promise<SlidesAssetRecord> {
     const normalizedUserId = userId.trim();
     if (!normalizedUserId) {
-      throw new SlidesClientError('userId is required for asset creation.', {
-        code: 'INVALID_USER_ID',
+      throw new SlidesClientError("userId is required for asset creation.", {
+        code: "INVALID_USER_ID",
         retryable: false,
       });
     }
 
     const normalizedUrl = ensureHttpsUrl(url);
-    const sourceHash = crypto.createHash('sha256').update(normalizedUrl).digest('hex');
+    const sourceHash = crypto
+      .createHash("sha256")
+      .update(normalizedUrl)
+      .digest("hex");
 
     return this.repository.create({
       userId: normalizedUserId,
@@ -161,7 +171,7 @@ export class SlidesAssetsService {
     const asset = await this.repository.getById(input.assetId);
     if (!asset) {
       throw new SlidesClientError(`Asset not found: ${input.assetId}`, {
-        code: 'ASSET_NOT_FOUND',
+        code: "ASSET_NOT_FOUND",
         retryable: false,
       });
     }
@@ -170,13 +180,16 @@ export class SlidesAssetsService {
     const slideObjectId = input.slideObjectId.trim();
 
     if (!presentationId || !slideObjectId) {
-      throw new SlidesClientError('presentationId and slideObjectId are required.', {
-        code: 'INVALID_ATTACHMENT_TARGET',
-        retryable: false,
-      });
+      throw new SlidesClientError(
+        "presentationId and slideObjectId are required.",
+        {
+          code: "INVALID_ATTACHMENT_TARGET",
+          retryable: false,
+        },
+      );
     }
 
-    const imageObjectId = input.imageObjectId?.trim() || objectId('img');
+    const imageObjectId = input.imageObjectId?.trim() || objectId("img");
 
     const createRequest: slides_v1.Schema$Request = {
       createImage: {
@@ -189,7 +202,7 @@ export class SlidesAssetsService {
             scaleY: input.transform?.scaleY ?? 1,
             translateX: input.transform?.translateX ?? 40,
             translateY: input.transform?.translateY ?? 90,
-            unit: input.transform?.unit ?? 'PT',
+            unit: input.transform?.unit ?? "PT",
           },
         },
       },

@@ -18,39 +18,93 @@ export class MetadataCryptoService {
   /**
    * Encrypt extracted text with AAD bound to userId and documentId
    */
-  encryptExtractedText(userId: string, documentId: string, text: string, dk: Buffer): string {
+  encryptExtractedText(
+    userId: string,
+    documentId: string,
+    text: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "extractedText");
-    return this.enc.encryptStringToJson(text, key, `meta:${userId}:${documentId}:extractedText`);
+    return this.enc.encryptStringToJson(
+      text,
+      key,
+      `meta:${userId}:${documentId}:extractedText`,
+    );
   }
 
-  decryptExtractedText(userId: string, documentId: string, payloadJson: string, dk: Buffer): string {
+  decryptExtractedText(
+    userId: string,
+    documentId: string,
+    payloadJson: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "extractedText");
-    return this.enc.decryptStringFromJson(payloadJson, key, `meta:${userId}:${documentId}:extractedText`);
+    return this.enc.decryptStringFromJson(
+      payloadJson,
+      key,
+      `meta:${userId}:${documentId}:extractedText`,
+    );
   }
 
   /**
    * Encrypt entities JSON with AAD bound to userId and documentId
    */
-  encryptEntities(userId: string, documentId: string, entities: string, dk: Buffer): string {
+  encryptEntities(
+    userId: string,
+    documentId: string,
+    entities: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "entities");
-    return this.enc.encryptStringToJson(entities, key, `meta:${userId}:${documentId}:entities`);
+    return this.enc.encryptStringToJson(
+      entities,
+      key,
+      `meta:${userId}:${documentId}:entities`,
+    );
   }
 
-  decryptEntities(userId: string, documentId: string, payloadJson: string, dk: Buffer): string {
+  decryptEntities(
+    userId: string,
+    documentId: string,
+    payloadJson: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "entities");
-    return this.enc.decryptStringFromJson(payloadJson, key, `meta:${userId}:${documentId}:entities`);
+    return this.enc.decryptStringFromJson(
+      payloadJson,
+      key,
+      `meta:${userId}:${documentId}:entities`,
+    );
   }
 
   /**
    * Encrypt classification with AAD bound to userId and documentId
    */
-  encryptClassification(userId: string, documentId: string, classification: string, dk: Buffer): string {
+  encryptClassification(
+    userId: string,
+    documentId: string,
+    classification: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "classification");
-    return this.enc.encryptStringToJson(classification, key, `meta:${userId}:${documentId}:classification`);
+    return this.enc.encryptStringToJson(
+      classification,
+      key,
+      `meta:${userId}:${documentId}:classification`,
+    );
   }
 
-  decryptClassification(userId: string, documentId: string, payloadJson: string, dk: Buffer): string {
+  decryptClassification(
+    userId: string,
+    documentId: string,
+    payloadJson: string,
+    dk: Buffer,
+  ): string {
     const key = this.keyFor(dk, "classification");
-    return this.enc.decryptStringFromJson(payloadJson, key, `meta:${userId}:${documentId}:classification`);
+    return this.enc.decryptStringFromJson(
+      payloadJson,
+      key,
+      `meta:${userId}:${documentId}:classification`,
+    );
   }
 }

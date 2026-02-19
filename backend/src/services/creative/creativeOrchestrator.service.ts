@@ -1,14 +1,25 @@
-import sharp from 'sharp';
+import sharp from "sharp";
 
-import type { AssetSpec } from './assetSpec.types';
-import type { AssetLibraryRecord } from './assetLibrary.service';
-import { AssetLibraryService } from './assetLibrary.service';
-import { AssetProvenanceService, type ProvenanceContext, type ProvenanceProofBlock } from './assetProvenance.service';
-import { AssetRendererService } from './assetRenderer.service';
-import { NanoBananaClientService } from './nanoBanana.client.service';
-import { PromptBuilderService, type PromptBuilderInput, type SlideBlueprint } from './promptBuilder.service';
-import { QualityGateService, type QualityGateResult } from './qualityGate.service';
-import { StyleDNAService, type StyleDNAProfile } from './styleDNA.service';
+import type { AssetSpec } from "./assetSpec.types";
+import type { AssetLibraryRecord } from "./assetLibrary.service";
+import { AssetLibraryService } from "./assetLibrary.service";
+import {
+  AssetProvenanceService,
+  type ProvenanceContext,
+  type ProvenanceProofBlock,
+} from "./assetProvenance.service";
+import { AssetRendererService } from "./assetRenderer.service";
+import { NanoBananaClientService } from "./nanoBanana.client.service";
+import {
+  PromptBuilderService,
+  type PromptBuilderInput,
+  type SlideBlueprint,
+} from "./promptBuilder.service";
+import {
+  QualityGateService,
+  type QualityGateResult,
+} from "./qualityGate.service";
+import { StyleDNAService, type StyleDNAProfile } from "./styleDNA.service";
 
 export interface CreativeGenerationRequest {
   userId: string;
@@ -16,9 +27,9 @@ export interface CreativeGenerationRequest {
   presentationId: string;
   blueprint: SlideBlueprint;
   assets: AssetSpec[];
-  language: 'en' | 'pt';
+  language: "en" | "pt";
   brandName?: string;
-  globalConstraints?: PromptBuilderInput['globalConstraints'];
+  globalConstraints?: PromptBuilderInput["globalConstraints"];
   insertionTargets?: Array<{
     documentId: string;
     slideObjectId?: string;
@@ -101,9 +112,14 @@ export class CreativeOrchestratorService {
       const colorStats = await sharp(rendered.primary.buffer).stats();
       const dominantColors = colorStats.dominant
         ? [
-            `#${Math.round(colorStats.dominant.r).toString(16).padStart(2, '0')}${Math.round(colorStats.dominant.g)
+            `#${Math.round(colorStats.dominant.r).toString(16).padStart(2, "0")}${Math.round(
+              colorStats.dominant.g,
+            )
               .toString(16)
-              .padStart(2, '0')}${Math.round(colorStats.dominant.b).toString(16).padStart(2, '0')}`.toUpperCase(),
+              .padStart(
+                2,
+                "0",
+              )}${Math.round(colorStats.dominant.b).toString(16).padStart(2, "0")}`.toUpperCase(),
           ]
         : [];
 
@@ -122,14 +138,14 @@ export class CreativeOrchestratorService {
 
       if (!quality.pass) {
         throw new Error(
-          `Creative quality gate failed for asset ${assetSpec.id}: ${quality.issues.map((issue) => issue.code).join(', ')}`,
+          `Creative quality gate failed for asset ${assetSpec.id}: ${quality.issues.map((issue) => issue.code).join(", ")}`,
         );
       }
 
       const stored = await this.assetLibrary.store({
         userId: request.userId,
         buffer: rendered.primary.buffer,
-        mimeType: rendered.primary.mimeType as 'image/png' | 'image/webp',
+        mimeType: rendered.primary.mimeType as "image/png" | "image/webp",
         width: rendered.primary.width,
         height: rendered.primary.height,
         sha256: rendered.primary.sha256,
@@ -147,7 +163,7 @@ export class CreativeOrchestratorService {
         {
           userId: request.userId,
           assetId: stored.id,
-          tool: 'nano-banana',
+          tool: "nano-banana",
           prompt: `${prompt.systemPrompt}\n${prompt.userPrompt}\nNEG:${prompt.negativePrompt}`,
           params: {
             width: assetSpec.size.width,
@@ -157,7 +173,9 @@ export class CreativeOrchestratorService {
             model: generation.model,
             outputMimeType: rendered.primary.mimeType,
           },
-          inserted: request.insertionTargets ?? [{ documentId: request.documentId }],
+          inserted: request.insertionTargets ?? [
+            { documentId: request.documentId },
+          ],
           model: generation.model,
           runId: generation.providerRequestId,
         },

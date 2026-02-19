@@ -1,9 +1,9 @@
-import type { slides_v1 } from 'googleapis';
+import type { slides_v1 } from "googleapis";
 import {
   SlidesClientError,
   SlidesClientService,
   type SlidesRequestContext,
-} from './slidesClient.service';
+} from "./slidesClient.service";
 
 export interface SlidesThemeProfile {
   titleFontFamily: string;
@@ -25,13 +25,13 @@ interface ThemeColorMap {
 }
 
 const DEFAULT_THEME_PROFILE: SlidesThemeProfile = {
-  titleFontFamily: 'Arial',
-  bodyFontFamily: 'Arial',
+  titleFontFamily: "Arial",
+  bodyFontFamily: "Arial",
   titleFontSizePt: 32,
   bodyFontSizePt: 20,
-  primaryTextColor: '#1F2937',
-  accentColor: '#2563EB',
-  backgroundColor: '#FFFFFF',
+  primaryTextColor: "#1F2937",
+  accentColor: "#2563EB",
+  backgroundColor: "#FFFFFF",
 };
 
 function asArray<T>(value: T | T[] | undefined | null): T[] {
@@ -43,7 +43,7 @@ function rgbToHex(color: slides_v1.Schema$RgbColor | undefined): string | null {
   if (!color) return null;
 
   const to255 = (value: number | null | undefined): number => {
-    if (typeof value !== 'number' || Number.isNaN(value)) {
+    if (typeof value !== "number" || Number.isNaN(value)) {
       return 0;
     }
     return Math.max(0, Math.min(255, Math.round(value * 255)));
@@ -53,10 +53,15 @@ function rgbToHex(color: slides_v1.Schema$RgbColor | undefined): string | null {
   const g = to255(color.green);
   const b = to255(color.blue);
 
-  return `#${[r, g, b].map((part) => part.toString(16).padStart(2, '0')).join('').toUpperCase()}`;
+  return `#${[r, g, b]
+    .map((part) => part.toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase()}`;
 }
 
-function textStyleFromShape(shape: slides_v1.Schema$Shape | undefined): slides_v1.Schema$TextStyle | undefined {
+function textStyleFromShape(
+  shape: slides_v1.Schema$Shape | undefined,
+): slides_v1.Schema$TextStyle | undefined {
   const textElements = asArray(shape?.text?.textElements);
   for (const textElement of textElements) {
     if (textElement.textRun?.style) {
@@ -70,13 +75,18 @@ function textStyleFromShape(shape: slides_v1.Schema$Shape | undefined): slides_v
  * Deck-style detection and safe default styling for generated slides.
  */
 export class SlidesLayoutService {
-  constructor(private readonly slidesClient: SlidesClientService = new SlidesClientService()) {}
+  constructor(
+    private readonly slidesClient: SlidesClientService = new SlidesClientService(),
+  ) {}
 
   async detectTheme(
     presentationId: string,
     ctx?: SlidesRequestContext,
   ): Promise<SlidesThemeProfile> {
-    const presentation = await this.slidesClient.getPresentation(presentationId, ctx);
+    const presentation = await this.slidesClient.getPresentation(
+      presentationId,
+      ctx,
+    );
 
     const colorMap = this.extractThemeColorMap(presentation);
     const sampleStyles = this.extractSampleTextStyles(presentation);
@@ -85,14 +95,23 @@ export class SlidesLayoutService {
     const bodyStyle = sampleStyles.body;
 
     const profile: SlidesThemeProfile = {
-      titleFontFamily: titleStyle?.weightedFontFamily?.fontFamily ?? DEFAULT_THEME_PROFILE.titleFontFamily,
-      bodyFontFamily: bodyStyle?.weightedFontFamily?.fontFamily ?? DEFAULT_THEME_PROFILE.bodyFontFamily,
-      titleFontSizePt: titleStyle?.fontSize?.magnitude ?? DEFAULT_THEME_PROFILE.titleFontSizePt,
-      bodyFontSizePt: bodyStyle?.fontSize?.magnitude ?? DEFAULT_THEME_PROFILE.bodyFontSizePt,
+      titleFontFamily:
+        titleStyle?.weightedFontFamily?.fontFamily ??
+        DEFAULT_THEME_PROFILE.titleFontFamily,
+      bodyFontFamily:
+        bodyStyle?.weightedFontFamily?.fontFamily ??
+        DEFAULT_THEME_PROFILE.bodyFontFamily,
+      titleFontSizePt:
+        titleStyle?.fontSize?.magnitude ??
+        DEFAULT_THEME_PROFILE.titleFontSizePt,
+      bodyFontSizePt:
+        bodyStyle?.fontSize?.magnitude ?? DEFAULT_THEME_PROFILE.bodyFontSizePt,
       primaryTextColor:
-        this.resolveOpaqueColor(titleStyle?.foregroundColor, colorMap) ?? DEFAULT_THEME_PROFILE.primaryTextColor,
-      accentColor: colorMap['ACCENT1'] ?? DEFAULT_THEME_PROFILE.accentColor,
-      backgroundColor: colorMap['BACKGROUND1'] ?? DEFAULT_THEME_PROFILE.backgroundColor,
+        this.resolveOpaqueColor(titleStyle?.foregroundColor, colorMap) ??
+        DEFAULT_THEME_PROFILE.primaryTextColor,
+      accentColor: colorMap["ACCENT1"] ?? DEFAULT_THEME_PROFILE.accentColor,
+      backgroundColor:
+        colorMap["BACKGROUND1"] ?? DEFAULT_THEME_PROFILE.backgroundColor,
     };
 
     return profile;
@@ -104,19 +123,24 @@ export class SlidesLayoutService {
     ctx?: SlidesRequestContext,
   ): Promise<StyleConsistencyResult> {
     if (!slideObjectId.trim()) {
-      throw new SlidesClientError('slideObjectId is required.', {
-        code: 'INVALID_SLIDE_OBJECT_ID',
+      throw new SlidesClientError("slideObjectId is required.", {
+        code: "INVALID_SLIDE_OBJECT_ID",
         retryable: false,
       });
     }
 
-    const presentation = await this.slidesClient.getPresentation(presentationId, ctx);
+    const presentation = await this.slidesClient.getPresentation(
+      presentationId,
+      ctx,
+    );
     const profile = await this.detectTheme(presentationId, ctx);
 
-    const slide = (presentation.slides ?? []).find((entry) => entry.objectId === slideObjectId);
+    const slide = (presentation.slides ?? []).find(
+      (entry) => entry.objectId === slideObjectId,
+    );
     if (!slide) {
       throw new SlidesClientError(`Slide not found: ${slideObjectId}`, {
-        code: 'SLIDE_NOT_FOUND',
+        code: "SLIDE_NOT_FOUND",
         retryable: false,
       });
     }
@@ -134,7 +158,11 @@ export class SlidesLayoutService {
     slideObjectId: string,
     ctx?: SlidesRequestContext,
   ): Promise<StyleConsistencyResult> {
-    const result = await this.buildSafeDefaultsForSlide(presentationId, slideObjectId, ctx);
+    const result = await this.buildSafeDefaultsForSlide(
+      presentationId,
+      slideObjectId,
+      ctx,
+    );
 
     if (result.requests.length > 0) {
       await this.slidesClient.batchUpdate(presentationId, result.requests, ctx);
@@ -143,8 +171,11 @@ export class SlidesLayoutService {
     return result;
   }
 
-  private extractThemeColorMap(presentation: slides_v1.Schema$Presentation): ThemeColorMap {
-    const scheme = presentation.masters?.[0]?.pageProperties?.colorScheme?.colors ?? [];
+  private extractThemeColorMap(
+    presentation: slides_v1.Schema$Presentation,
+  ): ThemeColorMap {
+    const scheme =
+      presentation.masters?.[0]?.pageProperties?.colorScheme?.colors ?? [];
     const map: ThemeColorMap = {};
 
     for (const entry of scheme) {
@@ -160,7 +191,9 @@ export class SlidesLayoutService {
     return map;
   }
 
-  private extractSampleTextStyles(presentation: slides_v1.Schema$Presentation): {
+  private extractSampleTextStyles(
+    presentation: slides_v1.Schema$Presentation,
+  ): {
     title?: slides_v1.Schema$TextStyle;
     body?: slides_v1.Schema$TextStyle;
   } {
@@ -177,11 +210,17 @@ export class SlidesLayoutService {
         const style = textStyleFromShape(element.shape);
         if (!style) continue;
 
-        if (!titleStyle && (placeholderType === 'TITLE' || placeholderType === 'CENTERED_TITLE')) {
+        if (
+          !titleStyle &&
+          (placeholderType === "TITLE" || placeholderType === "CENTERED_TITLE")
+        ) {
           titleStyle = style;
         }
 
-        if (!bodyStyle && (placeholderType === 'BODY' || placeholderType === 'SUBTITLE')) {
+        if (
+          !bodyStyle &&
+          (placeholderType === "BODY" || placeholderType === "SUBTITLE")
+        ) {
           bodyStyle = style;
         }
       }
@@ -229,14 +268,18 @@ export class SlidesLayoutService {
       if (!objectId || !element.shape) continue;
 
       const placeholderType = element.shape.placeholder?.type;
-      const isTitle = placeholderType === 'TITLE' || placeholderType === 'CENTERED_TITLE';
-      const isBody = placeholderType === 'BODY' || placeholderType === 'SUBTITLE';
+      const isTitle =
+        placeholderType === "TITLE" || placeholderType === "CENTERED_TITLE";
+      const isBody =
+        placeholderType === "BODY" || placeholderType === "SUBTITLE";
 
       if (!isTitle && !isBody) continue;
 
       // Skip placeholders with no text — updateTextStyle on empty text throws
       const hasText = asArray(element.shape.text?.textElements).some(
-        (te) => te.textRun?.content && te.textRun.content.replace(/\n/g, '').length > 0,
+        (te) =>
+          te.textRun?.content &&
+          te.textRun.content.replace(/\n/g, "").length > 0,
       );
       if (!hasText) continue;
 
@@ -245,12 +288,16 @@ export class SlidesLayoutService {
           objectId,
           style: {
             weightedFontFamily: {
-              fontFamily: isTitle ? profile.titleFontFamily : profile.bodyFontFamily,
+              fontFamily: isTitle
+                ? profile.titleFontFamily
+                : profile.bodyFontFamily,
               weight: 400,
             },
             fontSize: {
-              unit: 'PT',
-              magnitude: isTitle ? profile.titleFontSizePt : profile.bodyFontSizePt,
+              unit: "PT",
+              magnitude: isTitle
+                ? profile.titleFontSizePt
+                : profile.bodyFontSizePt,
             },
             foregroundColor: {
               opaqueColor: {
@@ -258,8 +305,8 @@ export class SlidesLayoutService {
               },
             },
           },
-          fields: 'weightedFontFamily,fontSize,foregroundColor',
-          textRange: { type: 'ALL' },
+          fields: "weightedFontFamily,fontSize,foregroundColor",
+          textRange: { type: "ALL" },
         },
       });
     }
@@ -268,7 +315,7 @@ export class SlidesLayoutService {
   }
 
   private hexToRgb(hex: string): slides_v1.Schema$RgbColor {
-    const normalized = hex.replace('#', '').trim();
+    const normalized = hex.replace("#", "").trim();
     if (!/^[0-9A-Fa-f]{6}$/.test(normalized)) {
       return { red: 0, green: 0, blue: 0 };
     }

@@ -97,7 +97,12 @@ export interface ConversationStateLike {
     };
   };
   history: {
-    recentFallbacks: Array<{ reasonCode: string; fallbackType: string; strategy: string; turnId: number }>;
+    recentFallbacks: Array<{
+      reasonCode: string;
+      fallbackType: string;
+      strategy: string;
+      turnId: number;
+    }>;
     recentTokens: string[];
   };
   ephemeral: {
@@ -210,7 +215,11 @@ export interface FallbackPlan {
   debug?: {
     appliedRules: string[];
     suppressedBecause: string[];
-    antiRepetition: { usedHistory: boolean; changedStrategy: boolean; changedTokens: boolean };
+    antiRepetition: {
+      usedHistory: boolean;
+      changedStrategy: boolean;
+      changedTokens: boolean;
+    };
   };
 }
 
@@ -231,7 +240,10 @@ function isProd(env: EnvName): boolean {
   return env === "production";
 }
 
-function hasReason(ctx: FallbackRuntimeContext, code: FallbackReasonCode): boolean {
+function hasReason(
+  ctx: FallbackRuntimeContext,
+  code: FallbackReasonCode,
+): boolean {
   return ctx.reasonCodes.includes(code);
 }
 
@@ -242,7 +254,7 @@ function hasReason(ctx: FallbackRuntimeContext, code: FallbackReasonCode): boole
 const BANNED_EMPTY_RESULT_PATTERNS: RegExp[] = [
   /\bno relevant information found\b/i,
   /\bn[aã]o foi encontrada informa[cç][aã]o relevante\b/i,
-  /\bno se encontr[oó] informaci[oó]n relevante\b/i
+  /\bno se encontr[oó] informaci[oó]n relevante\b/i,
 ];
 
 // ----------------------------
@@ -255,11 +267,18 @@ export class FallbackEngineService {
   /**
    * Build a fallback plan. This is deterministic and policy-driven.
    */
-  buildPlan(state: ConversationStateLike, ctx: FallbackRuntimeContext): FallbackPlan {
+  buildPlan(
+    state: ConversationStateLike,
+    ctx: FallbackRuntimeContext,
+  ): FallbackPlan {
     const debug = {
       appliedRules: [] as string[],
       suppressedBecause: [] as string[],
-      antiRepetition: { usedHistory: true, changedStrategy: false, changedTokens: false }
+      antiRepetition: {
+        usedHistory: true,
+        changedStrategy: false,
+        changedTokens: false,
+      },
     };
 
     // 0) Load banks used for selection + variation constraints (no user-facing copy)
@@ -309,10 +328,13 @@ export class FallbackEngineService {
         constraints: {
           maxSentences: 1,
           maxQuestions: 1,
-          mustNotAssertAbsence: primaryReason === "scope_hard_constraints_empty" || primaryReason === "no_relevant_chunks_in_scoped_docs",
-          preferVariantFirst: primaryReason === "no_relevant_chunks_in_scoped_docs",
-          avoidTimeEstimates: primaryReason === "indexing_in_progress"
-        }
+          mustNotAssertAbsence:
+            primaryReason === "scope_hard_constraints_empty" ||
+            primaryReason === "no_relevant_chunks_in_scoped_docs",
+          preferVariantFirst:
+            primaryReason === "no_relevant_chunks_in_scoped_docs",
+          avoidTimeEstimates: primaryReason === "indexing_in_progress",
+        },
       });
     } else {
       // nav_pills must be intro-only + buttons; no fragments
@@ -332,16 +354,25 @@ export class FallbackEngineService {
       const opts = (ctx.options ?? []).slice(0, 8);
       const capped = this.limitOptions(opts, 4);
       disambiguation = {
-        renderMode: ctx.signals.intentFamily === "doc_discovery" ? "nav_pills" : "short_list",
+        renderMode:
+          ctx.signals.intentFamily === "doc_discovery"
+            ? "nav_pills"
+            : "short_list",
         options: capped,
-        questionIntent: "ui_clarification_question"
+        questionIntent: "ui_clarification_question",
       };
 
       uiTokens.push("ui_variant_confirmation_prompt");
     }
 
     // 6) Anti-repetition: if same fallback (reason+strategy) occurred recently, rotate strategy/tokens
-    const antiRep = this.applyAntiRepetition(state, primaryReason, baseStrategy, uiTokens, fragments);
+    const antiRep = this.applyAntiRepetition(
+      state,
+      primaryReason,
+      baseStrategy,
+      uiTokens,
+      fragments,
+    );
     debug.antiRepetition.changedStrategy = antiRep.changedStrategy;
     debug.antiRepetition.changedTokens = antiRep.changedTokens;
 
@@ -354,7 +385,7 @@ export class FallbackEngineService {
         reasonCode: primaryReason,
         type: fallbackType,
         strategy: antiRep.strategy,
-        severity: this.severityFor(primaryReason)
+        severity: this.severityFor(primaryReason),
       },
       output: {
         answerMode,
@@ -362,13 +393,13 @@ export class FallbackEngineService {
         maxQuestions: 1,
         maxOptions: primaryReason === "doc_ambiguous" ? 4 : undefined,
         suppressSourcesHeader: answerMode === "nav_pills",
-        suppressActions: true
+        suppressActions: true,
       },
       uiTokens: antiRep.uiTokens,
       fragments: antiRep.fragments,
       disambiguation,
       sanitizedDraftText: sanitizedDraftText ?? undefined,
-      debug: isProd(ctx.env) ? undefined : debug
+      debug: isProd(ctx.env) ? undefined : debug,
     };
 
     // Enforce nav_pills contract: no extra text fragments, no sources header, no actions
@@ -399,7 +430,7 @@ export class FallbackEngineService {
       "low_confidence",
       "indexing_in_progress",
       "grounding_fail_soft",
-      "scoped_not_found"
+      "scoped_not_found",
     ];
 
     for (const code of order) {
@@ -409,13 +440,23 @@ export class FallbackEngineService {
     // Derive reason codes if upstream didn’t provide them (deterministic)
     if (ctx.signals.indexingInProgress) return "indexing_in_progress";
     if (ctx.signals.hasIndexedDocs === false) return "no_docs_indexed";
-    if (ctx.signals.extractionCoverage != null && ctx.signals.extractionCoverage < 0.6) return "extraction_failed";
-    if (ctx.signals.hardScopeActive && (ctx.signals.retrievedChunks ?? 0) === 0) return "scope_hard_constraints_empty";
-    if (ctx.signals.searchExecuted && (ctx.signals.retrievedChunks ?? 0) === 0 && (ctx.signals.searchConfidence ?? 0) >= 0.7) {
+    if (
+      ctx.signals.extractionCoverage != null &&
+      ctx.signals.extractionCoverage < 0.6
+    )
+      return "extraction_failed";
+    if (ctx.signals.hardScopeActive && (ctx.signals.retrievedChunks ?? 0) === 0)
+      return "scope_hard_constraints_empty";
+    if (
+      ctx.signals.searchExecuted &&
+      (ctx.signals.retrievedChunks ?? 0) === 0 &&
+      (ctx.signals.searchConfidence ?? 0) >= 0.7
+    ) {
       return "no_relevant_chunks_in_scoped_docs";
     }
     if (ctx.signals.isAmbiguous) return "doc_ambiguous";
-    if (ctx.signals.topConfidence != null && ctx.signals.topConfidence < 0.55) return "low_confidence";
+    if (ctx.signals.topConfidence != null && ctx.signals.topConfidence < 0.55)
+      return "low_confidence";
 
     // Last resort
     return "grounding_fail_soft";
@@ -476,7 +517,9 @@ export class FallbackEngineService {
     }
   }
 
-  private severityFor(reason: FallbackReasonCode): FallbackPlan["fallback"]["severity"] {
+  private severityFor(
+    reason: FallbackReasonCode,
+  ): FallbackPlan["fallback"]["severity"] {
     switch (reason) {
       case "wrong_doc_detected":
       case "numeric_truncation_detected":
@@ -500,19 +543,29 @@ export class FallbackEngineService {
   // Output constraints
   // ----------------------------
 
-  private chooseAnswerMode(ctx: FallbackRuntimeContext, reason: FallbackReasonCode): AnswerMode {
+  private chooseAnswerMode(
+    ctx: FallbackRuntimeContext,
+    reason: FallbackReasonCode,
+  ): AnswerMode {
     // Discovery-style ambiguity should use nav_pills/doc list, but our fallback policy routes to clarification_policy.
     // Here we keep fallback in doc_grounded unless it's explicitly nav.
     if (ctx.signals.answerMode === "nav_pills") return "nav_pills";
 
     // If the reason is doc_ambiguous and intent is discovery, nav_pills is acceptable.
-    if (reason === "doc_ambiguous" && ctx.signals.intentFamily === "doc_discovery") return "nav_pills";
+    if (
+      reason === "doc_ambiguous" &&
+      ctx.signals.intentFamily === "doc_discovery"
+    )
+      return "nav_pills";
 
     // Otherwise default to doc grounded single (fallback explanation + next step)
     return "doc_grounded_single";
   }
 
-  private chooseOutputShape(answerMode: AnswerMode, reason: FallbackReasonCode): FallbackPlan["output"]["outputShape"] {
+  private chooseOutputShape(
+    answerMode: AnswerMode,
+    reason: FallbackReasonCode,
+  ): FallbackPlan["output"]["outputShape"] {
     if (answerMode === "nav_pills") return "button_only";
     // Clarification fallback often renders short list; but shape remains paragraph (single short paragraph)
     return "paragraph";
@@ -556,14 +609,20 @@ export class FallbackEngineService {
     reason: FallbackReasonCode,
     baseStrategy: FallbackStrategy,
     uiTokens: string[],
-    fragments: FallbackPlan["fragments"]
-  ): { strategy: FallbackStrategy; uiTokens: string[]; fragments: FallbackPlan["fragments"]; changedStrategy: boolean; changedTokens: boolean } {
+    fragments: FallbackPlan["fragments"],
+  ): {
+    strategy: FallbackStrategy;
+    uiTokens: string[];
+    fragments: FallbackPlan["fragments"];
+    changedStrategy: boolean;
+    changedTokens: boolean;
+  } {
     const nowTurn = state?.ephemeral?.turn?.turnId ?? 0;
     const recent = state?.history?.recentFallbacks ?? [];
 
     // Find most recent fallback with same reason
     const same = recent
-      .filter(r => r.reasonCode === reason)
+      .filter((r) => r.reasonCode === reason)
       .sort((a, b) => b.turnId - a.turnId)[0];
 
     // Cooldown default 3 turns (align with your banks)
@@ -571,29 +630,57 @@ export class FallbackEngineService {
     const withinCooldown = same ? nowTurn - same.turnId < cooldown : false;
 
     if (!withinCooldown) {
-      return { strategy: baseStrategy, uiTokens, fragments, changedStrategy: false, changedTokens: false };
+      return {
+        strategy: baseStrategy,
+        uiTokens,
+        fragments,
+        changedStrategy: false,
+        changedTokens: false,
+      };
     }
 
     // If within cooldown, rotate strategy *within the same reason* without changing meaning.
     // This keeps behavior unique like ChatGPT: same situation -> different next-step angle.
-    const rotated = this.rotateStrategy(reason, baseStrategy, same.strategy as FallbackStrategy);
+    const rotated = this.rotateStrategy(
+      reason,
+      baseStrategy,
+      same.strategy as FallbackStrategy,
+    );
     const changedStrategy = rotated !== baseStrategy;
 
     // Also rotate selectorKey so fragment realization changes
-    const rotatedFragments = fragments.map(f => ({
+    const rotatedFragments = fragments.map((f) => ({
       ...f,
-      selectorKey: `${f.selectorKey}:alt:${sha256(`${nowTurn}|${reason}|${same.turnId}`).slice(0, 6)}`
+      selectorKey: `${f.selectorKey}:alt:${sha256(`${nowTurn}|${reason}|${same.turnId}`).slice(0, 6)}`,
     }));
     const changedTokens = true;
 
-    return { strategy: rotated, uiTokens, fragments: rotatedFragments, changedStrategy, changedTokens };
+    return {
+      strategy: rotated,
+      uiTokens,
+      fragments: rotatedFragments,
+      changedStrategy,
+      changedTokens,
+    };
   }
 
-  private rotateStrategy(reason: FallbackReasonCode, base: FallbackStrategy, last: FallbackStrategy): FallbackStrategy {
+  private rotateStrategy(
+    reason: FallbackReasonCode,
+    base: FallbackStrategy,
+    last: FallbackStrategy,
+  ): FallbackStrategy {
     // Small, safe rotations per reason (avoid exploding strategy space)
     const rotations: Record<FallbackReasonCode, FallbackStrategy[]> = {
-      scope_hard_constraints_empty: ["offer_scope_relaxation", "guide_next_step", "request_clarification_or_rephrase"],
-      no_relevant_chunks_in_scoped_docs: ["acknowledge_and_offer_next_steps", "offer_variant_confirmation", "offer_scope_expansion"],
+      scope_hard_constraints_empty: [
+        "offer_scope_relaxation",
+        "guide_next_step",
+        "request_clarification_or_rephrase",
+      ],
+      no_relevant_chunks_in_scoped_docs: [
+        "acknowledge_and_offer_next_steps",
+        "offer_variant_confirmation",
+        "offer_scope_expansion",
+      ],
       extraction_failed: ["offer_alternative_sources", "guide_next_step"],
       indexing_in_progress: ["guide_next_step"],
       no_docs_indexed: ["guide_next_step"],
@@ -603,7 +690,10 @@ export class FallbackEngineService {
       numeric_truncation_detected: ["retry_retrieval_then_regen"],
       numeric_not_in_source: ["retry_retrieval_then_regen"],
       hallucination_risk_high: ["retry_retrieval_then_regen"],
-      grounding_fail_soft: ["request_clarification_or_rephrase", "guide_next_step"],
+      grounding_fail_soft: [
+        "request_clarification_or_rephrase",
+        "guide_next_step",
+      ],
       scoped_not_found: ["acknowledge_and_offer_next_steps"],
     };
 
@@ -621,7 +711,10 @@ export class FallbackEngineService {
   // Disambiguation options
   // ----------------------------
 
-  private limitOptions(options: Array<{ id: string; label: string; type: string; score?: number }>, max: number) {
+  private limitOptions(
+    options: Array<{ id: string; label: string; type: string; score?: number }>,
+    max: number,
+  ) {
     // Deterministic: sort by score desc then label asc, take max
     const sorted = [...options].sort((a, b) => {
       const sa = a.score ?? 0;

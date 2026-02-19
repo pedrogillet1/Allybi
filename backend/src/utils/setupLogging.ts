@@ -15,7 +15,9 @@
  *   - With LOG_LEVEL=debug: Full logging (same as before)
  */
 
-const LOG_LEVEL = process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'error' : 'debug');
+const LOG_LEVEL =
+  process.env.LOG_LEVEL ||
+  (process.env.NODE_ENV === "production" ? "error" : "debug");
 
 // Store original console methods for fallback
 const originalConsole = {
@@ -34,7 +36,8 @@ const LOG_LEVELS = {
   debug: 3,
 } as const;
 
-const currentLevel = LOG_LEVELS[LOG_LEVEL as keyof typeof LOG_LEVELS] ?? LOG_LEVELS.debug;
+const currentLevel =
+  LOG_LEVELS[LOG_LEVEL as keyof typeof LOG_LEVELS] ?? LOG_LEVELS.debug;
 
 /**
  * No-op function for disabled log levels
@@ -44,20 +47,20 @@ const noop = () => {};
 /**
  * Override console methods based on LOG_LEVEL
  */
-if (process.env.NODE_ENV === 'production' || LOG_LEVEL === 'error') {
+if (process.env.NODE_ENV === "production" || LOG_LEVEL === "error") {
   // Production: Only errors
   console.log = noop;
   console.debug = noop;
   console.info = noop;
   console.warn = currentLevel >= LOG_LEVELS.warn ? originalConsole.warn : noop;
   // console.error remains unchanged
-} else if (LOG_LEVEL === 'warn') {
+} else if (LOG_LEVEL === "warn") {
   // Warnings and errors only
   console.log = noop;
   console.debug = noop;
   console.info = noop;
   // console.warn and console.error remain unchanged
-} else if (LOG_LEVEL === 'info') {
+} else if (LOG_LEVEL === "info") {
   // Info, warnings, and errors
   console.debug = noop;
   // console.log, console.info, console.warn, console.error remain unchanged
@@ -66,7 +69,9 @@ if (process.env.NODE_ENV === 'production' || LOG_LEVEL === 'error') {
 
 // Log the logging configuration once at startup
 if (currentLevel >= LOG_LEVELS.info) {
-  originalConsole.info(`[LOGGING] Log level set to: ${LOG_LEVEL} (NODE_ENV: ${process.env.NODE_ENV || 'development'})`);
+  originalConsole.info(
+    `[LOGGING] Log level set to: ${LOG_LEVEL} (NODE_ENV: ${process.env.NODE_ENV || "development"})`,
+  );
 }
 
 /**

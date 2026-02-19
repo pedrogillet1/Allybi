@@ -71,7 +71,12 @@ export class XlsxInspectorService {
       });
     });
 
-    if (!Number.isFinite(minRow) || maxRow <= 0 || !Number.isFinite(minCol) || maxCol <= 0) {
+    if (
+      !Number.isFinite(minRow) ||
+      maxRow <= 0 ||
+      !Number.isFinite(minCol) ||
+      maxCol <= 0
+    ) {
       return null;
     }
 
@@ -102,4 +107,3 @@ export class XlsxInspectorService {
 }
 
 export default XlsxInspectorService;
-

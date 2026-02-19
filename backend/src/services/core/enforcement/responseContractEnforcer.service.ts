@@ -56,7 +56,13 @@ export type AnswerMode =
 
 export interface ResponseContractContext {
   answerMode: AnswerMode;
-  navType?: "open" | "where" | "discover" | "disambiguate" | "not_found" | string;
+  navType?:
+    | "open"
+    | "where"
+    | "discover"
+    | "disambiguate"
+    | "not_found"
+    | string;
   language: "en" | "pt" | "es";
   operator?: string;
   intentFamily?: string;
@@ -65,7 +71,13 @@ export interface ResponseContractContext {
     maxChars?: number;
     maxSentences?: number;
     exactBulletCount?: number;
-    outputShape?: "paragraph" | "bullets" | "numbered_list" | "table" | "file_list" | "button_only";
+    outputShape?:
+      | "paragraph"
+      | "bullets"
+      | "numbered_list"
+      | "table"
+      | "file_list"
+      | "button_only";
     userRequestedShort?: boolean;
   };
 
@@ -96,10 +108,19 @@ type RenderPolicyBank = {
   _meta: unknown;
   config?: {
     enabled?: boolean;
-    markdown?: { allowCodeBlocks?: boolean; bulletMarker?: string; maxConsecutiveNewlines?: number };
+    markdown?: {
+      allowCodeBlocks?: boolean;
+      bulletMarker?: string;
+      maxConsecutiveNewlines?: number;
+    };
     sourcesUIContract?: Record<
       string,
-      { showSourcesLabel?: boolean; showDivider?: boolean; pillsOnly?: boolean; maxPills?: number }
+      {
+        showSourcesLabel?: boolean;
+        showDivider?: boolean;
+        pillsOnly?: boolean;
+        maxPills?: number;
+      }
     >;
     followupUIContract?: Record<string, unknown>;
     noJsonOutput?: { enabled?: boolean; detectJsonLike?: boolean };
@@ -112,7 +133,11 @@ type UIContractsBank = {
   config?: { enabled?: boolean };
   // optional, depends on your design
   sources?: {
-    nav_pills?: { hideLabel?: boolean; hideDivider?: boolean; pillsOnly?: boolean };
+    nav_pills?: {
+      hideLabel?: boolean;
+      hideDivider?: boolean;
+      pillsOnly?: boolean;
+    };
     default?: { showLabel?: boolean; showDivider?: boolean };
   };
 };
@@ -161,7 +186,10 @@ function normalizeNewlines(text: string, maxConsecutive: number = 2): string {
   return t.trim();
 }
 
-function stripInlineSourcesSections(text: string): { text: string; changed: boolean } {
+function stripInlineSourcesSections(text: string): {
+  text: string;
+  changed: boolean;
+} {
   let t = text;
   const before = t;
 
@@ -173,16 +201,21 @@ function stripInlineSourcesSections(text: string): { text: string; changed: bool
     (m, _label, body) => {
       // Only strip if the body is mostly file-like lines
       const lines = String(body).split("\n").slice(0, 12);
-      const fileish = lines.filter(l => /\.(pdf|xlsx?|docx?|pptx?|csv|txt|png|jpe?g)\b/i.test(l)).length;
+      const fileish = lines.filter((l) =>
+        /\.(pdf|xlsx?|docx?|pptx?|csv|txt|png|jpe?g)\b/i.test(l),
+      ).length;
       if (fileish >= 1) return "\n";
       return m;
-    }
+    },
   );
 
   return { text: t.trim(), changed: t.trim() !== before.trim() };
 }
 
-function stripInlineFileLists(text: string): { text: string; changed: boolean } {
+function stripInlineFileLists(text: string): {
+  text: string;
+  changed: boolean;
+} {
   const before = text;
 
   // Remove bullet/numbered lists containing filenames
@@ -191,7 +224,9 @@ function stripInlineFileLists(text: string): { text: string; changed: boolean } 
 
   for (const line of lines) {
     const isListLine =
-      /^\s*[-*]\s+.+\.(pdf|xlsx?|docx?|pptx?|csv|txt|png|jpe?g)\b/i.test(line) ||
+      /^\s*[-*]\s+.+\.(pdf|xlsx?|docx?|pptx?|csv|txt|png|jpe?g)\b/i.test(
+        line,
+      ) ||
       /^\s*\d+\.\s+.+\.(pdf|xlsx?|docx?|pptx?|csv|txt|png|jpe?g)\b/i.test(line);
 
     if (!isListLine) out.push(line);
@@ -216,7 +251,10 @@ function stripCodeFences(text: string): { text: string; changed: boolean } {
   // remove fenced code blocks entirely (ChatGPT-like for your constraints)
   t = t.replace(/```[\s\S]*?```/g, (m) => {
     // keep content but strip fences if needed
-    const inner = m.replace(/```[a-z]*\n?/gi, "").replace(/```/g, "").trim();
+    const inner = m
+      .replace(/```[a-z]*\n?/gi, "")
+      .replace(/```/g, "")
+      .trim();
     return inner ? inner : "";
   });
 
@@ -228,13 +266,21 @@ function countSentences(text: string): number {
   return m ? m.length : 0;
 }
 
-function limitChars(text: string, maxChars: number): { text: string; changed: boolean } {
+function limitChars(
+  text: string,
+  maxChars: number,
+): { text: string; changed: boolean } {
   const t = text.trim();
   if (t.length <= maxChars) return { text: t, changed: false };
   // Trim to last sentence boundary within limit
   const slice = t.slice(0, maxChars);
-  const lastPunct = Math.max(slice.lastIndexOf("."), slice.lastIndexOf("!"), slice.lastIndexOf("?"));
-  if (lastPunct > 80) return { text: slice.slice(0, lastPunct + 1).trim(), changed: true };
+  const lastPunct = Math.max(
+    slice.lastIndexOf("."),
+    slice.lastIndexOf("!"),
+    slice.lastIndexOf("?"),
+  );
+  if (lastPunct > 80)
+    return { text: slice.slice(0, lastPunct + 1).trim(), changed: true };
   return { text: slice.trim(), changed: true };
 }
 
@@ -244,11 +290,15 @@ function keepFirstSentence(text: string, maxChars: number = 90): string {
   // sentence split
   const parts = t.split(/(?<=[.!?])\s+/);
   const first = parts[0] || t;
-  return first.length > maxChars ? first.slice(0, maxChars).trim() : first.trim();
+  return first.length > maxChars
+    ? first.slice(0, maxChars).trim()
+    : first.trim();
 }
 
 function getSourceButtonsCount(attachments: Attachment[] = []): number {
-  return attachments.filter(a => a && (a as Record<string, unknown>).type === "source_buttons").length;
+  return attachments.filter(
+    (a) => a && (a as Record<string, unknown>).type === "source_buttons",
+  ).length;
 }
 
 // -----------------------------------------------------------------------------
@@ -276,14 +326,20 @@ export class ResponseContractEnforcerService {
     this.tableRules = getBank<TableRulesBank>("table_rules");
   }
 
-  enforce(draft: DraftResponse, ctx: ResponseContractContext): EnforcedResponse {
+  enforce(
+    draft: DraftResponse,
+    ctx: ResponseContractContext,
+  ): EnforcedResponse {
     const repairs: string[] = [];
     const warnings: string[] = [];
-    const attachments: Attachment[] = Array.isArray(draft.attachments) ? draft.attachments : [];
+    const attachments: Attachment[] = Array.isArray(draft.attachments)
+      ? draft.attachments
+      : [];
     let content = draft.content || "";
 
     // 0) Normalize whitespace/newlines
-    const maxNL = this.renderPolicy?.config?.markdown?.maxConsecutiveNewlines ?? 2;
+    const maxNL =
+      this.renderPolicy?.config?.markdown?.maxConsecutiveNewlines ?? 2;
     content = normalizeNewlines(content, maxNL);
 
     // 1) nav_pills contract
@@ -331,13 +387,17 @@ export class ResponseContractEnforcerService {
     }
 
     // 3) Remove code fences + JSON output (Koda never outputs code blocks)
-    const allowCode = this.renderPolicy?.config?.markdown?.allowCodeBlocks ?? false;
+    const allowCode =
+      this.renderPolicy?.config?.markdown?.allowCodeBlocks ?? false;
     if (!allowCode) {
       const s = stripCodeFences(content);
       if (s.changed) repairs.push("STRIPPED_CODE_FENCES");
       content = s.text;
     }
-    if (this.renderPolicy?.config?.noJsonOutput?.enabled !== false && detectJsonLike(content)) {
+    if (
+      this.renderPolicy?.config?.noJsonOutput?.enabled !== false &&
+      detectJsonLike(content)
+    ) {
       // We don't "convert" here (composer should). We block or strip JSON-ish
       // and let quality gates or composer re-run.
       warnings.push("JSON_LIKE_DETECTED");
@@ -359,7 +419,10 @@ export class ResponseContractEnforcerService {
     }
 
     // 4) Enforce short constraints (if user requested short)
-    if (ctx.constraints?.userRequestedShort || (ctx.constraints?.maxSentences && ctx.constraints.maxSentences <= 3)) {
+    if (
+      ctx.constraints?.userRequestedShort ||
+      (ctx.constraints?.maxSentences && ctx.constraints.maxSentences <= 3)
+    ) {
       const maxChars = ctx.constraints?.maxChars ?? 420;
       const limited = limitChars(content, maxChars);
       if (limited.changed) repairs.push("SHORT_CONSTRAINT_TRIMMED_CHARS");

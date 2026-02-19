@@ -3,12 +3,12 @@
  * Real-time event feed from Postgres (with optional Redis)
  */
 
-import type { PrismaClient } from '@prisma/client';
-import { clampLimit } from './_shared/clamp';
-import { supportsModel } from './_shared/prismaAdapter';
+import type { PrismaClient } from "@prisma/client";
+import { clampLimit } from "./_shared/clamp";
+import { supportsModel } from "./_shared/prismaAdapter";
 
 export interface LiveEvent {
-  type: 'model_call' | 'retrieval' | 'ingestion';
+  type: "model_call" | "retrieval" | "ingestion";
   at: string;
   userId: string;
   traceId?: string;
@@ -25,7 +25,7 @@ export interface LiveEvent {
 
 export interface LiveEventsResult {
   items: LiveEvent[];
-  source: 'redis' | 'postgres';
+  source: "redis" | "postgres";
 }
 
 // Optional Redis client type
@@ -48,7 +48,7 @@ export function initLiveRedis(client: RedisClient): void {
  */
 export async function getRecentEvents(
   prisma: PrismaClient,
-  params: { limit?: number }
+  params: { limit?: number },
 ): Promise<LiveEventsResult> {
   const limit = clampLimit(params.limit, 50);
 
@@ -57,23 +57,26 @@ export async function getRecentEvents(
     try {
       const redisEvents = await getEventsFromRedis(limit);
       if (redisEvents.length > 0) {
-        return { items: redisEvents, source: 'redis' };
+        return { items: redisEvents, source: "redis" };
       }
     } catch (error) {
-      console.warn('[LiveService] Redis unavailable, falling back to Postgres:', error);
+      console.warn(
+        "[LiveService] Redis unavailable, falling back to Postgres:",
+        error,
+      );
     }
   }
 
   // Fallback to Postgres
   const postgresEvents = await getEventsFromPostgres(prisma, limit);
-  return { items: postgresEvents, source: 'postgres' };
+  return { items: postgresEvents, source: "postgres" };
 }
 
 async function getEventsFromRedis(limit: number): Promise<LiveEvent[]> {
   if (!redisClient) return [];
 
   try {
-    const raw = await redisClient.lrange('telemetry:live', 0, limit - 1);
+    const raw = await redisClient.lrange("telemetry:live", 0, limit - 1);
     const events: LiveEvent[] = [];
 
     for (const item of raw) {
@@ -92,13 +95,21 @@ async function getEventsFromRedis(limit: number): Promise<LiveEvent[]> {
 }
 
 function normalizeRedisEvent(raw: Record<string, unknown>): LiveEvent {
-  const type = (raw.type as string) || 'model_call';
-  const eventType = type === 'retrieval' ? 'retrieval' : type === 'ingestion' ? 'ingestion' : 'model_call';
+  const type = (raw.type as string) || "model_call";
+  const eventType =
+    type === "retrieval"
+      ? "retrieval"
+      : type === "ingestion"
+        ? "ingestion"
+        : "model_call";
 
   return {
     type: eventType,
-    at: (raw.at as string) || (raw.timestamp as string) || new Date().toISOString(),
-    userId: (raw.userId as string) || 'unknown',
+    at:
+      (raw.at as string) ||
+      (raw.timestamp as string) ||
+      new Date().toISOString(),
+    userId: (raw.userId as string) || "unknown",
     traceId: raw.traceId as string | undefined,
     provider: raw.provider as string | undefined,
     model: raw.model as string | undefined,
@@ -112,15 +123,18 @@ function normalizeRedisEvent(raw: Record<string, unknown>): LiveEvent {
   };
 }
 
-async function getEventsFromPostgres(prisma: PrismaClient, limit: number): Promise<LiveEvent[]> {
+async function getEventsFromPostgres(
+  prisma: PrismaClient,
+  limit: number,
+): Promise<LiveEvent[]> {
   const events: LiveEvent[] = [];
 
   // Get events from all three sources in parallel
   const [modelCalls, retrievalEvents, ingestionEvents] = await Promise.all([
-    supportsModel(prisma, 'modelCall')
+    supportsModel(prisma, "modelCall")
       ? prisma.modelCall.findMany({
           take: Math.ceil(limit / 3),
-          orderBy: { at: 'desc' },
+          orderBy: { at: "desc" },
           select: {
             at: true,
             userId: true,
@@ -133,10 +147,10 @@ async function getEventsFromPostgres(prisma: PrismaClient, limit: number): Promi
         })
       : [],
 
-    supportsModel(prisma, 'retrievalEvent')
+    supportsModel(prisma, "retrievalEvent")
       ? prisma.retrievalEvent.findMany({
           take: Math.ceil(limit / 3),
-          orderBy: { at: 'desc' },
+          orderBy: { at: "desc" },
           select: {
             at: true,
             userId: true,
@@ -147,10 +161,10 @@ async function getEventsFromPostgres(prisma: PrismaClient, limit: number): Promi
         })
       : [],
 
-    supportsModel(prisma, 'ingestionEvent')
+    supportsModel(prisma, "ingestionEvent")
       ? prisma.ingestionEvent.findMany({
           take: Math.ceil(limit / 3),
-          orderBy: { at: 'desc' },
+          orderBy: { at: "desc" },
           select: {
             at: true,
             userId: true,
@@ -166,7 +180,7 @@ async function getEventsFromPostgres(prisma: PrismaClient, limit: number): Promi
   // Convert to LiveEvent
   for (const mc of modelCalls) {
     events.push({
-      type: 'model_call',
+      type: "model_call",
       at: mc.at.toISOString(),
       userId: mc.userId,
       traceId: mc.traceId,
@@ -179,7 +193,7 @@ async function getEventsFromPostgres(prisma: PrismaClient, limit: number): Promi
 
   for (const re of retrievalEvents) {
     events.push({
-      type: 'retrieval',
+      type: "retrieval",
       at: re.at.toISOString(),
       userId: re.userId,
       traceId: re.traceId,
@@ -190,7 +204,7 @@ async function getEventsFromPostgres(prisma: PrismaClient, limit: number): Promi
 
   for (const ie of ingestionEvents) {
     events.push({
-      type: 'ingestion',
+      type: "ingestion",
       at: ie.at.toISOString(),
       userId: ie.userId,
       documentId: ie.documentId ?? undefined,

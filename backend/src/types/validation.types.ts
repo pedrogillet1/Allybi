@@ -10,26 +10,26 @@
  * Keep this file pure types (no runtime logic).
  */
 
-export type ValidationSeverity = 'info' | 'warning' | 'error';
+export type ValidationSeverity = "info" | "warning" | "error";
 
 export type ValidationPhase =
-  | 'intent'
-  | 'scope'
-  | 'retrieval'
-  | 'grounding'
-  | 'formatting'
-  | 'privacy'
-  | 'safety'
-  | 'final_output';
+  | "intent"
+  | "scope"
+  | "retrieval"
+  | "grounding"
+  | "formatting"
+  | "privacy"
+  | "safety"
+  | "final_output";
 
 export type ValidationActionType =
-  | 'pass'
-  | 'warn'
-  | 'transform'
-  | 'route'
-  | 'block'
-  | 'regenerate'
-  | 'retry_retrieval_then_regen';
+  | "pass"
+  | "warn"
+  | "transform"
+  | "route"
+  | "block"
+  | "regenerate"
+  | "retry_retrieval_then_regen";
 
 export interface ValidationRuleRef {
   /** Stable id like "QG_NUM_001" or "MD_002" */
@@ -48,7 +48,11 @@ export interface ValidationEvidence {
   /** Fields that failed (e.g., ["sources", "answerMode"]) */
   fields?: string[];
   /** Numbers found (for numeric validators) */
-  numbers?: Array<{ raw: string; normalized?: string; kind?: 'currency' | 'percent' | 'int' | 'float' }>;
+  numbers?: Array<{
+    raw: string;
+    normalized?: string;
+    kind?: "currency" | "percent" | "int" | "float";
+  }>;
   /** Optional debug object, must be safe for logs (no secrets) */
   debug?: Record<string, any>;
 }
@@ -139,7 +143,7 @@ export interface Validator<TInput = any> {
  * You can extend these as your pipeline evolves.
  */
 export interface ValidationContext {
-  env: 'production' | 'staging' | 'dev' | 'local';
+  env: "production" | "staging" | "dev" | "local";
 
   answerMode?: string;
   language?: string;

@@ -3,7 +3,7 @@
  * Safe model access with graceful degradation for missing models
  */
 
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from "@prisma/client";
 
 type PrismaModel = {
   findMany: (...args: unknown[]) => Promise<unknown[]>;
@@ -18,26 +18,26 @@ type PrismaModel = {
 
 // Known model names (camelCase as used in Prisma client)
 const MODEL_NAMES = [
-  'modelCall',
-  'usageEvent',
-  'retrievalEvent',
-  'ingestionEvent',
-  'queryTelemetry',
-  'user',
-  'document',
-  'conversation',
-  'message',
-  'tokenUsage',
-  'errorLog',
-  'auditLog',
-  'session',
-  'analyticsUserActivity',
-  'dailyAnalyticsAggregate',
-  'hourlyMetrics',
-  'analyticsSystemHealth',
-  'documentProcessingMetrics',
-  'aPIPerformanceLog',
-  'adminAuditLog',
+  "modelCall",
+  "usageEvent",
+  "retrievalEvent",
+  "ingestionEvent",
+  "queryTelemetry",
+  "user",
+  "document",
+  "conversation",
+  "message",
+  "tokenUsage",
+  "errorLog",
+  "auditLog",
+  "session",
+  "analyticsUserActivity",
+  "dailyAnalyticsAggregate",
+  "hourlyMetrics",
+  "analyticsSystemHealth",
+  "documentProcessingMetrics",
+  "aPIPerformanceLog",
+  "adminAuditLog",
 ] as const;
 
 type ModelName = (typeof MODEL_NAMES)[number];
@@ -48,7 +48,7 @@ type ModelName = (typeof MODEL_NAMES)[number];
 export function supportsModel(prisma: PrismaClient, name: string): boolean {
   try {
     const model = (prisma as unknown as Record<string, unknown>)[name];
-    return model !== undefined && typeof model === 'object' && model !== null;
+    return model !== undefined && typeof model === "object" && model !== null;
   } catch {
     return false;
   }
@@ -57,10 +57,15 @@ export function supportsModel(prisma: PrismaClient, name: string): boolean {
 /**
  * Get a model from Prisma client, returns null if not found
  */
-export function getModel(prisma: PrismaClient, name: string): PrismaModel | null {
+export function getModel(
+  prisma: PrismaClient,
+  name: string,
+): PrismaModel | null {
   try {
-    const model = (prisma as unknown as Record<string, unknown>)[name] as PrismaModel | undefined;
-    if (model && typeof model.findMany === 'function') {
+    const model = (prisma as unknown as Record<string, unknown>)[name] as
+      | PrismaModel
+      | undefined;
+    if (model && typeof model.findMany === "function") {
       return model;
     }
     return null;
@@ -76,14 +81,16 @@ export function getModel(prisma: PrismaClient, name: string): PrismaModel | null
 export async function safeQuery<T>(
   prisma: PrismaClient,
   modelName: string,
-  operation: 'findMany' | 'groupBy',
-  args: Record<string, unknown>
+  operation: "findMany" | "groupBy",
+  args: Record<string, unknown>,
 ): Promise<T[]> {
   const model = getModel(prisma, modelName);
   if (!model) return [];
 
   try {
-    const result = await (model[operation] as (args: Record<string, unknown>) => Promise<T[]>)(args);
+    const result = await (
+      model[operation] as (args: Record<string, unknown>) => Promise<T[]>
+    )(args);
     return result;
   } catch (error) {
     console.error(`[PrismaAdapter] Error in ${modelName}.${operation}:`, error);
@@ -97,7 +104,7 @@ export async function safeQuery<T>(
 export async function safeCount(
   prisma: PrismaClient,
   modelName: string,
-  args?: Record<string, unknown>
+  args?: Record<string, unknown>,
 ): Promise<number> {
   const model = getModel(prisma, modelName);
   if (!model) return 0;
@@ -117,7 +124,7 @@ export async function safeCount(
 export async function safeAggregate<T>(
   prisma: PrismaClient,
   modelName: string,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
 ): Promise<T | null> {
   const model = getModel(prisma, modelName);
   if (!model) return null;
@@ -137,7 +144,7 @@ export async function safeAggregate<T>(
 export async function safeFindFirst<T>(
   prisma: PrismaClient,
   modelName: string,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
 ): Promise<T | null> {
   const model = getModel(prisma, modelName);
   if (!model) return null;
@@ -157,7 +164,7 @@ export async function safeFindFirst<T>(
 export async function safeFindUnique<T>(
   prisma: PrismaClient,
   modelName: string,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
 ): Promise<T | null> {
   const model = getModel(prisma, modelName);
   if (!model) return null;
@@ -175,5 +182,5 @@ export async function safeFindUnique<T>(
  * Check which models are available
  */
 export function getAvailableModels(prisma: PrismaClient): string[] {
-  return MODEL_NAMES.filter(name => supportsModel(prisma, name));
+  return MODEL_NAMES.filter((name) => supportsModel(prisma, name));
 }

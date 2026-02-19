@@ -10,15 +10,15 @@
  *   https://<fanout-service>/pubsub/extract-fanout
  */
 
-import express from 'express';
-import type { Request, Response } from 'express';
+import express from "express";
+import type { Request, Response } from "express";
 
-import { logger } from '../infra/logger';
+import { logger } from "../infra/logger";
 import {
   publishExtractJobsBulk,
   type DocumentJobInfo,
-} from '../services/jobs/pubsubPublisher.service';
-import { config } from '../config/env';
+} from "../services/jobs/pubsubPublisher.service";
+import { config } from "../config/env";
 
 type PubSubPushBody = {
   message?: {
@@ -31,18 +31,18 @@ type PubSubPushBody = {
 };
 
 function asString(v: unknown): string | null {
-  return typeof v === 'string' && v.trim() ? v.trim() : null;
+  return typeof v === "string" && v.trim() ? v.trim() : null;
 }
 
 function decodePubSubData(dataB64: string): unknown {
-  const json = Buffer.from(dataB64, 'base64').toString('utf8');
+  const json = Buffer.from(dataB64, "base64").toString("utf8");
   return JSON.parse(json) as unknown;
 }
 
 function isAuthorized(req: Request): boolean {
   const expected = process.env.PUBSUB_PUSH_SECRET;
   if (!expected) return true; // allow if unset (dev)
-  const provided = asString(req.headers['x-koda-worker-secret']);
+  const provided = asString(req.headers["x-koda-worker-secret"]);
   return Boolean(provided && provided === expected);
 }
 
@@ -55,7 +55,7 @@ function msSince(iso?: string): number | null {
 
 async function handleExtractFanout(req: Request, res: Response): Promise<void> {
   if (!isAuthorized(req)) {
-    res.status(401).json({ ok: false, error: 'unauthorized' });
+    res.status(401).json({ ok: false, error: "unauthorized" });
     return;
   }
 
@@ -71,13 +71,15 @@ async function handleExtractFanout(req: Request, res: Response): Promise<void> {
   try {
     payload = decodePubSubData(dataB64);
   } catch (e: any) {
-    logger.error('[PubSubFanout] Failed to decode Pub/Sub message', { error: e?.message || String(e) });
+    logger.error("[PubSubFanout] Failed to decode Pub/Sub message", {
+      error: e?.message || String(e),
+    });
     res.status(204).end();
     return;
   }
 
   const jobType = asString(payload?.jobType);
-  if (jobType !== 'extract_fanout') {
+  if (jobType !== "extract_fanout") {
     // Not for this service.
     res.status(204).end();
     return;
@@ -91,20 +93,20 @@ async function handleExtractFanout(req: Request, res: Response): Promise<void> {
   for (const d of docsRaw) {
     const documentId = asString(d?.documentId);
     const userId = asString(d?.userId);
-    const storageKey = asString(d?.storageKey) || '';
-    const mimeType = asString(d?.mimeType) || 'application/octet-stream';
+    const storageKey = asString(d?.storageKey) || "";
+    const mimeType = asString(d?.mimeType) || "application/octet-stream";
     const filename = asString(d?.filename) || undefined;
     if (!documentId || !userId) continue;
     documents.push({ documentId, userId, storageKey, mimeType, filename });
   }
 
   if (documents.length === 0) {
-    logger.warn('[PubSubFanout] Empty fanout batch', { deliveryLatencyMs });
+    logger.warn("[PubSubFanout] Empty fanout batch", { deliveryLatencyMs });
     res.status(204).end();
     return;
   }
 
-  logger.info('[PubSubFanout] Fanout received', {
+  logger.info("[PubSubFanout] Fanout received", {
     batchSize: documents.length,
     deliveryLatencyMs,
   });
@@ -112,41 +114,47 @@ async function handleExtractFanout(req: Request, res: Response): Promise<void> {
   try {
     const t0 = Date.now();
     const results = await publishExtractJobsBulk(documents);
-    const okCount = Array.from(results.values()).filter((v) => v !== 'error').length;
-    logger.info('[PubSubFanout] Fanout published', {
+    const okCount = Array.from(results.values()).filter(
+      (v) => v !== "error",
+    ).length;
+    logger.info("[PubSubFanout] Fanout published", {
       batchSize: documents.length,
       okCount,
       durationMs: Date.now() - t0,
     });
     res.status(204).end();
   } catch (e: any) {
-    logger.error('[PubSubFanout] Fanout publish failed', { error: e?.message || String(e) });
-    res.status(500).json({ ok: false, error: 'fanout_failed' });
+    logger.error("[PubSubFanout] Fanout publish failed", {
+      error: e?.message || String(e),
+    });
+    res.status(500).json({ ok: false, error: "fanout_failed" });
   }
 }
 
 export async function startPubSubFanoutWorker(): Promise<void> {
   const app = express();
-  app.use(express.json({ limit: '5mb' }));
+  app.use(express.json({ limit: "5mb" }));
 
-  app.get('/health', (_req, res) => res.status(200).send('ok'));
-  app.post('/pubsub/extract-fanout', (req, res) => {
+  app.get("/health", (_req, res) => res.status(200).send("ok"));
+  app.post("/pubsub/extract-fanout", (req, res) => {
     handleExtractFanout(req, res).catch((err) => {
-      logger.error('[PubSubFanout] Unhandled error', { error: err?.message || String(err) });
-      res.status(500).json({ ok: false, error: 'unhandled' });
+      logger.error("[PubSubFanout] Unhandled error", {
+        error: err?.message || String(err),
+      });
+      res.status(500).json({ ok: false, error: "unhandled" });
     });
   });
 
   const port = Number(process.env.PORT || 8080);
   app.listen(port, () => {
-    logger.info('[PubSubFanout] Listening', { port, nodeEnv: config.NODE_ENV });
+    logger.info("[PubSubFanout] Listening", { port, nodeEnv: config.NODE_ENV });
   });
 }
 
 if (require.main === module) {
   startPubSubFanoutWorker().catch((e) => {
     // eslint-disable-next-line no-console
-    console.error('[PubSubFanout] Fatal:', e);
+    console.error("[PubSubFanout] Fatal:", e);
     process.exit(1);
   });
 }

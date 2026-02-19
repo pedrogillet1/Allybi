@@ -1,17 +1,17 @@
 // file: src/analytics/rollups/hourlyRollup.job.ts
 // Hourly metrics rollup job - computes hourly aggregates from telemetry tables
 
-import { PrismaClient } from '@prisma/client';
-import { percentile } from '../calculators/latency.calculator';
+import { PrismaClient } from "@prisma/client";
+import { percentile } from "../calculators/latency.calculator";
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────────────────────
 
 export interface HourlyRollupOptions {
-  backfillHours?: number;      // Default: 6 hours
-  maxBucketsPerRun?: number;   // Default: 24 buckets
-  dryRun?: boolean;            // Log only, don't write
+  backfillHours?: number; // Default: 6 hours
+  maxBucketsPerRun?: number; // Default: 24 buckets
+  dryRun?: boolean; // Log only, don't write
 }
 
 export interface HourlyMetrics {
@@ -69,7 +69,7 @@ function addHours(d: Date, hours: number): Date {
  * Format date as ISO hour string for logging (YYYY-MM-DDTHH:00:00Z)
  */
 function formatHour(d: Date): string {
-  return d.toISOString().slice(0, 13) + ':00:00Z';
+  return d.toISOString().slice(0, 13) + ":00:00Z";
 }
 
 /**
@@ -89,7 +89,7 @@ function generateHourBuckets(start: Date, end: Date): Date[] {
 // ADVISORY LOCK
 // ─────────────────────────────────────────────────────────────
 
-const LOCK_KEY = 'koda:analytics:hourly';
+const LOCK_KEY = "koda:analytics:hourly";
 
 async function tryAcquireLock(prisma: PrismaClient): Promise<boolean> {
   const result = await prisma.$queryRaw<{ locked: boolean }[]>`
@@ -111,7 +111,7 @@ async function releaseLock(prisma: PrismaClient): Promise<void> {
 async function computeHourlyMetrics(
   prisma: PrismaClient,
   bucketStart: Date,
-  bucketEnd: Date
+  bucketEnd: Date,
 ): Promise<HourlyMetrics> {
   // Initialize with zeros
   const metrics: HourlyMetrics = {
@@ -155,7 +155,9 @@ async function computeHourlyMetrics(
   metrics.messages = Number(messagesResult[0]?.count || 0);
 
   // ─── Queries (from QueryTelemetry) ───
-  const queriesResult = await prisma.$queryRaw<{ count: bigint; weak: bigint }[]>`
+  const queriesResult = await prisma.$queryRaw<
+    { count: bigint; weak: bigint }[]
+  >`
     SELECT
       COUNT(*) as count,
       COUNT(*) FILTER (WHERE "hadFallback" = true OR "retrievalAdequate" = false) as weak
@@ -164,9 +166,8 @@ async function computeHourlyMetrics(
   `;
   metrics.queries = Number(queriesResult[0]?.count || 0);
   metrics.weakEvidenceCount = Number(queriesResult[0]?.weak || 0);
-  metrics.weakEvidenceRate = metrics.queries > 0
-    ? metrics.weakEvidenceCount / metrics.queries
-    : 0;
+  metrics.weakEvidenceRate =
+    metrics.queries > 0 ? metrics.weakEvidenceCount / metrics.queries : 0;
 
   // ─── Documents Uploaded (from UsageEvent) ───
   const docsResult = await prisma.$queryRaw<{ count: bigint }[]>`
@@ -178,11 +179,13 @@ async function computeHourlyMetrics(
   metrics.documentsUploaded = Number(docsResult[0]?.count || 0);
 
   // ─── API Performance (from APIPerformanceLog) ───
-  const apiResult = await prisma.$queryRaw<{
-    total: bigint;
-    errors: bigint;
-    latencies: number[];
-  }[]>`
+  const apiResult = await prisma.$queryRaw<
+    {
+      total: bigint;
+      errors: bigint;
+      latencies: number[];
+    }[]
+  >`
     SELECT
       COUNT(*) as total,
       COUNT(*) FILTER (WHERE "statusCode" >= 500 OR "rateLimitHit" = true) as errors,
@@ -193,25 +196,30 @@ async function computeHourlyMetrics(
 
   metrics.apiRequests = Number(apiResult[0]?.total || 0);
   metrics.apiErrorCount = Number(apiResult[0]?.errors || 0);
-  metrics.apiErrorRate = metrics.apiRequests > 0
-    ? metrics.apiErrorCount / metrics.apiRequests
-    : 0;
+  metrics.apiErrorRate =
+    metrics.apiRequests > 0 ? metrics.apiErrorCount / metrics.apiRequests : 0;
 
-  const latencies = (apiResult[0]?.latencies || []).filter(l => l != null && l > 0);
+  const latencies = (apiResult[0]?.latencies || []).filter(
+    (l) => l != null && l > 0,
+  );
   if (latencies.length > 0) {
     latencies.sort((a, b) => a - b);
-    metrics.avgLatencyMs = Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length);
+    metrics.avgLatencyMs = Math.round(
+      latencies.reduce((a, b) => a + b, 0) / latencies.length,
+    );
     metrics.p50LatencyMs = Math.round(percentile(latencies, 50) || 0);
     metrics.p95LatencyMs = Math.round(percentile(latencies, 95) || 0);
   }
 
   // ─── LLM Usage (from TokenUsage) ───
-  const llmResult = await prisma.$queryRaw<{
-    calls: bigint;
-    cost: number;
-    tokensIn: bigint;
-    tokensOut: bigint;
-  }[]>`
+  const llmResult = await prisma.$queryRaw<
+    {
+      calls: bigint;
+      cost: number;
+      tokensIn: bigint;
+      tokensOut: bigint;
+    }[]
+  >`
     SELECT
       COUNT(*) as calls,
       COALESCE(SUM("totalCost"), 0) as cost,
@@ -236,7 +244,7 @@ async function computeHourlyMetrics(
 
 async function upsertHourlyMetrics(
   prisma: PrismaClient,
-  metrics: HourlyMetrics
+  metrics: HourlyMetrics,
 ): Promise<void> {
   // Using raw SQL upsert since we may not have a HourlyMetrics model
   // If model exists, replace with prisma.hourlyMetrics.upsert
@@ -282,7 +290,7 @@ async function upsertHourlyMetrics(
 
 export async function runHourlyRollup(
   prisma: PrismaClient,
-  opts?: HourlyRollupOptions
+  opts?: HourlyRollupOptions,
 ): Promise<RollupResult> {
   const startTime = Date.now();
   const backfillHours = opts?.backfillHours ?? 6;
@@ -302,7 +310,9 @@ export async function runHourlyRollup(
   // Acquire advisory lock
   const gotLock = await tryAcquireLock(prisma);
   if (!gotLock) {
-    result.errors.push('Failed to acquire advisory lock - another instance may be running');
+    result.errors.push(
+      "Failed to acquire advisory lock - another instance may be running",
+    );
     result.durationMs = Date.now() - startTime;
     return result;
   }
@@ -340,7 +350,11 @@ export async function runHourlyRollup(
       const bucketEnd = addHours(bucketStart, 1);
 
       try {
-        const metrics = await computeHourlyMetrics(prisma, bucketStart, bucketEnd);
+        const metrics = await computeHourlyMetrics(
+          prisma,
+          bucketStart,
+          bucketEnd,
+        );
 
         if (!dryRun) {
           await upsertHourlyMetrics(prisma, metrics);
@@ -349,7 +363,9 @@ export async function runHourlyRollup(
 
         result.bucketsProcessed++;
       } catch (err: any) {
-        result.errors.push(`Bucket ${formatHour(bucketStart)}: ${err.message || 'unknown error'}`);
+        result.errors.push(
+          `Bucket ${formatHour(bucketStart)}: ${err.message || "unknown error"}`,
+        );
         // Continue to next bucket
       }
     }

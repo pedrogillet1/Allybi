@@ -8,23 +8,23 @@
  * - No user-facing microcopy (reason codes only)
  */
 
-import crypto from 'crypto';
-import type { LLMProvider } from './llmErrors.types';
+import crypto from "crypto";
+import type { LLMProvider } from "./llmErrors.types";
 
 export type RateLimitScope =
-  | 'global'
-  | 'tenant'
-  | 'user'
-  | 'tenant_provider'
-  | 'user_provider'
-  | 'tenant_model'
-  | 'user_model';
+  | "global"
+  | "tenant"
+  | "user"
+  | "tenant_provider"
+  | "user_provider"
+  | "tenant_model"
+  | "user_model";
 
 export type RateLimitMetric =
-  | 'requests' // count of LLM calls
-  | 'tokens'; // total tokens (prompt+completion)
+  | "requests" // count of LLM calls
+  | "tokens"; // total tokens (prompt+completion)
 
-export type RateLimitWindow = '10s' | '1m' | '5m' | '15m' | '1h' | '1d';
+export type RateLimitWindow = "10s" | "1m" | "5m" | "15m" | "1h" | "1d";
 
 export interface RateLimitRule {
   enabled: boolean;
@@ -105,10 +105,10 @@ export interface RateLimitDecision {
 
   /** If blocked, what caused it */
   reason?:
-    | 'RATE_LIMIT_DISABLED'
-    | 'RULES_EMPTY'
-    | 'LIMIT_EXCEEDED'
-    | 'BACKEND_ERROR';
+    | "RATE_LIMIT_DISABLED"
+    | "RULES_EMPTY"
+    | "LIMIT_EXCEEDED"
+    | "BACKEND_ERROR";
 
   /** The rule that triggered the block (if any) */
   violatedRule?: RateLimitRule;
@@ -127,7 +127,7 @@ export interface RateLimitDecision {
   meta?: {
     traceId: string;
     key?: string;
-    backend: 'memory' | 'external';
+    backend: "memory" | "external";
   };
 }
 
@@ -238,12 +238,17 @@ export class LLMRateLimitService {
   private readonly memory?: MemorySlidingWindowBackend;
   private sweepTimer?: NodeJS.Timeout;
 
-  constructor(params: { config: RateLimitConfig; externalBackend?: ExternalRateLimitBackend }) {
+  constructor(params: {
+    config: RateLimitConfig;
+    externalBackend?: ExternalRateLimitBackend;
+  }) {
     this.config = params.config;
     this.external = params.externalBackend;
 
     if (!this.external && this.config.memory) {
-      this.memory = new MemorySlidingWindowBackend({ maxKeys: this.config.memory.maxKeys });
+      this.memory = new MemorySlidingWindowBackend({
+        maxKeys: this.config.memory.maxKeys,
+      });
       this.sweepTimer = setInterval(() => {
         try {
           this.memory?.sweep(Date.now(), 60 * 60 * 1000);
@@ -263,21 +268,31 @@ export class LLMRateLimitService {
    * Checks + consumes units if allowed (atomic at backend boundary).
    * If blocked, it does not consume (except in best-effort memory mode, which is still deterministic).
    */
-  async checkAndConsume(req: RateLimitCheckRequest): Promise<RateLimitDecision> {
+  async checkAndConsume(
+    req: RateLimitCheckRequest,
+  ): Promise<RateLimitDecision> {
     if (!this.config.enabled) {
       return {
         allowed: true,
-        reason: 'RATE_LIMIT_DISABLED',
-        meta: { traceId: req.traceId, backend: this.external ? 'external' : 'memory' },
+        reason: "RATE_LIMIT_DISABLED",
+        meta: {
+          traceId: req.traceId,
+          backend: this.external ? "external" : "memory",
+        },
       };
     }
 
-    const rules = (req.rulesOverride ?? this.config.rules).filter(r => r.enabled);
+    const rules = (req.rulesOverride ?? this.config.rules).filter(
+      (r) => r.enabled,
+    );
     if (rules.length === 0) {
       return {
         allowed: true,
-        reason: 'RULES_EMPTY',
-        meta: { traceId: req.traceId, backend: this.external ? 'external' : 'memory' },
+        reason: "RULES_EMPTY",
+        meta: {
+          traceId: req.traceId,
+          backend: this.external ? "external" : "memory",
+        },
       };
     }
 
@@ -291,7 +306,10 @@ export class LLMRateLimitService {
       });
 
       const windowMs = windowToMs(rule.window);
-      const granularityMs = Math.max(1000, this.config.granularitySeconds * 1000);
+      const granularityMs = Math.max(
+        1000,
+        this.config.granularitySeconds * 1000,
+      );
       const ttlMs = windowMs + 2 * granularityMs; // keep a bit beyond window
       const nowMs = Date.now();
 
@@ -313,34 +331,48 @@ export class LLMRateLimitService {
             // (use predicted tokens for tokens metric).
             return {
               allowed: false,
-              reason: 'LIMIT_EXCEEDED',
+              reason: "LIMIT_EXCEEDED",
               violatedRule: rule,
               retryAtMs: resetAtMs,
               snapshot: { used: total, limit: rule.limit, window: rule.window },
-              meta: { traceId: req.traceId, key, backend: this.external ? 'external' : 'memory' },
+              meta: {
+                traceId: req.traceId,
+                key,
+                backend: this.external ? "external" : "memory",
+              },
             };
           }
         }
       } catch {
         return {
           allowed: true, // fail-open to avoid taking system down; banks decide fallback behavior
-          reason: 'BACKEND_ERROR',
-          meta: { traceId: req.traceId, key, backend: this.external ? 'external' : 'memory' },
+          reason: "BACKEND_ERROR",
+          meta: {
+            traceId: req.traceId,
+            key,
+            backend: this.external ? "external" : "memory",
+          },
         };
       }
     }
 
     return {
       allowed: true,
-      meta: { traceId: req.traceId, backend: this.external ? 'external' : 'memory' },
+      meta: {
+        traceId: req.traceId,
+        backend: this.external ? "external" : "memory",
+      },
     };
   }
 
   /**
    * Build a deterministic key for a specific rule+identity bucket.
    */
-  buildKey(params: { rule: RateLimitRule; identity: RateLimitIdentity }): string {
-    const salt = this.config.keySalt ?? '';
+  buildKey(params: {
+    rule: RateLimitRule;
+    identity: RateLimitIdentity;
+  }): string {
+    const salt = this.config.keySalt ?? "";
 
     const stable = {
       metric: params.rule.metric,
@@ -405,17 +437,17 @@ function ruleSort(a: RateLimitRule, b: RateLimitRule): number {
 
 function windowToMs(w: RateLimitWindow): number {
   switch (w) {
-    case '10s':
+    case "10s":
       return 10_000;
-    case '1m':
+    case "1m":
       return 60_000;
-    case '5m':
+    case "5m":
       return 5 * 60_000;
-    case '15m':
+    case "15m":
       return 15 * 60_000;
-    case '1h':
+    case "1h":
       return 60 * 60_000;
-    case '1d':
+    case "1d":
       return 24 * 60 * 60_000;
     default:
       return 60_000;
@@ -423,11 +455,11 @@ function windowToMs(w: RateLimitWindow): number {
 }
 
 function sha256(s: string): string {
-  return crypto.createHash('sha256').update(s, 'utf8').digest('hex');
+  return crypto.createHash("sha256").update(s, "utf8").digest("hex");
 }
 
 function sortKeysDeep<T>(x: T): T {
-  if (x === null || typeof x !== 'object') return x;
+  if (x === null || typeof x !== "object") return x;
   if (Array.isArray(x)) return x.map(sortKeysDeep) as unknown as T;
 
   const obj = x as Record<string, unknown>;

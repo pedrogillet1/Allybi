@@ -1,4 +1,4 @@
-import * as crypto from 'crypto';
+import * as crypto from "crypto";
 
 export interface NanoBananaRequest {
   systemPrompt: string;
@@ -11,7 +11,7 @@ export interface NanoBananaRequest {
 
 export interface NanoBananaResponse {
   imageBuffer: Buffer;
-  mimeType: 'image/png' | 'image/webp';
+  mimeType: "image/png" | "image/webp";
   model: string;
   providerRequestId: string;
   latencyMs: number;
@@ -23,7 +23,7 @@ export class NanoBananaClientError extends Error {
 
   constructor(message: string, code: string) {
     super(message);
-    this.name = 'NanoBananaClientError';
+    this.name = "NanoBananaClientError";
     this.code = code;
   }
 }
@@ -32,13 +32,16 @@ export class NanoBananaClientError extends Error {
  * Nano Banana image generation client.
  * Default implementation is an adapter shell: wire real API call in one place.
  */
-export type NanoBananaProviderFn = (request: NanoBananaRequest) => Promise<NanoBananaResponse>;
+export type NanoBananaProviderFn = (
+  request: NanoBananaRequest,
+) => Promise<NanoBananaResponse>;
 
 export class NanoBananaClientService {
   private readonly providerFn?: NanoBananaProviderFn;
 
   constructor(
-    private readonly modelName: string = process.env.NANO_BANANA_MODEL || 'nano-banana-v1',
+    private readonly modelName: string = process.env.NANO_BANANA_MODEL ||
+      "nano-banana-v1",
     providerFn?: NanoBananaProviderFn,
   ) {
     this.providerFn = providerFn;
@@ -46,11 +49,22 @@ export class NanoBananaClientService {
 
   async generate(request: NanoBananaRequest): Promise<NanoBananaResponse> {
     if (!request.systemPrompt.trim() || !request.userPrompt.trim()) {
-      throw new NanoBananaClientError('systemPrompt and userPrompt are required.', 'INVALID_PROMPT');
+      throw new NanoBananaClientError(
+        "systemPrompt and userPrompt are required.",
+        "INVALID_PROMPT",
+      );
     }
 
-    if (!Number.isInteger(request.width) || !Number.isInteger(request.height) || request.width <= 0 || request.height <= 0) {
-      throw new NanoBananaClientError('width and height must be positive integers.', 'INVALID_DIMENSIONS');
+    if (
+      !Number.isInteger(request.width) ||
+      !Number.isInteger(request.height) ||
+      request.width <= 0 ||
+      request.height <= 0
+    ) {
+      throw new NanoBananaClientError(
+        "width and height must be positive integers.",
+        "INVALID_DIMENSIONS",
+      );
     }
 
     if (this.providerFn) {
@@ -60,8 +74,8 @@ export class NanoBananaClientService {
     // Adapter shell intentionally throws until provider call is configured.
     // This keeps pipeline deterministic and fail-fast in production.
     throw new NanoBananaClientError(
-      'Nano Banana provider is not configured yet. Inject a provider-specific implementation into NanoBananaClientService.generate().',
-      'NANO_BANANA_NOT_CONFIGURED',
+      "Nano Banana provider is not configured yet. Inject a provider-specific implementation into NanoBananaClientService.generate().",
+      "NANO_BANANA_NOT_CONFIGURED",
     );
   }
 
@@ -75,7 +89,7 @@ export class NanoBananaClientService {
       seed: request.seed,
     });
 
-    return crypto.createHash('sha256').update(payload).digest('hex');
+    return crypto.createHash("sha256").update(payload).digest("hex");
   }
 }
 

@@ -13,15 +13,15 @@
  *   sessions for that user are revoked (theft assumption)
  */
 
-import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
-import prisma from '../config/database';
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import prisma from "../config/database";
 import {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,
-} from '../utils/jwt';
-import type { AuthService } from '../controllers/auth.controller';
+} from "../utils/jwt";
+import type { AuthService } from "../controllers/auth.controller";
 
 const BCRYPT_ROUNDS = 12;
 
@@ -30,15 +30,19 @@ const BCRYPT_ROUNDS = 12;
  * The pepper is a separate secret from the JWT signing keys —
  * if the DB is compromised the hashes are still uncrackable without it.
  */
-const REFRESH_TOKEN_PEPPER = process.env.KODA_REFRESH_PEPPER || process.env.JWT_REFRESH_SECRET || '';
+const REFRESH_TOKEN_PEPPER =
+  process.env.KODA_REFRESH_PEPPER || process.env.JWT_REFRESH_SECRET || "";
 
 function hmacSha256(input: string): string {
-  return crypto.createHmac('sha256', REFRESH_TOKEN_PEPPER).update(input).digest('hex');
+  return crypto
+    .createHmac("sha256", REFRESH_TOKEN_PEPPER)
+    .update(input)
+    .digest("hex");
 }
 
 /** Backward-compatible: plain SHA-256 (for sessions created before HMAC migration) */
 function sha256(input: string): string {
-  return crypto.createHash('sha256').update(input).digest('hex');
+  return crypto.createHash("sha256").update(input).digest("hex");
 }
 
 export function createAuthService(): AuthService {
@@ -49,7 +53,7 @@ export function createAuthService(): AuthService {
       // Check for existing user
       const existing = await prisma.user.findUnique({ where: { email } });
       if (existing) {
-        throw new Error('Email already exists');
+        throw new Error("Email already exists");
       }
 
       // Hash password
@@ -62,7 +66,7 @@ export function createAuthService(): AuthService {
       if (input.name) {
         const nameParts = input.name.trim().split(/\s+/);
         firstName = nameParts[0] || null;
-        lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : null;
+        lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : null;
       }
 
       // Delete any existing pending user with same email
@@ -93,11 +97,11 @@ export function createAuthService(): AuthService {
 
       // Send verification email
       try {
-        const emailService = await import('../services/email.service');
+        const emailService = await import("../services/email.service");
         await emailService.sendVerificationCodeEmail(email, emailCode);
         console.log(`Verification code sent to ${email}`);
       } catch (error) {
-        console.error('Failed to send verification email:', error);
+        console.error("Failed to send verification email:", error);
         console.log(`[DEV MODE] Verification code for ${email}: ${emailCode}`);
       }
 
@@ -105,7 +109,7 @@ export function createAuthService(): AuthService {
       return {
         requiresVerification: true,
         email,
-        message: 'Please verify your email to complete registration',
+        message: "Please verify your email to complete registration",
       };
     },
 
@@ -114,16 +118,19 @@ export function createAuthService(): AuthService {
 
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user || !user.passwordHash) {
-        throw new Error('Invalid credentials');
+        throw new Error("Invalid credentials");
       }
 
       const valid = await bcrypt.compare(input.password, user.passwordHash);
       if (!valid) {
-        throw new Error('Invalid credentials');
+        throw new Error("Invalid credentials");
       }
 
       // Generate tokens
-      const refreshToken = generateRefreshToken({ userId: user.id, email: user.email });
+      const refreshToken = generateRefreshToken({
+        userId: user.id,
+        email: user.email,
+      });
 
       // Store session
       const session = await prisma.session.create({
@@ -147,7 +154,8 @@ export function createAuthService(): AuthService {
         user: {
           id: user.id,
           email: user.email,
-          name: [user.firstName, user.lastName].filter(Boolean).join(' ') || null,
+          name:
+            [user.firstName, user.lastName].filter(Boolean).join(" ") || null,
           firstName: user.firstName,
           lastName: user.lastName,
           phoneNumber: user.phoneNumber,
@@ -171,7 +179,7 @@ export function createAuthService(): AuthService {
       try {
         payload = verifyRefreshToken(input.refreshToken);
       } catch {
-        throw new Error('Refresh token invalid or expired');
+        throw new Error("Refresh token invalid or expired");
       }
 
       // Try HMAC hash first (new sessions), then fall back to SHA-256 (legacy)
@@ -221,17 +229,22 @@ export function createAuthService(): AuthService {
           });
         }
 
-        throw new Error('Refresh token invalid or expired');
+        throw new Error("Refresh token invalid or expired");
       }
 
       // Fetch user
-      const user = await prisma.user.findUnique({ where: { id: session.userId } });
+      const user = await prisma.user.findUnique({
+        where: { id: session.userId },
+      });
       if (!user) {
-        throw new Error('User not found');
+        throw new Error("User not found");
       }
 
       // Rotate: deactivate old session, create new one
-      const newRefreshToken = generateRefreshToken({ userId: user.id, email: user.email });
+      const newRefreshToken = generateRefreshToken({
+        userId: user.id,
+        email: user.email,
+      });
 
       const [, newSession] = await prisma.$transaction([
         prisma.session.update({
@@ -306,14 +319,15 @@ export function createAuthService(): AuthService {
       });
 
       if (!user) {
-        throw new Error('User not found');
+        throw new Error("User not found");
       }
 
       return {
         user: {
           id: user.id,
           email: user.email,
-          name: [user.firstName, user.lastName].filter(Boolean).join(' ') || null,
+          name:
+            [user.firstName, user.lastName].filter(Boolean).join(" ") || null,
           firstName: user.firstName,
           lastName: user.lastName,
           phoneNumber: user.phoneNumber,
@@ -341,7 +355,7 @@ export async function issueVerificationCode(
   type: string,
   expiresInMs = 15 * 60 * 1000,
 ): Promise<string> {
-  const rawCode = crypto.randomBytes(32).toString('hex');
+  const rawCode = crypto.randomBytes(32).toString("hex");
   const hashedCode = sha256(rawCode);
 
   await prisma.verificationCode.create({
@@ -375,7 +389,7 @@ export async function consumeVerificationCode(
       isUsed: false,
       expiresAt: { gt: new Date() },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
   });
 
   if (!record) return false;
@@ -390,8 +404,8 @@ export async function consumeVerificationCode(
   }
 
   // Constant-time comparison (defense in depth)
-  const expected = Buffer.from(record.code, 'utf-8');
-  const provided = Buffer.from(hashedCode, 'utf-8');
+  const expected = Buffer.from(record.code, "utf-8");
+  const provided = Buffer.from(hashedCode, "utf-8");
 
   let isValid = false;
   if (expected.length === provided.length) {

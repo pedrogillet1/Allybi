@@ -1,6 +1,6 @@
-import { Queue, Worker, type Job } from 'bullmq';
+import { Queue, Worker, type Job } from "bullmq";
 
-import { config } from '../config/env';
+import { config } from "../config/env";
 
 export interface ReindexRevisionJobData {
   documentId: string;
@@ -22,7 +22,7 @@ function buildConnection() {
         host: url.hostname,
         port: Number(url.port || 6379),
         password: url.password || undefined,
-        tls: url.protocol === 'rediss:' ? {} : undefined,
+        tls: url.protocol === "rediss:" ? {} : undefined,
         maxRetriesPerRequest: null,
       };
     } catch {
@@ -39,7 +39,9 @@ function buildConnection() {
 }
 
 const connection = buildConnection();
-const prefix = process.env.QUEUE_PREFIX || (process.env.NODE_ENV === 'production' ? '' : 'dev-');
+const prefix =
+  process.env.QUEUE_PREFIX ||
+  (process.env.NODE_ENV === "production" ? "" : "dev-");
 
 const queueName = `${prefix}edit-reindex`;
 
@@ -47,7 +49,7 @@ export const editQueue = new Queue<ReindexRevisionJobData>(queueName, {
   connection,
   defaultJobOptions: {
     attempts: 3,
-    backoff: { type: 'exponential', delay: 1000 },
+    backoff: { type: "exponential", delay: 1000 },
     removeOnComplete: { count: 1000, age: 24 * 3600 },
     removeOnFail: { count: 300, age: 7 * 24 * 3600 },
   },
@@ -57,7 +59,7 @@ let editWorker: Worker<ReindexRevisionJobData> | null = null;
 
 export async function addReindexRevisionJob(data: ReindexRevisionJobData) {
   const targetId = data.revisionId || data.documentId;
-  return editQueue.add('reindex-revision', data, {
+  return editQueue.add("reindex-revision", data, {
     jobId: `reindex:${targetId}:${Date.now()}`,
   });
 }
@@ -66,7 +68,9 @@ export async function enqueueEditReindex(data: ReindexRevisionJobData) {
   return addReindexRevisionJob(data);
 }
 
-export function startEditWorker(handler: (job: Job<ReindexRevisionJobData>) => Promise<void>): void {
+export function startEditWorker(
+  handler: (job: Job<ReindexRevisionJobData>) => Promise<void>,
+): void {
   if (editWorker) return;
 
   editWorker = new Worker<ReindexRevisionJobData>(

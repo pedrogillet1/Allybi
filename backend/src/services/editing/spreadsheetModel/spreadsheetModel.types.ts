@@ -158,7 +158,10 @@ export type SpreadsheetModel = {
 export type SemanticIndex = {
   sheetName: string;
   headerRow?: number;
-  columns: Record<number, { header?: string; kind?: "currency" | "percent" | "text" | "date" }>;
+  columns: Record<
+    number,
+    { header?: string; kind?: "currency" | "percent" | "text" | "date" }
+  >;
   rowGroups: Array<{ label: string; startRow: number; endRow: number }>;
   keyCells: Record<string, { role: string; row: number; col: number }>;
 };

@@ -62,8 +62,14 @@ function safeString(x: any): string {
   return String(x);
 }
 
-function stableSortByName(tools: OpenAIToolDefinition[]): OpenAIToolDefinition[] {
-  return tools.slice().sort((a, b) => safeString(a.function?.name).localeCompare(safeString(b.function?.name)));
+function stableSortByName(
+  tools: OpenAIToolDefinition[],
+): OpenAIToolDefinition[] {
+  return tools
+    .slice()
+    .sort((a, b) =>
+      safeString(a.function?.name).localeCompare(safeString(b.function?.name)),
+    );
 }
 
 function normalizeParameters(p: any): any {
@@ -81,7 +87,9 @@ export class OpenAIToolAdapterService {
    * Convert Allybi tool definitions to OpenAI tools array.
    * Deterministic ordering by function name.
    */
-  toOpenAITools(tools?: KodaToolDefinition[]): OpenAIToolDefinition[] | undefined {
+  toOpenAITools(
+    tools?: KodaToolDefinition[],
+  ): OpenAIToolDefinition[] | undefined {
     if (!Array.isArray(tools) || tools.length === 0) return undefined;
 
     const normalized: OpenAIToolDefinition[] = tools.map((t) => {
@@ -92,7 +100,9 @@ export class OpenAIToolAdapterService {
           type: "function",
           function: {
             name: safeString(fn.name),
-            description: fn.description ? safeString(fn.description) : undefined,
+            description: fn.description
+              ? safeString(fn.description)
+              : undefined,
             parameters: normalizeParameters(fn.parameters),
           },
         };
@@ -100,7 +110,9 @@ export class OpenAIToolAdapterService {
 
       // Allybi minimal tool definition
       const name = safeString((t as any).name);
-      const description = (t as any).description ? safeString((t as any).description) : undefined;
+      const description = (t as any).description
+        ? safeString((t as any).description)
+        : undefined;
       const parameters = normalizeParameters((t as any).parameters);
 
       return {
@@ -172,9 +184,16 @@ export class OpenAIToolAdapterService {
           typeof item.arguments === "string"
             ? item.arguments
             : typeof item.function?.arguments === "string"
-            ? item.function.arguments
-            : JSON.stringify(item.arguments ?? item.function?.arguments ?? {});
-        if (name) calls.push({ id: id || `tool_${calls.length}`, name, argumentsJson: args });
+              ? item.function.arguments
+              : JSON.stringify(
+                  item.arguments ?? item.function?.arguments ?? {},
+                );
+        if (name)
+          calls.push({
+            id: id || `tool_${calls.length}`,
+            name,
+            argumentsJson: args,
+          });
       }
     }
 
@@ -185,14 +204,17 @@ export class OpenAIToolAdapterService {
    * Parse incremental tool call delta from OpenAI stream chunk.
    * Useful when streaming tools.
    */
-  parseToolCallDeltaFromStream(chunk: any): { toolCallId: string; deltaJson: string } | null {
+  parseToolCallDeltaFromStream(
+    chunk: any,
+  ): { toolCallId: string; deltaJson: string } | null {
     const tc = chunk?.choices?.[0]?.delta?.tool_calls;
     if (!Array.isArray(tc) || tc.length === 0) return null;
 
     const t0 = tc[0];
     const id = safeString(t0.id || "toolcall_0");
     const args = t0.function?.arguments;
-    if (typeof args === "string" && args.length) return { toolCallId: id, deltaJson: args };
+    if (typeof args === "string" && args.length)
+      return { toolCallId: id, deltaJson: args };
 
     return null;
   }

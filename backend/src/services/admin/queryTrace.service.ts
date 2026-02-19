@@ -4,8 +4,8 @@
  * Includes waterfall timeline, bank usage, keywords, and entities
  */
 
-import type { PrismaClient } from '@prisma/client';
-import { supportsModel } from './_shared/prismaAdapter';
+import type { PrismaClient } from "@prisma/client";
+import { supportsModel } from "./_shared/prismaAdapter";
 
 // ============================================================================
 // Types
@@ -116,24 +116,21 @@ export interface QueryTraceDetail {
  */
 export async function getQueryTrace(
   prisma: PrismaClient,
-  traceId: string
+  traceId: string,
 ): Promise<QueryTraceDetail | null> {
   // Try to find the query in QueryTelemetry first
   let baseTelemetry: any = null;
 
-  if (supportsModel(prisma, 'queryTelemetry')) {
+  if (supportsModel(prisma, "queryTelemetry")) {
     baseTelemetry = await prisma.queryTelemetry.findFirst({
       where: {
-        OR: [
-          { queryId: traceId },
-          { id: traceId },
-        ],
+        OR: [{ queryId: traceId }, { id: traceId }],
       },
     });
   }
 
   // Fallback to RetrievalEvent if not found
-  if (!baseTelemetry && supportsModel(prisma, 'retrievalEvent')) {
+  if (!baseTelemetry && supportsModel(prisma, "retrievalEvent")) {
     const event = await prisma.retrievalEvent.findFirst({
       where: { traceId },
     });
@@ -152,8 +149,8 @@ export async function getQueryTrace(
         hadFallback: !!event.fallbackReasonCode,
         fallbackScenario: event.fallbackReasonCode,
         totalMs: null,
-        answerMode: event.navPillsUsed ? 'nav_pills' : 'doc_grounded_single',
-        resolvedLang: 'en',
+        answerMode: event.navPillsUsed ? "nav_pills" : "doc_grounded_single",
+        resolvedLang: "en",
       };
     }
   }
@@ -164,12 +161,12 @@ export async function getQueryTrace(
 
   // Get trace spans (waterfall)
   let spans: TraceSpan[] = [];
-  if (supportsModel(prisma, 'traceSpan')) {
+  if (supportsModel(prisma, "traceSpan")) {
     const spanRecords = await prisma.traceSpan.findMany({
       where: { traceId },
-      orderBy: { startedAt: 'asc' },
+      orderBy: { startedAt: "asc" },
     });
-    spans = spanRecords.map(s => ({
+    spans = spanRecords.map((s) => ({
       id: s.id,
       stepName: s.stepName,
       startedAt: s.startedAt.toISOString(),
@@ -183,12 +180,12 @@ export async function getQueryTrace(
 
   // Get bank usage events
   let banksUsed: BankUsage[] = [];
-  if (supportsModel(prisma, 'bankUsageEvent')) {
+  if (supportsModel(prisma, "bankUsageEvent")) {
     const bankRecords = await prisma.bankUsageEvent.findMany({
       where: { traceId },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: "asc" },
     });
-    banksUsed = bankRecords.map(b => ({
+    banksUsed = bankRecords.map((b) => ({
       id: b.id,
       bankType: b.bankType,
       bankId: b.bankId,
@@ -200,12 +197,12 @@ export async function getQueryTrace(
 
   // Get keywords
   let keywords: KeywordItem[] = [];
-  if (supportsModel(prisma, 'queryKeyword')) {
+  if (supportsModel(prisma, "queryKeyword")) {
     const keywordRecords = await prisma.queryKeyword.findMany({
       where: { traceId },
-      orderBy: { weight: 'desc' },
+      orderBy: { weight: "desc" },
     });
-    keywords = keywordRecords.map(k => ({
+    keywords = keywordRecords.map((k) => ({
       keyword: k.keyword,
       weight: k.weight,
     }));
@@ -213,12 +210,12 @@ export async function getQueryTrace(
 
   // Get entities
   let entities: EntityItem[] = [];
-  if (supportsModel(prisma, 'queryEntity')) {
+  if (supportsModel(prisma, "queryEntity")) {
     const entityRecords = await prisma.queryEntity.findMany({
       where: { traceId },
-      orderBy: { confidence: 'desc' },
+      orderBy: { confidence: "desc" },
     });
-    entities = entityRecords.map(e => ({
+    entities = entityRecords.map((e) => ({
       type: e.entityType,
       value: e.value,
       confidence: e.confidence,
@@ -226,13 +223,13 @@ export async function getQueryTrace(
   }
 
   // Get model calls
-  let modelCalls: QueryTraceDetail['modelCalls'] = [];
-  if (supportsModel(prisma, 'modelCall')) {
+  let modelCalls: QueryTraceDetail["modelCalls"] = [];
+  if (supportsModel(prisma, "modelCall")) {
     const callRecords = await prisma.modelCall.findMany({
       where: { traceId },
-      orderBy: { at: 'asc' },
+      orderBy: { at: "asc" },
     });
-    modelCalls = callRecords.map(c => ({
+    modelCalls = callRecords.map((c) => ({
       provider: c.provider,
       model: c.model,
       stage: c.stage,
@@ -247,15 +244,21 @@ export async function getQueryTrace(
   // Calculate totals
   const totalTokens = modelCalls.reduce(
     (sum, c) => sum + (c.promptTokens ?? 0) + (c.completionTokens ?? 0),
-    0
+    0,
   );
-  const totalDuration = modelCalls.reduce((sum, c) => sum + (c.durationMs ?? 0), 0);
+  const totalDuration = modelCalls.reduce(
+    (sum, c) => sum + (c.durationMs ?? 0),
+    0,
+  );
 
   // Derive evidence flags
-  const weakEvidence = baseTelemetry.fallbackScenario === 'WEAK_EVIDENCE' ||
-    (baseTelemetry.topRelevanceScore !== null && baseTelemetry.topRelevanceScore < 0.35);
-  const noEvidence = baseTelemetry.fallbackScenario === 'NO_EVIDENCE' ||
-    baseTelemetry.fallbackScenario === 'NO_DOCS' ||
+  const weakEvidence =
+    baseTelemetry.fallbackScenario === "WEAK_EVIDENCE" ||
+    (baseTelemetry.topRelevanceScore !== null &&
+      baseTelemetry.topRelevanceScore < 0.35);
+  const noEvidence =
+    baseTelemetry.fallbackScenario === "NO_EVIDENCE" ||
+    baseTelemetry.fallbackScenario === "NO_DOCS" ||
     baseTelemetry.chunksReturned === 0;
 
   // Build response
@@ -264,17 +267,18 @@ export async function getQueryTrace(
     traceId,
     queryId: baseTelemetry.queryId ?? baseTelemetry.id,
     userId: baseTelemetry.userId,
-    timestamp: baseTelemetry.timestamp instanceof Date
-      ? baseTelemetry.timestamp.toISOString()
-      : baseTelemetry.timestamp,
-    language: baseTelemetry.resolvedLang ?? 'en',
+    timestamp:
+      baseTelemetry.timestamp instanceof Date
+        ? baseTelemetry.timestamp.toISOString()
+        : baseTelemetry.timestamp,
+    language: baseTelemetry.resolvedLang ?? "en",
 
     // Routing
-    domain: baseTelemetry.domain ?? 'general',
+    domain: baseTelemetry.domain ?? "general",
     domainConfidence: baseTelemetry.domainConfidence ?? null,
-    intent: baseTelemetry.intent ?? 'chat',
+    intent: baseTelemetry.intent ?? "chat",
     intentConfidence: baseTelemetry.intentConfidence ?? 0.8,
-    operator: baseTelemetry.family ?? baseTelemetry.operatorFamily ?? 'qa',
+    operator: baseTelemetry.family ?? baseTelemetry.operatorFamily ?? "qa",
     subIntent: baseTelemetry.subIntent ?? null,
 
     // Quality
@@ -336,9 +340,9 @@ export interface WaterfallStats {
 
 export async function getWaterfallStats(
   prisma: PrismaClient,
-  params: { from: Date; to: Date }
+  params: { from: Date; to: Date },
 ): Promise<WaterfallStats[]> {
-  if (!supportsModel(prisma, 'traceSpan')) {
+  if (!supportsModel(prisma, "traceSpan")) {
     return [];
   }
 
@@ -357,7 +361,10 @@ export async function getWaterfallStats(
   });
 
   // Group by step name
-  const byStep = new Map<string, Array<{ durationMs: number | null; status: string }>>();
+  const byStep = new Map<
+    string,
+    Array<{ durationMs: number | null; status: string }>
+  >();
   for (const span of spans) {
     const arr = byStep.get(span.stepName) ?? [];
     arr.push({ durationMs: span.durationMs, status: span.status });
@@ -368,11 +375,11 @@ export async function getWaterfallStats(
   const stats: WaterfallStats[] = [];
   for (const [stepName, entries] of byStep) {
     const durations = entries
-      .map(e => e.durationMs)
+      .map((e) => e.durationMs)
       .filter((d): d is number => d !== null)
       .sort((a, b) => a - b);
 
-    const errorCount = entries.filter(e => e.status === 'error').length;
+    const errorCount = entries.filter((e) => e.status === "error").length;
 
     if (durations.length === 0) {
       stats.push({
@@ -402,25 +409,25 @@ export async function getWaterfallStats(
 
   // Sort by pipeline order
   const pipelineOrder = [
-    'DOC_INDEX_LOAD',
-    'QUERY_NORMALIZE',
-    'INTENT_RESOLVE',
-    'CONVERSATION_CHECK',
-    'DOC_AVAILABILITY',
-    'QUERY_REWRITE',
-    'SCOPE_RESOLVE',
-    'CANDIDATE_FILTER',
-    'RETRIEVAL',
-    'RANKING',
-    'ANSWER_MODE_ROUTE',
-    'ANSWER_GENERATE',
-    'RENDER_POLICY',
-    'GROUNDING_CHECK',
-    'SOURCE_FILTER',
-    'QUALITY_GATES',
-    'FINALIZE',
-    'STATE_UPDATE',
-    'TELEMETRY_EMIT',
+    "DOC_INDEX_LOAD",
+    "QUERY_NORMALIZE",
+    "INTENT_RESOLVE",
+    "CONVERSATION_CHECK",
+    "DOC_AVAILABILITY",
+    "QUERY_REWRITE",
+    "SCOPE_RESOLVE",
+    "CANDIDATE_FILTER",
+    "RETRIEVAL",
+    "RANKING",
+    "ANSWER_MODE_ROUTE",
+    "ANSWER_GENERATE",
+    "RENDER_POLICY",
+    "GROUNDING_CHECK",
+    "SOURCE_FILTER",
+    "QUALITY_GATES",
+    "FINALIZE",
+    "STATE_UPDATE",
+    "TELEMETRY_EMIT",
   ];
 
   stats.sort((a, b) => {

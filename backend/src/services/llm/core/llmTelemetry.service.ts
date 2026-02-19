@@ -6,9 +6,9 @@
  * Feeds into the application telemetry pipeline.
  */
 
-import { injectable } from 'tsyringe';
-import type { LlmProviderId, LlmModelId, LlmUsage } from '../types/llm.types';
-import type { LlmErrorCode } from '../types/llmErrors.types';
+import { injectable } from "tsyringe";
+import type { LlmProviderId, LlmModelId, LlmUsage } from "../types/llm.types";
+import type { LlmErrorCode } from "../types/llmErrors.types";
 
 export interface LlmCallMetric {
   provider: LlmProviderId;
@@ -18,7 +18,7 @@ export interface LlmCallMetric {
   streaming: boolean;
   cached: boolean;
   error?: LlmErrorCode;
-  timestamp: string;           // ISO
+  timestamp: string; // ISO
 }
 
 @injectable()
@@ -29,7 +29,11 @@ export class LlmTelemetryService {
   }
 
   /** Record an LLM error */
-  recordError(provider: LlmProviderId, model: LlmModelId, errorCode: LlmErrorCode): void {
+  recordError(
+    provider: LlmProviderId,
+    model: LlmModelId,
+    errorCode: LlmErrorCode,
+  ): void {
     // TODO: Implement error recording
   }
 

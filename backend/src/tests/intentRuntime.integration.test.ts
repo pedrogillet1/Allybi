@@ -1,5 +1,8 @@
 import { describe, expect, test, beforeAll } from "@jest/globals";
-import { analyzeMessageToPlan, clearCaches } from "../services/editing/intentRuntime";
+import {
+  analyzeMessageToPlan,
+  clearCaches,
+} from "../services/editing/intentRuntime";
 
 describe("intentRuntime integration (critical editing paths)", () => {
   beforeAll(() => {
@@ -16,7 +19,8 @@ describe("intentRuntime integration (critical editing paths)", () => {
     });
     expect(result).not.toBeNull();
     expect(result?.kind).toBe("plan");
-    const ops = result && result.kind === "plan" ? result.ops.map((o) => o.op) : [];
+    const ops =
+      result && result.kind === "plan" ? result.ops.map((o) => o.op) : [];
     expect(ops.length).toBeGreaterThanOrEqual(2);
     expect(ops).toContain("XLSX_SET_RANGE_VALUES");
   });
@@ -38,7 +42,8 @@ describe("intentRuntime integration (critical editing paths)", () => {
     });
     expect(result).not.toBeNull();
     expect(result?.kind).toBe("plan");
-    const ops = result && result.kind === "plan" ? result.ops.map((o) => o.op) : [];
+    const ops =
+      result && result.kind === "plan" ? result.ops.map((o) => o.op) : [];
     expect(ops.some((op) => op.startsWith("DOCX_LIST_"))).toBe(true);
   });
 
@@ -118,7 +123,9 @@ describe("intentRuntime integration (critical editing paths)", () => {
     expect(result).not.toBeNull();
     expect(result?.kind).toBe("plan");
     if (result?.kind !== "plan") return;
-    const styleStep = result.ops.find((o) => o.op === "DOCX_SET_PARAGRAPH_STYLE");
+    const styleStep = result.ops.find(
+      (o) => o.op === "DOCX_SET_PARAGRAPH_STYLE",
+    );
     expect(styleStep).toBeTruthy();
     expect(styleStep?.params?.styleName).toBe("Heading 2");
   });
@@ -234,7 +241,12 @@ describe("intentRuntime integration (critical editing paths)", () => {
       domain: "docx",
       viewerContext: {
         selection: {
-          ranges: [{ paragraphId: "docx:p:7", text: "First sentence. Second sentence." }],
+          ranges: [
+            {
+              paragraphId: "docx:p:7",
+              text: "First sentence. Second sentence.",
+            },
+          ],
         },
       },
       language: "en",
@@ -268,4 +280,3 @@ describe("intentRuntime integration (critical editing paths)", () => {
     }
   });
 });
-

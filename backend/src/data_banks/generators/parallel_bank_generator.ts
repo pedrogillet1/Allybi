@@ -4,23 +4,25 @@
  * Runs multiple branches in parallel for maximum speed
  */
 
-import Anthropic from '@anthropic-ai/sdk';
-import * as fs from 'fs';
-import * as path from 'path';
+import Anthropic from "@anthropic-ai/sdk";
+import * as fs from "fs";
+import * as path from "path";
 
 const client = new Anthropic();
 
-const OUTPUT_DIR = path.join(__dirname, '..');
-const TRIGGERS_DIR = path.join(OUTPUT_DIR, 'triggers');
-const SIGNALS_DIR = path.join(OUTPUT_DIR, 'signals');
-const ALIASES_DIR = path.join(OUTPUT_DIR, 'aliases');
-const LEXICONS_DIR = path.join(OUTPUT_DIR, 'lexicons');
-const RULES_DIR = path.join(OUTPUT_DIR, 'rules');
+const OUTPUT_DIR = path.join(__dirname, "..");
+const TRIGGERS_DIR = path.join(OUTPUT_DIR, "triggers");
+const SIGNALS_DIR = path.join(OUTPUT_DIR, "signals");
+const ALIASES_DIR = path.join(OUTPUT_DIR, "aliases");
+const LEXICONS_DIR = path.join(OUTPUT_DIR, "lexicons");
+const RULES_DIR = path.join(OUTPUT_DIR, "rules");
 
 // Ensure directories exist
-[TRIGGERS_DIR, SIGNALS_DIR, ALIASES_DIR, LEXICONS_DIR, RULES_DIR].forEach(dir => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-});
+[TRIGGERS_DIR, SIGNALS_DIR, ALIASES_DIR, LEXICONS_DIR, RULES_DIR].forEach(
+  (dir) => {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  },
+);
 
 interface GenerationTask {
   name: string;
@@ -32,8 +34,8 @@ interface GenerationTask {
 
 const INTENT_PROMPTS: GenerationTask[] = [
   {
-    name: 'documents_content',
-    outputFile: path.join(TRIGGERS_DIR, 'documents_content_expanded.json'),
+    name: "documents_content",
+    outputFile: path.join(TRIGGERS_DIR, "documents_content_expanded.json"),
     prompt: `Generate a comprehensive JSON intent pattern bank for "documents_content" (QA/extract/summary queries).
 
 Requirements:
@@ -59,11 +61,11 @@ Output JSON format:
   }
 }
 
-Generate diverse, natural language patterns. Be creative with variations. Output ONLY valid JSON.`
+Generate diverse, natural language patterns. Be creative with variations. Output ONLY valid JSON.`,
   },
   {
-    name: 'documents_search_expanded',
-    outputFile: path.join(TRIGGERS_DIR, 'documents_search_expanded.json'),
+    name: "documents_search_expanded",
+    outputFile: path.join(TRIGGERS_DIR, "documents_search_expanded.json"),
     prompt: `Generate a comprehensive JSON intent pattern bank for "documents_search" (mention/locator queries).
 
 Requirements:
@@ -85,11 +87,11 @@ Output JSON format:
   }
 }
 
-Output ONLY valid JSON.`
+Output ONLY valid JSON.`,
   },
   {
-    name: 'documents_extract_expanded',
-    outputFile: path.join(TRIGGERS_DIR, 'documents_extract_expanded.json'),
+    name: "documents_extract_expanded",
+    outputFile: path.join(TRIGGERS_DIR, "documents_extract_expanded.json"),
     prompt: `Generate a comprehensive JSON intent pattern bank for "documents_extract" (entity/KPI/date extraction).
 
 Requirements:
@@ -111,11 +113,11 @@ Output JSON format:
   }
 }
 
-Output ONLY valid JSON.`
+Output ONLY valid JSON.`,
   },
   {
-    name: 'finance_excel_expanded',
-    outputFile: path.join(TRIGGERS_DIR, 'finance_excel_expanded.json'),
+    name: "finance_excel_expanded",
+    outputFile: path.join(TRIGGERS_DIR, "finance_excel_expanded.json"),
     prompt: `Generate a comprehensive JSON intent pattern bank for "finance_excel" (spreadsheet/financial queries).
 
 Requirements:
@@ -138,11 +140,11 @@ Output JSON format:
   }
 }
 
-Output ONLY valid JSON.`
+Output ONLY valid JSON.`,
   },
   {
-    name: 'compare_table',
-    outputFile: path.join(TRIGGERS_DIR, 'compare_table_expanded.json'),
+    name: "compare_table",
+    outputFile: path.join(TRIGGERS_DIR, "compare_table_expanded.json"),
     prompt: `Generate a comprehensive JSON intent pattern bank for "compare_table" (comparison/table queries).
 
 Requirements:
@@ -164,11 +166,11 @@ Output JSON format:
   }
 }
 
-Output ONLY valid JSON.`
+Output ONLY valid JSON.`,
   },
   {
-    name: 'file_inventory',
-    outputFile: path.join(TRIGGERS_DIR, 'file_inventory_expanded.json'),
+    name: "file_inventory",
+    outputFile: path.join(TRIGGERS_DIR, "file_inventory_expanded.json"),
     prompt: `Generate a comprehensive JSON intent pattern bank for "file_inventory" (file/folder metadata queries).
 
 Requirements:
@@ -190,14 +192,14 @@ Output JSON format:
   }
 }
 
-Output ONLY valid JSON.`
-  }
+Output ONLY valid JSON.`,
+  },
 ];
 
 const SIGNAL_PROMPTS: GenerationTask[] = [
   {
-    name: 'formatting_overlay',
-    outputFile: path.join(SIGNALS_DIR, 'formatting_overlay_expanded.json'),
+    name: "formatting_overlay",
+    outputFile: path.join(SIGNALS_DIR, "formatting_overlay_expanded.json"),
     prompt: `Generate a comprehensive JSON signal pattern bank for "formatting_overlay" (format constraints).
 
 Requirements:
@@ -218,11 +220,11 @@ Output JSON format:
   }
 }
 
-Output ONLY valid JSON.`
+Output ONLY valid JSON.`,
   },
   {
-    name: 'followup_memory',
-    outputFile: path.join(SIGNALS_DIR, 'followup_memory_expanded.json'),
+    name: "followup_memory",
+    outputFile: path.join(SIGNALS_DIR, "followup_memory_expanded.json"),
     prompt: `Generate a comprehensive JSON signal pattern bank for "followup_memory" (conversation memory markers).
 
 Requirements:
@@ -243,14 +245,14 @@ Output JSON format:
   }
 }
 
-Output ONLY valid JSON.`
-  }
+Output ONLY valid JSON.`,
+  },
 ];
 
 const ALIAS_PROMPTS: GenerationTask[] = [
   {
-    name: 'finance_aliases',
-    outputFile: path.join(ALIASES_DIR, 'finance_aliases.json'),
+    name: "finance_aliases",
+    outputFile: path.join(ALIASES_DIR, "finance_aliases.json"),
     prompt: `Generate a comprehensive JSON semantic alias bank for finance terms.
 
 Requirements:
@@ -277,11 +279,11 @@ Output JSON format:
   ]
 }
 
-Generate at least 100 canonical terms with their aliases. Output ONLY valid JSON.`
+Generate at least 100 canonical terms with their aliases. Output ONLY valid JSON.`,
   },
   {
-    name: 'document_type_aliases',
-    outputFile: path.join(ALIASES_DIR, 'document_type_aliases.json'),
+    name: "document_type_aliases",
+    outputFile: path.join(ALIASES_DIR, "document_type_aliases.json"),
     prompt: `Generate a comprehensive JSON semantic alias bank for document types and references.
 
 Requirements:
@@ -302,11 +304,11 @@ Output JSON format:
   ]
 }
 
-Generate at least 50 canonical terms. Output ONLY valid JSON.`
+Generate at least 50 canonical terms. Output ONLY valid JSON.`,
   },
   {
-    name: 'time_period_aliases',
-    outputFile: path.join(ALIASES_DIR, 'time_period_aliases.json'),
+    name: "time_period_aliases",
+    outputFile: path.join(ALIASES_DIR, "time_period_aliases.json"),
     prompt: `Generate a comprehensive JSON semantic alias bank for time periods.
 
 Requirements:
@@ -333,14 +335,14 @@ Output JSON format:
   ]
 }
 
-Cover all 12 months, 4 quarters, and common time references. Output ONLY valid JSON.`
-  }
+Cover all 12 months, 4 quarters, and common time references. Output ONLY valid JSON.`,
+  },
 ];
 
 const LEXICON_PROMPTS: GenerationTask[] = [
   {
-    name: 'navigation_lexicon',
-    outputFile: path.join(LEXICONS_DIR, 'navigation_lexicon.json'),
+    name: "navigation_lexicon",
+    outputFile: path.join(LEXICONS_DIR, "navigation_lexicon.json"),
     prompt: `Generate a comprehensive JSON navigation lexicon for file actions.
 
 Requirements:
@@ -369,11 +371,11 @@ Output JSON format:
   }
 }
 
-Output ONLY valid JSON.`
+Output ONLY valid JSON.`,
   },
   {
-    name: 'computation_lexicon',
-    outputFile: path.join(LEXICONS_DIR, 'computation_lexicon.json'),
+    name: "computation_lexicon",
+    outputFile: path.join(LEXICONS_DIR, "computation_lexicon.json"),
     prompt: `Generate a comprehensive JSON computation lexicon for financial/data operations.
 
 Requirements:
@@ -402,14 +404,14 @@ Output JSON format:
   }
 }
 
-Output ONLY valid JSON.`
-  }
+Output ONLY valid JSON.`,
+  },
 ];
 
 const RULES_PROMPTS: GenerationTask[] = [
   {
-    name: 'typo_normalization',
-    outputFile: path.join(RULES_DIR, 'typo_normalization.json'),
+    name: "typo_normalization",
+    outputFile: path.join(RULES_DIR, "typo_normalization.json"),
     prompt: `Generate a comprehensive JSON typo/normalization rules file.
 
 Requirements:
@@ -434,11 +436,11 @@ Output JSON format:
   ]
 }
 
-Generate 100+ typo corrections and 50+ accent normalizations. Output ONLY valid JSON.`
+Generate 100+ typo corrections and 50+ accent normalizations. Output ONLY valid JSON.`,
   },
   {
-    name: 'tone_banned_phrases',
-    outputFile: path.join(RULES_DIR, 'tone_banned_phrases.json'),
+    name: "tone_banned_phrases",
+    outputFile: path.join(RULES_DIR, "tone_banned_phrases.json"),
     prompt: `Generate a comprehensive JSON tone and banned phrases file.
 
 Requirements:
@@ -470,11 +472,11 @@ Output JSON format:
   ]
 }
 
-Output ONLY valid JSON.`
+Output ONLY valid JSON.`,
   },
   {
-    name: 'formatting_triggers',
-    outputFile: path.join(RULES_DIR, 'formatting_triggers.json'),
+    name: "formatting_triggers",
+    outputFile: path.join(RULES_DIR, "formatting_triggers.json"),
     prompt: `Generate a comprehensive JSON formatting trigger rules file.
 
 Requirements:
@@ -508,8 +510,8 @@ Output JSON format:
   ]
 }
 
-Output ONLY valid JSON.`
-  }
+Output ONLY valid JSON.`,
+  },
 ];
 
 // ========== GENERATION FUNCTIONS ==========
@@ -519,19 +521,19 @@ async function generateWithClaude(task: GenerationTask): Promise<void> {
 
   try {
     const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: "claude-sonnet-4-20250514",
       max_tokens: 16000,
       messages: [
         {
-          role: 'user',
-          content: task.prompt
-        }
-      ]
+          role: "user",
+          content: task.prompt,
+        },
+      ],
     });
 
     const content = response.content[0];
-    if (content.type !== 'text') {
-      throw new Error('Unexpected response type');
+    if (content.type !== "text") {
+      throw new Error("Unexpected response type");
     }
 
     // Extract JSON from response
@@ -548,57 +550,72 @@ async function generateWithClaude(task: GenerationTask): Promise<void> {
 
     // Write to file
     fs.writeFileSync(task.outputFile, JSON.stringify(parsed, null, 2));
-    console.log(`  [${task.name}] ✓ Generated and saved to ${path.basename(task.outputFile)}`);
+    console.log(
+      `  [${task.name}] ✓ Generated and saved to ${path.basename(task.outputFile)}`,
+    );
   } catch (error) {
     console.error(`  [${task.name}] ✗ Error:`, error);
     throw error;
   }
 }
 
-async function runParallelBranch(tasks: GenerationTask[], branchName: string): Promise<void> {
+async function runParallelBranch(
+  tasks: GenerationTask[],
+  branchName: string,
+): Promise<void> {
   console.log(`\n=== Branch: ${branchName} (${tasks.length} tasks) ===`);
 
   // Run tasks in parallel within the branch
   const results = await Promise.allSettled(
-    tasks.map(task => generateWithClaude(task))
+    tasks.map((task) => generateWithClaude(task)),
   );
 
-  const successful = results.filter(r => r.status === 'fulfilled').length;
-  const failed = results.filter(r => r.status === 'rejected').length;
+  const successful = results.filter((r) => r.status === "fulfilled").length;
+  const failed = results.filter((r) => r.status === "rejected").length;
 
-  console.log(`\n  Branch ${branchName}: ${successful}/${tasks.length} successful, ${failed} failed`);
+  console.log(
+    `\n  Branch ${branchName}: ${successful}/${tasks.length} successful, ${failed} failed`,
+  );
 }
 
 async function main(): Promise<void> {
-  console.log('='.repeat(60));
-  console.log('PARALLEL DATA BANK GENERATOR');
-  console.log('='.repeat(60));
+  console.log("=".repeat(60));
+  console.log("PARALLEL DATA BANK GENERATOR");
+  console.log("=".repeat(60));
   console.log(`\nOutput directory: ${OUTPUT_DIR}`);
-  console.log(`Total tasks: ${INTENT_PROMPTS.length + SIGNAL_PROMPTS.length + ALIAS_PROMPTS.length + LEXICON_PROMPTS.length + RULES_PROMPTS.length}`);
+  console.log(
+    `Total tasks: ${INTENT_PROMPTS.length + SIGNAL_PROMPTS.length + ALIAS_PROMPTS.length + LEXICON_PROMPTS.length + RULES_PROMPTS.length}`,
+  );
 
   const startTime = Date.now();
 
   // Run all branches in parallel
   await Promise.all([
-    runParallelBranch(INTENT_PROMPTS, 'INTENTS'),
-    runParallelBranch(SIGNAL_PROMPTS, 'SIGNALS'),
-    runParallelBranch(ALIAS_PROMPTS, 'ALIASES'),
-    runParallelBranch(LEXICON_PROMPTS, 'LEXICONS'),
-    runParallelBranch(RULES_PROMPTS, 'RULES')
+    runParallelBranch(INTENT_PROMPTS, "INTENTS"),
+    runParallelBranch(SIGNAL_PROMPTS, "SIGNALS"),
+    runParallelBranch(ALIAS_PROMPTS, "ALIASES"),
+    runParallelBranch(LEXICON_PROMPTS, "LEXICONS"),
+    runParallelBranch(RULES_PROMPTS, "RULES"),
   ]);
 
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
-  console.log('\n' + '='.repeat(60));
+  console.log("\n" + "=".repeat(60));
   console.log(`GENERATION COMPLETE in ${elapsed}s`);
-  console.log('='.repeat(60));
+  console.log("=".repeat(60));
 
   // Count generated patterns
-  console.log('\nGenerated files:');
-  const dirs = [TRIGGERS_DIR, SIGNALS_DIR, ALIASES_DIR, LEXICONS_DIR, RULES_DIR];
+  console.log("\nGenerated files:");
+  const dirs = [
+    TRIGGERS_DIR,
+    SIGNALS_DIR,
+    ALIASES_DIR,
+    LEXICONS_DIR,
+    RULES_DIR,
+  ];
   for (const dir of dirs) {
     if (fs.existsSync(dir)) {
-      const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+      const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json"));
       console.log(`  ${path.basename(dir)}/: ${files.length} files`);
     }
   }

@@ -24,10 +24,16 @@ const FALLBACK_CATEGORIES = [
 const cache = new Map<string, unknown | null>();
 
 function shouldAllowFilesystemFallback(): boolean {
-  const explicit = String(process.env.KODA_EDITING_ALLOW_FILESYSTEM_FALLBACK || "").trim().toLowerCase();
+  const explicit = String(
+    process.env.KODA_EDITING_ALLOW_FILESYSTEM_FALLBACK || "",
+  )
+    .trim()
+    .toLowerCase();
   if (explicit === "true") return true;
-  const env = String(process.env.NODE_ENV || "").trim().toLowerCase();
-  return env === "test" || env === "local";
+  const env = String(process.env.NODE_ENV || "")
+    .trim()
+    .toLowerCase();
+  return env === "test";
 }
 
 export function clearEditingBankCache(): void {
@@ -68,7 +74,9 @@ export function safeEditingBank<T = unknown>(id: string): T | null {
     for (const category of FALLBACK_CATEGORIES) {
       const categoryDir = path.join(dataDir, category);
       if (!fs.existsSync(categoryDir)) continue;
-      const files = fs.readdirSync(categoryDir).filter((name) => name.endsWith(".any.json"));
+      const files = fs
+        .readdirSync(categoryDir)
+        .filter((name) => name.endsWith(".any.json"));
       for (const file of files) {
         const p = path.join(categoryDir, file);
         try {

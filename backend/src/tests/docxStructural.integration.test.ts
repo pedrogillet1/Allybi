@@ -206,10 +206,7 @@ describe("DOCX Structural Editing", () => {
     });
 
     test("merges 2 numbered items", async () => {
-      const pids = await findPids(docxBuffer, [
-        "Phase one",
-        "Phase two",
-      ]);
+      const pids = await findPids(docxBuffer, ["Phase one", "Phase two"]);
 
       const result = await editor.mergeParagraphs(docxBuffer, pids, ". ");
       const texts = await extractTexts(result);
@@ -244,20 +241,36 @@ describe("DOCX Structural Editing", () => {
         "Additional funding may be required for phase three.",
       ];
 
-      const result = await editor.splitParagraphToList(docxBuffer, pid, items, "bulleted");
+      const result = await editor.splitParagraphToList(
+        docxBuffer,
+        pid,
+        items,
+        "bulleted",
+      );
       const texts = await extractTexts(result);
 
       // 14 - 1 + 2 = 15 paragraphs
       expect(texts.length).toBe(15);
-      expect(texts.some((t) => t.includes("fifty thousand dollars"))).toBe(true);
+      expect(texts.some((t) => t.includes("fifty thousand dollars"))).toBe(
+        true,
+      );
       expect(texts.some((t) => t.includes("Additional funding"))).toBe(true);
     });
 
     test("splits a paragraph into numbered list items", async () => {
       const pid = await findPid(docxBuffer, "three main areas");
-      const items = ["Area one: design.", "Area two: development.", "Area three: testing."];
+      const items = [
+        "Area one: design.",
+        "Area two: development.",
+        "Area three: testing.",
+      ];
 
-      const result = await editor.splitParagraphToList(docxBuffer, pid, items, "numbered");
+      const result = await editor.splitParagraphToList(
+        docxBuffer,
+        pid,
+        items,
+        "numbered",
+      );
       const texts = await extractTexts(result);
 
       // 14 - 1 + 3 = 16 paragraphs
@@ -267,7 +280,12 @@ describe("DOCX Structural Editing", () => {
 
     test("split with empty items returns original buffer", async () => {
       const pid = await findPid(docxBuffer, "Total budget");
-      const result = await editor.splitParagraphToList(docxBuffer, pid, [], "bulleted");
+      const result = await editor.splitParagraphToList(
+        docxBuffer,
+        pid,
+        [],
+        "bulleted",
+      );
       expect(result.equals(docxBuffer)).toBe(true);
     });
   });
@@ -395,32 +413,56 @@ describe("DOCX Structural Editing", () => {
         "Second requirement",
         "Third requirement",
       ]);
-      const afterMerge = await editor.mergeParagraphs(docxBuffer, bulletPids, " ");
+      const afterMerge = await editor.mergeParagraphs(
+        docxBuffer,
+        bulletPids,
+        " ",
+      );
 
       // Step 2: Edit the "Budget" heading on the merged buffer
       const budgetPid = await findPid(afterMerge, "Budget");
-      const afterEdit = await editor.setTextCase(afterMerge, budgetPid, "upper");
+      const afterEdit = await editor.setTextCase(
+        afterMerge,
+        budgetPid,
+        "upper",
+      );
 
       const texts = await extractTexts(afterEdit);
       expect(texts.some((t) => t.includes("BUDGET"))).toBe(true);
       // Merged paragraph still present
-      expect(texts.some((t) => t.includes("First requirement") && t.includes("Third requirement"))).toBe(true);
+      expect(
+        texts.some(
+          (t) =>
+            t.includes("First requirement") && t.includes("Third requirement"),
+        ),
+      ).toBe(true);
     });
 
     test("split then merge round-trips paragraph count correctly", async () => {
       // Split body paragraph into 2 items
       const pid = await findPid(docxBuffer, "Total budget is estimated");
       const afterSplit = await editor.splitParagraphToList(
-        docxBuffer, pid,
-        ["Total budget is estimated at fifty thousand dollars.", "Additional funding may be required."],
+        docxBuffer,
+        pid,
+        [
+          "Total budget is estimated at fifty thousand dollars.",
+          "Additional funding may be required.",
+        ],
         "bulleted",
       );
       const splitTexts = await extractTexts(afterSplit);
       expect(splitTexts.length).toBe(15); // 14 - 1 + 2
 
       // Now merge those 2 back
-      const splitPids = await findPids(afterSplit, ["fifty thousand", "Additional funding"]);
-      const afterMerge = await editor.mergeParagraphs(afterSplit, splitPids, " ");
+      const splitPids = await findPids(afterSplit, [
+        "fifty thousand",
+        "Additional funding",
+      ]);
+      const afterMerge = await editor.mergeParagraphs(
+        afterSplit,
+        splitPids,
+        " ",
+      );
       const mergeTexts = await extractTexts(afterMerge);
       expect(mergeTexts.length).toBe(14); // back to original count
     });

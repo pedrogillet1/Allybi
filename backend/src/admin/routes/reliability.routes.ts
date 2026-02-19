@@ -3,11 +3,18 @@
  * GET /api/admin/reliability
  */
 
-import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { listErrors, listIngestionFailures, getReliabilityTimeseries } from '../../services/admin';
-import { parseRange, normalizeRange } from '../../services/admin/_shared/rangeWindow';
-import { getGoogleMetrics } from '../../services/admin/googleMetrics.service';
+import { Router, Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
+import {
+  listErrors,
+  listIngestionFailures,
+  getReliabilityTimeseries,
+} from "../../services/admin";
+import {
+  parseRange,
+  normalizeRange,
+} from "../../services/admin/_shared/rangeWindow";
+import { getGoogleMetrics } from "../../services/admin/googleMetrics.service";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -26,10 +33,10 @@ function percentile(arr: number[], p: number): number {
  * GET /api/admin/reliability
  * Returns reliability KPIs
  */
-router.get('/', async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
   try {
-    const range = (req.query.range as string) || '7d';
-    const rangeKey = normalizeRange(range, '7d');
+    const range = (req.query.range as string) || "7d";
+    const rangeKey = normalizeRange(range, "7d");
     const window = parseRange(rangeKey);
     const { from, to } = window;
 
@@ -41,34 +48,44 @@ router.get('/', async (req: Request, res: Response) => {
     ]);
 
     // Calculate KPIs from ModelCall table
-    const modelCalls = await prisma.modelCall.findMany({
-      where: { at: { gte: from, lt: to } },
-      select: { durationMs: true, status: true },
-      take: 100000,
-    }).catch(() => []);
+    const modelCalls = await prisma.modelCall
+      .findMany({
+        where: { at: { gte: from, lt: to } },
+        select: { durationMs: true, status: true },
+        take: 100000,
+      })
+      .catch(() => []);
 
-    const latencies = modelCalls.map(c => c.durationMs ?? 0).filter(v => v > 0);
-    const errorCount = modelCalls.filter(c => c.status === 'fail').length;
+    const latencies = modelCalls
+      .map((c) => c.durationMs ?? 0)
+      .filter((v) => v > 0);
+    const errorCount = modelCalls.filter((c) => c.status === "fail").length;
     const totalCalls = modelCalls.length;
     const errorRate = totalCalls > 0 ? errorCount / totalCalls : 0;
 
     // Get message count
-    const totalMessages = await prisma.message.count({
-      where: { createdAt: { gte: from, lt: to } },
-    }).catch(() => 0);
+    const totalMessages = await prisma.message
+      .count({
+        where: { createdAt: { gte: from, lt: to } },
+      })
+      .catch(() => 0);
 
     // Get active users (users with messages in time range)
-    const activeUsersData = await prisma.message.groupBy({
-      by: ['conversationId'],
-      where: { createdAt: { gte: from, lt: to } },
-    }).catch(() => []);
+    const activeUsersData = await prisma.message
+      .groupBy({
+        by: ["conversationId"],
+        where: { createdAt: { gte: from, lt: to } },
+      })
+      .catch(() => []);
     // Get unique user count from conversations
-    const conversationIds = activeUsersData.map(d => d.conversationId);
-    const conversationsWithUsers = await prisma.conversation.findMany({
-      where: { id: { in: conversationIds } },
-      select: { userId: true },
-      distinct: ['userId'],
-    }).catch(() => []);
+    const conversationIds = activeUsersData.map((d) => d.conversationId);
+    const conversationsWithUsers = await prisma.conversation
+      .findMany({
+        where: { id: { in: conversationIds } },
+        select: { userId: true },
+        distinct: ["userId"],
+      })
+      .catch(() => []);
     const activeUsers = conversationsWithUsers.length;
 
     // Transform errors to match frontend LLMErrorItem format
@@ -77,8 +94,8 @@ router.get('/', async (req: Request, res: Response) => {
       ts: err.at,
       provider: err.provider,
       model: err.model,
-      errorType: err.errorCode || 'UNKNOWN',
-      message: err.errorCode || 'Unknown error',
+      errorType: err.errorCode || "UNKNOWN",
+      message: err.errorCode || "Unknown error",
       stage: err.stage,
     }));
 
@@ -86,11 +103,11 @@ router.get('/', async (req: Request, res: Response) => {
     const recentIngestionFailures = ingestionResult.items.map((fail, idx) => ({
       id: fail.documentId || `fail-${idx}`,
       ts: fail.at,
-      fileId: fail.documentId || '',
-      fileName: fail.filename || 'Unknown file',
-      mimeType: fail.mimeType || 'unknown',
-      error: fail.errorCode || 'Unknown error',
-      stage: fail.extractionMethod || 'ingestion',
+      fileId: fail.documentId || "",
+      fileName: fail.filename || "Unknown file",
+      mimeType: fail.mimeType || "unknown",
+      error: fail.errorCode || "Unknown error",
+      stage: fail.extractionMethod || "ingestion",
     }));
 
     res.json({
@@ -114,17 +131,17 @@ router.get('/', async (req: Request, res: Response) => {
         },
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
     });
   } catch (error) {
-    console.error('[Admin] Reliability error:', error);
+    console.error("[Admin] Reliability error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch reliability metrics',
-      code: 'RELIABILITY_ERROR',
+      error: "Failed to fetch reliability metrics",
+      code: "RELIABILITY_ERROR",
     });
   }
 });
@@ -133,9 +150,9 @@ router.get('/', async (req: Request, res: Response) => {
  * GET /api/admin/reliability/errors
  * Returns paginated list of LLM errors
  */
-router.get('/errors', async (req: Request, res: Response) => {
+router.get("/errors", async (req: Request, res: Response) => {
   try {
-    const range = (req.query.range as string) || '7d';
+    const range = (req.query.range as string) || "7d";
     const limit = parseInt(req.query.limit as string) || 50;
     const cursor = req.query.cursor as string | undefined;
 
@@ -147,8 +164,8 @@ router.get('/errors', async (req: Request, res: Response) => {
       ts: err.at,
       provider: err.provider,
       model: err.model,
-      errorType: err.errorCode || 'UNKNOWN',
-      message: err.errorCode || 'Unknown error',
+      errorType: err.errorCode || "UNKNOWN",
+      message: err.errorCode || "Unknown error",
       stage: err.stage,
     }));
 
@@ -161,18 +178,18 @@ router.get('/errors', async (req: Request, res: Response) => {
         errors,
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
       ...(result.nextCursor && { nextCursor: result.nextCursor }),
     });
   } catch (error) {
-    console.error('[Admin] Errors list error:', error);
+    console.error("[Admin] Errors list error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch errors',
-      code: 'ERRORS_ERROR',
+      error: "Failed to fetch errors",
+      code: "ERRORS_ERROR",
     });
   }
 });
@@ -181,23 +198,27 @@ router.get('/errors', async (req: Request, res: Response) => {
  * GET /api/admin/reliability/ingestion-failures
  * Returns paginated list of ingestion failures
  */
-router.get('/ingestion-failures', async (req: Request, res: Response) => {
+router.get("/ingestion-failures", async (req: Request, res: Response) => {
   try {
-    const range = (req.query.range as string) || '7d';
+    const range = (req.query.range as string) || "7d";
     const limit = parseInt(req.query.limit as string) || 50;
     const cursor = req.query.cursor as string | undefined;
 
-    const result = await listIngestionFailures(prisma, { range, limit, cursor });
+    const result = await listIngestionFailures(prisma, {
+      range,
+      limit,
+      cursor,
+    });
 
     // Transform to match frontend IngestionFailureItem format
     const failures = result.items.map((fail, idx) => ({
       id: fail.documentId || `fail-${idx}`,
       ts: fail.at,
-      fileId: fail.documentId || '',
-      fileName: fail.filename || 'Unknown file',
-      mimeType: fail.mimeType || 'unknown',
-      error: fail.errorCode || 'Unknown error',
-      stage: fail.extractionMethod || 'ingestion',
+      fileId: fail.documentId || "",
+      fileName: fail.filename || "Unknown file",
+      mimeType: fail.mimeType || "unknown",
+      error: fail.errorCode || "Unknown error",
+      stage: fail.extractionMethod || "ingestion",
     }));
 
     res.json({
@@ -209,18 +230,18 @@ router.get('/ingestion-failures', async (req: Request, res: Response) => {
         failures,
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
       ...(result.nextCursor && { nextCursor: result.nextCursor }),
     });
   } catch (error) {
-    console.error('[Admin] Ingestion failures error:', error);
+    console.error("[Admin] Ingestion failures error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch ingestion failures',
-      code: 'INGESTION_FAILURES_ERROR',
+      error: "Failed to fetch ingestion failures",
+      code: "INGESTION_FAILURES_ERROR",
     });
   }
 });
@@ -229,10 +250,10 @@ router.get('/ingestion-failures', async (req: Request, res: Response) => {
  * GET /api/admin/reliability/timeseries
  * Returns reliability timeseries data
  */
-router.get('/timeseries', async (req: Request, res: Response) => {
+router.get("/timeseries", async (req: Request, res: Response) => {
   try {
-    const range = (req.query.range as string) || '7d';
-    const metric = (req.query.metric as string) || 'llm_errors';
+    const range = (req.query.range as string) || "7d";
+    const metric = (req.query.metric as string) || "llm_errors";
 
     const result = await getReliabilityTimeseries(prisma, { range, metric });
 
@@ -245,17 +266,17 @@ router.get('/timeseries', async (req: Request, res: Response) => {
         points: result.points,
       },
       meta: {
-        cache: 'miss',
+        cache: "miss",
         generatedAt: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || null,
+        requestId: (req.headers["x-request-id"] as string) || null,
       },
     });
   } catch (error) {
-    console.error('[Admin] Reliability timeseries error:', error);
+    console.error("[Admin] Reliability timeseries error:", error);
     res.status(500).json({
       ok: false,
-      error: 'Failed to fetch reliability timeseries',
-      code: 'RELIABILITY_TIMESERIES_ERROR',
+      error: "Failed to fetch reliability timeseries",
+      code: "RELIABILITY_TIMESERIES_ERROR",
     });
   }
 });

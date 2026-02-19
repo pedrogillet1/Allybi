@@ -10,22 +10,22 @@
  * - Candidate filtering output + reasons
  */
 
-import type { DocType, DocumentRef } from './rag.types';
+import type { DocType, DocumentRef } from "./rag.types";
 
 // ----------------------------------------------------------------------------
 // Primitive IDs
 // ----------------------------------------------------------------------------
 
 export type DocId = string; // e.g. "doc:abc123"
-export type LockType = 'none' | 'soft' | 'hard';
+export type LockType = "none" | "soft" | "hard";
 
 // Explicit reference the user gave (filename/docId)
 export interface ExplicitDocRef {
   present: boolean;
-  kind?: 'docId' | 'filename';
-  value?: string;              // docId or filename
-  normalizedValue?: string;    // normalized filename
-  confidence?: number;         // 0..1
+  kind?: "docId" | "filename";
+  value?: string; // docId or filename
+  normalizedValue?: string; // normalized filename
+  confidence?: number; // 0..1
 }
 
 // ----------------------------------------------------------------------------
@@ -33,18 +33,18 @@ export interface ExplicitDocRef {
 // ----------------------------------------------------------------------------
 
 export interface ScopeHard {
-  docIdAllowlist?: DocId[];           // keep only these docs
-  filenameMustContain?: string[];     // filename tokens must match (fallback when docId not resolved)
-  docTypeAllowlist?: DocType[];       // keep only these types
-  docIdDenylist?: DocId[];            // remove these docs
+  docIdAllowlist?: DocId[]; // keep only these docs
+  filenameMustContain?: string[]; // filename tokens must match (fallback when docId not resolved)
+  docTypeAllowlist?: DocType[]; // keep only these types
+  docIdDenylist?: DocId[]; // remove these docs
 }
 
 export interface ScopeSoft {
-  docIdAllowlist?: DocId[];           // preferred doc(s) (tag for ranking)
-  docTypePreference?: DocType[];      // preferred types
-  timeHint?: string;                  // FY2025 / Q1 etc.
-  metricHint?: string;                // revenue / NOI etc.
-  entityHint?: string;                // property / borrower / client name
+  docIdAllowlist?: DocId[]; // preferred doc(s) (tag for ranking)
+  docTypePreference?: DocType[]; // preferred types
+  timeHint?: string; // FY2025 / Q1 etc.
+  metricHint?: string; // revenue / NOI etc.
+  entityHint?: string; // property / borrower / client name
 }
 
 export interface ScopeContext {
@@ -74,7 +74,7 @@ export interface ActiveDocRef {
   docId?: DocId;
   fileName?: string;
   lockType: LockType; // none/soft/hard
-  setBy?: 'user' | 'system';
+  setBy?: "user" | "system";
   setAt?: string; // ISO
 }
 
@@ -109,7 +109,9 @@ export interface CandidateFilterOutput {
 
   hardConstraintApplied: boolean;
   hardConstraintEmpty: boolean;
-  hardConstraintReason?: 'empty_due_to_hard_constraints' | 'scope_hard_constraints_empty';
+  hardConstraintReason?:
+    | "empty_due_to_hard_constraints"
+    | "scope_hard_constraints_empty";
 
   // Useful counts for routing
   stats?: {
@@ -125,12 +127,12 @@ export interface CandidateFilterOutput {
 // ----------------------------------------------------------------------------
 
 export type ScopeFailureReason =
-  | 'no_docs_indexed'
-  | 'indexing_in_progress'
-  | 'extraction_failed'
-  | 'scope_hard_constraints_empty'
-  | 'no_relevant_chunks_in_scoped_docs'
-  | 'unknown';
+  | "no_docs_indexed"
+  | "indexing_in_progress"
+  | "extraction_failed"
+  | "scope_hard_constraints_empty"
+  | "no_relevant_chunks_in_scoped_docs"
+  | "unknown";
 
 export interface ScopeFailureContext {
   reason: ScopeFailureReason;

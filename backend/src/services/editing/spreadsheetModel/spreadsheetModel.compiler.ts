@@ -16,10 +16,18 @@ function applyStyle(cell: ExcelJS.Cell, style: StyleModel | undefined): void {
     const font: Partial<ExcelJS.Font> = {
       ...(style.font.name ? { name: style.font.name } : {}),
       ...(typeof style.font.size === "number" ? { size: style.font.size } : {}),
-      ...(typeof style.font.bold === "boolean" ? { bold: style.font.bold } : {}),
-      ...(typeof style.font.italic === "boolean" ? { italic: style.font.italic } : {}),
-      ...(typeof style.font.underline === "boolean" ? { underline: style.font.underline } : {}),
-      ...(toArgb(style.font.color) ? { color: { argb: toArgb(style.font.color)! } } : {}),
+      ...(typeof style.font.bold === "boolean"
+        ? { bold: style.font.bold }
+        : {}),
+      ...(typeof style.font.italic === "boolean"
+        ? { italic: style.font.italic }
+        : {}),
+      ...(typeof style.font.underline === "boolean"
+        ? { underline: style.font.underline }
+        : {}),
+      ...(toArgb(style.font.color)
+        ? { color: { argb: toArgb(style.font.color)! } }
+        : {}),
     };
     cell.font = font as ExcelJS.Font;
   }
@@ -38,8 +46,12 @@ function applyStyle(cell: ExcelJS.Cell, style: StyleModel | undefined): void {
   if (style.align) {
     cell.alignment = {
       ...(style.align.h ? { horizontal: style.align.h } : {}),
-      ...(style.align.v ? { vertical: style.align.v === "middle" ? "middle" : style.align.v } : {}),
-      ...(typeof style.align.wrap === "boolean" ? { wrapText: style.align.wrap } : {}),
+      ...(style.align.v
+        ? { vertical: style.align.v === "middle" ? "middle" : style.align.v }
+        : {}),
+      ...(typeof style.align.wrap === "boolean"
+        ? { wrapText: style.align.wrap }
+        : {}),
     } as ExcelJS.Alignment;
   }
 
@@ -48,7 +60,9 @@ function applyStyle(cell: ExcelJS.Cell, style: StyleModel | undefined): void {
   }
 }
 
-export async function compileSpreadsheetModelToXlsx(model: SpreadsheetModel): Promise<Buffer> {
+export async function compileSpreadsheetModelToXlsx(
+  model: SpreadsheetModel,
+): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
 
   for (const sheet of model.sheets) {
@@ -64,7 +78,8 @@ export async function compileSpreadsheetModelToXlsx(model: SpreadsheetModel): Pr
 
     for (let c = 1; c <= maxCol; c += 1) {
       const w = sheet.grid.colWidths?.[c];
-      if (typeof w === "number" && Number.isFinite(w)) ws.getColumn(c).width = w;
+      if (typeof w === "number" && Number.isFinite(w))
+        ws.getColumn(c).width = w;
     }
 
     for (const [key, cellModel] of Object.entries(sheet.cells)) {
@@ -133,7 +148,9 @@ export async function compileSpreadsheetModelToXlsx(model: SpreadsheetModel): Pr
       }
     }
 
-    const conditionalFormats = Array.isArray(sheet.conditionalFormats) ? sheet.conditionalFormats : [];
+    const conditionalFormats = Array.isArray(sheet.conditionalFormats)
+      ? sheet.conditionalFormats
+      : [];
     if (typeof (ws as any).addConditionalFormatting === "function") {
       for (const item of conditionalFormats) {
         const type = String(item.rule?.type || "NUMBER_GREATER").toUpperCase();
@@ -165,7 +182,9 @@ export async function compileSpreadsheetModelToXlsx(model: SpreadsheetModel): Pr
       }
     }
 
-    const tables = (model.tables || []).filter((item) => item.sheetName === sheet.name);
+    const tables = (model.tables || []).filter(
+      (item) => item.sheetName === sheet.name,
+    );
     for (const table of tables) {
       try {
         const parsed = parseA1Range(table.range, sheet.name);
@@ -173,12 +192,15 @@ export async function compileSpreadsheetModelToXlsx(model: SpreadsheetModel): Pr
         const headers: string[] = [];
         for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
           const headerCell = ws.getCell(parsed.start.row, c);
-          const label = String((headerCell.value as any) ?? `Column${c - parsed.start.col + 1}`);
+          const label = String(
+            (headerCell.value as any) ?? `Column${c - parsed.start.col + 1}`,
+          );
           headers.push(label || `Column${c - parsed.start.col + 1}`);
         }
 
         const rows: any[][] = [];
-        const dataStart = table.hasHeader === false ? parsed.start.row : parsed.start.row + 1;
+        const dataStart =
+          table.hasHeader === false ? parsed.start.row : parsed.start.row + 1;
         for (let r = dataStart; r <= parsed.end.row; r += 1) {
           const row: any[] = [];
           for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
@@ -188,7 +210,9 @@ export async function compileSpreadsheetModelToXlsx(model: SpreadsheetModel): Pr
         }
 
         ws.addTable({
-          name: table.id.replace(/[^A-Za-z0-9_]/g, "").slice(0, 30) || `Table${Math.floor(Math.random() * 1e6)}`,
+          name:
+            table.id.replace(/[^A-Za-z0-9_]/g, "").slice(0, 30) ||
+            `Table${Math.floor(Math.random() * 1e6)}`,
           ref: start.address,
           headerRow: table.hasHeader !== false,
           totalsRow: false,

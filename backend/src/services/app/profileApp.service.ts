@@ -165,7 +165,8 @@ async function readUsersFile(filePath: string): Promise<UsersFile> {
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object") throw new Error("invalid");
     if (!parsed.users || typeof parsed.users !== "object") parsed.users = {};
-    if (!parsed.version || typeof parsed.version !== "string") parsed.version = "1.0.0";
+    if (!parsed.version || typeof parsed.version !== "string")
+      parsed.version = "1.0.0";
     return parsed as UsersFile;
   } catch {
     return { version: "1.0.0", users: {} };
@@ -216,12 +217,19 @@ function toPublicProfile(u: UserRecord): PublicProfile {
   };
 }
 
-function validatePatch(cfg: ProfileAppConfig, body: any): { patch: ProfilePatch; errors: string[] } {
+function validatePatch(
+  cfg: ProfileAppConfig,
+  body: any,
+): { patch: ProfilePatch; errors: string[] } {
   const errors: string[] = [];
   const patch: ProfilePatch = {};
 
-  const displayName = safeString(body?.displayName, cfg.maxFieldLengths.displayName);
-  if (body?.displayName != null && !displayName) errors.push("displayName_invalid");
+  const displayName = safeString(
+    body?.displayName,
+    cfg.maxFieldLengths.displayName,
+  );
+  if (body?.displayName != null && !displayName)
+    errors.push("displayName_invalid");
   if (displayName) patch.displayName = displayName;
 
   const email = safeString(body?.email, cfg.maxFieldLengths.email);
@@ -253,15 +261,18 @@ function validatePatch(cfg: ProfileAppConfig, body: any): { patch: ProfilePatch;
   }
 
   const preferConcise = safeBool(body?.preferConcise);
-  if (body?.preferConcise != null && preferConcise === null) errors.push("preferConcise_invalid");
+  if (body?.preferConcise != null && preferConcise === null)
+    errors.push("preferConcise_invalid");
   if (preferConcise !== null) patch.preferConcise = preferConcise;
 
   const preferBullets = safeBool(body?.preferBullets);
-  if (body?.preferBullets != null && preferBullets === null) errors.push("preferBullets_invalid");
+  if (body?.preferBullets != null && preferBullets === null)
+    errors.push("preferBullets_invalid");
   if (preferBullets !== null) patch.preferBullets = preferBullets;
 
   const preferTables = safeBool(body?.preferTables);
-  if (body?.preferTables != null && preferTables === null) errors.push("preferTables_invalid");
+  if (body?.preferTables != null && preferTables === null)
+    errors.push("preferTables_invalid");
   if (preferTables !== null) patch.preferTables = preferTables;
 
   return { patch, errors };
@@ -275,7 +286,14 @@ export class ProfileAppService {
   private cfg: ProfileAppConfig;
 
   constructor(config: Partial<ProfileAppConfig> = {}) {
-    this.cfg = { ...DEFAULT_CONFIG, ...config, maxFieldLengths: { ...DEFAULT_CONFIG.maxFieldLengths, ...(config.maxFieldLengths || {}) } };
+    this.cfg = {
+      ...DEFAULT_CONFIG,
+      ...config,
+      maxFieldLengths: {
+        ...DEFAULT_CONFIG.maxFieldLengths,
+        ...(config.maxFieldLengths || {}),
+      },
+    };
   }
 
   /**
@@ -301,7 +319,12 @@ export class ProfileAppService {
 
     const { patch, errors } = validatePatch(this.cfg, body);
     if (errors.length) {
-      throw new ProfileAppError("validation_error", "Invalid profile fields", 400, { errors });
+      throw new ProfileAppError(
+        "validation_error",
+        "Invalid profile fields",
+        400,
+        { errors },
+      );
     }
 
     const updated = await withUsersWriteLock(async () => {
@@ -320,7 +343,8 @@ export class ProfileAppService {
       return next;
     });
 
-    if (!updated) throw new ProfileAppError("unauthorized", "Unauthorized", 401);
+    if (!updated)
+      throw new ProfileAppError("unauthorized", "Unauthorized", 401);
     return toPublicProfile(updated);
   }
 
@@ -357,15 +381,20 @@ export class ProfileAppService {
       return next;
     });
 
-    if (!updated) throw new ProfileAppError("unauthorized", "Unauthorized", 401);
+    if (!updated)
+      throw new ProfileAppError("unauthorized", "Unauthorized", 401);
     return toPublicProfile(updated);
   }
 
   /**
    * Convenience: update language preference only (common in chat).
    */
-  async setLanguage(userId: string, language: LangCode): Promise<PublicProfile> {
-    if (!isLang(language)) throw new ProfileAppError("validation_error", "Invalid language", 400);
+  async setLanguage(
+    userId: string,
+    language: LangCode,
+  ): Promise<PublicProfile> {
+    if (!isLang(language))
+      throw new ProfileAppError("validation_error", "Invalid language", 400);
 
     return this.updateProfile(userId, { language });
   }

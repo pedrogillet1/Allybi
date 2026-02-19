@@ -1,7 +1,7 @@
-import crypto from 'crypto';
-import IORedis from 'ioredis';
+import crypto from "crypto";
+import IORedis from "ioredis";
 
-type EnvName = 'production' | 'staging' | 'dev' | 'local' | string;
+type EnvName = "production" | "staging" | "dev" | "local" | string;
 
 export interface EditorLockKey {
   userId: string;
@@ -21,11 +21,19 @@ function keyToRedisKey(k: EditorLockKey): string {
 function buildRedis(): IORedis | null {
   const redisUrl = process.env.REDIS_URL;
   const host = process.env.REDIS_HOST;
-  const port = process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : undefined;
+  const port = process.env.REDIS_PORT
+    ? Number(process.env.REDIS_PORT)
+    : undefined;
 
   try {
     if (redisUrl) return new IORedis(redisUrl, { maxRetriesPerRequest: null });
-    if (host) return new IORedis({ host, port: port ?? 6379, password: process.env.REDIS_PASSWORD || undefined, maxRetriesPerRequest: null });
+    if (host)
+      return new IORedis({
+        host,
+        port: port ?? 6379,
+        password: process.env.REDIS_PASSWORD || undefined,
+        maxRetriesPerRequest: null,
+      });
   } catch {
     return null;
   }
@@ -35,34 +43,42 @@ function buildRedis(): IORedis | null {
 // Redis-based lock when available; otherwise falls back to in-process lock.
 export class EditorLockService {
   private readonly redis: IORedis | null;
-  private readonly memory = new Map<string, { token: string; expiresAt: number }>();
+  private readonly memory = new Map<
+    string,
+    { token: string; expiresAt: number }
+  >();
   private readonly env: EnvName;
 
   constructor(opts?: { redis?: IORedis | null; env?: EnvName }) {
-    this.redis = opts?.redis === undefined ? buildRedis() : (opts.redis ?? null);
-    this.env = opts?.env ?? (process.env.NODE_ENV || 'local');
+    this.redis =
+      opts?.redis === undefined ? buildRedis() : (opts.redis ?? null);
+    this.env = opts?.env ?? (process.env.NODE_ENV || "local");
   }
 
   async acquire(key: EditorLockKey, ttlMs = 30_000): Promise<EditorLockHandle> {
     const ttl = Math.max(2_000, Math.min(ttlMs, 5 * 60_000));
-    const token = crypto.randomBytes(16).toString('hex');
+    const token = crypto.randomBytes(16).toString("hex");
     const expiresAt = Date.now() + ttl;
     const redisKey = keyToRedisKey(key);
 
     if (this.redis) {
-      const ok = await this.redis.set(redisKey, token, 'PX', ttl, 'NX');
-      if (ok !== 'OK') throw new Error('EDIT_LOCK_BUSY');
+      const ok = await this.redis.set(redisKey, token, "PX", ttl, "NX");
+      if (ok !== "OK") throw new Error("EDIT_LOCK_BUSY");
       return { key, token, expiresAt };
     }
 
     // In-memory (single-instance) fallback.
     const existing = this.memory.get(redisKey);
-    if (existing && existing.expiresAt > Date.now()) throw new Error('EDIT_LOCK_BUSY');
+    if (existing && existing.expiresAt > Date.now())
+      throw new Error("EDIT_LOCK_BUSY");
     this.memory.set(redisKey, { token, expiresAt });
     return { key, token, expiresAt };
   }
 
-  async extend(handle: EditorLockHandle, ttlMs = 30_000): Promise<EditorLockHandle> {
+  async extend(
+    handle: EditorLockHandle,
+    ttlMs = 30_000,
+  ): Promise<EditorLockHandle> {
     const ttl = Math.max(2_000, Math.min(ttlMs, 5 * 60_000));
     const expiresAt = Date.now() + ttl;
     const redisKey = keyToRedisKey(handle.key);
@@ -76,13 +92,24 @@ export class EditorLockService {
           return 0
         end
       `;
-      const res = await this.redis.eval(lua, 1, redisKey, handle.token, String(ttl));
-      if (Number(res) !== 1) throw new Error('EDIT_LOCK_LOST');
+      const res = await this.redis.eval(
+        lua,
+        1,
+        redisKey,
+        handle.token,
+        String(ttl),
+      );
+      if (Number(res) !== 1) throw new Error("EDIT_LOCK_LOST");
       return { ...handle, expiresAt };
     }
 
     const existing = this.memory.get(redisKey);
-    if (!existing || existing.token !== handle.token || existing.expiresAt <= Date.now()) throw new Error('EDIT_LOCK_LOST');
+    if (
+      !existing ||
+      existing.token !== handle.token ||
+      existing.expiresAt <= Date.now()
+    )
+      throw new Error("EDIT_LOCK_LOST");
     this.memory.set(redisKey, { token: handle.token, expiresAt });
     return { ...handle, expiresAt };
   }
@@ -104,7 +131,8 @@ export class EditorLockService {
     }
 
     const existing = this.memory.get(redisKey);
-    if (existing && existing.token === handle.token) this.memory.delete(redisKey);
+    if (existing && existing.token === handle.token)
+      this.memory.delete(redisKey);
   }
 
   async isLocked(key: EditorLockKey): Promise<boolean> {
@@ -128,8 +156,15 @@ export class EditorLockService {
   }
 
   // Useful when running without Redis; in production we expect Redis for correctness across instances.
-  getDiagnosticsSync(): { mode: 'redis' | 'memory'; env: string; memoryLocks: number } {
-    return { mode: this.redis ? 'redis' : 'memory', env: this.env, memoryLocks: this.memory.size };
+  getDiagnosticsSync(): {
+    mode: "redis" | "memory";
+    env: string;
+    memoryLocks: number;
+  } {
+    return {
+      mode: this.redis ? "redis" : "memory",
+      env: this.env,
+      memoryLocks: this.memory.size,
+    };
   }
 }
-

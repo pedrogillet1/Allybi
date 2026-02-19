@@ -33,12 +33,12 @@ const MAX_DATE_SERIAL = 73051; // December 31, 2099
  * Common date format patterns in Excel numFmt strings
  */
 const DATE_FORMAT_PATTERNS = [
-  /[dD]{1,4}/,       // d, dd, ddd, dddd (day)
-  /[mM]{1,5}/,       // m, mm, mmm, mmmm, mmmmm (month) - but not after h/H (minutes)
-  /[yY]{2,4}/,       // yy, yyyy (year)
-  /[sS]{1,2}/,       // s, ss (seconds) - indicates datetime
-  /[hH]{1,2}/,       // h, hh (hours) - indicates datetime
-  /AM\/PM/i,         // AM/PM indicator
+  /[dD]{1,4}/, // d, dd, ddd, dddd (day)
+  /[mM]{1,5}/, // m, mm, mmm, mmmm, mmmmm (month) - but not after h/H (minutes)
+  /[yY]{2,4}/, // yy, yyyy (year)
+  /[sS]{1,2}/, // s, ss (seconds) - indicates datetime
+  /[hH]{1,2}/, // h, hh (hours) - indicates datetime
+  /AM\/PM/i, // AM/PM indicator
 ];
 
 /**
@@ -46,14 +46,14 @@ const DATE_FORMAT_PATTERNS = [
  * (even if it contains m for minutes)
  */
 const NUMBER_FORMAT_PATTERNS = [
-  /#/,               // # = digit placeholder
-  /0\.0/,            // Decimal number format
-  /\[.*\]/,          // Conditional formatting
-  /%/,               // Percentage
-  /\$/,              // Currency
-  /€/,               // Euro
-  /£/,               // Pound
-  /¥/,               // Yen
+  /#/, // # = digit placeholder
+  /0\.0/, // Decimal number format
+  /\[.*\]/, // Conditional formatting
+  /%/, // Percentage
+  /\$/, // Currency
+  /€/, // Euro
+  /£/, // Pound
+  /¥/, // Yen
 ];
 
 // ============================================================================
@@ -71,7 +71,7 @@ const NUMBER_FORMAT_PATTERNS = [
  * excelDateToJSDate(45658) // Returns Date for 2025-01-01
  */
 export function excelDateToJSDate(serial: number): Date {
-  if (typeof serial !== 'number' || isNaN(serial)) {
+  if (typeof serial !== "number" || isNaN(serial)) {
     return new Date(NaN); // Invalid date
   }
 
@@ -129,7 +129,7 @@ export function jsDateToExcelSerial(date: Date): number {
  * isDateFormat("0.00%")       // false
  */
 export function isDateFormat(numFmt: string | undefined | null): boolean {
-  if (!numFmt || typeof numFmt !== 'string') {
+  if (!numFmt || typeof numFmt !== "string") {
     return false;
   }
 
@@ -168,7 +168,7 @@ export function isDateFormat(numFmt: string | undefined | null): boolean {
  */
 export function isExcelDateSerial(value: any, numFmt?: string | null): boolean {
   // Must be a number
-  if (typeof value !== 'number' || isNaN(value)) {
+  if (typeof value !== "number" || isNaN(value)) {
     return false;
   }
 
@@ -184,7 +184,7 @@ export function isExcelDateSerial(value: any, numFmt?: string | null): boolean {
     // Additional heuristic: dates usually don't have many decimal places
     // Serial 45678.5 = noon on that day (valid)
     // Serial 45678.123456789 = probably not a date
-    const decimalPlaces = (value.toString().split('.')[1] || '').length;
+    const decimalPlaces = (value.toString().split(".")[1] || "").length;
     return decimalPlaces <= 6; // Excel time precision is about 6 decimal places
   }
 
@@ -208,13 +208,13 @@ export function formatExcelDate(
   options: {
     locale?: string;
     includeTime?: boolean;
-    dateStyle?: 'short' | 'medium' | 'long' | 'full';
-  } = {}
+    dateStyle?: "short" | "medium" | "long" | "full";
+  } = {},
 ): string {
   const {
-    locale = 'en-US',
+    locale = "en-US",
     includeTime = false,
-    dateStyle = 'short'
+    dateStyle = "short",
   } = options;
 
   const date = excelDateToJSDate(serial);
@@ -228,18 +228,18 @@ export function formatExcelDate(
       // Has time component
       return date.toLocaleString(locale, {
         dateStyle,
-        timeStyle: 'short'
+        timeStyle: "short",
       });
     }
 
     return date.toLocaleDateString(locale, {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric'
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
     });
   } catch (error) {
     // Fallback for unsupported locales
-    return date.toLocaleDateString('en-US');
+    return date.toLocaleDateString("en-US");
   }
 }
 
@@ -255,7 +255,10 @@ export function formatExcelDate(
  * formatExcelTime(0.75)   // "6:00 PM"
  * formatExcelTime(45658.5) // "12:00 PM" (extracts time from datetime)
  */
-export function formatExcelTime(serial: number, locale: string = 'en-US'): string {
+export function formatExcelTime(
+  serial: number,
+  locale: string = "en-US",
+): string {
   const timeFraction = serial % 1;
   const totalMinutes = Math.round(timeFraction * 24 * 60);
   const hours = Math.floor(totalMinutes / 60);
@@ -266,11 +269,11 @@ export function formatExcelTime(serial: number, locale: string = 'en-US'): strin
 
   try {
     return date.toLocaleTimeString(locale, {
-      hour: 'numeric',
-      minute: '2-digit'
+      hour: "numeric",
+      minute: "2-digit",
     });
   } catch {
-    return date.toLocaleTimeString('en-US');
+    return date.toLocaleTimeString("en-US");
   }
 }
 
@@ -286,11 +289,11 @@ export function formatExcelTime(serial: number, locale: string = 'en-US'): strin
 export function formatCellValueWithDateSupport(
   value: any,
   numFmt?: string | null,
-  locale: string = 'en-US'
+  locale: string = "en-US",
 ): string {
   // Handle null/undefined
   if (value === null || value === undefined) {
-    return '';
+    return "";
   }
 
   // Handle Date objects directly
@@ -299,7 +302,7 @@ export function formatCellValueWithDateSupport(
   }
 
   // Handle numbers that might be dates
-  if (typeof value === 'number') {
+  if (typeof value === "number") {
     // Check if it's a date based on numFmt or heuristics
     if (isExcelDateSerial(value, numFmt)) {
       return formatExcelDate(value, { locale });
@@ -313,8 +316,8 @@ export function formatCellValueWithDateSupport(
   }
 
   // Handle booleans
-  if (typeof value === 'boolean') {
-    return value ? 'TRUE' : 'FALSE';
+  if (typeof value === "boolean") {
+    return value ? "TRUE" : "FALSE";
   }
 
   // Default: convert to string

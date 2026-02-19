@@ -24,17 +24,49 @@ export class BankIntegrityService {
     ];
 
     const missingBanks = requiredBanks.filter((id) => !safeEditingBank(id));
-    const operatorCatalog = safeEditingBank<{ operators?: Record<string, unknown> }>("operator_catalog");
-    const operators = operatorCatalog?.operators && typeof operatorCatalog.operators === "object"
-      ? Object.keys(operatorCatalog.operators)
-      : [];
-    const opSet = new Set(operators.map((op) => String(op || "").trim().toUpperCase()).filter(Boolean));
+    const operatorCatalog = safeEditingBank<{
+      operators?: Record<string, unknown>;
+    }>("operator_catalog");
+    const operators =
+      operatorCatalog?.operators &&
+      typeof operatorCatalog.operators === "object"
+        ? Object.keys(operatorCatalog.operators)
+        : [];
+    const opSet = new Set(
+      operators
+        .map((op) =>
+          String(op || "")
+            .trim()
+            .toUpperCase(),
+        )
+        .filter(Boolean),
+    );
 
     const patternBanks = [
-      safeEditingBank<{ patterns?: Array<{ operator?: string; planTemplate?: Array<{ op?: string }> }> }>("intent_patterns_excel_en"),
-      safeEditingBank<{ patterns?: Array<{ operator?: string; planTemplate?: Array<{ op?: string }> }> }>("intent_patterns_excel_pt"),
-      safeEditingBank<{ patterns?: Array<{ operator?: string; planTemplate?: Array<{ op?: string }> }> }>("intent_patterns_docx_en"),
-      safeEditingBank<{ patterns?: Array<{ operator?: string; planTemplate?: Array<{ op?: string }> }> }>("intent_patterns_docx_pt"),
+      safeEditingBank<{
+        patterns?: Array<{
+          operator?: string;
+          planTemplate?: Array<{ op?: string }>;
+        }>;
+      }>("intent_patterns_excel_en"),
+      safeEditingBank<{
+        patterns?: Array<{
+          operator?: string;
+          planTemplate?: Array<{ op?: string }>;
+        }>;
+      }>("intent_patterns_excel_pt"),
+      safeEditingBank<{
+        patterns?: Array<{
+          operator?: string;
+          planTemplate?: Array<{ op?: string }>;
+        }>;
+      }>("intent_patterns_docx_en"),
+      safeEditingBank<{
+        patterns?: Array<{
+          operator?: string;
+          planTemplate?: Array<{ op?: string }>;
+        }>;
+      }>("intent_patterns_docx_pt"),
     ];
 
     const missingOperators: string[] = [];
@@ -42,14 +74,23 @@ export class BankIntegrityService {
       const patterns = Array.isArray(bank?.patterns) ? bank!.patterns : [];
       for (const p of patterns) {
         const opsFromTemplate = Array.isArray((p as any)?.planTemplate)
-          ? (p as any).planTemplate.map((step: any) => String(step?.op || "").trim().toUpperCase()).filter(Boolean)
+          ? (p as any).planTemplate
+              .map((step: any) =>
+                String(step?.op || "")
+                  .trim()
+                  .toUpperCase(),
+              )
+              .filter(Boolean)
           : [];
         const ops = [
           ...opsFromTemplate,
-          String((p as any)?.operator || "").trim().toUpperCase(),
+          String((p as any)?.operator || "")
+            .trim()
+            .toUpperCase(),
         ].filter(Boolean);
         for (const op of ops) {
-          if (!opSet.has(op) && !missingOperators.includes(op)) missingOperators.push(op);
+          if (!opSet.has(op) && !missingOperators.includes(op))
+            missingOperators.push(op);
         }
       }
     }

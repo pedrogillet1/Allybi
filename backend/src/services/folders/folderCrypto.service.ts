@@ -22,23 +22,59 @@ export class FolderCryptoService {
     return `folder:${userId}:${folderId}:${field}`;
   }
 
-  encryptName(userId: string, folderId: string, name: string, fk: Buffer): string {
+  encryptName(
+    userId: string,
+    folderId: string,
+    name: string,
+    fk: Buffer,
+  ): string {
     const key = this.keyFor(fk, "name");
-    return this.enc.encryptStringToJson(name, key, this.aad(userId, folderId, "name"));
+    return this.enc.encryptStringToJson(
+      name,
+      key,
+      this.aad(userId, folderId, "name"),
+    );
   }
 
-  decryptName(userId: string, folderId: string, payloadJson: string, fk: Buffer): string {
+  decryptName(
+    userId: string,
+    folderId: string,
+    payloadJson: string,
+    fk: Buffer,
+  ): string {
     const key = this.keyFor(fk, "name");
-    return this.enc.decryptStringFromJson(payloadJson, key, this.aad(userId, folderId, "name"));
+    return this.enc.decryptStringFromJson(
+      payloadJson,
+      key,
+      this.aad(userId, folderId, "name"),
+    );
   }
 
-  encryptDescription(userId: string, folderId: string, description: string, fk: Buffer): string {
+  encryptDescription(
+    userId: string,
+    folderId: string,
+    description: string,
+    fk: Buffer,
+  ): string {
     const key = this.keyFor(fk, "description");
-    return this.enc.encryptStringToJson(description, key, this.aad(userId, folderId, "description"));
+    return this.enc.encryptStringToJson(
+      description,
+      key,
+      this.aad(userId, folderId, "description"),
+    );
   }
 
-  decryptDescription(userId: string, folderId: string, payloadJson: string, fk: Buffer): string {
+  decryptDescription(
+    userId: string,
+    folderId: string,
+    payloadJson: string,
+    fk: Buffer,
+  ): string {
     const key = this.keyFor(fk, "description");
-    return this.enc.decryptStringFromJson(payloadJson, key, this.aad(userId, folderId, "description"));
+    return this.enc.decryptStringFromJson(
+      payloadJson,
+      key,
+      this.aad(userId, folderId, "description"),
+    );
   }
 }

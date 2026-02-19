@@ -61,4 +61,3 @@ describe("editing + extraction integration", () => {
     expect(out.after).toContain("integration");
   });
 });
-

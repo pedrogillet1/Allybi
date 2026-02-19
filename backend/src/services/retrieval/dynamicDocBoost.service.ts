@@ -3,8 +3,8 @@
  * Computes boost factors per document based on intent targets, recency, and metadata
  */
 
-import prisma from '../../config/database';
-import { IntentClassificationV3 } from '../../types/rag.types';
+import prisma from "../../config/database";
+import { IntentClassificationV3 } from "../../types/rag.types";
 
 /**
  * Parameters for computing dynamic document boosts.
@@ -49,8 +49,11 @@ export class DynamicDocBoostService {
    * @param params Parameters including userId, intent, and candidate document IDs.
    * @returns Map of documentId to DocumentBoost with factor and reason.
    */
-  public async computeBoosts(params: DynamicBoostParams): Promise<DocumentBoostMap> {
-    const { userId, intent, candidateDocumentIds, conversationDocumentIds } = params;
+  public async computeBoosts(
+    params: DynamicBoostParams,
+  ): Promise<DocumentBoostMap> {
+    const { userId, intent, candidateDocumentIds, conversationDocumentIds } =
+      params;
 
     // Defensive: if no candidates, return empty map
     if (!candidateDocumentIds || candidateDocumentIds.length === 0) {
@@ -63,13 +66,13 @@ export class DynamicDocBoostService {
       boostMap[docId] = {
         documentId: docId,
         factor: 1.0,
-        reason: 'neutral base factor',
+        reason: "neutral base factor",
       };
     }
 
     // 1. Boost explicitly targeted documents in intent.target.documentIds (factor 2.0)
     const targetedDocIds = new Set<string>();
-    const targetObj = typeof intent?.target === 'object' ? intent.target : null;
+    const targetObj = typeof intent?.target === "object" ? intent.target : null;
     if (targetObj?.documentIds && Array.isArray(targetObj.documentIds)) {
       for (const docId of targetObj.documentIds) {
         targetedDocIds.add(docId);
@@ -81,7 +84,7 @@ export class DynamicDocBoostService {
         boostMap[docId] = {
           documentId: docId,
           factor: 2.0,
-          reason: 'explicitly requested by intent target',
+          reason: "explicitly requested by intent target",
         };
       }
     }
@@ -99,24 +102,36 @@ export class DynamicDocBoostService {
       const olderDocIds = conversationDocumentIds.slice(1);
 
       // Boost most recent doc (only if candidate and not explicitly targeted)
-      if (mostRecentDocId && boostMap[mostRecentDocId] && !targetedDocIds.has(mostRecentDocId)) {
+      if (
+        mostRecentDocId &&
+        boostMap[mostRecentDocId] &&
+        !targetedDocIds.has(mostRecentDocId)
+      ) {
         boostMap[mostRecentDocId] = {
           documentId: mostRecentDocId,
           factor: 2.5,
-          reason: 'most recently referenced in conversation (PRIORITY)',
+          reason: "most recently referenced in conversation (PRIORITY)",
         };
-        console.log(`[DynamicDocBoost] CONVERSATION_BOOST_PRIORITY: ${mostRecentDocId} boosted to 2.5x`);
+        console.log(
+          `[DynamicDocBoost] CONVERSATION_BOOST_PRIORITY: ${mostRecentDocId} boosted to 2.5x`,
+        );
       }
 
       // Boost other conversation docs (2.0x)
       for (const docId of olderDocIds) {
-        if (boostMap[docId] && !targetedDocIds.has(docId) && docId !== mostRecentDocId) {
+        if (
+          boostMap[docId] &&
+          !targetedDocIds.has(docId) &&
+          docId !== mostRecentDocId
+        ) {
           boostMap[docId] = {
             documentId: docId,
             factor: 2.0,
-            reason: 'referenced in conversation context',
+            reason: "referenced in conversation context",
           };
-          console.log(`[DynamicDocBoost] CONVERSATION_BOOST: ${docId} boosted to 2.0x`);
+          console.log(
+            `[DynamicDocBoost] CONVERSATION_BOOST: ${docId} boosted to 2.0x`,
+          );
         }
       }
     }
@@ -132,7 +147,6 @@ export class DynamicDocBoostService {
 
 // Singleton instance for direct import
 // Singleton removed - use container.getDynamicDocBoost() instead
-
 
 // Export class for DI registration
 export default DynamicDocBoostService;

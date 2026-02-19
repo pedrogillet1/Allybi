@@ -16,7 +16,10 @@
 import type { LLMClient } from "./llmClient.interface";
 import type { LLMProvider } from "./llmErrors.types";
 
-import { GeminiClientService, type GeminiClientConfig } from "../providers/gemini/geminiClient.service";
+import {
+  GeminiClientService,
+  type GeminiClientConfig,
+} from "../providers/gemini/geminiClient.service";
 import { OpenAIClientService } from "../providers/openai/openaiClient.service";
 import { LocalClientService } from "../providers/local/localClient.service";
 import type { OpenAIProviderConfig } from "../providers/openai/openaiConfig";
@@ -72,11 +75,17 @@ export class LLMClientFactory {
     if (!this.clients.has("openai") && p.openai?.enabled) {
       // OpenAIClientService implements LlmClient (types/llm.types), not LLMClient (core).
       // An adapter is needed for full parity; for now, cast to allow factory storage.
-      this.clients.set("openai", new OpenAIClientService(p.openai.config as any) as unknown as LLMClient);
+      this.clients.set(
+        "openai",
+        new OpenAIClientService(p.openai.config as any) as unknown as LLMClient,
+      );
     }
 
     if (!this.clients.has("google") && p.google?.enabled) {
-      this.clients.set("google", new GeminiClientService(p.google.config as GeminiClientConfig));
+      this.clients.set(
+        "google",
+        new GeminiClientService(p.google.config as GeminiClientConfig),
+      );
     }
 
     if (!this.clients.has("local") && p.local?.enabled) {

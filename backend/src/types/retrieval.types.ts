@@ -10,24 +10,32 @@
  * - Retrieval always returns structured evidence separate from answer text.
  */
 
-import type { DocType, DocumentRef, ScopeContext, CandidateDoc, EvidenceItem, SourcesUiPackage, QuerySignals } from './rag.types';
-import type { DomainId } from './domains.types';
+import type {
+  DocType,
+  DocumentRef,
+  ScopeContext,
+  CandidateDoc,
+  EvidenceItem,
+  SourcesUiPackage,
+  QuerySignals,
+} from "./rag.types";
+import type { DomainId } from "./domains.types";
 
 // ----------------------------------------------------------------------------
 // Core retrieval query objects
 // ----------------------------------------------------------------------------
 
 export type RetrievalIntent =
-  | 'answer'          // normal content retrieval for answering
-  | 'discover_docs'   // "which file contains X" corpus-wide search
-  | 'nav'             // open/where: metadata-only confirmation
-  | 'locate_content'  // find where inside a doc
-  | 'debug';          // internal testing
+  | "answer" // normal content retrieval for answering
+  | "discover_docs" // "which file contains X" corpus-wide search
+  | "nav" // open/where: metadata-only confirmation
+  | "locate_content" // find where inside a doc
+  | "debug"; // internal testing
 
 export interface RetrievalQuery {
-  text: string;                 // final rewritten query text
-  rawText?: string;             // original user query
-  language?: 'en' | 'pt' | 'es';
+  text: string; // final rewritten query text
+  rawText?: string; // original user query
+  language?: "en" | "pt" | "es";
   intent?: RetrievalIntent;
 
   domain?: DomainId;
@@ -43,9 +51,9 @@ export interface RetrievalQuery {
 
   // For precision lookups
   hints?: {
-    metric?: string;            // e.g. "revenue", "noi"
-    entity?: string;            // e.g. property name
-    time?: string;              // user time mention
+    metric?: string; // e.g. "revenue", "noi"
+    entity?: string; // e.g. property name
+    time?: string; // user time mention
     sheetName?: string;
     cellRange?: string;
     slideNumber?: number;
@@ -57,7 +65,11 @@ export interface RetrievalQuery {
 // Retrieval configuration
 // ----------------------------------------------------------------------------
 
-export type RetrievalMethod = 'lexical' | 'semantic' | 'hybrid' | 'metadata_only';
+export type RetrievalMethod =
+  | "lexical"
+  | "semantic"
+  | "hybrid"
+  | "metadata_only";
 
 export interface RetrievalWeights {
   lexical: number;
@@ -101,7 +113,7 @@ export interface IndexedChunk {
   charCount: number;
 
   // Layout signals
-  structureKind?: 'paragraph' | 'heading' | 'table' | 'kv' | 'list' | 'unknown';
+  structureKind?: "paragraph" | "heading" | "table" | "kv" | "list" | "unknown";
 
   // Locations (optional)
   pageStart?: number;
@@ -111,9 +123,9 @@ export interface IndexedChunk {
   slideNumber?: number;
 
   // OCR / extraction signals
-  ocrConfidence?: number;       // 0..1
-  gibberishScore?: number;      // 0..1 (higher = worse)
-  pdfGibberishScore?: number;   // 0..1
+  ocrConfidence?: number; // 0..1
+  gibberishScore?: number; // 0..1 (higher = worse)
+  pdfGibberishScore?: number; // 0..1
 
   // Precomputed embeddings key or vector id
   embeddingId?: string;
@@ -128,7 +140,7 @@ export interface IndexedDocument extends DocumentRef {
 
   // Doc-level signals
   ocrDominant?: boolean;
-  extractionStatus?: 'ok' | 'failed' | 'processing';
+  extractionStatus?: "ok" | "failed" | "processing";
   extractedTextChars?: number;
 
   // Domain hints from ingestion
@@ -151,7 +163,7 @@ export interface ChunkScoreBreakdown {
 
 export interface ScoredChunk {
   chunk: IndexedChunk;
-  score: number;                  // 0..1 normalized
+  score: number; // 0..1 normalized
   breakdown?: ChunkScoreBreakdown;
   tags?: string[];
 }
@@ -162,9 +174,9 @@ export interface DocScore {
   docTitle?: string;
   docType: DocType;
 
-  score: number;                  // 0..1
-  margin?: number;                // vs second best (optional)
-  signals?: string[];             // why it ranked highly
+  score: number; // 0..1
+  margin?: number; // vs second best (optional)
+  signals?: string[]; // why it ranked highly
 }
 
 // ----------------------------------------------------------------------------
@@ -174,19 +186,19 @@ export interface DocScore {
 export interface RetrievalEmptyInfo {
   isEmpty: boolean;
   reasonCode?:
-    | 'no_docs_indexed'
-    | 'indexing_in_progress'
-    | 'extraction_failed'
-    | 'scope_hard_constraints_empty'
-    | 'no_relevant_chunks_in_scoped_docs';
+    | "no_docs_indexed"
+    | "indexing_in_progress"
+    | "extraction_failed"
+    | "scope_hard_constraints_empty"
+    | "no_relevant_chunks_in_scoped_docs";
 
   reasonShort?: string;
   recommendedNext?: Array<
-    | 'ask_for_section'
-    | 'ask_for_exact_sheet_or_slide'
-    | 'offer_doc_selection'
-    | 'remove_scope_lock'
-    | 'upload_document'
+    | "ask_for_section"
+    | "ask_for_exact_sheet_or_slide"
+    | "offer_doc_selection"
+    | "remove_scope_lock"
+    | "upload_document"
   >;
 }
 
@@ -202,7 +214,7 @@ export interface DiscoveryResultItem {
   docTitle?: string;
   docType: DocType;
 
-  relevanceScore: number;          // 0..1
+  relevanceScore: number; // 0..1
   snippet?: string;
   pageHint?: number;
 }
@@ -262,6 +274,6 @@ export interface IHybridSearcher {
   combine(
     lexical: ScoredChunk[],
     semantic: ScoredChunk[],
-    weights: RetrievalWeights
+    weights: RetrievalWeights,
   ): ScoredChunk[];
 }

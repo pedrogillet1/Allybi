@@ -9,8 +9,8 @@ import {
   IntentClassificationV3,
   RankingParams,
   RankedChunks,
-} from '../../types/rag.types';
-import { DocumentBoostMap } from './dynamicDocBoost.service';
+} from "../../types/rag.types";
+import { DocumentBoostMap } from "./dynamicDocBoost.service";
 
 /**
  * Service responsible for ranking retrieved chunks by applying dynamic document boosts,
@@ -32,13 +32,15 @@ export class KodaRetrievalRankingService {
 
       // Apply dynamic document boost factor; default to 1.0 if none found
       const boostEntry = (boostMap as any)[chunk.documentId];
-      const boostFactor = (typeof boostEntry === 'object' ? boostEntry?.factor : boostEntry) ?? 1.0;
+      const boostFactor =
+        (typeof boostEntry === "object" ? boostEntry?.factor : boostEntry) ??
+        1.0;
 
       // Initial boosted score
       let score = baseScore * boostFactor;
 
       // Apply position weighting based on page number if available
-      if (typeof chunk.pageNumber === 'number') {
+      if (typeof chunk.pageNumber === "number") {
         if (chunk.pageNumber >= 1 && chunk.pageNumber <= 3) {
           // Early pages get a slight boost
           score += 0.05;
@@ -53,25 +55,29 @@ export class KodaRetrievalRankingService {
       const questionType = intent.questionType || intent.primaryType;
 
       switch (questionType) {
-        case 'SUMMARY':
+        case "SUMMARY":
           // For summary, downweight chunks from same doc to improve diversity
-          const sameDocCount = (chunks ?? []).filter((c: any) => c.documentId === chunk.documentId).length;
+          const sameDocCount = (chunks ?? []).filter(
+            (c: any) => c.documentId === chunk.documentId,
+          ).length;
           if (sameDocCount > 5) {
             score -= 0.03;
           }
           break;
 
-        case 'NUMERIC':
-        case 'EXTRACT':
+        case "NUMERIC":
+        case "EXTRACT":
           // Prefer shorter, denser chunks for numeric or extract queries
           if (chunk.content.length < 500) {
             score += 0.05;
           }
           break;
 
-        case 'COMPARE':
+        case "COMPARE":
           // Prefer multiple docs instead of only one doc
-          const uniqueDocs = new Set((chunks ?? []).map((c: any) => c.documentId));
+          const uniqueDocs = new Set(
+            (chunks ?? []).map((c: any) => c.documentId),
+          );
           if (uniqueDocs.size === 1) {
             score -= 0.04;
           }
@@ -105,4 +111,3 @@ export class KodaRetrievalRankingService {
 }
 
 // Singleton removed - use container.getKodaRetrievalRanking() instead
-

@@ -20,7 +20,12 @@ export class DocumentKeyService {
   async getDocumentKey(userId: string, documentId: string): Promise<Buffer> {
     const doc = await this.prisma.document.findUnique({
       where: { id: documentId },
-      select: { id: true, userId: true, dataKeyEncrypted: true, dataKeyMeta: true },
+      select: {
+        id: true,
+        userId: true,
+        dataKeyEncrypted: true,
+        dataKeyMeta: true,
+      },
     });
     if (!doc || doc.userId !== userId) throw new Error("Document not found");
 
@@ -28,7 +33,11 @@ export class DocumentKeyService {
 
     if (!doc.dataKeyEncrypted) {
       const dk = this.enc.randomKey32();
-      const wrapped = this.envelopes.wrapRecordKey(dk, tk, `wrap:document:${documentId}`);
+      const wrapped = this.envelopes.wrapRecordKey(
+        dk,
+        tk,
+        `wrap:document:${documentId}`,
+      );
 
       await this.prisma.document.update({
         where: { id: documentId },

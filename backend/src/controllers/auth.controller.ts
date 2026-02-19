@@ -13,19 +13,24 @@ import { Prisma } from "@prisma/client";
 /**
  * Log a security audit event (fire-and-forget).
  */
-function logSecurityEvent(action: string, details: Record<string, unknown> = {}): void {
-  const ip = details.ip as string || 'unknown';
-  prisma.auditLog.create({
-    data: {
-      action,
-      userId: details.userId as string || null,
-      ipAddress: ip,
-      userAgent: details.userAgent as string || null,
-      status: action.includes('FAILED') ? 'failed' : 'success',
-      details: JSON.stringify(details),
-      createdAt: new Date(),
-    },
-  }).catch(() => {}); // fire-and-forget
+function logSecurityEvent(
+  action: string,
+  details: Record<string, unknown> = {},
+): void {
+  const ip = (details.ip as string) || "unknown";
+  prisma.auditLog
+    .create({
+      data: {
+        action,
+        userId: (details.userId as string) || null,
+        ipAddress: ip,
+        userAgent: (details.userAgent as string) || null,
+        status: action.includes("FAILED") ? "failed" : "success",
+        details: JSON.stringify(details),
+        createdAt: new Date(),
+      },
+    })
+    .catch(() => {}); // fire-and-forget
 }
 
 export type AuthLanguage = "en" | "pt" | "es";
@@ -82,7 +87,9 @@ function ok<T>(res: Response, data: T, status = 200) {
 }
 
 function err(res: Response, code: string, message: string, status = 400) {
-  return res.status(status).json({ ok: false, error: { code, message } } satisfies ApiErr);
+  return res
+    .status(status)
+    .json({ ok: false, error: { code, message } } satisfies ApiErr);
 }
 
 function asString(v: unknown): string | null {
@@ -121,24 +128,47 @@ function mapServiceError(res: Response, e: unknown) {
       res,
       "DB_UNAVAILABLE",
       "Database is unavailable. Start local Postgres (docker-compose.dev.yml) or fix DATABASE_URL.",
-      503
+      503,
     );
   }
 
   if (m.includes("invalid credentials") || m.includes("wrong password")) {
-    return err(res, "AUTH_INVALID_CREDENTIALS", "Invalid email or password.", 401);
+    return err(
+      res,
+      "AUTH_INVALID_CREDENTIALS",
+      "Invalid email or password.",
+      401,
+    );
   }
 
   if (m.includes("email already") || m.includes("already exists")) {
-    return err(res, "AUTH_EMAIL_EXISTS", "That email is already registered.", 409);
+    return err(
+      res,
+      "AUTH_EMAIL_EXISTS",
+      "That email is already registered.",
+      409,
+    );
   }
 
-  if (m.includes("refresh token") && (m.includes("invalid") || m.includes("expired"))) {
-    return err(res, "AUTH_REFRESH_INVALID", "Session expired. Please log in again.", 401);
+  if (
+    m.includes("refresh token") &&
+    (m.includes("invalid") || m.includes("expired"))
+  ) {
+    return err(
+      res,
+      "AUTH_REFRESH_INVALID",
+      "Session expired. Please log in again.",
+      401,
+    );
   }
 
   if (m.includes("unauthorized") || m.includes("forbidden")) {
-    return err(res, "AUTH_UNAUTHORIZED", "You're not authorized for this action.", 401);
+    return err(
+      res,
+      "AUTH_UNAUTHORIZED",
+      "You're not authorized for this action.",
+      401,
+    );
   }
 
   return err(res, "AUTH_ERROR", msg || "Authentication error.", 400);
@@ -151,15 +181,30 @@ export class AuthController {
     const email = asString((req.body as any)?.email);
     const password = asString((req.body as any)?.password);
     const name = asString((req.body as any)?.name) ?? undefined;
-    const recoveryKeyHash = asString((req.body as any)?.recoveryKeyHash) ?? undefined;
-    const masterKeyEncrypted = asString((req.body as any)?.masterKeyEncrypted) ?? undefined;
+    const recoveryKeyHash =
+      asString((req.body as any)?.recoveryKeyHash) ?? undefined;
+    const masterKeyEncrypted =
+      asString((req.body as any)?.masterKeyEncrypted) ?? undefined;
 
-    if (!email) return err(res, "VALIDATION_EMAIL_REQUIRED", "Email is required.", 400);
+    if (!email)
+      return err(res, "VALIDATION_EMAIL_REQUIRED", "Email is required.", 400);
     if (!password || password.length < 8)
-      return err(res, "VALIDATION_PASSWORD_WEAK", "Password must be at least 8 characters.", 400);
+      return err(
+        res,
+        "VALIDATION_PASSWORD_WEAK",
+        "Password must be at least 8 characters.",
+        400,
+      );
 
     try {
-      const result = await this.auth.register({ email, password, name, language: getLang(req), recoveryKeyHash, masterKeyEncrypted });
+      const result = await this.auth.register({
+        email,
+        password,
+        name,
+        language: getLang(req),
+        recoveryKeyHash,
+        masterKeyEncrypted,
+      });
 
       // Pending verification flow: return requiresVerification to frontend
       if (result.requiresVerification) {
@@ -172,7 +217,11 @@ export class AuthController {
 
       // Direct registration flow (legacy/fallback): return tokens + set cookies
       if (result.tokens?.accessToken && result.tokens?.refreshToken) {
-        setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken);
+        setAuthCookies(
+          res,
+          result.tokens.accessToken,
+          result.tokens.refreshToken,
+        );
       }
       return res.status(201).json({
         user: result.user,
@@ -187,18 +236,39 @@ export class AuthController {
   login = async (req: Request, res: Response) => {
     const email = asString((req.body as any)?.email);
     const password = asString((req.body as any)?.password);
-    const ip = req.ip || req.headers['x-forwarded-for'] as string || 'unknown';
-    const userAgent = req.headers['user-agent'] || null;
+    const ip =
+      req.ip || (req.headers["x-forwarded-for"] as string) || "unknown";
+    const userAgent = req.headers["user-agent"] || null;
 
-    if (!email) return err(res, "VALIDATION_EMAIL_REQUIRED", "Email is required.", 400);
-    if (!password) return err(res, "VALIDATION_PASSWORD_REQUIRED", "Password is required.", 400);
+    if (!email)
+      return err(res, "VALIDATION_EMAIL_REQUIRED", "Email is required.", 400);
+    if (!password)
+      return err(
+        res,
+        "VALIDATION_PASSWORD_REQUIRED",
+        "Password is required.",
+        400,
+      );
 
     try {
-      const result = await this.auth.login({ email, password, language: getLang(req) });
+      const result = await this.auth.login({
+        email,
+        password,
+        language: getLang(req),
+      });
       // Log successful login
-      logSecurityEvent('LOGIN_SUCCESS', { email, userId: result.user.id, ip, userAgent });
+      logSecurityEvent("LOGIN_SUCCESS", {
+        email,
+        userId: result.user.id,
+        ip,
+        userAgent,
+      });
       // Flatten: frontend expects { accessToken, refreshToken, user }
-      setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken!);
+      setAuthCookies(
+        res,
+        result.tokens.accessToken,
+        result.tokens.refreshToken!,
+      );
       return res.status(200).json({
         user: result.user,
         accessToken: result.tokens.accessToken,
@@ -206,25 +276,40 @@ export class AuthController {
       });
     } catch (e) {
       // Log failed login attempt
-      logSecurityEvent('LOGIN_FAILED', { email, ip, userAgent, error: e instanceof Error ? e.message : 'Unknown error' });
+      logSecurityEvent("LOGIN_FAILED", {
+        email,
+        ip,
+        userAgent,
+        error: e instanceof Error ? e.message : "Unknown error",
+      });
       return mapServiceError(res, e);
     }
   };
 
   refresh = async (req: Request, res: Response) => {
     // Accept refresh token from body or cookie (Safari fallback)
-    const refreshToken = asString((req.body as any)?.refreshToken)
-      || (req as any).cookies?.koda_rt
-      || null;
+    const refreshToken =
+      asString((req.body as any)?.refreshToken) ||
+      (req as any).cookies?.koda_rt ||
+      null;
 
     if (!refreshToken) {
-      return err(res, "VALIDATION_REFRESH_REQUIRED", "Refresh token is required.", 400);
+      return err(
+        res,
+        "VALIDATION_REFRESH_REQUIRED",
+        "Refresh token is required.",
+        400,
+      );
     }
 
     try {
       const result = await this.auth.refresh({ refreshToken });
       // Set cookies + return JSON
-      setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken!);
+      setAuthCookies(
+        res,
+        result.tokens.accessToken,
+        result.tokens.refreshToken!,
+      );
       return res.status(200).json({
         accessToken: result.tokens.accessToken,
         refreshToken: result.tokens.refreshToken,
@@ -235,9 +320,10 @@ export class AuthController {
   };
 
   logout = async (req: Request, res: Response) => {
-    const refreshToken = asString((req.body as any)?.refreshToken)
-      || (req as any).cookies?.koda_rt
-      || undefined;
+    const refreshToken =
+      asString((req.body as any)?.refreshToken) ||
+      (req as any).cookies?.koda_rt ||
+      undefined;
     const userId = getUserIdFromReq(req) ?? undefined;
 
     try {
@@ -251,7 +337,8 @@ export class AuthController {
 
   me = async (req: Request, res: Response) => {
     const userId = getUserIdFromReq(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     try {
       const result = await this.auth.me({ userId });

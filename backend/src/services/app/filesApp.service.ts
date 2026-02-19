@@ -21,9 +21,20 @@
  * Never returns absolute paths. URLs are server routes.
  */
 
-import type { DocumentAppService, ClientDoc, DocTypeCategory, ListDocsOptions, WhereInfo } from "./documentsApp.service";
+import type {
+  DocumentAppService,
+  ClientDoc,
+  DocTypeCategory,
+  ListDocsOptions,
+  WhereInfo,
+} from "./documentsApp.service";
 
-export type FileActionSortBy = "updatedAt" | "createdAt" | "sizeBytes" | "title" | "filename";
+export type FileActionSortBy =
+  | "updatedAt"
+  | "createdAt"
+  | "sizeBytes"
+  | "title"
+  | "filename";
 export type SortDir = "asc" | "desc";
 
 export type FileFilter = {
@@ -52,10 +63,14 @@ export type FileCountResult = {
 export class FilesAppService {
   constructor(private readonly documentApp: DocumentAppService) {}
 
-  async list(filter: FileFilter = {}, opts?: { sortBy?: FileActionSortBy; sortDir?: SortDir; limit?: number }): Promise<FileListResult> {
+  async list(
+    filter: FileFilter = {},
+    opts?: { sortBy?: FileActionSortBy; sortDir?: SortDir; limit?: number },
+  ): Promise<FileListResult> {
     const sortBy = opts?.sortBy ?? "updatedAt";
     const sortDir = opts?.sortDir ?? "desc";
-    const limit = typeof opts?.limit === "number" ? Math.max(1, opts!.limit!) : 200;
+    const limit =
+      typeof opts?.limit === "number" ? Math.max(1, opts!.limit!) : 200;
 
     // DocumentAppService already filters/sorts deterministically
     const docs = await this.documentApp.listDocs({
@@ -69,7 +84,9 @@ export class FilesAppService {
 
     // Optional folderPath filter (client-safe)
     const folder = filter.folderPath ? String(filter.folderPath) : null;
-    const filtered = folder ? docs.filter((d) => (d.folderPath || null) === folder) : docs;
+    const filtered = folder
+      ? docs.filter((d) => (d.folderPath || null) === folder)
+      : docs;
 
     return {
       docs: filtered,
@@ -104,7 +121,9 @@ export class FilesAppService {
     return { total: docs.length, byType };
   }
 
-  async open(docId: string): Promise<{ doc: ClientDoc | null; openUrl: string | null }> {
+  async open(
+    docId: string,
+  ): Promise<{ doc: ClientDoc | null; openUrl: string | null }> {
     const doc = await this.documentApp.getDoc(docId);
     return { doc, openUrl: doc?.openUrl ?? null };
   }
@@ -117,7 +136,10 @@ export class FilesAppService {
    * Group docs by docType (pdf/spreadsheet/slides/image/text/unknown).
    * This is a common “ChatGPT-like” grouping for file inventories.
    */
-  async groupByType(filter: FileFilter = {}, opts?: { sortBy?: FileActionSortBy; sortDir?: SortDir; limit?: number }): Promise<Record<string, ClientDoc[]>> {
+  async groupByType(
+    filter: FileFilter = {},
+    opts?: { sortBy?: FileActionSortBy; sortDir?: SortDir; limit?: number },
+  ): Promise<Record<string, ClientDoc[]>> {
     const list = await this.list(filter, opts);
     const grouped: Record<string, ClientDoc[]> = {};
     for (const d of list.docs) {

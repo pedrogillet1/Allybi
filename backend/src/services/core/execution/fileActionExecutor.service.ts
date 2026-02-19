@@ -11,10 +11,19 @@
  * NO hardcoded operator names or switch statements.
  */
 
-import prisma from '../../../config/database';
-import { getOptionalBank } from '../banks/bankLoader.service';
-import { EntityExtractorService, getEntityExtractor, type LanguageCode, type FileActionOperatorsBank } from '../extraction/entityExtractor.service';
-import { ActionHistoryService, getActionHistoryService, type UndoHistoryEntry } from './actionHistory.service';
+import prisma from "../../../config/database";
+import { getOptionalBank } from "../banks/bankLoader.service";
+import {
+  EntityExtractorService,
+  getEntityExtractor,
+  type LanguageCode,
+  type FileActionOperatorsBank,
+} from "../extraction/entityExtractor.service";
+import {
+  ActionHistoryService,
+  getActionHistoryService,
+  type UndoHistoryEntry,
+} from "./actionHistory.service";
 
 export interface FileActionContext {
   userId: string;
@@ -28,18 +37,18 @@ export interface FileActionContext {
 export interface FileActionAttachment {
   // 'folder' and 'document' match frontend SourcesList rendering
   // 'action_confirmation' is for destructive action confirmation buttons
-  type: 'folder' | 'document' | 'action_confirmation';
+  type: "folder" | "document" | "action_confirmation";
   id?: string;
   title?: string;
   filename?: string;
   folderId?: string;
-  docId?: string;        // Frontend expects docId, not documentId
-  documentId?: string;   // Keep for backwards compatibility
+  docId?: string; // Frontend expects docId, not documentId
+  documentId?: string; // Keep for backwards compatibility
   confirmationId?: string;
   confirmLabel?: string;
   cancelLabel?: string;
   confirmStyle?: string;
-  operator?: string;     // For confirmation flow
+  operator?: string; // For confirmation flow
 }
 
 export interface FileActionResult {
@@ -70,9 +79,13 @@ export class FileActionExecutorService {
   }
 
   private loadBank(): void {
-    this.bank = getOptionalBank<FileActionOperatorsBank>('file_action_operators');
+    this.bank = getOptionalBank<FileActionOperatorsBank>(
+      "file_action_operators",
+    );
     if (this.bank) {
-      console.log('[FileActionExecutor] Loaded file_action_operators bank successfully');
+      console.log(
+        "[FileActionExecutor] Loaded file_action_operators bank successfully",
+      );
     }
   }
 
@@ -92,7 +105,10 @@ export class FileActionExecutorService {
   async execute(ctx: FileActionContext): Promise<FileActionResult> {
     const bank = this.ensureBank();
     if (!bank) {
-      return { success: false, message: 'File action operators not configured.' };
+      return {
+        success: false,
+        message: "File action operators not configured.",
+      };
     }
 
     // Load operator config from databank
@@ -112,34 +128,39 @@ export class FileActionExecutorService {
     const entities = await this.entityExtractor.extract(
       ctx.message,
       config.entityExtraction,
-      ctx.language
+      ctx.language,
     );
 
     // Handle bulk operations with attached document IDs
     // When user says "move these files to X" with attachments, use attachedDocumentIds
-    if (bulkConfig && ctx.attachedDocumentIds && ctx.attachedDocumentIds.length > 0) {
-      const attachmentIndicators = /\b(these|those|attached|the files|esses|essas|esses arquivos|esses documentos|anexados|anexos)\b/i;
+    if (
+      bulkConfig &&
+      ctx.attachedDocumentIds &&
+      ctx.attachedDocumentIds.length > 0
+    ) {
+      const attachmentIndicators =
+        /\b(these|those|attached|the files|esses|essas|esses arquivos|esses documentos|anexados|anexos)\b/i;
       if (attachmentIndicators.test(ctx.message)) {
         // For bulk move with attachments, we need target folder from entities
-        if (ctx.operator === 'file_bulk_move') {
+        if (ctx.operator === "file_bulk_move") {
           return this.executeBulkMoveWithIds(
             ctx.userId,
             ctx.attachedDocumentIds,
             entities.targetFolder,
             ctx.language,
             config,
-            bulkConfig
+            bulkConfig,
           );
         }
         // For bulk delete with attachments
-        if (ctx.operator === 'file_bulk_delete') {
+        if (ctx.operator === "file_bulk_delete") {
           if (config.requiresConfirmation && !ctx.confirmationToken) {
             return this.buildConfirmationResponse(
               config,
               bulkConfig,
               { ...entities, count: String(ctx.attachedDocumentIds.length) },
               ctx.language,
-              ctx.operator
+              ctx.operator,
             );
           }
           return this.executeBulkDeleteWithIds(
@@ -147,30 +168,33 @@ export class FileActionExecutorService {
             ctx.attachedDocumentIds,
             ctx.language,
             config,
-            bulkConfig
+            bulkConfig,
           );
         }
         // For bulk copy with attachments
-        if (ctx.operator === 'file_bulk_copy') {
+        if (ctx.operator === "file_bulk_copy") {
           return this.executeBulkCopyWithIds(
             ctx.userId,
             ctx.attachedDocumentIds,
             entities.targetFolder,
             ctx.language,
             config,
-            bulkConfig
+            bulkConfig,
           );
         }
       }
     }
 
     // Handle file_multi_move (multiple named files like "move file1.pdf and file2.xlsx to folder X")
-    if (ctx.operator === 'file_multi_move') {
-      const filenames = this.entityExtractor.extractMultipleFilenames(ctx.message);
+    if (ctx.operator === "file_multi_move") {
+      const filenames = this.entityExtractor.extractMultipleFilenames(
+        ctx.message,
+      );
       if (filenames.length === 0) {
-        const microcopy = config.microcopy?.missingEntity?.[ctx.language] ||
-                          config.microcopy?.missingEntity?.en ||
-                          'Please specify the files to move.';
+        const microcopy =
+          config.microcopy?.missingEntity?.[ctx.language] ||
+          config.microcopy?.missingEntity?.en ||
+          "Please specify the files to move.";
         return { success: false, message: microcopy };
       }
       return this.executeMultiFileMove(
@@ -178,44 +202,74 @@ export class FileActionExecutorService {
         filenames,
         entities.targetFolder,
         ctx.language,
-        config
+        config,
       );
     }
 
     // Check for missing required entities
-    const missing = this.entityExtractor.getMissingEntities(entities, config.entityExtraction);
+    const missing = this.entityExtractor.getMissingEntities(
+      entities,
+      config.entityExtraction,
+    );
     if (missing.length > 0) {
-      const microcopy = config.microcopy?.missingEntity?.[ctx.language] ||
-                        config.microcopy?.missingEntity?.en ||
-                        `Missing required information: ${missing.join(', ')}`;
+      const microcopy =
+        config.microcopy?.missingEntity?.[ctx.language] ||
+        config.microcopy?.missingEntity?.en ||
+        `Missing required information: ${missing.join(", ")}`;
       return { success: false, message: microcopy };
     }
 
     // Check confirmation requirement (from databank).
     // Minimal safety: require a token with the expected operator prefix.
     const hasValidConfirmationToken =
-      typeof ctx.confirmationToken === 'string' &&
+      typeof ctx.confirmationToken === "string" &&
       ctx.confirmationToken.startsWith(`${ctx.operator}_`) &&
       ctx.confirmationToken.length <= 256;
 
     if (config.requiresConfirmation && !hasValidConfirmationToken) {
-      return this.buildConfirmationResponse(config, bulkConfig, entities, ctx.language, ctx.operator);
+      return this.buildConfirmationResponse(
+        config,
+        bulkConfig,
+        entities,
+        ctx.language,
+        ctx.operator,
+      );
     }
 
     // Execute the operation
-    const result = await this.executeOperation(ctx.userId, ctx.operator, config, entities);
+    const result = await this.executeOperation(
+      ctx.userId,
+      ctx.operator,
+      config,
+      entities,
+    );
 
     // Record undo history if applicable (non-blocking - don't fail if undo table missing)
     if (config.canUndo && result.success && result.data) {
       try {
-        await this.recordUndoHistory(ctx.userId, ctx.operator, result.data, entities);
+        await this.recordUndoHistory(
+          ctx.userId,
+          ctx.operator,
+          result.data,
+          entities,
+        );
       } catch (undoErr: any) {
-        console.warn('[FileActionExecutor] Could not record undo history:', undoErr.message);
+        console.warn(
+          "[FileActionExecutor] Could not record undo history:",
+          undoErr.message,
+        );
       }
     }
 
     // Build response using databank microcopy
-    return this.buildSuccessResponse(config, bulkConfig, entities, result, ctx.language, ctx.operator);
+    return this.buildSuccessResponse(
+      config,
+      bulkConfig,
+      entities,
+      result,
+      ctx.language,
+      ctx.operator,
+    );
   }
 
   /**
@@ -225,7 +279,7 @@ export class FileActionExecutorService {
     userId: string,
     operator: string,
     config: any,
-    entities: Record<string, string>
+    entities: Record<string, string>,
   ): Promise<ServiceResult> {
     const serviceName = config.service;
     const method = config.method;
@@ -233,20 +287,20 @@ export class FileActionExecutorService {
     try {
       // Route to appropriate service based on operator
       switch (serviceName) {
-        case 'folderService':
+        case "folderService":
           return this.executeFolderOperation(userId, method, entities);
 
-        case 'documentService':
+        case "documentService":
           return this.executeDocumentOperation(userId, method, entities);
 
-        case 'actionHistoryService':
+        case "actionHistoryService":
           return this.executeUndoOperation(userId);
 
         default:
           return { success: false, error: `Unknown service: ${serviceName}` };
       }
     } catch (error: any) {
-      return { success: false, error: error.message || 'Operation failed' };
+      return { success: false, error: error.message || "Operation failed" };
     }
   }
 
@@ -256,26 +310,34 @@ export class FileActionExecutorService {
   private async executeFolderOperation(
     userId: string,
     method: string,
-    entities: Record<string, string>
+    entities: Record<string, string>,
   ): Promise<ServiceResult> {
     switch (method) {
-      case 'create': {
+      case "create": {
         const name = entities.folderName;
         const parentName = entities.parentFolder;
 
         // Check for duplicate
         const existing = await prisma.folder.findFirst({
-          where: { userId, name: { equals: name, mode: 'insensitive' }, isDeleted: false },
+          where: {
+            userId,
+            name: { equals: name, mode: "insensitive" },
+            isDeleted: false,
+          },
         });
         if (existing) {
-          return { success: false, microcopyKey: 'alreadyExists' };
+          return { success: false, microcopyKey: "alreadyExists" };
         }
 
         // Find parent folder if specified
         let parentFolderId: string | null = null;
         if (parentName) {
           const parent = await prisma.folder.findFirst({
-            where: { userId, name: { equals: parentName, mode: 'insensitive' }, isDeleted: false },
+            where: {
+              userId,
+              name: { equals: parentName, mode: "insensitive" },
+              isDeleted: false,
+            },
           });
           if (parent) {
             parentFolderId = parent.id;
@@ -288,20 +350,28 @@ export class FileActionExecutorService {
 
         return {
           success: true,
-          microcopyKey: parentFolderId ? 'successWithParent' : 'success',
-          data: { folderId: folder.id, folderName: name, parentFolder: parentName },
+          microcopyKey: parentFolderId ? "successWithParent" : "success",
+          data: {
+            folderId: folder.id,
+            folderName: name,
+            parentFolder: parentName,
+          },
         };
       }
 
-      case 'rename': {
+      case "rename": {
         const oldName = entities.folderName;
         const newName = entities.newName;
 
         const folder = await prisma.folder.findFirst({
-          where: { userId, name: { equals: oldName, mode: 'insensitive' }, isDeleted: false },
+          where: {
+            userId,
+            name: { equals: oldName, mode: "insensitive" },
+            isDeleted: false,
+          },
         });
         if (!folder) {
-          return { success: false, microcopyKey: 'notFound' };
+          return { success: false, microcopyKey: "notFound" };
         }
 
         // Capture previous state for undo
@@ -323,14 +393,18 @@ export class FileActionExecutorService {
         };
       }
 
-      case 'delete': {
+      case "delete": {
         const name = entities.folderName;
 
         const folder = await prisma.folder.findFirst({
-          where: { userId, name: { equals: name, mode: 'insensitive' }, isDeleted: false },
+          where: {
+            userId,
+            name: { equals: name, mode: "insensitive" },
+            isDeleted: false,
+          },
         });
         if (!folder) {
-          return { success: false, microcopyKey: 'notFound' };
+          return { success: false, microcopyKey: "notFound" };
         }
 
         // Move documents in folder to root
@@ -351,20 +425,24 @@ export class FileActionExecutorService {
         };
       }
 
-      case 'move': {
+      case "move": {
         const folderName = entities.folderName;
         const targetName = entities.targetFolder;
 
         const folder = await prisma.folder.findFirst({
-          where: { userId, name: { equals: folderName, mode: 'insensitive' }, isDeleted: false },
+          where: {
+            userId,
+            name: { equals: folderName, mode: "insensitive" },
+            isDeleted: false,
+          },
         });
         if (!folder) {
-          return { success: false, microcopyKey: 'notFound' };
+          return { success: false, microcopyKey: "notFound" };
         }
 
         // Capture previous parent for undo (both ID and name)
         const previousParentId = folder.parentFolderId;
-        let originalParent = 'root';
+        let originalParent = "root";
         if (previousParentId) {
           const prevParentFolder = await prisma.folder.findUnique({
             where: { id: previousParentId },
@@ -380,9 +458,12 @@ export class FileActionExecutorService {
         let newParentId: string | null = null;
         if (!isRoot) {
           // Use resolveTargetFolder for nested path support ("X inside Y")
-          const targetFolder = await this.resolveTargetFolder(userId, targetName);
+          const targetFolder = await this.resolveTargetFolder(
+            userId,
+            targetName,
+          );
           if (!targetFolder) {
-            return { success: false, microcopyKey: 'targetNotFound' };
+            return { success: false, microcopyKey: "targetNotFound" };
           }
           newParentId = targetFolder.id;
         }
@@ -394,7 +475,7 @@ export class FileActionExecutorService {
 
         return {
           success: true,
-          microcopyKey: isRoot ? 'successToRoot' : 'success',
+          microcopyKey: isRoot ? "successToRoot" : "success",
           data: {
             folderId: folder.id,
             folderName,
@@ -416,28 +497,31 @@ export class FileActionExecutorService {
   private async executeDocumentOperation(
     userId: string,
     method: string,
-    entities: Record<string, string>
+    entities: Record<string, string>,
   ): Promise<ServiceResult> {
     switch (method) {
-      case 'move': {
+      case "move": {
         const filename = entities.filename;
         const targetFolderName = entities.targetFolder;
 
         // Find document
         const doc = await this.findDocument(userId, filename);
         if (!doc) {
-          return { success: false, microcopyKey: 'notFound' };
+          return { success: false, microcopyKey: "notFound" };
         }
 
         // Find target folder (with nested path support)
-        const targetFolder = await this.resolveTargetFolder(userId, targetFolderName);
+        const targetFolder = await this.resolveTargetFolder(
+          userId,
+          targetFolderName,
+        );
         if (!targetFolder) {
-          return { success: false, microcopyKey: 'folderNotFound' };
+          return { success: false, microcopyKey: "folderNotFound" };
         }
 
         // Capture previous folder for undo (both ID and name)
         const previousFolderId = doc.folderId;
-        let originalFolder = 'root';
+        let originalFolder = "root";
         if (previousFolderId) {
           const prevFolder = await prisma.folder.findUnique({
             where: { id: previousFolderId },
@@ -464,20 +548,23 @@ export class FileActionExecutorService {
         };
       }
 
-      case 'copy': {
+      case "copy": {
         const filename = entities.filename;
         const targetFolderName = entities.targetFolder;
 
         // Find document
         const doc = await this.findDocument(userId, filename);
         if (!doc) {
-          return { success: false, microcopyKey: 'notFound' };
+          return { success: false, microcopyKey: "notFound" };
         }
 
         // Find target folder if specified (with nested path support)
         let targetFolderId = doc.folderId;
         if (targetFolderName) {
-          const targetFolder = await this.resolveTargetFolder(userId, targetFolderName);
+          const targetFolder = await this.resolveTargetFolder(
+            userId,
+            targetFolderName,
+          );
           if (targetFolder) {
             targetFolderId = targetFolder.id;
           }
@@ -501,7 +588,7 @@ export class FileActionExecutorService {
 
         return {
           success: true,
-          microcopyKey: targetFolderName ? 'success' : 'successSameFolder',
+          microcopyKey: targetFolderName ? "success" : "successSameFolder",
           data: {
             documentId: copy.id,
             originalId: doc.id,
@@ -512,13 +599,13 @@ export class FileActionExecutorService {
         };
       }
 
-      case 'rename': {
+      case "rename": {
         const filename = entities.filename;
         const newName = entities.newName;
 
         const doc = await this.findDocument(userId, filename);
         if (!doc) {
-          return { success: false, microcopyKey: 'notFound' };
+          return { success: false, microcopyKey: "notFound" };
         }
 
         // Capture previous name for undo (use fallbacks if filename is null)
@@ -540,17 +627,17 @@ export class FileActionExecutorService {
         };
       }
 
-      case 'delete': {
+      case "delete": {
         const filename = entities.filename;
 
         const doc = await this.findDocument(userId, filename);
         if (!doc) {
-          return { success: false, microcopyKey: 'notFound' };
+          return { success: false, microcopyKey: "notFound" };
         }
 
         await prisma.document.update({
           where: { id: doc.id },
-          data: { status: 'deleted' },
+          data: { status: "deleted" },
         });
 
         return {
@@ -559,12 +646,12 @@ export class FileActionExecutorService {
         };
       }
 
-      case 'open': {
+      case "open": {
         const filename = entities.filename;
 
         const doc = await this.findDocument(userId, filename);
         if (!doc) {
-          return { success: false, microcopyKey: 'notFound' };
+          return { success: false, microcopyKey: "notFound" };
         }
 
         return {
@@ -587,21 +674,26 @@ export class FileActionExecutorService {
     targetFolderName: string | undefined,
     language: LanguageCode,
     config: any,
-    bulkConfig: any
+    bulkConfig: any,
   ): Promise<FileActionResult> {
     if (!targetFolderName) {
-      const microcopy = config.microcopy?.missingEntity?.[language] ||
-                        config.microcopy?.missingEntity?.en ||
-                        'Please specify the destination folder.';
+      const microcopy =
+        config.microcopy?.missingEntity?.[language] ||
+        config.microcopy?.missingEntity?.en ||
+        "Please specify the destination folder.";
       return { success: false, message: microcopy };
     }
 
     // Find target folder (with nested path support)
-    const targetFolder = await this.resolveTargetFolder(userId, targetFolderName);
+    const targetFolder = await this.resolveTargetFolder(
+      userId,
+      targetFolderName,
+    );
     if (!targetFolder) {
-      const microcopy = bulkConfig?.microcopy?.folderNotFound?.[language] ||
-                        config.microcopy?.folderNotFound?.[language] ||
-                        `I couldn't find a folder named **${targetFolderName}**.`;
+      const microcopy =
+        bulkConfig?.microcopy?.folderNotFound?.[language] ||
+        config.microcopy?.folderNotFound?.[language] ||
+        `I couldn't find a folder named **${targetFolderName}**.`;
       return { success: false, message: microcopy };
     }
 
@@ -613,7 +705,7 @@ export class FileActionExecutorService {
     for (const docId of documentIds) {
       try {
         const doc = await prisma.document.findFirst({
-          where: { id: docId, userId, status: { not: 'deleted' } },
+          where: { id: docId, userId, status: { not: "deleted" } },
         });
         if (doc) {
           await prisma.document.update({
@@ -621,7 +713,10 @@ export class FileActionExecutorService {
             data: { folderId: targetFolder.id },
           });
           successCount++;
-          movedDocs.push({ id: docId, filename: doc.filename || doc.encryptedFilename || 'file' });
+          movedDocs.push({
+            id: docId,
+            filename: doc.filename || doc.encryptedFilename || "file",
+          });
         } else {
           failCount++;
         }
@@ -631,13 +726,14 @@ export class FileActionExecutorService {
     }
 
     if (successCount === 0) {
-      return { success: false, message: 'No files were moved.' };
+      return { success: false, message: "No files were moved." };
     }
 
-    const microcopyKey = failCount > 0 ? 'partialSuccess' : 'success';
-    const template = bulkConfig?.microcopy?.[microcopyKey]?.[language] ||
-                     bulkConfig?.microcopy?.[microcopyKey]?.en ||
-                     `Done — moved **${successCount}** files to **${targetFolderName}**.`;
+    const microcopyKey = failCount > 0 ? "partialSuccess" : "success";
+    const template =
+      bulkConfig?.microcopy?.[microcopyKey]?.[language] ||
+      bulkConfig?.microcopy?.[microcopyKey]?.en ||
+      `Done — moved **${successCount}** files to **${targetFolderName}**.`;
 
     const message = this.interpolate(template, {
       count: String(successCount),
@@ -647,21 +743,23 @@ export class FileActionExecutorService {
     });
 
     // Build attachments for moved files (show first few)
-    const attachments: FileActionAttachment[] = movedDocs.slice(0, 3).map(doc => ({
-      type: 'document' as const,
-      id: doc.id,
-      docId: doc.id,
-      documentId: doc.id,
-      title: doc.filename,
-      filename: doc.filename,
-    }));
+    const attachments: FileActionAttachment[] = movedDocs
+      .slice(0, 3)
+      .map((doc) => ({
+        type: "document" as const,
+        id: doc.id,
+        docId: doc.id,
+        documentId: doc.id,
+        title: doc.filename,
+        filename: doc.filename,
+      }));
 
     return {
       success: true,
       message,
       attachments: attachments.length > 0 ? attachments : undefined,
       data: { count: successCount, targetFolder: targetFolderName, movedDocs },
-      operator: 'file_bulk_move',
+      operator: "file_bulk_move",
     };
   }
 
@@ -673,7 +771,7 @@ export class FileActionExecutorService {
     documentIds: string[],
     language: LanguageCode,
     config: any,
-    bulkConfig: any
+    bulkConfig: any,
   ): Promise<FileActionResult> {
     let successCount = 0;
 
@@ -681,7 +779,7 @@ export class FileActionExecutorService {
       try {
         await prisma.document.update({
           where: { id: docId, userId },
-          data: { status: 'deleted' },
+          data: { status: "deleted" },
         });
         successCount++;
       } catch {
@@ -689,9 +787,10 @@ export class FileActionExecutorService {
       }
     }
 
-    const template = bulkConfig?.microcopy?.success?.[language] ||
-                     bulkConfig?.microcopy?.success?.en ||
-                     `Done — deleted **${successCount}** files.`;
+    const template =
+      bulkConfig?.microcopy?.success?.[language] ||
+      bulkConfig?.microcopy?.success?.en ||
+      `Done — deleted **${successCount}** files.`;
 
     const message = this.interpolate(template, { count: String(successCount) });
 
@@ -699,7 +798,7 @@ export class FileActionExecutorService {
       success: true,
       message,
       data: { count: successCount },
-      operator: 'file_bulk_delete',
+      operator: "file_bulk_delete",
     };
   }
 
@@ -712,12 +811,15 @@ export class FileActionExecutorService {
     targetFolderName: string | undefined,
     language: LanguageCode,
     config: any,
-    bulkConfig: any
+    bulkConfig: any,
   ): Promise<FileActionResult> {
     // Find target folder if specified
     let targetFolderId: string | null = null;
     if (targetFolderName) {
-      const targetFolder = await this.resolveTargetFolder(userId, targetFolderName);
+      const targetFolder = await this.resolveTargetFolder(
+        userId,
+        targetFolderName,
+      );
       if (targetFolder) {
         targetFolderId = targetFolder.id;
       }
@@ -729,10 +831,10 @@ export class FileActionExecutorService {
     for (const docId of documentIds) {
       try {
         const doc = await prisma.document.findFirst({
-          where: { id: docId, userId, status: { not: 'deleted' } },
+          where: { id: docId, userId, status: { not: "deleted" } },
         });
         if (doc) {
-          const copyName = this.generateCopyName(doc.filename || 'file');
+          const copyName = this.generateCopyName(doc.filename || "file");
           const copy = await prisma.document.create({
             data: {
               userId,
@@ -754,20 +856,21 @@ export class FileActionExecutorService {
       }
     }
 
-    const template = bulkConfig?.microcopy?.success?.[language] ||
-                     bulkConfig?.microcopy?.success?.en ||
-                     `Done — copied **${successCount}** files.`;
+    const template =
+      bulkConfig?.microcopy?.success?.[language] ||
+      bulkConfig?.microcopy?.success?.en ||
+      `Done — copied **${successCount}** files.`;
 
     const message = this.interpolate(template, {
       count: String(successCount),
-      targetFolder: targetFolderName || 'same folder',
+      targetFolder: targetFolderName || "same folder",
     });
 
     return {
       success: true,
       message,
       data: { count: successCount, copiedDocs },
-      operator: 'file_bulk_copy',
+      operator: "file_bulk_copy",
     };
   }
 
@@ -780,20 +883,25 @@ export class FileActionExecutorService {
     filenames: string[],
     targetFolderName: string | undefined,
     language: LanguageCode,
-    config: any
+    config: any,
   ): Promise<FileActionResult> {
     if (!targetFolderName) {
-      const microcopy = config.microcopy?.missingEntity?.[language] ||
-                        config.microcopy?.missingEntity?.en ||
-                        'Please specify the destination folder.';
+      const microcopy =
+        config.microcopy?.missingEntity?.[language] ||
+        config.microcopy?.missingEntity?.en ||
+        "Please specify the destination folder.";
       return { success: false, message: microcopy };
     }
 
     // Find target folder (with nested path support)
-    const targetFolder = await this.resolveTargetFolder(userId, targetFolderName);
+    const targetFolder = await this.resolveTargetFolder(
+      userId,
+      targetFolderName,
+    );
     if (!targetFolder) {
-      const microcopy = config.microcopy?.folderNotFound?.[language] ||
-                        `I couldn't find a folder named **${targetFolderName}**.`;
+      const microcopy =
+        config.microcopy?.folderNotFound?.[language] ||
+        `I couldn't find a folder named **${targetFolderName}**.`;
       return { success: false, message: microcopy };
     }
 
@@ -822,16 +930,18 @@ export class FileActionExecutorService {
     }
 
     if (successCount === 0) {
-      const microcopy = config.microcopy?.noneFound?.[language] ||
-                        config.microcopy?.noneFound?.en ||
-                        "I couldn't find any of those files.";
+      const microcopy =
+        config.microcopy?.noneFound?.[language] ||
+        config.microcopy?.noneFound?.en ||
+        "I couldn't find any of those files.";
       return { success: false, message: microcopy };
     }
 
-    const microcopyKey = failCount > 0 ? 'partialSuccess' : 'success';
-    const template = config.microcopy?.[microcopyKey]?.[language] ||
-                     config.microcopy?.[microcopyKey]?.en ||
-                     `Done — moved **${successCount}** files to **${targetFolderName}**.`;
+    const microcopyKey = failCount > 0 ? "partialSuccess" : "success";
+    const template =
+      config.microcopy?.[microcopyKey]?.[language] ||
+      config.microcopy?.[microcopyKey]?.en ||
+      `Done — moved **${successCount}** files to **${targetFolderName}**.`;
 
     const message = this.interpolate(template, {
       count: String(successCount),
@@ -841,21 +951,23 @@ export class FileActionExecutorService {
     });
 
     // Build attachments for moved files (show first few)
-    const attachments: FileActionAttachment[] = movedDocs.slice(0, 3).map(doc => ({
-      type: 'document' as const,
-      id: doc.id,
-      docId: doc.id,
-      documentId: doc.id,
-      title: doc.filename,
-      filename: doc.filename,
-    }));
+    const attachments: FileActionAttachment[] = movedDocs
+      .slice(0, 3)
+      .map((doc) => ({
+        type: "document" as const,
+        id: doc.id,
+        docId: doc.id,
+        documentId: doc.id,
+        title: doc.filename,
+        filename: doc.filename,
+      }));
 
     return {
       success: true,
       message,
       attachments: attachments.length > 0 ? attachments : undefined,
       data: { count: successCount, targetFolder: targetFolderName, movedDocs },
-      operator: 'file_multi_move',
+      operator: "file_multi_move",
     };
   }
 
@@ -864,10 +976,11 @@ export class FileActionExecutorService {
    */
   private async resolveTargetFolder(
     userId: string,
-    folderName: string
+    folderName: string,
   ): Promise<{ id: string; name: string } | null> {
     // Check for nested path patterns: "X inside Y", "X in Y", "X within Y", "X dentro de Y"
-    const nestedPattern = /^(.+?)\s+(?:inside|in|within|under|dentro\s+de|em|sob)\s+(.+)$/i;
+    const nestedPattern =
+      /^(.+?)\s+(?:inside|in|within|under|dentro\s+de|em|sob)\s+(.+)$/i;
     const nestedMatch = folderName.match(nestedPattern);
 
     if (nestedMatch) {
@@ -876,7 +989,11 @@ export class FileActionExecutorService {
 
       // First find the parent folder
       const parentFolder = await prisma.folder.findFirst({
-        where: { userId, name: { equals: parentName, mode: 'insensitive' }, isDeleted: false },
+        where: {
+          userId,
+          name: { equals: parentName, mode: "insensitive" },
+          isDeleted: false,
+        },
       });
 
       if (!parentFolder) {
@@ -887,18 +1004,24 @@ export class FileActionExecutorService {
       const targetFolder = await prisma.folder.findFirst({
         where: {
           userId,
-          name: { equals: targetName, mode: 'insensitive' },
+          name: { equals: targetName, mode: "insensitive" },
           parentFolderId: parentFolder.id,
           isDeleted: false,
         },
       });
 
-      return targetFolder ? { id: targetFolder.id, name: targetFolder.name || folderName } : null;
+      return targetFolder
+        ? { id: targetFolder.id, name: targetFolder.name || folderName }
+        : null;
     }
 
     // Simple folder lookup (no nesting)
     const folder = await prisma.folder.findFirst({
-      where: { userId, name: { equals: folderName, mode: 'insensitive' }, isDeleted: false },
+      where: {
+        userId,
+        name: { equals: folderName, mode: "insensitive" },
+        isDeleted: false,
+      },
     });
 
     return folder ? { id: folder.id, name: folder.name || folderName } : null;
@@ -911,7 +1034,7 @@ export class FileActionExecutorService {
     const lastAction = await this.actionHistory.getLastUndoable(userId);
 
     if (!lastAction) {
-      return { success: false, microcopyKey: 'nothingToUndo' };
+      return { success: false, microcopyKey: "nothingToUndo" };
     }
 
     const { id, operator, previousState, entityIds } = lastAction;
@@ -922,12 +1045,12 @@ export class FileActionExecutorService {
       if (!entityValid) {
         // Entity no longer exists - mark as used and report error
         await this.actionHistory.markUsed(id);
-        return { success: false, microcopyKey: 'entityNotFound' };
+        return { success: false, microcopyKey: "entityNotFound" };
       }
 
       // Restore previous state based on operator type
       switch (operator) {
-        case 'folder_create':
+        case "folder_create":
           // Delete the created folder
           await prisma.folder.update({
             where: { id: entityIds.folderId },
@@ -935,7 +1058,7 @@ export class FileActionExecutorService {
           });
           break;
 
-        case 'folder_rename':
+        case "folder_rename":
           // Rename back to original
           await prisma.folder.update({
             where: { id: entityIds.folderId },
@@ -943,7 +1066,7 @@ export class FileActionExecutorService {
           });
           break;
 
-        case 'folder_move':
+        case "folder_move":
           // Move back to original parent
           await prisma.folder.update({
             where: { id: entityIds.folderId },
@@ -951,7 +1074,7 @@ export class FileActionExecutorService {
           });
           break;
 
-        case 'file_move':
+        case "file_move":
           // Move back to original folder
           await prisma.document.update({
             where: { id: entityIds.documentId },
@@ -959,24 +1082,27 @@ export class FileActionExecutorService {
           });
           break;
 
-        case 'file_copy':
+        case "file_copy":
           // Delete the copy
           await prisma.document.update({
             where: { id: entityIds.copyId || entityIds.documentId },
-            data: { status: 'deleted' },
+            data: { status: "deleted" },
           });
           break;
 
-        case 'file_rename':
+        case "file_rename":
           // Rename back to original
           await prisma.document.update({
             where: { id: entityIds.documentId },
-            data: { filename: previousState.filename, encryptedFilename: previousState.filename },
+            data: {
+              filename: previousState.filename,
+              encryptedFilename: previousState.filename,
+            },
           });
           break;
 
         default:
-          return { success: false, microcopyKey: 'cannotUndo' };
+          return { success: false, microcopyKey: "cannotUndo" };
       }
 
       // Mark action as used
@@ -993,7 +1119,7 @@ export class FileActionExecutorService {
     } catch (error: any) {
       // Mark as used to prevent repeated failures
       await this.actionHistory.markUsed(id).catch(() => {});
-      return { success: false, error: error.message || 'Undo failed' };
+      return { success: false, error: error.message || "Undo failed" };
     }
   }
 
@@ -1002,13 +1128,13 @@ export class FileActionExecutorService {
    */
   private async validateUndoEntity(
     operator: string,
-    entityIds: Record<string, string>
+    entityIds: Record<string, string>,
   ): Promise<boolean> {
     try {
       switch (operator) {
-        case 'folder_create':
-        case 'folder_rename':
-        case 'folder_move': {
+        case "folder_create":
+        case "folder_rename":
+        case "folder_move": {
           if (!entityIds.folderId) return false;
           const folder = await prisma.folder.findUnique({
             where: { id: entityIds.folderId },
@@ -1016,22 +1142,22 @@ export class FileActionExecutorService {
           return folder !== null && !folder.isDeleted;
         }
 
-        case 'file_move':
-        case 'file_rename': {
+        case "file_move":
+        case "file_rename": {
           if (!entityIds.documentId) return false;
           const doc = await prisma.document.findUnique({
             where: { id: entityIds.documentId },
           });
-          return doc !== null && doc.status !== 'deleted';
+          return doc !== null && doc.status !== "deleted";
         }
 
-        case 'file_copy': {
+        case "file_copy": {
           const copyId = entityIds.copyId || entityIds.documentId;
           if (!copyId) return false;
           const doc = await prisma.document.findUnique({
             where: { id: copyId },
           });
-          return doc !== null && doc.status !== 'deleted';
+          return doc !== null && doc.status !== "deleted";
         }
 
         default:
@@ -1050,16 +1176,19 @@ export class FileActionExecutorService {
     bulkConfig: any,
     entities: Record<string, string>,
     lang: LanguageCode,
-    operator: string
+    operator: string,
   ): FileActionResult {
     const confirmation = bulkConfig?.confirmation || config.confirmation;
     if (!confirmation) {
-      return { success: false, message: 'Confirmation required but not configured.' };
+      return {
+        success: false,
+        message: "Confirmation required but not configured.",
+      };
     }
 
     const message = this.interpolate(
       confirmation.prompt[lang] || confirmation.prompt.en,
-      entities
+      entities,
     );
 
     return {
@@ -1067,14 +1196,18 @@ export class FileActionExecutorService {
       requiresConfirmation: true,
       message,
       operator,
-      attachments: [{
-        type: 'action_confirmation',
-        confirmationId: `${operator}_${Date.now()}`,
-        operator,  // Include operator for confirmation flow
-        confirmLabel: confirmation.confirmLabel[lang] || confirmation.confirmLabel.en,
-        cancelLabel: confirmation.cancelLabel[lang] || confirmation.cancelLabel.en,
-        confirmStyle: confirmation.confirmStyle,
-      }],
+      attachments: [
+        {
+          type: "action_confirmation",
+          confirmationId: `${operator}_${Date.now()}`,
+          operator, // Include operator for confirmation flow
+          confirmLabel:
+            confirmation.confirmLabel[lang] || confirmation.confirmLabel.en,
+          cancelLabel:
+            confirmation.cancelLabel[lang] || confirmation.cancelLabel.en,
+          confirmStyle: confirmation.confirmStyle,
+        },
+      ],
     };
   }
 
@@ -1087,21 +1220,23 @@ export class FileActionExecutorService {
     entities: Record<string, string>,
     result: ServiceResult,
     lang: LanguageCode,
-    operator: string
+    operator: string,
   ): FileActionResult {
     const microcopy = bulkConfig?.microcopy || config.microcopy;
-    const microcopyKey = result.microcopyKey || (result.success ? 'success' : 'error');
+    const microcopyKey =
+      result.microcopyKey || (result.success ? "success" : "error");
 
-    let template = microcopy?.[microcopyKey]?.[lang] ||
-                   microcopy?.[microcopyKey]?.en ||
-                   (result.success ? 'Done.' : 'Operation failed.');
+    let template =
+      microcopy?.[microcopyKey]?.[lang] ||
+      microcopy?.[microcopyKey]?.en ||
+      (result.success ? "Done." : "Operation failed.");
 
     // For undo, get the undo description
-    if (operator === 'undo' && result.success && result.data) {
+    if (operator === "undo" && result.success && result.data) {
       const undoDesc = this.actionHistory.getUndoDescription(
         result.data.operator,
         { ...entities, ...result.data.entityIds, ...result.data.previousState },
-        lang
+        lang,
       );
       entities.undoDescription = undoDesc;
     }
@@ -1118,27 +1253,31 @@ export class FileActionExecutorService {
     const attachments: FileActionAttachment[] = [];
     if (result.success && result.data) {
       // For rename operations, show the NEW name in the pill
-      const isRename = operator === 'folder_rename' || operator === 'file_rename';
+      const isRename =
+        operator === "folder_rename" || operator === "file_rename";
 
-      if (result.data.folderId && !['folder_delete'].includes(operator)) {
+      if (result.data.folderId && !["folder_delete"].includes(operator)) {
         const displayName = isRename
-          ? (result.data.newName || result.data.folderName || '')
-          : (result.data.folderName || result.data.newName || '');
+          ? result.data.newName || result.data.folderName || ""
+          : result.data.folderName || result.data.newName || "";
         attachments.push({
-          type: 'folder',
+          type: "folder",
           id: result.data.folderId,
           folderId: result.data.folderId,
           title: displayName,
           filename: displayName,
         });
-      } else if (result.data.documentId && !['file_delete'].includes(operator)) {
+      } else if (
+        result.data.documentId &&
+        !["file_delete"].includes(operator)
+      ) {
         const displayName = isRename
-          ? (result.data.newName || result.data.filename || '')
-          : (result.data.filename || result.data.newName || '');
+          ? result.data.newName || result.data.filename || ""
+          : result.data.filename || result.data.newName || "";
         attachments.push({
-          type: 'document',
+          type: "document",
           id: result.data.documentId,
-          docId: result.data.documentId,  // Frontend expects docId
+          docId: result.data.documentId, // Frontend expects docId
           documentId: result.data.documentId,
           title: displayName,
           filename: displayName,
@@ -1162,7 +1301,7 @@ export class FileActionExecutorService {
     userId: string,
     operator: string,
     data: Record<string, any>,
-    entities: Record<string, string>
+    entities: Record<string, string>,
   ): Promise<void> {
     const entry: UndoHistoryEntry = {
       userId,
@@ -1180,10 +1319,13 @@ export class FileActionExecutorService {
     if (entities.folderName) entry.entityIds.folderName = entities.folderName;
     if (entities.filename) entry.entityIds.filename = entities.filename;
     if (entities.newName) entry.entityIds.newName = entities.newName;
-    if (entities.targetFolder) entry.entityIds.targetFolder = entities.targetFolder;
+    if (entities.targetFolder)
+      entry.entityIds.targetFolder = entities.targetFolder;
     // Add originalParent/originalFolder for move undo descriptions
-    if (data.originalParent) entry.entityIds.originalParent = data.originalParent;
-    if (data.originalFolder) entry.entityIds.originalFolder = data.originalFolder;
+    if (data.originalParent)
+      entry.entityIds.originalParent = data.originalParent;
+    if (data.originalFolder)
+      entry.entityIds.originalFolder = data.originalFolder;
 
     await this.actionHistory.record(entry);
   }
@@ -1195,10 +1337,10 @@ export class FileActionExecutorService {
     return prisma.document.findFirst({
       where: {
         userId,
-        status: { not: 'deleted' },
+        status: { not: "deleted" },
         OR: [
-          { filename: { contains: filename, mode: 'insensitive' } },
-          { encryptedFilename: { contains: filename, mode: 'insensitive' } },
+          { filename: { contains: filename, mode: "insensitive" } },
+          { encryptedFilename: { contains: filename, mode: "insensitive" } },
         ],
       },
     });
@@ -1209,15 +1351,22 @@ export class FileActionExecutorService {
    */
   private isRootTarget(target: string, entities: Record<string, any>): boolean {
     if (!target) return false;
-    const rootTerms = ['root', 'top level', 'top-level', 'raiz', 'nível principal', 'nivel principal'];
-    return rootTerms.some(t => target.toLowerCase().includes(t));
+    const rootTerms = [
+      "root",
+      "top level",
+      "top-level",
+      "raiz",
+      "nível principal",
+      "nivel principal",
+    ];
+    return rootTerms.some((t) => target.toLowerCase().includes(t));
   }
 
   /**
    * Generate a copy name for a file.
    */
   private generateCopyName(originalName: string): string {
-    const dotIndex = originalName.lastIndexOf('.');
+    const dotIndex = originalName.lastIndexOf(".");
     if (dotIndex === -1) {
       return `${originalName} (copy)`;
     }
@@ -1261,19 +1410,21 @@ export class FileActionExecutorService {
   detectOperator(message: string): string | null {
     const bank = this.ensureBank();
     if (!bank) {
-      console.log('[FileActionExecutor] detectOperator: bank not loaded');
+      console.log("[FileActionExecutor] detectOperator: bank not loaded");
       return null;
     }
 
     const detectionConfig = bank.config.operatorDetection;
     if (!detectionConfig?.enabled) {
-      console.log('[FileActionExecutor] detectOperator: detection disabled');
+      console.log("[FileActionExecutor] detectOperator: detection disabled");
       return null;
     }
 
     const detectionRules = bank.detectionRules;
     if (!detectionRules || detectionRules.length === 0) {
-      console.log('[FileActionExecutor] detectOperator: no detection rules found');
+      console.log(
+        "[FileActionExecutor] detectOperator: no detection rules found",
+      );
       return null;
     }
 
@@ -1283,7 +1434,11 @@ export class FileActionExecutorService {
     }
 
     // Collect all matching candidates with their priority and confidence
-    const candidates: Array<{ operator: string; priority: number; confidence: number }> = [];
+    const candidates: Array<{
+      operator: string;
+      priority: number;
+      confidence: number;
+    }> = [];
 
     for (const rule of detectionRules) {
       if (this.ruleMatches(message, rule, detectionConfig.caseInsensitive)) {
@@ -1307,7 +1462,10 @@ export class FileActionExecutorService {
    */
   private failsGlobalGuards(
     message: string,
-    guards?: { mustNotMatchWholeMessage?: Record<string, string[]>; mustNotContain?: Record<string, string[]> }
+    guards?: {
+      mustNotMatchWholeMessage?: Record<string, string[]>;
+      mustNotContain?: Record<string, string[]>;
+    },
   ): boolean {
     if (!guards) return false;
 
@@ -1315,28 +1473,32 @@ export class FileActionExecutorService {
 
     // Check mustNotMatchWholeMessage patterns
     if (guards.mustNotMatchWholeMessage) {
-      for (const lang of ['en', 'pt']) {
+      for (const lang of ["en", "pt"]) {
         const patterns = guards.mustNotMatchWholeMessage[lang] || [];
         for (const pattern of patterns) {
           try {
-            if (new RegExp(pattern, 'i').test(msg)) {
+            if (new RegExp(pattern, "i").test(msg)) {
               return true;
             }
-          } catch { /* invalid regex, skip */ }
+          } catch {
+            /* invalid regex, skip */
+          }
         }
       }
     }
 
     // Check mustNotContain patterns
     if (guards.mustNotContain) {
-      for (const lang of ['en', 'pt']) {
+      for (const lang of ["en", "pt"]) {
         const patterns = guards.mustNotContain[lang] || [];
         for (const pattern of patterns) {
           try {
-            if (new RegExp(pattern, 'i').test(msg)) {
+            if (new RegExp(pattern, "i").test(msg)) {
               return true;
             }
-          } catch { /* invalid regex, skip */ }
+          } catch {
+            /* invalid regex, skip */
+          }
         }
       }
     }
@@ -1349,22 +1511,28 @@ export class FileActionExecutorService {
    */
   private ruleMatches(
     message: string,
-    rule: { patterns: Record<string, string[]>; mustContain?: Record<string, string[]>; mustNotContain?: Record<string, string[]> },
-    caseInsensitive: boolean
+    rule: {
+      patterns: Record<string, string[]>;
+      mustContain?: Record<string, string[]>;
+      mustNotContain?: Record<string, string[]>;
+    },
+    caseInsensitive: boolean,
   ): boolean {
-    const flags = caseInsensitive ? 'i' : '';
+    const flags = caseInsensitive ? "i" : "";
     const msg = caseInsensitive ? message.toLowerCase() : message;
 
     // Check mustNotContain first (exclusion patterns)
     if (rule.mustNotContain) {
-      for (const lang of ['en', 'pt']) {
+      for (const lang of ["en", "pt"]) {
         const patterns = rule.mustNotContain[lang] || [];
         for (const pattern of patterns) {
           try {
             if (new RegExp(pattern, flags).test(message)) {
               return false;
             }
-          } catch { /* invalid regex, skip */ }
+          } catch {
+            /* invalid regex, skip */
+          }
         }
       }
     }
@@ -1372,7 +1540,7 @@ export class FileActionExecutorService {
     // Check mustContain if present
     if (rule.mustContain) {
       let hasRequired = false;
-      for (const lang of ['en', 'pt']) {
+      for (const lang of ["en", "pt"]) {
         const patterns = rule.mustContain[lang] || [];
         for (const pattern of patterns) {
           try {
@@ -1380,7 +1548,9 @@ export class FileActionExecutorService {
               hasRequired = true;
               break;
             }
-          } catch { /* invalid regex, skip */ }
+          } catch {
+            /* invalid regex, skip */
+          }
         }
         if (hasRequired) break;
       }
@@ -1388,14 +1558,16 @@ export class FileActionExecutorService {
     }
 
     // Check main patterns (any match is sufficient)
-    for (const lang of ['en', 'pt']) {
+    for (const lang of ["en", "pt"]) {
       const patterns = rule.patterns[lang] || [];
       for (const pattern of patterns) {
         try {
           if (new RegExp(pattern, flags).test(message)) {
             return true;
           }
-        } catch { /* invalid regex, skip */ }
+        } catch {
+          /* invalid regex, skip */
+        }
       }
     }
 

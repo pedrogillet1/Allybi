@@ -1,5 +1,5 @@
 // src/services/retrieval/pinecone.service.ts
-import { Pinecone } from '@pinecone-database/pinecone';
+import { Pinecone } from "@pinecone-database/pinecone";
 
 type Primitive = string | number | boolean;
 type PineconeMetaValue = Primitive | Primitive[];
@@ -70,13 +70,19 @@ export class PineconeService {
   private readonly deleteBatchSize: number;
 
   constructor() {
-    this.indexName = process.env.PINECONE_INDEX_NAME || 'koda-openai';
+    this.indexName = process.env.PINECONE_INDEX_NAME || "koda-openai";
     this.dimension = Number(process.env.PINECONE_DIMENSION || 1536);
     this.defaultTopK = Number(process.env.PINECONE_DEFAULT_TOPK || 10);
-    this.defaultMinSimilarity = Number(process.env.PINECONE_DEFAULT_MIN_SIMILARITY || 0.3);
+    this.defaultMinSimilarity = Number(
+      process.env.PINECONE_DEFAULT_MIN_SIMILARITY || 0.3,
+    );
     // Increased from 100 to 200 for better throughput on large document batches
-    this.upsertBatchSize = Number(process.env.PINECONE_UPSERT_BATCH_SIZE || 200);
-    this.deleteBatchSize = Number(process.env.PINECONE_DELETE_BATCH_SIZE || 1000);
+    this.upsertBatchSize = Number(
+      process.env.PINECONE_UPSERT_BATCH_SIZE || 200,
+    );
+    this.deleteBatchSize = Number(
+      process.env.PINECONE_DELETE_BATCH_SIZE || 1000,
+    );
   }
 
   private async ensureInit(): Promise<void> {
@@ -99,7 +105,7 @@ export class PineconeService {
   }
 
   private getIndex() {
-    if (!this.pc) throw new Error('Pinecone client not initialized');
+    if (!this.pc) throw new Error("Pinecone client not initialized");
     return this.pc.index(this.indexName);
   }
 
@@ -110,7 +116,7 @@ export class PineconeService {
     if (vec.length !== this.dimension) {
       throw new Error(
         `[Pinecone] ${label} embedding dim mismatch: got ${vec.length}, expected ${this.dimension}. ` +
-          `Set PINECONE_DIMENSION to match your index.`
+          `Set PINECONE_DIMENSION to match your index.`,
       );
     }
   }
@@ -128,7 +134,7 @@ export class PineconeService {
 
   private toIso(d: Date | string | undefined): string | undefined {
     if (!d) return undefined;
-    if (typeof d === 'string') return d;
+    if (typeof d === "string") return d;
     return d.toISOString();
   }
 
@@ -138,7 +144,10 @@ export class PineconeService {
    * - Converts arrays of non-primitives into strings
    * - Converts objects into JSON strings (truncated)
    */
-  private sanitizeMetadata(obj: Record<string, any>, maxJsonChars = 2000): Record<string, PineconeMetaValue> {
+  private sanitizeMetadata(
+    obj: Record<string, any>,
+    maxJsonChars = 2000,
+  ): Record<string, PineconeMetaValue> {
     const out: Record<string, PineconeMetaValue> = {};
 
     for (const [k, v] of Object.entries(obj || {})) {
@@ -146,14 +155,21 @@ export class PineconeService {
 
       const t = typeof v;
 
-      if (t === 'string' || t === 'number' || t === 'boolean') {
+      if (t === "string" || t === "number" || t === "boolean") {
         out[k] = v as Primitive;
         continue;
       }
 
       if (Array.isArray(v)) {
         // allow string/number/boolean arrays
-        if (v.every(x => typeof x === 'string' || typeof x === 'number' || typeof x === 'boolean')) {
+        if (
+          v.every(
+            (x) =>
+              typeof x === "string" ||
+              typeof x === "number" ||
+              typeof x === "boolean",
+          )
+        ) {
           out[k] = v as Primitive[];
         } else {
           out[k] = JSON.stringify(v).slice(0, maxJsonChars);
@@ -173,7 +189,7 @@ export class PineconeService {
   }
 
   private hasNonZero(vec: number[]): boolean {
-    return vec.some(n => n !== 0);
+    return vec.some((n) => n !== 0);
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -184,14 +200,15 @@ export class PineconeService {
     documentId: string,
     userId: string,
     document: DocumentMetadataForPinecone,
-    chunks: ChunkForPineconeUpsert[]
+    chunks: ChunkForPineconeUpsert[],
   ): Promise<{ upserted: number; skipped: number }> {
     await this.ensureInit();
     if (!this.isAvailable()) return { upserted: 0, skipped: chunks.length };
 
     const index = this.getIndex();
 
-    const createdAt = this.toIso(document.createdAt) || new Date().toISOString();
+    const createdAt =
+      this.toIso(document.createdAt) || new Date().toISOString();
     const uploadedAt = this.toIso(document.uploadedAt);
 
     const vectors = [];
@@ -206,7 +223,7 @@ export class PineconeService {
       this.assertVectorDim(c.embedding, `chunk ${c.chunkIndex}`);
 
       // Keep content in metadata (for fast retrieval), but cap size
-      const content = (c.content || '').slice(0, 5000);
+      const content = (c.content || "").slice(0, 5000);
 
       const meta = this.sanitizeMetadata({
         // scoping
@@ -235,7 +252,10 @@ export class PineconeService {
         content,
 
         // embedding model tracking (for consistency verification)
-        embeddingModel: c.metadata?.embeddingModel || process.env.OPENAI_EMBEDDING_MODEL || 'text-embedding-3-small',
+        embeddingModel:
+          c.metadata?.embeddingModel ||
+          process.env.OPENAI_EMBEDDING_MODEL ||
+          "text-embedding-3-small",
         embeddingDim: c.metadata?.embeddingDim || this.dimension,
 
         // extra extraction metadata (pageStart/pageEnd/sheetName/cellRange/etc.)
@@ -252,7 +272,7 @@ export class PineconeService {
     if (vectors.length === 0) {
       throw new Error(
         `[Pinecone] All embeddings invalid (empty or all-zero). ` +
-          `Upsert aborted for document ${documentId}.`
+          `Upsert aborted for document ${documentId}.`,
       );
     }
 
@@ -261,7 +281,7 @@ export class PineconeService {
     for (let i = 0; i < vectors.length; i += this.upsertBatchSize) {
       upsertBatches.push(vectors.slice(i, i + this.upsertBatchSize));
     }
-    await Promise.all(upsertBatches.map(batch => index.upsert(batch as any)));
+    await Promise.all(upsertBatches.map((batch) => index.upsert(batch as any)));
 
     return { upserted: vectors.length, skipped };
   }
@@ -276,16 +296,20 @@ export class PineconeService {
     topK = this.defaultTopK,
     minSimilarity = this.defaultMinSimilarity,
     attachedDocumentId?: string,
-    folderId?: string
+    folderId?: string,
   ): Promise<PineconeSearchHit[]> {
     await this.ensureInit();
     if (!this.isAvailable()) return [];
 
-    this.assertVectorDim(queryEmbedding, 'query');
+    this.assertVectorDim(queryEmbedding, "query");
 
     const index = this.getIndex();
 
-    const filter: any = this.buildFilter({ userId, documentId: attachedDocumentId, folderId });
+    const filter: any = this.buildFilter({
+      userId,
+      documentId: attachedDocumentId,
+      folderId,
+    });
 
     const res = await index.query({
       vector: queryEmbedding,
@@ -302,24 +326,24 @@ export class PineconeService {
       if (score < minSimilarity) continue;
 
       const md = (m?.metadata || {}) as Record<string, any>;
-      const documentId = String(md.documentId || '');
+      const documentId = String(md.documentId || "");
       if (!documentId) continue;
 
       // Soft filter out deleted docs purely from Pinecone metadata (no DB call)
-      const status = String(md.status || 'active');
-      if (status === 'deleted') continue;
+      const status = String(md.status || "active");
+      if (status === "deleted") continue;
 
       hits.push({
         documentId,
         chunkIndex: Number(md.chunkIndex ?? -1),
-        content: String(md.content || ''),
+        content: String(md.content || ""),
         similarity: score,
         metadata: md,
         document: {
           id: documentId,
-          filename: String(md.filename || ''),
-          mimeType: String(md.mimeType || ''),
-          createdAt: String(md.createdAt || ''),
+          filename: String(md.filename || ""),
+          mimeType: String(md.mimeType || ""),
+          createdAt: String(md.createdAt || ""),
           status,
           folderId: md.folderId ? String(md.folderId) : undefined,
           folderPath: md.folderPath ? String(md.folderPath) : undefined,
@@ -336,7 +360,9 @@ export class PineconeService {
       if (!prev || h.similarity > prev.similarity) seen.set(k, h);
     }
 
-    return [...seen.values()].sort((a, b) => b.similarity - a.similarity).slice(0, topK);
+    return [...seen.values()]
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, topK);
   }
 
   async query(embedding: number[], options: PineconeQueryOptions) {
@@ -346,10 +372,10 @@ export class PineconeService {
       options.topK ?? this.defaultTopK,
       options.minSimilarity ?? this.defaultMinSimilarity,
       options.documentId,
-      options.folderId
+      options.folderId,
     );
 
-    return results.map(r => ({
+    return results.map((r) => ({
       documentId: r.documentId,
       content: r.content,
       filename: r.document.filename,
@@ -365,13 +391,27 @@ export class PineconeService {
     }));
   }
 
-  private buildFilter(args: { userId: string; documentId?: string; folderId?: string }) {
+  private buildFilter(args: {
+    userId: string;
+    documentId?: string;
+    folderId?: string;
+  }) {
     // Use $and only when needed (keeps filter simple and compatible)
     if (args.documentId) {
-      return { $and: [{ userId: { $eq: args.userId } }, { documentId: { $eq: args.documentId } }] };
+      return {
+        $and: [
+          { userId: { $eq: args.userId } },
+          { documentId: { $eq: args.documentId } },
+        ],
+      };
     }
     if (args.folderId) {
-      return { $and: [{ userId: { $eq: args.userId } }, { folderId: { $eq: args.folderId } }] };
+      return {
+        $and: [
+          { userId: { $eq: args.userId } },
+          { folderId: { $eq: args.folderId } },
+        ],
+      };
     }
     return { userId: { $eq: args.userId } };
   }
@@ -380,7 +420,12 @@ export class PineconeService {
   // METADATA-ONLY LOOKUPS (slide/sheet) using dummy non-zero vector
   // ─────────────────────────────────────────────────────────────
 
-  async searchBySlideNumber(userId: string, slideNumber: number, topK = 50, documentId?: string) {
+  async searchBySlideNumber(
+    userId: string,
+    slideNumber: number,
+    topK = 50,
+    documentId?: string,
+  ) {
     await this.ensureInit();
     if (!this.isAvailable()) return [];
 
@@ -403,7 +448,12 @@ export class PineconeService {
     return this.mapMatchesToHits(res?.matches || []);
   }
 
-  async searchBySheetNumber(userId: string, sheetNumber: number, topK = 200, documentId?: string) {
+  async searchBySheetNumber(
+    userId: string,
+    sheetNumber: number,
+    topK = 200,
+    documentId?: string,
+  ) {
     await this.ensureInit();
     if (!this.isAvailable()) return [];
 
@@ -431,23 +481,23 @@ export class PineconeService {
 
     for (const m of matches || []) {
       const md = (m?.metadata || {}) as Record<string, any>;
-      const documentId = String(md.documentId || '');
+      const documentId = String(md.documentId || "");
       if (!documentId) continue;
 
-      const status = String(md.status || 'active');
-      if (status === 'deleted') continue;
+      const status = String(md.status || "active");
+      if (status === "deleted") continue;
 
       hits.push({
         documentId,
         chunkIndex: Number(md.chunkIndex ?? -1),
-        content: String(md.content || ''),
+        content: String(md.content || ""),
         similarity: Number(m?.score || 0),
         metadata: md,
         document: {
           id: documentId,
-          filename: String(md.filename || ''),
-          mimeType: String(md.mimeType || ''),
-          createdAt: String(md.createdAt || ''),
+          filename: String(md.filename || ""),
+          mimeType: String(md.mimeType || ""),
+          createdAt: String(md.createdAt || ""),
           status,
           folderId: md.folderId ? String(md.folderId) : undefined,
           folderPath: md.folderPath ? String(md.folderPath) : undefined,
@@ -470,7 +520,10 @@ export class PineconeService {
    *
    * If chunkCount is omitted, we fall back to a bounded query-by-filter (topK 10k).
    */
-  async deleteDocumentEmbeddings(documentId: string, opts?: { userId?: string; chunkCount?: number }) {
+  async deleteDocumentEmbeddings(
+    documentId: string,
+    opts?: { userId?: string; chunkCount?: number },
+  ) {
     await this.ensureInit();
     if (!this.isAvailable()) return;
 
@@ -479,7 +532,8 @@ export class PineconeService {
     // Fast path: delete by deterministic IDs if chunkCount known
     if (opts?.chunkCount && opts.chunkCount > 0) {
       const ids: string[] = [];
-      for (let i = 0; i < opts.chunkCount; i++) ids.push(this.makeVectorId(documentId, i));
+      for (let i = 0; i < opts.chunkCount; i++)
+        ids.push(this.makeVectorId(documentId, i));
       await this.deleteIdsInBatches(index, ids);
       return;
     }
@@ -487,7 +541,12 @@ export class PineconeService {
     // Fallback path: query vector IDs by metadata filter (bounded to 10k)
     // NOTE: requires userId if your index is multi-tenant and you reuse documentId values.
     const filter = opts?.userId
-      ? { $and: [{ userId: { $eq: opts.userId } }, { documentId: { $eq: documentId } }] }
+      ? {
+          $and: [
+            { userId: { $eq: opts.userId } },
+            { documentId: { $eq: documentId } },
+          ],
+        }
       : { documentId: { $eq: documentId } };
 
     const res = await index.query({
@@ -497,7 +556,9 @@ export class PineconeService {
       filter,
     } as any);
 
-    const ids = (res?.matches || []).map((m: any) => String(m?.id)).filter(Boolean);
+    const ids = (res?.matches || [])
+      .map((m: any) => String(m?.id))
+      .filter(Boolean);
     if (ids.length === 0) return;
 
     await this.deleteIdsInBatches(index, ids);
@@ -506,7 +567,7 @@ export class PineconeService {
   async deleteMultipleDocumentEmbeddings(
     documentIds: string[],
     opts?: { userId?: string; chunkCounts?: Record<string, number> },
-    onProgress?: (done: number, total: number) => void
+    onProgress?: (done: number, total: number) => void,
   ) {
     await this.ensureInit();
     if (!this.isAvailable()) return 0;
@@ -518,7 +579,10 @@ export class PineconeService {
       const docId = documentIds[i];
       const chunkCount = opts?.chunkCounts?.[docId];
       // re-use single delete logic
-      await this.deleteDocumentEmbeddings(docId, { userId: opts?.userId, chunkCount });
+      await this.deleteDocumentEmbeddings(docId, {
+        userId: opts?.userId,
+        chunkCount,
+      });
       // we cannot know exact deleted count without listing; treat as “docs processed”
       deleted++;
       onProgress?.(i + 1, total);
@@ -539,7 +603,12 @@ export class PineconeService {
   // STATS + VERIFY
   // ─────────────────────────────────────────────────────────────
 
-  async getIndexStats(): Promise<{ available: boolean; indexName?: string; stats?: any; error?: string }> {
+  async getIndexStats(): Promise<{
+    available: boolean;
+    indexName?: string;
+    stats?: any;
+    error?: string;
+  }> {
     await this.ensureInit();
     if (!this.isAvailable()) return { available: false };
 
@@ -552,15 +621,23 @@ export class PineconeService {
     }
   }
 
-  async verifyDocumentEmbeddings(documentId: string, opts?: { userId?: string; minCount?: number }) {
+  async verifyDocumentEmbeddings(
+    documentId: string,
+    opts?: { userId?: string; minCount?: number },
+  ) {
     await this.ensureInit();
     if (!this.isAvailable()) {
-      return { success: false, count: 0, message: 'Pinecone not available' };
+      return { success: false, count: 0, message: "Pinecone not available" };
     }
 
     const index = this.getIndex();
     const filter = opts?.userId
-      ? { $and: [{ userId: { $eq: opts.userId } }, { documentId: { $eq: documentId } }] }
+      ? {
+          $and: [
+            { userId: { $eq: opts.userId } },
+            { documentId: { $eq: documentId } },
+          ],
+        }
       : { documentId: { $eq: documentId } };
 
     const res = await index.query({
@@ -576,7 +653,10 @@ export class PineconeService {
     return {
       success: count >= minCount,
       count,
-      message: count >= minCount ? `OK: found ${count} vectors` : 'No embeddings found in Pinecone',
+      message:
+        count >= minCount
+          ? `OK: found ${count} vectors`
+          : "No embeddings found in Pinecone",
     };
   }
 }

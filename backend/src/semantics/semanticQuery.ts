@@ -14,17 +14,20 @@
  * Used by AnswerPlanService to create intelligent answer plans.
  */
 
-import type { IntentFamily, Operator } from '../types/handlerResult.types';
-import type { FormatConstraints } from '../services/core/inputs/formatConstraintParser.service';
-import type { RoutingDecision as RoutingResult } from '../services/core/routing/router.service';
+import type { IntentFamily, Operator } from "../types/handlerResult.types";
+import type { FormatConstraints } from "../services/core/inputs/formatConstraintParser.service";
+import type { RoutingDecision as RoutingResult } from "../services/core/routing/router.service";
 
 // Local type aliases for types no longer exported from old router
 type DocScope = string;
-type DocScopeMode = 'single' | 'multi' | 'all' | 'none';
+type DocScopeMode = "single" | "multi" | "all" | "none";
 type RoutingRequest = Record<string, any>;
-type SupportedLanguage = 'en' | 'pt' | 'es';
+type SupportedLanguage = "en" | "pt" | "es";
 
-function parseFormatConstraints(_text: string, _lang?: string): FormatConstraints {
+function parseFormatConstraints(
+  _text: string,
+  _lang?: string,
+): FormatConstraints {
   return {};
 }
 
@@ -32,9 +35,15 @@ function parseFormatConstraints(_text: string, _lang?: string): FormatConstraint
 // TYPES
 // ═══════════════════════════════════════════════════════════════════════════
 
-export type Domain = 'finance' | 'legal' | 'medical' | 'engineering' | 'accounting' | 'general';
-export type DepthPreference = 'quick' | 'normal' | 'deep';
-export type Language = 'en' | 'pt' | 'es';
+export type Domain =
+  | "finance"
+  | "legal"
+  | "medical"
+  | "engineering"
+  | "accounting"
+  | "general";
+export type DepthPreference = "quick" | "normal" | "deep";
+export type Language = "en" | "pt" | "es";
 
 /**
  * Extracted entities from the query
@@ -160,7 +169,7 @@ interface DomainPattern {
 
 const DOMAIN_PATTERNS: DomainPattern[] = [
   {
-    domain: 'finance',
+    domain: "finance",
     keywords: [
       /\b(revenue|profit|loss|margin|ebitda|cash\s*flow|roi|expense|budget|forecast|p\&l|income|balance\s*sheet|financial|fiscal|quarter|q[1-4]|fy\d{2,4})\b/i,
       /\b(receita|lucro|prejuízo|margem|despesa|orçamento|previsão|balanço|financeiro|trimestre)\b/i,
@@ -168,7 +177,7 @@ const DOMAIN_PATTERNS: DomainPattern[] = [
     confidence: 0.85,
   },
   {
-    domain: 'legal',
+    domain: "legal",
     keywords: [
       /\b(contract|agreement|clause|liability|compliance|regulation|legal|law|lawsuit|litigation|terms|conditions|warranty|indemnity)\b/i,
       /\b(contrato|acordo|cláusula|responsabilidade|conformidade|regulamento|legal|lei|processo|litígio|termos|condições|garantia)\b/i,
@@ -176,7 +185,7 @@ const DOMAIN_PATTERNS: DomainPattern[] = [
     confidence: 0.85,
   },
   {
-    domain: 'medical',
+    domain: "medical",
     keywords: [
       /\b(patient|diagnosis|treatment|symptom|medication|prescription|clinical|medical|healthcare|disease|therapy|dosage)\b/i,
       /\b(paciente|diagnóstico|tratamento|sintoma|medicamento|prescrição|clínico|médico|saúde|doença|terapia|dosagem)\b/i,
@@ -184,15 +193,15 @@ const DOMAIN_PATTERNS: DomainPattern[] = [
     confidence: 0.85,
   },
   {
-    domain: 'engineering',
+    domain: "engineering",
     keywords: [
       /\b(specification|requirement|design|architecture|component|system|technical|engineering|module|interface|protocol)\b/i,
       /\b(especificação|requisito|design|arquitetura|componente|sistema|técnico|engenharia|módulo|interface|protocolo)\b/i,
     ],
-    confidence: 0.80,
+    confidence: 0.8,
   },
   {
-    domain: 'accounting',
+    domain: "accounting",
     keywords: [
       /\b(debit|credit|ledger|journal|account|audit|tax|depreciation|amortization|accrual|reconciliation|invoice)\b/i,
       /\b(débito|crédito|razão|diário|conta|auditoria|imposto|depreciação|amortização|provisão|reconciliação|fatura)\b/i,
@@ -201,9 +210,16 @@ const DOMAIN_PATTERNS: DomainPattern[] = [
   },
 ];
 
-function detectDomain(query: string): { domain: Domain; keywords: string[]; confidence: number } {
+function detectDomain(query: string): {
+  domain: Domain;
+  keywords: string[];
+  confidence: number;
+} {
   const matchedKeywords: string[] = [];
-  let bestMatch: { domain: Domain; confidence: number } = { domain: 'general', confidence: 0.5 };
+  let bestMatch: { domain: Domain; confidence: number } = {
+    domain: "general",
+    confidence: 0.5,
+  };
 
   for (const pattern of DOMAIN_PATTERNS) {
     for (const regex of pattern.keywords) {
@@ -211,7 +227,10 @@ function detectDomain(query: string): { domain: Domain; keywords: string[]; conf
       if (matches) {
         matchedKeywords.push(...matches);
         if (pattern.confidence > bestMatch.confidence) {
-          bestMatch = { domain: pattern.domain, confidence: pattern.confidence };
+          bestMatch = {
+            domain: pattern.domain,
+            confidence: pattern.confidence,
+          };
         }
       }
     }
@@ -282,7 +301,7 @@ function extractEntities(query: string): ExtractedEntities {
   for (const pattern of METRIC_PATTERNS) {
     const matches = query.match(pattern);
     if (matches) {
-      entities.metrics.push(...matches.map(m => m.toLowerCase()));
+      entities.metrics.push(...matches.map((m) => m.toLowerCase()));
     }
   }
 
@@ -306,7 +325,7 @@ function extractEntities(query: string): ExtractedEntities {
   for (const pattern of DOC_NAME_PATTERNS) {
     const matches = query.match(pattern);
     if (matches) {
-      entities.docNames.push(...matches.map(m => m.trim()));
+      entities.docNames.push(...matches.map((m) => m.trim()));
     }
   }
 
@@ -336,17 +355,17 @@ const DEEP_PATTERNS = [
 function detectDepthPreference(query: string): DepthPreference {
   for (const pattern of QUICK_PATTERNS) {
     if (pattern.test(query)) {
-      return 'quick';
+      return "quick";
     }
   }
 
   for (const pattern of DEEP_PATTERNS) {
     if (pattern.test(query)) {
-      return 'deep';
+      return "deep";
     }
   }
 
-  return 'normal';
+  return "normal";
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -378,8 +397,11 @@ export interface BuildSemanticQueryInput {
  * @param input - The routing result and query information
  * @returns A complete SemanticQuery object
  */
-export function buildSemanticQuery(input: BuildSemanticQueryInput): SemanticQuery {
-  const { routingResult, routingRequest, originalQuery, normalizedQuery } = input;
+export function buildSemanticQuery(
+  input: BuildSemanticQueryInput,
+): SemanticQuery {
+  const { routingResult, routingRequest, originalQuery, normalizedQuery } =
+    input;
 
   // 1. Domain detection
   const domainResult = detectDomain(normalizedQuery);
@@ -391,7 +413,7 @@ export function buildSemanticQuery(input: BuildSemanticQueryInput): SemanticQuer
   const rd = routingResult as any;
   const formatConstraints = parseFormatConstraints(
     normalizedQuery,
-    (rd.languageLocked ?? rd.language ?? 'en') as SupportedLanguage
+    (rd.languageLocked ?? rd.language ?? "en") as SupportedLanguage,
   );
 
   // 4. Depth preference
@@ -408,7 +430,8 @@ export function buildSemanticQuery(input: BuildSemanticQueryInput): SemanticQuer
   }
 
   // 6. Scope confidence (from routing debug info if available)
-  const scopeConfidence = (rd._debug ?? rd.trace)?.scopeDecision?.confidence || 0.7;
+  const scopeConfidence =
+    (rd._debug ?? rd.trace)?.scopeDecision?.confidence || 0.7;
 
   // 7. Build the semantic query
   const semanticQuery: SemanticQuery = {
@@ -419,7 +442,7 @@ export function buildSemanticQuery(input: BuildSemanticQueryInput): SemanticQuer
     subIntent: rd.subIntent ?? null,
 
     // Scope understanding
-    scopeMode: (rd.docScope?.mode ?? 'all') as DocScopeMode,
+    scopeMode: (rd.docScope?.mode ?? "all") as DocScopeMode,
     targetDocIds: rd.docScope?.docIds || [],
     targetDocNames: rd.docScope?.docNames || [],
     scopeConfidence,
@@ -437,7 +460,7 @@ export function buildSemanticQuery(input: BuildSemanticQueryInput): SemanticQuer
     formatConstraints,
 
     // Language
-    language: rd.languageLocked ?? rd.language ?? 'en',
+    language: rd.languageLocked ?? rd.language ?? "en",
 
     // Follow-up context
     isFollowUp: (rd.flags ?? rd.signals)?.isFollowup ?? false,
@@ -460,7 +483,9 @@ export function buildSemanticQuery(input: BuildSemanticQueryInput): SemanticQuer
  */
 export function requiresRetrieval(sq: SemanticQuery): boolean {
   // file_actions, help, conversation don't need RAG
-  if (['file_actions', 'help', 'conversation', 'error'].includes(sq.intentFamily)) {
+  if (
+    ["file_actions", "help", "conversation", "error"].includes(sq.intentFamily)
+  ) {
     return false;
   }
 
@@ -471,8 +496,10 @@ export function requiresRetrieval(sq: SemanticQuery): boolean {
 /**
  * Get the primary document reference (if single_doc scope)
  */
-export function getPrimaryDocRef(sq: SemanticQuery): { id?: string; name?: string } | null {
-  if ((sq.scopeMode as string) !== 'single_doc') {
+export function getPrimaryDocRef(
+  sq: SemanticQuery,
+): { id?: string; name?: string } | null {
+  if ((sq.scopeMode as string) !== "single_doc") {
     return null;
   }
 
@@ -488,7 +515,12 @@ export function getPrimaryDocRef(sq: SemanticQuery): { id?: string; name?: strin
 export function hasExplicitFormatRequirements(sq: SemanticQuery): boolean {
   const fc = sq.formatConstraints;
   const fca = fc as any;
-  return fca.wantsBullets || fca.wantsNumbered || fca.wantsTable || fca.bulletCount !== undefined;
+  return (
+    fca.wantsBullets ||
+    fca.wantsNumbered ||
+    fca.wantsTable ||
+    fca.bulletCount !== undefined
+  );
 }
 
 /**
@@ -504,11 +536,11 @@ export function semanticQuerySummary(sq: SemanticQuery): string {
   ];
 
   if (sq.isFollowUp) {
-    parts.push('followup');
+    parts.push("followup");
   }
 
   if ((sq.formatConstraints as any).wantsTable) {
-    parts.push('table');
+    parts.push("table");
   }
 
   if ((sq.formatConstraints as any).bulletCount) {
@@ -516,10 +548,10 @@ export function semanticQuerySummary(sq: SemanticQuery): string {
   }
 
   if (sq.entities.metrics.length > 0) {
-    parts.push(`metrics=${sq.entities.metrics.slice(0, 3).join(',')}`);
+    parts.push(`metrics=${sq.entities.metrics.slice(0, 3).join(",")}`);
   }
 
-  return parts.join(' | ');
+  return parts.join(" | ");
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

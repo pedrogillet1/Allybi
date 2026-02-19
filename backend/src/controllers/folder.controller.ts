@@ -29,21 +29,44 @@ export interface FolderTreeNode extends FolderRecord {
 }
 
 export interface FolderService {
-  list(input: { userId: string; parentId?: string | null; q?: string; limit?: number; cursor?: string }):
-    Promise<{ items: FolderRecord[]; nextCursor?: string }>;
+  list(input: {
+    userId: string;
+    parentId?: string | null;
+    q?: string;
+    limit?: number;
+    cursor?: string;
+  }): Promise<{ items: FolderRecord[]; nextCursor?: string }>;
 
   tree(input: { userId: string }): Promise<FolderTreeNode[]>;
 
-  get(input: { userId: string; folderId: string }): Promise<FolderRecord | null>;
+  get(input: {
+    userId: string;
+    folderId: string;
+  }): Promise<FolderRecord | null>;
 
-  create(input: { userId: string; name: string; parentId?: string | null }): Promise<FolderRecord>;
+  create(input: {
+    userId: string;
+    name: string;
+    parentId?: string | null;
+  }): Promise<FolderRecord>;
 
-  rename(input: { userId: string; folderId: string; name: string }): Promise<FolderRecord>;
+  rename(input: {
+    userId: string;
+    folderId: string;
+    name: string;
+  }): Promise<FolderRecord>;
 
-  move(input: { userId: string; folderId: string; newParentId?: string | null }): Promise<FolderRecord>;
+  move(input: {
+    userId: string;
+    folderId: string;
+    newParentId?: string | null;
+  }): Promise<FolderRecord>;
 
-  delete(input: { userId: string; folderId: string; mode?: "soft" | "hard" | "cascade" | "folderOnly" }):
-    Promise<{ deleted: true; movedDocs?: number; movedToFolderId?: string }>;
+  delete(input: {
+    userId: string;
+    folderId: string;
+    mode?: "soft" | "hard" | "cascade" | "folderOnly";
+  }): Promise<{ deleted: true; movedDocs?: number; movedToFolderId?: string }>;
 }
 
 type ApiOk<T> = { ok: true; data: T };
@@ -54,7 +77,9 @@ function ok<T>(res: Response, data: T, status = 200) {
 }
 
 function err(res: Response, code: string, message: string, status = 400) {
-  return res.status(status).json({ ok: false, error: { code, message } } satisfies ApiErr);
+  return res
+    .status(status)
+    .json({ ok: false, error: { code, message } } satisfies ApiErr);
 }
 
 function asString(v: unknown): string | null {
@@ -76,18 +101,34 @@ function getUserId(req: Request): string | null {
   return typeof userId === "string" && userId.trim() ? userId.trim() : null;
 }
 
-function mapError(e: unknown): { code: string; message: string; status: number } {
+function mapError(e: unknown): {
+  code: string;
+  message: string;
+  status: number;
+} {
   const msg = e instanceof Error ? e.message : "Unknown error";
   const m = msg.toLowerCase();
 
   if (m.includes("unauthorized") || m.includes("not authenticated")) {
-    return { code: "AUTH_UNAUTHORIZED", message: "Not authenticated.", status: 401 };
+    return {
+      code: "AUTH_UNAUTHORIZED",
+      message: "Not authenticated.",
+      status: 401,
+    };
   }
   if (m.includes("not found")) {
-    return { code: "FOLDER_NOT_FOUND", message: "Folder not found.", status: 404 };
+    return {
+      code: "FOLDER_NOT_FOUND",
+      message: "Folder not found.",
+      status: 404,
+    };
   }
   if (m.includes("already exists") || m.includes("duplicate")) {
-    return { code: "FOLDER_NAME_CONFLICT", message: "A folder with this name already exists here.", status: 409 };
+    return {
+      code: "FOLDER_NAME_CONFLICT",
+      message: "A folder with this name already exists here.",
+      status: 409,
+    };
   }
   if (m.includes("invalid") || m.includes("validation")) {
     return { code: "VALIDATION_ERROR", message: msg, status: 400 };
@@ -100,16 +141,25 @@ export class FolderController {
 
   list = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const includeAll = req.query.includeAll === "true";
-    const parentId = includeAll ? undefined : (asString(req.query.parentId) ?? null);
+    const parentId = includeAll
+      ? undefined
+      : (asString(req.query.parentId) ?? null);
     const q = asString(req.query.q) ?? undefined;
     const limit = Math.min(Math.max(asInt(req.query.limit) ?? 50, 1), 200);
     const cursor = asString(req.query.cursor) ?? undefined;
 
     try {
-      const out = await this.folders.list({ userId, parentId, q, limit, cursor });
+      const out = await this.folders.list({
+        userId,
+        parentId,
+        q,
+        limit,
+        cursor,
+      });
       return ok(res, out, 200);
     } catch (e) {
       const mapped = mapError(e);
@@ -119,7 +169,8 @@ export class FolderController {
 
   tree = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     try {
       const out = await this.folders.tree({ userId });
@@ -132,14 +183,22 @@ export class FolderController {
 
   get = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const folderId = asString(req.params.id);
-    if (!folderId) return err(res, "VALIDATION_FOLDER_ID_REQUIRED", "Folder id is required.", 400);
+    if (!folderId)
+      return err(
+        res,
+        "VALIDATION_FOLDER_ID_REQUIRED",
+        "Folder id is required.",
+        400,
+      );
 
     try {
       const folder = await this.folders.get({ userId, folderId });
-      if (!folder) return err(res, "FOLDER_NOT_FOUND", "Folder not found.", 404);
+      if (!folder)
+        return err(res, "FOLDER_NOT_FOUND", "Folder not found.", 404);
       return ok(res, folder, 200);
     } catch (e) {
       const mapped = mapError(e);
@@ -149,12 +208,19 @@ export class FolderController {
 
   create = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const name = asString((req.body as any)?.name);
     const parentId = asString((req.body as any)?.parentId) ?? null;
 
-    if (!name) return err(res, "VALIDATION_NAME_REQUIRED", "Folder name is required.", 400);
+    if (!name)
+      return err(
+        res,
+        "VALIDATION_NAME_REQUIRED",
+        "Folder name is required.",
+        400,
+      );
 
     try {
       const created = await this.folders.create({ userId, name, parentId });
@@ -167,17 +233,30 @@ export class FolderController {
 
   update = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const folderId = asString(req.params.id);
-    if (!folderId) return err(res, "VALIDATION_FOLDER_ID_REQUIRED", "Folder id is required.", 400);
+    if (!folderId)
+      return err(
+        res,
+        "VALIDATION_FOLDER_ID_REQUIRED",
+        "Folder id is required.",
+        400,
+      );
 
     const name = asString((req.body as any)?.name);
     const parentIdRaw = (req.body as any)?.parentId;
-    const parentId = parentIdRaw === undefined ? undefined : (asString(parentIdRaw) ?? null);
+    const parentId =
+      parentIdRaw === undefined ? undefined : (asString(parentIdRaw) ?? null);
 
     if (!name && parentId === undefined) {
-      return err(res, "VALIDATION_UPDATE_REQUIRED", "Provide at least one of: name, parentId.", 400);
+      return err(
+        res,
+        "VALIDATION_UPDATE_REQUIRED",
+        "Provide at least one of: name, parentId.",
+        400,
+      );
     }
 
     try {
@@ -188,7 +267,11 @@ export class FolderController {
       }
 
       if (parentId !== undefined) {
-        out = await this.folders.move({ userId, folderId, newParentId: parentId });
+        out = await this.folders.move({
+          userId,
+          folderId,
+          newParentId: parentId,
+        });
       }
 
       if (!out) return err(res, "FOLDER_ERROR", "No update performed.", 400);
@@ -201,12 +284,25 @@ export class FolderController {
 
   delete = async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+    if (!userId)
+      return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const folderId = asString(req.params.id);
-    if (!folderId) return err(res, "VALIDATION_FOLDER_ID_REQUIRED", "Folder id is required.", 400);
+    if (!folderId)
+      return err(
+        res,
+        "VALIDATION_FOLDER_ID_REQUIRED",
+        "Folder id is required.",
+        400,
+      );
 
-    const mode = (asString(req.query.mode) as "soft" | "hard" | "cascade" | "folderOnly" | null) ?? "cascade";
+    const mode =
+      (asString(req.query.mode) as
+        | "soft"
+        | "hard"
+        | "cascade"
+        | "folderOnly"
+        | null) ?? "cascade";
 
     try {
       const out = await this.folders.delete({ userId, folderId, mode });

@@ -1,6 +1,6 @@
 // src/types/api.types.ts
 
-import type { LanguageCode } from './intents.types';
+import type { LanguageCode } from "./intents.types";
 
 /**
  * Generic API response shape (non-streaming).
@@ -38,20 +38,20 @@ export type Pagination = {
  * “source_buttons” is the ChatGPT-like pill attachment.
  */
 export type AttachmentType =
-  | 'source_buttons'
-  | 'file_list'
-  | 'grouped_files'
-  | 'select_file'
-  | 'options'
-  | 'debug'
+  | "source_buttons"
+  | "file_list"
+  | "grouped_files"
+  | "select_file"
+  | "options"
+  | "debug"
   | string;
 
 export type SourceLocation =
-  | { type: 'page'; value: number; label?: string }
-  | { type: 'slide'; value: number; label?: string }
-  | { type: 'sheet'; value: string; label?: string }
-  | { type: 'cell'; value: string; label?: string }
-  | { type: 'section'; value: string; label?: string };
+  | { type: "page"; value: number; label?: string }
+  | { type: "slide"; value: number; label?: string }
+  | { type: "sheet"; value: string; label?: string }
+  | { type: "cell"; value: string; label?: string }
+  | { type: "section"; value: string; label?: string };
 
 export type SourceButton = {
   documentId: string;
@@ -70,8 +70,8 @@ export type SeeAllMeta = {
 };
 
 export type SourceButtonsAttachment = {
-  type: 'source_buttons';
-  answerMode?: 'nav_pill' | 'nav_pills' | string; // frontend uses this to hide actions/labels
+  type: "source_buttons";
+  answerMode?: "nav_pill" | "nav_pills" | string; // frontend uses this to hide actions/labels
   buttons: SourceButton[];
   seeAll?: SeeAllMeta;
 };
@@ -87,7 +87,7 @@ export type FileItem = {
 };
 
 export type FileListAttachment = {
-  type: 'file_list';
+  type: "file_list";
   items: FileItem[];
   totalCount: number;
   seeAll?: SeeAllMeta;
@@ -95,7 +95,7 @@ export type FileListAttachment = {
 };
 
 export type GroupedFilesAttachment = {
-  type: 'grouped_files';
+  type: "grouped_files";
   totalCount: number;
   groups: Array<{
     groupKey: string; // e.g. folder name / extension / domain
@@ -107,7 +107,7 @@ export type GroupedFilesAttachment = {
 };
 
 export type SelectFileAttachment = {
-  type: 'select_file';
+  type: "select_file";
   prompt?: string;
   options: FileItem[];
 };
@@ -128,7 +128,7 @@ export type Attachment =
  */
 export type ChatMessage = {
   id: string;
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
   createdAt: string;
 
@@ -164,18 +164,18 @@ export type ChatMessage = {
  * Backend can send incremental chunks and a final “done”.
  */
 export type ChatStreamEventType =
-  | 'meta'
-  | 'delta'
-  | 'attachments'
-  | 'done'
-  | 'error'
+  | "meta"
+  | "delta"
+  | "attachments"
+  | "done"
+  | "error"
   | string;
 
 export type ChatStreamMeta = {
   requestId?: string;
   conversationId?: string;
   messageId?: string; // assistant message id
-  language?: LanguageCode | 'en' | 'pt' | 'es';
+  language?: LanguageCode | "en" | "pt" | "es";
   answerMode?: string | null;
   operator?: string | null;
   domain?: string | null;
@@ -205,11 +205,11 @@ export type ChatStreamError = {
 };
 
 export type ChatStreamEvent =
-  | { type: 'meta'; data: ChatStreamMeta }
-  | { type: 'delta'; data: ChatStreamDelta }
-  | { type: 'attachments'; data: ChatStreamAttachments }
-  | { type: 'done'; data: ChatStreamDone }
-  | { type: 'error'; data: ChatStreamError }
+  | { type: "meta"; data: ChatStreamMeta }
+  | { type: "delta"; data: ChatStreamDelta }
+  | { type: "attachments"; data: ChatStreamAttachments }
+  | { type: "done"; data: ChatStreamDone }
+  | { type: "error"; data: ChatStreamError }
   | { type: ChatStreamEventType; data: any };
 
 /**
@@ -220,7 +220,7 @@ export type ChatAskRequest = {
   message: string;
 
   // optional: user intent hints
-  language?: LanguageCode | 'en' | 'pt' | 'es';
+  language?: LanguageCode | "en" | "pt" | "es";
   attachedDocumentId?: string | null;
 
   // regenerate controls

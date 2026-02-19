@@ -9,17 +9,17 @@
  * - No user-facing strings
  */
 
-import crypto from 'crypto';
+import crypto from "crypto";
 
 export type CacheNamespace =
-  | 'intent'
-  | 'scope'
-  | 'retrieval'
-  | 'compose'
-  | 'llm_complete'
-  | 'llm_stream_prefill'
-  | 'validation'
-  | 'other';
+  | "intent"
+  | "scope"
+  | "retrieval"
+  | "compose"
+  | "llm_complete"
+  | "llm_stream_prefill"
+  | "validation"
+  | "other";
 
 export interface CacheKeyParts {
   namespace: CacheNamespace;
@@ -78,7 +78,7 @@ export interface CacheSetOptions {
 }
 
 export interface CacheStats {
-  backend: 'memory' | 'external';
+  backend: "memory" | "external";
   size: number;
   hits: number;
   misses: number;
@@ -125,16 +125,21 @@ export interface LLMCacheConfig {
  * - Deterministic behavior
  */
 class MemoryStore {
-  private map = new Map<string, { raw: string; bytes: number; expiresAtMs: number }>();
+  private map = new Map<
+    string,
+    { raw: string; bytes: number; expiresAtMs: number }
+  >();
   private totalBytes = 0;
 
   private hits = 0;
   private misses = 0;
   private evictions = 0;
 
-  constructor(private readonly limits: { maxEntries: number; maxBytes: number }) {}
+  constructor(
+    private readonly limits: { maxEntries: number; maxBytes: number },
+  ) {}
 
-  getStats(): Pick<CacheStats, 'size' | 'hits' | 'misses' | 'evictions'> {
+  getStats(): Pick<CacheStats, "size" | "hits" | "misses" | "evictions"> {
     return {
       size: this.map.size,
       hits: this.hits,
@@ -162,7 +167,7 @@ class MemoryStore {
   }
 
   set(key: string, raw: string, ttlMs: number, nowMs: number): void {
-    const bytes = Buffer.byteLength(raw, 'utf8');
+    const bytes = Buffer.byteLength(raw, "utf8");
     const expiresAtMs = nowMs + ttlMs;
 
     // If exists, remove first
@@ -220,7 +225,10 @@ export class LLMCacheService {
 
   private sweepTimer?: NodeJS.Timeout;
 
-  constructor(params: { config: LLMCacheConfig; externalBackend?: ExternalCacheBackend }) {
+  constructor(params: {
+    config: LLMCacheConfig;
+    externalBackend?: ExternalCacheBackend;
+  }) {
     this.config = params.config;
     this.external = params.externalBackend;
 
@@ -252,21 +260,27 @@ export class LLMCacheService {
    * Produces: "koda:<namespace>:<hash>"
    */
   buildKey(parts: CacheKeyParts): string {
-    const salt = this.config.keySalt ?? '';
+    const salt = this.config.keySalt ?? "";
     const includeConv = this.config.includeConversationScope ?? false;
 
     const stable = {
       ns: parts.namespace,
       tenantId: parts.tenantId ?? null,
-      conversationId: includeConv ? parts.conversationId ?? null : null,
-      turnId: includeConv ? parts.turnId ?? null : null,
+      conversationId: includeConv ? (parts.conversationId ?? null) : null,
+      turnId: includeConv ? (parts.turnId ?? null) : null,
       docLock: parts.docLock?.enabled
-        ? { docId: parts.docLock.docId ?? null, filename: parts.docLock.filename ?? null }
+        ? {
+            docId: parts.docLock.docId ?? null,
+            filename: parts.docLock.filename ?? null,
+          }
         : { docId: null, filename: null },
       model: parts.model
-        ? { provider: parts.model.provider ?? null, name: parts.model.name ?? null }
+        ? {
+            provider: parts.model.provider ?? null,
+            name: parts.model.name ?? null,
+          }
         : { provider: null, name: null },
-      version: parts.version ?? 'v1',
+      version: parts.version ?? "v1",
       payload: parts.payload,
       salt,
     };
@@ -311,25 +325,31 @@ export class LLMCacheService {
   /**
    * Set cache entry.
    */
-  async set<T>(key: string, value: T, options?: Partial<CacheSetOptions> & { namespace?: CacheNamespace }): Promise<void> {
+  async set<T>(
+    key: string,
+    value: T,
+    options?: Partial<CacheSetOptions> & { namespace?: CacheNamespace },
+  ): Promise<void> {
     if (!this.config.enabled) return;
 
     const nowMs = Date.now();
-    const namespace = options?.namespace ?? inferNamespaceFromKey(key) ?? 'other';
-    const ttlMs = options?.ttlMs ?? this.config.defaultTtlMs[namespace] ?? 60_000;
+    const namespace =
+      options?.namespace ?? inferNamespaceFromKey(key) ?? "other";
+    const ttlMs =
+      options?.ttlMs ?? this.config.defaultTtlMs[namespace] ?? 60_000;
 
     const entry: CacheEntry<T> = {
       value,
       meta: {
         createdAtMs: nowMs,
         expiresAtMs: nowMs + ttlMs,
-        keyHash: key.split(':').slice(-1)[0] ?? key,
+        keyHash: key.split(":").slice(-1)[0] ?? key,
         namespace,
       },
     };
 
     const raw = JSON.stringify(entry);
-    const bytes = Buffer.byteLength(raw, 'utf8');
+    const bytes = Buffer.byteLength(raw, "utf8");
 
     if (options?.maxBytes && bytes > options.maxBytes) return;
 
@@ -381,15 +401,20 @@ export class LLMCacheService {
   getStats(): CacheStats {
     if (this.external) {
       return {
-        backend: 'external',
+        backend: "external",
         size: 0,
         hits: 0,
         misses: 0,
         evictions: 0,
       };
     }
-    const s = this.memory?.getStats() ?? { size: 0, hits: 0, misses: 0, evictions: 0 };
-    return { backend: 'memory', ...s };
+    const s = this.memory?.getStats() ?? {
+      size: 0,
+      hits: 0,
+      misses: 0,
+      evictions: 0,
+    };
+    return { backend: "memory", ...s };
   }
 }
 
@@ -409,18 +434,18 @@ function normalizeJson(x: unknown): unknown {
   if (x === null) return null;
 
   const t = typeof x;
-  if (t === 'string' || t === 'number' || t === 'boolean') return x;
-  if (t === 'bigint') return x.toString();
-  if (t === 'undefined' || t === 'function' || t === 'symbol') return null;
+  if (t === "string" || t === "number" || t === "boolean") return x;
+  if (t === "bigint") return x.toString();
+  if (t === "undefined" || t === "function" || t === "symbol") return null;
 
   if (Array.isArray(x)) return x.map(normalizeJson);
 
-  if (t === 'object') {
+  if (t === "object") {
     const obj = x as Record<string, unknown>;
     const out: Record<string, unknown> = {};
     for (const k of Object.keys(obj)) {
       const v = obj[k];
-      if (typeof v === 'undefined') continue;
+      if (typeof v === "undefined") continue;
       out[k] = normalizeJson(v);
     }
     return out;
@@ -432,7 +457,7 @@ function normalizeJson(x: unknown): unknown {
 function sortKeysDeep(x: unknown): unknown {
   if (x === null) return null;
   if (Array.isArray(x)) return x.map(sortKeysDeep);
-  if (typeof x !== 'object') return x;
+  if (typeof x !== "object") return x;
 
   const obj = x as Record<string, unknown>;
   const keys = Object.keys(obj).sort();
@@ -442,12 +467,12 @@ function sortKeysDeep(x: unknown): unknown {
 }
 
 function sha256(s: string): string {
-  return crypto.createHash('sha256').update(s, 'utf8').digest('hex');
+  return crypto.createHash("sha256").update(s, "utf8").digest("hex");
 }
 
 function inferNamespaceFromKey(key: string): CacheNamespace | null {
   // Expected format: koda:<namespace>:<hash>
-  const parts = key.split(':');
+  const parts = key.split(":");
   if (parts.length < 3) return null;
   const ns = parts[1] as CacheNamespace;
   return ns ?? null;

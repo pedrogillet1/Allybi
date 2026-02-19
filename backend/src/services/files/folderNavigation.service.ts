@@ -13,7 +13,7 @@
  */
 
 // pickFileActionMessage is a conceptual function — use inline microcopy selection
-const pickFileActionMessage = (..._args: any[]): string => '';
+const pickFileActionMessage = (..._args: any[]): string => "";
 
 interface Folder {
   id: string;
@@ -43,34 +43,45 @@ interface FolderTreeNode {
  * Format complete folder listing with hierarchy
  * Used when user asks "which folders do I have?" or "show my folders"
  */
-export function formatFolderListingResponse(folders: Folder[], language: 'en' | 'pt' | 'es' = 'en'): string {
+export function formatFolderListingResponse(
+  folders: Folder[],
+  language: "en" | "pt" | "es" = "en",
+): string {
   if (folders.length === 0) {
-    return pickFileActionMessage('no_folders', language, `folders_${Date.now()}`, { includeSuggestion: true });
+    return pickFileActionMessage(
+      "no_folders",
+      language,
+      `folders_${Date.now()}`,
+      { includeSuggestion: true },
+    );
   }
 
   // Build folder tree
   const tree = buildFolderTree(folders);
-  const topLevelFolders = tree.filter(node => node.depth === 0);
+  const topLevelFolders = tree.filter((node) => node.depth === 0);
 
   // Count total files
-  const totalFiles = folders.reduce((sum, f) => sum + (f._count?.documents || 0), 0);
+  const totalFiles = folders.reduce(
+    (sum, f) => sum + (f._count?.documents || 0),
+    0,
+  );
 
   let response = `## Your Folder Structure\n\n`;
-  response += `You have **${folders.length} folder${folders.length > 1 ? 's' : ''}** `;
-  response += `organized in **${topLevelFolders.length} top-level folder${topLevelFolders.length > 1 ? 's' : ''}**`;
+  response += `You have **${folders.length} folder${folders.length > 1 ? "s" : ""}** `;
+  response += `organized in **${topLevelFolders.length} top-level folder${topLevelFolders.length > 1 ? "s" : ""}**`;
   if (totalFiles > 0) {
-    response += ` with **${totalFiles} file${totalFiles > 1 ? 's' : ''}** total`;
+    response += ` with **${totalFiles} file${totalFiles > 1 ? "s" : ""}** total`;
   }
   response += `:\n\n`;
 
   // Top-level folders summary
   response += `### Top-Level Folders\n\n`;
-  topLevelFolders.forEach(node => {
+  topLevelFolders.forEach((node) => {
     const fileCount = node.folder._count?.documents || 0;
     const subfolderCount = node.children.length;
-    response += `**${node.folder.name}** → ${fileCount} file${fileCount !== 1 ? 's' : ''}`;
+    response += `**${node.folder.name}** → ${fileCount} file${fileCount !== 1 ? "s" : ""}`;
     if (subfolderCount > 0) {
-      response += `, ${subfolderCount} subfolder${subfolderCount !== 1 ? 's' : ''}`;
+      response += `, ${subfolderCount} subfolder${subfolderCount !== 1 ? "s" : ""}`;
     }
     response += `\n`;
   });
@@ -89,7 +100,7 @@ export function formatFolderListingResponse(folders: Folder[], language: 'en' | 
 
   // Add examples with real folder names
   const exampleFolders = topLevelFolders.slice(0, 2);
-  exampleFolders.forEach(node => {
+  exampleFolders.forEach((node) => {
     response += `- "Show me ${node.folder.name} folder"\n`;
     if (node.children.length > 0) {
       const firstChild = node.children[0];
@@ -110,26 +121,26 @@ export function formatFolderListingResponse(folders: Folder[], language: 'en' | 
  */
 export function formatFolderContentResponse(
   folder: Folder,
-  allFolders: Folder[]
+  allFolders: Folder[],
 ): string {
   const breadcrumb = buildBreadcrumbPath(folder, allFolders);
-  const fullPath = breadcrumb.join(' / ');
+  const fullPath = breadcrumb.join(" / ");
 
   const fileCount = folder.documents?.length || folder._count?.documents || 0;
   const subfolderCount = folder.subfolders?.length || 0;
 
   let response = `## ${folder.name}/\n\n`;
   response += `**Location:** ${fullPath}\n`;
-  response += `**Contains:** ${fileCount} file${fileCount !== 1 ? 's' : ''}`;
+  response += `**Contains:** ${fileCount} file${fileCount !== 1 ? "s" : ""}`;
   if (subfolderCount > 0) {
-    response += `, ${subfolderCount} subfolder${subfolderCount !== 1 ? 's' : ''}`;
+    response += `, ${subfolderCount} subfolder${subfolderCount !== 1 ? "s" : ""}`;
   }
   response += `\n\n---\n\n`;
 
   // Files section
   if (fileCount > 0 && folder.documents) {
     response += `### Files (${fileCount})\n\n`;
-    folder.documents.slice(0, 20).forEach(doc => {
+    folder.documents.slice(0, 20).forEach((doc) => {
       response += `- **${doc.filename}**`;
       if (doc.mimeType) {
         const fileType = getFileTypeLabel(doc.mimeType);
@@ -143,7 +154,7 @@ export function formatFolderContentResponse(
     });
 
     if (fileCount > 20) {
-      response += `\n*...and ${fileCount - 20} more file${fileCount - 20 !== 1 ? 's' : ''}*\n`;
+      response += `\n*...and ${fileCount - 20} more file${fileCount - 20 !== 1 ? "s" : ""}*\n`;
     }
 
     response += `\n---\n\n`;
@@ -152,10 +163,10 @@ export function formatFolderContentResponse(
   // Subfolders section
   if (subfolderCount > 0 && folder.subfolders) {
     response += `### Subfolders (${subfolderCount})\n\n`;
-    folder.subfolders.forEach(sf => {
+    folder.subfolders.forEach((sf) => {
       const sfFileCount = sf._count?.documents || 0;
-      const sfEmoji = sf.emoji || '';
-      response += `${sfEmoji} **${sf.name}/** → ${sfFileCount} file${sfFileCount !== 1 ? 's' : ''}\n`;
+      const sfEmoji = sf.emoji || "";
+      response += `${sfEmoji} **${sf.name}/** → ${sfFileCount} file${sfFileCount !== 1 ? "s" : ""}\n`;
     });
 
     response += `\n---\n\n`;
@@ -166,15 +177,15 @@ export function formatFolderContentResponse(
 
   if (subfolderCount > 0 && folder.subfolders) {
     response += `**Go deeper:**\n`;
-    folder.subfolders.slice(0, 3).forEach(sf => {
-      const subPath = breadcrumb.slice(1).concat(sf.name).join('/');
+    folder.subfolders.slice(0, 3).forEach((sf) => {
+      const subPath = breadcrumb.slice(1).concat(sf.name).join("/");
       response += `- "Show me ${subPath} folder"\n`;
     });
     response += `\n`;
   }
 
   if (folder.parentFolderId) {
-    const parent = allFolders.find(f => f.id === folder.parentFolderId);
+    const parent = allFolders.find((f) => f.id === folder.parentFolderId);
     if (parent) {
       response += `**Go up:**\n`;
       response += `- "Show me ${parent.name} folder" (parent)\n`;
@@ -183,7 +194,7 @@ export function formatFolderContentResponse(
   }
 
   response += `**Search within:**\n`;
-  const searchPath = breadcrumb.slice(1).join('/');
+  const searchPath = breadcrumb.slice(1).join("/");
   response += `- "Find files about [topic] in ${searchPath}"\n`;
 
   return response;
@@ -200,32 +211,42 @@ export function formatFolderContentResponse(
 export function formatFolderNotFoundResponse(
   searchedName: string,
   availableFolders: Folder[],
-  language: 'en' | 'pt' | 'es' = 'en'
+  language: "en" | "pt" | "es" = "en",
 ): string {
-  const notFoundMsg = pickFileActionMessage('folder_not_found', language, `notfound_${Date.now()}`, {
-    placeholders: { '{{folderName}}': searchedName }
-  });
+  const notFoundMsg = pickFileActionMessage(
+    "folder_not_found",
+    language,
+    `notfound_${Date.now()}`,
+    {
+      placeholders: { "{{folderName}}": searchedName },
+    },
+  );
 
   let response = `${notFoundMsg}\n\n`;
 
   if (availableFolders.length === 0) {
-    const noFoldersMsg = pickFileActionMessage('no_folders', language, `nofolders_${Date.now()}`, { includeSuggestion: true });
+    const noFoldersMsg = pickFileActionMessage(
+      "no_folders",
+      language,
+      `nofolders_${Date.now()}`,
+      { includeSuggestion: true },
+    );
     response += `${noFoldersMsg}\n`;
     return response;
   }
 
   // Show available folders
   const tree = buildFolderTree(availableFolders);
-  const topLevelFolders = tree.filter(node => node.depth === 0);
+  const topLevelFolders = tree.filter((node) => node.depth === 0);
 
   response += `### Your Current Folders\n\n`;
   response += `**Top-Level Folders (${topLevelFolders.length}):**\n`;
-  topLevelFolders.forEach(node => {
+  topLevelFolders.forEach((node) => {
     const fileCount = node.folder._count?.documents || 0;
     const subfolderCount = node.children.length;
-    response += `- **${node.folder.name}** → ${fileCount} file${fileCount !== 1 ? 's' : ''}`;
+    response += `- **${node.folder.name}** → ${fileCount} file${fileCount !== 1 ? "s" : ""}`;
     if (subfolderCount > 0) {
-      response += `, ${subfolderCount} subfolder${subfolderCount !== 1 ? 's' : ''}`;
+      response += `, ${subfolderCount} subfolder${subfolderCount !== 1 ? "s" : ""}`;
     }
     response += `\n`;
   });
@@ -240,7 +261,7 @@ export function formatFolderNotFoundResponse(
   response += `### What Would You Like To Do?\n\n`;
 
   response += `**Option 1:** Explore an existing folder\n`;
-  topLevelFolders.slice(0, 2).forEach(node => {
+  topLevelFolders.slice(0, 2).forEach((node) => {
     response += `- "Show me ${node.folder.name} folder"\n`;
   });
   response += `\n`;
@@ -265,10 +286,10 @@ export function formatFolderNotFoundResponse(
  */
 export function formatEmptyFolderResponse(
   folder: Folder,
-  allFolders: Folder[]
+  allFolders: Folder[],
 ): string {
   const breadcrumb = buildBreadcrumbPath(folder, allFolders);
-  const fullPath = breadcrumb.join(' / ');
+  const fullPath = breadcrumb.join(" / ");
   const subfolderCount = folder.subfolders?.length || 0;
 
   let response = `## ${folder.name}/\n\n`;
@@ -280,7 +301,7 @@ export function formatEmptyFolderResponse(
   response += `### Folder Details\n\n`;
 
   if (folder.parentFolderId) {
-    const parent = allFolders.find(f => f.id === folder.parentFolderId);
+    const parent = allFolders.find((f) => f.id === folder.parentFolderId);
     if (parent) {
       response += `- **Parent Folder:** ${parent.name}/\n`;
     }
@@ -294,9 +315,9 @@ export function formatEmptyFolderResponse(
   // Show subfolders if any
   if (subfolderCount > 0 && folder.subfolders) {
     response += `**Subfolders:**\n`;
-    folder.subfolders.forEach(sf => {
+    folder.subfolders.forEach((sf) => {
       const sfFileCount = sf._count?.documents || 0;
-      response += `- **${sf.name}/** (${sfFileCount} file${sfFileCount !== 1 ? 's' : ''})\n`;
+      response += `- **${sf.name}/** (${sfFileCount} file${sfFileCount !== 1 ? "s" : ""})\n`;
     });
     response += `\n`;
   }
@@ -310,12 +331,12 @@ export function formatEmptyFolderResponse(
   response += `- Drag and drop files to organize them in this folder\n\n`;
 
   response += `**Option 2:** Create subfolders\n`;
-  const folderPath = breadcrumb.slice(1).join('/');
+  const folderPath = breadcrumb.slice(1).join("/");
   response += `- "Create folder ${folderPath}/2024"\n`;
   response += `- "Create folder ${folderPath}/archive"\n\n`;
 
   if (folder.parentFolderId) {
-    const parent = allFolders.find(f => f.id === folder.parentFolderId);
+    const parent = allFolders.find((f) => f.id === folder.parentFolderId);
     if (parent) {
       response += `**Option 3:** Go back to parent\n`;
       response += `- "Show me ${parent.name} folder"\n\n`;
@@ -343,13 +364,13 @@ function buildBreadcrumbPath(folder: Folder, allFolders: Folder[]): string[] {
   while (current) {
     path.unshift(current.name);
     if (current.parentFolderId) {
-      current = allFolders.find(f => f.id === current!.parentFolderId);
+      current = allFolders.find((f) => f.id === current!.parentFolderId);
     } else {
       break;
     }
   }
 
-  path.unshift('Root');
+  path.unshift("Root");
   return path;
 }
 
@@ -361,18 +382,18 @@ function buildFolderTree(folders: Folder[]): FolderTreeNode[] {
   const rootNodes: FolderTreeNode[] = [];
 
   // Create nodes
-  folders.forEach(folder => {
+  folders.forEach((folder) => {
     folderMap.set(folder.id, {
       folder,
       children: [],
       depth: 0,
       path: folder.name,
-      isLast: false
+      isLast: false,
     });
   });
 
   // Build tree structure
-  folders.forEach(folder => {
+  folders.forEach((folder) => {
     const node = folderMap.get(folder.id)!;
 
     if (folder.parentFolderId) {
@@ -380,7 +401,7 @@ function buildFolderTree(folders: Folder[]): FolderTreeNode[] {
       if (parent) {
         parent.children.push(node);
         node.depth = parent.depth + 1;
-        node.path = parent.path + '/' + folder.name;
+        node.path = parent.path + "/" + folder.name;
       } else {
         rootNodes.push(node);
       }
@@ -394,7 +415,7 @@ function buildFolderTree(folders: Folder[]): FolderTreeNode[] {
     if (nodes.length > 0) {
       nodes[nodes.length - 1].isLast = true;
     }
-    nodes.forEach(node => markLastChildren(node.children));
+    nodes.forEach((node) => markLastChildren(node.children));
   };
   markLastChildren(rootNodes);
 
@@ -405,15 +426,28 @@ function buildFolderTree(folders: Folder[]): FolderTreeNode[] {
  * Build visual tree display with symbols
  */
 function buildFolderTreeDisplay(tree: FolderTreeNode[]): string {
-  let result = '';
+  let result = "";
 
-  const renderNode = (node: FolderTreeNode, prefix: string, isLast: boolean) => {
+  const renderNode = (
+    node: FolderTreeNode,
+    prefix: string,
+    isLast: boolean,
+  ) => {
     const fileCount = node.folder._count?.documents || 0;
-    const connector = isLast ? '└── ' : '├── ';
-    const folderLine = prefix + connector + '**' + node.folder.name + '/** (' + fileCount + ' file' + (fileCount !== 1 ? 's' : '') + ')\n';
+    const connector = isLast ? "└── " : "├── ";
+    const folderLine =
+      prefix +
+      connector +
+      "**" +
+      node.folder.name +
+      "/** (" +
+      fileCount +
+      " file" +
+      (fileCount !== 1 ? "s" : "") +
+      ")\n";
     result += folderLine;
 
-    const newPrefix = prefix + (isLast ? '    ' : '│   ');
+    const newPrefix = prefix + (isLast ? "    " : "│   ");
     node.children.forEach((child, index) => {
       renderNode(child, newPrefix, index === node.children.length - 1);
     });
@@ -421,14 +455,21 @@ function buildFolderTreeDisplay(tree: FolderTreeNode[]): string {
 
   tree.forEach((node, index) => {
     const fileCount = node.folder._count?.documents || 0;
-    result += '**' + node.folder.name + '/** (' + fileCount + ' file' + (fileCount !== 1 ? 's' : '') + ')\n';
+    result +=
+      "**" +
+      node.folder.name +
+      "/** (" +
+      fileCount +
+      " file" +
+      (fileCount !== 1 ? "s" : "") +
+      ")\n";
 
     node.children.forEach((child, childIndex) => {
-      renderNode(child, '', childIndex === node.children.length - 1);
+      renderNode(child, "", childIndex === node.children.length - 1);
     });
 
     if (index < tree.length - 1) {
-      result += '\n';
+      result += "\n";
     }
   });
 
@@ -440,30 +481,33 @@ function buildFolderTreeDisplay(tree: FolderTreeNode[]): string {
  */
 function getFileTypeLabel(mimeType: string): string {
   const typeMap: { [key: string]: string } = {
-    'application/pdf': 'PDF',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word',
-    'application/msword': 'Word',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Excel',
-    'application/vnd.ms-excel': 'Excel',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'PowerPoint',
-    'application/vnd.ms-powerpoint': 'PowerPoint',
-    'text/plain': 'Text',
-    'text/csv': 'CSV',
-    'image/jpeg': 'JPEG',
-    'image/png': 'PNG',
-    'image/gif': 'GIF',
+    "application/pdf": "PDF",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+      "Word",
+    "application/msword": "Word",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+      "Excel",
+    "application/vnd.ms-excel": "Excel",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+      "PowerPoint",
+    "application/vnd.ms-powerpoint": "PowerPoint",
+    "text/plain": "Text",
+    "text/csv": "CSV",
+    "image/jpeg": "JPEG",
+    "image/png": "PNG",
+    "image/gif": "GIF",
   };
 
-  return typeMap[mimeType] || 'File';
+  return typeMap[mimeType] || "File";
 }
 
 /**
  * Format file size in human-readable format
  */
 function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 B';
+  if (bytes === 0) return "0 B";
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return Math.round(bytes / Math.pow(k, i) * 10) / 10 + ' ' + sizes[i];
+  return Math.round((bytes / Math.pow(k, i)) * 10) / 10 + " " + sizes[i];
 }

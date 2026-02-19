@@ -56,9 +56,7 @@ export function buildWorklog(
 
     if (entry?.uiStepTemplate) {
       const template =
-        language === "pt"
-          ? entry.uiStepTemplate.pt
-          : entry.uiStepTemplate.en;
+        language === "pt" ? entry.uiStepTemplate.pt : entry.uiStepTemplate.en;
       title = interpolateTemplate(template, step.params);
     } else {
       title = fallbackLabel(step.op, language);

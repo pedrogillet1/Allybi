@@ -1,18 +1,18 @@
 // src/services/extraction/googleVisionOcr.service.ts
-import { ImageAnnotatorClient } from '@google-cloud/vision';
+import { ImageAnnotatorClient } from "@google-cloud/vision";
 
-export type OcrMode = 'document' | 'text';
+export type OcrMode = "document" | "text";
 
 export interface OcrOptions {
-  mode?: OcrMode;                 // 'document' is best for invoices/IDs/scans
-  languageHints?: string[];       // e.g. ['pt', 'en']
-  maxChars?: number;              // safety cap for huge outputs
-  stripHyphenLineBreaks?: boolean;// join "line-\nbreak" => "linebreak"
+  mode?: OcrMode; // 'document' is best for invoices/IDs/scans
+  languageHints?: string[]; // e.g. ['pt', 'en']
+  maxChars?: number; // safety cap for huge outputs
+  stripHyphenLineBreaks?: boolean; // join "line-\nbreak" => "linebreak"
 }
 
 export interface OcrResult {
   text: string;
-  confidence?: number;            // avg confidence if available
+  confidence?: number; // avg confidence if available
   blocks?: Array<{
     text: string;
     confidence?: number;
@@ -31,7 +31,7 @@ export interface OcrPdfResult {
   pages: OcrPdfPageResult[];
   pageCount: number;
   confidence: number;
-  mode: 'direct' | 'split';
+  mode: "direct" | "split";
   warnings: string[];
 }
 
@@ -74,9 +74,12 @@ export class GoogleVisionOcrService {
       const json = process.env.GOOGLE_VISION_CREDENTIALS_JSON;
 
       if (b64) {
-        const decoded = Buffer.from(b64, 'base64').toString('utf8');
+        const decoded = Buffer.from(b64, "base64").toString("utf8");
         const creds = safeJsonParse(decoded);
-        if (!creds) throw new Error('Invalid GOOGLE_VISION_CREDENTIALS_B64 (not valid JSON).');
+        if (!creds)
+          throw new Error(
+            "Invalid GOOGLE_VISION_CREDENTIALS_B64 (not valid JSON).",
+          );
 
         this.client = new ImageAnnotatorClient({
           credentials: creds,
@@ -87,7 +90,10 @@ export class GoogleVisionOcrService {
 
       if (json) {
         const creds = safeJsonParse(json);
-        if (!creds) throw new Error('Invalid GOOGLE_VISION_CREDENTIALS_JSON (not valid JSON).');
+        if (!creds)
+          throw new Error(
+            "Invalid GOOGLE_VISION_CREDENTIALS_JSON (not valid JSON).",
+          );
 
         this.client = new ImageAnnotatorClient({
           credentials: creds,
@@ -122,14 +128,14 @@ export class GoogleVisionOcrService {
    * Process a scanned PDF using Google Vision's document text detection.
    */
   async processScannedPDF(
-    buffer: Buffer
+    buffer: Buffer,
   ): Promise<{ text: string; pageCount: number; confidence: number }> {
     const result = await this.processPdfPages(buffer);
     const pagesOrdered = [...result.pages].sort((a, b) => a.page - b.page);
     const fullText = pagesOrdered
       .map((p) => p.text)
       .filter((t) => t && t.trim().length > 0)
-      .join('\f');
+      .join("\f");
 
     return {
       text: fullText.trim(),
@@ -145,41 +151,57 @@ export class GoogleVisionOcrService {
    */
   async processPdfPages(
     buffer: Buffer,
-    opts?: { pages?: number[]; maxPages?: number }
+    opts?: { pages?: number[]; maxPages?: number },
   ): Promise<OcrPdfResult> {
     if (!this.client) {
-      throw new Error(this.initError || 'Google Vision not initialized');
+      throw new Error(this.initError || "Google Vision not initialized");
     }
 
     const totalPages = await this.detectPdfPageCount(buffer);
-    const maxPages = Math.min(totalPages, Math.max(1, opts?.maxPages ?? OCR_PDF_MAX_PAGES));
+    const maxPages = Math.min(
+      totalPages,
+      Math.max(1, opts?.maxPages ?? OCR_PDF_MAX_PAGES),
+    );
     const targetPages = this.normalizeTargetPages(opts?.pages, maxPages);
     const warnings: string[] = [];
 
     if (targetPages.length === 0) {
-      return { pages: [], pageCount: maxPages, confidence: 0, mode: 'direct', warnings: ['NO_TARGET_PAGES'] };
+      return {
+        pages: [],
+        pageCount: maxPages,
+        confidence: 0,
+        mode: "direct",
+        warnings: ["NO_TARGET_PAGES"],
+      };
     }
 
     console.log(
-      `[OCR] Processing PDF pages ${targetPages.length}/${maxPages} via batchAnnotateFiles (buffer ${(buffer.length / 1024 / 1024).toFixed(1)} MB)...`
+      `[OCR] Processing PDF pages ${targetPages.length}/${maxPages} via batchAnnotateFiles (buffer ${(buffer.length / 1024 / 1024).toFixed(1)} MB)...`,
     );
 
     const direct = await this.runDirectPdfBatches(buffer, targetPages);
     let pages = direct.pages;
-    let mode: 'direct' | 'split' = 'direct';
+    let mode: "direct" | "split" = "direct";
 
-    const lowCoverage = targetPages.length > 0 && pages.length < Math.max(1, Math.floor(targetPages.length * 0.6));
+    const lowCoverage =
+      targetPages.length > 0 &&
+      pages.length < Math.max(1, Math.floor(targetPages.length * 0.6));
     const shouldSplit =
       direct.payloadLimitHit ||
       (direct.resourceExhaustedHit && lowCoverage) ||
-      (buffer.length >= OCR_PDF_PAYLOAD_LIMIT_BYTES && pages.length < targetPages.length);
+      (buffer.length >= OCR_PDF_PAYLOAD_LIMIT_BYTES &&
+        pages.length < targetPages.length);
 
     if (shouldSplit) {
-      warnings.push(direct.payloadLimitHit ? 'PAYLOAD_LIMIT_FALLBACK_SPLIT' : 'RESOURCE_LIMIT_FALLBACK_SPLIT');
+      warnings.push(
+        direct.payloadLimitHit
+          ? "PAYLOAD_LIMIT_FALLBACK_SPLIT"
+          : "RESOURCE_LIMIT_FALLBACK_SPLIT",
+      );
       const split = await this.runSplitPdfBatches(buffer, targetPages);
       if (split.pages.length >= pages.length) {
         pages = split.pages;
-        mode = 'split';
+        mode = "split";
         warnings.push(...split.warnings);
       }
     }
@@ -193,14 +215,20 @@ export class GoogleVisionOcrService {
       }
     }
 
-    const sortedPages = Array.from(byPage.values()).sort((a, b) => a.page - b.page);
-    const confidenceValues = sortedPages.map((p) => p.confidence).filter((c) => Number.isFinite(c) && c > 0);
-    const confidence = confidenceValues.length > 0
-      ? confidenceValues.reduce((sum, c) => sum + c, 0) / confidenceValues.length
-      : 0.7;
+    const sortedPages = Array.from(byPage.values()).sort(
+      (a, b) => a.page - b.page,
+    );
+    const confidenceValues = sortedPages
+      .map((p) => p.confidence)
+      .filter((c) => Number.isFinite(c) && c > 0);
+    const confidence =
+      confidenceValues.length > 0
+        ? confidenceValues.reduce((sum, c) => sum + c, 0) /
+          confidenceValues.length
+        : 0.7;
 
     console.log(
-      `[OCR] PDF OCR complete (${mode}): ${sortedPages.length}/${targetPages.length} pages, confidence ${(confidence * 100).toFixed(1)}%`
+      `[OCR] PDF OCR complete (${mode}): ${sortedPages.length}/${targetPages.length} pages, confidence ${(confidence * 100).toFixed(1)}%`,
     );
 
     return {
@@ -216,14 +244,17 @@ export class GoogleVisionOcrService {
     let totalPages = 1;
 
     try {
-      const { PDFParse } = require('pdf-parse');
+      const { PDFParse } = require("pdf-parse");
       const parser = new PDFParse({ data: buffer });
       const info = await parser.getInfo();
       const textInfo = await parser.getText();
       await parser.destroy();
 
       const fromInfo = Number(info?.total || info?.numpages || 0);
-      const markerMatches = String(textInfo?.text || '').match(/--\s*\d+\s*(of|de)\s*(\d+)\s*--/gi) || [];
+      const markerMatches =
+        String(textInfo?.text || "").match(
+          /--\s*\d+\s*(of|de)\s*(\d+)\s*--/gi,
+        ) || [];
       let fromMarkers = 0;
       for (const match of markerMatches) {
         const mm = match.match(/(?:of|de)\s*(\d+)/i);
@@ -233,11 +264,11 @@ export class GoogleVisionOcrService {
         }
       }
 
-      const formFeeds = String(textInfo?.text || '').split('\f').length;
+      const formFeeds = String(textInfo?.text || "").split("\f").length;
       totalPages = Math.max(1, fromInfo, fromMarkers, formFeeds);
     } catch {
       try {
-        const { PDFDocument } = require('@cantoo/pdf-lib');
+        const { PDFDocument } = require("@cantoo/pdf-lib");
         const pdfDoc = await PDFDocument.load(buffer);
         totalPages = Math.max(1, pdfDoc.getPageCount());
       } catch {
@@ -248,7 +279,10 @@ export class GoogleVisionOcrService {
     return totalPages;
   }
 
-  private normalizeTargetPages(pages: number[] | undefined, maxPages: number): number[] {
+  private normalizeTargetPages(
+    pages: number[] | undefined,
+    maxPages: number,
+  ): number[] {
     if (!Array.isArray(pages) || pages.length === 0) {
       return Array.from({ length: maxPages }, (_, i) => i + 1);
     }
@@ -271,7 +305,10 @@ export class GoogleVisionOcrService {
     return out;
   }
 
-  private async runDirectPdfBatches(buffer: Buffer, targetPages: number[]): Promise<{
+  private async runDirectPdfBatches(
+    buffer: Buffer,
+    targetPages: number[],
+  ): Promise<{
     pages: OcrPdfPageResult[];
     payloadLimitHit: boolean;
     resourceExhaustedHit: boolean;
@@ -290,17 +327,22 @@ export class GoogleVisionOcrService {
         const batchPages = pageBatches[idx];
         try {
           const [result] = await this.client!.batchAnnotateFiles({
-            requests: [{
-              inputConfig: { content: buffer, mimeType: 'application/pdf' },
-              features: [{ type: 'DOCUMENT_TEXT_DETECTION' as any }],
-              pages: batchPages,
-            }],
+            requests: [
+              {
+                inputConfig: { content: buffer, mimeType: "application/pdf" },
+                features: [{ type: "DOCUMENT_TEXT_DETECTION" as any }],
+                pages: batchPages,
+              },
+            ],
           });
           pages.push(...this.collectPdfResponses(result, batchPages, (n) => n));
         } catch (err: any) {
           if (this.isPayloadLimitError(err)) payloadLimitHit = true;
           if (this.isResourceExhaustedError(err)) resourceExhaustedHit = true;
-          console.warn(`[OCR] Direct batch failed for pages ${batchPages.join(',')}:`, err?.message || err);
+          console.warn(
+            `[OCR] Direct batch failed for pages ${batchPages.join(",")}:`,
+            err?.message || err,
+          );
         }
       }
     });
@@ -309,13 +351,16 @@ export class GoogleVisionOcrService {
     return { pages, payloadLimitHit, resourceExhaustedHit };
   }
 
-  private async runSplitPdfBatches(buffer: Buffer, targetPages: number[]): Promise<{
+  private async runSplitPdfBatches(
+    buffer: Buffer,
+    targetPages: number[],
+  ): Promise<{
     pages: OcrPdfPageResult[];
     warnings: string[];
   }> {
     const warnings: string[] = [];
     const out: OcrPdfPageResult[] = [];
-    const { PDFDocument } = require('@cantoo/pdf-lib');
+    const { PDFDocument } = require("@cantoo/pdf-lib");
     const sourcePdf = await PDFDocument.load(buffer);
 
     const queue = this.splitIntoBatches(targetPages, OCR_PDF_BATCH_SIZE);
@@ -323,34 +368,52 @@ export class GoogleVisionOcrService {
       const globalPages = queue.shift()!;
       let subsetBuffer = await this.buildPdfSubset(sourcePdf, globalPages);
 
-      if (subsetBuffer.length >= OCR_PDF_PAYLOAD_LIMIT_BYTES && globalPages.length > 1) {
+      if (
+        subsetBuffer.length >= OCR_PDF_PAYLOAD_LIMIT_BYTES &&
+        globalPages.length > 1
+      ) {
         const mid = Math.ceil(globalPages.length / 2);
         queue.unshift(globalPages.slice(mid), globalPages.slice(0, mid));
-        warnings.push('SPLIT_BATCH_BY_SIZE');
+        warnings.push("SPLIT_BATCH_BY_SIZE");
         continue;
       }
 
-      const localPages = Array.from({ length: globalPages.length }, (_, i) => i + 1);
+      const localPages = Array.from(
+        { length: globalPages.length },
+        (_, i) => i + 1,
+      );
 
       try {
         const [result] = await this.client!.batchAnnotateFiles({
-          requests: [{
-            inputConfig: { content: subsetBuffer, mimeType: 'application/pdf' },
-            features: [{ type: 'DOCUMENT_TEXT_DETECTION' as any }],
-            pages: localPages,
-          }],
+          requests: [
+            {
+              inputConfig: {
+                content: subsetBuffer,
+                mimeType: "application/pdf",
+              },
+              features: [{ type: "DOCUMENT_TEXT_DETECTION" as any }],
+              pages: localPages,
+            },
+          ],
         });
         out.push(
-          ...this.collectPdfResponses(result, localPages, (localPage) => globalPages[localPage - 1] || localPage)
+          ...this.collectPdfResponses(
+            result,
+            localPages,
+            (localPage) => globalPages[localPage - 1] || localPage,
+          ),
         );
       } catch (err: any) {
         if (this.isResourceExhaustedError(err) && globalPages.length > 1) {
           const mid = Math.ceil(globalPages.length / 2);
           queue.unshift(globalPages.slice(mid), globalPages.slice(0, mid));
-          warnings.push('SPLIT_BATCH_BY_RESOURCE');
+          warnings.push("SPLIT_BATCH_BY_RESOURCE");
           continue;
         }
-        console.warn(`[OCR] Split batch failed for pages ${globalPages.join(',')}:`, err?.message || err);
+        console.warn(
+          `[OCR] Split batch failed for pages ${globalPages.join(",")}:`,
+          err?.message || err,
+        );
       } finally {
         subsetBuffer = Buffer.alloc(0);
       }
@@ -359,8 +422,11 @@ export class GoogleVisionOcrService {
     return { pages: out, warnings };
   }
 
-  private async buildPdfSubset(sourcePdf: any, globalPages: number[]): Promise<Buffer> {
-    const { PDFDocument } = require('@cantoo/pdf-lib');
+  private async buildPdfSubset(
+    sourcePdf: any,
+    globalPages: number[],
+  ): Promise<Buffer> {
+    const { PDFDocument } = require("@cantoo/pdf-lib");
     const subset = await PDFDocument.create();
     const indices = globalPages.map((p) => Math.max(0, p - 1));
     const copied = await subset.copyPages(sourcePdf, indices);
@@ -369,21 +435,31 @@ export class GoogleVisionOcrService {
     return Buffer.from(bytes);
   }
 
-  private collectPdfResponses(result: any, requestedPages: number[], pageResolver: (page: number) => number): OcrPdfPageResult[] {
+  private collectPdfResponses(
+    result: any,
+    requestedPages: number[],
+    pageResolver: (page: number) => number,
+  ): OcrPdfPageResult[] {
     const out: OcrPdfPageResult[] = [];
     const responses = result?.responses?.[0]?.responses || [];
 
     for (let i = 0; i < responses.length; i++) {
       const response = responses[i];
       const resolvedPage = pageResolver(requestedPages[i] ?? i + 1);
-      const text = String(response?.fullTextAnnotation?.text || '').trim();
-      const blocks = response?.fullTextAnnotation?.pages?.flatMap((p: any) => p.blocks || []) || [];
+      const text = String(response?.fullTextAnnotation?.text || "").trim();
+      const blocks =
+        response?.fullTextAnnotation?.pages?.flatMap(
+          (p: any) => p.blocks || [],
+        ) || [];
       const confs = blocks
         .map((b: any) => b?.confidence)
-        .filter((c: any): c is number => typeof c === 'number' && Number.isFinite(c));
-      const confidence = confs.length > 0
-        ? confs.reduce((sum: number, c: number) => sum + c, 0) / confs.length
-        : 0.7;
+        .filter(
+          (c: any): c is number => typeof c === "number" && Number.isFinite(c),
+        );
+      const confidence =
+        confs.length > 0
+          ? confs.reduce((sum: number, c: number) => sum + c, 0) / confs.length
+          : 0.7;
 
       out.push({ page: resolvedPage, text, confidence });
     }
@@ -392,13 +468,16 @@ export class GoogleVisionOcrService {
   }
 
   private isPayloadLimitError(err: any): boolean {
-    const msg = String(err?.message || '').toLowerCase();
-    return msg.includes('request payload size exceeds the limit') || msg.includes('41943040');
+    const msg = String(err?.message || "").toLowerCase();
+    return (
+      msg.includes("request payload size exceeds the limit") ||
+      msg.includes("41943040")
+    );
   }
 
   private isResourceExhaustedError(err: any): boolean {
-    const msg = String(err?.message || '').toLowerCase();
-    return err?.code === 8 || msg.includes('resource_exhausted');
+    const msg = String(err?.message || "").toLowerCase();
+    return err?.code === 8 || msg.includes("resource_exhausted");
   }
 
   /**
@@ -413,7 +492,7 @@ export class GoogleVisionOcrService {
   async extractTextWithRetry(
     buffer: Buffer,
     options: OcrOptions = {},
-    maxRetries = 3
+    maxRetries = 3,
   ): Promise<OcrResult> {
     // gRPC status codes for transient errors:
     // 2 = UNKNOWN, 13 = INTERNAL, 14 = UNAVAILABLE
@@ -425,15 +504,15 @@ export class GoogleVisionOcrService {
       } catch (err: any) {
         const isTransient =
           TRANSIENT_CODES.includes(err.code) ||
-          err.message?.includes('RST_STREAM') ||
-          err.message?.includes('INTERNAL') ||
-          err.message?.includes('UNAVAILABLE');
+          err.message?.includes("RST_STREAM") ||
+          err.message?.includes("INTERNAL") ||
+          err.message?.includes("UNAVAILABLE");
 
         if (isTransient && attempt < maxRetries) {
           // Exponential backoff: 1s, 2s, 4s (capped at 8s)
           const delay = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
           console.log(
-            `[OCR] Transient error (attempt ${attempt}/${maxRetries}), retrying in ${delay}ms: ${err.message}`
+            `[OCR] Transient error (attempt ${attempt}/${maxRetries}), retrying in ${delay}ms: ${err.message}`,
           );
           await new Promise((r) => setTimeout(r, delay));
           continue;
@@ -442,7 +521,7 @@ export class GoogleVisionOcrService {
       }
     }
     // Unreachable, but TypeScript needs this
-    throw new Error('OCR retry exhausted without result');
+    throw new Error("OCR retry exhausted without result");
   }
 
   /**
@@ -450,33 +529,33 @@ export class GoogleVisionOcrService {
    */
   async extractTextFromBuffer(
     buffer: Buffer,
-    options: OcrOptions = {}
+    options: OcrOptions = {},
   ): Promise<OcrResult> {
     const warnings: string[] = [];
     if (!this.client) {
       const msg = this.initError
         ? `Google Vision not initialized: ${this.initError}`
-        : 'Google Vision not initialized (missing credentials?)';
+        : "Google Vision not initialized (missing credentials?)";
       throw new Error(msg);
     }
 
     const {
-      mode = 'document',
-      languageHints = ['en', 'pt'],
+      mode = "document",
+      languageHints = ["en", "pt"],
       maxChars = 200_000,
       stripHyphenLineBreaks = true,
     } = options;
 
     // Basic guard
     if (!buffer || buffer.length === 0) {
-      return { text: '', warnings: ['EMPTY_BUFFER'] };
+      return { text: "", warnings: ["EMPTY_BUFFER"] };
     }
 
     // Google API call
     const image = { content: buffer };
 
     const request =
-      mode === 'document'
+      mode === "document"
         ? {
             image,
             imageContext: { languageHints },
@@ -486,13 +565,13 @@ export class GoogleVisionOcrService {
             imageContext: { languageHints },
           };
 
-    let rawText = '';
+    let rawText = "";
     let confidence: number | undefined;
-    let blocks: OcrResult['blocks'] | undefined;
+    let blocks: OcrResult["blocks"] | undefined;
 
-    if (mode === 'document') {
+    if (mode === "document") {
       const [res] = await this.client.documentTextDetection(request as any);
-      const fullText = res.fullTextAnnotation?.text || '';
+      const fullText = res.fullTextAnnotation?.text || "";
       rawText = fullText;
 
       // Try to compute an average confidence from pages/blocks if present
@@ -502,7 +581,7 @@ export class GoogleVisionOcrService {
       if (pageBlocks.length > 0) {
         const confs = pageBlocks
           .map((b) => b.confidence)
-          .filter((c): c is number => typeof c === 'number');
+          .filter((c): c is number => typeof c === "number");
 
         if (confs.length > 0) {
           confidence = confs.reduce((a, b) => a + b, 0) / confs.length;
@@ -515,7 +594,7 @@ export class GoogleVisionOcrService {
               ?.flatMap((p) => p.words || [])
               .flatMap((w) => w.symbols || [])
               .map((s) => s.text)
-              .join('') || '',
+              .join("") || "",
           confidence: b.confidence ?? undefined,
           boundingBox:
             b.boundingBox?.vertices?.map((v) => ({
@@ -526,27 +605,29 @@ export class GoogleVisionOcrService {
       }
     } else {
       const [res] = await this.client.textDetection(request as any);
-      rawText = res.fullTextAnnotation?.text || (res.textAnnotations?.[0]?.description ?? '');
+      rawText =
+        res.fullTextAnnotation?.text ||
+        (res.textAnnotations?.[0]?.description ?? "");
     }
 
     // Normalize output
-    let text = rawText.replace(/\r\n/g, '\n');
+    let text = rawText.replace(/\r\n/g, "\n");
 
     // Join hyphenated line breaks: "credi-\ncard" -> "credicard" (optional)
     if (stripHyphenLineBreaks) {
-      text = text.replace(/(\w)-\n(\w)/g, '$1$2');
+      text = text.replace(/(\w)-\n(\w)/g, "$1$2");
     }
 
     // Collapse excessive blank lines
-    text = text.replace(/\n{3,}/g, '\n\n').trim();
+    text = text.replace(/\n{3,}/g, "\n\n").trim();
 
     // Cap size
     if (text.length > maxChars) {
-      warnings.push('TRUNCATED_OUTPUT');
+      warnings.push("TRUNCATED_OUTPUT");
       text = text.slice(0, maxChars);
     }
 
-    if (!text) warnings.push('NO_TEXT_DETECTED');
+    if (!text) warnings.push("NO_TEXT_DETECTED");
 
     return { text, confidence, blocks, warnings };
   }

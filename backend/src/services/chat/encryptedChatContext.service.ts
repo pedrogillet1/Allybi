@@ -9,8 +9,16 @@ type ChatRole = "user" | "assistant" | "system";
 export class EncryptedChatContextService {
   constructor(private chatRepo: EncryptedChatRepo) {}
 
-  async buildLLMContext(userId: string, conversationId: string, limit = 20): Promise<Array<{ role: ChatRole; content: string }>> {
-    const msgs = await this.chatRepo.listMessagesDecrypted(userId, conversationId, limit);
+  async buildLLMContext(
+    userId: string,
+    conversationId: string,
+    limit = 20,
+  ): Promise<Array<{ role: ChatRole; content: string }>> {
+    const msgs = await this.chatRepo.listMessagesDecrypted(
+      userId,
+      conversationId,
+      limit,
+    );
     return msgs.map((m) => ({ role: m.role as ChatRole, content: m.content }));
   }
 }

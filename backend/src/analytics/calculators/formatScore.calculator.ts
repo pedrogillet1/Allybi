@@ -12,12 +12,12 @@ export type QueryQualityEvent = {
 };
 
 export type ScoreContributions = {
-  citationsBonus: number;      // +0.25 if citationsCount >= 1
-  topScoreBonus: number;       // +0.25 if topScore >= 0.80
+  citationsBonus: number; // +0.25 if citationsCount >= 1
+  topScoreBonus: number; // +0.25 if topScore >= 0.80
   weakEvidencePenalty: number; // -0.35 if weakEvidence true
-  fallbackPenalty: number;     // -0.15 if fallbackUsed true
-  rawScore: number;            // Sum before clamping
-  finalScore: number;          // Clamped [0, 1]
+  fallbackPenalty: number; // -0.15 if fallbackUsed true
+  rawScore: number; // Sum before clamping
+  finalScore: number; // Clamped [0, 1]
 };
 
 export type DomainScore = {
@@ -39,11 +39,11 @@ export type FormatScoreResult = {
 
 // Rubric constants
 const RUBRIC = {
-  citationsBonus: 0.25,      // citationsCount >= 1
-  topScoreBonus: 0.25,       // topScore >= 0.80
+  citationsBonus: 0.25, // citationsCount >= 1
+  topScoreBonus: 0.25, // topScore >= 0.80
   weakEvidencePenalty: -0.35, // weakEvidence true
-  fallbackPenalty: -0.15,     // fallbackUsed true
-  baseScore: 0.5,             // Starting point
+  fallbackPenalty: -0.15, // fallbackUsed true
+  baseScore: 0.5, // Starting point
 };
 
 /**
@@ -56,15 +56,25 @@ const RUBRIC = {
  * - 0.15 if fallbackUsed true
  * Clamped to [0, 1]
  */
-export function calculateSingleScore(query: QueryQualityEvent): ScoreContributions {
+export function calculateSingleScore(
+  query: QueryQualityEvent,
+): ScoreContributions {
   let score = RUBRIC.baseScore;
 
-  const citationsBonus = (query.citationsCount ?? 0) >= 1 ? RUBRIC.citationsBonus : 0;
-  const topScoreBonus = (query.topScore ?? 0) >= 0.80 ? RUBRIC.topScoreBonus : 0;
-  const weakEvidencePenalty = query.weakEvidence === true ? RUBRIC.weakEvidencePenalty : 0;
-  const fallbackPenalty = query.fallbackUsed === true ? RUBRIC.fallbackPenalty : 0;
+  const citationsBonus =
+    (query.citationsCount ?? 0) >= 1 ? RUBRIC.citationsBonus : 0;
+  const topScoreBonus = (query.topScore ?? 0) >= 0.8 ? RUBRIC.topScoreBonus : 0;
+  const weakEvidencePenalty =
+    query.weakEvidence === true ? RUBRIC.weakEvidencePenalty : 0;
+  const fallbackPenalty =
+    query.fallbackUsed === true ? RUBRIC.fallbackPenalty : 0;
 
-  const rawScore = score + citationsBonus + topScoreBonus + weakEvidencePenalty + fallbackPenalty;
+  const rawScore =
+    score +
+    citationsBonus +
+    topScoreBonus +
+    weakEvidencePenalty +
+    fallbackPenalty;
   const finalScore = Math.max(0, Math.min(1, rawScore));
 
   return {
@@ -81,16 +91,16 @@ export function calculateSingleScore(query: QueryQualityEvent): ScoreContributio
  * Get score bucket label for distribution
  */
 function getScoreBucket(score: number): string {
-  if (score >= 0.9) return '0.9-1.0';
-  if (score >= 0.8) return '0.8-0.9';
-  if (score >= 0.7) return '0.7-0.8';
-  if (score >= 0.6) return '0.6-0.7';
-  if (score >= 0.5) return '0.5-0.6';
-  if (score >= 0.4) return '0.4-0.5';
-  if (score >= 0.3) return '0.3-0.4';
-  if (score >= 0.2) return '0.2-0.3';
-  if (score >= 0.1) return '0.1-0.2';
-  return '0.0-0.1';
+  if (score >= 0.9) return "0.9-1.0";
+  if (score >= 0.8) return "0.8-0.9";
+  if (score >= 0.7) return "0.7-0.8";
+  if (score >= 0.6) return "0.6-0.7";
+  if (score >= 0.5) return "0.5-0.6";
+  if (score >= 0.4) return "0.4-0.5";
+  if (score >= 0.3) return "0.3-0.4";
+  if (score >= 0.2) return "0.2-0.3";
+  if (score >= 0.1) return "0.1-0.2";
+  return "0.0-0.1";
 }
 
 /**
@@ -99,7 +109,9 @@ function getScoreBucket(score: number): string {
  * @param queries - Array of query quality events
  * @returns Format score statistics including average, distribution, and domain breakdown
  */
-export function calculateFormatScore(queries: QueryQualityEvent[]): FormatScoreResult {
+export function calculateFormatScore(
+  queries: QueryQualityEvent[],
+): FormatScoreResult {
   const emptyResult: FormatScoreResult = {
     avgScore: null,
     distribution: [],
@@ -128,8 +140,16 @@ export function calculateFormatScore(queries: QueryQualityEvent[]): FormatScoreR
 
   // Initialize all buckets with 0
   const buckets = [
-    '0.0-0.1', '0.1-0.2', '0.2-0.3', '0.3-0.4', '0.4-0.5',
-    '0.5-0.6', '0.6-0.7', '0.7-0.8', '0.8-0.9', '0.9-1.0'
+    "0.0-0.1",
+    "0.1-0.2",
+    "0.2-0.3",
+    "0.3-0.4",
+    "0.4-0.5",
+    "0.5-0.6",
+    "0.6-0.7",
+    "0.7-0.8",
+    "0.8-0.9",
+    "0.9-1.0",
   ];
   for (const bucket of buckets) {
     bucketCounts.set(bucket, 0);
@@ -140,7 +160,7 @@ export function calculateFormatScore(queries: QueryQualityEvent[]): FormatScoreR
     scores.push(finalScore);
 
     // Domain breakdown
-    const domain = query.domain || 'unknown';
+    const domain = query.domain || "unknown";
     if (!domainScores.has(domain)) {
       domainScores.set(domain, []);
     }
@@ -153,10 +173,11 @@ export function calculateFormatScore(queries: QueryQualityEvent[]): FormatScoreR
 
   // Calculate overall average
   const sum = scores.reduce((acc, s) => acc + s, 0);
-  const avgScore = scores.length > 0 ? Math.round((sum / scores.length) * 1000) / 1000 : null;
+  const avgScore =
+    scores.length > 0 ? Math.round((sum / scores.length) * 1000) / 1000 : null;
 
   // Build distribution array (in order)
-  const distribution = buckets.map(bucket => ({
+  const distribution = buckets.map((bucket) => ({
     bucket,
     count: bucketCounts.get(bucket) ?? 0,
   }));
@@ -167,7 +188,10 @@ export function calculateFormatScore(queries: QueryQualityEvent[]): FormatScoreR
     const domSum = domScores.reduce((acc, s) => acc + s, 0);
     byDomain.push({
       domain,
-      avgScore: domScores.length > 0 ? Math.round((domSum / domScores.length) * 1000) / 1000 : null,
+      avgScore:
+        domScores.length > 0
+          ? Math.round((domSum / domScores.length) * 1000) / 1000
+          : null,
       count: domScores.length,
     });
   }

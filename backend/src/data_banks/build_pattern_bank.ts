@@ -5,8 +5,8 @@
  * Run with: npx ts-node src/data_banks/build_pattern_bank.ts
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 interface PatternEntry {
   id: string;
@@ -65,10 +65,10 @@ interface ConsolidatedBank {
 }
 
 const DATA_BANKS_DIR = path.join(__dirname);
-const TRIGGERS_DIR = path.join(DATA_BANKS_DIR, 'triggers');
-const SIGNALS_DIR = path.join(DATA_BANKS_DIR, 'signals');
-const NEGATIVES_DIR = path.join(DATA_BANKS_DIR, 'negatives');
-const OUTPUT_FILE = path.join(DATA_BANKS_DIR, 'pattern_bank.runtime.json');
+const TRIGGERS_DIR = path.join(DATA_BANKS_DIR, "triggers");
+const SIGNALS_DIR = path.join(DATA_BANKS_DIR, "signals");
+const NEGATIVES_DIR = path.join(DATA_BANKS_DIR, "negatives");
+const OUTPUT_FILE = path.join(DATA_BANKS_DIR, "pattern_bank.runtime.json");
 
 function loadJsonFiles<T>(dir: string): T[] {
   if (!fs.existsSync(dir)) {
@@ -76,12 +76,12 @@ function loadJsonFiles<T>(dir: string): T[] {
     return [];
   }
 
-  const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json"));
   const results: T[] = [];
 
   for (const file of files) {
     try {
-      const content = fs.readFileSync(path.join(dir, file), 'utf-8');
+      const content = fs.readFileSync(path.join(dir, file), "utf-8");
       results.push(JSON.parse(content));
       console.log(`  Loaded: ${file}`);
     } catch (err) {
@@ -92,13 +92,16 @@ function loadJsonFiles<T>(dir: string): T[] {
   return results;
 }
 
-function countPatterns(patterns: { pt: PatternEntry[]; en: PatternEntry[] }): number {
+function countPatterns(patterns: {
+  pt: PatternEntry[];
+  en: PatternEntry[];
+}): number {
   return (patterns?.pt?.length || 0) + (patterns?.en?.length || 0);
 }
 
 function validatePattern(pattern: string, id: string): boolean {
   try {
-    new RegExp(pattern, 'i');
+    new RegExp(pattern, "i");
     return true;
   } catch (err) {
     console.error(`  Invalid regex in ${id}: ${pattern}`);
@@ -117,10 +120,10 @@ function validatePatterns(patterns: PatternEntry[], source: string): number {
 }
 
 async function build(): Promise<void> {
-  console.log('=== Intent Pattern Data Bank Builder ===\n');
+  console.log("=== Intent Pattern Data Bank Builder ===\n");
 
   // Load triggers
-  console.log('Loading triggers...');
+  console.log("Loading triggers...");
   const triggers = loadJsonFiles<TriggerFile>(TRIGGERS_DIR);
   const triggersMap: Record<string, TriggerFile> = {};
   let triggerPatternCount = 0;
@@ -133,11 +136,13 @@ async function build(): Promise<void> {
     // Validate patterns
     const validPt = validatePatterns(t.patterns?.pt, `${t.intent}:pt`);
     const validEn = validatePatterns(t.patterns?.en, `${t.intent}:en`);
-    console.log(`    ${t.intent}: ${count} patterns (${validPt} PT valid, ${validEn} EN valid)`);
+    console.log(
+      `    ${t.intent}: ${count} patterns (${validPt} PT valid, ${validEn} EN valid)`,
+    );
   }
 
   // Load signals
-  console.log('\nLoading signals...');
+  console.log("\nLoading signals...");
   const signals = loadJsonFiles<SignalFile>(SIGNALS_DIR);
   const signalsMap: Record<string, SignalFile> = {};
   let signalPatternCount = 0;
@@ -149,11 +154,13 @@ async function build(): Promise<void> {
 
     const validPt = validatePatterns(s.patterns?.pt, `${s.signal}:pt`);
     const validEn = validatePatterns(s.patterns?.en, `${s.signal}:en`);
-    console.log(`    ${s.signal}: ${count} patterns (${validPt} PT valid, ${validEn} EN valid)`);
+    console.log(
+      `    ${s.signal}: ${count} patterns (${validPt} PT valid, ${validEn} EN valid)`,
+    );
   }
 
   // Load negatives
-  console.log('\nLoading negatives...');
+  console.log("\nLoading negatives...");
   const negatives = loadJsonFiles<NegativeFile>(NEGATIVES_DIR);
   const negativesMap: Record<string, NegativeFile> = {};
   let negativePatternCount = 0;
@@ -165,36 +172,45 @@ async function build(): Promise<void> {
 
     const validPt = validatePatterns(n.patterns?.pt, `${n.blocker}:pt`);
     const validEn = validatePatterns(n.patterns?.en, `${n.blocker}:en`);
-    console.log(`    ${n.blocker}: ${count} patterns (${validPt} PT valid, ${validEn} EN valid)`);
+    console.log(
+      `    ${n.blocker}: ${count} patterns (${validPt} PT valid, ${validEn} EN valid)`,
+    );
   }
 
   // Build consolidated bank
   const bank: ConsolidatedBank = {
-    version: '1.0.0',
+    version: "1.0.0",
     buildDate: new Date().toISOString(),
     stats: {
-      totalPatterns: triggerPatternCount + signalPatternCount + negativePatternCount,
+      totalPatterns:
+        triggerPatternCount + signalPatternCount + negativePatternCount,
       triggerPatterns: triggerPatternCount,
       signalPatterns: signalPatternCount,
       negativePatterns: negativePatternCount,
       intents: Object.keys(triggersMap).length,
       signals: Object.keys(signalsMap).length,
-      blockers: Object.keys(negativesMap).length
+      blockers: Object.keys(negativesMap).length,
     },
     triggers: triggersMap,
     signals: signalsMap,
-    negatives: negativesMap
+    negatives: negativesMap,
   };
 
   // Write output
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(bank, null, 2));
 
   // Print summary
-  console.log('\n=== Build Summary ===');
+  console.log("\n=== Build Summary ===");
   console.log(`Total Patterns: ${bank.stats.totalPatterns}`);
-  console.log(`  - Triggers: ${bank.stats.triggerPatterns} (${bank.stats.intents} intents)`);
-  console.log(`  - Signals: ${bank.stats.signalPatterns} (${bank.stats.signals} signals)`);
-  console.log(`  - Negatives: ${bank.stats.negativePatterns} (${bank.stats.blockers} blockers)`);
+  console.log(
+    `  - Triggers: ${bank.stats.triggerPatterns} (${bank.stats.intents} intents)`,
+  );
+  console.log(
+    `  - Signals: ${bank.stats.signalPatterns} (${bank.stats.signals} signals)`,
+  );
+  console.log(
+    `  - Negatives: ${bank.stats.negativePatterns} (${bank.stats.blockers} blockers)`,
+  );
   console.log(`\nOutput: ${OUTPUT_FILE}`);
 }
 

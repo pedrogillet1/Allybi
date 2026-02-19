@@ -5,11 +5,11 @@
  * The gateway is the only runtime path allowed to assemble prompts.
  */
 
-import type { LLMProvider } from './llmErrors.types';
-import type { StreamSink, LLMStreamingConfig } from './llmStreaming.types';
+import type { LLMProvider } from "./llmErrors.types";
+import type { StreamSink, LLMStreamingConfig } from "./llmStreaming.types";
 
-import type { ChatEngine, ChatRole } from '../../prismaChat.service';
-import type { LlmGatewayService } from './llmGateway.service';
+import type { ChatEngine, ChatRole } from "../../prismaChat.service";
+import type { LlmGatewayService } from "./llmGateway.service";
 
 export interface LLMChatEngineConfig {
   modelId: string;
@@ -26,15 +26,19 @@ export class LLMChatEngine implements ChatEngine {
     private readonly gateway: LlmGatewayService,
     config?: Partial<LLMChatEngineConfig>,
   ) {
-    this.provider = config?.provider ?? 'google';
-    this.modelId = config?.modelId ?? 'gemini-2.0-flash';
+    this.provider = config?.provider ?? "google";
+    this.modelId = config?.modelId ?? "gemini-2.0-flash";
   }
 
   async generate(params: {
     traceId: string;
     userId: string;
     conversationId: string;
-    messages: Array<{ role: ChatRole; content: string; attachments?: unknown | null }>;
+    messages: Array<{
+      role: ChatRole;
+      content: string;
+      attachments?: unknown | null;
+    }>;
     context?: Record<string, unknown>;
     meta?: Record<string, unknown>;
   }): Promise<{
@@ -65,7 +69,11 @@ export class LLMChatEngine implements ChatEngine {
     traceId: string;
     userId: string;
     conversationId: string;
-    messages: Array<{ role: ChatRole; content: string; attachments?: unknown | null }>;
+    messages: Array<{
+      role: ChatRole;
+      content: string;
+      attachments?: unknown | null;
+    }>;
     context?: Record<string, unknown>;
     meta?: Record<string, unknown>;
     sink: StreamSink;

@@ -303,7 +303,12 @@ export interface EditPolicy {
 
 export interface EditTelemetry {
   track(
-    event: "edit_planned" | "edit_previewed" | "edit_applied" | "edit_failed" | "edit_noop",
+    event:
+      | "edit_planned"
+      | "edit_previewed"
+      | "edit_applied"
+      | "edit_failed"
+      | "edit_noop",
     payload: Record<string, unknown>,
   ): Promise<void>;
 }
@@ -330,7 +335,12 @@ export interface EditRevisionStore {
       affectedRanges?: string[];
       affectedParagraphIds?: string[];
       locateRange?: string | null;
-      changedSamples?: Array<{ sheetName: string; cell: string; before: string; after: string }>;
+      changedSamples?: Array<{
+        sheetName: string;
+        cell: string;
+        before: string;
+        after: string;
+      }>;
       rejectedOps?: string[];
       patchesApplied?: number;
     };

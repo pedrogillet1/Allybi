@@ -15,8 +15,8 @@
  * - File actions: NO content, ONLY source_buttons attachment
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 // =============================================================================
 // DATA BANK LOADING
@@ -53,14 +53,17 @@ function loadSourceEngineBank(): SourceEngineDataBank {
 
   const bankPath = path.join(
     __dirname,
-    '../../../data_banks/retrieval/source_engine.any.json'
+    "../../../data_banks/retrieval/source_engine.any.json",
   );
 
   try {
-    const raw = fs.readFileSync(bankPath, 'utf-8');
+    const raw = fs.readFileSync(bankPath, "utf-8");
     _sourceEngineBank = JSON.parse(raw) as SourceEngineDataBank;
   } catch (err) {
-    console.error('[SourceButtons] Failed to load source_engine data bank:', err);
+    console.error(
+      "[SourceButtons] Failed to load source_engine data bank:",
+      err,
+    );
     // Fallback to minimal defaults
     _sourceEngineBank = {
       sourceFiltering: {
@@ -88,7 +91,7 @@ function loadSourceEngineBank(): SourceEngineDataBank {
 function getStopwordsSet(): Set<string> {
   const bank = loadSourceEngineBank();
   const combined = new Set<string>();
-  for (const lang of ['en', 'pt', 'es'] as const) {
+  for (const lang of ["en", "pt", "es"] as const) {
     for (const word of bank.stopwords[lang] || []) {
       combined.add(word.toLowerCase());
     }
@@ -102,7 +105,7 @@ function getStopwordsSet(): Set<string> {
 function getCommonCapsSet(): Set<string> {
   const bank = loadSourceEngineBank();
   const combined = new Set<string>();
-  for (const lang of ['any', 'pt', 'es'] as const) {
+  for (const lang of ["any", "pt", "es"] as const) {
     for (const word of bank.commonCapitalizedWords[lang] || []) {
       combined.add(word);
     }
@@ -143,7 +146,7 @@ export interface SourceButton {
 
   /** Optional location within document (page, slide, sheet, cell) */
   location?: {
-    type: 'page' | 'slide' | 'sheet' | 'cell' | 'section';
+    type: "page" | "slide" | "sheet" | "cell" | "section";
     value: string | number;
     label?: string; // e.g., "Page 3", "Sheet: Q4 2024"
   };
@@ -154,7 +157,7 @@ export interface SourceButton {
  * This is what gets attached to assistant messages.
  */
 export interface SourceButtonsAttachment {
-  type: 'source_buttons';
+  type: "source_buttons";
 
   /** Array of source buttons to display */
   buttons: SourceButton[];
@@ -172,7 +175,7 @@ export interface SourceButtonsAttachment {
  * Used for "list files" queries - not sources, but file listing.
  */
 export interface FileListAttachment {
-  type: 'file_list';
+  type: "file_list";
 
   /** Array of file buttons to display (max 10) */
   buttons: SourceButton[];
@@ -240,14 +243,16 @@ export class SourceButtonsService {
       /** Max buttons to show */
       maxButtons?: number;
       /** Context: 'qa' for document QA, 'file_action' for file operations */
-      context?: 'qa' | 'file_action';
+      context?: "qa" | "file_action";
       /** Language for labels */
-      language?: 'en' | 'pt' | 'es';
-    } = {}
+      language?: "en" | "pt" | "es";
+    } = {},
   ): SourceButtonsAttachment | null {
     const {
-      maxButtons = options.context === 'file_action' ? MAX_SOURCE_BUTTONS_FILE_ACTION : MAX_SOURCE_BUTTONS_QA,
-      language = 'en',
+      maxButtons = options.context === "file_action"
+        ? MAX_SOURCE_BUTTONS_FILE_ACTION
+        : MAX_SOURCE_BUTTONS_QA,
+      language = "en",
     } = options;
 
     if (!sources || sources.length === 0) {
@@ -264,10 +269,12 @@ export class SourceButtonsService {
     const limited = sorted.slice(0, maxButtons);
 
     // 4. Convert to SourceButton format
-    const buttons: SourceButton[] = limited.map(source => this.rawToButton(source));
+    const buttons: SourceButton[] = limited.map((source) =>
+      this.rawToButton(source),
+    );
 
     return {
-      type: 'source_buttons',
+      type: "source_buttons",
       buttons,
     };
   }
@@ -283,25 +290,25 @@ export class SourceButtonsService {
   buildFileListAttachment(
     files: Array<{ id: string; filename: string; mimeType?: string }>,
     totalCount: number,
-    language: 'en' | 'pt' | 'es' = 'en'
+    language: "en" | "pt" | "es" = "en",
   ): FileListAttachment {
     const displayFiles = files.slice(0, MAX_FILE_LIST_BUTTONS);
     const hasMore = totalCount > MAX_FILE_LIST_BUTTONS;
 
-    const buttons: SourceButton[] = displayFiles.map(f => ({
+    const buttons: SourceButton[] = displayFiles.map((f) => ({
       documentId: f.id,
       title: f.filename,
       mimeType: f.mimeType,
     }));
 
     const seeAllLabels: Record<string, string> = {
-      en: 'See all',
-      pt: 'Ver todos',
-      es: 'Ver todos',
+      en: "See all",
+      pt: "Ver todos",
+      es: "Ver todos",
     };
 
     return {
-      type: 'file_list',
+      type: "file_list",
       buttons,
       ...(hasMore && {
         seeAll: {
@@ -320,16 +327,18 @@ export class SourceButtonsService {
     documentId: string,
     title: string,
     mimeType?: string,
-    location?: SourceButton['location']
+    location?: SourceButton["location"],
   ): SourceButtonsAttachment {
     return {
-      type: 'source_buttons',
-      buttons: [{
-        documentId,
-        title,
-        mimeType,
-        location,
-      }],
+      type: "source_buttons",
+      buttons: [
+        {
+          documentId,
+          title,
+          mimeType,
+          location,
+        },
+      ],
     };
   }
 
@@ -352,14 +361,14 @@ export class SourceButtonsService {
       };
       score?: number;
     }>,
-    language: 'en' | 'pt' | 'es' = 'en'
+    language: "en" | "pt" | "es" = "en",
   ): SourceButtonsAttachment | null {
     // Convert chunks to RawSource format
     const sources: RawSource[] = chunks
-      .filter(chunk => chunk.documentId || chunk.metadata?.documentId)
-      .map(chunk => ({
+      .filter((chunk) => chunk.documentId || chunk.metadata?.documentId)
+      .map((chunk) => ({
         documentId: (chunk.documentId || chunk.metadata?.documentId)!,
-        filename: chunk.metadata?.filename || 'Document',
+        filename: chunk.metadata?.filename || "Document",
         mimeType: chunk.metadata?.mimeType,
         folderPath: chunk.metadata?.folderPath,
         folderSegments: chunk.metadata?.folderSegments,
@@ -369,7 +378,7 @@ export class SourceButtonsService {
         score: chunk.score,
       }));
 
-    return this.buildSourceButtons(sources, { context: 'qa', language });
+    return this.buildSourceButtons(sources, { context: "qa", language });
   }
 
   // ===========================================================================
@@ -407,31 +416,31 @@ export class SourceButtonsService {
     // Add location if available
     if (source.pageNumber) {
       button.location = {
-        type: 'page',
+        type: "page",
         value: source.pageNumber,
         label: `Page ${source.pageNumber}`,
       };
     } else if (source.slideNumber) {
       button.location = {
-        type: 'slide',
+        type: "slide",
         value: source.slideNumber,
         label: `Slide ${source.slideNumber}`,
       };
     } else if (source.sheetName) {
       button.location = {
-        type: 'sheet',
+        type: "sheet",
         value: source.sheetName,
         label: source.sheetName,
       };
     } else if (source.cellReference) {
       button.location = {
-        type: 'cell',
+        type: "cell",
         value: source.cellReference,
         label: source.cellReference,
       };
     } else if (source.sectionTitle) {
       button.location = {
-        type: 'section',
+        type: "section",
         value: source.sectionTitle,
         label: source.sectionTitle,
       };
@@ -485,7 +494,7 @@ export interface EvidenceChunkForFiltering {
  */
 export function extractUsedDocuments(
   draft: string,
-  evidence: EvidenceChunkForFiltering[]
+  evidence: EvidenceChunkForFiltering[],
 ): Set<string> {
   const usedDocIds = new Set<string>();
 
@@ -508,7 +517,10 @@ export function extractUsedDocuments(
     const specificPhrases = extractSpecificPhrases(chunk.text);
     for (const phrase of specificPhrases) {
       const normalizedPhrase = normalizeForMatching(phrase);
-      if (normalizedPhrase.length >= rules.minPhraseChars && draftNormalized.includes(normalizedPhrase)) {
+      if (
+        normalizedPhrase.length >= rules.minPhraseChars &&
+        draftNormalized.includes(normalizedPhrase)
+      ) {
         score += 3;
       }
     }
@@ -575,15 +587,24 @@ function extractSpecificPhrases(text: string): string[] {
   const stopWords = getStopwordsSet();
   const rules = getMatchingRules();
 
-  const sentences = text.split(/[.!?;]+/).filter(s => s.trim().length > 20);
+  const sentences = text.split(/[.!?;]+/).filter((s) => s.trim().length > 20);
   for (const sentence of sentences.slice(0, 8)) {
-    const words = sentence.trim().split(/\s+/).filter((w: string) => w.length > 2);
+    const words = sentence
+      .trim()
+      .split(/\s+/)
+      .filter((w: string) => w.length > 2);
     for (let i = 0; i <= words.length - rules.minPhraseLength; i++) {
-      for (let len = rules.minPhraseLength; len <= Math.min(8, words.length - i); len++) {
+      for (
+        let len = rules.minPhraseLength;
+        len <= Math.min(8, words.length - i);
+        len++
+      ) {
         const phraseWords = words.slice(i, i + len);
-        const meaningfulWords = phraseWords.filter((w: string) => !stopWords.has(w.toLowerCase()));
+        const meaningfulWords = phraseWords.filter(
+          (w: string) => !stopWords.has(w.toLowerCase()),
+        );
         if (meaningfulWords.length >= rules.minMeaningfulWords) {
-          const phrase = phraseWords.join(' ');
+          const phrase = phraseWords.join(" ");
           if (phrase.length >= 20) {
             phrases.push(phrase);
           }
@@ -603,7 +624,8 @@ function extractUniqueTerminology(text: string): string[] {
   const commonCaps = getCommonCapsSet();
 
   // Match capitalized words/phrases (proper nouns)
-  const capitalizedMatches = text.match(/[A-Z][a-zà-ü]+(?:\s+[A-Z][a-zà-ü]+)*/g) || [];
+  const capitalizedMatches =
+    text.match(/[A-Z][a-zà-ü]+(?:\s+[A-Z][a-zà-ü]+)*/g) || [];
   for (const match of capitalizedMatches) {
     if (match.length > 5 && !commonCaps.has(match)) {
       terms.push(match);
@@ -612,11 +634,13 @@ function extractUniqueTerminology(text: string): string[] {
 
   // Match acronyms
   const acronyms = text.match(/\b[A-Z]{2,}[-\w]*\b/g) || [];
-  terms.push(...acronyms.filter((t: string) => t.length >= 3 && t.length <= 15));
+  terms.push(
+    ...acronyms.filter((t: string) => t.length >= 3 && t.length <= 15),
+  );
 
   // Match quoted text
   const quoted = text.match(/"([^"]{5,50})"|'([^']{5,50})'/g) || [];
-  terms.push(...quoted.map((q: string) => q.replace(/['"]/g, '')));
+  terms.push(...quoted.map((q: string) => q.replace(/['"]/g, "")));
 
   return [...new Set(terms)].slice(0, 20);
 }
@@ -628,23 +652,28 @@ function extractKeyPhrases(text: string): string[] {
   const phrases: string[] = [];
 
   // Split into sentences
-  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 10);
+  const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 10);
 
-  for (const sentence of sentences.slice(0, 5)) { // Limit to first 5 sentences
+  for (const sentence of sentences.slice(0, 5)) {
+    // Limit to first 5 sentences
     // Extract 3-6 word phrases
-    const words = sentence.trim().split(/\s+/).filter(w => w.length > 2);
+    const words = sentence
+      .trim()
+      .split(/\s+/)
+      .filter((w) => w.length > 2);
 
     for (let i = 0; i < words.length - 2; i++) {
       // 3-word phrases
       if (i + 3 <= words.length) {
-        const phrase = words.slice(i, i + 3).join(' ');
-        if (phrase.length >= 12) { // Meaningful length
+        const phrase = words.slice(i, i + 3).join(" ");
+        if (phrase.length >= 12) {
+          // Meaningful length
           phrases.push(phrase);
         }
       }
       // 4-word phrases
       if (i + 4 <= words.length) {
-        const phrase = words.slice(i, i + 4).join(' ');
+        const phrase = words.slice(i, i + 4).join(" ");
         if (phrase.length >= 15) {
           phrases.push(phrase);
         }
@@ -661,8 +690,8 @@ function extractKeyPhrases(text: string): string[] {
 function normalizeForMatching(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^\w\s]/g, ' ')
-    .replace(/\s+/g, ' ')
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -677,7 +706,7 @@ function extractSignificantNumbers(text: string): Set<string> {
   const matches = text.match(/\b\d{1,3}(?:[,.]?\d{3})*(?:\.\d+)?\b/g) || [];
 
   for (const match of matches) {
-    const normalized = match.replace(/,/g, '');
+    const normalized = match.replace(/,/g, "");
     const num = parseFloat(normalized);
 
     // Skip common/meaningless numbers
@@ -696,7 +725,7 @@ function extractSignificantNumbers(text: string): Set<string> {
  */
 export function filterSourceButtonsByUsage(
   attachment: SourceButtonsAttachment | null,
-  usedDocIds: Set<string>
+  usedDocIds: Set<string>,
 ): SourceButtonsAttachment | null {
   if (!attachment || !attachment.buttons || attachment.buttons.length === 0) {
     return null;
@@ -707,8 +736,8 @@ export function filterSourceButtonsByUsage(
     return attachment;
   }
 
-  const filteredButtons = attachment.buttons.filter(btn =>
-    usedDocIds.has(btn.documentId)
+  const filteredButtons = attachment.buttons.filter((btn) =>
+    usedDocIds.has(btn.documentId),
   );
 
   if (filteredButtons.length === 0) {
@@ -751,10 +780,13 @@ export interface StandardResponse {
 export function buildDocGroundedResponse(
   content: string,
   sources: RawSource[],
-  language: 'en' | 'pt' | 'es' = 'en'
+  language: "en" | "pt" | "es" = "en",
 ): StandardResponse {
   const service = getSourceButtonsService();
-  const sourceButtons = service.buildSourceButtons(sources, { context: 'qa', language });
+  const sourceButtons = service.buildSourceButtons(sources, {
+    context: "qa",
+    language,
+  });
 
   return {
     content,
@@ -771,24 +803,28 @@ export function buildDocGroundedResponse(
  */
 export function buildFileActionResponse(
   files: Array<{ id: string; filename: string; mimeType?: string }>,
-  _language: 'en' | 'pt' | 'es' = 'en'
+  _language: "en" | "pt" | "es" = "en",
 ): StandardResponse {
   const service = getSourceButtonsService();
 
   // For single file: use source_buttons
   // For multiple files: use source_buttons with multiple items
-  const buttons: SourceButton[] = files.slice(0, MAX_SOURCE_BUTTONS_FILE_ACTION).map(f => ({
-    documentId: f.id,
-    title: f.filename,
-    mimeType: f.mimeType,
-  }));
+  const buttons: SourceButton[] = files
+    .slice(0, MAX_SOURCE_BUTTONS_FILE_ACTION)
+    .map((f) => ({
+      documentId: f.id,
+      title: f.filename,
+      mimeType: f.mimeType,
+    }));
 
   return {
-    content: '', // NO content for file actions
-    attachments: [{
-      type: 'source_buttons',
-      buttons,
-    }],
+    content: "", // NO content for file actions
+    attachments: [
+      {
+        type: "source_buttons",
+        buttons,
+      },
+    ],
     metadata: {
       documentsUsed: files.length,
     },
@@ -802,8 +838,8 @@ export function buildFileActionResponse(
 export function buildFileListResponse(
   files: Array<{ id: string; filename: string; mimeType?: string }>,
   totalCount: number,
-  introText: string = '',
-  language: 'en' | 'pt' | 'es' = 'en'
+  introText: string = "",
+  language: "en" | "pt" | "es" = "en",
 ): StandardResponse {
   const service = getSourceButtonsService();
   const fileList = service.buildFileListAttachment(files, totalCount, language);
@@ -822,7 +858,7 @@ export function buildFileListResponse(
  * Content only, NO source buttons.
  */
 export function buildNoEvidenceResponse(
-  clarifyingQuestion: string
+  clarifyingQuestion: string,
 ): StandardResponse {
   return {
     content: clarifyingQuestion,

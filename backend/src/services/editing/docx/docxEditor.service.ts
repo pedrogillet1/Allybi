@@ -1,6 +1,6 @@
-import AdmZip = require('adm-zip');
-import logger from '../../../utils/logger';
-import { DocxAnchorsService, ParagraphNode } from './docxAnchors.service';
+import AdmZip = require("adm-zip");
+import logger from "../../../utils/logger";
+import { DocxAnchorsService, ParagraphNode } from "./docxAnchors.service";
 
 interface XmlNode {
   [key: string]: unknown;
@@ -28,7 +28,7 @@ function asArray<T>(value: T | T[] | undefined | null): T[] {
 }
 
 function normalizeWhitespace(text: string): string {
-  return text.replace(/\s+/g, ' ').trim();
+  return text.replace(/\s+/g, " ").trim();
 }
 
 function deepClone<T>(value: T): T {
@@ -37,22 +37,24 @@ function deepClone<T>(value: T): T {
 
 function readRunText(run: XmlNode): string {
   const parts: string[] = [];
-  const textNodes = asArray(run['w:t'] as string | XmlNode | Array<string | XmlNode> | undefined);
+  const textNodes = asArray(
+    run["w:t"] as string | XmlNode | Array<string | XmlNode> | undefined,
+  );
 
   for (const node of textNodes) {
-    if (typeof node === 'string') {
+    if (typeof node === "string") {
       parts.push(node);
       continue;
     }
     const value = node?._;
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       parts.push(value);
     }
   }
 
-  if (run['w:tab']) parts.push('\t');
-  if (run['w:br']) parts.push('\n');
-  return parts.join('');
+  if (run["w:tab"]) parts.push("\t");
+  if (run["w:br"]) parts.push("\n");
+  return parts.join("");
 }
 
 type RichStyleState = {
@@ -73,15 +75,21 @@ function decodeHtmlEntities(input: string): string {
     amp: "&",
     lt: "<",
     gt: ">",
-    quot: "\"",
+    quot: '"',
     apos: "'",
     nbsp: " ",
   };
 
   return input
-    .replace(/&([a-zA-Z]+);/g, (m, name) => (named[name] !== undefined ? named[name]! : m))
-    .replace(/&#x([0-9a-fA-F]+);/g, (_m, hex) => String.fromCodePoint(parseInt(hex, 16)))
-    .replace(/&#([0-9]+);/g, (_m, dec) => String.fromCodePoint(parseInt(dec, 10)));
+    .replace(/&([a-zA-Z]+);/g, (m, name) =>
+      named[name] !== undefined ? named[name]! : m,
+    )
+    .replace(/&#x([0-9a-fA-F]+);/g, (_m, hex) =>
+      String.fromCodePoint(parseInt(hex, 16)),
+    )
+    .replace(/&#([0-9]+);/g, (_m, dec) =>
+      String.fromCodePoint(parseInt(dec, 10)),
+    );
 }
 
 function parseFontSizeHalfPointsFromStyle(styleAttr: string): number | null {
@@ -127,12 +135,18 @@ function tokenizeRichHtml(html: string): RichToken[] {
     colorHex: undefined,
     fontFamily: undefined,
   };
-  const stack: Array<{ tag: string; style: RichStyleState }> = [{ tag: "root", style: base }];
+  const stack: Array<{ tag: string; style: RichStyleState }> = [
+    { tag: "root", style: base },
+  ];
 
   const pushText = (text: string) => {
     const decoded = decodeHtmlEntities(text);
     if (!decoded) return;
-    tokens.push({ kind: "text", text: decoded, style: stack[stack.length - 1]!.style });
+    tokens.push({
+      kind: "text",
+      text: decoded,
+      style: stack[stack.length - 1]!.style,
+    });
   };
 
   const tagRe = /<[^>]*>/g;
@@ -163,7 +177,8 @@ function tokenizeRichHtml(html: string): RichToken[] {
         }
       }
       // Treat block closes as a line break (keeps us inside a single DOCX paragraph).
-      if (tagName === "p" || tagName === "div" || tagName === "li") tokens.push({ kind: "br" });
+      if (tagName === "p" || tagName === "div" || tagName === "li")
+        tokens.push({ kind: "br" });
       continue;
     }
 
@@ -179,9 +194,13 @@ function tokenizeRichHtml(html: string): RichToken[] {
     if (tagName === "u") next.underline = true;
 
     if (tagName === "span") {
-      const styleMatch = tagContent.match(/\bstyle\s*=\s*("([^"]*)"|'([^']*)')/i);
+      const styleMatch = tagContent.match(
+        /\bstyle\s*=\s*("([^"]*)"|'([^']*)')/i,
+      );
       const styleAttr = (styleMatch?.[2] || styleMatch?.[3] || "").trim();
-      const size = styleAttr ? parseFontSizeHalfPointsFromStyle(styleAttr) : null;
+      const size = styleAttr
+        ? parseFontSizeHalfPointsFromStyle(styleAttr)
+        : null;
       if (size) next.fontSizeHalfPoints = size;
       const color = styleAttr ? parseColorHexFromStyle(styleAttr) : null;
       if (color) next.colorHex = color;
@@ -190,7 +209,8 @@ function tokenizeRichHtml(html: string): RichToken[] {
       // Explicit style-removal markers (font-weight:normal → bold=false, etc.)
       if (/\bfont-weight\s*:\s*normal\b/i.test(styleAttr)) next.bold = false;
       if (/\bfont-style\s*:\s*normal\b/i.test(styleAttr)) next.italic = false;
-      if (/\btext-decoration\s*:\s*none\b/i.test(styleAttr)) next.underline = false;
+      if (/\btext-decoration\s*:\s*none\b/i.test(styleAttr))
+        next.underline = false;
     }
 
     if (!isSelfClosing) {
@@ -198,7 +218,8 @@ function tokenizeRichHtml(html: string): RichToken[] {
     }
 
     // Opening block tags behave like a line break boundary.
-    if (tagName === "p" || tagName === "div" || tagName === "li") tokens.push({ kind: "br" });
+    if (tagName === "p" || tagName === "div" || tagName === "li")
+      tokens.push({ kind: "br" });
   }
 
   if (lastIdx < html.length) pushText(html.slice(lastIdx));
@@ -221,77 +242,94 @@ function richHtmlToPlainText(html: string): string {
 function extractParagraphPlainText(paragraph: XmlNode): string {
   const parts: string[] = [];
 
-  const runs = asArray(paragraph['w:r'] as XmlNode | XmlNode[] | undefined);
+  const runs = asArray(paragraph["w:r"] as XmlNode | XmlNode[] | undefined);
   for (const run of runs) {
     parts.push(readRunText(run));
   }
 
-  const hyperlinks = asArray(paragraph['w:hyperlink'] as XmlNode | XmlNode[] | undefined);
+  const hyperlinks = asArray(
+    paragraph["w:hyperlink"] as XmlNode | XmlNode[] | undefined,
+  );
   for (const hyperlink of hyperlinks) {
-    const linkRuns = asArray(hyperlink['w:r'] as XmlNode | XmlNode[] | undefined);
+    const linkRuns = asArray(
+      hyperlink["w:r"] as XmlNode | XmlNode[] | undefined,
+    );
     for (const run of linkRuns) {
       parts.push(readRunText(run));
     }
   }
 
-  const insertions = asArray(paragraph['w:ins'] as XmlNode | XmlNode[] | undefined);
+  const insertions = asArray(
+    paragraph["w:ins"] as XmlNode | XmlNode[] | undefined,
+  );
   for (const insertion of insertions) {
-    const insertionRuns = asArray(insertion['w:r'] as XmlNode | XmlNode[] | undefined);
+    const insertionRuns = asArray(
+      insertion["w:r"] as XmlNode | XmlNode[] | undefined,
+    );
     for (const run of insertionRuns) {
       parts.push(readRunText(run));
     }
   }
 
-  return normalizeWhitespace(parts.join(''));
+  return normalizeWhitespace(parts.join(""));
 }
 
 function runFormattingSignature(run: XmlNode): string {
-  const rPr = asArray(run['w:rPr'] as XmlNode | XmlNode[] | undefined)[0];
-  if (!rPr) return 'plain';
+  const rPr = asArray(run["w:rPr"] as XmlNode | XmlNode[] | undefined)[0];
+  if (!rPr) return "plain";
 
   const flags = [
-    rPr['w:b'] ? 'b' : '',
-    rPr['w:i'] ? 'i' : '',
-    rPr['w:u'] ? 'u' : '',
-    rPr['w:strike'] ? 's' : '',
-    rPr['w:smallCaps'] ? 'sc' : '',
+    rPr["w:b"] ? "b" : "",
+    rPr["w:i"] ? "i" : "",
+    rPr["w:u"] ? "u" : "",
+    rPr["w:strike"] ? "s" : "",
+    rPr["w:smallCaps"] ? "sc" : "",
   ]
     .filter(Boolean)
-    .join('');
+    .join("");
 
-  const sizeNode = asArray(rPr['w:sz'] as XmlNode | XmlNode[] | undefined)[0];
-  const sizeRaw =
-    ((sizeNode?.$ as Record<string, unknown> | undefined)?.['w:val'] ??
-      (sizeNode?.$ as Record<string, unknown> | undefined)?.['val']) as string | number | undefined;
+  const sizeNode = asArray(rPr["w:sz"] as XmlNode | XmlNode[] | undefined)[0];
+  const sizeRaw = ((sizeNode?.$ as Record<string, unknown> | undefined)?.[
+    "w:val"
+  ] ?? (sizeNode?.$ as Record<string, unknown> | undefined)?.["val"]) as
+    | string
+    | number
+    | undefined;
 
-  return `${flags || 'plain'}:${sizeRaw ?? ''}`;
+  return `${flags || "plain"}:${sizeRaw ?? ""}`;
 }
 
 function paragraphHasMixedRichRuns(paragraph: XmlNode): boolean {
-  const runs = asArray(paragraph['w:r'] as XmlNode | XmlNode[] | undefined);
+  const runs = asArray(paragraph["w:r"] as XmlNode | XmlNode[] | undefined);
   if (runs.length <= 1) return false;
   const signatures = new Set(runs.map(runFormattingSignature));
   return signatures.size > 1;
 }
 
-function buildReplacementRun(text: string, preservedRunProps: XmlNode | undefined): XmlNode {
+function buildReplacementRun(
+  text: string,
+  preservedRunProps: XmlNode | undefined,
+): XmlNode {
   const run: XmlNode = {
-    'w:t': [
+    "w:t": [
       {
         _: text,
-        $: { 'xml:space': 'preserve' },
+        $: { "xml:space": "preserve" },
       },
     ],
   };
 
   if (preservedRunProps) {
-    run['w:rPr'] = [preservedRunProps];
+    run["w:rPr"] = [preservedRunProps];
   }
 
   return run;
 }
 
-function buildRunProps(base: XmlNode | undefined, style: RichStyleState): XmlNode | undefined {
+function buildRunProps(
+  base: XmlNode | undefined,
+  style: RichStyleState,
+): XmlNode | undefined {
   const hasStyle =
     style.bold !== undefined ||
     style.italic !== undefined ||
@@ -332,14 +370,20 @@ function buildRunProps(base: XmlNode | undefined, style: RichStyleState): XmlNod
   if (style.fontFamily) {
     const family = String(style.fontFamily || "").trim();
     if (family) {
-      rPr["w:rFonts"] = [{ $: { "w:ascii": family, "w:hAnsi": family, "w:cs": family } }];
+      rPr["w:rFonts"] = [
+        { $: { "w:ascii": family, "w:hAnsi": family, "w:cs": family } },
+      ];
     }
   }
 
   return rPr;
 }
 
-function buildTextRun(text: string, preservedRunProps: XmlNode | undefined, style: RichStyleState): XmlNode {
+function buildTextRun(
+  text: string,
+  preservedRunProps: XmlNode | undefined,
+  style: RichStyleState,
+): XmlNode {
   const run: XmlNode = {
     "w:t": [
       {
@@ -353,14 +397,20 @@ function buildTextRun(text: string, preservedRunProps: XmlNode | undefined, styl
   return run;
 }
 
-function buildBreakRun(preservedRunProps: XmlNode | undefined, style: RichStyleState): XmlNode {
+function buildBreakRun(
+  preservedRunProps: XmlNode | undefined,
+  style: RichStyleState,
+): XmlNode {
   const run: XmlNode = { "w:br": [{}] };
   const rPr = buildRunProps(preservedRunProps, style);
   if (rPr) run["w:rPr"] = [rPr];
   return run;
 }
 
-function buildRunsFromRichHtml(html: string, preservedRunProps: XmlNode | undefined): XmlNode[] {
+function buildRunsFromRichHtml(
+  html: string,
+  preservedRunProps: XmlNode | undefined,
+): XmlNode[] {
   const tokens = tokenizeRichHtml(html);
 
   // If the HTML contains no explicit rich-text formatting (e.g. generated from
@@ -384,7 +434,10 @@ function buildRunsFromRichHtml(html: string, preservedRunProps: XmlNode | undefi
     for (const token of tokens) {
       if (token.kind === "br") {
         if (!plainRuns.length || plainLastWasBreak) continue;
-        const br: XmlNode = { "w:br": [{}], "w:rPr": [deepClone(preservedRunProps)] };
+        const br: XmlNode = {
+          "w:br": [{}],
+          "w:rPr": [deepClone(preservedRunProps)],
+        };
         plainRuns.push(br);
         plainLastWasBreak = true;
         continue;
@@ -403,14 +456,16 @@ function buildRunsFromRichHtml(html: string, preservedRunProps: XmlNode | undefi
     if (token.kind === "br") {
       if (!runs.length) continue;
       if (lastWasBreak) continue;
-      runs.push(buildBreakRun(preservedRunProps, {
-        bold: undefined,
-        italic: undefined,
-        underline: undefined,
-        fontSizeHalfPoints: undefined,
-        colorHex: undefined,
-        fontFamily: undefined,
-      }));
+      runs.push(
+        buildBreakRun(preservedRunProps, {
+          bold: undefined,
+          italic: undefined,
+          underline: undefined,
+          fontSizeHalfPoints: undefined,
+          colorHex: undefined,
+          fontFamily: undefined,
+        }),
+      );
       lastWasBreak = true;
       continue;
     }
@@ -421,15 +476,24 @@ function buildRunsFromRichHtml(html: string, preservedRunProps: XmlNode | undefi
     lastWasBreak = false;
   }
 
-  return runs.length ? runs : [buildReplacementRun(normalizeWhitespace(richHtmlToPlainText(html)), preservedRunProps)];
+  return runs.length
+    ? runs
+    : [
+        buildReplacementRun(
+          normalizeWhitespace(richHtmlToPlainText(html)),
+          preservedRunProps,
+        ),
+      ];
 }
 
 function getParagraphStyleName(paragraph: XmlNode): string {
-  const pPr = asArray(paragraph['w:pPr'] as XmlNode | XmlNode[] | undefined)[0];
-  const pStyle = asArray(pPr?.['w:pStyle'] as XmlNode | XmlNode[] | undefined)[0];
+  const pPr = asArray(paragraph["w:pPr"] as XmlNode | XmlNode[] | undefined)[0];
+  const pStyle = asArray(
+    pPr?.["w:pStyle"] as XmlNode | XmlNode[] | undefined,
+  )[0];
   const attrs = (pStyle?.$ as Record<string, unknown> | undefined) ?? {};
-  const value = attrs['w:val'] ?? attrs['val'];
-  return typeof value === 'string' ? value : '';
+  const value = attrs["w:val"] ?? attrs["val"];
+  return typeof value === "string" ? value : "";
 }
 
 type RichParagraphStyle = {
@@ -437,15 +501,22 @@ type RichParagraphStyle = {
   lineSpacingTwips?: number;
 };
 
-function parseParagraphAlignmentFromStyle(styleAttr: string): RichParagraphStyle["alignment"] | null {
-  const m = styleAttr.match(/\btext-align\s*:\s*(left|right|center|justify)\b/i);
+function parseParagraphAlignmentFromStyle(
+  styleAttr: string,
+): RichParagraphStyle["alignment"] | null {
+  const m = styleAttr.match(
+    /\btext-align\s*:\s*(left|right|center|justify)\b/i,
+  );
   if (!m?.[1]) return null;
   const v = String(m[1]).toLowerCase();
-  if (v === "left" || v === "right" || v === "center" || v === "justify") return v;
+  if (v === "left" || v === "right" || v === "center" || v === "justify")
+    return v;
   return null;
 }
 
-function parseParagraphLineSpacingTwipsFromStyle(styleAttr: string): number | null {
+function parseParagraphLineSpacingTwipsFromStyle(
+  styleAttr: string,
+): number | null {
   const m = styleAttr.match(/\bline-height\s*:\s*([0-9.]+)\s*(%|px|pt)?\b/i);
   if (!m?.[1]) return null;
   const raw = Number(m[1]);
@@ -464,7 +535,9 @@ function parseParagraphLineSpacingTwipsFromStyle(styleAttr: string): number | nu
 
 function parseParagraphStyleFromRichHtml(html: string): RichParagraphStyle {
   const src = String(html || "");
-  const tag = src.match(/<(?:p|div)\b[^>]*\bstyle\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>/i);
+  const tag = src.match(
+    /<(?:p|div)\b[^>]*\bstyle\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>/i,
+  );
   const styleAttr = String(tag?.[1] || tag?.[2] || "").trim();
   if (!styleAttr) return {};
 
@@ -477,7 +550,9 @@ function parseParagraphStyleFromRichHtml(html: string): RichParagraphStyle {
 }
 
 function ensureParagraphProps(paragraph: XmlNode): XmlNode {
-  const existing = asArray(paragraph["w:pPr"] as XmlNode | XmlNode[] | undefined)[0];
+  const existing = asArray(
+    paragraph["w:pPr"] as XmlNode | XmlNode[] | undefined,
+  )[0];
   if (existing) {
     paragraph["w:pPr"] = [existing];
     return existing;
@@ -497,20 +572,29 @@ function readAttr(node: XmlNode | undefined, ...keys: string[]): string {
   return "";
 }
 
-function readParagraphNumPr(paragraph: XmlNode): { numId: string; ilvl: string } | null {
+function readParagraphNumPr(
+  paragraph: XmlNode,
+): { numId: string; ilvl: string } | null {
   const pPr = asArray(paragraph["w:pPr"] as XmlNode | XmlNode[] | undefined)[0];
   if (!pPr) return null;
   const numPr = asArray(pPr["w:numPr"] as XmlNode | XmlNode[] | undefined)[0];
   if (!numPr) return null;
-  const numIdNode = asArray(numPr["w:numId"] as XmlNode | XmlNode[] | undefined)[0];
-  const ilvlNode = asArray(numPr["w:ilvl"] as XmlNode | XmlNode[] | undefined)[0];
+  const numIdNode = asArray(
+    numPr["w:numId"] as XmlNode | XmlNode[] | undefined,
+  )[0];
+  const ilvlNode = asArray(
+    numPr["w:ilvl"] as XmlNode | XmlNode[] | undefined,
+  )[0];
   const numId = readAttr(numIdNode, "w:val", "val");
   const ilvl = readAttr(ilvlNode, "w:val", "val") || "0";
   if (!numId) return null;
   return { numId, ilvl };
 }
 
-function applyNumberingToParagraph(paragraph: XmlNode, params: { numId: string; ilvl?: string }): void {
+function applyNumberingToParagraph(
+  paragraph: XmlNode,
+  params: { numId: string; ilvl?: string },
+): void {
   const numId = String(params.numId || "").trim();
   if (!numId) return;
   const ilvl = String(params.ilvl || "0").trim() || "0";
@@ -525,21 +609,35 @@ function applyNumberingToParagraph(paragraph: XmlNode, params: { numId: string; 
 
 function stripLeadingBulletText(paragraph: XmlNode): void {
   const text = extractParagraphPlainText(paragraph);
-  const cleaned = String(text || "").replace(/^\s*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*]|□)\s+/, "").trim();
+  const cleaned = String(text || "")
+    .replace(
+      /^\s*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*]|□)\s+/,
+      "",
+    )
+    .trim();
   if (!cleaned || cleaned === text) return;
   const runs = asArray(paragraph["w:r"] as XmlNode | XmlNode[] | undefined);
   const firstRun = runs[0];
-  const firstRunProps = firstRun ? asArray(firstRun["w:rPr"] as XmlNode | XmlNode[] | undefined)[0] : undefined;
+  const firstRunProps = firstRun
+    ? asArray(firstRun["w:rPr"] as XmlNode | XmlNode[] | undefined)[0]
+    : undefined;
   paragraph["w:r"] = [buildReplacementRun(cleaned, firstRunProps)];
 }
 
 function prependBulletGlyphIfNeeded(paragraph: XmlNode): void {
   const text = extractParagraphPlainText(paragraph);
-  if (/^\s*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*]|□)\s+/.test(text)) return;
+  if (
+    /^\s*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*]|□)\s+/.test(
+      text,
+    )
+  )
+    return;
   const runs = asArray(paragraph["w:r"] as XmlNode | XmlNode[] | undefined);
   if (runs.length) {
     const firstRun = runs[0];
-    const textNodes = asArray(firstRun["w:t"] as string | XmlNode | Array<string | XmlNode> | undefined);
+    const textNodes = asArray(
+      firstRun["w:t"] as string | XmlNode | Array<string | XmlNode> | undefined,
+    );
     if (textNodes.length) {
       const firstNode = textNodes[0];
       if (typeof firstNode === "string") {
@@ -547,7 +645,10 @@ function prependBulletGlyphIfNeeded(paragraph: XmlNode): void {
       } else if (firstNode && typeof firstNode === "object") {
         const prev = typeof firstNode._ === "string" ? firstNode._ : "";
         firstNode._ = `• ${prev}`;
-        firstNode.$ = { ...((firstNode.$ as Record<string, unknown> | undefined) || {}), "xml:space": "preserve" };
+        firstNode.$ = {
+          ...((firstNode.$ as Record<string, unknown> | undefined) || {}),
+          "xml:space": "preserve",
+        };
       } else {
         textNodes[0] = { _: "• ", $: { "xml:space": "preserve" } };
       }
@@ -564,7 +665,9 @@ function prependNumberGlyphIfNeeded(paragraph: XmlNode): void {
   const runs = asArray(paragraph["w:r"] as XmlNode | XmlNode[] | undefined);
   if (runs.length) {
     const firstRun = runs[0];
-    const textNodes = asArray(firstRun["w:t"] as string | XmlNode | Array<string | XmlNode> | undefined);
+    const textNodes = asArray(
+      firstRun["w:t"] as string | XmlNode | Array<string | XmlNode> | undefined,
+    );
     if (textNodes.length) {
       const firstNode = textNodes[0];
       if (typeof firstNode === "string") {
@@ -572,7 +675,10 @@ function prependNumberGlyphIfNeeded(paragraph: XmlNode): void {
       } else if (firstNode && typeof firstNode === "object") {
         const prev = typeof firstNode._ === "string" ? firstNode._ : "";
         firstNode._ = `1. ${prev}`;
-        firstNode.$ = { ...((firstNode.$ as Record<string, unknown> | undefined) || {}), "xml:space": "preserve" };
+        firstNode.$ = {
+          ...((firstNode.$ as Record<string, unknown> | undefined) || {}),
+          "xml:space": "preserve",
+        };
       } else {
         textNodes[0] = { _: "1. ", $: { "xml:space": "preserve" } };
       }
@@ -583,19 +689,29 @@ function prependNumberGlyphIfNeeded(paragraph: XmlNode): void {
   paragraph["w:r"] = [buildReplacementRun(`1. ${text || ""}`, undefined)];
 }
 
-async function resolveListNumId(zip: AdmZip, preferred: "bulleted" | "numbered"): Promise<string | null> {
+async function resolveListNumId(
+  zip: AdmZip,
+  preferred: "bulleted" | "numbered",
+): Promise<string | null> {
   const numberingEntry = zip.getEntry("word/numbering.xml");
   if (!numberingEntry) return null;
   const xml = numberingEntry.getData().toString("utf8");
   if (!xml.trim()) return null;
   const xml2js = require("xml2js");
-  const parser = new xml2js.Parser({ explicitArray: true, preserveChildrenOrder: true });
+  const parser = new xml2js.Parser({
+    explicitArray: true,
+    preserveChildrenOrder: true,
+  });
   const root = (await parser.parseStringPromise(xml)) as XmlNode;
-  const numbering = asArray(root["w:numbering"] as XmlNode | XmlNode[] | undefined)[0];
+  const numbering = asArray(
+    root["w:numbering"] as XmlNode | XmlNode[] | undefined,
+  )[0];
   if (!numbering) return null;
 
   const matchingAbstractIds = new Set<string>();
-  const abstractNums = asArray(numbering["w:abstractNum"] as XmlNode | XmlNode[] | undefined);
+  const abstractNums = asArray(
+    numbering["w:abstractNum"] as XmlNode | XmlNode[] | undefined,
+  );
   for (const abs of abstractNums) {
     const abstractNumId = readAttr(abs, "w:abstractNumId", "abstractNumId");
     if (!abstractNumId) continue;
@@ -603,11 +719,16 @@ async function resolveListNumId(zip: AdmZip, preferred: "bulleted" | "numbered")
     for (const lvl of levels) {
       const ilvl = readAttr(lvl, "w:ilvl", "ilvl") || "0";
       if (ilvl !== "0") continue;
-      const numFmtNode = asArray(lvl["w:numFmt"] as XmlNode | XmlNode[] | undefined)[0];
+      const numFmtNode = asArray(
+        lvl["w:numFmt"] as XmlNode | XmlNode[] | undefined,
+      )[0];
       const numFmt = readAttr(numFmtNode, "w:val", "val").toLowerCase();
       const isBullet = numFmt === "bullet";
       const isNumbered = numFmt && numFmt !== "bullet" && numFmt !== "none";
-      if ((preferred === "bulleted" && isBullet) || (preferred === "numbered" && isNumbered)) {
+      if (
+        (preferred === "bulleted" && isBullet) ||
+        (preferred === "numbered" && isNumbered)
+      ) {
         matchingAbstractIds.add(abstractNumId);
         break;
       }
@@ -619,24 +740,32 @@ async function resolveListNumId(zip: AdmZip, preferred: "bulleted" | "numbered")
   for (const num of nums) {
     const numId = readAttr(num, "w:numId", "numId");
     if (!numId) continue;
-    const absRef = asArray(num["w:abstractNumId"] as XmlNode | XmlNode[] | undefined)[0];
+    const absRef = asArray(
+      num["w:abstractNumId"] as XmlNode | XmlNode[] | undefined,
+    )[0];
     const absId = readAttr(absRef, "w:val", "val");
     if (absId && matchingAbstractIds.has(absId)) return numId;
   }
   return null;
 }
 
-function applyParagraphStyleToParagraph(paragraph: XmlNode, style: RichParagraphStyle): void {
+function applyParagraphStyleToParagraph(
+  paragraph: XmlNode,
+  style: RichParagraphStyle,
+): void {
   const pPr = ensureParagraphProps(paragraph);
 
   if (style.alignment) {
-    const wordAlignment = style.alignment === "justify" ? "both" : style.alignment;
+    const wordAlignment =
+      style.alignment === "justify" ? "both" : style.alignment;
     pPr["w:jc"] = [{ $: { "w:val": wordAlignment } }];
   }
 
   if (style.lineSpacingTwips) {
-    const spacingNode = asArray(pPr["w:spacing"] as XmlNode | XmlNode[] | undefined)[0] || {};
-    const attrs = ((spacingNode.$ as Record<string, unknown> | undefined) || {}) as Record<string, unknown>;
+    const spacingNode =
+      asArray(pPr["w:spacing"] as XmlNode | XmlNode[] | undefined)[0] || {};
+    const attrs = ((spacingNode.$ as Record<string, unknown> | undefined) ||
+      {}) as Record<string, unknown>;
     attrs["w:line"] = String(style.lineSpacingTwips);
     attrs["w:lineRule"] = "auto";
     spacingNode.$ = attrs;
@@ -645,21 +774,30 @@ function applyParagraphStyleToParagraph(paragraph: XmlNode, style: RichParagraph
 }
 
 async function parseDocumentXml(xml: string): Promise<ParsedDocumentXml> {
-  const xml2js = require('xml2js');
-  const parser = new xml2js.Parser({ explicitArray: true, preserveChildrenOrder: true });
+  const xml2js = require("xml2js");
+  const parser = new xml2js.Parser({
+    explicitArray: true,
+    preserveChildrenOrder: true,
+  });
   const parsedRoot = (await parser.parseStringPromise(xml)) as XmlNode;
 
-  const documentNode = asArray(parsedRoot['w:document'] as XmlNode | XmlNode[] | undefined)[0];
+  const documentNode = asArray(
+    parsedRoot["w:document"] as XmlNode | XmlNode[] | undefined,
+  )[0];
   if (!documentNode) {
-    throw new Error('Invalid DOCX XML: missing w:document');
+    throw new Error("Invalid DOCX XML: missing w:document");
   }
 
-  const bodyNode = asArray(documentNode['w:body'] as XmlNode | XmlNode[] | undefined)[0];
+  const bodyNode = asArray(
+    documentNode["w:body"] as XmlNode | XmlNode[] | undefined,
+  )[0];
   if (!bodyNode) {
-    throw new Error('Invalid DOCX XML: missing w:body');
+    throw new Error("Invalid DOCX XML: missing w:body");
   }
 
-  const paragraphs = asArray(bodyNode['w:p'] as XmlNode | XmlNode[] | undefined);
+  const paragraphs = asArray(
+    bodyNode["w:p"] as XmlNode | XmlNode[] | undefined,
+  );
 
   return {
     document: documentNode,
@@ -669,7 +807,10 @@ async function parseDocumentXml(xml: string): Promise<ParsedDocumentXml> {
   };
 }
 
-function findParagraphXmlIndex(target: ParagraphNode, paragraphs: XmlNode[]): number {
+function findParagraphXmlIndex(
+  target: ParagraphNode,
+  paragraphs: XmlNode[],
+): number {
   const nonEmpty: Array<{ xmlIndex: number; text: string }> = [];
   for (let i = 0; i < paragraphs.length; i++) {
     const text = extractParagraphPlainText(paragraphs[i]);
@@ -679,11 +820,18 @@ function findParagraphXmlIndex(target: ParagraphNode, paragraphs: XmlNode[]): nu
   }
 
   const byOrdinal = nonEmpty[target.indexInSection]?.xmlIndex;
-  if (byOrdinal !== undefined && normalizeWhitespace(nonEmpty[target.indexInSection]!.text) === normalizeWhitespace(target.text)) {
+  if (
+    byOrdinal !== undefined &&
+    normalizeWhitespace(nonEmpty[target.indexInSection]!.text) ===
+      normalizeWhitespace(target.text)
+  ) {
     return byOrdinal;
   }
 
-  const exactByText = nonEmpty.findIndex(item => normalizeWhitespace(item.text) === normalizeWhitespace(target.text));
+  const exactByText = nonEmpty.findIndex(
+    (item) =>
+      normalizeWhitespace(item.text) === normalizeWhitespace(target.text),
+  );
   if (exactByText >= 0) {
     return nonEmpty[exactByText]!.xmlIndex;
   }
@@ -691,42 +839,52 @@ function findParagraphXmlIndex(target: ParagraphNode, paragraphs: XmlNode[]): nu
   return -1;
 }
 
-function applyTextToParagraph(paragraph: XmlNode, newText: string): { formatLossRisk: boolean; removedHyperlinks: boolean } {
-  const runs = asArray(paragraph['w:r'] as XmlNode | XmlNode[] | undefined);
+function applyTextToParagraph(
+  paragraph: XmlNode,
+  newText: string,
+): { formatLossRisk: boolean; removedHyperlinks: boolean } {
+  const runs = asArray(paragraph["w:r"] as XmlNode | XmlNode[] | undefined);
   const firstRun = runs[0];
   const firstRunProps = firstRun
-    ? asArray(firstRun['w:rPr'] as XmlNode | XmlNode[] | undefined)[0]
+    ? asArray(firstRun["w:rPr"] as XmlNode | XmlNode[] | undefined)[0]
     : undefined;
 
   const formatLossRisk = paragraphHasMixedRichRuns(paragraph);
-  const removedHyperlinks = Boolean(paragraph['w:hyperlink']);
+  const removedHyperlinks = Boolean(paragraph["w:hyperlink"]);
 
-  paragraph['w:r'] = [buildReplacementRun(newText, firstRunProps)];
+  paragraph["w:r"] = [buildReplacementRun(newText, firstRunProps)];
 
-  if (paragraph['w:hyperlink']) {
-    delete paragraph['w:hyperlink'];
+  if (paragraph["w:hyperlink"]) {
+    delete paragraph["w:hyperlink"];
   }
 
-  if (paragraph['w:ins']) {
-    delete paragraph['w:ins'];
+  if (paragraph["w:ins"]) {
+    delete paragraph["w:ins"];
   }
 
   return { formatLossRisk, removedHyperlinks };
 }
 
-function validateInput(paragraphId: string, content: string, opts?: DocxContentOpts): void {
+function validateInput(
+  paragraphId: string,
+  content: string,
+  opts?: DocxContentOpts,
+): void {
   if (!paragraphId.trim()) {
-    throw new Error('paragraphId is required');
+    throw new Error("paragraphId is required");
   }
 
-  const plain = opts?.format === "html" ? richHtmlToPlainText(content) : content;
+  const plain =
+    opts?.format === "html" ? richHtmlToPlainText(content) : content;
   const normalized = normalizeWhitespace(plain);
   if (!normalized) {
-    throw new Error('newText cannot be empty');
+    throw new Error("newText cannot be empty");
   }
 
   if (normalized.length > MAX_PARAGRAPH_TEXT_LENGTH) {
-    throw new Error(`newText exceeds safe paragraph limit (${MAX_PARAGRAPH_TEXT_LENGTH})`);
+    throw new Error(
+      `newText exceeds safe paragraph limit (${MAX_PARAGRAPH_TEXT_LENGTH})`,
+    );
   }
 }
 
@@ -741,7 +899,11 @@ function setRunPlainText(run: XmlNode, text: string): void {
   ];
 }
 
-function patchRunInPlace(runs: XmlNode[], beforeFullText: string, afterFullText: string): boolean {
+function patchRunInPlace(
+  runs: XmlNode[],
+  beforeFullText: string,
+  afterFullText: string,
+): boolean {
   const before = String(beforeFullText || "");
   const after = String(afterFullText || "");
   if (before === after) return true;
@@ -753,8 +915,8 @@ function patchRunInPlace(runs: XmlNode[], beforeFullText: string, afterFullText:
 
   let suffix = 0;
   while (
-    suffix < (before.length - prefix) &&
-    suffix < (after.length - prefix) &&
+    suffix < before.length - prefix &&
+    suffix < after.length - prefix &&
     before[before.length - 1 - suffix] === after[after.length - 1 - suffix]
   ) {
     suffix += 1;
@@ -788,7 +950,10 @@ function patchRunInPlace(runs: XmlNode[], beforeFullText: string, afterFullText:
   if (runText.includes("\n") || runText.includes("\t")) return false;
 
   const localStart = Math.max(0, changeStart - runStart);
-  const localEnd = Math.min(runText.length, Math.max(localStart, changeEnd - runStart));
+  const localEnd = Math.min(
+    runText.length,
+    Math.max(localStart, changeEnd - runStart),
+  );
   const nextText = `${runText.slice(0, localStart)}${replacement}${runText.slice(localEnd)}`;
   setRunPlainText(runs[targetRunIndex]!, nextText);
   return true;
@@ -797,36 +962,51 @@ function patchRunInPlace(runs: XmlNode[], beforeFullText: string, afterFullText:
 export class DocxEditorService {
   private readonly anchorsService = new DocxAnchorsService();
 
-  async applyParagraphEdit(buffer: Buffer, paragraphId: string, newText: string, opts?: DocxContentOpts): Promise<Buffer> {
+  async applyParagraphEdit(
+    buffer: Buffer,
+    paragraphId: string,
+    newText: string,
+    opts?: DocxContentOpts,
+  ): Promise<Buffer> {
     validateInput(paragraphId, newText, opts);
 
     const anchors = await this.anchorsService.extractParagraphNodes(buffer);
-    const targetAnchor = anchors.find(anchor => anchor.paragraphId === paragraphId);
+    const targetAnchor = anchors.find(
+      (anchor) => anchor.paragraphId === paragraphId,
+    );
     if (!targetAnchor) {
       throw new Error(`Paragraph target not found: ${paragraphId}`);
     }
 
     const zip = new AdmZip(buffer);
-    const documentEntry = zip.getEntry('word/document.xml');
+    const documentEntry = zip.getEntry("word/document.xml");
     if (!documentEntry) {
-      throw new Error('Invalid DOCX: missing word/document.xml');
+      throw new Error("Invalid DOCX: missing word/document.xml");
     }
 
-    const documentXml = documentEntry.getData().toString('utf8');
+    const documentXml = documentEntry.getData().toString("utf8");
     const parsed = await parseDocumentXml(documentXml);
 
     const xmlIndex = findParagraphXmlIndex(targetAnchor, parsed.paragraphs);
     if (xmlIndex < 0) {
-      throw new Error(`Unable to map paragraphId to XML paragraph: ${paragraphId}`);
+      throw new Error(
+        `Unable to map paragraphId to XML paragraph: ${paragraphId}`,
+      );
     }
 
     const paragraph = parsed.paragraphs[xmlIndex];
     const beforeText = extractParagraphPlainText(paragraph);
-    const afterPlainText = normalizeWhitespace(opts?.format === "html" ? richHtmlToPlainText(newText) : newText);
-    const nextParagraphStyle = opts?.format === "html" ? parseParagraphStyleFromRichHtml(newText) : {};
-    const hasParagraphStylePatch = Boolean(nextParagraphStyle.alignment || nextParagraphStyle.lineSpacingTwips);
+    const afterPlainText = normalizeWhitespace(
+      opts?.format === "html" ? richHtmlToPlainText(newText) : newText,
+    );
+    const nextParagraphStyle =
+      opts?.format === "html" ? parseParagraphStyleFromRichHtml(newText) : {};
+    const hasParagraphStylePatch = Boolean(
+      nextParagraphStyle.alignment || nextParagraphStyle.lineSpacingTwips,
+    );
     const hasInlineMarkupPatch =
-      opts?.format === "html" && /<(?:b|strong|i|em|u|span|font)\b/i.test(String(newText || ""));
+      opts?.format === "html" &&
+      /<(?:b|strong|i|em|u|span|font)\b/i.test(String(newText || ""));
 
     // Style-only edits can keep paragraph text unchanged, so only skip when truly no-op.
     if (
@@ -843,9 +1023,13 @@ export class DocxEditorService {
     const { formatLossRisk, removedHyperlinks } =
       opts?.format === "html"
         ? (() => {
-            const runs = asArray(paragraph["w:r"] as XmlNode | XmlNode[] | undefined);
+            const runs = asArray(
+              paragraph["w:r"] as XmlNode | XmlNode[] | undefined,
+            );
             const firstRun = runs[0];
-            const firstRunProps = firstRun ? asArray(firstRun["w:rPr"] as XmlNode | XmlNode[] | undefined)[0] : undefined;
+            const firstRunProps = firstRun
+              ? asArray(firstRun["w:rPr"] as XmlNode | XmlNode[] | undefined)[0]
+              : undefined;
             const patchedInPlace =
               !hasInlineMarkupPatch &&
               runs.length > 1 &&
@@ -853,37 +1037,46 @@ export class DocxEditorService {
             if (!patchedInPlace) {
               paragraph["w:r"] = buildRunsFromRichHtml(newText, firstRunProps);
             }
-            if (nextParagraphStyle.alignment || nextParagraphStyle.lineSpacingTwips) {
+            if (
+              nextParagraphStyle.alignment ||
+              nextParagraphStyle.lineSpacingTwips
+            ) {
               applyParagraphStyleToParagraph(paragraph, nextParagraphStyle);
             }
             const hadLinks = Boolean(paragraph["w:hyperlink"]);
             if (paragraph["w:hyperlink"]) delete paragraph["w:hyperlink"];
             if (paragraph["w:ins"]) delete paragraph["w:ins"];
-            return { formatLossRisk: paragraphHasMixedRichRuns(paragraph), removedHyperlinks: hadLinks };
+            return {
+              formatLossRisk: paragraphHasMixedRichRuns(paragraph),
+              removedHyperlinks: hadLinks,
+            };
           })()
         : applyTextToParagraph(paragraph, newText);
 
     // Optional: convert a list/bullet paragraph into a normal paragraph by removing numbering properties.
     if (opts?.removeNumbering) {
       const pPr = ensureParagraphProps(paragraph);
-      if ((pPr as any)['w:numPr']) {
-        delete (pPr as any)['w:numPr'];
+      if ((pPr as any)["w:numPr"]) {
+        delete (pPr as any)["w:numPr"];
       }
-      const pStyle = asArray(pPr["w:pStyle"] as XmlNode | XmlNode[] | undefined)[0];
+      const pStyle = asArray(
+        pPr["w:pStyle"] as XmlNode | XmlNode[] | undefined,
+      )[0];
       const styleVal = readAttr(pStyle, "w:val", "val");
       if (styleVal && /(list|bullet|number)/i.test(styleVal)) {
         delete (pPr as any)["w:pStyle"];
         // Clear list-inherited indentation so the paragraph renders as a
         // normal body paragraph instead of staying visually indented.
-        if ((pPr as any)['w:ind']) {
-          delete (pPr as any)['w:ind'];
+        if ((pPr as any)["w:ind"]) {
+          delete (pPr as any)["w:ind"];
         }
       }
       stripLeadingBulletText(paragraph);
     }
 
     if (opts?.applyNumbering) {
-      const preferredType = opts?.applyNumberingType === "numbered" ? "numbered" : "bulleted";
+      const preferredType =
+        opts?.applyNumberingType === "numbered" ? "numbered" : "bulleted";
 
       // First try to resolve the correct numId for the requested list type
       // from numbering.xml so we get the right bullet vs numbered definition.
@@ -895,16 +1088,26 @@ export class DocxEditorService {
 
       // Fallback: use nearest paragraph's numbering if resolveListNumId found nothing.
       if (!numPr?.numId) {
-        for (let i = Math.max(0, xmlIndex - 8); i <= Math.min(parsed.paragraphs.length - 1, xmlIndex + 8); i++) {
+        for (
+          let i = Math.max(0, xmlIndex - 8);
+          i <= Math.min(parsed.paragraphs.length - 1, xmlIndex + 8);
+          i++
+        ) {
           if (i === xmlIndex) continue;
           const nearby = readParagraphNumPr(parsed.paragraphs[i]!);
-          if (nearby?.numId) { numPr = nearby; break; }
+          if (nearby?.numId) {
+            numPr = nearby;
+            break;
+          }
         }
       }
       if (!numPr?.numId) {
         for (const p of parsed.paragraphs) {
           const nearby = readParagraphNumPr(p);
-          if (nearby?.numId) { numPr = nearby; break; }
+          if (nearby?.numId) {
+            numPr = nearby;
+            break;
+          }
         }
       }
 
@@ -920,7 +1123,9 @@ export class DocxEditorService {
       // numPr-based numbering and the old style may conflict.
       if (numPr?.numId) {
         const pPr = ensureParagraphProps(paragraph);
-        const pStyleNode = asArray(pPr["w:pStyle"] as XmlNode | XmlNode[] | undefined)[0];
+        const pStyleNode = asArray(
+          pPr["w:pStyle"] as XmlNode | XmlNode[] | undefined,
+        )[0];
         const currentStyle = readAttr(pStyleNode, "w:val", "val");
         if (currentStyle && /(list|bullet|number)/i.test(currentStyle)) {
           delete (pPr as any)["w:pStyle"];
@@ -928,35 +1133,47 @@ export class DocxEditorService {
       }
     }
 
-    const xml2js = require('xml2js');
+    const xml2js = require("xml2js");
     const builder = new xml2js.Builder();
     const nextDocumentXml = builder.buildObject(parsed.parsedRoot);
 
-    zip.updateFile('word/document.xml', Buffer.from(nextDocumentXml, 'utf8'));
+    zip.updateFile("word/document.xml", Buffer.from(nextDocumentXml, "utf8"));
     const outputBuffer = zip.toBuffer();
 
     // Integrity check: ensure edited file can be reopened and still has document.xml.
     const verificationZip = new AdmZip(outputBuffer);
-    const verificationEntry = verificationZip.getEntry('word/document.xml');
+    const verificationEntry = verificationZip.getEntry("word/document.xml");
     if (!verificationEntry) {
-      throw new Error('DOCX integrity check failed after edit: missing word/document.xml');
+      throw new Error(
+        "DOCX integrity check failed after edit: missing word/document.xml",
+      );
     }
 
-    const verificationXml = verificationEntry.getData().toString('utf8');
-    if (!verificationXml.includes(afterPlainText.slice(0, Math.min(afterPlainText.length, 32)))) {
-      logger.warn('[DocxEditor] Integrity check warning: edited text probe not found in XML preview', {
-        paragraphId,
-        probeLength: Math.min(afterPlainText.length, 32),
-      });
+    const verificationXml = verificationEntry.getData().toString("utf8");
+    if (
+      !verificationXml.includes(
+        afterPlainText.slice(0, Math.min(afterPlainText.length, 32)),
+      )
+    ) {
+      logger.warn(
+        "[DocxEditor] Integrity check warning: edited text probe not found in XML preview",
+        {
+          paragraphId,
+          probeLength: Math.min(afterPlainText.length, 32),
+        },
+      );
     }
 
     if (formatLossRisk || removedHyperlinks) {
-      logger.warn('[DocxEditor] Applied safe fallback while preserving paragraph style', {
-        paragraphId,
-        styleName,
-        formatLossRisk,
-        removedHyperlinks,
-      });
+      logger.warn(
+        "[DocxEditor] Applied safe fallback while preserving paragraph style",
+        {
+          paragraphId,
+          styleName,
+          formatLossRisk,
+          removedHyperlinks,
+        },
+      );
     }
 
     return outputBuffer;
@@ -967,43 +1184,49 @@ export class DocxEditorService {
    * This removes the paragraph node from the document body.
    */
   async deleteParagraph(buffer: Buffer, paragraphId: string): Promise<Buffer> {
-    if (!paragraphId.trim()) throw new Error('paragraphId is required');
+    if (!paragraphId.trim()) throw new Error("paragraphId is required");
 
     const anchors = await this.anchorsService.extractParagraphNodes(buffer);
-    const targetAnchor = anchors.find(anchor => anchor.paragraphId === paragraphId);
+    const targetAnchor = anchors.find(
+      (anchor) => anchor.paragraphId === paragraphId,
+    );
     if (!targetAnchor) {
       throw new Error(`Paragraph target not found: ${paragraphId}`);
     }
 
     const zip = new AdmZip(buffer);
-    const documentEntry = zip.getEntry('word/document.xml');
+    const documentEntry = zip.getEntry("word/document.xml");
     if (!documentEntry) {
-      throw new Error('Invalid DOCX: missing word/document.xml');
+      throw new Error("Invalid DOCX: missing word/document.xml");
     }
 
-    const documentXml = documentEntry.getData().toString('utf8');
+    const documentXml = documentEntry.getData().toString("utf8");
     const parsed = await parseDocumentXml(documentXml);
 
     const xmlIndex = findParagraphXmlIndex(targetAnchor, parsed.paragraphs);
     if (xmlIndex < 0) {
-      throw new Error(`Unable to map paragraphId to XML paragraph: ${paragraphId}`);
+      throw new Error(
+        `Unable to map paragraphId to XML paragraph: ${paragraphId}`,
+      );
     }
 
     parsed.paragraphs.splice(xmlIndex, 1);
-    parsed.body['w:p'] = parsed.paragraphs;
+    parsed.body["w:p"] = parsed.paragraphs;
 
-    const xml2js = require('xml2js');
+    const xml2js = require("xml2js");
     const builder = new xml2js.Builder();
     const nextDocumentXml = builder.buildObject(parsed.parsedRoot);
 
-    zip.updateFile('word/document.xml', Buffer.from(nextDocumentXml, 'utf8'));
+    zip.updateFile("word/document.xml", Buffer.from(nextDocumentXml, "utf8"));
     const outputBuffer = zip.toBuffer();
 
     // Integrity check
     const verificationZip = new AdmZip(outputBuffer);
-    const verificationEntry = verificationZip.getEntry('word/document.xml');
+    const verificationEntry = verificationZip.getEntry("word/document.xml");
     if (!verificationEntry) {
-      throw new Error('DOCX integrity check failed after delete: missing word/document.xml');
+      throw new Error(
+        "DOCX integrity check failed after delete: missing word/document.xml",
+      );
     }
 
     return outputBuffer;
@@ -1014,21 +1237,25 @@ export class DocxEditorService {
    * Resolves all target indices against a single anchor extraction, then removes
    * them in reverse order so earlier deletions don't shift later indices.
    */
-  async deleteParagraphs(buffer: Buffer, paragraphIds: string[]): Promise<Buffer> {
+  async deleteParagraphs(
+    buffer: Buffer,
+    paragraphIds: string[],
+  ): Promise<Buffer> {
     if (!paragraphIds.length) return buffer;
 
     const anchors = await this.anchorsService.extractParagraphNodes(buffer);
     const zip = new AdmZip(buffer);
-    const documentEntry = zip.getEntry('word/document.xml');
-    if (!documentEntry) throw new Error('Invalid DOCX: missing word/document.xml');
+    const documentEntry = zip.getEntry("word/document.xml");
+    if (!documentEntry)
+      throw new Error("Invalid DOCX: missing word/document.xml");
 
-    const documentXml = documentEntry.getData().toString('utf8');
+    const documentXml = documentEntry.getData().toString("utf8");
     const parsed = await parseDocumentXml(documentXml);
 
     // Map all target PIDs to XML indices in one extraction pass
     const xmlIndicesToDelete: number[] = [];
     for (const pid of paragraphIds) {
-      const targetAnchor = anchors.find(a => a.paragraphId === pid.trim());
+      const targetAnchor = anchors.find((a) => a.paragraphId === pid.trim());
       if (!targetAnchor) continue; // skip unresolvable (don't throw)
       const xmlIndex = findParagraphXmlIndex(targetAnchor, parsed.paragraphs);
       if (xmlIndex >= 0) xmlIndicesToDelete.push(xmlIndex);
@@ -1041,20 +1268,22 @@ export class DocxEditorService {
     for (const idx of sorted) {
       parsed.paragraphs.splice(idx, 1);
     }
-    parsed.body['w:p'] = parsed.paragraphs;
+    parsed.body["w:p"] = parsed.paragraphs;
 
-    const xml2js = require('xml2js');
+    const xml2js = require("xml2js");
     const builder = new xml2js.Builder();
     const nextDocumentXml = builder.buildObject(parsed.parsedRoot);
 
-    zip.updateFile('word/document.xml', Buffer.from(nextDocumentXml, 'utf8'));
+    zip.updateFile("word/document.xml", Buffer.from(nextDocumentXml, "utf8"));
     const outputBuffer = zip.toBuffer();
 
     // Integrity check
     const verificationZip = new AdmZip(outputBuffer);
-    const verificationEntry = verificationZip.getEntry('word/document.xml');
+    const verificationEntry = verificationZip.getEntry("word/document.xml");
     if (!verificationEntry) {
-      throw new Error('DOCX integrity check failed after batch delete: missing word/document.xml');
+      throw new Error(
+        "DOCX integrity check failed after batch delete: missing word/document.xml",
+      );
     }
 
     return outputBuffer;
@@ -1071,67 +1300,98 @@ export class DocxEditorService {
   async applyRunStyle(
     buffer: Buffer,
     paragraphId: string,
-    style: { bold?: boolean; italic?: boolean; underline?: boolean; color?: string; fontFamily?: string; fontSizePt?: number },
+    style: {
+      bold?: boolean;
+      italic?: boolean;
+      underline?: boolean;
+      color?: string;
+      fontFamily?: string;
+      fontSizePt?: number;
+    },
   ): Promise<Buffer> {
     return this.mutateParaInPlace(buffer, paragraphId, (paragraph) => {
-      const runs = asArray(paragraph['w:r'] as XmlNode | XmlNode[] | undefined);
+      const runs = asArray(paragraph["w:r"] as XmlNode | XmlNode[] | undefined);
       for (const run of runs) {
-        const existing = asArray(run['w:rPr'] as XmlNode | XmlNode[] | undefined)[0] || {};
+        const existing =
+          asArray(run["w:rPr"] as XmlNode | XmlNode[] | undefined)[0] || {};
         const rPr = deepClone(existing);
 
-        if (style.bold === true) rPr['w:b'] = [{}];
-        else if (style.bold === false) delete rPr['w:b'];
+        if (style.bold === true) rPr["w:b"] = [{}];
+        else if (style.bold === false) delete rPr["w:b"];
 
-        if (style.italic === true) rPr['w:i'] = [{}];
-        else if (style.italic === false) delete rPr['w:i'];
+        if (style.italic === true) rPr["w:i"] = [{}];
+        else if (style.italic === false) delete rPr["w:i"];
 
-        if (style.underline === true) rPr['w:u'] = [{ $: { 'w:val': 'single' } }];
-        else if (style.underline === false) delete rPr['w:u'];
+        if (style.underline === true)
+          rPr["w:u"] = [{ $: { "w:val": "single" } }];
+        else if (style.underline === false) delete rPr["w:u"];
 
         if (style.color) {
-          const hex = style.color.replace('#', '');
+          const hex = style.color.replace("#", "");
           if (/^[0-9A-Fa-f]{6}$/.test(hex)) {
-            rPr['w:color'] = [{ $: { 'w:val': hex.toUpperCase() } }];
+            rPr["w:color"] = [{ $: { "w:val": hex.toUpperCase() } }];
           }
         }
 
         if (style.fontFamily) {
-          rPr['w:rFonts'] = [{ $: { 'w:ascii': style.fontFamily, 'w:hAnsi': style.fontFamily, 'w:cs': style.fontFamily } }];
+          rPr["w:rFonts"] = [
+            {
+              $: {
+                "w:ascii": style.fontFamily,
+                "w:hAnsi": style.fontFamily,
+                "w:cs": style.fontFamily,
+              },
+            },
+          ];
         }
 
         if (style.fontSizePt != null && style.fontSizePt > 0) {
           const halfPt = String(Math.round(style.fontSizePt * 2));
-          rPr['w:sz'] = [{ $: { 'w:val': halfPt } }];
-          rPr['w:szCs'] = [{ $: { 'w:val': halfPt } }];
+          rPr["w:sz"] = [{ $: { "w:val": halfPt } }];
+          rPr["w:szCs"] = [{ $: { "w:val": halfPt } }];
         }
 
-        run['w:rPr'] = [rPr];
+        run["w:rPr"] = [rPr];
       }
 
       // Also apply to runs inside hyperlinks
-      const hyperlinks = asArray(paragraph['w:hyperlink'] as XmlNode | XmlNode[] | undefined);
+      const hyperlinks = asArray(
+        paragraph["w:hyperlink"] as XmlNode | XmlNode[] | undefined,
+      );
       for (const hl of hyperlinks) {
-        const hlRuns = asArray(hl['w:r'] as XmlNode | XmlNode[] | undefined);
+        const hlRuns = asArray(hl["w:r"] as XmlNode | XmlNode[] | undefined);
         for (const run of hlRuns) {
-          const existing = asArray(run['w:rPr'] as XmlNode | XmlNode[] | undefined)[0] || {};
+          const existing =
+            asArray(run["w:rPr"] as XmlNode | XmlNode[] | undefined)[0] || {};
           const rPr = deepClone(existing);
-          if (style.bold === true) rPr['w:b'] = [{}];
-          else if (style.bold === false) delete rPr['w:b'];
-          if (style.italic === true) rPr['w:i'] = [{}];
-          else if (style.italic === false) delete rPr['w:i'];
-          if (style.underline === true) rPr['w:u'] = [{ $: { 'w:val': 'single' } }];
-          else if (style.underline === false) delete rPr['w:u'];
+          if (style.bold === true) rPr["w:b"] = [{}];
+          else if (style.bold === false) delete rPr["w:b"];
+          if (style.italic === true) rPr["w:i"] = [{}];
+          else if (style.italic === false) delete rPr["w:i"];
+          if (style.underline === true)
+            rPr["w:u"] = [{ $: { "w:val": "single" } }];
+          else if (style.underline === false) delete rPr["w:u"];
           if (style.color) {
-            const hex = style.color.replace('#', '');
-            if (/^[0-9A-Fa-f]{6}$/.test(hex)) rPr['w:color'] = [{ $: { 'w:val': hex.toUpperCase() } }];
+            const hex = style.color.replace("#", "");
+            if (/^[0-9A-Fa-f]{6}$/.test(hex))
+              rPr["w:color"] = [{ $: { "w:val": hex.toUpperCase() } }];
           }
-          if (style.fontFamily) rPr['w:rFonts'] = [{ $: { 'w:ascii': style.fontFamily, 'w:hAnsi': style.fontFamily, 'w:cs': style.fontFamily } }];
+          if (style.fontFamily)
+            rPr["w:rFonts"] = [
+              {
+                $: {
+                  "w:ascii": style.fontFamily,
+                  "w:hAnsi": style.fontFamily,
+                  "w:cs": style.fontFamily,
+                },
+              },
+            ];
           if (style.fontSizePt != null && style.fontSizePt > 0) {
             const halfPt = String(Math.round(style.fontSizePt * 2));
-            rPr['w:sz'] = [{ $: { 'w:val': halfPt } }];
-            rPr['w:szCs'] = [{ $: { 'w:val': halfPt } }];
+            rPr["w:sz"] = [{ $: { "w:val": halfPt } }];
+            rPr["w:szCs"] = [{ $: { "w:val": halfPt } }];
           }
-          run['w:rPr'] = [rPr];
+          run["w:rPr"] = [rPr];
         }
       }
     });
@@ -1142,9 +1402,9 @@ export class DocxEditorService {
    */
   async clearRunStyle(buffer: Buffer, paragraphId: string): Promise<Buffer> {
     return this.mutateParaInPlace(buffer, paragraphId, (paragraph) => {
-      const runs = asArray(paragraph['w:r'] as XmlNode | XmlNode[] | undefined);
+      const runs = asArray(paragraph["w:r"] as XmlNode | XmlNode[] | undefined);
       for (const run of runs) {
-        delete run['w:rPr'];
+        delete run["w:rPr"];
       }
     });
   }
@@ -1152,11 +1412,15 @@ export class DocxEditorService {
   /**
    * Set paragraph alignment (w:jc): left, center, right, both (justify).
    */
-  async setAlignment(buffer: Buffer, paragraphId: string, alignment: string): Promise<Buffer> {
+  async setAlignment(
+    buffer: Buffer,
+    paragraphId: string,
+    alignment: string,
+  ): Promise<Buffer> {
     return this.mutateParaInPlace(buffer, paragraphId, (paragraph) => {
       const pPr = ensureParagraphProps(paragraph);
-      const wordAlignment = alignment === 'justify' ? 'both' : alignment;
-      pPr['w:jc'] = [{ $: { 'w:val': wordAlignment } }];
+      const wordAlignment = alignment === "justify" ? "both" : alignment;
+      pPr["w:jc"] = [{ $: { "w:val": wordAlignment } }];
     });
   }
 
@@ -1170,13 +1434,18 @@ export class DocxEditorService {
   ): Promise<Buffer> {
     return this.mutateParaInPlace(buffer, paragraphId, (paragraph) => {
       const pPr = ensureParagraphProps(paragraph);
-      const indNode = asArray(pPr['w:ind'] as XmlNode | XmlNode[] | undefined)[0] || {};
-      const attrs = ((indNode.$ as Record<string, unknown> | undefined) || {}) as Record<string, unknown>;
-      if (opts.leftPt != null) attrs['w:left'] = String(Math.round(opts.leftPt * 20)); // pt → twips
-      if (opts.rightPt != null) attrs['w:right'] = String(Math.round(opts.rightPt * 20));
-      if (opts.firstLinePt != null) attrs['w:firstLine'] = String(Math.round(opts.firstLinePt * 20));
+      const indNode =
+        asArray(pPr["w:ind"] as XmlNode | XmlNode[] | undefined)[0] || {};
+      const attrs = ((indNode.$ as Record<string, unknown> | undefined) ||
+        {}) as Record<string, unknown>;
+      if (opts.leftPt != null)
+        attrs["w:left"] = String(Math.round(opts.leftPt * 20)); // pt → twips
+      if (opts.rightPt != null)
+        attrs["w:right"] = String(Math.round(opts.rightPt * 20));
+      if (opts.firstLinePt != null)
+        attrs["w:firstLine"] = String(Math.round(opts.firstLinePt * 20));
       indNode.$ = attrs;
-      pPr['w:ind'] = [indNode];
+      pPr["w:ind"] = [indNode];
     });
   }
 
@@ -1184,15 +1453,21 @@ export class DocxEditorService {
    * Set paragraph line spacing (w:spacing line + lineRule).
    * @param multiplier — e.g. 1.0 = single, 1.5, 2.0 = double
    */
-  async setLineSpacing(buffer: Buffer, paragraphId: string, multiplier: number): Promise<Buffer> {
+  async setLineSpacing(
+    buffer: Buffer,
+    paragraphId: string,
+    multiplier: number,
+  ): Promise<Buffer> {
     return this.mutateParaInPlace(buffer, paragraphId, (paragraph) => {
       const pPr = ensureParagraphProps(paragraph);
-      const spacingNode = asArray(pPr['w:spacing'] as XmlNode | XmlNode[] | undefined)[0] || {};
-      const attrs = ((spacingNode.$ as Record<string, unknown> | undefined) || {}) as Record<string, unknown>;
-      attrs['w:line'] = String(Math.round(multiplier * 240));
-      attrs['w:lineRule'] = 'auto';
+      const spacingNode =
+        asArray(pPr["w:spacing"] as XmlNode | XmlNode[] | undefined)[0] || {};
+      const attrs = ((spacingNode.$ as Record<string, unknown> | undefined) ||
+        {}) as Record<string, unknown>;
+      attrs["w:line"] = String(Math.round(multiplier * 240));
+      attrs["w:lineRule"] = "auto";
       spacingNode.$ = attrs;
-      pPr['w:spacing'] = [spacingNode];
+      pPr["w:spacing"] = [spacingNode];
     });
   }
 
@@ -1206,65 +1481,104 @@ export class DocxEditorService {
   ): Promise<Buffer> {
     return this.mutateParaInPlace(buffer, paragraphId, (paragraph) => {
       const pPr = ensureParagraphProps(paragraph);
-      const spacingNode = asArray(pPr['w:spacing'] as XmlNode | XmlNode[] | undefined)[0] || {};
-      const attrs = ((spacingNode.$ as Record<string, unknown> | undefined) || {}) as Record<string, unknown>;
-      if (opts.beforePt != null) attrs['w:before'] = String(Math.round(opts.beforePt * 20)); // pt → twips
-      if (opts.afterPt != null) attrs['w:after'] = String(Math.round(opts.afterPt * 20));
+      const spacingNode =
+        asArray(pPr["w:spacing"] as XmlNode | XmlNode[] | undefined)[0] || {};
+      const attrs = ((spacingNode.$ as Record<string, unknown> | undefined) ||
+        {}) as Record<string, unknown>;
+      if (opts.beforePt != null)
+        attrs["w:before"] = String(Math.round(opts.beforePt * 20)); // pt → twips
+      if (opts.afterPt != null)
+        attrs["w:after"] = String(Math.round(opts.afterPt * 20));
       spacingNode.$ = attrs;
-      pPr['w:spacing'] = [spacingNode];
+      pPr["w:spacing"] = [spacingNode];
     });
   }
 
   /**
    * Set the named paragraph style (w:pStyle), e.g. "Heading1", "Normal", "Title".
    */
-  async setParagraphStyle(buffer: Buffer, paragraphId: string, styleName: string): Promise<Buffer> {
+  async setParagraphStyle(
+    buffer: Buffer,
+    paragraphId: string,
+    styleName: string,
+  ): Promise<Buffer> {
     return this.mutateParaInPlace(buffer, paragraphId, (paragraph) => {
       const pPr = ensureParagraphProps(paragraph);
-      pPr['w:pStyle'] = [{ $: { 'w:val': styleName } }];
+      pPr["w:pStyle"] = [{ $: { "w:val": styleName } }];
     });
   }
 
   /**
    * Transform the text in a paragraph's runs to the specified case.
    */
-  async setTextCase(buffer: Buffer, paragraphId: string, caseType: string): Promise<Buffer> {
+  async setTextCase(
+    buffer: Buffer,
+    paragraphId: string,
+    caseType: string,
+  ): Promise<Buffer> {
     return this.mutateParaInPlace(buffer, paragraphId, (paragraph) => {
       // Normalize: accept both short ("upper") and bank/pattern forms ("uppercase", "title_case")
-      const raw = (caseType || '').trim().toLowerCase();
-      const norm = raw === 'title_case' ? 'title'
-        : raw === 'sentence_case' ? 'sentence'
-        : raw === 'uppercase' ? 'upper'
-        : raw === 'lowercase' ? 'lower'
-        : raw;
+      const raw = (caseType || "").trim().toLowerCase();
+      const norm =
+        raw === "title_case"
+          ? "title"
+          : raw === "sentence_case"
+            ? "sentence"
+            : raw === "uppercase"
+              ? "upper"
+              : raw === "lowercase"
+                ? "lower"
+                : raw;
       const transform = (text: string): string => {
         switch (norm) {
-          case 'upper': return text.toUpperCase();
-          case 'lower': return text.toLowerCase();
-          case 'title': return text.replace(/\S+/g, w => w[0].toUpperCase() + w.slice(1).toLowerCase());
-          case 'sentence': return text.replace(/(^\s*\w|[.!?]\s+\w)/g, m => m.toUpperCase());
-          default: return text;
+          case "upper":
+            return text.toUpperCase();
+          case "lower":
+            return text.toLowerCase();
+          case "title":
+            return text.replace(
+              /\S+/g,
+              (w) => w[0].toUpperCase() + w.slice(1).toLowerCase(),
+            );
+          case "sentence":
+            return text.replace(/(^\s*\w|[.!?]\s+\w)/g, (m) => m.toUpperCase());
+          default:
+            return text;
         }
       };
       const transformRuns = (runs: XmlNode[]) => {
         for (const run of runs) {
-          const textNodes = asArray(run['w:t'] as string | XmlNode | Array<string | XmlNode> | undefined);
+          const textNodes = asArray(
+            run["w:t"] as
+              | string
+              | XmlNode
+              | Array<string | XmlNode>
+              | undefined,
+          );
           for (let i = 0; i < textNodes.length; i++) {
             const node = textNodes[i];
-            if (typeof node === 'string') {
+            if (typeof node === "string") {
               textNodes[i] = transform(node);
-            } else if (node && typeof node === 'object' && typeof node._ === 'string') {
+            } else if (
+              node &&
+              typeof node === "object" &&
+              typeof node._ === "string"
+            ) {
               node._ = transform(node._);
             }
           }
-          run['w:t'] = textNodes as any;
+          run["w:t"] = textNodes as any;
         }
       };
-      transformRuns(asArray(paragraph['w:r'] as XmlNode | XmlNode[] | undefined));
+      transformRuns(
+        asArray(paragraph["w:r"] as XmlNode | XmlNode[] | undefined),
+      );
       // Also transform hyperlink runs
-      const hyperlinks = asArray(paragraph['w:hyperlink'] as XmlNode | XmlNode[] | undefined);
+      const hyperlinks = asArray(
+        paragraph["w:hyperlink"] as XmlNode | XmlNode[] | undefined,
+      );
       for (const hl of hyperlinks) {
-        transformRuns(asArray(hl['w:r'] as XmlNode | XmlNode[] | undefined));
+        transformRuns(asArray(hl["w:r"] as XmlNode | XmlNode[] | undefined));
       }
     });
   }
@@ -1277,21 +1591,26 @@ export class DocxEditorService {
    * Merge multiple paragraphs into one. Keeps the first paragraph, concatenates text,
    * removes numbering, and deletes the remaining paragraphs.
    */
-  async mergeParagraphs(buffer: Buffer, paragraphIds: string[], joinSeparator = ' '): Promise<Buffer> {
+  async mergeParagraphs(
+    buffer: Buffer,
+    paragraphIds: string[],
+    joinSeparator = " ",
+  ): Promise<Buffer> {
     if (paragraphIds.length < 2) return buffer;
 
     const anchors = await this.anchorsService.extractParagraphNodes(buffer);
     const zip = new AdmZip(buffer);
-    const documentEntry = zip.getEntry('word/document.xml');
-    if (!documentEntry) throw new Error('Invalid DOCX: missing word/document.xml');
+    const documentEntry = zip.getEntry("word/document.xml");
+    if (!documentEntry)
+      throw new Error("Invalid DOCX: missing word/document.xml");
 
-    const documentXml = documentEntry.getData().toString('utf8');
+    const documentXml = documentEntry.getData().toString("utf8");
     const parsed = await parseDocumentXml(documentXml);
 
     // Resolve all paragraph IDs to XML indices
     const resolved: Array<{ pid: string; xmlIndex: number }> = [];
     for (const pid of paragraphIds) {
-      const anchor = anchors.find(a => a.paragraphId === pid.trim());
+      const anchor = anchors.find((a) => a.paragraphId === pid.trim());
       if (!anchor) continue;
       const xmlIndex = findParagraphXmlIndex(anchor, parsed.paragraphs);
       if (xmlIndex >= 0) resolved.push({ pid, xmlIndex });
@@ -1310,31 +1629,40 @@ export class DocxEditorService {
 
     // Replace first paragraph's content with merged text
     const firstParagraph = parsed.paragraphs[resolved[0].xmlIndex];
-    const firstRuns = asArray(firstParagraph['w:r'] as XmlNode | XmlNode[] | undefined);
+    const firstRuns = asArray(
+      firstParagraph["w:r"] as XmlNode | XmlNode[] | undefined,
+    );
     const firstRunProps = firstRuns[0]
-      ? asArray(firstRuns[0]['w:rPr'] as XmlNode | XmlNode[] | undefined)[0]
+      ? asArray(firstRuns[0]["w:rPr"] as XmlNode | XmlNode[] | undefined)[0]
       : undefined;
-    firstParagraph['w:r'] = [buildReplacementRun(mergedText, firstRunProps)];
-    delete firstParagraph['w:hyperlink'];
-    delete firstParagraph['w:ins'];
+    firstParagraph["w:r"] = [buildReplacementRun(mergedText, firstRunProps)];
+    delete firstParagraph["w:hyperlink"];
+    delete firstParagraph["w:ins"];
 
     // Remove numbering from merged result
-    const pPr = asArray(firstParagraph['w:pPr'] as XmlNode | XmlNode[] | undefined)[0];
+    const pPr = asArray(
+      firstParagraph["w:pPr"] as XmlNode | XmlNode[] | undefined,
+    )[0];
     if (pPr) {
-      delete (pPr as any)['w:numPr'];
-      const pStyle = asArray(pPr['w:pStyle'] as XmlNode | XmlNode[] | undefined)[0];
-      const styleVal = readAttr(pStyle, 'w:val', 'val');
+      delete (pPr as any)["w:numPr"];
+      const pStyle = asArray(
+        pPr["w:pStyle"] as XmlNode | XmlNode[] | undefined,
+      )[0];
+      const styleVal = readAttr(pStyle, "w:val", "val");
       if (styleVal && /(list|bullet|number)/i.test(styleVal)) {
-        delete (pPr as any)['w:pStyle'];
+        delete (pPr as any)["w:pStyle"];
       }
     }
 
     // Delete remaining paragraphs in reverse order
-    const deleteIndices = resolved.slice(1).map(r => r.xmlIndex).sort((a, b) => b - a);
+    const deleteIndices = resolved
+      .slice(1)
+      .map((r) => r.xmlIndex)
+      .sort((a, b) => b - a);
     for (const idx of deleteIndices) {
       parsed.paragraphs.splice(idx, 1);
     }
-    parsed.body['w:p'] = parsed.paragraphs;
+    parsed.body["w:p"] = parsed.paragraphs;
 
     return this.rebuildZip(zip, parsed);
   }
@@ -1347,71 +1675,95 @@ export class DocxEditorService {
     buffer: Buffer,
     paragraphId: string,
     items: string[],
-    listType: 'bulleted' | 'numbered',
+    listType: "bulleted" | "numbered",
   ): Promise<Buffer> {
     const normalizedItems = (items || [])
       .map((text) => String(text || ""))
-      .map((line) => line
-        .replace(/^[\s"'`“”‘’\u200B-\u200D\uFEFF]+/, "")
-        .replace(/^(?:&bull;|&#8226;|&#x2022;)\s*/i, "")
-        .replace(/^[\s]*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25AB\u25CF\u25CB\u25C9\u2765\u2767]|[\-\*\+]|□)\s*/, "")
-        .replace(/^\(?\d{1,3}\)?[.)\-:]\s*/, "")
-        .replace(/^[a-zA-Z][.)\-:]\s+/, "")
-        .replace(/\s+/g, " ")
-        .trim())
+      .map((line) =>
+        line
+          .replace(/^[\s"'`“”‘’\u200B-\u200D\uFEFF]+/, "")
+          .replace(/^(?:&bull;|&#8226;|&#x2022;)\s*/i, "")
+          .replace(
+            /^[\s]*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25AB\u25CF\u25CB\u25C9\u2765\u2767]|[\-\*\+]|□)\s*/,
+            "",
+          )
+          .replace(/^\(?\d{1,3}\)?[.)\-:]\s*/, "")
+          .replace(/^[a-zA-Z][.)\-:]\s+/, "")
+          .replace(/\s+/g, " ")
+          .trim(),
+      )
       .filter(Boolean);
     if (!normalizedItems.length) return buffer;
 
     const anchors = await this.anchorsService.extractParagraphNodes(buffer);
-    const targetAnchor = anchors.find(a => a.paragraphId === paragraphId);
-    if (!targetAnchor) throw new Error(`Paragraph target not found: ${paragraphId}`);
+    const targetAnchor = anchors.find((a) => a.paragraphId === paragraphId);
+    if (!targetAnchor)
+      throw new Error(`Paragraph target not found: ${paragraphId}`);
 
     const zip = new AdmZip(buffer);
-    const documentEntry = zip.getEntry('word/document.xml');
-    if (!documentEntry) throw new Error('Invalid DOCX: missing word/document.xml');
+    const documentEntry = zip.getEntry("word/document.xml");
+    if (!documentEntry)
+      throw new Error("Invalid DOCX: missing word/document.xml");
 
-    const documentXml = documentEntry.getData().toString('utf8');
+    const documentXml = documentEntry.getData().toString("utf8");
     const parsed = await parseDocumentXml(documentXml);
 
     const xmlIndex = findParagraphXmlIndex(targetAnchor, parsed.paragraphs);
-    if (xmlIndex < 0) throw new Error(`Unable to map paragraphId to XML paragraph: ${paragraphId}`);
+    if (xmlIndex < 0)
+      throw new Error(
+        `Unable to map paragraphId to XML paragraph: ${paragraphId}`,
+      );
 
     const sourceParagraph = parsed.paragraphs[xmlIndex];
-    const sourceRuns = asArray(sourceParagraph['w:r'] as XmlNode | XmlNode[] | undefined);
+    const sourceRuns = asArray(
+      sourceParagraph["w:r"] as XmlNode | XmlNode[] | undefined,
+    );
     const sourceRunProps = sourceRuns[0]
-      ? asArray(sourceRuns[0]['w:rPr'] as XmlNode | XmlNode[] | undefined)[0]
+      ? asArray(sourceRuns[0]["w:rPr"] as XmlNode | XmlNode[] | undefined)[0]
       : undefined;
 
     // Resolve a valid numId for the list
     let numPr: { numId: string; ilvl: string } | null = null;
     // Look for nearby list paragraphs
-    for (let i = Math.max(0, xmlIndex - 8); i <= Math.min(parsed.paragraphs.length - 1, xmlIndex + 8); i++) {
+    for (
+      let i = Math.max(0, xmlIndex - 8);
+      i <= Math.min(parsed.paragraphs.length - 1, xmlIndex + 8);
+      i++
+    ) {
       const existing = readParagraphNumPr(parsed.paragraphs[i]!);
-      if (existing?.numId) { numPr = existing; break; }
+      if (existing?.numId) {
+        numPr = existing;
+        break;
+      }
     }
     if (!numPr) {
       const listNumId = await resolveListNumId(zip, listType);
-      if (listNumId) numPr = { numId: listNumId, ilvl: '0' };
+      if (listNumId) numPr = { numId: listNumId, ilvl: "0" };
     }
     // If still no numPr, try to create numbering.xml
     if (!numPr) {
       const created = await this.ensureNumberingDefinition(zip, listType);
-      if (created) numPr = { numId: created, ilvl: '0' };
+      if (created) numPr = { numId: created, ilvl: "0" };
     }
 
     // Build new paragraph nodes
-    const newParagraphs: XmlNode[] = normalizedItems.map(text => {
+    const newParagraphs: XmlNode[] = normalizedItems.map((text) => {
       const newP: XmlNode = {
-        'w:pPr': [{}],
-        'w:r': [buildReplacementRun(text.trim(), sourceRunProps ? deepClone(sourceRunProps) : undefined)],
+        "w:pPr": [{}],
+        "w:r": [
+          buildReplacementRun(
+            text.trim(),
+            sourceRunProps ? deepClone(sourceRunProps) : undefined,
+          ),
+        ],
       };
       if (numPr) {
         applyNumberingToParagraph(newP, numPr);
       } else {
         // Text-based fallback
-        const run = asArray(newP['w:r'] as XmlNode | XmlNode[] | undefined)[0];
+        const run = asArray(newP["w:r"] as XmlNode | XmlNode[] | undefined)[0];
         if (run) {
-          if (listType === 'numbered') prependNumberGlyphIfNeeded(newP);
+          if (listType === "numbered") prependNumberGlyphIfNeeded(newP);
           else prependBulletGlyphIfNeeded(newP);
         }
       }
@@ -1420,7 +1772,7 @@ export class DocxEditorService {
 
     // Replace the source paragraph with the new list paragraphs
     parsed.paragraphs.splice(xmlIndex, 1, ...newParagraphs);
-    parsed.body['w:p'] = parsed.paragraphs;
+    parsed.body["w:p"] = parsed.paragraphs;
 
     return this.rebuildZip(zip, parsed);
   }
@@ -1431,17 +1783,24 @@ export class DocxEditorService {
   async promoteOrDemoteListLevel(
     buffer: Buffer,
     paragraphId: string,
-    direction: 'promote' | 'demote',
+    direction: "promote" | "demote",
   ): Promise<Buffer> {
     return this.mutateParaInPlace(buffer, paragraphId, (paragraph) => {
       const pPr = ensureParagraphProps(paragraph);
-      const numPrNode = asArray(pPr['w:numPr'] as XmlNode | XmlNode[] | undefined)[0];
+      const numPrNode = asArray(
+        pPr["w:numPr"] as XmlNode | XmlNode[] | undefined,
+      )[0];
       if (!numPrNode) return; // Not a list item — no-op
 
-      const ilvlNode = asArray(numPrNode['w:ilvl'] as XmlNode | XmlNode[] | undefined)[0];
-      const current = Number(readAttr(ilvlNode, 'w:val', 'val') || '0');
-      const next = direction === 'promote' ? Math.max(0, current - 1) : Math.min(8, current + 1);
-      numPrNode['w:ilvl'] = [{ $: { 'w:val': String(next) } }];
+      const ilvlNode = asArray(
+        numPrNode["w:ilvl"] as XmlNode | XmlNode[] | undefined,
+      )[0];
+      const current = Number(readAttr(ilvlNode, "w:val", "val") || "0");
+      const next =
+        direction === "promote"
+          ? Math.max(0, current - 1)
+          : Math.min(8, current + 1);
+      numPrNode["w:ilvl"] = [{ $: { "w:val": String(next) } }];
     });
   }
 
@@ -1452,15 +1811,15 @@ export class DocxEditorService {
   async applyListFormatting(
     buffer: Buffer,
     paragraphId: string,
-    listType: 'bulleted' | 'numbered',
+    listType: "bulleted" | "numbered",
   ): Promise<Buffer> {
     const anchors = await this.anchorsService.extractParagraphNodes(buffer);
-    const anchor = anchors.find(a => a.paragraphId === paragraphId);
+    const anchor = anchors.find((a) => a.paragraphId === paragraphId);
     if (!anchor) throw new Error(`Paragraph target not found: ${paragraphId}`);
     // Re-apply the paragraph's own text with applyNumbering flags so the
     // existing numbering-aware logic in applyParagraphEdit handles everything.
     return this.applyParagraphEdit(buffer, paragraphId, anchor.text, {
-      format: 'plain',
+      format: "plain",
       applyNumbering: true,
       applyNumberingType: listType,
     });
@@ -1475,10 +1834,10 @@ export class DocxEditorService {
     paragraphId: string,
   ): Promise<Buffer> {
     const anchors = await this.anchorsService.extractParagraphNodes(buffer);
-    const anchor = anchors.find(a => a.paragraphId === paragraphId);
+    const anchor = anchors.find((a) => a.paragraphId === paragraphId);
     if (!anchor) throw new Error(`Paragraph target not found: ${paragraphId}`);
     return this.applyParagraphEdit(buffer, paragraphId, anchor.text, {
-      format: 'plain',
+      format: "plain",
       removeNumbering: true,
     });
   }
@@ -1494,54 +1853,66 @@ export class DocxEditorService {
     startAt = 1,
   ): Promise<Buffer> {
     const anchors = await this.anchorsService.extractParagraphNodes(buffer);
-    const targetAnchor = anchors.find(a => a.paragraphId === paragraphId);
-    if (!targetAnchor) throw new Error(`Paragraph target not found: ${paragraphId}`);
+    const targetAnchor = anchors.find((a) => a.paragraphId === paragraphId);
+    if (!targetAnchor)
+      throw new Error(`Paragraph target not found: ${paragraphId}`);
 
     const zip = new AdmZip(buffer);
-    const documentEntry = zip.getEntry('word/document.xml');
-    if (!documentEntry) throw new Error('Invalid DOCX: missing word/document.xml');
+    const documentEntry = zip.getEntry("word/document.xml");
+    if (!documentEntry)
+      throw new Error("Invalid DOCX: missing word/document.xml");
 
-    const documentXml = documentEntry.getData().toString('utf8');
+    const documentXml = documentEntry.getData().toString("utf8");
     const parsed = await parseDocumentXml(documentXml);
 
     const xmlIndex = findParagraphXmlIndex(targetAnchor, parsed.paragraphs);
-    if (xmlIndex < 0) throw new Error(`Unable to map paragraphId to XML paragraph: ${paragraphId}`);
+    if (xmlIndex < 0)
+      throw new Error(
+        `Unable to map paragraphId to XML paragraph: ${paragraphId}`,
+      );
 
     const paragraph = parsed.paragraphs[xmlIndex]!;
     const numPrInfo = readParagraphNumPr(paragraph);
     if (!numPrInfo) return buffer; // Not a list item — no-op
 
     const currentNumId = numPrInfo.numId;
-    const ilvl = numPrInfo.ilvl || '0';
+    const ilvl = numPrInfo.ilvl || "0";
 
     // Parse numbering.xml to find the abstractNumId for this numId
-    const xml2js = require('xml2js');
-    const parser = new xml2js.Parser({ explicitArray: true, preserveChildrenOrder: true });
+    const xml2js = require("xml2js");
+    const parser = new xml2js.Parser({
+      explicitArray: true,
+      preserveChildrenOrder: true,
+    });
 
-    let numberingEntry = zip.getEntry('word/numbering.xml');
+    let numberingEntry = zip.getEntry("word/numbering.xml");
     let numberingRoot: XmlNode;
     if (numberingEntry) {
-      const xml = numberingEntry.getData().toString('utf8');
+      const xml = numberingEntry.getData().toString("utf8");
       numberingRoot = xml.trim()
-        ? (await parser.parseStringPromise(xml)) as XmlNode
+        ? ((await parser.parseStringPromise(xml)) as XmlNode)
         : this.buildEmptyNumberingRoot();
     } else {
       numberingRoot = this.buildEmptyNumberingRoot();
     }
 
-    const numbering = asArray(numberingRoot['w:numbering'] as XmlNode | XmlNode[] | undefined)[0];
+    const numbering = asArray(
+      numberingRoot["w:numbering"] as XmlNode | XmlNode[] | undefined,
+    )[0];
     if (!numbering) return buffer;
 
     // Find the abstractNumId referenced by the current numId
-    const nums = asArray(numbering['w:num'] as XmlNode | XmlNode[] | undefined);
+    const nums = asArray(numbering["w:num"] as XmlNode | XmlNode[] | undefined);
     let abstractNumId: string | null = null;
     let maxNumId = 0;
     for (const num of nums) {
-      const nid = Number(readAttr(num, 'w:numId', 'numId') || '0');
+      const nid = Number(readAttr(num, "w:numId", "numId") || "0");
       if (nid > maxNumId) maxNumId = nid;
       if (String(nid) === currentNumId) {
-        const absNode = asArray(num['w:abstractNumId'] as XmlNode | XmlNode[] | undefined)[0];
-        abstractNumId = readAttr(absNode, 'w:val', 'val');
+        const absNode = asArray(
+          num["w:abstractNumId"] as XmlNode | XmlNode[] | undefined,
+        )[0];
+        abstractNumId = readAttr(absNode, "w:val", "val");
       }
     }
     if (!abstractNumId) return buffer; // Can't find definition — no-op
@@ -1549,24 +1920,26 @@ export class DocxEditorService {
     // Create a new w:num with lvlOverride that restarts at startAt
     const newNumId = String(maxNumId + 1);
     const newNum: XmlNode = {
-      $: { 'w:numId': newNumId },
-      'w:abstractNumId': [{ $: { 'w:val': abstractNumId } }],
-      'w:lvlOverride': [{
-        $: { 'w:ilvl': ilvl },
-        'w:startOverride': [{ $: { 'w:val': String(startAt) } }],
-      }],
+      $: { "w:numId": newNumId },
+      "w:abstractNumId": [{ $: { "w:val": abstractNumId } }],
+      "w:lvlOverride": [
+        {
+          $: { "w:ilvl": ilvl },
+          "w:startOverride": [{ $: { "w:val": String(startAt) } }],
+        },
+      ],
     };
 
-    if (!Array.isArray(numbering['w:num'])) numbering['w:num'] = nums;
-    (numbering['w:num'] as XmlNode[]).push(newNum);
+    if (!Array.isArray(numbering["w:num"])) numbering["w:num"] = nums;
+    (numbering["w:num"] as XmlNode[]).push(newNum);
 
     // Write updated numbering.xml
     const builder = new xml2js.Builder();
     const numberingXml = builder.buildObject(numberingRoot);
     if (numberingEntry) {
-      zip.updateFile('word/numbering.xml', Buffer.from(numberingXml, 'utf8'));
+      zip.updateFile("word/numbering.xml", Buffer.from(numberingXml, "utf8"));
     } else {
-      zip.addFile('word/numbering.xml', Buffer.from(numberingXml, 'utf8'));
+      zip.addFile("word/numbering.xml", Buffer.from(numberingXml, "utf8"));
       this.ensureContentTypeForNumbering(zip);
     }
 
@@ -1583,12 +1956,13 @@ export class DocxEditorService {
    */
   async updateTableOfContents(buffer: Buffer): Promise<Buffer> {
     const zip = new AdmZip(buffer);
-    const documentEntry = zip.getEntry('word/document.xml');
-    if (!documentEntry) throw new Error('Invalid DOCX: missing word/document.xml');
+    const documentEntry = zip.getEntry("word/document.xml");
+    if (!documentEntry)
+      throw new Error("Invalid DOCX: missing word/document.xml");
 
-    const documentXml = documentEntry.getData().toString('utf8');
+    const documentXml = documentEntry.getData().toString("utf8");
     // Check if there's a TOC field
-    if (!documentXml.includes('TOC') && !documentXml.includes('w:sdt')) {
+    if (!documentXml.includes("TOC") && !documentXml.includes("w:sdt")) {
       return buffer; // No TOC present
     }
 
@@ -1597,19 +1971,27 @@ export class DocxEditorService {
     // Find and mark TOC structured document tags as dirty
     let modified = false;
     const markDirty = (node: XmlNode): void => {
-      if (!node || typeof node !== 'object') return;
+      if (!node || typeof node !== "object") return;
       // Look for w:sdt (structured document tag) containing TOC
-      const sdtContent = asArray(node['w:sdtContent'] as XmlNode | XmlNode[] | undefined);
+      const sdtContent = asArray(
+        node["w:sdtContent"] as XmlNode | XmlNode[] | undefined,
+      );
       if (sdtContent.length > 0) {
-        const sdtPr = asArray(node['w:sdtPr'] as XmlNode | XmlNode[] | undefined)[0];
+        const sdtPr = asArray(
+          node["w:sdtPr"] as XmlNode | XmlNode[] | undefined,
+        )[0];
         if (sdtPr) {
-          const docPartObj = asArray(sdtPr['w:docPartObj'] as XmlNode | XmlNode[] | undefined)[0];
+          const docPartObj = asArray(
+            sdtPr["w:docPartObj"] as XmlNode | XmlNode[] | undefined,
+          )[0];
           if (docPartObj) {
-            const docPartGallery = asArray(docPartObj['w:docPartGallery'] as XmlNode | XmlNode[] | undefined)[0];
-            const galleryVal = readAttr(docPartGallery, 'w:val', 'val');
-            if (galleryVal && galleryVal.toLowerCase().includes('toc')) {
+            const docPartGallery = asArray(
+              docPartObj["w:docPartGallery"] as XmlNode | XmlNode[] | undefined,
+            )[0];
+            const galleryVal = readAttr(docPartGallery, "w:val", "val");
+            if (galleryVal && galleryVal.toLowerCase().includes("toc")) {
               // Mark the SDT as needing update
-              sdtPr['w:tag'] = [{ $: { 'w:val': 'TOC_DIRTY' } }];
+              sdtPr["w:tag"] = [{ $: { "w:val": "TOC_DIRTY" } }];
               modified = true;
             }
           }
@@ -1620,7 +2002,7 @@ export class DocxEditorService {
         const child = node[key];
         if (Array.isArray(child)) {
           for (const item of child) {
-            if (item && typeof item === 'object') markDirty(item as XmlNode);
+            if (item && typeof item === "object") markDirty(item as XmlNode);
           }
         }
       }
@@ -1630,7 +2012,7 @@ export class DocxEditorService {
 
     // Also look for fldChar-based TOC fields and mark the document settings
     // to update fields on open
-    if (!modified && documentXml.includes('TOC')) {
+    if (!modified && documentXml.includes("TOC")) {
       // There's a field-code TOC but no SDT.  Mark the document to update.
       modified = true;
     }
@@ -1638,15 +2020,15 @@ export class DocxEditorService {
     if (!modified) return buffer;
 
     // Mark the document to update fields on open via settings.xml
-    const settingsEntry = zip.getEntry('word/settings.xml');
+    const settingsEntry = zip.getEntry("word/settings.xml");
     if (settingsEntry) {
-      let settingsXml = settingsEntry.getData().toString('utf8');
-      if (!settingsXml.includes('w:updateFields')) {
+      let settingsXml = settingsEntry.getData().toString("utf8");
+      if (!settingsXml.includes("w:updateFields")) {
         settingsXml = settingsXml.replace(
-          '</w:settings>',
+          "</w:settings>",
           '<w:updateFields w:val="true"/></w:settings>',
         );
-        zip.updateFile('word/settings.xml', Buffer.from(settingsXml, 'utf8'));
+        zip.updateFile("word/settings.xml", Buffer.from(settingsXml, "utf8"));
       }
     }
 
@@ -1661,38 +2043,56 @@ export class DocxEditorService {
    * Delete a section: the heading paragraph + all paragraphs under it until
    * the next same-or-higher-level heading.
    */
-  async deleteSection(buffer: Buffer, headingParagraphId: string): Promise<Buffer> {
+  async deleteSection(
+    buffer: Buffer,
+    headingParagraphId: string,
+  ): Promise<Buffer> {
     const anchors = await this.anchorsService.extractParagraphNodes(buffer);
-    const headingAnchor = anchors.find(a => a.paragraphId === headingParagraphId);
-    if (!headingAnchor) throw new Error(`Heading paragraph not found: ${headingParagraphId}`);
-    if (!headingAnchor.headingLevel) throw new Error(`Paragraph is not a heading: ${headingParagraphId}`);
+    const headingAnchor = anchors.find(
+      (a) => a.paragraphId === headingParagraphId,
+    );
+    if (!headingAnchor)
+      throw new Error(`Heading paragraph not found: ${headingParagraphId}`);
+    if (!headingAnchor.headingLevel)
+      throw new Error(`Paragraph is not a heading: ${headingParagraphId}`);
 
     const zip = new AdmZip(buffer);
-    const documentEntry = zip.getEntry('word/document.xml');
-    if (!documentEntry) throw new Error('Invalid DOCX: missing word/document.xml');
+    const documentEntry = zip.getEntry("word/document.xml");
+    if (!documentEntry)
+      throw new Error("Invalid DOCX: missing word/document.xml");
 
-    const documentXml = documentEntry.getData().toString('utf8');
+    const documentXml = documentEntry.getData().toString("utf8");
     const parsed = await parseDocumentXml(documentXml);
 
-    const headingXmlIndex = findParagraphXmlIndex(headingAnchor, parsed.paragraphs);
-    if (headingXmlIndex < 0) throw new Error(`Unable to map heading to XML paragraph: ${headingParagraphId}`);
+    const headingXmlIndex = findParagraphXmlIndex(
+      headingAnchor,
+      parsed.paragraphs,
+    );
+    if (headingXmlIndex < 0)
+      throw new Error(
+        `Unable to map heading to XML paragraph: ${headingParagraphId}`,
+      );
 
     // Find the end of the section: next same-or-higher heading level
     const headingLevel = headingAnchor.headingLevel;
     let endIndex = parsed.paragraphs.length; // default: rest of document
     for (let i = headingXmlIndex + 1; i < parsed.paragraphs.length; i++) {
       const p = parsed.paragraphs[i];
-      const pPr = asArray(p['w:pPr'] as XmlNode | XmlNode[] | undefined)[0];
+      const pPr = asArray(p["w:pPr"] as XmlNode | XmlNode[] | undefined)[0];
       const styleName = getParagraphStyleName(p);
       const match = /(?:heading|título|title)[\s_-]?(\d+)/i.exec(styleName);
       let level: number | null = null;
       if (match) level = Number(match[1]);
       if (!level && pPr) {
-        const outlineLvl = asArray(pPr['w:outlineLvl'] as XmlNode | XmlNode[] | undefined)[0];
-        const attrs = (outlineLvl?.$ as Record<string, unknown> | undefined) ?? {};
-        const raw = attrs['w:val'] ?? attrs['val'];
+        const outlineLvl = asArray(
+          pPr["w:outlineLvl"] as XmlNode | XmlNode[] | undefined,
+        )[0];
+        const attrs =
+          (outlineLvl?.$ as Record<string, unknown> | undefined) ?? {};
+        const raw = attrs["w:val"] ?? attrs["val"];
         const numeric = Number(raw);
-        if (Number.isFinite(numeric) && numeric >= 0 && numeric <= 8) level = numeric + 1;
+        if (Number.isFinite(numeric) && numeric >= 0 && numeric <= 8)
+          level = numeric + 1;
       }
       if (level != null && level <= headingLevel) {
         endIndex = i;
@@ -1703,7 +2103,7 @@ export class DocxEditorService {
     // Delete from headingXmlIndex to endIndex (exclusive) in reverse
     const count = endIndex - headingXmlIndex;
     parsed.paragraphs.splice(headingXmlIndex, count);
-    parsed.body['w:p'] = parsed.paragraphs;
+    parsed.body["w:p"] = parsed.paragraphs;
 
     return this.rebuildZip(zip, parsed);
   }
@@ -1720,32 +2120,43 @@ export class DocxEditorService {
     validateInput(paragraphId, newText, opts);
 
     const anchors = await this.anchorsService.extractParagraphNodes(buffer);
-    const targetAnchor = anchors.find(a => a.paragraphId === paragraphId);
-    if (!targetAnchor) throw new Error(`Paragraph target not found: ${paragraphId}`);
+    const targetAnchor = anchors.find((a) => a.paragraphId === paragraphId);
+    if (!targetAnchor)
+      throw new Error(`Paragraph target not found: ${paragraphId}`);
 
     const zip = new AdmZip(buffer);
-    const documentEntry = zip.getEntry('word/document.xml');
-    if (!documentEntry) throw new Error('Invalid DOCX: missing word/document.xml');
+    const documentEntry = zip.getEntry("word/document.xml");
+    if (!documentEntry)
+      throw new Error("Invalid DOCX: missing word/document.xml");
 
-    const documentXml = documentEntry.getData().toString('utf8');
+    const documentXml = documentEntry.getData().toString("utf8");
     const parsed = await parseDocumentXml(documentXml);
 
     const xmlIndex = findParagraphXmlIndex(targetAnchor, parsed.paragraphs);
-    if (xmlIndex < 0) throw new Error(`Unable to map paragraphId to XML paragraph: ${paragraphId}`);
+    if (xmlIndex < 0)
+      throw new Error(
+        `Unable to map paragraphId to XML paragraph: ${paragraphId}`,
+      );
 
     const targetParagraph = parsed.paragraphs[xmlIndex];
-    const targetRuns = asArray(targetParagraph['w:r'] as XmlNode | XmlNode[] | undefined);
+    const targetRuns = asArray(
+      targetParagraph["w:r"] as XmlNode | XmlNode[] | undefined,
+    );
     const firstRunProps = targetRuns[0]
-      ? asArray(targetRuns[0]['w:rPr'] as XmlNode | XmlNode[] | undefined)[0]
+      ? asArray(targetRuns[0]["w:rPr"] as XmlNode | XmlNode[] | undefined)[0]
       : undefined;
 
-    const afterText = normalizeWhitespace(opts?.format === 'html' ? richHtmlToPlainText(newText) : newText);
+    const afterText = normalizeWhitespace(
+      opts?.format === "html" ? richHtmlToPlainText(newText) : newText,
+    );
     const replacementRuns =
-      opts?.format === 'html' ? buildRunsFromRichHtml(newText, firstRunProps) : [buildReplacementRun(afterText, firstRunProps)];
-    const newParagraph: XmlNode = { 'w:r': replacementRuns };
+      opts?.format === "html"
+        ? buildRunsFromRichHtml(newText, firstRunProps)
+        : [buildReplacementRun(afterText, firstRunProps)];
+    const newParagraph: XmlNode = { "w:r": replacementRuns };
 
     parsed.paragraphs.splice(xmlIndex, 0, newParagraph);
-    parsed.body['w:p'] = parsed.paragraphs;
+    parsed.body["w:p"] = parsed.paragraphs;
 
     return this.rebuildZip(zip, parsed);
   }
@@ -1762,23 +2173,32 @@ export class DocxEditorService {
   private async mutateParaInPlace(
     buffer: Buffer,
     paragraphId: string,
-    mutator: (paragraph: XmlNode, xmlIndex: number, parsed: ParsedDocumentXml) => void,
+    mutator: (
+      paragraph: XmlNode,
+      xmlIndex: number,
+      parsed: ParsedDocumentXml,
+    ) => void,
   ): Promise<Buffer> {
-    if (!paragraphId.trim()) throw new Error('paragraphId is required');
+    if (!paragraphId.trim()) throw new Error("paragraphId is required");
 
     const anchors = await this.anchorsService.extractParagraphNodes(buffer);
-    const targetAnchor = anchors.find(a => a.paragraphId === paragraphId);
-    if (!targetAnchor) throw new Error(`Paragraph target not found: ${paragraphId}`);
+    const targetAnchor = anchors.find((a) => a.paragraphId === paragraphId);
+    if (!targetAnchor)
+      throw new Error(`Paragraph target not found: ${paragraphId}`);
 
     const zip = new AdmZip(buffer);
-    const documentEntry = zip.getEntry('word/document.xml');
-    if (!documentEntry) throw new Error('Invalid DOCX: missing word/document.xml');
+    const documentEntry = zip.getEntry("word/document.xml");
+    if (!documentEntry)
+      throw new Error("Invalid DOCX: missing word/document.xml");
 
-    const documentXml = documentEntry.getData().toString('utf8');
+    const documentXml = documentEntry.getData().toString("utf8");
     const parsed = await parseDocumentXml(documentXml);
 
     const xmlIndex = findParagraphXmlIndex(targetAnchor, parsed.paragraphs);
-    if (xmlIndex < 0) throw new Error(`Unable to map paragraphId to XML paragraph: ${paragraphId}`);
+    if (xmlIndex < 0)
+      throw new Error(
+        `Unable to map paragraphId to XML paragraph: ${paragraphId}`,
+      );
 
     mutator(parsed.paragraphs[xmlIndex], xmlIndex, parsed);
 
@@ -1787,15 +2207,16 @@ export class DocxEditorService {
 
   /** Serialize parsed XML back into the ZIP and return a verified buffer. */
   private rebuildZip(zip: AdmZip, parsed: ParsedDocumentXml): Buffer {
-    const xml2js = require('xml2js');
+    const xml2js = require("xml2js");
     const builder = new xml2js.Builder();
     const nextDocumentXml = builder.buildObject(parsed.parsedRoot);
-    zip.updateFile('word/document.xml', Buffer.from(nextDocumentXml, 'utf8'));
+    zip.updateFile("word/document.xml", Buffer.from(nextDocumentXml, "utf8"));
     const outputBuffer = zip.toBuffer();
 
     const verificationZip = new AdmZip(outputBuffer);
-    const verificationEntry = verificationZip.getEntry('word/document.xml');
-    if (!verificationEntry) throw new Error('DOCX integrity check failed: missing word/document.xml');
+    const verificationEntry = verificationZip.getEntry("word/document.xml");
+    if (!verificationEntry)
+      throw new Error("DOCX integrity check failed: missing word/document.xml");
     return outputBuffer;
   }
 
@@ -1804,16 +2225,22 @@ export class DocxEditorService {
    * Creates numbering.xml if it doesn't exist, adds abstractNum + num entries.
    * Returns the new numId on success, null on failure.
    */
-  private async ensureNumberingDefinition(zip: AdmZip, listType: 'bulleted' | 'numbered'): Promise<string | null> {
-    const xml2js = require('xml2js');
-    const parser = new xml2js.Parser({ explicitArray: true, preserveChildrenOrder: true });
+  private async ensureNumberingDefinition(
+    zip: AdmZip,
+    listType: "bulleted" | "numbered",
+  ): Promise<string | null> {
+    const xml2js = require("xml2js");
+    const parser = new xml2js.Parser({
+      explicitArray: true,
+      preserveChildrenOrder: true,
+    });
     const builder = new xml2js.Builder();
 
-    let numberingEntry = zip.getEntry('word/numbering.xml');
+    let numberingEntry = zip.getEntry("word/numbering.xml");
     let root: XmlNode;
 
     if (numberingEntry) {
-      const xml = numberingEntry.getData().toString('utf8');
+      const xml = numberingEntry.getData().toString("utf8");
       if (xml.trim()) {
         root = (await parser.parseStringPromise(xml)) as XmlNode;
       } else {
@@ -1823,69 +2250,112 @@ export class DocxEditorService {
       root = this.buildEmptyNumberingRoot();
     }
 
-    const numbering = asArray(root['w:numbering'] as XmlNode | XmlNode[] | undefined)[0];
+    const numbering = asArray(
+      root["w:numbering"] as XmlNode | XmlNode[] | undefined,
+    )[0];
     if (!numbering) return null;
 
     // Find max abstractNumId and numId
-    const abstractNums = asArray(numbering['w:abstractNum'] as XmlNode | XmlNode[] | undefined);
-    const nums = asArray(numbering['w:num'] as XmlNode | XmlNode[] | undefined);
+    const abstractNums = asArray(
+      numbering["w:abstractNum"] as XmlNode | XmlNode[] | undefined,
+    );
+    const nums = asArray(numbering["w:num"] as XmlNode | XmlNode[] | undefined);
     let maxAbsId = 0;
     for (const abs of abstractNums) {
-      const id = Number(readAttr(abs, 'w:abstractNumId', 'abstractNumId'));
+      const id = Number(readAttr(abs, "w:abstractNumId", "abstractNumId"));
       if (id > maxAbsId) maxAbsId = id;
     }
     let maxNumId = 0;
     for (const num of nums) {
-      const id = Number(readAttr(num, 'w:numId', 'numId'));
+      const id = Number(readAttr(num, "w:numId", "numId"));
       if (id > maxNumId) maxNumId = id;
     }
 
     const newAbsId = String(maxAbsId + 1);
     const newNumId = String(maxNumId + 1);
 
-    const numFmt = listType === 'numbered' ? 'decimal' : 'bullet';
-    const lvlText = listType === 'numbered' ? '%1.' : '\u2022';
+    const numFmt = listType === "numbered" ? "decimal" : "bullet";
+    const lvlText = listType === "numbered" ? "%1." : "\u2022";
 
     // Create abstractNum with 9 levels
     const levels: XmlNode[] = [];
     for (let i = 0; i < 9; i++) {
       const lvl: XmlNode = {
-        $: { 'w:ilvl': String(i) },
-        'w:start': [{ $: { 'w:val': '1' } }],
-        'w:numFmt': [{ $: { 'w:val': i === 0 ? numFmt : (listType === 'numbered' ? 'lowerLetter' : 'bullet') } }],
-        'w:lvlText': [{ $: { 'w:val': i === 0 ? lvlText : (listType === 'numbered' ? `%${i + 1}.` : '\u25E6') } }],
-        'w:lvlJc': [{ $: { 'w:val': 'left' } }],
-        'w:pPr': [{
-          'w:ind': [{ $: { 'w:left': String(720 * (i + 1)), 'w:hanging': '360' } }],
-        }],
+        $: { "w:ilvl": String(i) },
+        "w:start": [{ $: { "w:val": "1" } }],
+        "w:numFmt": [
+          {
+            $: {
+              "w:val":
+                i === 0
+                  ? numFmt
+                  : listType === "numbered"
+                    ? "lowerLetter"
+                    : "bullet",
+            },
+          },
+        ],
+        "w:lvlText": [
+          {
+            $: {
+              "w:val":
+                i === 0
+                  ? lvlText
+                  : listType === "numbered"
+                    ? `%${i + 1}.`
+                    : "\u25E6",
+            },
+          },
+        ],
+        "w:lvlJc": [{ $: { "w:val": "left" } }],
+        "w:pPr": [
+          {
+            "w:ind": [
+              { $: { "w:left": String(720 * (i + 1)), "w:hanging": "360" } },
+            ],
+          },
+        ],
       };
-      if (listType === 'bulleted') {
-        lvl['w:rPr'] = [{ 'w:rFonts': [{ $: { 'w:ascii': 'Symbol', 'w:hAnsi': 'Symbol', 'w:hint': 'default' } }] }];
+      if (listType === "bulleted") {
+        lvl["w:rPr"] = [
+          {
+            "w:rFonts": [
+              {
+                $: {
+                  "w:ascii": "Symbol",
+                  "w:hAnsi": "Symbol",
+                  "w:hint": "default",
+                },
+              },
+            ],
+          },
+        ];
       }
       levels.push(lvl);
     }
 
     const newAbstractNum: XmlNode = {
-      $: { 'w:abstractNumId': newAbsId },
-      'w:lvl': levels,
+      $: { "w:abstractNumId": newAbsId },
+      "w:lvl": levels,
     };
 
     const newNum: XmlNode = {
-      $: { 'w:numId': newNumId },
-      'w:abstractNumId': [{ $: { 'w:val': newAbsId } }],
+      $: { "w:numId": newNumId },
+      "w:abstractNumId": [{ $: { "w:val": newAbsId } }],
     };
 
     // Append to numbering
-    if (!Array.isArray(numbering['w:abstractNum'])) numbering['w:abstractNum'] = abstractNums;
-    (numbering['w:abstractNum'] as XmlNode[]).push(newAbstractNum);
-    if (!Array.isArray(numbering['w:num'])) numbering['w:num'] = nums;
-    (numbering['w:num'] as XmlNode[]).push(newNum);
+    if (!Array.isArray(numbering["w:abstractNum"]))
+      numbering["w:abstractNum"] = abstractNums;
+    (numbering["w:abstractNum"] as XmlNode[]).push(newAbstractNum);
+    if (!Array.isArray(numbering["w:num"])) numbering["w:num"] = nums;
+    (numbering["w:num"] as XmlNode[]).push(newNum);
 
     const numberingXml = builder.buildObject(root);
     if (numberingEntry) {
-      zip.updateFile('word/numbering.xml', Buffer.from(numberingXml, 'utf8'));
+      zip.updateFile("word/numbering.xml", Buffer.from(numberingXml, "utf8"));
     } else {
-      zip.addFile('word/numbering.xml', Buffer.from(numberingXml, 'utf8'));
+      zip.addFile("word/numbering.xml", Buffer.from(numberingXml, "utf8"));
       // Also ensure numbering.xml is referenced in [Content_Types].xml
       this.ensureContentTypeForNumbering(zip);
     }
@@ -1895,26 +2365,31 @@ export class DocxEditorService {
 
   private buildEmptyNumberingRoot(): XmlNode {
     return {
-      'w:numbering': [{
-        $: {
-          'xmlns:w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main',
-          'xmlns:r': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships',
+      "w:numbering": [
+        {
+          $: {
+            "xmlns:w":
+              "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
+            "xmlns:r":
+              "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
+          },
+          "w:abstractNum": [],
+          "w:num": [],
         },
-        'w:abstractNum': [],
-        'w:num': [],
-      }],
+      ],
     };
   }
 
   private ensureContentTypeForNumbering(zip: AdmZip): void {
-    const ctEntry = zip.getEntry('[Content_Types].xml');
+    const ctEntry = zip.getEntry("[Content_Types].xml");
     if (!ctEntry) return;
-    let ct = ctEntry.getData().toString('utf8');
-    if (ct.includes('numbering.xml')) return;
+    let ct = ctEntry.getData().toString("utf8");
+    if (ct.includes("numbering.xml")) return;
     // Add Override before the closing Types tag
-    const override = '<Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>';
-    ct = ct.replace('</Types>', `${override}</Types>`);
-    zip.updateFile('[Content_Types].xml', Buffer.from(ct, 'utf8'));
+    const override =
+      '<Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>';
+    ct = ct.replace("</Types>", `${override}</Types>`);
+    zip.updateFile("[Content_Types].xml", Buffer.from(ct, "utf8"));
   }
 
   /**
@@ -1925,32 +2400,38 @@ export class DocxEditorService {
     buffer: Buffer,
     paragraphId: string,
     newText: string,
-    opts?: (DocxContentOpts & { removeNumbering?: boolean }),
+    opts?: DocxContentOpts & { removeNumbering?: boolean },
   ): Promise<Buffer> {
     validateInput(paragraphId, newText, opts);
 
     const anchors = await this.anchorsService.extractParagraphNodes(buffer);
-    const targetAnchor = anchors.find(anchor => anchor.paragraphId === paragraphId);
+    const targetAnchor = anchors.find(
+      (anchor) => anchor.paragraphId === paragraphId,
+    );
     if (!targetAnchor) {
       throw new Error(`Paragraph target not found: ${paragraphId}`);
     }
 
     const zip = new AdmZip(buffer);
-    const documentEntry = zip.getEntry('word/document.xml');
+    const documentEntry = zip.getEntry("word/document.xml");
     if (!documentEntry) {
-      throw new Error('Invalid DOCX: missing word/document.xml');
+      throw new Error("Invalid DOCX: missing word/document.xml");
     }
 
-    const documentXml = documentEntry.getData().toString('utf8');
+    const documentXml = documentEntry.getData().toString("utf8");
     const parsed = await parseDocumentXml(documentXml);
 
     const xmlIndex = findParagraphXmlIndex(targetAnchor, parsed.paragraphs);
     if (xmlIndex < 0) {
-      throw new Error(`Unable to map paragraphId to XML paragraph: ${paragraphId}`);
+      throw new Error(
+        `Unable to map paragraphId to XML paragraph: ${paragraphId}`,
+      );
     }
 
     const targetParagraph = parsed.paragraphs[xmlIndex];
-    const targetPPrRaw = asArray(targetParagraph['w:pPr'] as XmlNode | XmlNode[] | undefined)[0];
+    const targetPPrRaw = asArray(
+      targetParagraph["w:pPr"] as XmlNode | XmlNode[] | undefined,
+    )[0];
     // When inserting after a list/bullet paragraph, callers often want a normal paragraph
     // (not another list item). Best-effort: remove numbering props from the cloned pPr.
     const targetPPr = (() => {
@@ -1958,42 +2439,50 @@ export class DocxEditorService {
       if (!opts?.removeNumbering) return targetPPrRaw;
       try {
         const clone: any = JSON.parse(JSON.stringify(targetPPrRaw));
-        delete clone['w:numPr'];
+        delete clone["w:numPr"];
         return clone as any;
       } catch {
         return targetPPrRaw;
       }
     })();
-    const targetRuns = asArray(targetParagraph['w:r'] as XmlNode | XmlNode[] | undefined);
+    const targetRuns = asArray(
+      targetParagraph["w:r"] as XmlNode | XmlNode[] | undefined,
+    );
     const firstRunProps = targetRuns[0]
-      ? asArray(targetRuns[0]['w:rPr'] as XmlNode | XmlNode[] | undefined)[0]
+      ? asArray(targetRuns[0]["w:rPr"] as XmlNode | XmlNode[] | undefined)[0]
       : undefined;
 
-    const afterText = normalizeWhitespace(opts?.format === "html" ? richHtmlToPlainText(newText) : newText);
+    const afterText = normalizeWhitespace(
+      opts?.format === "html" ? richHtmlToPlainText(newText) : newText,
+    );
     const replacementRuns =
-      opts?.format === "html" ? buildRunsFromRichHtml(newText, firstRunProps) : [buildReplacementRun(afterText, firstRunProps)];
+      opts?.format === "html"
+        ? buildRunsFromRichHtml(newText, firstRunProps)
+        : [buildReplacementRun(afterText, firstRunProps)];
     const newParagraph: XmlNode = {
-      ...(targetPPr ? { 'w:pPr': [targetPPr] } : {}),
-      'w:r': replacementRuns,
+      ...(targetPPr ? { "w:pPr": [targetPPr] } : {}),
+      "w:r": replacementRuns,
     };
 
     // Insert into the body paragraph array.
     parsed.paragraphs.splice(xmlIndex + 1, 0, newParagraph);
     // Ensure the body node sees the updated paragraph list.
-    parsed.body['w:p'] = parsed.paragraphs;
+    parsed.body["w:p"] = parsed.paragraphs;
 
-    const xml2js = require('xml2js');
+    const xml2js = require("xml2js");
     const builder = new xml2js.Builder();
     const nextDocumentXml = builder.buildObject(parsed.parsedRoot);
 
-    zip.updateFile('word/document.xml', Buffer.from(nextDocumentXml, 'utf8'));
+    zip.updateFile("word/document.xml", Buffer.from(nextDocumentXml, "utf8"));
     const outputBuffer = zip.toBuffer();
 
     // Integrity check
     const verificationZip = new AdmZip(outputBuffer);
-    const verificationEntry = verificationZip.getEntry('word/document.xml');
+    const verificationEntry = verificationZip.getEntry("word/document.xml");
     if (!verificationEntry) {
-      throw new Error('DOCX integrity check failed after insert: missing word/document.xml');
+      throw new Error(
+        "DOCX integrity check failed after insert: missing word/document.xml",
+      );
     }
 
     return outputBuffer;

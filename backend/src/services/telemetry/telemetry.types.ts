@@ -115,6 +115,7 @@ export interface UsageEventCreate {
     | "CONVERSATION_CREATED"
     | "ALLYBI_VISIT_STARTED"
     | "ALLYBI_PUBLIC_VISIT_STARTED"
+    | "ALLYBI_AD_CLICKED"
     | "ALLYBI_OPEN_CLICKED"
     | "ALLYBI_SUGGESTION_CLICKED"
     | "ALLYBI_MESSAGE_SENT"
@@ -230,7 +231,16 @@ export interface IngestionEventCreate {
   status: TelemetryStatus;
   errorCode?: string | null;
 
-  extractionMethod?: "pdf_parse" | "ocr" | "docx" | "xlsx" | "pptx" | "text" | "image" | "unknown" | null;
+  extractionMethod?:
+    | "pdf_parse"
+    | "ocr"
+    | "docx"
+    | "xlsx"
+    | "pptx"
+    | "text"
+    | "image"
+    | "unknown"
+    | null;
 
   pages?: number | null;
   ocrUsed?: boolean | null;

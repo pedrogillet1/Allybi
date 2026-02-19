@@ -3,9 +3,13 @@
  * Calculate user retention cohorts from real data
  */
 
-import type { PrismaClient } from '@prisma/client';
-import { parseRange, normalizeRange, type TimeWindow } from './_shared/rangeWindow';
-import { supportsModel } from './_shared/prismaAdapter';
+import type { PrismaClient } from "@prisma/client";
+import {
+  parseRange,
+  normalizeRange,
+  type TimeWindow,
+} from "./_shared/rangeWindow";
+import { supportsModel } from "./_shared/prismaAdapter";
 
 export interface CohortRow {
   cohort: string;
@@ -38,9 +42,9 @@ export interface CohortsResult {
  */
 export async function getCohorts(
   prisma: PrismaClient,
-  params: { range?: string }
+  params: { range?: string },
 ): Promise<CohortsResult> {
-  const rangeKey = normalizeRange(params.range, '90d');
+  const rangeKey = normalizeRange(params.range, "90d");
   const window = parseRange(rangeKey);
   const { from, to } = window;
 
@@ -57,7 +61,7 @@ export async function getCohorts(
     },
   };
 
-  if (!supportsModel(prisma, 'user')) {
+  if (!supportsModel(prisma, "user")) {
     return emptyResult;
   }
 
@@ -78,10 +82,13 @@ export async function getCohorts(
   }
 
   // Group users by signup week
-  const cohortMap = new Map<string, {
-    cohortStart: Date;
-    userIds: string[];
-  }>();
+  const cohortMap = new Map<
+    string,
+    {
+      cohortStart: Date;
+      userIds: string[];
+    }
+  >();
 
   for (const user of users) {
     const weekStart = getWeekStart(user.createdAt);
@@ -106,10 +113,34 @@ export async function getCohorts(
 
     // Calculate retention at each week mark
     const week0 = 100; // All users are active in week 0 by definition
-    const week1 = await calculateRetention(prisma, userIds, cohortStart, 1, now);
-    const week2 = await calculateRetention(prisma, userIds, cohortStart, 2, now);
-    const week3 = await calculateRetention(prisma, userIds, cohortStart, 3, now);
-    const week4 = await calculateRetention(prisma, userIds, cohortStart, 4, now);
+    const week1 = await calculateRetention(
+      prisma,
+      userIds,
+      cohortStart,
+      1,
+      now,
+    );
+    const week2 = await calculateRetention(
+      prisma,
+      userIds,
+      cohortStart,
+      2,
+      now,
+    );
+    const week3 = await calculateRetention(
+      prisma,
+      userIds,
+      cohortStart,
+      3,
+      now,
+    );
+    const week4 = await calculateRetention(
+      prisma,
+      userIds,
+      cohortStart,
+      4,
+      now,
+    );
 
     cohorts.push({
       cohort: cohortKey,
@@ -130,16 +161,24 @@ export async function getCohorts(
   const recentCohorts = cohorts.slice(0, 8);
 
   // Calculate summary
-  const cohortsWithWeek1 = recentCohorts.filter(c => c.week1 >= 0);
-  const cohortsWithWeek4 = recentCohorts.filter(c => c.week4 >= 0);
+  const cohortsWithWeek1 = recentCohorts.filter((c) => c.week1 >= 0);
+  const cohortsWithWeek4 = recentCohorts.filter((c) => c.week4 >= 0);
 
-  const avgWeek1Retention = cohortsWithWeek1.length > 0
-    ? Math.round(cohortsWithWeek1.reduce((sum, c) => sum + c.week1, 0) / cohortsWithWeek1.length)
-    : 0;
+  const avgWeek1Retention =
+    cohortsWithWeek1.length > 0
+      ? Math.round(
+          cohortsWithWeek1.reduce((sum, c) => sum + c.week1, 0) /
+            cohortsWithWeek1.length,
+        )
+      : 0;
 
-  const avgWeek4Retention = cohortsWithWeek4.length > 0
-    ? Math.round(cohortsWithWeek4.reduce((sum, c) => sum + c.week4, 0) / cohortsWithWeek4.length)
-    : 0;
+  const avgWeek4Retention =
+    cohortsWithWeek4.length > 0
+      ? Math.round(
+          cohortsWithWeek4.reduce((sum, c) => sum + c.week4, 0) /
+            cohortsWithWeek4.length,
+        )
+      : 0;
 
   const totalUsers = recentCohorts.reduce((sum, c) => sum + c.users, 0);
 
@@ -172,7 +211,7 @@ function getWeekStart(date: Date): Date {
  * Format cohort key as "Mon W#" (e.g., "Jan W1", "Feb W2")
  */
 function formatCohortKey(date: Date): string {
-  const month = date.toLocaleDateString('en-US', { month: 'short' });
+  const month = date.toLocaleDateString("en-US", { month: "short" });
   const weekOfMonth = Math.ceil(date.getDate() / 7);
   return `${month} W${weekOfMonth}`;
 }
@@ -186,9 +225,10 @@ async function calculateRetention(
   userIds: string[],
   cohortStart: Date,
   weekNumber: number,
-  now: Date
+  now: Date,
 ): Promise<number> {
-  const weekStartMs = cohortStart.getTime() + weekNumber * 7 * 24 * 60 * 60 * 1000;
+  const weekStartMs =
+    cohortStart.getTime() + weekNumber * 7 * 24 * 60 * 60 * 1000;
   const weekEndMs = weekStartMs + 7 * 24 * 60 * 60 * 1000;
 
   // If this week hasn't started yet, return -1
@@ -201,35 +241,41 @@ async function calculateRetention(
 
   // Count active users in this week
   // Check for activity in Conversation table (most reliable indicator)
-  if (supportsModel(prisma, 'conversation')) {
+  if (supportsModel(prisma, "conversation")) {
     const activeUsers = await prisma.conversation.groupBy({
-      by: ['userId'],
+      by: ["userId"],
       where: {
         userId: { in: userIds },
         updatedAt: { gte: weekStart, lt: weekEnd },
       },
     });
 
-    const retentionPct = Math.round((activeUsers.length / userIds.length) * 100);
+    const retentionPct = Math.round(
+      (activeUsers.length / userIds.length) * 100,
+    );
     return retentionPct;
   }
 
   // Fallback: check Message table
-  if (supportsModel(prisma, 'message')) {
+  if (supportsModel(prisma, "message")) {
     const messages = await prisma.message.findMany({
       where: {
         createdAt: { gte: weekStart, lt: weekEnd },
-        role: 'user',
+        role: "user",
         conversation: {
           userId: { in: userIds },
         },
       },
       select: { conversation: { select: { userId: true } } },
-      distinct: ['conversationId'],
+      distinct: ["conversationId"],
     });
 
-    const activeUserIds = new Set(messages.map(m => m.conversation?.userId).filter(Boolean));
-    const retentionPct = Math.round((activeUserIds.size / userIds.length) * 100);
+    const activeUserIds = new Set(
+      messages.map((m) => m.conversation?.userId).filter(Boolean),
+    );
+    const retentionPct = Math.round(
+      (activeUserIds.size / userIds.length) * 100,
+    );
     return retentionPct;
   }
 

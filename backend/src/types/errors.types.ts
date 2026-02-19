@@ -88,10 +88,22 @@ export class ApiError extends Error {
  */
 export const Errors = {
   badRequest: (message = "Bad request", details?: any) =>
-    new ApiError({ code: "bad_request", message, status: 400, details, expose: true }),
+    new ApiError({
+      code: "bad_request",
+      message,
+      status: 400,
+      details,
+      expose: true,
+    }),
 
   validation: (message = "Validation error", details?: any) =>
-    new ApiError({ code: "validation_error", message, status: 400, details, expose: true }),
+    new ApiError({
+      code: "validation_error",
+      message,
+      status: 400,
+      details,
+      expose: true,
+    }),
 
   unauthorized: (message = "Unauthorized") =>
     new ApiError({ code: "unauthorized", message, status: 401, expose: true }),
@@ -100,14 +112,38 @@ export const Errors = {
     new ApiError({ code: "forbidden", message, status: 403, expose: true }),
 
   notFound: (message = "Not found", details?: any) =>
-    new ApiError({ code: "not_found", message, status: 404, details, expose: true }),
+    new ApiError({
+      code: "not_found",
+      message,
+      status: 404,
+      details,
+      expose: true,
+    }),
 
   conflict: (message = "Conflict", details?: any) =>
-    new ApiError({ code: "conflict", message, status: 409, details, expose: true }),
+    new ApiError({
+      code: "conflict",
+      message,
+      status: 409,
+      details,
+      expose: true,
+    }),
 
   rateLimited: (message = "Rate limited", details?: any) =>
-    new ApiError({ code: "rate_limited", message, status: 429, details, expose: true }),
+    new ApiError({
+      code: "rate_limited",
+      message,
+      status: 429,
+      details,
+      expose: true,
+    }),
 
   internal: (message = "Request failed", details?: any) =>
-    new ApiError({ code: "internal_error", message, status: 500, details, expose: false }),
+    new ApiError({
+      code: "internal_error",
+      message,
+      status: 500,
+      details,
+      expose: false,
+    }),
 };

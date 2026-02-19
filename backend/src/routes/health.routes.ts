@@ -85,8 +85,10 @@ router.get("/version", (_req: Request, res: Response) => {
 /**
  * Error boundary (router-level)
  */
-router.use((err: unknown, _req: Request, _res: Response, next: NextFunction) => {
-  next(err);
-});
+router.use(
+  (err: unknown, _req: Request, _res: Response, next: NextFunction) => {
+    next(err);
+  },
+);
 
 export default router;

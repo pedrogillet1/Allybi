@@ -68,17 +68,26 @@ export class ComposePromptBuilder {
     let base = "";
     if (bank?.config?.content) base = localizedText(bank.config.content, lang);
     else if (Array.isArray(bank?.config?.messages)) {
-      const dev = bank.config.messages.find((m: any) => (m.role ?? "developer") === "developer");
+      const dev = bank.config.messages.find(
+        (m: any) => (m.role ?? "developer") === "developer",
+      );
       if (dev) base = localizedText(dev.content, lang);
     } else if (Array.isArray(bank?.templates)) {
-      const t = bank.templates.find((t: any) => t.id === "compose_answer") ?? bank.templates[0];
-      const dev = t?.messages?.find((m: any) => (m.role ?? "developer") === "developer");
+      const t =
+        bank.templates.find((t: any) => t.id === "compose_answer") ??
+        bank.templates[0];
+      const dev = t?.messages?.find(
+        (m: any) => (m.role ?? "developer") === "developer",
+      );
       if (dev) base = localizedText(dev.content, lang);
     } else {
       base = bank?._meta?.description ?? "";
     }
 
-    const maxQuestions = typeof ctx.maxQuestions === "number" ? Math.max(0, Math.min(2, ctx.maxQuestions)) : 1;
+    const maxQuestions =
+      typeof ctx.maxQuestions === "number"
+        ? Math.max(0, Math.min(2, ctx.maxQuestions))
+        : 1;
 
     // Strict compose contract (internal instructions)
     const contract = [
@@ -100,16 +109,19 @@ export class ComposePromptBuilder {
       contract.push(
         "QUOTE_MODE:",
         "- Provide short, exact excerpts only when evidence contains the exact wording.",
-        "- Keep quotes concise; attribute each quote to its source location."
+        "- Keep quotes concise; attribute each quote to its source location.",
       );
     }
 
-    if (ctx.answerMode === "doc_grounded_table" || ctx.formatBias?.preferTables) {
+    if (
+      ctx.answerMode === "doc_grounded_table" ||
+      ctx.formatBias?.preferTables
+    ) {
       contract.push(
         "TABLE_MODE:",
         "- Use GitHub-flavored markdown tables.",
         "- Include a header row and separator row.",
-        "- Keep table compact; summarize after table if needed."
+        "- Keep table compact; summarize after table if needed.",
       );
     }
 
@@ -118,7 +130,7 @@ export class ComposePromptBuilder {
         "COMPARE_MODE:",
         "- Compare across documents; do not collapse everything into one doc.",
         "- Use a table when it improves clarity.",
-        "- Only compare items that appear in evidence."
+        "- Only compare items that appear in evidence.",
       );
     }
 
@@ -131,7 +143,11 @@ export class ComposePromptBuilder {
       evidenceUniqueDocs: ctx.evidenceSummary?.uniqueDocs ?? "",
     };
 
-    const final = normalizeWs([contract.join("\n"), interpolate(base, slots)].filter(Boolean).join("\n\n"));
+    const final = normalizeWs(
+      [contract.join("\n"), interpolate(base, slots)]
+        .filter(Boolean)
+        .join("\n\n"),
+    );
 
     return {
       role: "developer",

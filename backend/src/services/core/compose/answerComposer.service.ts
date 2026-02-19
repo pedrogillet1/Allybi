@@ -65,7 +65,13 @@ export interface ComposerContext {
 
   // constraints from upstream (format parser, answer_style_policy selection, etc.)
   constraints?: {
-    outputShape?: "paragraph" | "bullets" | "steps" | "table" | "file_list" | "button_only";
+    outputShape?:
+      | "paragraph"
+      | "bullets"
+      | "steps"
+      | "table"
+      | "file_list"
+      | "button_only";
     exactBulletCount?: number;
     maxSentences?: number;
     userRequestedShort?: boolean;
@@ -128,7 +134,13 @@ export interface ComposeOutput {
 // Banks (minimal contracts used by this service)
 // -----------------------------------------------------------------------------
 
-type StyleProfile = "micro" | "brief" | "concise" | "standard" | "detailed" | "deep";
+type StyleProfile =
+  | "micro"
+  | "brief"
+  | "concise"
+  | "standard"
+  | "detailed"
+  | "deep";
 
 interface AnswerStylePolicyBank {
   _meta: any;
@@ -145,7 +157,11 @@ interface AnswerStylePolicyBank {
         maxQuoteLines: number;
         maxQuestions: number;
       };
-      behavior: { intro: "never" | "always" | "usually"; conclusion: "never" | "always" | "usually"; allowFollowup: boolean };
+      behavior: {
+        intro: "never" | "always" | "usually";
+        conclusion: "never" | "always" | "usually";
+        allowFollowup: boolean;
+      };
     }
   >;
   blockPlanner: {
@@ -174,7 +190,11 @@ interface MicrocopyBank {
     {
       weight?: number;
       messages?: Array<{ id: string; text: string }>;
-      details?: Array<{ id: string; text: string; useOnlyIfProvided?: boolean }>;
+      details?: Array<{
+        id: string;
+        text: string;
+        useOnlyIfProvided?: boolean;
+      }>;
       nextSteps?: Array<{ id: string; text: string }>;
     }
   >;
@@ -186,8 +206,16 @@ interface MicrocopyBank {
 
 import * as crypto from "crypto";
 
-function makeVariationSeed(conversationId: string, turnId: string, regenCount: number): string {
-  return crypto.createHash("sha256").update(`${conversationId}:${turnId}:${regenCount}`).digest("hex").slice(0, 12);
+function makeVariationSeed(
+  conversationId: string,
+  turnId: string,
+  regenCount: number,
+): string {
+  return crypto
+    .createHash("sha256")
+    .update(`${conversationId}:${turnId}:${regenCount}`)
+    .digest("hex")
+    .slice(0, 12);
 }
 
 function seededRand(seed: string): () => number {
@@ -224,7 +252,9 @@ export class AnswerComposerService {
 
     // microcopy/fallback banks
     this.noDocsBank = getBank<MicrocopyBank>("no_docs_messages");
-    this.scopedNotFoundBank = getBank<MicrocopyBank>("scoped_not_found_messages");
+    this.scopedNotFoundBank = getBank<MicrocopyBank>(
+      "scoped_not_found_messages",
+    );
     this.refusalBank = getBank<MicrocopyBank>("refusal_phrases");
 
     // (optional) help microcopy bank if you have one
@@ -233,7 +263,11 @@ export class AnswerComposerService {
 
   compose(input: ComposeInput): ComposeOutput {
     const ctx = input.ctx;
-    const variationSeed = makeVariationSeed(ctx.conversationId, ctx.turnId, ctx.regenCount || 0);
+    const variationSeed = makeVariationSeed(
+      ctx.conversationId,
+      ctx.turnId,
+      ctx.regenCount || 0,
+    );
     const rand = seededRand(variationSeed);
 
     const repairsApplied: string[] = [];
@@ -262,18 +296,63 @@ export class AnswerComposerService {
     }
 
     if (ctx.answerMode === "refusal") {
-      const content = this.composeMicrocopyFallback("refusal", input, rand, repairsApplied, warnings);
-      return this.wrap(content, [], ctx, "micro", ["answer_direct"], repairsApplied, warnings, variationSeed);
+      const content = this.composeMicrocopyFallback(
+        "refusal",
+        input,
+        rand,
+        repairsApplied,
+        warnings,
+      );
+      return this.wrap(
+        content,
+        [],
+        ctx,
+        "micro",
+        ["answer_direct"],
+        repairsApplied,
+        warnings,
+        variationSeed,
+      );
     }
 
     if (ctx.answerMode === "no_docs") {
-      const content = this.composeMicrocopyFallback("no_docs", input, rand, repairsApplied, warnings);
-      return this.wrap(content, [], ctx, "brief", ["answer_direct"], repairsApplied, warnings, variationSeed);
+      const content = this.composeMicrocopyFallback(
+        "no_docs",
+        input,
+        rand,
+        repairsApplied,
+        warnings,
+      );
+      return this.wrap(
+        content,
+        [],
+        ctx,
+        "brief",
+        ["answer_direct"],
+        repairsApplied,
+        warnings,
+        variationSeed,
+      );
     }
 
     if (ctx.answerMode === "scoped_not_found") {
-      const content = this.composeMicrocopyFallback("scoped_not_found", input, rand, repairsApplied, warnings);
-      return this.wrap(content, [], ctx, "brief", ["answer_direct"], repairsApplied, warnings, variationSeed);
+      const content = this.composeMicrocopyFallback(
+        "scoped_not_found",
+        input,
+        rand,
+        repairsApplied,
+        warnings,
+      );
+      return this.wrap(
+        content,
+        [],
+        ctx,
+        "brief",
+        ["answer_direct"],
+        repairsApplied,
+        warnings,
+        variationSeed,
+      );
     }
 
     // 2) Determine profile + plan (bank-driven)
@@ -287,9 +366,25 @@ export class AnswerComposerService {
     // Route to scoped_not_found microcopy (docs exist) or no_docs (no docs).
     if (this.isDocGroundedMode(ctx.answerMode) && draft.length < 10) {
       warnings.push("EMPTY_DRAFT_DOC_GROUNDED");
-      const fallbackMode = (ctx.docContext?.docCount ?? 0) > 0 ? "scoped_not_found" : "no_docs";
-      const content = this.composeMicrocopyFallback(fallbackMode, input, rand, repairsApplied, warnings);
-      return this.wrap(content, [], ctx, "brief", ["answer_direct"], repairsApplied, warnings, variationSeed);
+      const fallbackMode =
+        (ctx.docContext?.docCount ?? 0) > 0 ? "scoped_not_found" : "no_docs";
+      const content = this.composeMicrocopyFallback(
+        fallbackMode,
+        input,
+        rand,
+        repairsApplied,
+        warnings,
+      );
+      return this.wrap(
+        content,
+        [],
+        ctx,
+        "brief",
+        ["answer_direct"],
+        repairsApplied,
+        warnings,
+        variationSeed,
+      );
     }
 
     // 4) Attach sources via attachments only (never inline)
@@ -301,7 +396,12 @@ export class AnswerComposerService {
     // 5) Apply finalization pipeline (strip boilerplate -> normalize markdown -> bullet hygiene -> bolding)
     draft = this.stripBoilerplate(draft, ctx.language, repairsApplied);
     draft = this.stripInlineSourcesLabels(draft, repairsApplied);
-    draft = this.normalizeMarkdown(draft, ctx.intentFamily, repairsApplied, warnings);
+    draft = this.normalizeMarkdown(
+      draft,
+      ctx.intentFamily,
+      repairsApplied,
+      warnings,
+    );
 
     // bullet hygiene: 1–3 sentences per bullet, split long bullets
     draft = this.enforceBulletHygiene(draft, repairsApplied);
@@ -322,7 +422,16 @@ export class AnswerComposerService {
       repairsApplied.push("FOLLOWUP_APPENDED");
     }
 
-    return this.wrap(draft, attachments, ctx, profile, plannedBlocks, repairsApplied, warnings, variationSeed);
+    return this.wrap(
+      draft,
+      attachments,
+      ctx,
+      profile,
+      plannedBlocks,
+      repairsApplied,
+      warnings,
+      variationSeed,
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -333,14 +442,21 @@ export class AnswerComposerService {
     // Minimal deterministic selection; your intent engine can override this by passing constraints/profile.
     if (ctx.answerMode === "nav_pills") return "micro";
 
-    const short = !!ctx.constraints?.userRequestedShort || !!ctx.constraints?.maxSentences && ctx.constraints.maxSentences <= 3;
+    const short =
+      !!ctx.constraints?.userRequestedShort ||
+      (!!ctx.constraints?.maxSentences && ctx.constraints.maxSentences <= 3);
     const deep = !!ctx.constraints?.userRequestedDetailed;
 
     if (short) return "brief";
     if (deep) return "deep";
 
     // table/numeric default to concise
-    if (ctx.operator === "compute" || ctx.signals?.numericIntentStrong || ctx.signals?.userAskedForTable) return "concise";
+    if (
+      ctx.operator === "compute" ||
+      ctx.signals?.numericIntentStrong ||
+      ctx.signals?.userAskedForTable
+    )
+      return "concise";
 
     // help tends to be brief/concise
     if (ctx.intentFamily === "help") return "concise";
@@ -357,18 +473,27 @@ export class AnswerComposerService {
     if (override && override.length) return override;
 
     const base = planner.plansByProfile?.[profile]?.default;
-    return base && base.length ? base : ["intro", "answer_direct", "conclusion"];
+    return base && base.length
+      ? base
+      : ["intro", "answer_direct", "conclusion"];
   }
 
   private isDocGroundedMode(mode: AnswerMode): boolean {
-    return mode.startsWith("doc_grounded") || mode === "rank_autopick" || mode === "rank_disambiguate";
+    return (
+      mode.startsWith("doc_grounded") ||
+      mode === "rank_autopick" ||
+      mode === "rank_disambiguate"
+    );
   }
 
   // ---------------------------------------------------------------------------
   // Nav pills (pills-only; text = single line intro)
   // ---------------------------------------------------------------------------
 
-  private composeNavPills(input: ComposeInput, rand: () => number): { content: string; attachments: Attachment[] } {
+  private composeNavPills(
+    input: ComposeInput,
+    rand: () => number,
+  ): { content: string; attachments: Attachment[] } {
     const ctx = input.ctx;
     const navType = input.navType || "open";
     const lang = ctx.language;
@@ -395,7 +520,7 @@ export class AnswerComposerService {
     input: ComposeInput,
     rand: () => number,
     repairsApplied: string[],
-    warnings: string[]
+    warnings: string[],
   ): string {
     const ctx = input.ctx;
 
@@ -403,8 +528,8 @@ export class AnswerComposerService {
       kind === "no_docs"
         ? this.noDocsBank
         : kind === "scoped_not_found"
-        ? this.scopedNotFoundBank
-        : this.refusalBank;
+          ? this.scopedNotFoundBank
+          : this.refusalBank;
 
     if (!bank?.categories) {
       warnings.push(`MISSING_MICROCOPY_BANK:${kind}`);
@@ -412,19 +537,29 @@ export class AnswerComposerService {
       return ctx.language === "pt"
         ? "Não consegui completar isso com as informações disponíveis agora."
         : ctx.language === "es"
-        ? "No pude completar esto con la información disponible ahora."
-        : "I couldn’t complete that with the information available right now.";
+          ? "No pude completar esto con la información disponible ahora."
+          : "I couldn’t complete that with the information available right now.";
     }
 
     // Determine category: keep simple; your bank can include routing.byState logic too.
     const categoryKey = this.pickFallbackCategory(kind, input);
     const cat = bank.categories[categoryKey] || bank.categories["generic"];
 
-    const message = this.pickMicrocopyLine(cat?.messages, rand, ctx, repairsApplied);
-    const next = this.pickMicrocopyLine(cat?.nextSteps, rand, ctx, repairsApplied);
+    const message = this.pickMicrocopyLine(
+      cat?.messages,
+      rand,
+      ctx,
+      repairsApplied,
+    );
+    const next = this.pickMicrocopyLine(
+      cat?.nextSteps,
+      rand,
+      ctx,
+      repairsApplied,
+    );
 
     const assembled = [message, next].filter(Boolean).join(" ").trim();
-    return assembled || (message || next || "");
+    return assembled || message || next || "";
   }
 
   private pickFallbackCategory(kind: string, input: ComposeInput): string {
@@ -438,7 +573,8 @@ export class AnswerComposerService {
     }
 
     if (kind === "scoped_not_found") {
-      if (reason.includes("scope_hard_constraints_empty")) return "scope_excluded";
+      if (reason.includes("scope_hard_constraints_empty"))
+        return "scope_excluded";
       if (reason.includes("no_relevant_chunks")) return "scope_excluded";
       return "scope_excluded";
     }
@@ -450,7 +586,7 @@ export class AnswerComposerService {
     items: Array<{ id: string; text: string }> | undefined,
     rand: () => number,
     ctx: ComposerContext,
-    repairsApplied: string[]
+    repairsApplied: string[],
   ): string {
     if (!items || items.length === 0) return "";
     const picked = seededPick(items, rand);
@@ -471,22 +607,39 @@ export class AnswerComposerService {
   // Finalization steps
   // ---------------------------------------------------------------------------
 
-  private stripBoilerplate(text: string, language: LanguageCode, repairsApplied: string[]): string {
+  private stripBoilerplate(
+    text: string,
+    language: LanguageCode,
+    repairsApplied: string[],
+  ): string {
     const stripper = getBoilerplateStripper();
-    const result = stripper.strip(text, language === "es" ? "en" : (language as any));
+    const result = stripper.strip(
+      text,
+      language === "es" ? "en" : (language as any),
+    );
     if (result.modified) repairsApplied.push("BOILERPLATE_STRIPPED");
     return result.modified ? result.text : text;
   }
 
-  private stripInlineSourcesLabels(text: string, repairsApplied: string[]): string {
+  private stripInlineSourcesLabels(
+    text: string,
+    repairsApplied: string[],
+  ): string {
     const before = text;
     // Never show “Sources:” blocks in body
-    const cleaned = before.replace(/\n{0,2}\b(Sources|Fontes|Fuentes)\s*:\s*[\s\S]*$/i, "").trim();
+    const cleaned = before
+      .replace(/\n{0,2}\b(Sources|Fontes|Fuentes)\s*:\s*[\s\S]*$/i, "")
+      .trim();
     if (cleaned !== before) repairsApplied.push("INLINE_SOURCES_STRIPPED");
     return cleaned;
   }
 
-  private normalizeMarkdown(text: string, intent: string, repairsApplied: string[], warnings: string[]): string {
+  private normalizeMarkdown(
+    text: string,
+    intent: string,
+    repairsApplied: string[],
+    warnings: string[],
+  ): string {
     const normalizer = getMarkdownNormalizer();
     const res = normalizer.normalize(text, {
       maxConsecutiveNewlines: 2,
@@ -499,7 +652,10 @@ export class AnswerComposerService {
     return res.text.trim();
   }
 
-  private enforceShortParagraphs(text: string, repairsApplied: string[]): string {
+  private enforceShortParagraphs(
+    text: string,
+    repairsApplied: string[],
+  ): string {
     // markdownNormalizer already splits long paragraphs; this is a safety re-pass.
     const normalizer = getMarkdownNormalizer();
     const res = normalizer.enforceShortParagraphs(text, 2);
@@ -527,7 +683,9 @@ export class AnswerComposerService {
       // Split by sentence count first
       if (sentences.length > 3) {
         repairsApplied.push("BULLET_SPLIT_SENTENCES");
-        const chunks = chunkByCount(sentences, 3).map((chunk) => chunk.join(" ").trim());
+        const chunks = chunkByCount(sentences, 3).map((chunk) =>
+          chunk.join(" ").trim(),
+        );
         for (const c of chunks) out.push(`- ${c}`);
         continue;
       }
@@ -543,10 +701,18 @@ export class AnswerComposerService {
       out.push(`- ${item}`);
     }
 
-    return out.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+    return out
+      .join("\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
   }
 
-  private applySmartBolding(text: string, ctx: ComposerContext, repairsApplied: string[], warnings: string[]): string {
+  private applySmartBolding(
+    text: string,
+    ctx: ComposerContext,
+    repairsApplied: string[],
+    warnings: string[],
+  ): string {
     // No bolding for nav_pills (handled earlier).
     const bolding = getBoldingNormalizer();
 
@@ -554,7 +720,8 @@ export class AnswerComposerService {
     let maxBoldItems = 12;
     if (ctx.constraints?.userRequestedShort) maxBoldItems = 8;
     if (ctx.constraints?.userRequestedDetailed) maxBoldItems = 14;
-    if (ctx.domain === "medical" || ctx.domain === "personal_docs") maxBoldItems = 10;
+    if (ctx.domain === "medical" || ctx.domain === "personal_docs")
+      maxBoldItems = 10;
 
     const before = text;
 
@@ -563,12 +730,18 @@ export class AnswerComposerService {
       lang: (ctx as any).language ?? "any",
     });
 
-    repairsApplied.push(...(norm.meta?.transformations || []).map((r: string) => `BOLD:${r}`));
+    repairsApplied.push(
+      ...(norm.meta?.transformations || []).map((r: string) => `BOLD:${r}`),
+    );
 
     return norm.text.trim();
   }
 
-  private applyBudgets(text: string, profile: StyleProfile, repairsApplied: string[]): string {
+  private applyBudgets(
+    text: string,
+    profile: StyleProfile,
+    repairsApplied: string[],
+  ): string {
     const budget = this.styleBank?.profiles?.[profile]?.budget;
     if (!budget) return text;
 
@@ -594,7 +767,10 @@ export class AnswerComposerService {
     return out.trim();
   }
 
-  private pickFollowup(ctx: ComposerContext, rand: () => number): string | null {
+  private pickFollowup(
+    ctx: ComposerContext,
+    rand: () => number,
+  ): string | null {
     // Chips-only UX: follow-up suggestions are emitted as structured data (not appended to answer text).
     // Keep this disabled to avoid duplicating prompts and to keep answers clean.
     return null;
@@ -612,7 +788,7 @@ export class AnswerComposerService {
     plannedBlocks: string[],
     repairsApplied: string[],
     warnings: string[],
-    variationSeed: string
+    variationSeed: string,
   ): ComposeOutput {
     // Final safety cleanup: no triple blank lines
     const finalContent = (content || "").replace(/\n{3,}/g, "\n\n").trim();
@@ -705,5 +881,8 @@ function trimBulletListsToMax(text: string, maxBullets: number): string {
     out.push(line);
   }
 
-  return out.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+  return out
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }

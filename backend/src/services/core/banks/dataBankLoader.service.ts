@@ -84,7 +84,10 @@ export interface BankAliasesFile {
 }
 
 export class DataBankError extends Error {
-  constructor(message: string, public details?: any) {
+  constructor(
+    message: string,
+    public details?: any,
+  ) {
     super(message);
     this.name = "DataBankError";
   }
@@ -117,9 +120,12 @@ function stripBom(s: string): string {
 function assertNoJsonComments(raw: string, fileHint: string) {
   // Strict JSON: disallow // and /* */
   // Allow URLs in strings by a conservative scan (remove string literals before checking)
-  const withoutStrings = raw.replace(/"([^"\\]|\\.)*"/g, "\"\"");
+  const withoutStrings = raw.replace(/"([^"\\]|\\.)*"/g, '""');
   if (/(^|\s)\/\/|\/\*/.test(withoutStrings)) {
-    throw new DataBankError(`Invalid JSON (comments not allowed) in ${fileHint}`, { fileHint });
+    throw new DataBankError(
+      `Invalid JSON (comments not allowed) in ${fileHint}`,
+      { fileHint },
+    );
   }
 }
 
@@ -129,13 +135,20 @@ function safeParseJson<T>(raw: string, fileHint: string): T {
   try {
     return JSON.parse(cleaned) as T;
   } catch (err: any) {
-    throw new DataBankError(`Invalid JSON in ${fileHint}: ${err?.message ?? String(err)}`, { fileHint });
+    throw new DataBankError(
+      `Invalid JSON in ${fileHint}: ${err?.message ?? String(err)}`,
+      { fileHint },
+    );
   }
 }
 
 function requireFields(obj: any, fields: string[], fileHint: string) {
   for (const f of fields) {
-    if (!(f in obj)) throw new DataBankError(`Missing required field '${f}' in ${fileHint}`, { fileHint, field: f });
+    if (!(f in obj))
+      throw new DataBankError(`Missing required field '${f}' in ${fileHint}`, {
+        fileHint,
+        field: f,
+      });
   }
 }
 
@@ -144,11 +157,19 @@ function normalizeRegistryPath(p: string): string {
 }
 
 function ensureEnvMap(map: any, fileHint: string): Record<EnvName, boolean> {
-  const out: Record<EnvName, boolean> = { production: false, staging: false, dev: false, local: false };
+  const out: Record<EnvName, boolean> = {
+    production: false,
+    staging: false,
+    dev: false,
+    local: false,
+  };
   if (!map) return out;
   for (const k of Object.keys(map)) {
     if (!isEnvName(k)) {
-      throw new DataBankError(`Invalid env key '${k}' in ${fileHint}. Must be production|staging|dev|local`, { fileHint, key: k });
+      throw new DataBankError(
+        `Invalid env key '${k}' in ${fileHint}. Must be production|staging|dev|local`,
+        { fileHint, key: k },
+      );
     }
     out[k] = Boolean(map[k]);
   }
@@ -165,12 +186,19 @@ function nowIso(): string {
  */
 function validateMinimalBankContract(bank: any, fileHint: string) {
   requireFields(bank, ["_meta", "config"], fileHint);
-  requireFields(bank._meta, ["id", "version", "description", "languages", "lastUpdated"], fileHint);
+  requireFields(
+    bank._meta,
+    ["id", "version", "description", "languages", "lastUpdated"],
+    fileHint,
+  );
   if (typeof bank._meta.id !== "string" || bank._meta.id.length < 1) {
     throw new DataBankError(`Invalid _meta.id in ${fileHint}`, { fileHint });
   }
   if (!bank.config || typeof bank.config.enabled !== "boolean") {
-    throw new DataBankError(`Invalid config.enabled in ${fileHint} (must be boolean)`, { fileHint });
+    throw new DataBankError(
+      `Invalid config.enabled in ${fileHint} (must be boolean)`,
+      { fileHint },
+    );
   }
 }
 
@@ -185,7 +213,11 @@ function tryCreateAjv(): any | null {
     const Ajv = require("ajv");
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const addFormats = require("ajv-formats");
-    const ajv = new Ajv({ allErrors: true, strict: false, allowUnionTypes: true });
+    const ajv = new Ajv({
+      allErrors: true,
+      strict: false,
+      allowUnionTypes: true,
+    });
     addFormats(ajv);
     return ajv;
   } catch {
@@ -217,13 +249,15 @@ export class DataBankLoaderService {
     this.logger = options.logger ?? {
       info: () => undefined,
       warn: () => undefined,
-      error: () => undefined
+      error: () => undefined,
     };
 
     if (this.opts.validateSchemas) {
       this.ajv = tryCreateAjv();
       if (!this.ajv) {
-        this.logger.warn("AJV not available; falling back to minimal contract validation only.");
+        this.logger.warn(
+          "AJV not available; falling back to minimal contract validation only.",
+        );
       }
     }
   }
@@ -258,7 +292,10 @@ export class DataBankLoaderService {
     for (const entry of ordered) {
       if (!this.isEnabledInEnv(entry)) continue;
 
-      const filePath = path.join(this.opts.rootDir, normalizeRegistryPath(entry.path));
+      const filePath = path.join(
+        this.opts.rootDir,
+        normalizeRegistryPath(entry.path),
+      );
       const bank = await this.readBankFile<BankFile>(filePath, entry.id);
 
       // Minimal contract
@@ -266,10 +303,13 @@ export class DataBankLoaderService {
 
       // Ensure id matches registry id
       if (bank._meta?.id !== entry.id) {
-        throw new DataBankError(`Bank _meta.id mismatch for ${entry.id}. Registry id=${entry.id}, file _meta.id=${bank._meta?.id}`, {
-          entry,
-          fileMetaId: bank._meta?.id
-        });
+        throw new DataBankError(
+          `Bank _meta.id mismatch for ${entry.id}. Registry id=${entry.id}, file _meta.id=${bank._meta?.id}`,
+          {
+            entry,
+            fileMetaId: bank._meta?.id,
+          },
+        );
       }
 
       // Validate checksum policy (optional)
@@ -292,7 +332,7 @@ export class DataBankLoaderService {
 
     this.logger.info("Data banks loaded successfully", {
       env: this.opts.env,
-      loaded: this.bankCache.size
+      loaded: this.bankCache.size,
     });
   }
 
@@ -303,11 +343,14 @@ export class DataBankLoaderService {
     const canonical = this.resolveAlias(id);
     const bank = this.bankCache.get(canonical);
     if (!bank) {
-      throw new DataBankError(`Bank not loaded: ${id} (canonical=${canonical})`, {
-        id,
-        canonical,
-        loadedIds: Array.from(this.bankCache.keys()).slice(0, 50)
-      });
+      throw new DataBankError(
+        `Bank not loaded: ${id} (canonical=${canonical})`,
+        {
+          id,
+          canonical,
+          loadedIds: Array.from(this.bankCache.keys()).slice(0, 50),
+        },
+      );
     }
     return bank as unknown as T;
   }
@@ -332,7 +375,7 @@ export class DataBankLoaderService {
   getRegistryEntry(id: string): BankRegistryEntry | null {
     if (!this.registry) return null;
     const canonical = this.resolveAlias(id);
-    return this.registry.banks.find(b => b.id === canonical) ?? null;
+    return this.registry.banks.find((b) => b.id === canonical) ?? null;
   }
 
   // -------------------------
@@ -340,22 +383,34 @@ export class DataBankLoaderService {
   // -------------------------
 
   private async loadRegistryBootstrap(): Promise<void> {
-    const registryPath = path.join(this.opts.rootDir, "manifest/bank_registry.any.json");
+    const registryPath = path.join(
+      this.opts.rootDir,
+      "manifest/bank_registry.any.json",
+    );
     const raw = await fs.readFile(registryPath, "utf8").catch((err: any) => {
-      throw new DataBankError(`Missing bank registry at ${registryPath}`, { err });
+      throw new DataBankError(`Missing bank registry at ${registryPath}`, {
+        err,
+      });
     });
 
-    const registry = safeParseJson<BankRegistryFile>(raw, "manifest/bank_registry.any.json");
+    const registry = safeParseJson<BankRegistryFile>(
+      raw,
+      "manifest/bank_registry.any.json",
+    );
     validateMinimalBankContract(registry, "manifest/bank_registry.any.json");
     requireFields(registry, ["banks"], "manifest/bank_registry.any.json");
-    if (!Array.isArray(registry.banks)) throw new DataBankError("bank_registry.banks must be an array");
+    if (!Array.isArray(registry.banks))
+      throw new DataBankError("bank_registry.banks must be an array");
 
     this.registry = registry;
     this.logger.info("Loaded bank registry", { banks: registry.banks.length });
   }
 
   private async loadAliasesBootstrap(): Promise<void> {
-    const aliasesPath = path.join(this.opts.rootDir, "manifest/bank_aliases.any.json");
+    const aliasesPath = path.join(
+      this.opts.rootDir,
+      "manifest/bank_aliases.any.json",
+    );
     try {
       const raw = await fs.readFile(aliasesPath, "utf8");
       const parsed = safeParseJson<any>(raw, "manifest/bank_aliases.any.json");
@@ -377,10 +432,14 @@ export class DataBankLoaderService {
       }
 
       this.aliases = { ...parsed, aliases: aliasMap };
-      this.logger.info("Loaded bank aliases", { aliases: Object.keys(aliasMap).length });
+      this.logger.info("Loaded bank aliases", {
+        aliases: Object.keys(aliasMap).length,
+      });
     } catch {
       this.aliases = null;
-      this.logger.warn("bank_aliases.any.json not found; alias resolution disabled");
+      this.logger.warn(
+        "bank_aliases.any.json not found; alias resolution disabled",
+      );
     }
   }
 
@@ -392,10 +451,15 @@ export class DataBankLoaderService {
   private async loadSchemasBootstrap(): Promise<void> {
     if (!this.registry) return;
 
-    const schemaEntries = this.registry.banks.filter(b => b.category === "schemas" || (b.id ?? "").endsWith("_schema"));
+    const schemaEntries = this.registry.banks.filter(
+      (b) => b.category === "schemas" || (b.id ?? "").endsWith("_schema"),
+    );
     for (const entry of schemaEntries) {
       if (!this.isEnabledInEnv(entry)) continue;
-      const filePath = path.join(this.opts.rootDir, normalizeRegistryPath(entry.path));
+      const filePath = path.join(
+        this.opts.rootDir,
+        normalizeRegistryPath(entry.path),
+      );
       const bank = await this.readBankFile<any>(filePath, entry.id);
 
       // Minimal schema bank contract
@@ -421,34 +485,49 @@ export class DataBankLoaderService {
     for (const b of this.registry.banks) {
       // Derive filename from path if not explicitly provided
       if (!b.filename && b.path) {
-        (b as any).filename = b.path.split('/').pop() || b.path;
+        (b as any).filename = b.path.split("/").pop() || b.path;
       }
 
       if (!b.id || !b.path || !b.category) {
-        throw new DataBankError("Invalid registry entry (missing id/path/category)", { entry: b });
+        throw new DataBankError(
+          "Invalid registry entry (missing id/path/category)",
+          { entry: b },
+        );
       }
 
       const p = normalizeRegistryPath(b.path);
 
-      if (ids.has(b.id)) throw new DataBankError(`Duplicate bank id in registry: ${b.id}`);
-      if (paths.has(p)) throw new DataBankError(`Duplicate bank path in registry: ${p}`);
+      if (ids.has(b.id))
+        throw new DataBankError(`Duplicate bank id in registry: ${b.id}`);
+      if (paths.has(p))
+        throw new DataBankError(`Duplicate bank path in registry: ${p}`);
 
       ids.add(b.id);
       paths.add(p);
 
       // Validate env keys
-      if (b.enabledByEnv) ensureEnvMap(b.enabledByEnv, `bank_registry entry ${b.id}.enabledByEnv`);
-      if (b.requiredByEnv) ensureEnvMap(b.requiredByEnv, `bank_registry entry ${b.id}.requiredByEnv`);
+      if (b.enabledByEnv)
+        ensureEnvMap(
+          b.enabledByEnv,
+          `bank_registry entry ${b.id}.enabledByEnv`,
+        );
+      if (b.requiredByEnv)
+        ensureEnvMap(
+          b.requiredByEnv,
+          `bank_registry entry ${b.id}.requiredByEnv`,
+        );
     }
 
     // Validate loadOrder categories exist
     const loadOrder = this.registry.loadOrder ?? [];
     if (Array.isArray(loadOrder) && loadOrder.length) {
-      const categories = new Set(this.registry.banks.map(b => b.category));
+      const categories = new Set(this.registry.banks.map((b) => b.category));
       for (const c of loadOrder) {
         if (!categories.has(c)) {
           // allow categories with no banks only if explicitly intended; we warn instead of failing
-          this.logger.warn("Registry loadOrder category has no banks", { category: c });
+          this.logger.warn("Registry loadOrder category has no banks", {
+            category: c,
+          });
         }
       }
     }
@@ -467,31 +546,32 @@ export class DataBankLoaderService {
     if (!this.registry) throw new DataBankError("Registry not loaded");
 
     // Filter only enabled banks in env (still keep dependencies for ordering)
-    const enabled = this.registry.banks.filter(b => this.isEnabledInEnv(b));
+    const enabled = this.registry.banks.filter((b) => this.isEnabledInEnv(b));
 
     // Group by category in loadOrder (if provided)
-    const loadOrder = Array.isArray(this.registry.loadOrder) && this.registry.loadOrder.length
-      ? this.registry.loadOrder
-      : [
-          "manifest",
-          "schemas",
-          "routing",
-          "operators",
-          "normalizers",
-          "negatives",
-          "semantics",
-          "retrieval",
-          "formatting",
-          "microcopy",
-          "overlays",
-          "triggers",
-          "ambiguity",
-          "quality",
-          "state",
-          "probes",
-          "policies",
-          "prompts"
-        ];
+    const loadOrder =
+      Array.isArray(this.registry.loadOrder) && this.registry.loadOrder.length
+        ? this.registry.loadOrder
+        : [
+            "manifest",
+            "schemas",
+            "routing",
+            "operators",
+            "normalizers",
+            "negatives",
+            "semantics",
+            "retrieval",
+            "formatting",
+            "microcopy",
+            "overlays",
+            "triggers",
+            "ambiguity",
+            "quality",
+            "state",
+            "probes",
+            "policies",
+            "prompts",
+          ];
 
     // Step A: preliminary ordered list by category priority
     const categoryRank = new Map<string, number>();
@@ -509,7 +589,7 @@ export class DataBankLoaderService {
   }
 
   private topoSort(entries: BankRegistryEntry[]): BankRegistryEntry[] {
-    const byId = new Map(entries.map(e => [e.id, e]));
+    const byId = new Map(entries.map((e) => [e.id, e]));
     const visiting = new Set<string>();
     const visited = new Set<string>();
     const out: BankRegistryEntry[] = [];
@@ -517,7 +597,9 @@ export class DataBankLoaderService {
     const visit = (id: string, stack: string[]) => {
       if (visited.has(id)) return;
       if (visiting.has(id)) {
-        throw new DataBankError(`Dependency cycle detected: ${[...stack, id].join(" -> ")}`);
+        throw new DataBankError(
+          `Dependency cycle detected: ${[...stack, id].join(" -> ")}`,
+        );
       }
       visiting.add(id);
       const e = byId.get(id);
@@ -554,13 +636,13 @@ export class DataBankLoaderService {
   private assertRequiredBanksLoaded(): void {
     if (!this.registry) return;
 
-    const required = this.registry.banks.filter(b => this.isRequiredInEnv(b));
-    const missing = required.filter(b => !this.bankCache.has(b.id));
+    const required = this.registry.banks.filter((b) => this.isRequiredInEnv(b));
+    const missing = required.filter((b) => !this.bankCache.has(b.id));
 
     if (missing.length) {
       throw new DataBankError("Missing required banks for environment", {
         env: this.opts.env,
-        missing: missing.map(m => ({ id: m.id, path: m.path }))
+        missing: missing.map((m) => ({ id: m.id, path: m.path })),
       });
     }
   }
@@ -569,7 +651,10 @@ export class DataBankLoaderService {
   // Schema validation
   // -------------------------
 
-  private async validateAgainstSchema(entry: BankRegistryEntry, bank: any): Promise<void> {
+  private async validateAgainstSchema(
+    entry: BankRegistryEntry,
+    bank: any,
+  ): Promise<void> {
     // If no schemaId defined, fallback to minimal checks only
     const schemaId = entry.schemaId ?? null;
     if (!schemaId) return;
@@ -578,9 +663,15 @@ export class DataBankLoaderService {
     if (!schemaBank) {
       // If strict and schema missing, fail; else warn.
       if (this.opts.strict) {
-        throw new DataBankError(`Schema bank '${schemaId}' required by '${entry.id}' not loaded`, { entry, schemaId });
+        throw new DataBankError(
+          `Schema bank '${schemaId}' required by '${entry.id}' not loaded`,
+          { entry, schemaId },
+        );
       }
-      this.logger.warn("Schema bank not loaded; skipping schema validation", { entryId: entry.id, schemaId });
+      this.logger.warn("Schema bank not loaded; skipping schema validation", {
+        entryId: entry.id,
+        schemaId,
+      });
       return;
     }
 
@@ -588,17 +679,24 @@ export class DataBankLoaderService {
     // We support two common patterns:
     //  1) schemaBank.schema is a JSON Schema object
     //  2) schemaBank.action.schema is a JSON Schema object
-    const schemaObj = schemaBank.schema ?? schemaBank?.action?.schema ?? schemaBank?.config?.schema ?? null;
+    const schemaObj =
+      schemaBank.schema ??
+      schemaBank?.action?.schema ??
+      schemaBank?.config?.schema ??
+      null;
 
     if (this.ajv && schemaObj && typeof schemaObj === "object") {
       const validate = this.ajv.compile(schemaObj);
       const ok = validate(bank);
       if (!ok) {
-        throw new DataBankError(`Schema validation failed for ${entry.id} against ${schemaId}`, {
-          entryId: entry.id,
-          schemaId,
-          errors: validate.errors
-        });
+        throw new DataBankError(
+          `Schema validation failed for ${entry.id} against ${schemaId}`,
+          {
+            entryId: entry.id,
+            schemaId,
+            errors: validate.errors,
+          },
+        );
       }
       return;
     }
@@ -613,16 +711,33 @@ export class DataBankLoaderService {
   // Checksums
   // -------------------------
 
-  private async validateChecksumPolicy(entry: BankRegistryEntry, filePath: string): Promise<void> {
+  private async validateChecksumPolicy(
+    entry: BankRegistryEntry,
+    filePath: string,
+  ): Promise<void> {
+    // Registry is self-referential; validating its own checksum against a mutable
+    // manifest creates an impossible fixed point and can hard-fail startup.
+    if (
+      String(entry.id || "").trim() === "bank_registry" ||
+      normalizeRegistryPath(String(entry.path || "").trim()) ===
+        "manifest/bank_registry.any.json"
+    ) {
+      return;
+    }
+
     const declared = (entry.checksumSha256 ?? "").trim();
     if (!declared) {
-      const strictEnv = this.opts.env === "production" || this.opts.env === "staging";
+      const strictEnv =
+        this.opts.env === "production" || this.opts.env === "staging";
       if (strictEnv && !this.opts.allowEmptyChecksumsInNonProd) {
-        throw new DataBankError(`Empty checksum is not allowed in ${this.opts.env}`, {
-          id: entry.id,
-          path: entry.path,
-          env: this.opts.env,
-        });
+        throw new DataBankError(
+          `Empty checksum is not allowed in ${this.opts.env}`,
+          {
+            id: entry.id,
+            path: entry.path,
+            env: this.opts.env,
+          },
+        );
       }
       return;
     }
@@ -634,7 +749,7 @@ export class DataBankLoaderService {
         id: entry.id,
         path: entry.path,
         declared,
-        actual
+        actual,
       });
     }
   }
@@ -645,17 +760,25 @@ export class DataBankLoaderService {
 
   private isEnabledInEnv(entry: BankRegistryEntry): boolean {
     const env = this.opts.env;
-    const enabledByEnv = ensureEnvMap(entry.enabledByEnv, `bank_registry entry ${entry.id}.enabledByEnv`);
+    const enabledByEnv = ensureEnvMap(
+      entry.enabledByEnv,
+      `bank_registry entry ${entry.id}.enabledByEnv`,
+    );
     // If enabledByEnv is missing or all false, default true (safer for dev)
-    const explicitlyProvided = entry.enabledByEnv && Object.keys(entry.enabledByEnv).length > 0;
+    const explicitlyProvided =
+      entry.enabledByEnv && Object.keys(entry.enabledByEnv).length > 0;
     if (!explicitlyProvided) return true;
     return Boolean(enabledByEnv[env]);
   }
 
   private isRequiredInEnv(entry: BankRegistryEntry): boolean {
     const env = this.opts.env;
-    const requiredByEnv = ensureEnvMap(entry.requiredByEnv, `bank_registry entry ${entry.id}.requiredByEnv`);
-    const explicitlyProvided = entry.requiredByEnv && Object.keys(entry.requiredByEnv).length > 0;
+    const requiredByEnv = ensureEnvMap(
+      entry.requiredByEnv,
+      `bank_registry entry ${entry.id}.requiredByEnv`,
+    );
+    const explicitlyProvided =
+      entry.requiredByEnv && Object.keys(entry.requiredByEnv).length > 0;
     if (!explicitlyProvided) return false;
     return Boolean(requiredByEnv[env]);
   }
@@ -685,9 +808,16 @@ export class DataBankLoaderService {
   // File reading
   // -------------------------
 
-  private async readBankFile<T = any>(filePath: string, bankId: string): Promise<T> {
+  private async readBankFile<T = any>(
+    filePath: string,
+    bankId: string,
+  ): Promise<T> {
     const raw = await fs.readFile(filePath, "utf8").catch((err: any) => {
-      throw new DataBankError(`Missing bank file for ${bankId}: ${filePath}`, { bankId, filePath, err });
+      throw new DataBankError(`Missing bank file for ${bankId}: ${filePath}`, {
+        bankId,
+        filePath,
+        err,
+      });
     });
 
     const parsed = safeParseJson<T>(raw, filePath);

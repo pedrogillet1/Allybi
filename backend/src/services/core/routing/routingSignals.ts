@@ -49,7 +49,15 @@ export type AnswerMode =
   | "rank_disambiguate"
   | "rank_autopick";
 
-export type OutputShape = "button_only" | "paragraph" | "bullets" | "table" | "quote" | "breadcrumbs" | "file_list" | "steps";
+export type OutputShape =
+  | "button_only"
+  | "paragraph"
+  | "bullets"
+  | "table"
+  | "quote"
+  | "breadcrumbs"
+  | "file_list"
+  | "steps";
 
 /**
  * Canonical operators used by your operator_families / operator_aliases.
@@ -278,7 +286,14 @@ export interface RoutingSignals {
 export function createDefaultRoutingSignals(env: EnvName): RoutingSignals {
   return {
     env,
-    language: { detected: "any", selected: "any", requested: false, mixed: false, confidence: 0, scoreGap: 0 },
+    language: {
+      detected: "any",
+      selected: "any",
+      requested: false,
+      mixed: false,
+      confidence: 0,
+      scoreGap: 0,
+    },
     intentFamily: "unknown",
     operator: "unknown",
     operatorFamily: null,

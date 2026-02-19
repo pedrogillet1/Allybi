@@ -14,14 +14,14 @@ export class DocumentOutlineService {
     const items: OutlineItem[] = [];
     const headingRegex = /^(#{1,6})\s+(.+)$/gm;
     let match;
-    
+
     while ((match = headingRegex.exec(content)) !== null) {
       items.push({
         level: match[1].length,
         title: match[2].trim(),
       });
     }
-    
+
     return items;
   }
 }

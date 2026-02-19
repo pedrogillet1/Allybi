@@ -32,7 +32,7 @@ export type CohortRetention = {
  */
 function toUTCDay(ts: string): string {
   const d = new Date(ts);
-  if (isNaN(d.getTime())) return '';
+  if (isNaN(d.getTime())) return "";
   return d.toISOString().slice(0, 10);
 }
 
@@ -40,7 +40,7 @@ function toUTCDay(ts: string): string {
  * Adds N days to a date string, returns YYYY-MM-DD
  */
 function addDays(dayStr: string, n: number): string {
-  const d = new Date(dayStr + 'T00:00:00Z');
+  const d = new Date(dayStr + "T00:00:00Z");
   d.setUTCDate(d.getUTCDate() + n);
   return d.toISOString().slice(0, 10);
 }
@@ -61,9 +61,14 @@ export function calculateRetention(
   signups: SignupRecord[],
   activity: ActivityEvent[],
   windowsDays: number[],
-  opts?: RetentionOptions
+  opts?: RetentionOptions,
 ): CohortRetention[] {
-  if (!signups || signups.length === 0 || !windowsDays || windowsDays.length === 0) {
+  if (
+    !signups ||
+    signups.length === 0 ||
+    !windowsDays ||
+    windowsDays.length === 0
+  ) {
     return [];
   }
 
@@ -114,7 +119,7 @@ export function calculateRetention(
     const cohortUsers = cohorts.get(cohortDay)!;
     const cohortSize = cohortUsers.size;
 
-    const retention = windowsDays.map(windowDays => {
+    const retention = windowsDays.map((windowDays) => {
       const targetDay = addDays(cohortDay, windowDays);
       let retained = 0;
 

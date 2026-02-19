@@ -1,8 +1,8 @@
-import fs from 'fs';
-import path from 'path';
-import AdmZip from 'adm-zip';
-import sharp from 'sharp';
-import { uploadFile, getSignedUrl } from '../../config/storage';
+import fs from "fs";
+import path from "path";
+import AdmZip from "adm-zip";
+import sharp from "sharp";
+import { uploadFile, getSignedUrl } from "../../config/storage";
 
 interface ExtractedImage {
   slideNumber: number;
@@ -25,7 +25,6 @@ interface SlideWithImages {
  * This bypasses LibreOffice and extracts embedded images from the ZIP archive
  */
 export class PPTXImageExtractorService {
-
   /**
    * Extract all images from PPTX and organize by slide
    */
@@ -36,7 +35,7 @@ export class PPTXImageExtractorService {
       uploadToGCS?: boolean;
       outputDir?: string;
       signedUrlExpiration?: number; // ✅ FIX: Add expiration option (in seconds)
-    } = {}
+    } = {},
   ): Promise<{
     success: boolean;
     slides?: SlideWithImages[];
@@ -44,34 +43,48 @@ export class PPTXImageExtractorService {
     error?: string;
   }> {
     try {
-      console.log('📸 [PPTX Image Extractor] Starting image extraction...');
+      console.log("📸 [PPTX Image Extractor] Starting image extraction...");
 
-      const { uploadToGCS = true, outputDir, signedUrlExpiration = 604800 } = options; // ✅ FIX: Default 7 days
+      const {
+        uploadToGCS = true,
+        outputDir,
+        signedUrlExpiration = 604800,
+      } = options; // ✅ FIX: Default 7 days
 
       // 1. Create temp directory
-      const tempDir = outputDir || path.join(process.cwd(), 'temp', `pptx-images-${documentId}-${Date.now()}`);
+      const tempDir =
+        outputDir ||
+        path.join(
+          process.cwd(),
+          "temp",
+          `pptx-images-${documentId}-${Date.now()}`,
+        );
       if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir, { recursive: true });
       }
 
       // 2. Extract PPTX (it's a ZIP file)
-      console.log('📦 [PPTX Image Extractor] Extracting PPTX archive...');
+      console.log("📦 [PPTX Image Extractor] Extracting PPTX archive...");
       const zip = new AdmZip(pptxFilePath);
       const zipEntries = zip.getEntries();
 
       // 3. Find all images in ppt/media/
       const mediaImages: { [key: string]: Buffer } = {};
-      zipEntries.forEach(entry => {
-        if (entry.entryName.startsWith('ppt/media/') && !entry.isDirectory) {
+      zipEntries.forEach((entry) => {
+        if (entry.entryName.startsWith("ppt/media/") && !entry.isDirectory) {
           const filename = path.basename(entry.entryName);
           if (/\.(png|jpg|jpeg|gif|bmp|tiff|webp)$/i.test(filename)) {
             mediaImages[filename] = entry.getData();
-            console.log(`   Found image: ${filename} (${entry.getData().length} bytes)`);
+            console.log(
+              `   Found image: ${filename} (${entry.getData().length} bytes)`,
+            );
           }
         }
       });
 
-      console.log(`✅ [PPTX Image Extractor] Found ${Object.keys(mediaImages).length} images in media folder`);
+      console.log(
+        `✅ [PPTX Image Extractor] Found ${Object.keys(mediaImages).length} images in media folder`,
+      );
 
       // 4. Parse slide relationships to map images to slides
       const slideImageMap = await this.mapImagesToSlides(zip);
@@ -89,7 +102,9 @@ export class PPTXImageExtractorService {
           const imageBuffer = mediaImages[imageRef];
 
           if (!imageBuffer) {
-            console.warn(`⚠️  Image ${imageRef} referenced in slide ${slideNum} but not found in media`);
+            console.warn(
+              `⚠️  Image ${imageRef} referenced in slide ${slideNum} but not found in media`,
+            );
             continue;
           }
 
@@ -98,15 +113,13 @@ export class PPTXImageExtractorService {
           const outputPath = path.join(tempDir, outputFilename);
 
           // Convert to PNG with Sharp for consistency
-          await sharp(imageBuffer)
-            .png({ quality: 90 })
-            .toFile(outputPath);
+          await sharp(imageBuffer).png({ quality: 90 }).toFile(outputPath);
 
           slideImages.push({
             slideNumber: slideNum,
             imageNumber: i + 1,
             filename: outputFilename,
-            localPath: outputPath
+            localPath: outputPath,
           });
 
           totalImagesSaved++;
@@ -115,16 +128,18 @@ export class PPTXImageExtractorService {
         if (slideImages.length > 0) {
           slides.push({
             slideNumber: slideNum,
-            images: slideImages
+            images: slideImages,
           });
         }
       }
 
-      console.log(`✅ [PPTX Image Extractor] Saved ${totalImagesSaved} images from ${slides.length} slides`);
+      console.log(
+        `✅ [PPTX Image Extractor] Saved ${totalImagesSaved} images from ${slides.length} slides`,
+      );
 
       // 6. Upload to GCS if requested
       if (uploadToGCS) {
-        console.log('☁️  [PPTX Image Extractor] Uploading images to GCS...');
+        console.log("☁️  [PPTX Image Extractor] Uploading images to GCS...");
 
         for (const slide of slides) {
           for (const image of slide.images) {
@@ -134,16 +149,22 @@ export class PPTXImageExtractorService {
               // Read the file buffer
               const fileBuffer = await fs.promises.readFile(image.localPath);
 
-              await uploadFile(storagePath, fileBuffer, 'image/png');
+              await uploadFile(storagePath, fileBuffer, "image/png");
 
               // ✅ FIX: Store the storage key for later signed URL generation
               image.storagePath = storagePath;
               image.gcsPath = storagePath;
               // ✅ FIX: Generate signed URL for immediate use (backward compatibility)
-              image.imageUrl = await getSignedUrl(storagePath, signedUrlExpiration);
+              image.imageUrl = await getSignedUrl(
+                storagePath,
+                signedUrlExpiration,
+              );
               console.log(`   ✅ Uploaded: ${storagePath}`);
             } catch (uploadError) {
-              console.error(`   ❌ Failed to upload ${storagePath}:`, uploadError);
+              console.error(
+                `   ❌ Failed to upload ${storagePath}:`,
+                uploadError,
+              );
               // ✅ FIX: Set all fields to null/undefined on failure
               image.imageUrl = null;
               image.storagePath = undefined;
@@ -154,22 +175,28 @@ export class PPTXImageExtractorService {
       }
 
       // 6.5. Create composite images for slides with multiple images
-      console.log('🖼️  [PPTX Image Extractor] Creating composite images...');
+      console.log("🖼️  [PPTX Image Extractor] Creating composite images...");
       for (const slide of slides) {
         if (slide.images.length > 1) {
           try {
-            console.log(`🖼️  Creating composite image for slide ${slide.slideNumber}...`);
+            console.log(
+              `🖼️  Creating composite image for slide ${slide.slideNumber}...`,
+            );
 
             // Load all images that were successfully uploaded
-            const validImages = slide.images.filter(img => img.imageUrl && img.localPath);
+            const validImages = slide.images.filter(
+              (img) => img.imageUrl && img.localPath,
+            );
 
             if (validImages.length === 0) {
-              console.warn(`⚠️  No valid images for slide ${slide.slideNumber}`);
+              console.warn(
+                `⚠️  No valid images for slide ${slide.slideNumber}`,
+              );
               continue;
             }
 
             const imageBuffers = await Promise.all(
-              validImages.map(img => sharp(img.localPath).toBuffer())
+              validImages.map((img) => sharp(img.localPath).toBuffer()),
             );
 
             if (imageBuffers.length > 0) {
@@ -179,9 +206,9 @@ export class PPTXImageExtractorService {
 
               // Overlay other images
               if (imageBuffers.length > 1) {
-                const composites = imageBuffers.slice(1).map(buffer => ({
+                const composites = imageBuffers.slice(1).map((buffer) => ({
                   input: buffer,
-                  blend: 'over' as const
+                  blend: "over" as const,
                 }));
                 composite = composite.composite(composites);
               }
@@ -196,23 +223,39 @@ export class PPTXImageExtractorService {
                 const compositeStoragePath = `slides/${documentId}/slide-${slide.slideNumber}-composite.png`;
                 try {
                   // Read the composite file buffer
-                  const compositeBuffer = await fs.promises.readFile(compositePath);
+                  const compositeBuffer =
+                    await fs.promises.readFile(compositePath);
 
-                  await uploadFile(compositeStoragePath, compositeBuffer, 'image/png');
+                  await uploadFile(
+                    compositeStoragePath,
+                    compositeBuffer,
+                    "image/png",
+                  );
 
                   // ✅ FIX: Store composite storage path for metadata
                   (slide as any).compositeStoragePath = compositeStoragePath;
-                  slide.compositeImageUrl = await getSignedUrl(compositeStoragePath, signedUrlExpiration);
-                  console.log(`   ✅ Uploaded composite: ${compositeStoragePath}`);
+                  slide.compositeImageUrl = await getSignedUrl(
+                    compositeStoragePath,
+                    signedUrlExpiration,
+                  );
+                  console.log(
+                    `   ✅ Uploaded composite: ${compositeStoragePath}`,
+                  );
                 } catch (uploadError) {
-                  console.error(`   ❌ Failed to upload composite:`, uploadError);
+                  console.error(
+                    `   ❌ Failed to upload composite:`,
+                    uploadError,
+                  );
                 }
               } else {
                 slide.compositeImageUrl = compositePath;
               }
             }
           } catch (compositeError) {
-            console.warn(`⚠️  Failed to create composite for slide ${slide.slideNumber}:`, compositeError);
+            console.warn(
+              `⚠️  Failed to create composite for slide ${slide.slideNumber}:`,
+              compositeError,
+            );
             // Non-critical error, continue
           }
         } else if (slide.images.length === 1) {
@@ -222,7 +265,9 @@ export class PPTXImageExtractorService {
         }
       }
 
-      console.log(`✅ [PPTX Image Extractor] Created composites for ${slides.filter(s => s.compositeImageUrl).length} slides`);
+      console.log(
+        `✅ [PPTX Image Extractor] Created composites for ${slides.filter((s) => s.compositeImageUrl).length} slides`,
+      );
 
       // 7. Clean up temp directory
       if (!outputDir) {
@@ -232,14 +277,13 @@ export class PPTXImageExtractorService {
       return {
         success: true,
         slides,
-        totalImages: totalImagesSaved
+        totalImages: totalImagesSaved,
       };
-
     } catch (error: any) {
-      console.error('❌ [PPTX Image Extractor] Error:', error);
+      console.error("❌ [PPTX Image Extractor] Error:", error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -247,15 +291,17 @@ export class PPTXImageExtractorService {
   /**
    * Parse slide XML relationships to map images to specific slides
    */
-  private async mapImagesToSlides(zip: AdmZip): Promise<{ [slideNumber: number]: string[] }> {
+  private async mapImagesToSlides(
+    zip: AdmZip,
+  ): Promise<{ [slideNumber: number]: string[] }> {
     const slideImageMap: { [slideNumber: number]: string[] } = {};
 
     try {
       const entries = zip.getEntries();
 
       // Find all slide XML files
-      const slideFiles = entries.filter(e =>
-        e.entryName.match(/^ppt\/slides\/slide(\d+)\.xml$/)
+      const slideFiles = entries.filter((e) =>
+        e.entryName.match(/^ppt\/slides\/slide(\d+)\.xml$/),
       );
 
       for (const slideFile of slideFiles) {
@@ -263,21 +309,24 @@ export class PPTXImageExtractorService {
         if (!match) continue;
 
         const slideNumber = parseInt(match[1]);
-        const slideXml = slideFile.getData().toString('utf8');
+        const slideXml = slideFile.getData().toString("utf8");
 
         // Find relationship file for this slide
         const relsPath = `ppt/slides/_rels/slide${slideNumber}.xml.rels`;
         const relsEntry = zip.getEntry(relsPath);
 
         if (!relsEntry) {
-          console.warn(`⚠️  No relationships file found for slide ${slideNumber}`);
+          console.warn(
+            `⚠️  No relationships file found for slide ${slideNumber}`,
+          );
           continue;
         }
 
-        const relsXml = relsEntry.getData().toString('utf8');
+        const relsXml = relsEntry.getData().toString("utf8");
 
         // Extract image relationships (Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" )
-        const imageRelRegex = /<Relationship[^>]+Type="[^"]*\/image"[^>]+Target="\.\.\/media\/([^"]+)"/g;
+        const imageRelRegex =
+          /<Relationship[^>]+Type="[^"]*\/image"[^>]+Target="\.\.\/media\/([^"]+)"/g;
         const imageRefs: string[] = [];
         let relMatch;
 
@@ -291,15 +340,13 @@ export class PPTXImageExtractorService {
         }
       }
 
-      console.log(`✅ [PPTX Image Extractor] Mapped images for ${Object.keys(slideImageMap).length} slides`);
-
+      console.log(
+        `✅ [PPTX Image Extractor] Mapped images for ${Object.keys(slideImageMap).length} slides`,
+      );
     } catch (error) {
-      console.error('❌ Error parsing slide relationships:', error);
+      console.error("❌ Error parsing slide relationships:", error);
     }
 
     return slideImageMap;
   }
 }
-
-
- 

@@ -25,7 +25,12 @@ export type LanguageCode = "en" | "pt" | "es" | "any";
 export interface DomainHint {
   topDomain?: string;
   confidence?: number;
-  matches?: Array<{ domainId: string; match: string; weight: number; source: "query" | "title" | "snippet" }>;
+  matches?: Array<{
+    domainId: string;
+    match: string;
+    weight: number;
+    source: "query" | "title" | "snippet";
+  }>;
 }
 
 export interface DomainState {
@@ -50,9 +55,9 @@ export interface DomainDecision {
   confidence: number;
   candidates: Array<{ domainId: string; confidence: number }>;
   relatedDomains: string[];
-  retrievalProfile: string;   // e.g. "balanced", "numeric_leaning"
-  formattingProfile: string;  // e.g. "numbers_first", "fields_first"
-  terminologyKey: string;     // key used by terminology bank(s)
+  retrievalProfile: string; // e.g. "balanced", "numeric_leaning"
+  formattingProfile: string; // e.g. "numbers_first", "fields_first"
+  terminologyKey: string; // key used by terminology bank(s)
   reasons: string[];
   debug?: {
     usedHint: boolean;
@@ -79,7 +84,10 @@ type DomainOntologyBank = {
   domains: Array<{
     id: string;
     aliases?: Record<string, string[]>; // lang -> aliases
-    docAffinity?: { preferredDocTypes?: string[]; ocrTolerance?: "low" | "medium" | "high" };
+    docAffinity?: {
+      preferredDocTypes?: string[];
+      ocrTolerance?: "low" | "medium" | "high";
+    };
     retrievalProfile?: string;
     formattingProfile?: string;
     terminologyKey?: string;
@@ -116,7 +124,7 @@ type BankAliases = {
   _meta: any;
   aliases: Array<{
     from: string; // old/alternate id
-    to: string;   // canonical id
+    to: string; // canonical id
   }>;
 };
 
@@ -185,9 +193,15 @@ export class DomainEnforcementService {
       const flags = this.detection.config.caseInsensitive ? "i" : "";
       for (const d of this.detection.domains || []) {
         this.compiled[d.id] = {
-          strong: (d.strong || []).map(p => safeRegex(p, flags)).filter(Boolean) as RegExp[],
-          medium: (d.medium || []).map(p => safeRegex(p, flags)).filter(Boolean) as RegExp[],
-          weak: (d.weak || []).map(p => safeRegex(p, flags)).filter(Boolean) as RegExp[],
+          strong: (d.strong || [])
+            .map((p) => safeRegex(p, flags))
+            .filter(Boolean) as RegExp[],
+          medium: (d.medium || [])
+            .map((p) => safeRegex(p, flags))
+            .filter(Boolean) as RegExp[],
+          weak: (d.weak || [])
+            .map((p) => safeRegex(p, flags))
+            .filter(Boolean) as RegExp[],
         };
       }
     }
@@ -240,19 +254,25 @@ export class DomainEnforcementService {
 
     // If hint confidence is high, accept it (but still decorate from ontology)
     if (hintValid && hintConfidence >= 0.75) {
-      const decision = this.decorateDecision(hintDomain!, hintConfidence, reasons, {
-        defaultDomain,
-        usedHint: true,
-        usedDetection: false,
-        strictDomainIds: strict,
-      });
+      const decision = this.decorateDecision(
+        hintDomain!,
+        hintConfidence,
+        reasons,
+        {
+          defaultDomain,
+          usedHint: true,
+          usedDetection: false,
+          strictDomainIds: strict,
+        },
+      );
       decision.reasons.push("used_upstream_hint_high_conf");
       return decision;
     }
 
     // 3) Run domain detection (regex-based) if available
     const detectionEnabled = !!this.detection?.config?.enabled;
-    let scored: Array<{ domainId: string; score: number; matches: number }> = [];
+    let scored: Array<{ domainId: string; score: number; matches: number }> =
+      [];
 
     if (detectionEnabled) {
       scored = this.scoreByDetection(q, title, snippets);
@@ -263,7 +283,11 @@ export class DomainEnforcementService {
     const boosted = this.applyDocTypeBoost(scored, input.docTypesInScope || []);
 
     // 5) If hint exists but low/medium confidence, blend it into candidates
-    const finalCandidates = this.mergeHintCandidate(boosted, hintValid ? hintDomain! : "", hintConfidence);
+    const finalCandidates = this.mergeHintCandidate(
+      boosted,
+      hintValid ? hintDomain! : "",
+      hintConfidence,
+    );
 
     // 6) Pick top candidate; handle strict/fallback behavior
     finalCandidates.sort((a, b) => b.score - a.score);
@@ -278,14 +302,16 @@ export class DomainEnforcementService {
     }
 
     // 7) If nothing strong, prefer active domain on followups (soft continuity)
-    const active = this.normalizeDomainId(input.state?.activeDomain?.value || "");
+    const active = this.normalizeDomainId(
+      input.state?.activeDomain?.value || "",
+    );
     if (active && this.isValidDomain(active)) {
       const topScore = finalCandidates[0]?.score ?? 0;
       // If top is weak, reuse active for continuity
-      if (topScore < 0.20 && conf < 0.60) {
+      if (topScore < 0.2 && conf < 0.6) {
         reasons.push("reused_active_domain_low_signal");
         chosen = active;
-        conf = Math.max(conf, 0.60);
+        conf = Math.max(conf, 0.6);
       }
     }
 
@@ -308,8 +334,11 @@ export class DomainEnforcementService {
     // candidates list (top 3)
     decision.candidates = finalCandidates
       .slice(0, 3)
-      .map(c => ({ domainId: c.domainId, confidence: this.scoreToConfidence(c.score) }))
-      .filter(c => this.isValidDomain(c.domainId));
+      .map((c) => ({
+        domainId: c.domainId,
+        confidence: this.scoreToConfidence(c.score),
+      }))
+      .filter((c) => this.isValidDomain(c.domainId));
 
     return decision;
   }
@@ -332,7 +361,9 @@ export class DomainEnforcementService {
       .replace(/^_+|_+$/g, "");
 
     // apply alias mapping if bank exists
-    const aliasTo = this.aliases?.aliases?.find(a => a.from === normalized)?.to;
+    const aliasTo = this.aliases?.aliases?.find(
+      (a) => a.from === normalized,
+    )?.to;
     return aliasTo || normalized;
   }
 
@@ -342,7 +373,7 @@ export class DomainEnforcementService {
   }
 
   private getDomainConfig(domainId: string) {
-    return (this.ontology?.domains || []).find(d => d.id === domainId);
+    return (this.ontology?.domains || []).find((d) => d.id === domainId);
   }
 
   private scoreByDetection(q: string, title: string, snippets: string[]) {
@@ -353,36 +384,84 @@ export class DomainEnforcementService {
     const titleBoost = det.config.titleBoost ?? 0.08;
     const snippetBoost = det.config.docTextBoost ?? 0.06;
 
-    const scored: Array<{ domainId: string; score: number; matches: number }> = [];
+    const scored: Array<{ domainId: string; score: number; matches: number }> =
+      [];
 
     for (const domain of det.domains || []) {
       // skip unknown domains if ontology is strict
-      if (this.ontology?.config?.strictDomainIds && !this.isValidDomain(domain.id)) continue;
+      if (
+        this.ontology?.config?.strictDomainIds &&
+        !this.isValidDomain(domain.id)
+      )
+        continue;
 
-      const compiled = this.compiled[domain.id] || { strong: [], medium: [], weak: [] };
+      const compiled = this.compiled[domain.id] || {
+        strong: [],
+        medium: [],
+        weak: [],
+      };
 
       let score = 0;
       let matches = 0;
 
       // Query matches (highest weight)
-      for (const r of compiled.strong) if (r.test(q)) { score += wStrong; matches++; }
-      for (const r of compiled.medium) if (r.test(q)) { score += wMed; matches++; }
-      for (const r of compiled.weak) if (r.test(q)) { score += wWeak; matches++; }
+      for (const r of compiled.strong)
+        if (r.test(q)) {
+          score += wStrong;
+          matches++;
+        }
+      for (const r of compiled.medium)
+        if (r.test(q)) {
+          score += wMed;
+          matches++;
+        }
+      for (const r of compiled.weak)
+        if (r.test(q)) {
+          score += wWeak;
+          matches++;
+        }
 
       // Title matches (boosted)
       if (title) {
-        for (const r of compiled.strong) if (r.test(title)) { score += wStrong + titleBoost; matches++; }
-        for (const r of compiled.medium) if (r.test(title)) { score += wMed + titleBoost; matches++; }
-        for (const r of compiled.weak) if (r.test(title)) { score += wWeak + titleBoost; matches++; }
+        for (const r of compiled.strong)
+          if (r.test(title)) {
+            score += wStrong + titleBoost;
+            matches++;
+          }
+        for (const r of compiled.medium)
+          if (r.test(title)) {
+            score += wMed + titleBoost;
+            matches++;
+          }
+        for (const r of compiled.weak)
+          if (r.test(title)) {
+            score += wWeak + titleBoost;
+            matches++;
+          }
       }
 
       // Snippet matches (small boost)
       for (const s of snippets) {
         if (!s) continue;
         let localHit = false;
-        for (const r of compiled.strong) if (r.test(s)) { score += wStrong + snippetBoost; matches++; localHit = true; }
-        for (const r of compiled.medium) if (r.test(s)) { score += wMed + snippetBoost; matches++; localHit = true; }
-        for (const r of compiled.weak) if (r.test(s)) { score += wWeak + snippetBoost; matches++; localHit = true; }
+        for (const r of compiled.strong)
+          if (r.test(s)) {
+            score += wStrong + snippetBoost;
+            matches++;
+            localHit = true;
+          }
+        for (const r of compiled.medium)
+          if (r.test(s)) {
+            score += wMed + snippetBoost;
+            matches++;
+            localHit = true;
+          }
+        for (const r of compiled.weak)
+          if (r.test(s)) {
+            score += wWeak + snippetBoost;
+            matches++;
+            localHit = true;
+          }
         // avoid runaway scoring from many snippets with same pattern
         if (localHit) break;
       }
@@ -397,22 +476,26 @@ export class DomainEnforcementService {
 
   private applyDocTypeBoost(
     scored: Array<{ domainId: string; score: number; matches: number }>,
-    docTypes: string[]
+    docTypes: string[],
   ) {
-    const types = (docTypes || []).map(t => (t || "").toLowerCase());
+    const types = (docTypes || []).map((t) => (t || "").toLowerCase());
     if (types.length === 0) return scored;
 
-    const out = scored.map(s => ({ ...s }));
+    const out = scored.map((s) => ({ ...s }));
 
     // helper to add or create
     const bump = (domainId: string, delta: number) => {
-      const found = out.find(o => o.domainId === domainId);
+      const found = out.find((o) => o.domainId === domainId);
       if (found) found.score += delta;
       else out.push({ domainId, score: delta, matches: 0 });
     };
 
     // Simple, safe boosts (never override strong textual detection)
-    if (types.includes("xlsx") || types.includes("xls") || types.includes("csv")) {
+    if (
+      types.includes("xlsx") ||
+      types.includes("xls") ||
+      types.includes("csv")
+    ) {
       bump("excel", 0.12);
       bump("accounting", 0.06);
       bump("finance", 0.06);
@@ -424,7 +507,11 @@ export class DomainEnforcementService {
       bump("invoices_billing", 0.04);
     }
 
-    if (types.includes("jpg") || types.includes("jpeg") || types.includes("png")) {
+    if (
+      types.includes("jpg") ||
+      types.includes("jpeg") ||
+      types.includes("png")
+    ) {
       bump("personal_docs", 0.06);
       bump("medical", 0.06);
       bump("invoices_billing", 0.06);
@@ -440,16 +527,20 @@ export class DomainEnforcementService {
   private mergeHintCandidate(
     scored: Array<{ domainId: string; score: number; matches: number }>,
     hintDomain: string,
-    hintConfidence: number
+    hintConfidence: number,
   ) {
     if (!hintDomain || !this.isValidDomain(hintDomain)) return scored;
     if (hintConfidence <= 0) return scored;
 
     // Blend as a small prior (does not dominate unless already close)
     const prior = 0.08 + 0.12 * clamp01(hintConfidence); // 0.08–0.20
-    const out = scored.map(s => ({ ...s }));
-    const found = out.find(s => s.domainId === hintDomain);
-    if (found) found.score = Math.min(found.score + prior, this.detection?.config?.capMaxConfidence ?? 0.98);
+    const out = scored.map((s) => ({ ...s }));
+    const found = out.find((s) => s.domainId === hintDomain);
+    if (found)
+      found.score = Math.min(
+        found.score + prior,
+        this.detection?.config?.capMaxConfidence ?? 0.98,
+      );
     else out.push({ domainId: hintDomain, score: prior, matches: 0 });
     return out;
   }
@@ -459,7 +550,7 @@ export class DomainEnforcementService {
     const s = Math.max(0, Math.min(0.98, score));
     if (s <= 0) return 0.55;
     // mild non-linear scaling so small scores don't look too confident
-    const conf = 0.55 + (0.43 * Math.pow(s / 0.98, 0.85));
+    const conf = 0.55 + 0.43 * Math.pow(s / 0.98, 0.85);
     return Math.min(0.98, Math.max(0.55, conf));
   }
 
@@ -467,7 +558,12 @@ export class DomainEnforcementService {
     domainId: string,
     confidence: number,
     reasons: string[],
-    dbg: { defaultDomain: string; usedHint: boolean; usedDetection: boolean; strictDomainIds: boolean }
+    dbg: {
+      defaultDomain: string;
+      usedHint: boolean;
+      usedDetection: boolean;
+      strictDomainIds: boolean;
+    },
   ): DomainDecision {
     const d = this.getDomainConfig(domainId);
 
@@ -478,7 +574,7 @@ export class DomainEnforcementService {
     // related domains
     let related: string[] = [];
     if (d?.relatedDomains?.length) {
-      related = d.relatedDomains.filter(x => this.isValidDomain(x));
+      related = d.relatedDomains.filter((x) => this.isValidDomain(x));
     } else {
       // fallback: heuristic based on known "clusters" if not provided
       related = this.heuristicRelatedDomains(domainId);
@@ -507,12 +603,21 @@ export class DomainEnforcementService {
 
   private heuristicRelatedDomains(domainId: string): string[] {
     const map: Record<string, string[]> = {
-      finance: ["accounting", "excel", "invoices_billing", "real_estate_hospitality"],
+      finance: [
+        "accounting",
+        "excel",
+        "invoices_billing",
+        "real_estate_hospitality",
+      ],
       accounting: ["finance", "excel", "invoices_billing"],
       excel: ["finance", "accounting"],
       legal: ["personal_docs", "invoices_billing"],
       medical: ["insurance", "personal_docs"],
-      personal_docs: ["identity_personal", "banking_statements", "invoices_billing"],
+      personal_docs: [
+        "identity_personal",
+        "banking_statements",
+        "invoices_billing",
+      ],
       invoices_billing: ["finance", "accounting", "banking_statements"],
       banking_statements: ["credit_cards", "finance", "personal_docs"],
       credit_cards: ["banking_statements", "personal_docs"],
@@ -523,7 +628,7 @@ export class DomainEnforcementService {
     };
 
     const list = map[domainId] || ["general"];
-    return list.filter(x => this.isValidDomain(x));
+    return list.filter((x) => this.isValidDomain(x));
   }
 }
 

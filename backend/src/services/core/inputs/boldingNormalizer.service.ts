@@ -1,7 +1,7 @@
 // backend/src/services/core/inputs/boldingNormalizer.service.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { clamp } from '../../../utils';
-import { normalizeWhitespace } from '../../../utils/markdown/markdownUtils';
+import { clamp } from "../../../utils";
+import { normalizeWhitespace } from "../../../utils/markdown/markdownUtils";
 
 /**
  * BoldingNormalizerService (ChatGPT-parity, deterministic)
@@ -136,7 +136,10 @@ function protectUnsafeRegions(text: string): ProtectedRegions {
 
 // ─── Cleanup passes (existing logic, preserved) ─────────────────────────────
 
-function unwrapOverlongBold(text: string, maxBoldSpanChars: number): { text: string; changed: boolean } {
+function unwrapOverlongBold(
+  text: string,
+  maxBoldSpanChars: number,
+): { text: string; changed: boolean } {
   const re = /\*\*([^*]+)\*\*/g;
   let changed = false;
   const out = text.replace(re, (_m, inner) => {
@@ -175,7 +178,7 @@ function boldNumericValues(text: string): { text: string; changed: boolean } {
     /(?<!\*\*)\(?\$\d[\d,]*(?:\.\d{1,2})?\)?(?!\*\*)/g,
     (match) => {
       // Skip if already bolded (check surrounding context)
-      if (match.startsWith('**') || match.endsWith('**')) return match;
+      if (match.startsWith("**") || match.endsWith("**")) return match;
       changed = true;
       return `**${match}**`;
     },
@@ -248,7 +251,10 @@ function boldSectionLeadIns(text: string): { text: string; changed: boolean } {
  * Uses the user query to identify what the answer is about.
  * E.g. "The EBITDA margin for FY2025 is 22.54%." → "The **EBITDA margin** for FY2025 is 22.54%."
  */
-function boldHeadlineEntity(text: string, userQuery: string): { text: string; changed: boolean } {
+function boldHeadlineEntity(
+  text: string,
+  userQuery: string,
+): { text: string; changed: boolean } {
   if (!userQuery || !text) return { text, changed: false };
 
   // Extract key noun phrases from the query (2-4 word phrases that look like entities)
@@ -283,7 +289,8 @@ function boldHeadlineEntity(text: string, userQuery: string): { text: string; ch
 
   // Find first sentence
   const firstSentenceEnd = text.search(/[.!?]\s/);
-  if (firstSentenceEnd === -1 || firstSentenceEnd > 300) return { text, changed: false };
+  if (firstSentenceEnd === -1 || firstSentenceEnd > 300)
+    return { text, changed: false };
   const firstSentence = text.slice(0, firstSentenceEnd + 1);
 
   // Try to bold the term in the first sentence only (first occurrence)
@@ -291,12 +298,18 @@ function boldHeadlineEntity(text: string, userQuery: string): { text: string; ch
   let result = text;
 
   for (const term of candidateTerms) {
-    const termRegex = new RegExp(`(?<!\\*\\*)\\b(${escapeRegex(term)})\\b(?!\\*\\*)`, 'i');
+    const termRegex = new RegExp(
+      `(?<!\\*\\*)\\b(${escapeRegex(term)})\\b(?!\\*\\*)`,
+      "i",
+    );
     const firstMatch = termRegex.exec(firstSentence);
     if (firstMatch) {
       // Bold only in the first sentence region of the full text
       const before = result.slice(0, firstMatch.index);
-      const matched = result.slice(firstMatch.index, firstMatch.index + firstMatch[0].length);
+      const matched = result.slice(
+        firstMatch.index,
+        firstMatch.index + firstMatch[0].length,
+      );
       const after = result.slice(firstMatch.index + firstMatch[0].length);
 
       // Don't double-bold
@@ -315,21 +328,37 @@ function boldHeadlineEntity(text: string, userQuery: string): { text: string; ch
  * Rule D: Bold first occurrence of domain terms.
  * Uses a small whitelist of common domain terms. Only bolds the first occurrence.
  */
-function boldFirstOccurrenceDomainTerms(text: string): { text: string; changed: boolean } {
+function boldFirstOccurrenceDomainTerms(text: string): {
+  text: string;
+  changed: boolean;
+} {
   const DOMAIN_TERMS = [
     // Financial
-    "EBITDA", "EBITDA Adjusted", "Gross Operating Profit",
-    "Net Income", "Net Loss", "Net Profit",
-    "Operating Revenue", "Operating Expenses",
-    "Total Revenue", "Total Expenses",
+    "EBITDA",
+    "EBITDA Adjusted",
+    "Gross Operating Profit",
+    "Net Income",
+    "Net Loss",
+    "Net Profit",
+    "Operating Revenue",
+    "Operating Expenses",
+    "Total Revenue",
+    "Total Expenses",
     // Tech/analytics
-    "Analytics Dashboard", "API calls",
-    "vector embeddings", "Pinecone",
+    "Analytics Dashboard",
+    "API calls",
+    "vector embeddings",
+    "Pinecone",
     "S3 storage",
     // Agile/Scrum
-    "Sprint", "Product Backlog", "Scrum Master",
-    "Sprint Review", "Sprint Retrospective", "Daily Scrum",
-    "Product Owner", "Development Team",
+    "Sprint",
+    "Product Backlog",
+    "Scrum Master",
+    "Sprint Review",
+    "Sprint Retrospective",
+    "Daily Scrum",
+    "Product Owner",
+    "Development Team",
   ];
 
   let changed = false;
@@ -345,7 +374,10 @@ function boldFirstOccurrenceDomainTerms(text: string): { text: string; changed: 
     if (alreadyBolded.has(term.toLowerCase())) continue;
 
     // Bold only the first occurrence
-    const regex = new RegExp(`(?<!\\*\\*)\\b(${escapeRegex(term)})\\b(?!\\*\\*)`, 'i');
+    const regex = new RegExp(
+      `(?<!\\*\\*)\\b(${escapeRegex(term)})\\b(?!\\*\\*)`,
+      "i",
+    );
     const match = regex.exec(result);
     if (match) {
       const before = result.slice(0, match.index);
@@ -361,7 +393,11 @@ function boldFirstOccurrenceDomainTerms(text: string): { text: string; changed: 
 
 // ─── Document name bolding (preserved from original) ────────────────────────
 
-function boldDocumentNames(text: string, names: string[], maxAdds: number): { text: string; changed: boolean } {
+function boldDocumentNames(
+  text: string,
+  names: string[],
+  maxAdds: number,
+): { text: string; changed: boolean } {
   if (!names || !names.length) return { text, changed: false };
 
   let changed = false;
@@ -403,7 +439,10 @@ function enforceDensityCap(
   const totalChars = Math.max(1, text.length);
   let density = statsBefore.chars / totalChars;
 
-  if (density <= maxBoldDensity && statsBefore.spans <= maxBoldSpansPerMessage) {
+  if (
+    density <= maxBoldDensity &&
+    statsBefore.spans <= maxBoldSpansPerMessage
+  ) {
     return { text, changed: false };
   }
 
@@ -420,11 +459,14 @@ function enforceDensityCap(
   for (let i = spans.length - 1; i >= 0; i--) {
     const after = countBoldSpans(out);
     density = after.chars / totalChars;
-    if (density <= maxBoldDensity && after.spans <= maxBoldSpansPerMessage) break;
+    if (density <= maxBoldDensity && after.spans <= maxBoldSpansPerMessage)
+      break;
 
     const span = spans[i];
     // Preserve filename bold and currency bold
-    const looksLikeFile = /\b[^ ]+\.(pdf|docx?|xlsx?|pptx?|txt|csv)\b/i.test(span.inner);
+    const looksLikeFile = /\b[^ ]+\.(pdf|docx?|xlsx?|pptx?|txt|csv)\b/i.test(
+      span.inner,
+    );
     const looksLikeCurrency = /^\(?[$€£]\d/.test(span.inner);
     if ((looksLikeFile && ensureDocNamesBold) || looksLikeCurrency) continue;
 
@@ -520,7 +562,11 @@ export class BoldingNormalizerService {
 
     // Document name bolding (legacy, now mostly handled by source pills)
     if (ensureDocNamesBold && input.documentNames?.length) {
-      const bd = boldDocumentNames(text, input.documentNames, maxDocNameBoldAdds);
+      const bd = boldDocumentNames(
+        text,
+        input.documentNames,
+        maxDocNameBoldAdds,
+      );
       if (bd.changed) {
         text = bd.text;
         transformations.push("bold_document_names");
@@ -528,7 +574,12 @@ export class BoldingNormalizerService {
     }
 
     // ── Phase 4: Enforce density cap ─────────────────────────────────────
-    const dc = enforceDensityCap(text, maxBoldDensity, maxBoldSpansPerMessage, ensureDocNamesBold);
+    const dc = enforceDensityCap(
+      text,
+      maxBoldDensity,
+      maxBoldSpansPerMessage,
+      ensureDocNamesBold,
+    );
     if (dc.changed) {
       text = dc.text;
       transformations.push("enforce_bold_density_cap");
@@ -574,7 +625,8 @@ export class BoldingNormalizerService {
 // Convenience singleton accessor for answerComposer
 let instance: BoldingNormalizerService | null = null;
 export function getBoldingNormalizer(): BoldingNormalizerService {
-  if (!instance) instance = new BoldingNormalizerService({ getBank: () => null } as any);
+  if (!instance)
+    instance = new BoldingNormalizerService({ getBank: () => null } as any);
   return instance;
 }
 
