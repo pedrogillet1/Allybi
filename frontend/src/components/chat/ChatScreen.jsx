@@ -81,6 +81,9 @@ export default function ChatScreen() {
 
   // Avoid spamming /conversations during dev remounts or when backend is rate limiting.
   const hydrateMetaRef = useRef({ lastAttemptTs: 0 });
+  const hasHydratedFromStorageRef = useRef(false);
+  const hydratedStorageKeyRef = useRef(conversationStorageKey);
+  const explicitNewChatRef = useRef(false);
 
   // Initial conversation resolution:
   //  1) URL param (e.g. /c/k4r8f5/{id})
@@ -113,16 +116,30 @@ export default function ChatScreen() {
   // ---------------------------------------------------------------------------
   useEffect(() => {
     if (location.state?.newConversation) {
+      explicitNewChatRef.current = false;
       setCurrentConversation(location.state.newConversation);
     }
   }, [location.state]);
 
   useEffect(() => {
+    if (hydratedStorageKeyRef.current !== conversationStorageKey) {
+      hydratedStorageKeyRef.current = conversationStorageKey;
+      hasHydratedFromStorageRef.current = false;
+    }
+  }, [conversationStorageKey]);
+
+  useEffect(() => {
     if (!currentConversation || !isEphemeral(currentConversation)) return;
+    if (explicitNewChatRef.current) return;
+    if (hasHydratedFromStorageRef.current) return;
+    if (urlConversationId && urlConversationId !== "new") return;
+    if (location.state?.newConversation?.id) return;
+
+    hasHydratedFromStorageRef.current = true;
     const savedId = localStorage.getItem(conversationStorageKey);
     if (!savedId || savedId === "new") return;
     setCurrentConversation({ id: savedId, title: "Loading…" });
-  }, [conversationStorageKey, currentConversation]);
+  }, [conversationStorageKey, currentConversation, location.state?.newConversation?.id, urlConversationId]);
 
   // ---------------------------------------------------------------------------
   // Persist current conversation id + sync URL bar
@@ -131,6 +148,7 @@ export default function ChatScreen() {
     if (!currentConversation) return;
 
     if (!isEphemeral(currentConversation) && currentConversation.id) {
+      explicitNewChatRef.current = false;
       localStorage.setItem(conversationStorageKey, currentConversation.id);
       silentReplaceUrl(buildRoute.chat(currentConversation.id));
     } else {
@@ -241,6 +259,7 @@ export default function ChatScreen() {
   // ---------------------------------------------------------------------------
 
   const handleSelectConversation = useCallback((conversation) => {
+    explicitNewChatRef.current = false;
     setCurrentConversation(conversation);
   }, []);
 
@@ -248,10 +267,14 @@ export default function ChatScreen() {
    * "New Chat" is always ephemeral until first message is actually sent.
    */
   const handleNewChat = useCallback((ephemeralConversation) => {
+    explicitNewChatRef.current = true;
+    hasHydratedFromStorageRef.current = true;
+    localStorage.removeItem(conversationStorageKey);
+    silentReplaceUrl(ROUTES.CHAT);
     setCurrentConversation(ephemeralConversation || makeEphemeralConversation());
     // This is now a "fresh session scope"
     hadInitialConversationRef.current = false;
-  }, []);
+  }, [conversationStorageKey]);
 
   /**
    * Called by ChatInterface when:
@@ -261,9 +284,15 @@ export default function ChatScreen() {
   const handleConversationUpdate = useCallback((updatedConversation) => {
     // If null => conversation not found. Reset to ephemeral new chat.
     if (updatedConversation === null) {
+      explicitNewChatRef.current = true;
+      hasHydratedFromStorageRef.current = true;
+      localStorage.removeItem(conversationStorageKey);
+      silentReplaceUrl(ROUTES.CHAT);
       setCurrentConversation(makeEphemeralConversation());
       return;
     }
+
+    explicitNewChatRef.current = false;
 
     // Update local state (clear isEphemeral when merging a real conversation)
     setCurrentConversation((prev) => {
@@ -278,12 +307,14 @@ export default function ChatScreen() {
     if (typeof updateConversationInListRef.current === "function") {
       updateConversationInListRef.current(updatedConversation);
     }
-  }, []);
+  }, [conversationStorageKey]);
 
   /**
    * Called by ChatInterface when the first user message creates a real conversation.
    */
   const handleConversationCreated = useCallback((newConversation) => {
+    explicitNewChatRef.current = false;
+    hasHydratedFromStorageRef.current = true;
     setCurrentConversation({ ...newConversation, isEphemeral: false });
 
     if (typeof updateConversationInListRef.current === "function") {

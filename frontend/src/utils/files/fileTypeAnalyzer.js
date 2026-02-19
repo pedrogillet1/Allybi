@@ -56,24 +56,24 @@ const FULLY_SUPPORTED = {
 
   // Data
   sql: { category: 'data', fullSupport: true },
+
+  // Images (visual-only, OCR attempted when possible)
+  jpg: { category: 'image', fullSupport: true },
+  jpeg: { category: 'image', fullSupport: true },
+  png: { category: 'image', fullSupport: true },
+  gif: { category: 'image', fullSupport: true },
+  bmp: { category: 'image', fullSupport: true },
+  tiff: { category: 'image', fullSupport: true },
+  tif: { category: 'image', fullSupport: true },
+  webp: { category: 'image', fullSupport: true },
+  svg: { category: 'image', fullSupport: true },
+  ico: { category: 'image', fullSupport: true },
 };
 
 /**
  * Limited support file types (extraction may be incomplete)
  */
 const LIMITED_SUPPORT = {
-  // Images (OCR not guaranteed)
-  jpg: { category: 'image', reason: 'ocr_required' },
-  jpeg: { category: 'image', reason: 'ocr_required' },
-  png: { category: 'image', reason: 'ocr_required' },
-  gif: { category: 'image', reason: 'ocr_required' },
-  bmp: { category: 'image', reason: 'ocr_required' },
-  tiff: { category: 'image', reason: 'ocr_required' },
-  tif: { category: 'image', reason: 'ocr_required' },
-  webp: { category: 'image', reason: 'ocr_required' },
-  svg: { category: 'image', reason: 'ocr_required' },
-  ico: { category: 'image', reason: 'ocr_required' },
-
   // Video files (supported by backend, limited text extraction)
   mp4: { category: 'video', reason: 'limited_extraction' },
   webm: { category: 'video', reason: 'limited_extraction' },

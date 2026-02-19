@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, startTransition, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import cleanDocumentName from '../../utils/cleanDocumentName';
@@ -281,6 +281,7 @@ const UploadHub = () => {
   const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
   const fileInputRef = useRef(null);
   const folderInputRef = useRef(null);
+  const filesCardRef = useRef(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [showRenameModal, setShowRenameModal] = useState(false);
@@ -771,6 +772,9 @@ const UploadHub = () => {
       }
       if (allowed.length === 0) return;
       setUploadingFiles(prev => [...allowed, ...prev]);
+      requestAnimationFrame(() => {
+        filesCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
     } else {
       // Fallback to old behavior for browsers that don't support DataTransferItemList
       const files = Array.from(e.dataTransfer.files);
@@ -796,6 +800,9 @@ const UploadHub = () => {
       }));
 
       setUploadingFiles(prev => [...pendingFiles, ...prev]);
+      requestAnimationFrame(() => {
+        filesCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
     }
   };
 
@@ -1530,12 +1537,15 @@ const UploadHub = () => {
       folderPath: file.path ? file.path.substring(0, file.path.lastIndexOf('/')) : null
     }));
 
-    startTransition(() => {
-      setUploadingFiles(prev => [...pendingFiles, ...prev]);
-    });
+    setUploadingFiles(prev => [...pendingFiles, ...prev]);
 
     // Reset input so the same file can be re-selected
     event.target.value = '';
+
+    // Auto-scroll to the files card so user sees the selected files
+    requestAnimationFrame(() => {
+      filesCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
   };
 
   // Handle scanned document completion (mobile scanner)
@@ -1554,8 +1564,11 @@ const UploadHub = () => {
       path: pdfFile.name
     };
 
-    startTransition(() => {
-      setUploadingFiles(prev => [pendingFile, ...prev]);
+    setUploadingFiles(prev => [pendingFile, ...prev]);
+
+    // Auto-scroll to the files card so user sees the scanned file
+    requestAnimationFrame(() => {
+      filesCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
   };
 
@@ -2958,7 +2971,9 @@ const UploadHub = () => {
               )}
 
               {/* Hidden inputs */}
-              <input ref={fileInputRef} type="file" multiple onChange={handleFileSelect} style={{ display: 'none' }} />
+              <input ref={fileInputRef} type="file" multiple onChange={handleFileSelect} style={{ display: 'none' }}
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.html,.htm,.rtf,.jpg,.jpeg,.png,.gif,.webp,.tiff,.tif,.bmp,.svg,.ico,.mp4,.webm,.ogg,.mov,.avi,.mp3,.wav,.m4a,.psd,.ai,.sketch,.fig,.xd"
+              />
               <input ref={folderInputRef} type="file" webkitdirectory="" directory="" multiple onChange={handleFolderSelect} style={{ display: 'none' }} />
             </div>
 
@@ -3131,7 +3146,7 @@ const UploadHub = () => {
           </div>
 
           {/* Row 2: Files card (span 12, full width) */}
-          <div style={{
+          <div ref={filesCardRef} style={{
             background: 'white', borderRadius: 16, border: '1px solid #E6E6EC',
             boxShadow: '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)',
             padding: 24, marginTop: isMobile ? -8 : 24,

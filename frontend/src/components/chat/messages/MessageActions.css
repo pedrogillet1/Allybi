@@ -27,12 +27,7 @@
   padding: 4px;
   border-radius: 10px;
   color: rgba(0, 0, 0, 0.55);
-  transition: background 120ms ease, color 120ms ease, transform 120ms ease;
-}
-
-.koda-action-btn:hover {
-  background: rgba(0, 0, 0, 0.04);
-  color: rgba(0, 0, 0, 0.8);
+  transition: transform 120ms ease;
 }
 
 .koda-action-btn:active {

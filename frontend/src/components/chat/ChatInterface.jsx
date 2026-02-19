@@ -5480,17 +5480,6 @@ export default function ChatInterface({
               >
                 <style>{`
                   .chat-v3-textarea::placeholder { color: #9CA3AF; }
-                  .assistant-message .koda-msg-actions,
-                  .assistant-message .koda-followup-chips {
-                    opacity: 0;
-                    transition: opacity 0.15s ease;
-                  }
-                  .assistant-message:hover .koda-msg-actions,
-                  .assistant-message:focus-within .koda-msg-actions,
-                  .assistant-message:hover .koda-followup-chips,
-                  .assistant-message:focus-within .koda-followup-chips {
-                    opacity: 1;
-                  }
                 `}</style>
                 <textarea
                   ref={inputRef}
