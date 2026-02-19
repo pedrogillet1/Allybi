@@ -518,7 +518,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "4bd622852440dd244530d787102380488218a03f44370b1e709fcb24a57755dd",
+      "checksumSha256": "bee3b079734b3184a639b93ad6206974cdce0f8a3d7f2747ac9424c8fbeca0ba",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -2984,6 +2984,16 @@
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
       "checksumSha256": "6951e3739ef7b65e7afdb3a7336e6492b22b371f34d57c3864ab84a697098192"
+    },
+    {
+      "id": "operator_priority",
+      "category": "routing",
+      "path": "routing/operator_priority.any.json",
+      "filename": "operator_priority.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-02-07",
+      "checksumSha256": "33cdc3ac00fd73786688703b19ab48e9c9f734858efa2577693e2963b0dfaae0"
     },
     {
       "id": "source_selection_routing",

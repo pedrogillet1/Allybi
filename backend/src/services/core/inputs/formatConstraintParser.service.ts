@@ -36,7 +36,10 @@ export type OutputShape =
   | "numbered_list"
   | "table"
   | "file_list"
-  | "button_only";
+  | "button_only"
+  | "quote"
+  | "breadcrumbs"
+  | "steps";
 
 export interface FormatConstraints {
   // core output shape

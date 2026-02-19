@@ -42,7 +42,16 @@ import { getBank } from "../banks/bankLoader.service";
 
 // If you already have these types in src/types/, import them instead.
 export type LanguageCode = "en" | "pt" | "es";
-export type OutputShape = "paragraph" | "bullets" | "numbered_list" | "table" | "file_list" | "button_only";
+export type OutputShape =
+  | "paragraph"
+  | "bullets"
+  | "numbered_list"
+  | "table"
+  | "file_list"
+  | "button_only"
+  | "quote"
+  | "breadcrumbs"
+  | "steps";
 
 export interface ConversationState {
   conversationId: string;

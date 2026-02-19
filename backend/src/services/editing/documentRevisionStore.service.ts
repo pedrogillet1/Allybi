@@ -72,6 +72,17 @@ function looksLikeDocxAnnotatedMarkdown(value: string): boolean {
   return /<!--\s*docx:\d+\s*-->/i.test(String(value || ""));
 }
 
+export class OperatorNotImplementedError extends Error {
+  readonly code = "OPERATOR_NOT_IMPLEMENTED" as const;
+  readonly operator: string;
+
+  constructor(operator: string) {
+    super(`Operator is not implemented in revision store: ${operator}`);
+    this.name = "OperatorNotImplementedError";
+    this.operator = String(operator || "").trim() || "unknown";
+  }
+}
+
 function safeJsonParseObject(value: unknown): Record<string, any> {
   if (typeof value !== "string" || !value.trim()) return {};
   try {
@@ -1018,7 +1029,7 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       (meta as any).slidesPresentationId = ensured.presentationId;
       (meta as any).slidesPresentationUrl = ensured.url;
     } else {
-      throw new Error(`Unsupported edit operator: ${op}`);
+      throw new OperatorNotImplementedError(op);
     }
 
     // Default: overwrite the original stored file (no new document in the user's library).

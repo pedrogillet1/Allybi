@@ -449,6 +449,8 @@ export class EditOrchestratorService {
     } catch (error) {
       const message = error instanceof Error ? error.message : "Apply failed";
       const isNoop = message.startsWith("EDIT_NOOP");
+      const errorCode = typeof (error as any)?.code === "string" ? String((error as any).code) : null;
+      const isOperatorNotImplemented = errorCode === "OPERATOR_NOT_IMPLEMENTED";
       await this.track(isNoop ? "edit_noop" as any : "edit_failed", ctx, {
         stage: isNoop ? "noop" : "apply",
         documentId: request.plan.documentId,
@@ -474,6 +476,23 @@ export class EditOrchestratorService {
             code: "EDIT_NOOP_NO_CHANGES",
             gate: "apply_proof",
             message: "No document mutation was verified.",
+          },
+        };
+      }
+      if (isOperatorNotImplemented) {
+        return {
+          ok: true,
+          applied: false,
+          outcomeType: "engine_unsupported",
+          preview,
+          error: message,
+          blockedReason: {
+            code: "OPERATOR_NOT_IMPLEMENTED",
+            gate: "executor_branch",
+            message,
+            details: {
+              operator: request.plan.operator,
+            },
           },
         };
       }

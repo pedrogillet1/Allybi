@@ -33,7 +33,16 @@ export type AnswerMode =
   | "help_steps"
   | "general_answer";
 
-export type OutputShape = "paragraph" | "bullets" | "numbered_list" | "table" | "file_list" | "button_only";
+export type OutputShape =
+  | "paragraph"
+  | "bullets"
+  | "numbered_list"
+  | "table"
+  | "file_list"
+  | "button_only"
+  | "quote"
+  | "breadcrumbs"
+  | "steps";
 
 export interface SourceButton {
   documentId: string;
