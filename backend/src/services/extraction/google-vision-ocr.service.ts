@@ -360,7 +360,7 @@ export class GoogleVisionOcrService {
   }
 
   private async buildPdfSubset(sourcePdf: any, globalPages: number[]): Promise<Buffer> {
-    const { PDFDocument } = require('pdf-lib');
+    const { PDFDocument } = require('@cantoo/pdf-lib');
     const subset = await PDFDocument.create();
     const indices = globalPages.map((p) => Math.max(0, p - 1));
     const copied = await subset.copyPages(sourcePdf, indices);
