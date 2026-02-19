@@ -1,6 +1,6 @@
 import type { StreamSink, LLMStreamingConfig } from "./llm/types/llmStreaming.types";
 import {
-  PrismaChatService as PrismaChatLegacyService,
+  PrismaChatCoreService,
   ConversationNotFoundError,
 } from "./prismaChat.legacy.service";
 import type {
@@ -35,12 +35,14 @@ export type {
 export { ConversationNotFoundError };
 
 /**
- * Thin chat facade:
- * - Keeps persistence + legacy operational paths available via inheritance
- * - Routes turn handling through ChatKernelService
+ * Centralized chat service entrypoint:
+ * - Single public PrismaChatService surface for routes/controllers
+ * - Uses core implementation for persistence + shared operations
+ * - Optionally routes turns through ChatKernelService
  */
-export class PrismaChatService extends PrismaChatLegacyService {
+export class PrismaChatService extends PrismaChatCoreService {
   private readonly kernel: ChatKernelService;
+  private readonly useKernel: boolean;
 
   constructor(
     engine: ChatEngine,
@@ -50,6 +52,9 @@ export class PrismaChatService extends PrismaChatLegacyService {
     },
   ) {
     super(engine, opts);
+    // Staged cutover switch for centralized turn routing.
+    // default=true preserves current behavior unless explicitly disabled.
+    this.useKernel = (process.env.PRISMA_CHAT_KERNEL_ENABLED ?? "true") !== "false";
     this.kernel = new ChatKernelService({
       chat: (req: ChatRequest) => super.chat(req),
       streamChat: (params: { req: ChatRequest; sink: StreamSink; streamingConfig: LLMStreamingConfig }) =>
@@ -58,6 +63,7 @@ export class PrismaChatService extends PrismaChatLegacyService {
   }
 
   override async chat(req: ChatRequest): Promise<ChatResult> {
+    if (!this.useKernel) return super.chat(req);
     return this.kernel.handleTurn(req);
   }
 
@@ -66,6 +72,7 @@ export class PrismaChatService extends PrismaChatLegacyService {
     sink: StreamSink;
     streamingConfig: LLMStreamingConfig;
   }): Promise<ChatResult> {
+    if (!this.useKernel) return super.streamChat(params);
     return this.kernel.streamTurn(params);
   }
 }

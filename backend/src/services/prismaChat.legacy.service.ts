@@ -176,6 +176,7 @@ type NoEvidenceKind = 'processing' | 'failed' | 'ocr_or_empty' | 'scoped_not_fou
 type NoEvidenceDoc = {
   id: string;
   filename: string | null;
+  encryptedFilename?: string | null;
   mimeType: string | null;
   status: string;
   rawText: string | null;
@@ -274,10 +275,10 @@ interface FileAction {
 }
 
 /* ---------------------------------------------
- * PrismaChatService
+ * PrismaChatCoreService (internal core implementation)
  * -------------------------------------------- */
 
-export class PrismaChatService {
+export class PrismaChatCoreService {
   private encryptedRepo?: EncryptedChatRepo;
   private encryptedContext?: EncryptedChatContextService;
   private readonly tokenVault = new TokenVaultService();
@@ -13254,27 +13255,13 @@ export class PrismaChatService {
     const attachedDocumentIds = req.attachedDocumentIds ?? [];
     const hasAttachments = attachedDocumentIds.length > 0;
 
-    if (hasAttachments) {
-      await prisma.conversation.update({
-        where: { id: conversationId },
-        data: { scopeDocumentIds: attachedDocumentIds },
-      });
-    }
-
-    // --- Document Scoping: load persisted scope ---
-    const ragScopeEnabled = (process.env.RAG_SCOPE_ENABLED ?? 'true') !== 'false';
+    // --- Document Scoping: explicit only in normal chat ---
     const ragScopeMinChunks = parseInt(process.env.RAG_SCOPE_MIN_CHUNKS ?? '2', 10) || 2;
     const strictScopeMode = (process.env.RAG_STRICT_SCOPE_MODE ?? 'true') !== 'false';
 
     let scopeDocIds: string[] = [];
     if (hasAttachments) {
       scopeDocIds = attachedDocumentIds;
-    } else if (ragScopeEnabled) {
-      const convScope = await prisma.conversation.findFirst({
-        where: { id: conversationId, userId: req.userId },
-        select: { scopeDocumentIds: true },
-      });
-      scopeDocIds = (convScope?.scopeDocumentIds as string[]) ?? [];
     }
 
     // SCOPED_SEARCH override: use folder-scoped doc IDs
@@ -13284,15 +13271,9 @@ export class PrismaChatService {
 
     // Decide scoping:
     // - Attachments/folder-scoped search are hard scope.
-    // - Persisted conversation scope is only used for referential/ambiguous follow-ups.
+    // - Normal chat follow-ups without explicit scope always search globally.
     const referentialFollowUp = this.isReferentialFollowUp(req.message, history);
-    let useScope = scopeDocIds.length > 0 && (hasAttachments || !!scopedSearchDocIds || referentialFollowUp);
-    let scopeCleared = false;
-    if (!hasAttachments && !scopedSearchDocIds && scopeDocIds.length > 0 && await this.queryNamesNewDocument(req.message, scopeDocIds)) {
-      scopeDocIds = [];
-      useScope = false;
-      scopeCleared = true;
-    }
+    const useScope = scopeDocIds.length > 0 && (hasAttachments || !!scopedSearchDocIds);
 
     // 3) Query expansion: skip when scoped (hard filter already constrains to right doc)
     let contextualQuery = useScope
@@ -13465,6 +13446,12 @@ export class PrismaChatService {
           meta: req.meta,
         });
         if (provisional) {
+          const provisionalText = this.enforceFreshFollowUpAnswer({
+            history,
+            query: req.message,
+            answer: provisional.text,
+            language: req.preferredLanguage,
+          });
           const userMsg = await this.createMessage({
             conversationId,
             role: 'user',
@@ -13475,7 +13462,7 @@ export class PrismaChatService {
           const assistantMsg = await this.createMessage({
             conversationId,
             role: 'assistant',
-            content: provisional.text,
+            content: provisionalText,
             userId: req.userId,
             metadata: {
               sources: provisional.sources,
@@ -13491,7 +13478,7 @@ export class PrismaChatService {
             conversationId,
             userMessageId: userMsg.id,
             assistantMessageId: assistantMsg.id,
-            assistantText: provisional.text,
+            assistantText: provisionalText,
             attachmentsPayload: [],
             sources: provisional.sources,
             answerMode: 'general_answer' as AnswerMode,
@@ -13505,6 +13492,12 @@ export class PrismaChatService {
         }
       }
 
+      const finalDiagnosticText = this.enforceFreshFollowUpAnswer({
+        history,
+        query: req.message,
+        answer: diagnosticText,
+        language: req.preferredLanguage,
+      });
       const userMsg = await this.createMessage({
         conversationId,
         role: 'user',
@@ -13515,7 +13508,7 @@ export class PrismaChatService {
       const assistantMsg = await this.createMessage({
         conversationId,
         role: 'assistant',
-        content: diagnosticText,
+        content: finalDiagnosticText,
         userId: req.userId,
         metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
       });
@@ -13524,7 +13517,7 @@ export class PrismaChatService {
         conversationId,
         userMessageId: userMsg.id,
         assistantMessageId: assistantMsg.id,
-        assistantText: diagnosticText,
+        assistantText: finalDiagnosticText,
         attachmentsPayload: [],
         sources: [],
         answerMode: 'general_answer' as AnswerMode,
@@ -13534,25 +13527,7 @@ export class PrismaChatService {
       };
     }
 
-    // --- Persist scope after retrieval ---
-    // Only persist scope when the user is clearly in a follow-up about the same doc,
-    // or when they explicitly attached files (hard scope).
-    const shouldPersistScope =
-      ragScopeEnabled &&
-      (hasAttachments || referentialFollowUp || /[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/i.test(req.message));
-
-    if (shouldPersistScope && chunks.length > 0) {
-      const retrievedDocIds = [...new Set(chunks.map(c => c.documentId))];
-      if (scopeDocIds.length === 0 || scopeCleared) {
-        // First turn or scope cleared (new doc named): set scope from retrieved docs
-        const newScopeDocIds = retrievedDocIds.slice(0, 3);
-        await prisma.conversation.update({
-          where: { id: conversationId },
-          data: { scopeDocumentIds: newScopeDocIds },
-        });
-      }
-      // If scope was active and used: keep existing scope (don't narrow further)
-    }
+    // Do not persist scope between normal chat turns.
 
     // Derive routing before building RAG context (context is mode-aware)
     const sources = this.buildSourcesFromChunks(chunks);
@@ -13679,6 +13654,12 @@ export class PrismaChatService {
       });
       cleanedText = boldResult.text;
     }
+    cleanedText = this.enforceFreshFollowUpAnswer({
+      history,
+      query: req.message,
+      answer: cleanedText,
+      language: req.preferredLanguage,
+    });
 
     // Sources are now persisted in message metadata — no need for text attribution
     const storedText = cleanedText;
@@ -13800,9 +13781,9 @@ export class PrismaChatService {
         return 'Ainda não consegui extrair texto pesquisável deste documento (pode ser um PDF/imagem escaneado com OCR baixo). Envie uma versão mais nítida ou com OCR.';
       }
       if (kind === 'scoped_not_found') {
-        return 'Verifiquei apenas os documentos selecionados e não encontrei esse dado neles. Se você quiser, eu procuro em outros arquivos ou você pode indicar página/unidade/seção exata.';
+        return 'Não encontrei esse dado nos documentos e anexos já indexados. Se quiser, anexe o arquivo mais relevante para focar a busca.';
       }
-      return 'Ainda não encontrei conteúdo pesquisável nos documentos selecionados. Aguarde a indexação e tente novamente.';
+      return 'Ainda não encontrei conteúdo pesquisável nos seus documentos e anexos. Aguarde a indexação e tente novamente.';
     }
     if (lang === 'es') {
       if (kind === 'processing') {
@@ -13815,9 +13796,9 @@ export class PrismaChatService {
         return 'Aún no pude extraer texto buscable de este documento (puede ser un PDF/imagen escaneado con OCR bajo). Sube una versión más clara o con OCR.';
       }
       if (kind === 'scoped_not_found') {
-        return 'Busqué solo en los documentos seleccionados y ese dato no aparece allí. Si quieres, busco en otros archivos o indícame la página/unidad/sección exacta.';
+        return 'No encontré ese dato en los documentos y adjuntos ya indexados. Si quieres, adjunta el archivo más relevante para enfocar la búsqueda.';
       }
-      return 'Aún no encontré contenido buscable en los documentos seleccionados. Espera a que termine la indexación e inténtalo nuevamente.';
+      return 'Aún no encontré contenido buscable en tus documentos y adjuntos. Espera a que termine la indexación e inténtalo nuevamente.';
     }
 
     if (kind === 'processing') {
@@ -13830,9 +13811,9 @@ export class PrismaChatService {
       return 'I could not extract searchable text from this document yet (it may be a scanned PDF/image with low OCR quality). Please upload a clearer scan or OCR version.';
     }
     if (kind === 'scoped_not_found') {
-      return 'I searched only within the selected documents and that detail is not present there. I can search other files, or you can point me to the exact page/unit/section.';
+      return 'I could not find that detail in your indexed documents and attachments. If you want, attach the most relevant file to focus the search.';
     }
-    return 'I could not find searchable content in the selected documents yet. Please wait for indexing to finish and try again.';
+    return 'I could not find searchable content in your documents and attachments yet. Please wait for indexing to finish and try again.';
   }
 
   private indexingChunkWaitMs(): number {
@@ -13863,12 +13844,12 @@ export class PrismaChatService {
   private localizeScopeRelaxNotice(language?: 'en' | 'pt' | 'es'): string {
     const lang = language || 'en';
     if (lang === 'pt') {
-      return 'Não encontrei evidência indexada suficiente apenas nos arquivos selecionados, então também consultei outros documentos indexados.';
+      return 'Não encontrei evidência indexada suficiente apenas nos arquivos anexados neste pedido, então também consultei outros documentos indexados.';
     }
     if (lang === 'es') {
-      return 'No encontré evidencia indexada suficiente solo en los archivos seleccionados, así que también consulté otros documentos indexados.';
+      return 'No encontré evidencia indexada suficiente solo en los archivos adjuntos de esta solicitud, así que también consulté otros documentos indexados.';
     }
-    return 'I could not find enough indexed evidence only in the selected files, so I also checked other indexed documents.';
+    return 'I could not find enough indexed evidence only in the files attached to this request, so I also checked other indexed documents.';
   }
 
   private buildFallbackTextCandidates(query: string, docs: NoEvidenceDoc[]): Array<{ doc: NoEvidenceDoc; text: string; score: number }> {
@@ -14000,6 +13981,7 @@ export class PrismaChatService {
       select: {
         id: true,
         filename: true,
+        encryptedFilename: true,
         mimeType: true,
         status: true,
         rawText: true,
@@ -14010,7 +13992,12 @@ export class PrismaChatService {
 
     const mappedDocs: NoEvidenceDoc[] = docs.map((d) => ({
       id: d.id,
-      filename: d.filename || null,
+      filename: this.resolveDocumentDisplayName({
+        documentId: d.id,
+        filename: d.filename || null,
+        encryptedFilename: d.encryptedFilename || null,
+      }),
+      encryptedFilename: d.encryptedFilename || null,
       mimeType: d.mimeType || null,
       status: String(d.status || ''),
       rawText: d.rawText || null,
@@ -14030,7 +14017,7 @@ export class PrismaChatService {
       statuses.has('enriching') ||
       statuses.has('indexing');
 
-    let kind: NoEvidenceKind = 'scoped_not_found';
+    let kind: NoEvidenceKind = 'generic';
     if (isStillProcessing) {
       kind = 'processing';
     } else if (statuses.has('failed')) {
@@ -14205,9 +14192,11 @@ export class PrismaChatService {
     // Build results with fallback chain: filename → decrypted filenameEncrypted → S3 path extraction
     return scoredChunks.filter(c => c.text).map(c => ({
       text: c.text,
-      filename: c.filename
-        || decryptedFilenames.get(c.documentId)
-        || this.extractFilenameFromPath(c.encryptedFilename),
+      filename: this.resolveDocumentDisplayName({
+        documentId: c.documentId,
+        filename: c.filename || decryptedFilenames.get(c.documentId),
+        encryptedFilename: c.encryptedFilename,
+      }),
       page: c.page,
       documentId: c.documentId,
       mimeType: c.mimeType,
@@ -14258,6 +14247,21 @@ export class PrismaChatService {
     base = base.replace(/\s+/g, ' ').trim();
 
     return base + ext;
+  }
+
+  private resolveDocumentDisplayName(input: {
+    documentId: string;
+    filename?: string | null;
+    encryptedFilename?: string | null;
+  }): string {
+    const direct = String(input.filename || '').trim();
+    if (direct && direct.toLowerCase() !== 'unknown') return direct;
+
+    const fromPath = this.extractFilenameFromPath(input.encryptedFilename || null);
+    if (fromPath && fromPath.toLowerCase() !== 'unknown') return fromPath;
+
+    const shortId = String(input.documentId || '').trim().slice(0, 8);
+    return shortId ? `Document ${shortId}` : 'Document';
   }
 
   /** Expand keywords with common English-Portuguese translations */
@@ -16062,6 +16066,50 @@ export class PrismaChatService {
     return false;
   }
 
+  private normalizeAnswerFingerprint(value: string): string {
+    return String(value || '')
+      .toLowerCase()
+      .replace(/[`*_~>#-]/g, ' ')
+      .replace(/[^\w\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private enforceFreshFollowUpAnswer(params: {
+    history: Array<{ role: ChatRole; content: string }>;
+    query: string;
+    answer: string;
+    language?: 'en' | 'pt' | 'es';
+  }): string {
+    const answer = String(params.answer || '').trim();
+    if (!answer) return answer;
+
+    const previousAssistant = [...params.history].reverse().find(
+      (m) => m.role === 'assistant' && String(m.content || '').trim(),
+    );
+    const previousUser = [...params.history].reverse().find(
+      (m) => m.role === 'user' && String(m.content || '').trim(),
+    );
+    if (!previousAssistant || !previousUser) return answer;
+
+    const prevAnswer = this.normalizeAnswerFingerprint(previousAssistant.content || '');
+    const nextAnswer = this.normalizeAnswerFingerprint(answer);
+    if (!prevAnswer || prevAnswer !== nextAnswer) return answer;
+
+    const currentQuery = this.normalizeAnswerFingerprint(params.query || '');
+    const previousQuery = this.normalizeAnswerFingerprint(previousUser.content || '');
+    if (!currentQuery || currentQuery === previousQuery) return answer;
+
+    const lang = params.language || 'en';
+    const note =
+      lang === 'pt'
+        ? 'Reavaliei este seguimento em todos os documentos armazenados e anexos.'
+        : lang === 'es'
+          ? 'Reevalué este seguimiento en todos los documentos almacenados y adjuntos.'
+          : 'I re-evaluated this follow-up across all stored documents and attachments.';
+    return `${note}\n\n${answer}`;
+  }
+
   /**
    * Detect when a query explicitly names a document NOT in the current scope.
    * Returns true when the query mentions a file (e.g., "summary.pdf") that doesn't
@@ -17540,31 +17588,13 @@ export class PrismaChatService {
     const attachedDocumentIds = params.req.attachedDocumentIds ?? [];
     const hasAttachments = attachedDocumentIds.length > 0;
 
-    if (hasAttachments) {
-      // Persist attached doc IDs into conversation scope so follow-up questions stay scoped
-      await prisma.conversation.update({
-        where: { id: conversationId },
-        data: {
-          scopeDocumentIds: attachedDocumentIds,
-        },
-      });
-    }
-
-    // --- Document Scoping: load persisted scope ---
-    const ragScopeEnabled = (process.env.RAG_SCOPE_ENABLED ?? 'true') !== 'false';
+    // --- Document Scoping: explicit only in normal chat ---
     const ragScopeMinChunks = parseInt(process.env.RAG_SCOPE_MIN_CHUNKS ?? '2', 10) || 2;
     const strictScopeMode = (process.env.RAG_STRICT_SCOPE_MODE ?? 'true') !== 'false';
 
     let scopeDocIds: string[] = [];
     if (hasAttachments) {
-      // Attachments override any persisted scope
       scopeDocIds = attachedDocumentIds;
-    } else if (ragScopeEnabled) {
-      const convScope = await prisma.conversation.findFirst({
-        where: { id: conversationId, userId: params.req.userId },
-        select: { scopeDocumentIds: true },
-      });
-      scopeDocIds = (convScope?.scopeDocumentIds as string[]) ?? [];
     }
 
     // SCOPED_SEARCH override: use folder-scoped doc IDs
@@ -17574,15 +17604,9 @@ export class PrismaChatService {
 
     // Decide scoping:
     // - Attachments/folder-scoped search are hard scope.
-    // - Persisted conversation scope is only used for referential/ambiguous follow-ups.
+    // - Normal chat follow-ups without explicit scope always search globally.
     const referentialFollowUp = this.isReferentialFollowUp(params.req.message, history);
-    let useScope = scopeDocIds.length > 0 && (hasAttachments || !!streamScopedSearchDocIds || referentialFollowUp);
-    let scopeCleared = false;
-    if (!hasAttachments && !streamScopedSearchDocIds && scopeDocIds.length > 0 && await this.queryNamesNewDocument(params.req.message, scopeDocIds)) {
-      scopeDocIds = [];
-      useScope = false;
-      scopeCleared = true;
-    }
+    const useScope = scopeDocIds.length > 0 && (hasAttachments || !!streamScopedSearchDocIds);
 
     // If user attached documents, wait for their chunks to be available (processing is async)
     if (hasAttachments) {
@@ -17651,6 +17675,12 @@ export class PrismaChatService {
             meta: params.req.meta,
           });
           if (provisional) {
+            const provisionalText = this.enforceFreshFollowUpAnswer({
+              history,
+              query: params.req.message,
+              answer: provisional.text,
+              language: params.req.preferredLanguage,
+            });
             const userMsg = existingUserMsgId
               ? { id: existingUserMsgId }
               : await this.createMessage({
@@ -17664,13 +17694,13 @@ export class PrismaChatService {
             if (params.sink.isOpen()) {
               params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
               params.sink.write({ event: 'sources', data: { sources: provisional.sources } } as any);
-              params.sink.write({ event: 'delta', data: { text: provisional.text } } as any);
+              params.sink.write({ event: 'delta', data: { text: provisionalText } } as any);
             }
 
             const assistantMsg = await this.createMessage({
               conversationId,
               role: 'assistant',
-              content: provisional.text,
+              content: provisionalText,
               userId: params.req.userId,
               metadata: {
                 sources: provisional.sources,
@@ -17686,7 +17716,7 @@ export class PrismaChatService {
               conversationId,
               userMessageId: userMsg.id,
               assistantMessageId: assistantMsg.id,
-              assistantText: provisional.text,
+              assistantText: provisionalText,
               attachmentsPayload: [],
               sources: provisional.sources,
               answerMode: 'general_answer' as AnswerMode,
@@ -17703,22 +17733,29 @@ export class PrismaChatService {
         const userMsg = existingUserMsgId
           ? { id: existingUserMsgId }
           : await this.createMessage({
-            conversationId,
-            role: 'user',
+              conversationId,
+              role: 'user',
             content: params.req.message,
             userId: params.req.userId,
-            ...(attachmentMeta ? { metadata: attachmentMeta } : {}),
-          });
+              ...(attachmentMeta ? { metadata: attachmentMeta } : {}),
+            });
+
+        const finalDiagnosticText = this.enforceFreshFollowUpAnswer({
+          history,
+          query: params.req.message,
+          answer: diagnosticText,
+          language: params.req.preferredLanguage,
+        });
 
         if (params.sink.isOpen()) {
           params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
-          params.sink.write({ event: 'delta', data: { text: diagnosticText } } as any);
+          params.sink.write({ event: 'delta', data: { text: finalDiagnosticText } } as any);
         }
 
         const assistantMsg = await this.createMessage({
           conversationId,
           role: 'assistant',
-          content: diagnosticText,
+          content: finalDiagnosticText,
           userId: params.req.userId,
           metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
         });
@@ -17727,7 +17764,7 @@ export class PrismaChatService {
           conversationId,
           userMessageId: userMsg.id,
           assistantMessageId: assistantMsg.id,
-          assistantText: diagnosticText,
+          assistantText: finalDiagnosticText,
           attachmentsPayload: [],
           sources: [],
           answerMode: 'general_answer' as AnswerMode,
@@ -17935,6 +17972,12 @@ export class PrismaChatService {
           meta: params.req.meta,
         });
         if (provisional) {
+          const provisionalText = this.enforceFreshFollowUpAnswer({
+            history,
+            query: params.req.message,
+            answer: provisional.text,
+            language: params.req.preferredLanguage,
+          });
           const userMsg = existingUserMsgId
             ? { id: existingUserMsgId }
             : await this.createMessage({
@@ -17948,13 +17991,13 @@ export class PrismaChatService {
           if (params.sink.isOpen()) {
             params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
             params.sink.write({ event: 'sources', data: { sources: provisional.sources } } as any);
-            params.sink.write({ event: 'delta', data: { text: provisional.text } } as any);
+            params.sink.write({ event: 'delta', data: { text: provisionalText } } as any);
           }
 
           const assistantMsg = await this.createMessage({
             conversationId,
             role: 'assistant',
-            content: provisional.text,
+            content: provisionalText,
             userId: params.req.userId,
             metadata: {
               sources: provisional.sources,
@@ -17970,7 +18013,7 @@ export class PrismaChatService {
             conversationId,
             userMessageId: userMsg.id,
             assistantMessageId: assistantMsg.id,
-            assistantText: provisional.text,
+            assistantText: provisionalText,
             attachmentsPayload: [],
             sources: provisional.sources,
             answerMode: 'general_answer' as AnswerMode,
@@ -17987,22 +18030,29 @@ export class PrismaChatService {
       const userMsg = existingUserMsgId
         ? { id: existingUserMsgId }
         : await this.createMessage({
-          conversationId,
-          role: 'user',
+            conversationId,
+            role: 'user',
           content: params.req.message,
           userId: params.req.userId,
-          ...(attachmentMeta ? { metadata: attachmentMeta } : {}),
-        });
+            ...(attachmentMeta ? { metadata: attachmentMeta } : {}),
+          });
+
+      const finalDiagnosticText = this.enforceFreshFollowUpAnswer({
+        history,
+        query: params.req.message,
+        answer: diagnosticText,
+        language: params.req.preferredLanguage,
+      });
 
       if (params.sink.isOpen()) {
         params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
-        params.sink.write({ event: 'delta', data: { text: diagnosticText } } as any);
+        params.sink.write({ event: 'delta', data: { text: finalDiagnosticText } } as any);
       }
 
       const assistantMsg = await this.createMessage({
         conversationId,
         role: 'assistant',
-        content: diagnosticText,
+        content: finalDiagnosticText,
         userId: params.req.userId,
         metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
       });
@@ -18011,7 +18061,7 @@ export class PrismaChatService {
         conversationId,
         userMessageId: userMsg.id,
         assistantMessageId: assistantMsg.id,
-        assistantText: diagnosticText,
+        assistantText: finalDiagnosticText,
         attachmentsPayload: [],
         sources: [],
         answerMode: 'general_answer' as AnswerMode,
@@ -18021,23 +18071,7 @@ export class PrismaChatService {
       };
     }
 
-    // --- Persist scope after retrieval ---
-    const shouldPersistScope =
-      ragScopeEnabled &&
-      (hasAttachments || referentialFollowUp || /[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/i.test(params.req.message));
-
-    if (shouldPersistScope && chunks.length > 0) {
-      const retrievedDocIds = [...new Set(chunks.map(c => c.documentId))];
-      if (scopeDocIds.length === 0 || scopeCleared) {
-        // First turn or scope cleared (new doc named): set scope from retrieved docs
-        const newScopeDocIds = retrievedDocIds.slice(0, 3);
-        await prisma.conversation.update({
-          where: { id: conversationId },
-          data: { scopeDocumentIds: newScopeDocIds },
-        });
-      }
-      // If scope was active and used: keep existing scope (don't narrow further)
-    }
+    // Do not persist scope between normal chat turns.
 
     // Derive routing before building RAG context (context is mode-aware)
     const sources = this.buildSourcesFromChunks(chunks);
@@ -18209,6 +18243,12 @@ export class PrismaChatService {
       });
       cleanedText = boldResult.text;
     }
+    cleanedText = this.enforceFreshFollowUpAnswer({
+      history,
+      query: params.req.message,
+      answer: cleanedText,
+      language: preferredLanguage,
+    });
 
     // Sources are now persisted in message metadata — no need for text attribution
     const storedText = cleanedText;

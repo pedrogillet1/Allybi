@@ -389,6 +389,39 @@ function stripSlidesDeckBoilerplate(text) {
 /** Clean source filename for display */
 const cleanSourceFilename = cleanDocumentName;
 
+const NON_TERMINAL_MESSAGE_STATUSES = new Set([
+  "streaming",
+  "thinking",
+  "pending",
+  "queued",
+  "running",
+  "finalizing",
+  "applying",
+]);
+
+function isNonTerminalMessageStatus(status) {
+  const key = String(status || "").trim().toLowerCase();
+  return key ? NON_TERMINAL_MESSAGE_STATUSES.has(key) : false;
+}
+
+function hasNonTerminalHydratedMessages(messages) {
+  if (!Array.isArray(messages)) return false;
+  return messages.some((m) => isNonTerminalMessageStatus(m?.status));
+}
+
+function sanitizeHydratedMessages(messages) {
+  if (!Array.isArray(messages)) return [];
+  return messages.map((m) => {
+    if (!m || typeof m !== "object") return m;
+    if (!isNonTerminalMessageStatus(m.status)) return m;
+    const nextStatus = String(m?.error || "").trim() ? "error" : "done";
+    return {
+      ...m,
+      status: nextStatus,
+    };
+  });
+}
+
 function isConnectorEmailArtifactName(name) {
   const n = String(name || "").trim();
   if (!n) return false;
@@ -1315,7 +1348,7 @@ export default function ChatInterface({
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { documents, folders, fetchDocuments, fetchFolders } = useDocuments();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const { triggerAuthGate, isUnauthenticated } = useAuthGate();
 
   const ACTIVE_CONNECTORS_KEY = useMemo(() => {
@@ -2050,12 +2083,14 @@ export default function ChatInterface({
     // 1) Try cache — instant restore, no auth needed.
     //    sessionStorage first (freshest, intra-tab), then localStorage (survives browser close).
     let hadCache = false;
+    let cacheHasNonTerminal = false;
     try {
       const sessionCached = sessionStorage.getItem(cacheKeyFor(curId));
       if (sessionCached) {
         const parsed = JSON.parse(sessionCached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setMessages(parsed);
+          cacheHasNonTerminal = hasNonTerminalHydratedMessages(parsed);
+          setMessages(sanitizeHydratedMessages(parsed));
           hadCache = true;
         }
       }
@@ -2063,7 +2098,8 @@ export default function ChatInterface({
     if (!hadCache) {
       const lsCached = lsCacheRead(curId);
       if (lsCached) {
-        setMessages(lsCached);
+        cacheHasNonTerminal = hasNonTerminalHydratedMessages(lsCached);
+        setMessages(sanitizeHydratedMessages(lsCached));
         hadCache = true;
       }
     }
@@ -2073,12 +2109,16 @@ export default function ChatInterface({
       setLoadingChat(true);
     }
 
+    // Safety timeout: clear loadingChat if auth or API takes too long,
+    // so the spinner doesn't persist indefinitely.
+    const loadingTimeout = setTimeout(() => setLoadingChat(false), 8000);
+
     // 2) API refresh requires auth — gate only the network call, not the cache.
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) return () => clearTimeout(loadingTimeout);
 
     // Never overwrite in-memory streaming state with an API refresh.
     // The streaming handler owns message state while active.
-    if (isStreaming) return;
+    if (isStreaming) return () => clearTimeout(loadingTimeout);
 
     // Mark conversation as loaded only after auth is ready. On page refresh,
     // isAuthenticated starts false; if we set prevConversationIdRef before this
@@ -2090,7 +2130,7 @@ export default function ChatInterface({
     try {
       const ts = Number(sessionStorage.getItem(cacheTsKeyFor(curId)) || "0");
       const age = ts ? Date.now() - ts : Infinity;
-      if (hadCache && age < 30_000) { // 30s freshness window
+      if (hadCache && age < 30_000 && !cacheHasNonTerminal) { // 30s freshness window
         setLoadingChat(false);
         return;
       }
@@ -2198,6 +2238,7 @@ export default function ChatInterface({
 
     return () => {
       cancelled = true;
+      clearTimeout(loadingTimeout);
     };
   }, [conversationId, isAuthenticated, isEphemeral, onConversationUpdate, isViewerVariant]);
 
@@ -2287,7 +2328,7 @@ export default function ChatInterface({
       } catch {}
       lsCacheWrite(conversationId, messages);
     }
-  }, [messages?.length ?? 0]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [messages, conversationId, isEphemeral, isViewerVariant]);
 
   // -------------------------
   // Streaming flush loop (ChatGPT-like cadence)
@@ -3645,11 +3686,26 @@ export default function ChatInterface({
     });
     if (!sources.length) return null;
 
+    const resolveSourceDisplayName = (source) => {
+      const raw = cleanSourceFilename(source?.filename || source?.title || source?.name || "");
+      const normalized = raw.toLowerCase();
+      if (raw && !["unknown", "unknown file", "arquivo desconhecido", "archivo desconocido"].includes(normalized)) {
+        return raw;
+      }
+      const docId = source?.docId || source?.documentId || source?.id;
+      if (docId) {
+        const doc = documents.find((d) => d?.id === docId);
+        const recovered = cleanSourceFilename(doc?.filename || doc?.name || doc?.originalName || "");
+        if (recovered) return recovered;
+      }
+      return raw || "Document";
+    };
+
     // Deduplicate by filename, keep the first (most relevant) occurrence
     const seen = new Set();
     const unique = [];
     for (const s of sources) {
-      const key = cleanSourceFilename(s.filename || s.title || s.name || '').toLowerCase();
+      const key = resolveSourceDisplayName(s).toLowerCase();
       if (key && !seen.has(key)) {
         seen.add(key);
         unique.push(s);
@@ -3657,9 +3713,9 @@ export default function ChatInterface({
     }
 
     // For action_receipt mode, show all action sources as pills
-    // For other modes, show only the top 1 source
+    // For other modes, show top 3 sources
     const isActionReceipt = m.answerMode === 'action_receipt' || m.answerMode === 'action_confirmation';
-    const displaySources = isActionReceipt ? unique : (unique.length > 0 ? [unique[0]] : []);
+    const displaySources = isActionReceipt ? unique : unique.slice(0, 3);
     if (!displaySources.length) return null;
 
     const isNav = m.answerMode === "nav_pills" || !!m.navType;
@@ -3671,8 +3727,8 @@ export default function ChatInterface({
           type: s.type,
           folderId: s.folderId,
           docId: s.docId || s.documentId || s.id,
-          title: cleanSourceFilename(s.title || s.filename || s.name || ""),
-          filename: cleanSourceFilename(s.filename || s.title || s.name || ""),
+          title: resolveSourceDisplayName(s),
+          filename: resolveSourceDisplayName(s),
           mimeType: s.mimeType,
           url: s.url,
           page: s.page,
@@ -4408,7 +4464,7 @@ export default function ChatInterface({
             flexDirection: 'column',
           }}
         >
-          {messages.length === 0 && (loadingChat || (!isEphemeral && !isAuthenticated)) ? (
+          {messages.length === 0 && (loadingChat || (!isEphemeral && authLoading)) ? (
             /* Switching to an existing chat or auth resolving — show subtle loader, not the welcome screen */
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', opacity: 0.5 }}>
               <img src={kodaIcon} alt="" style={{ width: 40, height: 40, animation: 'pulse 1.2s ease-in-out infinite' }} />
