@@ -15764,6 +15764,21 @@ export class PrismaChatService {
    * Returns true when the query mentions a file (e.g., "summary.pdf") that doesn't
    * match any filename from the current scope documents.
    */
+  private normalizeDocLikeText(value: string): string {
+    return String(value || '')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/([A-Za-z])(\d)/g, '$1 $2')
+      .replace(/(\d)([A-Za-z])/g, '$1 $2')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/gi, ' ')
+      .replace(/[_\-.\\/]+/g, ' ')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   private async queryNamesNewDocument(
     query: string,
     scopeDocIds: string[],
@@ -15778,20 +15793,20 @@ export class PrismaChatService {
 
     const scopedNames = scopedDocs.map(d => {
       const name = d.filename || this.extractFilenameFromPath(d.encryptedFilename) || '';
-      return name.toLowerCase();
+      return this.normalizeDocLikeText(name);
     }).filter(Boolean);
 
     const q = (query || '').trim();
     if (!q) return false;
+    const qNormalized = this.normalizeDocLikeText(q);
+    const qTokens = new Set(qNormalized.split(/\s+/).filter((t) => t.length >= 3));
 
     // 1) Explicit file references in the query (with extension).
     const fileRefs = q.match(/[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/gi) || [];
     for (const ref of fileRefs) {
-      const refLower = ref.toLowerCase();
-      const refBase = refLower.replace(/\.(pdf|docx?|xlsx?|pptx?|csv|txt)$/i, '');
+      const refBase = this.normalizeDocLikeText(ref);
       const inScope = scopedNames.some(name => {
-        const nameBase = name.replace(/\.(pdf|docx?|xlsx?|pptx?|csv|txt)$/i, '');
-        return name.includes(refBase) || nameBase.includes(refBase) || refBase.includes(nameBase);
+        return name.includes(refBase) || refBase.includes(name);
       });
       if (!inScope) return true;
     }
@@ -15802,9 +15817,7 @@ export class PrismaChatService {
     //
     // Heuristic: if the query contains a 2+ word phrase that matches a non-scoped
     // document base name, treat it as a new document mention.
-    const scopedBases = new Set(
-      scopedNames.map((n) => n.replace(/\.(pdf|docx?|xlsx?|pptx?|csv|txt)$/i, '').replace(/[_-]+/g, ' ').trim()),
-    );
+    const scopedBases = new Set(scopedNames);
 
     const anyScoped = await prisma.document.findFirst({
       where: { id: { in: scopeDocIds } },
@@ -15818,14 +15831,19 @@ export class PrismaChatService {
       take: 2000,
     });
 
-    const qLower = q.toLowerCase();
     for (const d of userDocs) {
-      const name = (d.filename || this.extractFilenameFromPath(d.encryptedFilename) || '').toLowerCase();
+      const name = this.normalizeDocLikeText(d.filename || this.extractFilenameFromPath(d.encryptedFilename) || '');
       if (!name) continue;
-      const base = name.replace(/\.(pdf|docx?|xlsx?|pptx?|csv|txt)$/i, '').replace(/[_-]+/g, ' ').trim();
+      const base = name;
       if (!base || base.length < 10) continue;
       if (scopedBases.has(base)) continue;
-      if (qLower.includes(base)) return true;
+      if (qNormalized.includes(base)) return true;
+
+      // Fuzzy token overlap for doc names written in camelCase/slug forms (e.g., edSaoBento).
+      const baseTokens = base.split(/\s+/).filter((t) => t.length >= 3);
+      const overlap = baseTokens.filter((t) => qTokens.has(t)).length;
+      const hasStrongToken = baseTokens.some((t) => qTokens.has(t) && t.length >= 5);
+      if (overlap >= 2 && hasStrongToken) return true;
     }
 
     // Check if any referenced file is NOT in the current scope
