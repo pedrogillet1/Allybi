@@ -13,6 +13,9 @@ export interface OverviewKpis {
   messages: number;
   conversationsCreated: number;
   uploads: number;
+  allybiVisits: number;
+  allybiClicks: number;
+  allybiClickThroughRate: number;
   llmCalls: number;
   tokensTotal: number;
   llmErrorRate: number;
@@ -40,7 +43,25 @@ export interface TimeseriesResult {
   points: TimeseriesPoint[];
 }
 
-type MetricName = 'dau' | 'messages' | 'uploads' | 'tokens' | 'llm_errors' | 'ingestion_failures' | 'weak_evidence_rate';
+type MetricName =
+  | 'dau'
+  | 'messages'
+  | 'uploads'
+  | 'tokens'
+  | 'llm_errors'
+  | 'ingestion_failures'
+  | 'weak_evidence_rate'
+  | 'allybi_visits'
+  | 'allybi_clicks';
+
+const ALLYBI_CLICK_EVENT_TYPES = [
+  'ALLYBI_OPEN_CLICKED',
+  'ALLYBI_SUGGESTION_CLICKED',
+  'ALLYBI_MESSAGE_SENT',
+  'ALLYBI_APPLY_CLICKED',
+  'SOURCE_PILL_CLICKED',
+  'FILE_PILL_CLICKED',
+] as const;
 
 /**
  * Get overview KPIs for the dashboard
@@ -100,6 +121,8 @@ async function calculateKpis(prisma: PrismaClient, window: TimeWindow): Promise<
     messagesCount,
     conversationsCount,
     uploadsCount,
+    allybiVisitsCount,
+    allybiClicksCount,
     llmCallsData,
     retrievalData,
     ingestionData,
@@ -141,6 +164,26 @@ async function calculateKpis(prisma: PrismaClient, window: TimeWindow): Promise<
       ? safe(
           () => prisma.document.count({
             where: { createdAt: { gte: from, lt: to } },
+          }),
+          0
+        )
+      : 0,
+
+    // Allybi visits (session start into Allybi surfaces)
+    supportsModel(prisma, 'usageEvent')
+      ? safe(
+          () => prisma.usageEvent.count({
+            where: { at: { gte: from, lt: to }, eventType: 'ALLYBI_VISIT_STARTED' },
+          }),
+          0
+        )
+      : 0,
+
+    // Allybi clicks (core interactions)
+    supportsModel(prisma, 'usageEvent')
+      ? safe(
+          () => prisma.usageEvent.count({
+            where: { at: { gte: from, lt: to }, eventType: { in: [...ALLYBI_CLICK_EVENT_TYPES] } },
           }),
           0
         )
@@ -201,6 +244,11 @@ async function calculateKpis(prisma: PrismaClient, window: TimeWindow): Promise<
   // Calculate LLM stats
   const llmCalls = llmCallsData?._count?._all ?? 0;
   const tokensTotal = llmCallsData?._sum?.totalTokens ?? 0;
+  const allybiVisits = Number(allybiVisitsCount || 0);
+  const allybiClicks = Number(allybiClicksCount || 0);
+  const allybiClickThroughRate = allybiVisits > 0
+    ? (allybiClicks / allybiVisits) * 100
+    : 0;
 
   // Calculate LLM error rate
   let llmErrorRate = 0;
@@ -249,6 +297,9 @@ async function calculateKpis(prisma: PrismaClient, window: TimeWindow): Promise<
     messages: messagesCount as number,
     conversationsCreated: conversationsCount as number,
     uploads: uploadsCount as number,
+    allybiVisits,
+    allybiClicks,
+    allybiClickThroughRate: Math.round(allybiClickThroughRate * 100) / 100,
     llmCalls,
     tokensTotal,
     llmErrorRate: Math.round(llmErrorRate * 100) / 100,
@@ -328,6 +379,39 @@ async function calculateTimeseries(
 
       for (const d of docs) {
         const bucketTime = new Date(Math.floor(d.createdAt.getTime() / bucketMs) * bucketMs).toISOString();
+        buckets.set(bucketTime, (buckets.get(bucketTime) ?? 0) + 1);
+      }
+      break;
+    }
+
+    case 'allybi_visits': {
+      if (!supportsModel(prisma, 'usageEvent')) break;
+      const visits = await prisma.usageEvent.findMany({
+        where: { at: { gte: from, lt: to }, eventType: 'ALLYBI_VISIT_STARTED' },
+        select: { at: true },
+        take: 100000,
+      });
+
+      for (const v of visits) {
+        const bucketTime = new Date(Math.floor(v.at.getTime() / bucketMs) * bucketMs).toISOString();
+        buckets.set(bucketTime, (buckets.get(bucketTime) ?? 0) + 1);
+      }
+      break;
+    }
+
+    case 'allybi_clicks': {
+      if (!supportsModel(prisma, 'usageEvent')) break;
+      const clicks = await prisma.usageEvent.findMany({
+        where: {
+          at: { gte: from, lt: to },
+          eventType: { in: [...ALLYBI_CLICK_EVENT_TYPES] },
+        },
+        select: { at: true },
+        take: 100000,
+      });
+
+      for (const c of clicks) {
+        const bucketTime = new Date(Math.floor(c.at.getTime() / bucketMs) * bucketMs).toISOString();
         buckets.set(bucketTime, (buckets.get(bucketTime) ?? 0) + 1);
       }
       break;

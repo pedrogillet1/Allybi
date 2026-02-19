@@ -1,0 +1,20 @@
+{
+  "_meta": {
+    "id": "mode_chat",
+    "version": "1.0.0",
+    "description": "Chat mode behavior and response contract.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-19"
+  },
+  "config": {
+    "enabled": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": {
+          "any": "Chat mode contract: answer directly, keep paragraphs short, avoid filler, avoid self-referential boilerplate. If blocked, ask at most one focused clarification question."
+        }
+      }
+    ]
+  }
+}

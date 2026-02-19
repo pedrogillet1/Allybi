@@ -449,6 +449,37 @@ export interface LoggerLike {
  * Old format uses: prompts[] with mode and languages
  */
 function transformModularToArrayFormat(config: any): SystemPromptsConfig {
+  // Prompt-bank format: prompts/system_prompt.any.json
+  if (config?._meta?.id === 'system_prompt' && config?.templates && !config?.prompts) {
+    const languages: any = {};
+    for (const lang of ['en', 'pt', 'es'] as LanguageCode[]) {
+      const sys = config?.templates?.[lang]?.system ?? config?.templates?.any?.system;
+      if (Array.isArray(sys) && sys.length) {
+        languages[lang] = {
+          systemPrompt: sys.join('\n'),
+          constraints: [],
+        };
+      } else if (typeof sys === 'string' && sys.trim()) {
+        languages[lang] = {
+          systemPrompt: sys,
+          constraints: [],
+        };
+      }
+    }
+
+    return {
+      version: config?._meta?.version || '1.0.0',
+      lastUpdated: config?._meta?.lastUpdated || new Date().toISOString().split('T')[0],
+      prompts: [
+        {
+          mode: 'DEFAULT',
+          description: config?._meta?.description || 'Default bank-backed system prompt',
+          languages,
+        },
+      ],
+    };
+  }
+
   // Check if it's the new modular format
   if (config.global && config.intentFamilies && !config.prompts) {
     const modular = config as ModularSystemPromptsConfig;
@@ -570,7 +601,7 @@ export class PromptConfigService {
 
       // Step 2: Load all JSON files
       // Transform modular format (v2.0.0) to array format if needed
-      const rawSystemPrompts = this.loadJSON<any>('system_prompts.json');
+      const rawSystemPrompts = this.loadJSON<any>('prompts/system_prompt.any.json');
       const systemPrompts = transformModularToArrayFormat(rawSystemPrompts);
       const answerStyles = this.loadJSON<AnswerStylesConfig>('answer_styles.json');
       const answerExamples = this.loadJSON<AnswerExamplesConfig>('answer_examples.json');
@@ -1379,15 +1410,15 @@ export class PromptConfigService {
 
   private validateSystemPrompts(config: SystemPromptsConfig): void {
     if (!config.prompts || !Array.isArray(config.prompts)) {
-      throw new Error('system_prompts.json: missing or invalid "prompts" array');
+      throw new Error('system prompt config: missing or invalid "prompts" array');
     }
 
     for (const prompt of config.prompts) {
       if (!prompt.mode) {
-        throw new Error('system_prompts.json: prompt missing "mode" field');
+        throw new Error('system prompt config: prompt missing "mode" field');
       }
       if (!prompt.languages || typeof prompt.languages !== 'object') {
-        throw new Error(`system_prompts.json: prompt "${prompt.mode}" missing "languages" object`);
+        throw new Error(`system prompt config: prompt "${prompt.mode}" missing "languages" object`);
       }
     }
 

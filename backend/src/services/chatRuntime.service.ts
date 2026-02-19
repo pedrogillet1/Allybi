@@ -1,7 +1,7 @@
 /**
- * prismaChat.service.ts
+ * chatRuntime.service.ts
  *
- * PrismaChatService (ChatService implementation)
+ * ChatRuntimeService (chat runtime implementation)
  * ----------------------------------------------
  * This version:
  * - Implements a ChatService-like interface (CRUD + chat + streamChat)
@@ -25,9 +25,9 @@ import { resolveDataDir } from '../utils/resolveDataDir';
 import { EncryptionService } from './security/encryption.service';
 import { EnvelopeService } from './security/envelope.service';
 import { TenantKeyService } from './security/tenantKey.service';
-import { DocumentKeyService } from '../services/documents/documentKey.service';
-import { DocumentCryptoService } from '../services/documents/documentCrypto.service';
-import { EncryptedDocumentRepo } from '../services/documents/encryptedDocumentRepo.service';
+import { DocumentKeyService } from './documents/documentKey.service';
+import { DocumentCryptoService } from './documents/documentCrypto.service';
+import { EncryptedDocumentRepo } from './documents/encryptedDocumentRepo.service';
 
 import type {
   StreamSink,
@@ -73,6 +73,33 @@ import { TargetResolverService } from './editing';
 import type { DocxParagraphNode, EditDomain, EditOperator, ResolvedTarget } from './editing';
 import { extractXlsxWithAnchors } from './extraction/xlsxExtractor.service';
 import ExcelJS from 'exceljs';
+import {
+  ConversationNotFoundError,
+  type AnswerClass,
+  type AnswerMode,
+  type ChatEngine,
+  type ChatMessageDTO,
+  type ChatRequest,
+  type ChatResult,
+  type ChatRole,
+  type ConversationDTO,
+  type ConversationWithMessagesDTO,
+  type NavType,
+} from './chatRuntime.contracts';
+
+export type {
+  AnswerClass,
+  AnswerMode,
+  ChatEngine,
+  ChatMessageDTO,
+  ChatRequest,
+  ChatResult,
+  ChatRole,
+  ConversationDTO,
+  ConversationWithMessagesDTO,
+  NavType,
+} from './chatRuntime.contracts';
+export { ConversationNotFoundError } from './chatRuntime.contracts';
 
 const VISIBLE_CHAT_DOC_FILTER = {
   status: { notIn: ['failed', 'uploading', 'deleted', 'skipped'] },
@@ -80,95 +107,11 @@ const VISIBLE_CHAT_DOC_FILTER = {
   encryptedFilename: { not: { contains: '/connectors/' } },
 };
 
-/* ---------------------------------------------
- * Minimal service contracts (align with controller)
- * -------------------------------------------- */
-
-export type ChatRole = "user" | "assistant" | "system";
-
-export interface ChatMessageDTO {
-  id: string;
-  role: ChatRole;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  attachments?: unknown | null;
-  telemetry?: Record<string, unknown> | null;
-  metadata?: Record<string, unknown> | null;
-}
-
-export interface ConversationDTO {
-  id: string;
-  title: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ConversationWithMessagesDTO extends ConversationDTO {
-  messages: ChatMessageDTO[];
-}
-
-export interface ChatRequest {
-  userId: string;
-  conversationId?: string;
-  message: string;
-  attachedDocumentIds?: string[];
-  preferredLanguage?: "en" | "pt" | "es";
-  confirmationToken?: string;
-  context?: Record<string, unknown>;
-  meta?: Record<string, unknown>;
-  isRegenerate?: boolean;
-  connectorContext?: {
-    // UI activation state: only the active provider is allowed for read/send operations.
-    activeProvider?: "gmail" | "outlook" | "slack" | null;
-    gmail?: { connected: boolean; canSend?: boolean };
-    outlook?: { connected: boolean; canSend?: boolean };
-    slack?: { connected: boolean; canSend?: boolean };
-  };
-}
-
-export type AnswerMode =
-  | 'doc_grounded_single'
-  | 'doc_grounded_multi'
-  | 'doc_grounded_quote'
-  | 'nav_pills'
-  | 'fallback'
-  | 'general_answer'
-  | 'help_steps'
-  | 'action_confirmation'
-  | 'action_receipt';
-
-export type AnswerClass = 'DOCUMENT' | 'NAVIGATION' | 'GENERAL';
-
 function deriveAnswerClass(answerMode: AnswerMode): AnswerClass {
   if (answerMode.startsWith('doc_grounded')) return 'DOCUMENT';
   if (answerMode === 'nav_pills') return 'NAVIGATION';
   if (answerMode === 'action_confirmation' || answerMode === 'action_receipt') return 'NAVIGATION';
   return 'GENERAL';
-}
-
-export type NavType = 'open' | 'discover' | 'where' | null;
-
-export interface ChatResult {
-  conversationId: string;
-  userMessageId: string;
-  assistantMessageId: string;
-  assistantText: string;
-  attachmentsPayload?: unknown;
-  assistantTelemetry?: Record<string, unknown>;
-  sources?: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }>;
-  listing?: Array<{ kind: 'file' | 'folder'; id: string; title: string; mimeType?: string; itemCount?: number; depth?: number }>;
-  breadcrumb?: Array<{ id: string; name: string }>;
-  answerMode?: AnswerMode;
-  answerClass?: AnswerClass;
-  navType?: NavType;
-  generatedTitle?: string;
-  answerProvisional?: boolean;
-  answerSourceMode?: "chunk" | "fallback_raw_text" | "global_relaxed";
-  indexingInProgress?: boolean;
-  scopeRelaxed?: boolean;
-  scopeRelaxReason?: string;
-  fallbackReasonCode?: string;
 }
 
 type NoEvidenceKind = 'processing' | 'failed' | 'ocr_or_empty' | 'scoped_not_found' | 'generic';
@@ -203,49 +146,6 @@ type ProvisionalAnswer = {
   };
 };
 
-/**
- * The AI engine contract PrismaChatService expects.
- * Wrap your orchestrator or LLM client behind this interface.
- */
-export interface ChatEngine {
-  generate(params: {
-    traceId: string;
-    userId: string;
-    conversationId: string;
-    messages: Array<{ role: ChatRole; content: string; attachments?: unknown | null }>;
-    context?: Record<string, unknown>;
-    meta?: Record<string, unknown>;
-  }): Promise<{
-    text: string;
-    attachmentsPayload?: unknown;
-    telemetry?: Record<string, unknown>;
-  }>;
-
-  stream(params: {
-    traceId: string;
-    userId: string;
-    conversationId: string;
-    messages: Array<{ role: ChatRole; content: string; attachments?: unknown | null }>;
-    context?: Record<string, unknown>;
-    meta?: Record<string, unknown>;
-    sink: StreamSink;
-    streamingConfig: LLMStreamingConfig;
-  }): Promise<{
-    finalText: string;
-    attachmentsPayload?: unknown;
-    telemetry?: Record<string, unknown>;
-  }>;
-}
-
-export class ConversationNotFoundError extends Error {
-  readonly code = "CONVERSATION_NOT_FOUND";
-
-  constructor(message = "Conversation not found.") {
-    super(message);
-    this.name = "ConversationNotFoundError";
-  }
-}
-
 /* ---------------------------------------------
  * Stop words filtered from queries to prevent
  * generic terms from diluting retrieval scoring
@@ -275,10 +175,10 @@ interface FileAction {
 }
 
 /* ---------------------------------------------
- * PrismaChatCoreService (internal core implementation)
+ * ChatRuntimeService (internal core implementation)
  * -------------------------------------------- */
 
-export class PrismaChatCoreService {
+export class ChatRuntimeService {
   private encryptedRepo?: EncryptedChatRepo;
   private encryptedContext?: EncryptedChatContextService;
   private readonly tokenVault = new TokenVaultService();
@@ -1183,17 +1083,6 @@ export class PrismaChatCoreService {
     ].join('\n');
   }
 
-  private buildEmailOnlyQAInstructionSystemMessage(): string {
-    return [
-      'EMAIL QA RULES:',
-      '- Use ONLY the email content provided below (subject/headers/body).',
-      '- Answer the user literally and precisely based on the email text.',
-      '- If the email does not contain the requested detail, say so explicitly.',
-      '- When helpful, quote the exact relevant line(s) from the email.',
-      '- Do not invent facts or assume missing context.',
-    ].join('\n');
-  }
-
   private buildEmailContextSystemMessage(email: {
     provider: 'gmail' | 'outlook';
     messageId: string;
@@ -1337,9 +1226,13 @@ export class PrismaChatCoreService {
 
     const messagesWithContext: Array<{ role: ChatRole; content: string }> = [
       ...params.history,
-      { role: 'system' as ChatRole, content: this.buildEmailOnlyQAInstructionSystemMessage() },
-      { role: 'system' as ChatRole, content: this.buildEmailContextSystemMessage(email) },
-      { role: 'user' as ChatRole, content: params.req.message },
+      {
+        role: 'user' as ChatRole,
+        content: JSON.stringify({
+          question: params.req.message,
+          emailContext: this.buildEmailContextSystemMessage(email),
+        }),
+      },
     ];
 
     const out = await this.engine.generate({
@@ -1348,7 +1241,10 @@ export class PrismaChatCoreService {
       conversationId: params.conversationId,
       messages: messagesWithContext,
       context: params.req.context,
-      meta: params.req.meta,
+      meta: {
+        ...(params.req.meta || {}),
+        promptTask: 'email_qa',
+      },
     });
 
     const text = String(out.text || '').trim() || "I couldn't answer that from the email.";
@@ -1420,16 +1316,6 @@ export class PrismaChatCoreService {
       ].join('\n');
     });
 
-    const system = [
-      'You are an expert at explaining emails to the user.',
-      'Summarize clearly and concretely. Do not invent details not present in the email body.',
-      '',
-      'Output format:',
-      '- Start with a 1-2 sentence summary.',
-      '- Then bullets: Key points, Action items, Deadlines/dates (if any).',
-      '- If the user likely needs to reply, include a short suggested reply draft.',
-    ].join('\n');
-
     const context = ['EMAIL CONTEXT:', ...picked].join('\n\n');
 
     const out = await this.engine.generate({
@@ -1437,10 +1323,17 @@ export class PrismaChatCoreService {
       userId: params.userId,
       conversationId: params.conversationId,
       messages: [
-        { role: 'system' as ChatRole, content: system },
-        { role: 'system' as ChatRole, content: context },
-        { role: 'user' as ChatRole, content: params.userPrompt || 'Explain the email(s).' },
+        {
+          role: 'user' as ChatRole,
+          content: JSON.stringify({
+            prompt: params.userPrompt || 'Explain the email(s).',
+            emailContext: context,
+          }),
+        },
       ],
+      meta: {
+        promptTask: 'email_explain',
+      },
     });
 
     return String(out.text || '').trim();
@@ -2799,7 +2692,7 @@ export class PrismaChatCoreService {
 
     try {
       const result = await client.generate({
-        systemPrompt: 'You are an expert image generation AI. Create a high-quality, detailed image based on the user description.',
+        systemPrompt: 'Create a high-quality, detailed image based on the user description.',
         userPrompt: params.message,
         width: 1024,
         height: 1024,
@@ -5195,16 +5088,9 @@ export class PrismaChatCoreService {
 
     for (let i = 0; i < limited.length; i += chunkSize) {
       const chunk = limited.slice(i, i + chunkSize);
-      const system =
-        "You are a careful editor. Improve clarity and consistency of bullet points while preserving meaning strictly.\n" +
-        "Rules:\n" +
-        "- Do NOT add new facts. Do NOT remove meaning.\n" +
-        "- Preserve all numbers, dates, names, and defined terms.\n" +
-        "- Keep the same subject and tone.\n" +
-        "- Output JSON only: an array of {paragraphId, text} with one entry per input bullet.\n" +
-        "No markdown. No commentary.";
 
       const user = JSON.stringify({
+        language: params.language || "en",
         toneProfile: params.toneProfile,
         instruction: params.instruction,
         bullets: chunk.map((b) => ({ paragraphId: b.paragraphId, text: String(b.text || "") })),
@@ -5214,10 +5100,11 @@ export class PrismaChatCoreService {
         traceId: params.traceId,
         userId: params.userId,
         conversationId: params.conversationId,
-        messages: [
-          { role: "system" as ChatRole, content: system },
-          { role: "user" as ChatRole, content: user },
-        ],
+        messages: [{ role: "user" as ChatRole, content: user }],
+        meta: {
+          promptTask: "docx_bullet_enhance",
+          promptTaskArgs: { chunkSize: chunk.length },
+        },
       });
 
       let arr: any[] = [];
@@ -5287,15 +5174,8 @@ export class PrismaChatCoreService {
     const chunkSize = 20;
     for (let i = 0; i < lines.length; i += chunkSize) {
       const chunk = lines.slice(i, i + chunkSize);
-      const system =
-        "You are a careful editor.\n" +
-        "Task: rewrite EACH input line independently following the instruction.\n" +
-        "Rules:\n" +
-        "- Keep one output line per input paragraphId.\n" +
-        "- Preserve meaning, numbers, dates, names, and key terms.\n" +
-        "- Do not merge lines. Do not split lines. Keep ordering.\n" +
-        "- Output JSON only: [{\"paragraphId\":\"...\",\"text\":\"...\"}].";
       const user = JSON.stringify({
+        language: "en",
         instruction: params.instruction,
         lines: chunk.map((c) => ({ paragraphId: c.paragraphId, text: c.text })),
       });
@@ -5304,10 +5184,11 @@ export class PrismaChatCoreService {
         traceId: `${params.traceId}:line_rewrite`,
         userId: params.userId,
         conversationId: params.conversationId,
-        messages: [
-          { role: "system" as ChatRole, content: system },
-          { role: "user" as ChatRole, content: user },
-        ],
+        messages: [{ role: "user" as ChatRole, content: user }],
+        meta: {
+          promptTask: "docx_line_rewrite",
+          promptTaskArgs: { chunkSize: chunk.length },
+        },
       });
 
       let arr: any[] = [];
@@ -5530,39 +5411,22 @@ export class PrismaChatCoreService {
       );
     };
 
-    const system =
-      "You are a careful editor.\n" +
-      "Task: Convert the bullet list into ONE paragraph.\n" +
-      "Rules:\n" +
-      (wantsSummary
-        ? "- Summarize the bullets into a cohesive paragraph (group into themes) while preserving meaning. Do NOT invent facts.\n"
-        : "- Preserve meaning strictly. Do NOT add new facts.\n") +
-      "- Preserve all numbers, dates, names, and defined terms.\n" +
-      "- Keep the same subject and tone.\n" +
-      "- Output JSON only (no markdown, no explanations): {\"paragraph\": \"...\"}\n" +
-      (wantsSummary
-        ? "- Write a cohesive paragraph (not a list and not a semicolon-separated run-on). Group the bullets into 3-6 themes and express them fluently.\n"
-        : "- Write a cohesive paragraph (not a list and not a semicolon-separated run-on). Prefer grouping into themes/capabilities rather than repeating the same verb for every bullet.\n") +
-      "- If bullets are questions, convert them into capability statements while preserving the meaning.\n" +
-      "- The paragraph must NOT mention headings, instructions, or the editing task itself.";
-
-    const user = [
-      `INSTRUCTION:\n${params.instruction}`,
-      "",
-      `HEADING:\n${params.headingText}`,
-      "",
-      "BULLETS:",
-      ...list.map((b) => `- ${b.text}`),
-    ].join("\n");
+    const user = JSON.stringify({
+      instruction: params.instruction,
+      heading: params.headingText,
+      wantsSummary,
+      bullets: list.map((b) => ({ paragraphId: b.paragraphId, text: b.text })),
+      toneProfile: params.toneProfile,
+    });
 
     const gen = await this.engine.generate({
       traceId: params.traceId,
       userId: params.userId,
       conversationId: params.conversationId,
-      messages: [
-        { role: "system" as ChatRole, content: system },
-        { role: "user" as ChatRole, content: user },
-      ],
+      messages: [{ role: "user" as ChatRole, content: user }],
+      meta: {
+        promptTask: "docx_list_to_paragraph",
+      },
     });
 
     const raw = String(gen.text || "").trim();
@@ -5661,32 +5525,21 @@ export class PrismaChatCoreService {
       .filter((p) => p.paragraphId && p.text);
     if (!lines.length) return [];
 
-    const system =
-      "You are a careful editor.\n" +
-      "Task: Rewrite the provided section content into ONE cohesive paragraph.\n" +
-      "Rules:\n" +
-      "- Preserve meaning strictly; do not invent facts.\n" +
-      "- Preserve all names, numbers, dates, and defined terms.\n" +
-      "- Do not mention instructions, headings, or editing actions.\n" +
-      "- Output JSON only: {\"paragraph\":\"...\"}. No markdown.";
-
-    const user = [
-      `INSTRUCTION:\n${params.instruction}`,
-      "",
-      `SECTION:\n${params.headingText}`,
-      "",
-      "CONTENT:",
-      ...lines.map((l) => `- ${l.text}`),
-    ].join("\n");
+    const user = JSON.stringify({
+      instruction: params.instruction,
+      section: params.headingText,
+      lines: lines.map((l) => ({ paragraphId: l.paragraphId, text: l.text })),
+      toneProfile: params.toneProfile,
+    });
 
     const gen = await this.engine.generate({
       traceId: params.traceId,
       userId: params.userId,
       conversationId: params.conversationId,
-      messages: [
-        { role: "system" as ChatRole, content: system },
-        { role: "user" as ChatRole, content: user },
-      ],
+      messages: [{ role: "user" as ChatRole, content: user }],
+      meta: {
+        promptTask: "docx_section_to_paragraph",
+      },
     });
 
     let paragraph = "";
@@ -5738,13 +5591,6 @@ export class PrismaChatCoreService {
     const chunkSize = 30;
     for (let i = 0; i < src.length; i += chunkSize) {
       const chunk = src.slice(i, i + chunkSize);
-      const system =
-        "You are a professional translator for office documents.\n" +
-        "Task: translate each input paragraph into the requested language.\n" +
-        "Rules:\n" +
-        "- Preserve names, dates, numbers, and structure.\n" +
-        "- Keep each item aligned by paragraphId.\n" +
-        "- Output JSON only: [{\"paragraphId\":\"...\",\"text\":\"...\"}]";
       const user = JSON.stringify({
         targetLanguage: params.targetLanguage,
         paragraphs: chunk.map((c) => ({ paragraphId: c.paragraphId, text: c.text })),
@@ -5788,10 +5634,10 @@ export class PrismaChatCoreService {
           traceId: params.traceId,
           userId: params.userId,
           conversationId: params.conversationId,
-          messages: [
-            { role: "system" as ChatRole, content: system },
-            { role: "user" as ChatRole, content: user },
-          ],
+          messages: [{ role: "user" as ChatRole, content: user }],
+          meta: {
+            promptTask: "docx_translate_batch",
+          },
         });
         parsed = parseRows(String(gen.text || ""));
       } catch {
@@ -5836,24 +5682,17 @@ export class PrismaChatCoreService {
             conversationId: params.conversationId,
             messages: [
               {
-                role: "system" as ChatRole,
-                content:
-                  "You are a professional translator for office documents.\n" +
-                  "Translate every provided paragraph to the target language.\n" +
-                  "Important:\n" +
-                  "- Return one item per input paragraph.\n" +
-                  "- Keep paragraphId unchanged.\n" +
-                  "- If a paragraph is already in target language, return it unchanged.\n" +
-                  "- Output JSON only: [{\"paragraphId\":\"...\",\"text\":\"...\"}]",
-              },
-              {
                 role: "user" as ChatRole,
                 content: JSON.stringify({
                   targetLanguage: params.targetLanguage,
                   paragraphs: unresolvedRows.map((c) => ({ paragraphId: c.paragraphId, text: c.text })),
+                  strict: true,
                 }),
               },
             ],
+            meta: {
+              promptTask: "docx_translate_retry",
+            },
           });
           const parsedSecond = parseRows(String(gen.text || ""));
           for (const item of parsedSecond) {
@@ -5883,18 +5722,16 @@ export class PrismaChatCoreService {
             conversationId: params.conversationId,
             messages: [
               {
-                role: "system" as ChatRole,
-                content:
-                  "You are a professional translator for office documents.\n" +
-                  "Translate the paragraph into the requested target language.\n" +
-                  "Preserve names, dates, numbers, acronyms, and punctuation style.\n" +
-                  "Output only the translated paragraph text with no JSON, no quotes, no markdown.",
-              },
-              {
                 role: "user" as ChatRole,
-                content: `targetLanguage=${params.targetLanguage}\nparagraph=${c.text}`,
+                content: JSON.stringify({
+                  targetLanguage: params.targetLanguage,
+                  paragraph: c.text,
+                }),
               },
             ],
+            meta: {
+              promptTask: "docx_translate_single",
+            },
           });
           const translated = String(gen.text || "").trim().replace(/^["']|["']$/g, "");
           if (translated) byId.set(c.paragraphId, translated);
@@ -6798,21 +6635,19 @@ export class PrismaChatCoreService {
     paragraphText: string;
     language?: "en" | "pt" | "es";
   }): Promise<string> {
-    const lang = params.language || "en";
-    const system =
-      lang === "pt"
-        ? "Você é um editor. Transforme o parágrafo em tópicos concisos. Cada tópico deve capturar um ponto-chave distinto. Saída: apenas os tópicos, um por linha, prefixados com '• '. Sem aspas, sem markdown, sem explicações."
-        : "You are an editor. Transform this paragraph into concise bullet points. Each bullet should capture one distinct key point. Output: only the bullet points, one per line, prefixed with '• '. No quotes, no markdown, no explanations.";
-    const user = `PARAGRAPH:\n${params.paragraphText}`;
+    const user = JSON.stringify({
+      language: params.language || "en",
+      paragraph: params.paragraphText,
+    });
     try {
       const out = await this.engine.generate({
         traceId: params.traceId,
         userId: params.userId,
         conversationId: params.conversationId,
-        messages: [
-          { role: "system" as ChatRole, content: system },
-          { role: "user" as ChatRole, content: user },
-        ],
+        messages: [{ role: "user" as ChatRole, content: user }],
+        meta: {
+          promptTask: "paragraph_to_bullets",
+        },
       });
       const raw = String(out.text || "").trim();
       if (!raw || raw.includes("```") || raw.toLowerCase().includes("as an ai")) return "";
@@ -6904,28 +6739,20 @@ export class PrismaChatCoreService {
         .replace(/\s+/g, " ")
         .trim();
 
-    const lang = params.language || "en";
-    const system =
-      lang === "pt"
-        ? "Você é um editor. Reescreva o TEXTO ORIGINAL seguindo a INSTRUÇÃO. Saída: apenas o texto reescrito (sem aspas, sem markdown, sem explicações). Preserve o tom e o estilo do texto original. Evite abertura genérica como 'Esta seção...'."
-        : lang === "es"
-          ? "Eres un editor. Reescribe el TEXTO ORIGINAL siguiendo la INSTRUCCION. Salida: solo el texto reescrito (sin comillas, sin markdown, sin explicaciones). Conserva el tono y estilo del original. Evita inicios genéricos como 'Esta sección...'."
-          : "You are an editor. Rewrite the ORIGINAL TEXT following the INSTRUCTION. Output: only the rewritten text (no quotes, no markdown, no explanations). Preserve the original tone/style and avoid generic opener drift like 'This section...' unless present in the original.";
-
-    const user = [
-      `INSTRUCTION:\n${params.instruction}`,
-      "",
-      `ORIGINAL TEXT:\n${params.beforeText}`,
-    ].join("\n");
+    const user = JSON.stringify({
+      language: params.language || "en",
+      instruction: params.instruction,
+      originalText: params.beforeText,
+    });
 
     const out = await this.engine.generate({
       traceId: params.traceId,
       userId: params.userId,
       conversationId: params.conversationId,
-      messages: [
-        { role: "system" as ChatRole, content: system },
-        { role: "user" as ChatRole, content: user },
-      ],
+      messages: [{ role: "user" as ChatRole, content: user }],
+      meta: {
+        promptTask: "rewrite_paragraph",
+      },
     });
 
     const raw = sanitize(String(out.text || ""));
@@ -6965,7 +6792,6 @@ export class PrismaChatCoreService {
       return raw;
     };
 
-    const lang = params.language || "en";
     const normalizeForEcho = (s: string): string =>
       String(s || "")
         .toLowerCase()
@@ -6998,46 +6824,32 @@ export class PrismaChatCoreService {
       return false;
     };
 
-    const systemBase =
-      lang === "pt"
-        ? "Você é um editor. Reescreva SOMENTE o TRECHO SELECIONADO seguindo a INSTRUÇÃO. Saída: apenas o texto de substituição (sem aspas, sem markdown, sem explicações)."
-        : lang === "es"
-          ? "Eres un editor. Reescribe SOLO el TEXTO SELECCIONADO siguiendo la INSTRUCCION. Salida: solo el texto de reemplazo (sin comillas, sin markdown, sin explicaciones)."
-          : "You are an editor. Rewrite ONLY the SELECTED TEXT following the INSTRUCTION. Output: only the replacement text (no quotes, no markdown, no explanations).";
-
-    const user = [
-      `INSTRUCTION:\n${params.instruction}`,
-      "",
-      `SELECTED TEXT (replace only this span):\n${params.selectedText}`,
-      "",
-      `FULL PARAGRAPH (context only; do not rewrite it):\n${params.paragraphText}`,
-    ].join("\n");
-
-    const runOnce = async (system: string): Promise<string> => {
+    const runOnce = async (strict: boolean): Promise<string> => {
       const out = await this.engine.generate({
         traceId: params.traceId,
         userId: params.userId,
         conversationId: params.conversationId,
-        messages: [
-          { role: "system" as ChatRole, content: system },
-          { role: "user" as ChatRole, content: user },
-        ],
+        messages: [{
+          role: "user" as ChatRole,
+          content: JSON.stringify({
+            language: params.language || "en",
+            instruction: params.instruction,
+            selectedText: params.selectedText,
+            paragraphText: params.paragraphText,
+            strict,
+          }),
+        }],
+        meta: {
+          promptTask: "rewrite_span",
+        },
       });
       return sanitize(String(out.text || ""));
     };
 
-    const first = await runOnce(systemBase);
+    const first = await runOnce(false);
     if (first && !looksLikeInstructionEcho(first)) return first;
 
-    // Second attempt: stricter guardrails to prevent instruction echo.
-    const system2 =
-      systemBase +
-      "\nRules:\n" +
-      "- Do NOT repeat or paraphrase the instruction itself.\n" +
-      "- Output must be a rewritten version of the selected content, not advice.\n" +
-      "- If the instruction is too generic (e.g. 'make concise'), still rewrite the selected text into a concise, professional form.\n";
-
-    const second = await runOnce(system2);
+    const second = await runOnce(true);
     if (second && !looksLikeInstructionEcho(second)) return second;
     return "";
   }
@@ -7992,29 +7804,21 @@ export class PrismaChatCoreService {
         const headingNode: any = (anchors as any[])[resolvedHeading.idx];
         const headingText = String(headingNode?.text || sectionHint || "Section").trim();
 
-        const sys =
-          params.req.preferredLanguage === "pt"
-            ? "Você é um editor. Escreva UM parágrafo novo para inserir abaixo da lista. Saída: apenas o parágrafo (sem aspas, sem markdown, sem explicações). Preserve números e nomes. Não adicione fatos."
-            : params.req.preferredLanguage === "es"
-              ? "Eres un editor. Escribe UN párrafo nuevo para insertar debajo de la lista. Salida: solo el párrafo (sin comillas, sin markdown, sin explicaciones). Conserva números y nombres. No agregues hechos."
-              : "You are an editor. Write ONE new paragraph to insert below the list. Output only the paragraph (no quotes, no markdown, no explanations). Preserve numbers and names. Don’t add new facts.";
-
-        const user = [
-          `TASK:\n${params.req.message}`,
-          "",
-          `SECTION:\n${headingText}`,
-          "",
-          `BULLETS (context to summarize):\n${bulletTexts.map((t: string) => `- ${t}`).join("\n") || "(none)"}`,
-        ].join("\n");
+        const user = JSON.stringify({
+          language: params.req.preferredLanguage || "en",
+          instruction: params.req.message,
+          section: headingText,
+          bullets: bulletTexts,
+        });
 
         const out = await this.engine.generate({
           traceId: params.traceId,
           userId: params.req.userId,
           conversationId: params.conversationId,
-          messages: [
-            { role: "system" as ChatRole, content: sys },
-            { role: "user" as ChatRole, content: user },
-          ],
+          messages: [{ role: "user" as ChatRole, content: user }],
+          meta: {
+            promptTask: "insert_paragraph_below_list",
+          },
         });
 
         const drafted = String(out.text || "").trim();
@@ -13576,13 +13380,6 @@ export class PrismaChatCoreService {
     const messagesWithContext: Array<{ role: ChatRole; content: string }> = [
       ...history,
     ];
-    if (req.preferredLanguage && req.preferredLanguage !== 'en') {
-      const langName = req.preferredLanguage === 'pt' ? 'Portuguese' : req.preferredLanguage === 'es' ? 'Spanish' : 'English';
-      messagesWithContext.unshift({
-        role: 'system' as ChatRole,
-        content: `LANGUAGE RULE: You MUST respond entirely in ${langName}. All your output must be in ${langName}. Do not respond in English unless the user explicitly asks for English.`,
-      });
-    }
     if (folderTreeContext) {
       messagesWithContext.push({ role: "system" as ChatRole, content: folderTreeContext });
     }
@@ -13602,7 +13399,13 @@ export class PrismaChatCoreService {
       conversationId,
       messages: messagesWithContext,
       context: req.context,
-      meta: req.meta,
+      meta: {
+        ...(req.meta || {}),
+        answerMode,
+        navType,
+        preferredLanguage: req.preferredLanguage || 'en',
+        promptFlow: 'chat_rag_sync',
+      },
     });
 
     // 7) Strip inline citations + guard forbidden phrases + fix currency + linkify sources + semantic bolding
@@ -13898,22 +13701,6 @@ export class PrismaChatCoreService {
       .join('\n\n---\n\n')
       .slice(0, 9000);
 
-    const lang = params.language || 'en';
-    const languageInstruction =
-      lang === 'pt'
-        ? 'Responda em português.'
-        : lang === 'es'
-          ? 'Responde en español.'
-          : 'Respond in English.';
-
-    const systemPrompt = [
-      'You are Allybi.',
-      'You must answer ONLY using the provided DOCUMENT EXTRACTS.',
-      'If information is missing, explicitly say what is not available.',
-      'Do not invent facts.',
-      languageInstruction,
-    ].join(' ');
-
     try {
       const out = await this.engine.generate({
         traceId: `${params.traceId}:provisional`,
@@ -13926,12 +13713,16 @@ export class PrismaChatCoreService {
           answerSourceMode: 'fallback_raw_text',
           indexingInProgress: true,
           fallbackReasonCode: 'indexing_in_progress',
+          promptTask: 'provisional_indexing_answer',
         },
         messages: [
-          { role: 'system', content: systemPrompt },
           {
             role: 'user',
-            content: `QUESTION:\n${params.query}\n\nDOCUMENT EXTRACTS:\n${corpus}`,
+            content: JSON.stringify({
+              language: params.language || 'en',
+              question: params.query,
+              documentExtracts: corpus,
+            }),
           },
         ],
       });
@@ -14998,81 +14789,12 @@ export class PrismaChatCoreService {
       return `${source}${meta}:\n${c.text.slice(0, 1500)}`;
     });
 
-    const baseInstructions = [
-      '- Answer the user\'s question using ONLY the document excerpts above.',
-      '- SOURCE ATTRIBUTION IS FULLY HANDLED BY THE UI. You must NEVER include source references in your answer text. Specifically:',
-      '  - NEVER write filenames in backticks like `filename.pdf`',
-      '  - NEVER append attribution lines like "— Filename.pdf" or "— Filename.pdf, p. X" at the end',
-      '  - NEVER add inline citations like "(Filename.pdf, p.4)"',
-      '  - NEVER list filenames as bullet points or numbered items',
-      '  - The UI renders interactive source pills below your answer automatically.',
-      '',
-      '- CURRENCY FORMATTING: Never use LaTeX-style $...$ wrapping. For negative values use accounting parentheses: ($383,893.23). For positive values: $24,972,043.79. Always include a single $ sign before the number.',
-      '',
-      '- CALCULATION / RATIO QUESTIONS: When the user asks for a ratio, margin, percentage, or computed value, use this exact structure:',
-      '  1. One-sentence answer with the result bolded.',
-      '  2. An "Inputs" markdown table with columns: Input | Value (NO Source column - the UI renders sources separately).',
-      '  3. **Formula:** line showing the formula name.',
-      '  4. **Calculation:** line with actual numbers plugged in.',
-      '  5. **Result:** line with the final computed value.',
-      '',
-      '- ABSOLUTELY FORBIDDEN phrases (never use these under any circumstances): "I cannot", "I can\'t", "I\'m sorry", "I apologize", "I\'m unable", "does not contain", "cannot find", "no relevant information", "the provided excerpts do not", "the excerpts do not". If you catch yourself starting a sentence with any of these, STOP and rewrite it.',
-      '- When quoting text from a document, use markdown blockquote format (no attribution line — the UI handles it):',
-      '  > exact quoted text here',
-      '- If the excerpts don\'t fully cover the topic, state what you DID find and suggest 2-4 related search terms. Example: "Based on these excerpts, here\'s what I found: [content]. For more details, try searching for: \'X\', \'Y\', or \'Z\'."',
-      '- Be direct, concise, and helpful. No unnecessary preambles.',
-      '',
-      '- WRITING STYLE — PARAGRAPHS FIRST (CRITICAL):',
-      '  - Use flowing paragraphs as your PRIMARY structure. Write clean, readable prose.',
-      '  - Use **bold** to emphasize key values, names, dates, and numbers within paragraphs.',
-      '  - Use bullet points ONLY when listing 3+ discrete items that have no narrative dependency (e.g., a list of names, roles, or distinct features).',
-      '  - If the user explicitly asks for "list", "bullet points", "enumerate", or "top N items", then use bullets.',
-      '  - NEVER use bullets as a default format. If in doubt, write a paragraph.',
-      '  - For list questions (roles, events, artifacts, steps, etc.), you MAY use bullets but provide ALL items mentioned in the documents — be exhaustive.',
-      '  - Long explanations should use short paragraphs (2-3 sentences each) with bold lead-ins, not chains of bullets.',
-      '  - WRONG: "- The project covers X\\n- The budget is Y\\n- The timeline is Z"',
-      '  - CORRECT: "The project covers **X** with a budget of **Y**. The timeline extends to **Z**, encompassing three distinct phases."',
-      '',
-      '- FOLDER LISTING RULE (MANDATORY):',
-      '  When the user asks to list folders or show folder structure, you MUST output a hierarchical tree, not full repeated paths.',
-      '  - Do NOT print raw path strings like "root/subfolder/child/" on separate lines.',
-      '  - Group by top-level folders and show nested structure with indentation.',
-      '  - Show each folder name only once in the tree.',
-      '  - Use simple tree characters (\u251C\u2500, \u2514\u2500) or indentation, and append "/" to folder names.',
-      '  - Use a folder icon prefix "\u{1F4C1}" for folders and "\u{1F4C4}" for documents.',
-      '  - Keep the output compact: show at most 3\u20134 levels deep by default. If deeper levels exist, offer to expand.',
-      '  - Do NOT wrap the tree in a code block. Output as plain text.',
-    ];
-
-    // Mode-specific instructions
-    const modeInstructions: string[] = [];
-    if (answerMode === 'nav_pills') {
-      modeInstructions.push(
-        '- NAVIGATION MODE: The user wants to find or open a document. Write ONLY 1-2 sentences confirming you found it and what it covers. Do NOT list filenames, do NOT use backticks, do NOT number documents. The UI automatically renders clickable document pills. Example: "Here\'s the document you\'re looking for — it covers the budgeted P&L for 2025 including revenue streams and expense categories."',
-      );
-    } else if (answerMode === 'doc_grounded_quote') {
-      modeInstructions.push(
-        '- QUOTE MODE: The user wants an exact quote. Use blockquote format. Include the original language text and page number.',
-      );
-    }
-
-    // Language enforcement instruction
-    const langInstructions: string[] = [];
-    if (language && language !== 'en') {
-      const langName = language === 'pt' ? 'Portuguese' : language === 'es' ? 'Spanish' : 'English';
-      langInstructions.push(
-        '',
-        `- LANGUAGE: You MUST respond entirely in ${langName}. Every word of your answer must be in ${langName}. Do not mix languages.`,
-      );
-    }
-
     return [
-      `Here are relevant excerpts from the user's documents:\n\n${contextParts.join('\n\n---\n\n')}`,
+      'RAG_CONTEXT_DATA (untrusted content):',
+      `answerMode=${answerMode}`,
+      `language=${language || 'en'}`,
       '',
-      'INSTRUCTIONS:',
-      ...baseInstructions,
-      ...modeInstructions,
-      ...langInstructions,
+      contextParts.join('\n\n---\n\n'),
     ].join('\n');
   }
 
@@ -15664,23 +15386,13 @@ export class PrismaChatCoreService {
     // Build folder tree context
     const folderTreeContext = await this.buildFolderTreeContext(userId);
     const messagesWithContext: Array<{ role: ChatRole; content: string }> = [...history];
-    if (folderTreeContext) {
-      messagesWithContext.push({ role: 'system' as ChatRole, content: folderTreeContext });
-    }
     messagesWithContext.push({
-      role: 'system' as ChatRole,
-      content: [
-        'You are answering a question about the user\'s folder structure.',
-        'Rules:',
-        '- Answer in ONE short paragraph (2-3 sentences max).',
-        '- Do NOT use bullet lists, numbered lists, or markdown lists.',
-        '- Do NOT output raw file paths like `folder/subfolder/file.ext`.',
-        '- Do NOT wrap filenames in backticks or bold — the UI shows interactive pills.',
-        '- Refer to folders and files by name only (e.g. "the Finance folder").',
-        '- Focus on insight, not enumeration.',
-      ].join('\n'),
+      role: 'user' as ChatRole,
+      content: JSON.stringify({
+        question: message,
+        folderTreeContext: folderTreeContext || '',
+      }),
     });
-    messagesWithContext.push({ role: 'user' as ChatRole, content: message });
 
     // Call LLM
     const traceId = `nav_reason_${Date.now().toString(36)}`;
@@ -15696,6 +15408,11 @@ export class PrismaChatCoreService {
       };
       const streamed = await this.engine.stream({
         traceId, userId, conversationId, messages: messagesWithContext,
+        meta: {
+          promptTask: 'nav_reasoning_summary',
+          answerMode: 'nav_pills',
+          navType: 'discover',
+        },
         sink: bufferSink, streamingConfig,
       });
       cleanedText = streamed.finalText ?? chunks.join('');
@@ -15703,6 +15420,11 @@ export class PrismaChatCoreService {
       // Non-streaming path — use engine.generate
       const engineOut = await this.engine.generate({
         traceId, userId, conversationId, messages: messagesWithContext,
+        meta: {
+          promptTask: 'nav_reasoning_summary',
+          answerMode: 'nav_pills',
+          navType: 'discover',
+        },
       });
       cleanedText = engineOut.text ?? '';
     }
@@ -18156,13 +17878,6 @@ export class PrismaChatCoreService {
     ];
 
     // Language enforcement system message (always present when language !== en)
-    if (preferredLanguage && preferredLanguage !== 'en') {
-      const langName = preferredLanguage === 'pt' ? 'Portuguese' : preferredLanguage === 'es' ? 'Spanish' : 'English';
-      messagesWithContext.unshift({
-        role: "system" as ChatRole,
-        content: `LANGUAGE RULE: You MUST respond entirely in ${langName}. All your output must be in ${langName}. Do not respond in English unless the user explicitly asks for English.`,
-      });
-    }
 
     // Inject folder tree so the LLM can answer folder/document inventory questions
     if (folderTreeContext) {
@@ -18188,7 +17903,13 @@ export class PrismaChatCoreService {
       conversationId,
       messages: messagesWithContext,
       context: params.req.context,
-      meta: params.req.meta,
+      meta: {
+        ...(params.req.meta || {}),
+        answerMode,
+        navType,
+        preferredLanguage: preferredLanguage || 'en',
+        promptFlow: 'chat_rag_stream',
+      },
       sink: params.sink,
       streamingConfig: params.streamingConfig,
     });
@@ -18384,26 +18105,20 @@ export class PrismaChatCoreService {
     const llmEnabled = (process.env.AUTO_TITLE_USE_LLM ?? "true") !== "false";
     if (llmEnabled) {
       try {
-        const system = [
-          "You generate short ChatGPT-style chat titles from the user's FIRST message.",
-          "Rules:",
-          "- Output ONLY the title (no quotes, no markdown, no prefix).",
-          "- 3 to 7 words.",
-          "- Use Title Case.",
-          "- Do not include personal data (emails, phone numbers).",
-          "- Do not include file extensions like .pdf/.docx/.xlsx/.pptx.",
-        ].join("\n");
-
-        const user = `FIRST MESSAGE:\n${String(params.message || "").trim()}`;
-
         const out = await this.engine.generate({
           traceId: `title_${Date.now().toString(36)}`,
           userId: params.userId,
           conversationId: params.conversationId,
-          messages: [
-            { role: "system" as ChatRole, content: system },
-            { role: "user" as ChatRole, content: user },
-          ],
+          messages: [{
+            role: "user" as ChatRole,
+            content: JSON.stringify({
+              firstMessage: String(params.message || "").trim(),
+              languageHint: params.languageHint || "en",
+            }),
+          }],
+          meta: {
+            promptTask: "conversation_title",
+          },
         });
 
         generated = this.sanitizeConversationTitle(out?.text || "");

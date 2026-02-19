@@ -1,0 +1,20 @@
+{
+  "_meta": {
+    "id": "mode_editing",
+    "version": "1.0.0",
+    "description": "Editing-mode behavioral constraints.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-19"
+  },
+  "config": {
+    "enabled": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": {
+          "any": "Editing mode contract: preserve factual content unless user explicitly requests transformation. Preserve numbers, names, dates, and defined terms. Do not merge or split targets unless explicitly requested."
+        }
+      }
+    ]
+  }
+}

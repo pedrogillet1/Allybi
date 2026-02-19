@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { applyEdit, extractVerifiedApply } from "../../../services/editingService";
+import { trackAllybiEvent } from "../../../services/allybiTelemetryService";
 import { buildRoute } from "../../../constants/routes";
 import kodaIconBlack from "../../../assets/koda-dark-knot.svg";
 import docIcon from "../../../assets/doc.svg";
@@ -300,6 +301,16 @@ export default function EditSessionCard({ session, onOpenDoc }) {
   const onApply = async () => {
     if (!session) return;
     if (!canApply) return;
+
+    void trackAllybiEvent("ALLYBI_APPLY_CLICKED", {
+      conversationId: safeString(session?.conversationId) || undefined,
+      documentId: safeString(session?.documentId) || undefined,
+      meta: {
+        surface: "chat_attachment",
+        source: "edit_session_card",
+        documentType: safeString(session?.domain || "").toLowerCase() || "unknown",
+      },
+    });
 
     setIsApplying(true);
     setApplyErr("");

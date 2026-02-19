@@ -1,0 +1,190 @@
+{
+  "_meta": {
+    "id": "editing_task_prompts",
+    "version": "1.1.0",
+    "description": "Task-specific prompts for editing, helper generation, and utility model calls.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-19"
+  },
+  "config": {
+    "enabled": true
+  },
+  "templates": [
+    {
+      "id": "conversation_title",
+      "priority": 300,
+      "when": { "operators": ["conversation_title"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Generate a short chat title from `firstMessage`. Output only the title text. Constraints: 3-7 words, Title Case, no quotes/markdown/prefixes, no personal data, and no file extensions."
+        }
+      ]
+    },
+    {
+      "id": "email_qa",
+      "priority": 300,
+      "when": { "operators": ["email_qa"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Answer only from `emailContext`. Be precise and concise. If detail is missing, state it explicitly. Do not invent facts."
+        }
+      ]
+    },
+    {
+      "id": "email_explain",
+      "priority": 300,
+      "when": { "operators": ["email_explain"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Explain the provided email context clearly. Output format: 1-2 sentence summary, then bullets for key points/action items/deadlines, and a short suggested reply when helpful. Do not invent details."
+        }
+      ]
+    },
+    {
+      "id": "provisional_indexing_answer",
+      "priority": 300,
+      "when": { "operators": ["provisional_indexing_answer"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Answer only using `documentExtracts`. If information is missing, explicitly state what is missing. Never invent facts. Follow `language`."
+        }
+      ]
+    },
+    {
+      "id": "nav_reasoning_summary",
+      "priority": 300,
+      "when": { "operators": ["nav_reasoning_summary"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use `folderTreeContext` to answer `question` in one short paragraph (2-3 sentences). No lists, no markdown lists, no raw file paths, no backticks, and no bold wrappers."
+        }
+      ]
+    },
+    {
+      "id": "docx_bullet_enhance",
+      "priority": 200,
+      "when": { "operators": ["docx_bullet_enhance"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Improve bullet clarity while preserving meaning and entities (names, numbers, dates, terms). Return JSON only: [{\"paragraphId\":\"...\",\"text\":\"...\"}] with one output per input bullet."
+        }
+      ]
+    },
+    {
+      "id": "docx_line_rewrite",
+      "priority": 200,
+      "when": { "operators": ["docx_line_rewrite"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Rewrite each line independently using `instruction`. Keep one output per input paragraphId, preserve ordering and meaning, and return JSON only: [{\"paragraphId\":\"...\",\"text\":\"...\"}]."
+        }
+      ]
+    },
+    {
+      "id": "docx_list_to_paragraph",
+      "priority": 200,
+      "when": { "operators": ["docx_list_to_paragraph"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Convert bullets into one cohesive paragraph. Respect `wantsSummary`. Preserve facts and entities. Do not mention instructions/tasks/headings. Return JSON only: {\"paragraph\":\"...\"}."
+        }
+      ]
+    },
+    {
+      "id": "docx_section_to_paragraph",
+      "priority": 200,
+      "when": { "operators": ["docx_section_to_paragraph"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Rewrite section lines into one cohesive paragraph while preserving facts and entities. Do not mention editing mechanics. Return JSON only: {\"paragraph\":\"...\"}."
+        }
+      ]
+    },
+    {
+      "id": "docx_translate_batch",
+      "priority": 220,
+      "when": { "operators": ["docx_translate_batch"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Translate each paragraph into `targetLanguage`. Preserve names, numbers, dates, acronyms, and meaning. Return JSON only: [{\"paragraphId\":\"...\",\"text\":\"...\"}]."
+        }
+      ]
+    },
+    {
+      "id": "docx_translate_retry",
+      "priority": 220,
+      "when": { "operators": ["docx_translate_retry"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Retry translation with strict alignment. Return one item per input paragraph, keep paragraphId unchanged, and return JSON only: [{\"paragraphId\":\"...\",\"text\":\"...\"}]."
+        }
+      ]
+    },
+    {
+      "id": "docx_translate_single",
+      "priority": 220,
+      "when": { "operators": ["docx_translate_single"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Translate `paragraph` into `targetLanguage`. Preserve entities and punctuation style. Output only translated text, with no JSON, quotes, or markdown."
+        }
+      ]
+    },
+    {
+      "id": "paragraph_to_bullets",
+      "priority": 200,
+      "when": { "operators": ["paragraph_to_bullets"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Convert `paragraph` into concise bullet lines. Each bullet should capture one key point. Output only lines prefixed with '• '."
+        }
+      ]
+    },
+    {
+      "id": "rewrite_paragraph",
+      "priority": 200,
+      "when": { "operators": ["rewrite_paragraph"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Rewrite `originalText` following `instruction`. Preserve facts and tone. Output only rewritten text, no markdown or commentary."
+        }
+      ]
+    },
+    {
+      "id": "rewrite_span",
+      "priority": 200,
+      "when": { "operators": ["rewrite_span"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Rewrite only `selectedText` using `instruction` and context from `paragraphText`. Never echo instruction text. If `strict` is true, apply tighter anti-echo behavior. Output only replacement text."
+        }
+      ]
+    },
+    {
+      "id": "insert_paragraph_below_list",
+      "priority": 200,
+      "when": { "operators": ["insert_paragraph_below_list"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": "Write one paragraph to insert below a bullet list using `instruction`, `section`, and `bullets`. Preserve names/numbers and do not add facts. Output only the paragraph."
+        }
+      ]
+    }
+  ]
+}

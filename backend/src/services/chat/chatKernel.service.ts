@@ -1,6 +1,6 @@
 import type { LLMStreamingConfig, StreamSink } from "../llm/types/llmStreaming.types";
 import { logger } from "../../utils/logger";
-import type { LegacyChatExecutor } from "./handlers/types";
+import type { TurnExecutor } from "./handlers/types";
 import type { ChatRequest, ChatResult, TurnRouteDecision } from "./chat.types";
 import { TurnContextBuilder } from "./turnContext.builder";
 import { TurnRouterService } from "./turnRouter.service";
@@ -20,11 +20,11 @@ export class ChatKernelService {
   private readonly knowledgeHandler: KnowledgeTurnHandler;
   private readonly generalHandler: GeneralTurnHandler;
 
-  constructor(private readonly legacy: LegacyChatExecutor) {
-    this.editorHandler = new EditorTurnHandler(legacy);
-    this.connectorHandler = new ConnectorTurnHandler(legacy);
-    this.knowledgeHandler = new KnowledgeTurnHandler(legacy);
-    this.generalHandler = new GeneralTurnHandler(legacy);
+  constructor(private readonly executor: TurnExecutor) {
+    this.editorHandler = new EditorTurnHandler(executor);
+    this.connectorHandler = new ConnectorTurnHandler(executor);
+    this.knowledgeHandler = new KnowledgeTurnHandler(executor);
+    this.generalHandler = new GeneralTurnHandler(executor);
   }
 
   async handleTurn(req: ChatRequest): Promise<ChatResult> {

@@ -1,0 +1,20 @@
+{
+  "_meta": {
+    "id": "policy_citations",
+    "version": "1.1.0",
+    "description": "Single citation policy contract for runtime outputs.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-19"
+  },
+  "config": {
+    "enabled": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": {
+          "any": "Citation policy: if retrieved evidence is used, append a `Sources` section at the end. Each source must use a human title (not internal filenames when avoidable) plus a stable locator (page, section, sheet, slide, or paragraph anchor) when available. Never fabricate citations. If no retrieved evidence is used, do not include a Sources section."
+        }
+      }
+    ]
+  }
+}

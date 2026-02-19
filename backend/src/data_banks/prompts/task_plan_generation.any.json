@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "id": "task_plan_generation",
+    "version": "1.0.0",
+    "description": "Planner/output-contract prompt for machine-consumed steps.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-19"
+  },
+  "config": {
+    "enabled": true
+  },
+  "templates": [
+    {
+      "id": "planner_json_contract",
+      "priority": 200,
+      "when": {
+        "operators": [
+          "plan_edit",
+          "plan_multi_intent",
+          "docx_edit_planner",
+          "xlsx_edit_planner",
+          "sheets_edit_planner",
+          "slides_edit_planner",
+          "multi_intent_planner"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "any": "Planner contract: return only valid JSON matching the required schema. If required fields are missing, return a clarification object instead of free-form prose."
+          }
+        }
+      ]
+    }
+  ]
+}

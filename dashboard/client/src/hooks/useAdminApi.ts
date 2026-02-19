@@ -5,6 +5,8 @@ import type {
   Environment,
   FileStatus,
   OverviewResponse,
+  OverviewTimeseriesResponse,
+  OverviewTimeseriesMetric,
   UsersResponse,
   UserDetail,
   FilesResponse,
@@ -41,6 +43,18 @@ export function useOverview(params: BaseQueryParams = {}) {
   return useQuery<OverviewResponse, Error>({
     queryKey: ["admin", "overview", params],
     queryFn: () => adminApi.getOverview(params),
+    staleTime: 30_000,
+  });
+}
+
+interface OverviewTimeseriesParams extends BaseQueryParams {
+  metric?: OverviewTimeseriesMetric;
+}
+
+export function useOverviewTimeseries(params: OverviewTimeseriesParams = {}) {
+  return useQuery<OverviewTimeseriesResponse, Error>({
+    queryKey: ["admin", "overview", "timeseries", params],
+    queryFn: () => adminApi.getOverviewTimeseries(params),
     staleTime: 30_000,
   });
 }

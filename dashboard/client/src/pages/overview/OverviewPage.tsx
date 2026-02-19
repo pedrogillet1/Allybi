@@ -3,10 +3,20 @@
  * Main dashboard with KPIs from the backend
  */
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
-import { useOverview } from "@/hooks/useAdminApi";
-import type { TimeRange, Environment } from "@/types/admin";
+import { useOverview, useOverviewTimeseries } from "@/hooks/useAdminApi";
+import type { TimeRange, Environment, OverviewTimeseriesMetric } from "@/types/admin";
+import { ChartContainer, ChartTooltip, chartColors, chartConfig } from "@/components/charts";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+} from "recharts";
 import {
   UserCheck,
   FileText,
@@ -19,6 +29,7 @@ import {
   Server,
   Cpu,
   ScanSearch,
+  MousePointerClick,
 } from "lucide-react";
 
 // ============================================================================
@@ -103,9 +114,37 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 export function OverviewPage() {
   const [range, setRange] = useState<TimeRange>("7d");
   const [env, setEnv] = useState<Environment>("prod");
+  const [allybiMetric, setAllybiMetric] = useState<OverviewTimeseriesMetric>("allybi_visits");
 
   const { data, isLoading, error, refetch } = useOverview({ range, env });
+  const {
+    data: allybiTimeseries,
+    isLoading: isTimeseriesLoading,
+    error: timeseriesError,
+    refetch: refetchTimeseries,
+  } = useOverviewTimeseries({ range, env, metric: allybiMetric });
   const google = data?.google;
+
+  const allybiSeriesData = useMemo(() => {
+    const points = Array.isArray(allybiTimeseries?.points) ? allybiTimeseries.points : [];
+    return points
+      .map((point) => {
+        const rawTime = point.t || point.timestamp || "";
+        const dt = rawTime ? new Date(rawTime) : null;
+        let label = "-";
+        if (dt && !Number.isNaN(dt.getTime())) {
+          label = range === "24h"
+            ? dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+            : dt.toLocaleDateString([], { month: "short", day: "numeric" });
+        }
+        return {
+          label,
+          value: Number(point.value || 0),
+          ts: rawTime,
+        };
+      })
+      .filter((point) => point.ts);
+  }, [allybiTimeseries?.points, range]);
 
   const formatBytes = (bytes: number | null | undefined) => {
     if (bytes == null || bytes <= 0) return "-";
@@ -144,10 +183,10 @@ export function OverviewPage() {
                 <KpiCard label="Messages" value={data.kpis.messages} icon={MessageSquare} />
                 <KpiCard label="Conversations" value={data.kpis.conversationsCreated} icon={MessageSquare} />
                 <KpiCard label="Uploads" value={data.kpis.uploads} icon={FileText} />
+                <KpiCard label="Allybi Visits" value={data.kpis.allybiVisits} icon={MousePointerClick} />
+                <KpiCard label="Allybi Clicks" value={data.kpis.allybiClicks} icon={MousePointerClick} />
+                <KpiCard label="Allybi CTR" value={data.kpis.allybiClickThroughRate} icon={TrendingUp} format="percent" />
                 <KpiCard label="LLM Calls" value={data.kpis.llmCalls} icon={Search} />
-                <KpiCard label="Tokens Used" value={data.kpis.tokensTotal} icon={DollarSign} />
-                <KpiCard label="LLM Error Rate" value={data.kpis.llmErrorRate} icon={AlertTriangle} format="percent" />
-                <KpiCard label="Weak Evidence Rate" value={data.kpis.weakEvidenceRate} icon={AlertTriangle} format="percent" />
               </>
             ) : null}
           </div>
@@ -158,13 +197,91 @@ export function OverviewPage() {
               [...Array(4)].map((_, i) => <KpiSkeleton key={i} />)
             ) : data ? (
               <>
+                <KpiCard label="Tokens Used" value={data.kpis.tokensTotal} icon={DollarSign} />
+                <KpiCard label="LLM Error Rate" value={data.kpis.llmErrorRate} icon={AlertTriangle} format="percent" />
+                <KpiCard label="Weak Evidence Rate" value={data.kpis.weakEvidenceRate} icon={AlertTriangle} format="percent" />
                 <KpiCard label="No Evidence Rate" value={data.kpis.noEvidenceRate} icon={AlertTriangle} format="percent" />
+              </>
+            ) : null}
+          </div>
+
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            {isLoading ? (
+              [...Array(3)].map((_, i) => <KpiSkeleton key={i} />)
+            ) : data ? (
+              <>
                 <KpiCard label="Ingestion Failures" value={data.kpis.ingestionFailures} icon={AlertTriangle} />
                 <KpiCard label="Latency P50" value={`${data.kpis.latencyMsP50}ms`} icon={TrendingUp} />
                 <KpiCard label="Latency P95" value={`${data.kpis.latencyMsP95}ms`} icon={TrendingUp} />
               </>
             ) : null}
           </div>
+
+          {/* Allybi Interaction Trend */}
+          <ChartContainer
+            title="Allybi Interaction Trend"
+            subtitle="Track visits and click activity over time."
+            className="mb-6"
+            height={340}
+            loading={isTimeseriesLoading}
+            empty={!allybiSeriesData.length}
+            error={timeseriesError?.message || null}
+            onRetry={refetchTimeseries}
+          >
+            <div className="h-full flex flex-col">
+              <div className="mb-4 flex items-center gap-2">
+                {[
+                  { key: "allybi_visits", label: "Visits" },
+                  { key: "allybi_clicks", label: "Clicks" },
+                ].map((opt) => {
+                  const active = allybiMetric === opt.key;
+                  return (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      onClick={() => setAllybiMetric(opt.key as OverviewTimeseriesMetric)}
+                      className={`px-3 py-1 text-xs font-semibold rounded-md border transition-colors ${
+                        active
+                          ? "bg-[#181818] text-white border-[#181818]"
+                          : "bg-white text-[#525252] border-[#e5e5e5] hover:border-[#181818]"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex-1 min-h-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={allybiSeriesData} margin={chartConfig.margin}>
+                    <CartesianGrid {...chartConfig.grid} />
+                    <XAxis
+                      dataKey="label"
+                      stroke={chartColors.grid}
+                      tick={chartConfig.axis.tick}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke={chartColors.grid}
+                      tick={chartConfig.axis.tick}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <Tooltip content={<ChartTooltip />} />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      name={allybiMetric === "allybi_clicks" ? "Clicks" : "Visits"}
+                      stroke={chartColors.primary}
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </ChartContainer>
 
           {/* Time Window Info */}
           {data?.window && (

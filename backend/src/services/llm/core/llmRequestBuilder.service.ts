@@ -36,10 +36,11 @@ import type {
   LlmGenerationOptions,
   LlmRoutePlan,
   EnvName,
-  LangCode,
 } from "../types/llm.types";
 
 import { BRAND_NAME } from "../../../config/brand";
+
+export type LangCode = "any" | "en" | "pt" | "es";
 
 export interface BankLoader {
   getBank<T = any>(bankId: string): T;
@@ -52,7 +53,15 @@ export interface PromptRegistryService {
   buildPrompt(
     promptId: "system" | "retrieval" | "compose_answer" | "disambiguation" | "fallback" | "tool",
     ctx: any
-  ): { id: string; messages: Array<{ role: "system" | "developer" | "user"; content: string }> };
+  ): {
+    id?: string;
+    messages: Array<{ role: "system" | "developer" | "user"; content: string }>;
+    trace?: {
+      orderedPrompts?: Array<{ bankId: string; version: string; templateId: string; hash: string }>;
+      appliedGuards?: string[];
+      slotsFilled?: string[];
+    };
+  };
 }
 
 /**
@@ -211,6 +220,7 @@ export class LlmRequestBuilderService {
       cacheKeyHint: this.cacheKeyHint(input, promptType),
       kodaMeta: {
         promptType,
+        promptTrace: prompt.trace ?? null,
         answerMode: input.signals.answerMode,
         operator: input.signals.operator,
         intentFamily: input.signals.intentFamily,
@@ -226,6 +236,15 @@ export class LlmRequestBuilderService {
   private choosePromptType(input: BuildRequestInput): "system" | "retrieval" | "compose_answer" | "disambiguation" | "fallback" | "tool" {
     // Disambiguation always wins
     if (input.signals.disambiguation?.active) return "disambiguation";
+
+    // Retrieval planning flows
+    if (
+      input.signals.operator === "locate_docs" ||
+      input.signals.operator === "locate_content" ||
+      input.signals.intentFamily === "retrieval"
+    ) {
+      return "retrieval";
+    }
 
     // File actions can use tool prompt shape
     if (input.signals.operatorFamily === "file_actions" && input.toolContext) return "tool";

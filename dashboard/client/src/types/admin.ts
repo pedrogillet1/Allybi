@@ -29,6 +29,9 @@ export const OverviewKpisSchema = z.object({
   messages: z.number().default(0),
   conversationsCreated: z.number().default(0),
   uploads: z.number().default(0),
+  allybiVisits: z.number().default(0),
+  allybiClicks: z.number().default(0),
+  allybiClickThroughRate: z.number().default(0),
   llmCalls: z.number().default(0),
   tokensTotal: z.number().default(0),
   llmErrorRate: z.number().default(0),
@@ -44,6 +47,18 @@ export const TimeSeriesPointSchema = z.object({
   timestamp: z.string().optional(),
   value: z.number(),
 });
+
+export const OverviewTimeseriesMetricSchema = z.enum([
+  "dau",
+  "messages",
+  "uploads",
+  "allybi_visits",
+  "allybi_clicks",
+  "tokens",
+  "weak_evidence_rate",
+  "llm_errors",
+  "ingestion_failures",
+]);
 
 export const OverviewWindowSchema = z.object({
   from: z.string(),
@@ -115,9 +130,17 @@ export const OverviewResponseSchema = z.object({
   pagination: PaginationSchema.optional(),
 });
 
+export const OverviewTimeseriesResponseSchema = z.object({
+  metric: OverviewTimeseriesMetricSchema,
+  points: z.array(TimeSeriesPointSchema).default([]),
+  pagination: PaginationSchema.optional(),
+});
+
 export type OverviewResponse = z.infer<typeof OverviewResponseSchema>;
 export type OverviewKpis = z.infer<typeof OverviewKpisSchema>;
 export type TimeSeriesPoint = z.infer<typeof TimeSeriesPointSchema>;
+export type OverviewTimeseriesMetric = z.infer<typeof OverviewTimeseriesMetricSchema>;
+export type OverviewTimeseriesResponse = z.infer<typeof OverviewTimeseriesResponseSchema>;
 
 // ============================================================================
 // Users Types (matches backend /api/admin/users)

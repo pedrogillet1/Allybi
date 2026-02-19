@@ -1,6 +1,7 @@
 import React from "react";
 import InlineNavPill from "./InlineNavPill";
 import cleanDocumentName from "../../../utils/cleanDocumentName";
+import { trackAllybiEvent } from "../../../services/allybiTelemetryService";
 
 // Asset file-type icons
 import pdfIcon from "../../../assets/pdf.svg";
@@ -52,7 +53,20 @@ export default function SourcePill({ source, onOpen, className = "", style = {} 
     ? <FolderIcon />
     : <FileTypeIcon mimeType={source?.mimeType} fileType={source?.fileType} filename={filename} />;
 
-  const handleClick = () => onOpen?.(source);
+  const handleClick = () => {
+    const isFilePill = Boolean(source?.docId || source?.documentId || source?.id);
+    const eventType = isFilePill ? "FILE_PILL_CLICKED" : "SOURCE_PILL_CLICKED";
+    void trackAllybiEvent(eventType, {
+      conversationId: source?.conversationId || undefined,
+      documentId: source?.documentId || source?.docId || source?.id || undefined,
+      meta: {
+        surface: source?.surface || "chat_screen",
+        source: "source_pill",
+        documentType: source?.mimeType || null,
+      },
+    });
+    onOpen?.(source);
+  };
 
   return (
     <InlineNavPill

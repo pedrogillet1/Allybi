@@ -28,6 +28,11 @@ import { LLMClientFactory } from './services/llm/core/llmClientFactory';
 import { LLMChatEngine } from './services/llm/core/llmChatEngine';
 import { loadGeminiConfig } from './services/llm/providers/gemini/geminiConfig';
 import { TelemetryLLMClient } from './services/llm/core/telemetryLlmClient.decorator';
+import { PromptRegistryService } from './services/llm/prompts/promptRegistry.service';
+import { LlmRequestBuilderService } from './services/llm/core/llmRequestBuilder.service';
+import { LlmRouterService } from './services/llm/core/llmRouter.service';
+import { LlmGatewayService } from './services/llm/core/llmGateway.service';
+import { getBankLoaderInstance } from './services/core/banks/bankLoader.service';
 
 // Security / encryption wiring
 import { EncryptionService } from './services/security/encryption.service';
@@ -98,12 +103,30 @@ async function startServer() {
       console.log('[Server] LLM client wrapped with telemetry decorator');
 
       const geminiCfg = loadGeminiConfig((process.env.NODE_ENV as any) || 'dev');
-      const chatEngine = new LLMChatEngine(llmClient, {
+      const bankLoader = getBankLoaderInstance();
+      const promptRegistry = new PromptRegistryService(bankLoader);
+      const requestBuilder = new LlmRequestBuilderService(promptRegistry);
+      const router = new LlmRouterService(bankLoader);
+      const llmGateway = new LlmGatewayService(llmClient, router, requestBuilder, {
+        env:
+          (process.env.NODE_ENV === 'production'
+            ? 'production'
+            : process.env.NODE_ENV === 'staging'
+              ? 'staging'
+              : process.env.NODE_ENV === 'test'
+                ? 'dev'
+                : 'local') as any,
+        provider: llmClient.provider,
+        modelId: geminiCfg.models.defaultDraft,
+        defaultTemperature: 0.2,
+        defaultMaxOutputTokens: 900,
+      });
+      const bankBackedChatEngine = new LLMChatEngine(llmGateway, {
         provider: llmClient.provider,
         modelId: geminiCfg.models.defaultDraft,
       });
 
-      chatService = new PrismaChatService(chatEngine);
+      chatService = new PrismaChatService(bankBackedChatEngine);
       console.log('[Server] Chat service wired with LLM engine');
     } catch (llmErr: any) {
       console.warn('[Server] LLM not available, chat will use fallback:', llmErr.message);

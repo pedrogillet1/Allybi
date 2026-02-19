@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   OverviewResponseSchema,
+  OverviewTimeseriesResponseSchema,
   UsersResponseSchema,
   UserDetailSchema,
   FilesResponseSchema,
@@ -18,6 +19,8 @@ import type {
   TimeRange,
   Environment,
   OverviewResponse,
+  OverviewTimeseriesResponse,
+  OverviewTimeseriesMetric,
   UsersResponse,
   UserDetail,
   FilesResponse,
@@ -198,6 +201,13 @@ export const adminApi = {
   async getOverview(params: BaseParams = {}): Promise<OverviewResponse> {
     const query = buildQueryString(params);
     return request(`/admin/overview${query}`, OverviewResponseSchema);
+  },
+
+  async getOverviewTimeseries(
+    params: BaseParams & { metric?: OverviewTimeseriesMetric } = {}
+  ): Promise<OverviewTimeseriesResponse> {
+    const query = buildQueryString(params);
+    return request(`/admin/overview/timeseries${query}`, OverviewTimeseriesResponseSchema);
   },
 
   // Users

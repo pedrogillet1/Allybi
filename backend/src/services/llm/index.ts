@@ -22,6 +22,7 @@ export * from './types/llmTools.types';
 export * from './core/llmRouter.service';
 export * from './core/llmClient.interface';
 export * from './core/llmRequestBuilder.service';
+export * from './core/llmGateway.service';
 export * from './core/llmResponseParser.service';
 export * from './core/llmStreamAdapter.service';
 export * from './core/llmSafetyAdapter.service';

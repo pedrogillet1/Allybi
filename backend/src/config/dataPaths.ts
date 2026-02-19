@@ -17,7 +17,6 @@ import fs from 'fs';
  */
 export type DataFileName =
   | 'answer_styles.json'
-  | 'system_prompts.json'
   | 'markdown_components.json'
   | 'table_presets.json'
   | 'answer_examples.json'
@@ -91,7 +90,6 @@ export function dataFileExists(fileName: DataFileName): boolean {
  */
 export const REQUIRED_DATA_FILES: DataFileName[] = [
   'answer_styles.json',
-  'system_prompts.json',
   'markdown_components.json',
   'table_presets.json',
   'answer_examples.json',

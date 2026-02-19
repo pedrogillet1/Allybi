@@ -27,6 +27,7 @@ import UniversalUploadModal from "../upload/UniversalUploadModal";
 import { DocumentScanner } from "../scanner";
 
 import { applyEdit, extractVerifiedApply } from "../../services/editingService";
+import { trackAllybiEvent, trackAllybiVisit } from "../../services/allybiTelemetryService";
 import StreamingMarkdown from "./streaming/StreamingMarkdown";
 import MessageActions from "./messages/MessageActions";
 import useStageLabel from "./messages/useStageLabel";
@@ -879,7 +880,7 @@ function extractDocxBundlePatchesForApply(session) {
 }
 
 /* Compact approve/reject actions for the inline diff in the worklog card */
-function InlineEditActions({ editSession, lang, onFileClick }) {
+function InlineEditActions({ editSession, lang, onFileClick, telemetryContext = null }) {
   const [status, setStatus] = React.useState("idle"); // idle | applying | applied | rejected | error
   const [errMsg, setErrMsg] = React.useState("");
   const lastErrRef = React.useRef({ msg: "", ts: 0 });
@@ -893,11 +894,24 @@ function InlineEditActions({ editSession, lang, onFileClick }) {
 
   if (!editSession) return null;
   const canApply = status === "idle" && s(editSession.documentId) && s(editSession.beforeText || editSession.diff?.before) && s(editSession.proposedText || editSession.diff?.after);
+  const telemetryConversationId = s(telemetryContext?.conversationId);
+  const telemetryDocumentId = s(telemetryContext?.documentId || editSession?.documentId);
+  const telemetrySurface = s(telemetryContext?.surface || "chat");
+  const telemetryDocumentType = s(telemetryContext?.documentType || editSession?.domain || "");
 
   const doApply = async () => {
     if (!canApply) return;
     setStatus("applying");
     setErrMsg("");
+    void trackAllybiEvent("ALLYBI_APPLY_CLICKED", {
+      conversationId: telemetryConversationId || undefined,
+      documentId: telemetryDocumentId || undefined,
+      meta: {
+        surface: telemetrySurface,
+        source: "inline_edit_actions",
+        documentType: telemetryDocumentType,
+      },
+    });
     try {
       const useRuntimeOperator = shouldPreferRuntimeOperator(editSession);
       const runtimeOperator = s(editSession.operator || editSession.canonicalOperator).toUpperCase();
@@ -1801,6 +1815,34 @@ export default function ChatInterface({
       }))
       .filter((d) => typeof d.id === "string" && d.id.trim().length > 0);
   }, [isViewerVariant, pinnedDocuments]);
+
+  const telemetryConversationId = useMemo(() => {
+    const cid = String(conversationId || "").trim();
+    if (!cid || cid === "new") return "";
+    return cid;
+  }, [conversationId]);
+
+  const telemetryDocumentId = useMemo(() => {
+    const viewerId = String(viewerContext?.activeDocumentId || "").trim();
+    if (viewerId) return viewerId;
+    const pinnedId = String(pinnedDocs?.[0]?.id || viewerDocsForUi?.[0]?.id || "").trim();
+    return pinnedId || "";
+  }, [viewerContext?.activeDocumentId, pinnedDocs, viewerDocsForUi]);
+
+  useEffect(() => {
+    const surface = isViewerVariant ? "document_viewer" : "chat";
+    void trackAllybiVisit({
+      conversationId: telemetryConversationId || undefined,
+      documentId: telemetryDocumentId || undefined,
+      dedupeKey: `${surface}:${telemetryDocumentId || "none"}:${telemetryConversationId || "new"}`,
+      meta: {
+        surface,
+        source: isViewerVariant ? "viewer_panel_mount" : "chat_mount",
+        documentType: isViewerVariant ? viewerPromptBucket : "chat",
+        variant: isViewerVariant ? "viewer" : "default",
+      },
+    });
+  }, [isViewerVariant, telemetryConversationId, telemetryDocumentId, viewerPromptBucket]);
 
   // Viewer document scope is implicit and backend-enforced; hide doc chip section in chat UI.
   const ViewerDocumentsSection = null;
@@ -3400,6 +3442,18 @@ export default function ChatInterface({
 
     if (!trimmed && !hasAttachments) return;
 
+    void trackAllybiEvent("ALLYBI_MESSAGE_SENT", {
+      conversationId: telemetryConversationId || undefined,
+      documentId: telemetryDocumentId || undefined,
+      meta: {
+        surface: isViewerVariant ? "document_viewer" : "chat",
+        source: opts?.source || (isViewerVariant ? "viewer_input" : "chat_input"),
+        documentType: isViewerVariant ? viewerPromptBucket : "chat",
+        hasText: Boolean(trimmed),
+        hasAttachments: Boolean(hasAttachments),
+      },
+    });
+
     // optimistic user message
     const userId = uid("user");
     const userMsg = {
@@ -3487,6 +3541,10 @@ export default function ChatInterface({
     pinnedIds,
     pinnedDocs,
     isViewerVariant,
+    telemetryConversationId,
+    telemetryDocumentId,
+    viewerPromptBucket,
+    viewerContext?.fileType,
   ]);
 
   useEffect(() => {
@@ -4515,10 +4573,23 @@ export default function ChatInterface({
                   </div>
 
                   <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {viewerStarterPrompts.map((ex) => (
+                    {viewerStarterPrompts.map((ex, idx) => (
                       <button
                         key={ex}
-                        onClick={() => setInput(ex)}
+                        onClick={() => {
+                          void trackAllybiEvent("ALLYBI_SUGGESTION_CLICKED", {
+                            conversationId: telemetryConversationId || undefined,
+                            documentId: telemetryDocumentId || undefined,
+                            meta: {
+                              surface: "document_viewer",
+                              source: "viewer_starter_prompt",
+                              documentType: viewerPromptBucket,
+                              position: idx + 1,
+                              suggestion: String(ex || "").slice(0, 180),
+                            },
+                          });
+                          setInput(ex);
+                        }}
                         style={{
                           textAlign: 'left',
                           border: '1px solid #EEF2F7',
@@ -5144,6 +5215,12 @@ export default function ChatInterface({
                                         editSession={es}
                                         lang={normalizeEditLang(i18n.language)}
                                         onFileClick={(att) => openPreviewFromSource(att)}
+                                        telemetryContext={{
+                                          conversationId: telemetryConversationId,
+                                          documentId: telemetryDocumentId,
+                                          surface: isViewerVariant ? "document_viewer" : "chat",
+                                          documentType: isViewerVariant ? viewerPromptBucket : "chat",
+                                        }}
                                       />
                                     );
                                   })()}

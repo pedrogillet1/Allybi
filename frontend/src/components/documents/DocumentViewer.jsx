@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Document, Page, pdfjs } from 'react-pdf';
 import api from '../../services/api';
 import { applyEdit, undoEdit, extractVerifiedApply } from '../../services/editingService';
+import { trackAllybiEvent, trackAllybiVisit } from '../../services/allybiTelemetryService';
 import LeftNav from '../app-shell/LeftNav';
 import NotificationPanel from '../notifications/NotificationPanel';
 import SearchInDocumentModal from './SearchInDocumentModal';
@@ -604,6 +605,55 @@ const DocumentViewer = () => {
     if (!document?.id) return [];
     return [{ id: document.id, filename: document.filename, mimeType: document.mimeType }];
   }, [document?.id, document?.filename, document?.mimeType]);
+
+  const allybiDocumentType = useMemo(() => {
+    if (currentFileType === 'word') return 'docx';
+    if (currentFileType === 'excel') return 'xlsx';
+    if (currentFileType === 'powerpoint') return 'pptx';
+    if (currentFileType === 'pdf') return 'pdf';
+    return 'unknown';
+  }, [currentFileType]);
+
+  const allybiConversationId = useMemo(() => {
+    const cid = String(editingConversation?.id || '').trim();
+    if (!cid || cid === 'new' || cid.startsWith('viewer-new:')) return '';
+    return cid;
+  }, [editingConversation?.id]);
+
+  const trackViewerVisit = useCallback((source = 'viewer_panel_open') => {
+    const docId = String(document?.id || '').trim();
+    if (!docId) return;
+    void trackAllybiVisit({
+      conversationId: allybiConversationId || undefined,
+      documentId: docId,
+      dedupeKey: `document_viewer:${docId}:${allybiConversationId || 'new'}`,
+      meta: {
+        surface: 'document_viewer',
+        source,
+        documentType: allybiDocumentType,
+      },
+    });
+  }, [allybiConversationId, allybiDocumentType, document?.id]);
+
+  const trackAskAllybiOpen = useCallback((source = 'ask_button') => {
+    const docId = String(document?.id || '').trim();
+    if (!docId) return;
+    void trackAllybiEvent('ALLYBI_OPEN_CLICKED', {
+      conversationId: allybiConversationId || undefined,
+      documentId: docId,
+      meta: {
+        surface: 'document_viewer',
+        source,
+        documentType: allybiDocumentType,
+      },
+    });
+    trackViewerVisit(source);
+  }, [allybiConversationId, allybiDocumentType, document?.id, trackViewerVisit]);
+
+  useEffect(() => {
+    if (!editingOpen) return;
+    trackViewerVisit('panel_visible');
+  }, [editingOpen, trackViewerVisit]);
 
   // ---------------------------------------------------------------------------
   // Editor shell state (targets + changes queue)
@@ -1255,6 +1305,7 @@ const DocumentViewer = () => {
 
   const handleExcelAskAllybi = useCallback((sel) => {
     if (!hasSheetsSelectionPayload(sel)) return;
+    const wasOpen = Boolean(editingOpenRef.current);
     const shouldMerge = Boolean(editingOpenRef.current && frozenSelectionRef.current);
     const nextSel = shouldMerge
       ? mergeSheetsSelections(frozenSelectionRef.current, sel)
@@ -1263,9 +1314,12 @@ const DocumentViewer = () => {
     setFrozenSelection((prev) => (sheetsSelectionKey(prev) === nextKey ? prev : nextSel));
     setLiveViewerSelection((prev) => (sheetsSelectionKey(prev) === nextKey ? prev : nextSel));
     setEditingOpen(true);
+    if (!wasOpen) {
+      trackAskAllybiOpen('excel_inline_ask');
+    }
     setSelectionOverlay({ rects: [], frozen: false });
     setViewerFocusNonce((n) => n + 1);
-  }, [hasSheetsSelectionPayload, mergeSheetsSelections, sheetsSelectionKey]);
+  }, [hasSheetsSelectionPayload, mergeSheetsSelections, sheetsSelectionKey, trackAskAllybiOpen]);
 
   useEffect(() => {
     if (!editingOpen) return;
@@ -1764,7 +1818,8 @@ const DocumentViewer = () => {
     return true;
   }, [supportsViewerEditing, showInfo, t]);
 
-  const toggleEditingPanel = useCallback(() => {
+  const toggleEditingPanel = useCallback((options = {}) => {
+    const source = String(options?.source || 'toggle_button').trim() || 'toggle_button';
     const wasOpen = editingOpenRef.current;
     const next = !wasOpen;
 
@@ -1780,6 +1835,7 @@ const DocumentViewer = () => {
       clearSelectionBubble();
       setFrozenSelection(null);
     } else {
+      trackAskAllybiOpen(source);
       // Opening — flush any pending manual edits so they aren't lost
       try { docxCanvasRef.current?.flushDirtyParagraphs?.(); } catch {}
       holdSelectionOverlayPosition(280);
@@ -1872,12 +1928,15 @@ const DocumentViewer = () => {
     }
     setShowAskKoda(false);
     try { sessionStorage.setItem('askKodaDismissed', 'true'); } catch {}
-  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, docxBlocks, clearSelectionBubble, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, refreshFrozenOverlay, supportsViewerEditing, showInfo, t]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, docxBlocks, clearSelectionBubble, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, refreshFrozenOverlay, supportsViewerEditing, showInfo, t, trackAskAllybiOpen]);
 
-  const openEditingPanel = useCallback(({ seedSelection = true, focusInput = true } = {}) => {
+  const openEditingPanel = useCallback(({ seedSelection = true, focusInput = true, trackOpenClick = false, source = 'ask_button' } = {}) => {
     if (!supportsViewerEditing) {
       showInfo(t('documentViewer.comingSoon'));
       return;
+    }
+    if (trackOpenClick) {
+      trackAskAllybiOpen(source);
     }
     holdSelectionOverlayPosition(280);
     const hasActiveDomSelection = () => {
@@ -1997,7 +2056,7 @@ const DocumentViewer = () => {
       }
     }
     if (focusInput) setViewerFocusNonce((n) => n + 1);
-  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, docxBlocks, refreshFrozenOverlay, supportsViewerEditing, frozenSelection, liveViewerSelection, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, showInfo, t]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, docxBlocks, refreshFrozenOverlay, supportsViewerEditing, frozenSelection, liveViewerSelection, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, showInfo, t, trackAskAllybiOpen]);
 
   // Measure container width for responsive PDF/DOCX sizing
   useEffect(() => {
@@ -4285,7 +4344,7 @@ const DocumentViewer = () => {
         excelStatusMsg={currentFileType === 'excel' ? editorStatusMsg : ''}
         excelLogoSrc={sphereIcon}
         onExcelLogoClick={() => {
-          openEditingPanel({ seedSelection: true, focusInput: true });
+          openEditingPanel({ seedSelection: true, focusInput: true, trackOpenClick: true, source: 'excel_toolbar_logo' });
         }}
 
         pptxTargets={pptxTargets}
@@ -5375,9 +5434,9 @@ const DocumentViewer = () => {
                   if (!handleAskAllybiClick(e)) return;
                   if (!editingOpen) {
                     try { docxCanvasRef.current?.restoreSelection?.(); } catch {}
-                    openEditingPanel({ seedSelection: true, focusInput: false });
+                    openEditingPanel({ seedSelection: true, focusInput: false, trackOpenClick: true, source: 'header_button' });
                   } else {
-                    toggleEditingPanel();
+                    toggleEditingPanel({ source: 'header_button' });
                   }
                 }}
               onClick={(e) => {
@@ -5388,9 +5447,9 @@ const DocumentViewer = () => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   if (!handleAskAllybiClick(e)) return;
                   if (!editingOpen) {
-                    openEditingPanel({ seedSelection: true, focusInput: false });
+                    openEditingPanel({ seedSelection: true, focusInput: false, trackOpenClick: true, source: 'header_button_keyboard' });
                   } else {
-                    toggleEditingPanel();
+                    toggleEditingPanel({ source: 'header_button_keyboard' });
                   }
                 }
               }}
@@ -5546,7 +5605,7 @@ const DocumentViewer = () => {
 	                // Restore the last DOCX selection Range (some browsers shift selection on click/mouseup).
 	                try { docxCanvasRef.current?.restoreSelection?.(); } catch {}
 	                // Open on mousedown (like the header Ask button) to avoid selection drift.
-	                toggleEditingPanel();
+	                toggleEditingPanel({ source: 'selection_bubble' });
 	              }}
 	              onClick={() => {
 	                // No-op: handled in onMouseDown to preserve selection.
@@ -5610,7 +5669,7 @@ const DocumentViewer = () => {
                 showInfo(t('documentViewer.comingSoon'));
                 return;
               }
-              toggleEditingPanel();
+              toggleEditingPanel({ source: 'floating_hint' });
             }}
             style={{
               height: 60,

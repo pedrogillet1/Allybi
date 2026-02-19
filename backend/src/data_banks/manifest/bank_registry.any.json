@@ -2125,6 +2125,78 @@
       "lastUpdated": "2026-01-26"
     },
     {
+      "id": "system_base",
+      "category": "prompts",
+      "path": "prompts/system_base.any.json",
+      "filename": "system_base.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-02-19"
+    },
+    {
+      "id": "mode_chat",
+      "category": "prompts",
+      "path": "prompts/mode_chat.any.json",
+      "filename": "mode_chat.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-02-19"
+    },
+    {
+      "id": "mode_editing",
+      "category": "prompts",
+      "path": "prompts/mode_editing.any.json",
+      "filename": "mode_editing.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-02-19"
+    },
+    {
+      "id": "rag_policy",
+      "category": "prompts",
+      "path": "prompts/rag_policy.any.json",
+      "filename": "rag_policy.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-02-19"
+    },
+    {
+      "id": "task_answer_with_sources",
+      "category": "prompts",
+      "path": "prompts/task_answer_with_sources.any.json",
+      "filename": "task_answer_with_sources.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-02-19"
+    },
+    {
+      "id": "task_plan_generation",
+      "category": "prompts",
+      "path": "prompts/task_plan_generation.any.json",
+      "filename": "task_plan_generation.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-02-19"
+    },
+    {
+      "id": "policy_citations",
+      "category": "prompts",
+      "path": "prompts/policy_citations.any.json",
+      "filename": "policy_citations.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-02-19"
+    },
+    {
+      "id": "editing_task_prompts",
+      "category": "prompts",
+      "path": "prompts/editing_task_prompts.any.json",
+      "filename": "editing_task_prompts.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-02-19"
+    },
+    {
       "id": "connectors_quality",
       "category": "quality",
       "path": "quality/connectors_quality.any.json",

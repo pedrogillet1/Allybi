@@ -1,0 +1,40 @@
+{
+  "_meta": {
+    "id": "task_answer_with_sources",
+    "version": "1.1.0",
+    "description": "Task-level answer formatting with structured sources contract.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-19"
+  },
+  "config": {
+    "enabled": true
+  },
+  "templates": [
+    {
+      "id": "answer_with_sources",
+      "priority": 200,
+      "when": { "answerModes": ["doc_grounded_single", "doc_grounded_multi"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "any": "Answer task contract: produce a concise user-facing answer and end with a `Sources` section. Sources must be grounded in provided evidence only and include human-readable titles plus locators when available."
+          }
+        }
+      ]
+    },
+    {
+      "id": "answer_without_sources",
+      "priority": 100,
+      "when": { "answerModes": ["general_answer", "action_receipt", "nav_pills", "rank_disambiguate"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "any": "Answer task contract: produce user-facing markdown only. Do not include a Sources section when no retrieved evidence was used."
+          }
+        }
+      ]
+    }
+  ]
+}

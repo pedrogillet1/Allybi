@@ -384,8 +384,13 @@ export class LlmRouterService {
     const out: Array<{ provider: LlmProviderId; model: LlmModelId }> = [];
 
     // 1) Bank-driven fallbacks
-    if (fallbacks?.config?.enabled !== false && Array.isArray(fallbacks.fallbacks)) {
-      for (const rule of fallbacks.fallbacks) {
+    const fallbackRules =
+      fallbacks?.config?.enabled !== false && Array.isArray(fallbacks?.fallbacks)
+        ? fallbacks.fallbacks
+        : [];
+
+    if (fallbackRules.length) {
+      for (const rule of fallbackRules) {
         const w = rule.when ?? {};
         const matchProvider = !w.provider || w.provider === primary.provider;
         const matchModel = !w.model || w.model === primary.model;
