@@ -29,12 +29,18 @@ const MIN_CHARS_PER_PAGE_THRESHOLD = 100;
 const MIN_MEANINGFUL_CHARS_PER_PAGE = 80;
 const MIN_MEANINGFUL_WORDS_PER_PAGE = 18;
 const MIN_TOKEN_DIVERSITY = 0.22;
+const WATERMARK_HEAVY_RATIO_THRESHOLD = 0.5;
 
 /** Form feed character used as page separator in some PDFs */
 const FORM_FEED = '\f';
 
 /** Page separator pattern injected by some PDF extractors */
 const PAGE_MARKER_REGEX = /\n*---\s*Page\s*(\d+)\s*---\n*/gi;
+const KNOWN_WATERMARK_PATTERNS: RegExp[] = [
+  /visualiza(?:c|ç)[aã]o disponibilizada pela central registradores de im[oó]veis/gi,
+  /visualizado em:\s*\d{1,2}\/\d{1,2}\/\d{2,4}\s+\d{1,2}:\d{2}:\d{2}/gi,
+  /www\.\s*registradores\.\s*org\.\s*br/gi,
+];
 
 // ============================================================================
 // Post-processing
@@ -77,13 +83,34 @@ function fixUtf8Encoding(text: string): string {
   return text;
 }
 
-function stripPageMarkers(text: string): string {
+function stripStructuralMarkers(text: string): string {
   return String(text || '')
     .replace(/--\s*\d+\s*(?:of|de)\s*\d+\s*--/gi, ' ')
     .replace(/---\s*Page\s*\d+\s*---/gi, ' ')
-    .replace(/\f/g, ' ')
+    .replace(/\f/g, ' ');
+}
+
+function stripKnownWatermarks(text: string): string {
+  let cleaned = String(text || '');
+  for (const pattern of KNOWN_WATERMARK_PATTERNS) {
+    cleaned = cleaned.replace(pattern, ' ');
+  }
+  return cleaned;
+}
+
+function stripPageMarkers(text: string): string {
+  return stripKnownWatermarks(stripStructuralMarkers(text))
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+function countWatermarkHits(text: string): number {
+  let total = 0;
+  for (const pattern of KNOWN_WATERMARK_PATTERNS) {
+    const matches = text.match(pattern);
+    if (matches) total += matches.length;
+  }
+  return total;
 }
 
 function estimatePageCount(rawText: string, parserPageCount: number): number {
@@ -106,7 +133,10 @@ function estimatePageCount(rawText: string, parserPageCount: number): number {
 
 function evaluateNativeTextQuality(rawText: string, pageCount: number): { weak: boolean; reasons: string[]; score: number } {
   const reasons: string[] = [];
+  const structuralText = stripStructuralMarkers(rawText).replace(/\s+/g, ' ').trim();
   const meaningful = stripPageMarkers(rawText);
+  const watermarkHits = countWatermarkHits(structuralText);
+  const charsPerPageBeforeWatermark = structuralText.length / Math.max(1, pageCount);
   const charsPerPage = meaningful.length / Math.max(1, pageCount);
   const words = meaningful
     .split(/\s+/)
@@ -123,6 +153,21 @@ function evaluateNativeTextQuality(rawText: string, pageCount: number): { weak: 
   if (charsPerPage < MIN_MEANINGFUL_CHARS_PER_PAGE) reasons.push('low_chars_per_page');
   if (wordsPerPage < MIN_MEANINGFUL_WORDS_PER_PAGE) reasons.push('low_words_per_page');
   if (lexicalWords.length >= 40 && tokenDiversity < MIN_TOKEN_DIVERSITY) reasons.push('low_token_diversity');
+  if (
+    watermarkHits > 0 &&
+    charsPerPageBeforeWatermark >= MIN_MEANINGFUL_CHARS_PER_PAGE &&
+    charsPerPage < MIN_MEANINGFUL_CHARS_PER_PAGE
+  ) {
+    reasons.push('watermark_only_native_text');
+  }
+
+  if (
+    watermarkHits > 0 &&
+    structuralText.length > 0 &&
+    meaningful.length / structuralText.length < WATERMARK_HEAVY_RATIO_THRESHOLD
+  ) {
+    reasons.push('watermark_heavy_text');
+  }
 
   const markerTokens = rawText.match(/--\s*\d+\s*(?:of|de)\s*\d+\s*--|---\s*Page\s*\d+\s*---/gi) || [];
   const markerOnlyLength = markerTokens.reduce((sum, token) => sum + token.length, 0);
