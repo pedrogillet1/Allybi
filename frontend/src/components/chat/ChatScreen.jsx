@@ -72,6 +72,8 @@ export default function ChatScreen() {
 
   // Used to update list items from child (ref to avoid re-render cascade)
   const updateConversationInListRef = useRef(null);
+  // Used to force ChatHistory to reload conversations from the server
+  const refreshConversationsRef = useRef(null);
 
   // Track onboarding open once per session
   const onboardingTriggeredRef = useRef(false);
@@ -321,6 +323,11 @@ export default function ChatScreen() {
       updateConversationInListRef.current(newConversation);
     }
 
+    // Force sidebar to sync with server in case the update callback had a race
+    if (typeof refreshConversationsRef.current === "function") {
+      refreshConversationsRef.current();
+    }
+
     // This conversation is now "real," so future hydration uses it
     hadInitialConversationRef.current = true;
   }, []);
@@ -360,6 +367,7 @@ export default function ChatScreen() {
         currentConversation={currentConversation}
         onNewChat={handleNewChat}
         onConversationUpdate={registerUpdateFunction}
+        refreshConversationsRef={refreshConversationsRef}
       />
 
       {/* Main chat thread */}

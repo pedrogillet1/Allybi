@@ -145,6 +145,7 @@ const ChatHistory = ({
   currentConversation,
   onNewChat,
   onConversationUpdate,
+  refreshConversationsRef,
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -272,8 +273,11 @@ const ChatHistory = ({
       setListStatus('ready');
 
       setConversations((prev) => {
-        // Preserve any locally known currentConversation if API is behind
-        let merged = normalized;
+        // Merge previous local state with API response so locally-known
+        // conversations aren't dropped if the API is behind or paginated.
+        // prev goes first so API items (later) overwrite via compactConversations
+        // dedup (keeps the entry with the most recent timestamp).
+        let merged = [...prev, ...normalized];
         const cId = currentConversation?.id;
         if (cId && cId !== 'new' && !currentConversation?.isEphemeral && !isLoadingPlaceholderConversation(currentConversation)) {
           const has = merged.some((c) => c.id === cId);
@@ -315,7 +319,6 @@ const ChatHistory = ({
       const newUpdatedAt = currentConversation.updatedAt || new Date().toISOString();
 
       if (idx === -1) {
-        if (!hasSuccessfulConversationFetch && prev.length === 0) return prev;
         const updated = compactConversations([{ ...currentConversation, title: newTitle, updatedAt: newUpdatedAt }, ...prev]);
         safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
         return updated;
@@ -338,7 +341,7 @@ const ChatHistory = ({
       safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(sanitized));
       return sanitized;
     });
-  }, [currentConversation?.id, currentConversation?.title, currentConversation?.updatedAt, hasSuccessfulConversationFetch]);
+  }, [currentConversation?.id, currentConversation?.title, currentConversation?.updatedAt]);
 
   // Expose list update callback (optional, if parent wants to push updates)
   useEffect(() => {
@@ -346,10 +349,11 @@ const ChatHistory = ({
     onConversationUpdate((updatedConversation) => {
       if (!updatedConversation || !updatedConversation.id) return;
       if (isLoadingPlaceholderConversation(updatedConversation)) return;
+      let isNewConversation = false;
       setConversations((prev) => {
         const idx = prev.findIndex((c) => c.id === updatedConversation.id);
         if (idx === -1) {
-          if (!hasSuccessfulConversationFetch && prev.length === 0) return prev;
+          isNewConversation = true;
           const next = compactConversations([{ ...updatedConversation, title: normalizeTitle(updatedConversation) }, ...prev]);
           safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(next));
           return next;
@@ -365,13 +369,25 @@ const ChatHistory = ({
         safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(sanitized));
         return sanitized;
       });
+      // Sync with server when a brand-new conversation appears
+      if (isNewConversation) {
+        loadConversationsMetaRef.current.lastTs = 0;
+        loadConversations();
+      }
     });
-  }, [hasSuccessfulConversationFetch, onConversationUpdate]);
+  }, [loadConversations, onConversationUpdate]);
 
   const retryLoadConversations = useCallback(() => {
     loadConversationsMetaRef.current.lastTs = 0;
     loadConversations();
   }, [loadConversations]);
+
+  // Expose refresh function to parent so ChatScreen can force a sidebar sync
+  useEffect(() => {
+    if (refreshConversationsRef) {
+      refreshConversationsRef.current = retryLoadConversations;
+    }
+  }, [refreshConversationsRef, retryLoadConversations]);
 
   // Cmd/Ctrl+K to open search modal (ChatGPT-like)
   useEffect(() => {
