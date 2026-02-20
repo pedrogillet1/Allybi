@@ -107,12 +107,17 @@ const missingLegacySystemPromptsRef = hasPattern(
   /system_prompts\.json|policies\/system_prompts\.any\.json/,
 );
 
-const healthRoutesFile = path.join(SRC, "routes/health.routes.ts");
-const healthHasRetrievalChecks =
-  hasPattern(healthRoutesFile, /retrievalStorage/) &&
-  hasPattern(healthRoutesFile, /retrievalEngineLoaded/) &&
-  hasPattern(healthRoutesFile, /answerEngineLoaded/) &&
-  hasPattern(healthRoutesFile, /health\/retrieval/);
+const healthRouteCandidates = [
+  path.join(SRC, "entrypoints/http/routes/health.routes.ts"),
+  path.join(SRC, "routes/health.routes.ts"),
+];
+const healthHasRetrievalChecks = healthRouteCandidates.some(
+  (file) =>
+    hasPattern(file, /retrievalStorage/) &&
+    hasPattern(file, /retrievalEngineLoaded/) &&
+    hasPattern(file, /answerEngineLoaded/) &&
+    hasPattern(file, /health\/retrieval/),
+);
 
 const containerFile = path.join(SRC, "bootstrap/container.ts");
 const containerHasRetrievalRegistration =

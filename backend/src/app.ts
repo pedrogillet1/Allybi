@@ -18,29 +18,7 @@ import { errorHandler } from "./middleware/error.middleware";
 import { secureLogsMiddleware } from "./middleware/secureLogs.middleware";
 import { csrfProtection } from "./middleware/csrf.middleware";
 
-// Routes (target 9 + health)
-import healthRoutes from "./entrypoints/http/routes/health.routes";
-import authRoutes from "./entrypoints/http/routes/auth.routes";
-import chatRoutes from "./entrypoints/http/routes/chat.routes";
-import historyRoutes from "./entrypoints/http/routes/history.routes";
-import documentRoutes from "./entrypoints/http/routes/documents.routes";
-import folderRoutes from "./entrypoints/http/routes/folders.routes";
-import userRoutes from "./entrypoints/http/routes/users.routes";
-import ragRoutes from "./entrypoints/http/routes/rag.routes";
-import profileRoutes from "./entrypoints/http/routes/profile.routes";
-import storageRoutes from "./entrypoints/http/routes/storage.routes";
-import batchRoutes from "./entrypoints/http/routes/batch.routes";
-import presignedUrlsRoutes from "./entrypoints/http/routes/presigned-urls.routes";
-import multipartUploadRoutes from "./entrypoints/http/routes/multipart-upload.routes";
-import adminTelemetryRoutes from "./entrypoints/http/routes/admin-telemetry.routes";
-import adminAnalyticsRoutes from "./entrypoints/http/routes/admin-analytics.routes";
-import adminAuthRoutes from "./entrypoints/http/routes/admin-auth.routes";
-import recoveryVerificationRoutes from "./entrypoints/http/routes/recovery-verification.routes";
-import integrationsRoutes from "./entrypoints/http/routes/integrations.routes";
-import editorSessionRoutes from "./entrypoints/http/routes/editor-session.routes";
-import editingRoutes from "./entrypoints/http/routes/editing.routes";
-import telemetryRoutes from "./entrypoints/http/routes/telemetry.routes";
-import { adminRouter } from "./admin";
+import { apiRouteMounts, healthRoutes } from "./entrypoints/http/routes";
 
 const app: Application = express();
 
@@ -244,33 +222,9 @@ app.use("/api", healthRoutes);
 /** -----------------------------
  * API routes (target 9)
  * ----------------------------- */
-app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/profile", profileRoutes);
-
-app.use("/api/chat", chatRoutes);
-app.use("/api/history", historyRoutes);
-
-app.use("/api/documents", documentRoutes);
-app.use("/api/folders", folderRoutes);
-
-app.use("/api/rag", ragRoutes);
-app.use("/api/storage", storageRoutes);
-app.use("/api/batch", batchRoutes);
-app.use("/api/presigned-urls", presignedUrlsRoutes);
-app.use("/api/multipart-upload", multipartUploadRoutes);
-app.use("/api/auth/admin", adminAuthRoutes);
-app.use("/api/admin/telemetry", adminTelemetryRoutes);
-app.use("/api/admin/analytics", adminAnalyticsRoutes);
-app.use("/api/recovery-verification", recoveryVerificationRoutes);
-app.use("/api/integrations", integrationsRoutes);
-app.use("/api/editor-session", editorSessionRoutes);
-app.use("/api/editing", editingRoutes);
-app.use("/api/telemetry", telemetryRoutes);
-
-// Admin Dashboard API (mounted at /api/admin AND /api/dashboard for compatibility)
-app.use("/api/admin", adminRouter);
-app.use("/api/dashboard", adminRouter); // Alias for dashboard frontend compatibility
+for (const mount of apiRouteMounts) {
+  app.use(mount.basePath, mount.router);
+}
 
 /** -----------------------------
  * 404

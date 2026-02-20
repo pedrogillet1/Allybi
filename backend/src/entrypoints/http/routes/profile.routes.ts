@@ -1,1 +1,5 @@
-export { default } from "../../../routes/profile.routes";
+import createProfileRouter from "../../../controllers/profile.controller";
+
+const router = createProfileRouter();
+
+export default router;
