@@ -110,29 +110,11 @@ interface ExtractionResult {
 }
 
 const SKIP_WORDS = new Set([
-  "The",
-  "This",
-  "That",
-  "Party",
-  "Contract",
-  "Agreement",
-  "Section",
-  "Article",
-  "Clause",
-  "Document",
-  "Property",
-  "Evidence",
-  "Witness",
-  "Owner",
-  "Guarantor",
-  "Signatory",
-  "Beneficiary",
-  "Tenant",
-  "Signed",
-  "Between",
-  "Whereas",
-  "Hereinafter",
-  "Hereby",
+  "The", "This", "That", "Party", "Contract", "Agreement",
+  "Section", "Article", "Clause", "Document", "Property",
+  "Evidence", "Witness", "Owner", "Guarantor", "Signatory",
+  "Beneficiary", "Tenant", "Signed", "Between", "Whereas",
+  "Hereinafter", "Hereby",
 ]);
 
 function findAllEntities(
@@ -141,10 +123,20 @@ function findAllEntities(
   const found: Array<{ entity: string; index: number }> = [];
   let m: RegExpExecArray | null;
 
-  // Multi-word capitalized names
+  // Multi-word capitalized names (e.g., "John Smith", "Jo\u00e3o Silva")
   const nameRx =
     /\b([A-Z\u00C0-\u024F][a-z\u00C0-\u024F]+(?:\s+(?:de|da|do|dos|das|e|van|von|el|al|del)?\s*[A-Z\u00C0-\u024F][a-z\u00C0-\u024F]+)+)\b/g;
   while ((m = nameRx.exec(text)) !== null) {
+    const val = m[1].trim();
+    if (val.length >= 3 && !found.some((f) => f.entity === val)) {
+      found.push({ entity: val, index: m.index });
+    }
+  }
+
+  // Company names: "Capitalized ACRONYM" (e.g., "Beta LLC", "Acme Inc")
+  const companyRx =
+    /\b([A-Z\u00C0-\u024F][a-z\u00C0-\u024F]+\s+[A-Z]{2,})\b/g;
+  while ((m = companyRx.exec(text)) !== null) {
     const val = m[1].trim();
     if (val.length >= 3 && !found.some((f) => f.entity === val)) {
       found.push({ entity: val, index: m.index });
@@ -165,24 +157,21 @@ function findAllEntities(
   return found;
 }
 
-function extractClosestEntities(
-  allEntities: Array<{ entity: string; index: number }>,
-  anchorPositions: Array<{ anchor: string; index: number }>,
-  windowChars: number,
-): string[] {
-  const result: string[] = [];
-  for (const pos of anchorPositions) {
-    const nearby = allEntities
-      .filter((e) => Math.abs(e.index - pos.index) <= windowChars)
-      .sort(
-        (a, b) => Math.abs(a.index - pos.index) - Math.abs(b.index - pos.index),
-      );
-
-    if (nearby.length > 0 && !result.includes(nearby[0].entity)) {
-      result.push(nearby[0].entity);
-    }
-  }
-  return result;
+/**
+ * Sentence-aware distance: raw char distance penalized for crossing
+ * sentence boundaries (periods, semicolons, etc.).
+ */
+function sentenceAwareDistance(
+  text: string,
+  posA: number,
+  posB: number,
+): number {
+  const rawDist = Math.abs(posA - posB);
+  const start = Math.min(posA, posB);
+  const end = Math.max(posA, posB);
+  const between = text.slice(start, end);
+  const boundaries = (between.match(/[.;!?]/g) || []).length;
+  return rawDist * (1 + boundaries * 2);
 }
 
 function findAnchorPositions(
@@ -246,48 +235,85 @@ function compileExtraction(
     const allEntities = findAllEntities(snippet);
 
     const targetPositions = findAnchorPositions(snippet, targetAnchors);
-    const targetEntities = extractClosestEntities(
-      allEntities,
-      targetPositions,
-      proximityWindow,
-    );
 
-    for (const entityText of targetEntities) {
-      const existing = allCandidates.find(
-        (c) => c.entityText.toLowerCase() === entityText.toLowerCase(),
-      );
-      if (existing) {
-        existing.confidence = Math.min(1.0, existing.confidence + 0.1);
-      } else {
-        allCandidates.push({
-          entityText,
-          roleId: slot.targetRoleId,
-          confidence: 0.85 + (item.score ?? 0.7) * 0.1,
-        });
+    // Collect ALL forbidden positions across all forbidden roles
+    const allForbiddenPositions: Array<{
+      anchor: string;
+      index: number;
+      roleId: string;
+    }> = [];
+    for (const [forbRoleId, forbAnchors] of forbiddenAnchorsMap) {
+      const positions = findAnchorPositions(snippet, forbAnchors);
+      for (const pos of positions) {
+        allForbiddenPositions.push({ ...pos, roleId: forbRoleId });
       }
     }
 
-    for (const [forbRoleId, forbAnchors] of forbiddenAnchorsMap) {
-      const forbPositions = findAnchorPositions(snippet, forbAnchors);
-      const forbEntities = extractClosestEntities(
-        allEntities,
-        forbPositions,
-        proximityWindow,
-      );
-      for (const entityText of forbEntities) {
-        if (
-          !allForbidden.some(
-            (f) =>
-              f.entityText.toLowerCase() === entityText.toLowerCase() &&
-              f.role === forbRoleId,
-          )
-        ) {
-          allForbidden.push({ role: forbRoleId, entityText });
+    // For each entity, compute sentence-aware distance to target vs forbidden
+    for (const entity of allEntities) {
+      const minTargetDist =
+        targetPositions.length > 0
+          ? Math.min(
+              ...targetPositions.map((p) =>
+                sentenceAwareDistance(snippet, entity.index, p.index),
+              ),
+            )
+          : Infinity;
+      const minForbiddenDist =
+        allForbiddenPositions.length > 0
+          ? Math.min(
+              ...allForbiddenPositions.map((p) =>
+                sentenceAwareDistance(snippet, entity.index, p.index),
+              ),
+            )
+          : Infinity;
+
+      if (
+        minTargetDist > proximityWindow &&
+        minForbiddenDist > proximityWindow
+      )
+        continue;
+
+      if (minTargetDist <= minForbiddenDist) {
+        if (minTargetDist <= proximityWindow) {
+          const existing = allCandidates.find(
+            (c) => c.entityText.toLowerCase() === entity.entity.toLowerCase(),
+          );
+          if (existing) {
+            existing.confidence = Math.min(1.0, existing.confidence + 0.1);
+          } else {
+            allCandidates.push({
+              entityText: entity.entity,
+              roleId: slot.targetRoleId,
+              confidence: 0.85 + (item.score ?? 0.7) * 0.1,
+            });
+          }
+        }
+      } else {
+        if (minForbiddenDist <= proximityWindow) {
+          const closestForbPos = [...allForbiddenPositions].sort(
+            (a, b) =>
+              sentenceAwareDistance(snippet, entity.index, a.index) -
+              sentenceAwareDistance(snippet, entity.index, b.index),
+          )[0];
+          if (
+            !allForbidden.some(
+              (f) =>
+                f.entityText.toLowerCase() === entity.entity.toLowerCase() &&
+                f.role === closestForbPos.roleId,
+            )
+          ) {
+            allForbidden.push({
+              role: closestForbPos.roleId,
+              entityText: entity.entity,
+            });
+          }
         }
       }
     }
   }
 
+  // Safety net: remove candidates that also appear as forbidden across snippets
   const cleanCandidates = allCandidates.filter(
     (c) =>
       !allForbidden.some(
