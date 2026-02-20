@@ -314,10 +314,17 @@ export class ChatRuntimeOrchestrator {
         : [],
     };
 
-    // Always try explicit document-name detection first, even on the first turn
-    // before a conversationId exists. This prevents cross-document retrieval on
-    // opening queries like "using document X...".
-    if ((next.attachedDocumentIds || []).length === 0) {
+    // Check if the message has explicit doc-reference phrases (e.g., "Usando os documentos X, Y e Z").
+    // When present, always re-detect — even if attachedDocumentIds is pre-populated from
+    // persisted scope — so multi-doc queries resolve all mentioned documents.
+    const hasExplicitDocPhrase = this.scopeRuntime.candidateDocRefRegex.some(
+      (re: RegExp) => {
+        re.lastIndex = 0; // reset stateful regex
+        return re.test(req.message);
+      },
+    );
+
+    if (hasExplicitDocPhrase || (next.attachedDocumentIds || []).length === 0) {
       const detected = await this.detectDocumentMentions(
         req.userId,
         req.message,
@@ -325,6 +332,8 @@ export class ChatRuntimeOrchestrator {
       if (detected.length > 0) {
         logger.debug("[Scope] detected document mentions", {
           detected,
+          hadExplicitDocPhrase: hasExplicitDocPhrase,
+          previousIds: next.attachedDocumentIds,
           userId: req.userId,
         });
         next.attachedDocumentIds = detected;
@@ -394,6 +403,11 @@ export class ChatRuntimeOrchestrator {
 
     if (candidates.size === 0) return [];
 
+    logger.debug("[Scope] document mention candidates", {
+      candidates: Array.from(candidates),
+      userId,
+    });
+
     // Fetch user's ready/indexed documents
     const docs = await prisma.document.findMany({
       where: {
@@ -404,10 +418,17 @@ export class ChatRuntimeOrchestrator {
     });
     if (!docs.length) return [];
 
+    logger.debug("[Scope] user indexed documents", {
+      filenames: docs.map((d) => d.filename || "(none)"),
+      count: docs.length,
+    });
+
     const matched = new Set<string>();
+    const candidateResults: Record<string, { matchedDocId?: string; matchType?: string; failed?: boolean }> = {};
 
     for (const candidate of candidates) {
       const candidateTokens = this.docnameTokens(candidate);
+      let candidateMatched = false;
 
       for (const doc of docs) {
         const fn = lower(doc.filename ?? "");
@@ -420,7 +441,9 @@ export class ChatRuntimeOrchestrator {
           candidate.includes(fn)
         ) {
           matched.add(doc.id);
-          continue;
+          candidateResults[candidate] = { matchedDocId: doc.id, matchType: "exact/substring" };
+          candidateMatched = true;
+          break;
         }
 
         // Token overlap match (threshold 0.5 — same family as ScopeGateService)
@@ -432,9 +455,22 @@ export class ChatRuntimeOrchestrator {
         );
         if (overlap >= this.scopeRuntime.tokenOverlapThreshold) {
           matched.add(doc.id);
+          candidateResults[candidate] = { matchedDocId: doc.id, matchType: `token-overlap(${overlap.toFixed(2)})` };
+          candidateMatched = true;
+          break;
         }
       }
+
+      if (!candidateMatched) {
+        candidateResults[candidate] = { failed: true };
+      }
     }
+
+    logger.debug("[Scope] document mention matches", {
+      matchedIds: Array.from(matched),
+      docsChecked: docs.length,
+      candidateResults,
+    });
 
     return Array.from(matched);
   }
