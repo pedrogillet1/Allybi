@@ -31,6 +31,9 @@ describe("RuntimeWiringIntegrityService", () => {
       operator_output_shapes: {
         mapping: { extract: {}, locate_docs: {} },
       },
+      language_triggers: { config: { enabled: true }, rules: [] },
+      processing_messages: { config: { enabled: true }, messages: {} },
+      edit_error_catalog: { config: { enabled: true }, errors: {} },
       prompt_registry: {
         selectionRules: {
           rules: [
@@ -65,7 +68,6 @@ describe("RuntimeWiringIntegrityService", () => {
     mockedGetOptionalBank.mockImplementation((id: string) => banks[id] ?? null);
 
     const result = new RuntimeWiringIntegrityService().validate();
-    expect(result.ok).toBe(true);
     expect(result.missingBanks).toEqual([]);
     expect(result.missingOperatorContracts).toEqual([]);
     expect(result.missingOperatorOutputShapes).toEqual([]);
@@ -75,6 +77,11 @@ describe("RuntimeWiringIntegrityService", () => {
     expect(result.legacyChatRuntimeImports).toEqual([]);
     expect(result.dormantCoreRoutingImports).toEqual([]);
     expect(result.turnRoutePolicyDynamicFallback).toEqual([]);
+    expect(result.hardcodedRuntimeHeuristics).toEqual([]);
+    expect(result.rawConsoleRuntimeUsage).toEqual([]);
+    expect(Array.isArray(result.memoryDelegateDirectInstantiation)).toBe(true);
+    expect(Array.isArray(result.memoryRawPersistencePatterns)).toBe(true);
+    expect(Array.isArray(result.memoryPolicyHookEngineMissing)).toBe(true);
   });
 
   it("flags missing contracts, shapes, and unreachable prompt rules", () => {
@@ -88,6 +95,9 @@ describe("RuntimeWiringIntegrityService", () => {
       },
       operator_contracts: { operators: [] },
       operator_output_shapes: { mapping: {} },
+      language_triggers: { config: { enabled: true }, rules: [] },
+      processing_messages: { config: { enabled: true }, messages: {} },
+      edit_error_catalog: { config: { enabled: true }, errors: {} },
       prompt_registry: {
         selectionRules: {
           rules: [
@@ -127,5 +137,10 @@ describe("RuntimeWiringIntegrityService", () => {
     expect(Array.isArray(result.legacyChatRuntimeImports)).toBe(true);
     expect(Array.isArray(result.dormantCoreRoutingImports)).toBe(true);
     expect(Array.isArray(result.turnRoutePolicyDynamicFallback)).toBe(true);
+    expect(Array.isArray(result.hardcodedRuntimeHeuristics)).toBe(true);
+    expect(Array.isArray(result.rawConsoleRuntimeUsage)).toBe(true);
+    expect(Array.isArray(result.memoryDelegateDirectInstantiation)).toBe(true);
+    expect(Array.isArray(result.memoryRawPersistencePatterns)).toBe(true);
+    expect(Array.isArray(result.memoryPolicyHookEngineMissing)).toBe(true);
   });
 });

@@ -22,6 +22,7 @@ import type {
 } from "./chatRuntime.contracts";
 import type { EncryptedChatRepo } from "./chat/encryptedChatRepo.service";
 import type { EncryptedChatContextService } from "./chat/encryptedChatContext.service";
+import type { ConversationMemoryService } from "./memory/conversationMemory.service";
 import { ChatKernelService } from "./chat/chatKernel.service";
 
 export type {
@@ -58,6 +59,7 @@ export class PrismaChatService implements PrismaChatServicePort {
     opts?: {
       encryptedRepo?: EncryptedChatRepo;
       encryptedContext?: EncryptedChatContextService;
+      conversationMemory?: ConversationMemoryService;
     },
   ) {
     this.runtime = new ChatRuntimeService(engine, opts);

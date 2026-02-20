@@ -4,6 +4,7 @@ import type {
 } from "../../../services/llm/types/llmStreaming.types";
 import type { EncryptedChatRepo } from "../../../services/chat/encryptedChatRepo.service";
 import type { EncryptedChatContextService } from "../../../services/chat/encryptedChatContext.service";
+import { ConversationMemoryService } from "../../../services/memory/conversationMemory.service";
 import {
   ConversationNotFoundError,
   type AnswerClass,
@@ -57,9 +58,16 @@ export class ChatRuntimeService {
     opts?: {
       encryptedRepo?: EncryptedChatRepo;
       encryptedContext?: EncryptedChatContextService;
+      conversationMemory?: ConversationMemoryService;
     },
   ) {
-    this.delegate = new CentralizedChatRuntimeDelegate(engine, opts);
+    const conversationMemory =
+      opts?.conversationMemory || new ConversationMemoryService();
+    this.delegate = new CentralizedChatRuntimeDelegate(engine, {
+      encryptedRepo: opts?.encryptedRepo,
+      encryptedContext: opts?.encryptedContext,
+      conversationMemory,
+    });
     const delegate: RuntimeDelegate = this.delegate;
     this.orchestrator = new ChatRuntimeOrchestrator(delegate);
   }

@@ -1,0 +1,184 @@
+{
+  "_meta": {
+    "id": "orchestrator_certification",
+    "version": "1.0.0",
+    "description": "Deployment-grade certification policy for orchestrator architecture, memory wiring, databank purity, reliability, coverage, and regression gates.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-20"
+  },
+  "config": {
+    "gateScores": {
+      "architecture": 20,
+      "databank": 20,
+      "memory_semantics": 20,
+      "reliability": 15,
+      "coverage": 15,
+      "regression": 10
+    },
+    "orchestratorFiles": [
+      "src/modules/chat/runtime/ChatRuntimeOrchestrator.ts",
+      "src/modules/chat/runtime/ScopeService.ts",
+      "src/modules/chat/runtime/EvidenceValidator.ts",
+      "src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+      "src/services/chat/turnRouter.service.ts",
+      "src/services/chat/guardrails/editorMode.guard.ts",
+      "src/services/editing/editOrchestrator.service.ts",
+      "src/services/preview/previewOrchestrator.service.ts",
+      "src/services/creative/creativeOrchestrator.service.ts",
+      "src/services/core/retrieval/evidenceGate.service.ts"
+    ],
+    "databank": {
+      "requiredRuntimeTuningSections": [
+        "scopeRuntime",
+        "evidenceGate",
+        "semanticSignals",
+        "semanticRetrieval"
+      ],
+      "hardcodedHeuristicRules": [
+        {
+          "code": "HARDCODED_RUNTIME_HEURISTIC",
+          "message": "Inline filename regex constant found in orchestrator runtime path.",
+          "pattern": "\\bFILE_EXT_RE\\b",
+          "flags": "",
+          "mode": "must_not_match"
+        },
+        {
+          "code": "HARDCODED_RUNTIME_HEURISTIC",
+          "message": "Inline document-reference phrase regex found in orchestrator runtime path.",
+          "pattern": "\\bDOC_REF_PHRASES_RE\\b",
+          "flags": "",
+          "mode": "must_not_match"
+        },
+        {
+          "code": "HARDCODED_RUNTIME_HEURISTIC",
+          "message": "Inline scope cardinality constant found in orchestrator runtime path.",
+          "pattern": "\\bMAX_SCOPE_DOCS\\b",
+          "flags": "",
+          "mode": "must_not_match"
+        },
+        {
+          "code": "HARDCODED_RUNTIME_HEURISTIC",
+          "message": "Inline connector detection regex found in orchestrator runtime path.",
+          "pattern": "\\bEXPLICIT_CONNECTOR_PATTERN\\b",
+          "flags": "",
+          "mode": "must_not_match"
+        },
+        {
+          "code": "HARDCODED_RUNTIME_HEURISTIC",
+          "message": "Inline evidence gate heuristics found in orchestrator runtime path.",
+          "pattern": "\\bFACT_REQUIRING_PATTERNS\\b|\\bNARRATIVE_RISK_PATTERNS\\b|\\bEVIDENCE_KEYWORDS\\b",
+          "flags": "",
+          "mode": "must_not_match"
+        }
+      ]
+    },
+    "memorySemantics": {
+      "checks": [
+        {
+          "code": "TEST_FAILURE",
+          "message": "Durable memory artifact writer is not wired in runtime delegate.",
+          "filePath": "src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+          "pattern": "recordConversationMemoryArtifacts",
+          "flags": "",
+          "mode": "must_match"
+        },
+        {
+          "code": "TEST_FAILURE",
+          "message": "Memory artifact persistence does not show optimistic concurrency protection.",
+          "filePath": "src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+          "pattern": "updateMany\\(\\{\\s*where:\\s*\\{[\\s\\S]*updatedAt:\\s*existing\\.updatedAt[\\s\\S]*\\}\\s*,[\\s\\S]*contextMeta:",
+          "flags": "m",
+          "mode": "must_match"
+        },
+        {
+          "code": "HARDCODED_RUNTIME_HEURISTIC",
+          "message": "Source buttons attachment language is hardcoded.",
+          "filePath": "src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+          "pattern": "language:\\s*[\"']en[\"']",
+          "flags": "",
+          "mode": "must_not_match"
+        }
+      ]
+    },
+    "reliability": {
+      "rawConsoleCode": "RAW_CONSOLE_USAGE",
+      "rawConsoleMessage": "Raw console usage found in orchestrator runtime path.",
+      "rawConsolePattern": "console\\.(log|warn|error|info|debug)\\(",
+      "rawConsoleFlags": ""
+    },
+    "coverage": {
+      "thresholds": [
+        {
+          "suffix": "src/modules/chat/runtime/ChatRuntimeOrchestrator.ts",
+          "linesPct": 90,
+          "branchesPct": 70
+        },
+        {
+          "suffix": "src/modules/chat/runtime/ScopeService.ts",
+          "linesPct": 94,
+          "branchesPct": 78
+        },
+        {
+          "suffix": "src/modules/chat/runtime/EvidenceValidator.ts",
+          "linesPct": 95,
+          "branchesPct": 80
+        },
+        {
+          "suffix": "src/services/chat/turnRouter.service.ts",
+          "linesPct": 92,
+          "branchesPct": 85
+        },
+        {
+          "suffix": "src/services/chat/guardrails/editorMode.guard.ts",
+          "linesPct": 95,
+          "branchesPct": 75
+        },
+        {
+          "suffix": "src/services/editing/editOrchestrator.service.ts",
+          "linesPct": 90,
+          "branchesPct": 65
+        },
+        {
+          "suffix": "src/services/preview/previewOrchestrator.service.ts",
+          "linesPct": 90,
+          "branchesPct": 85
+        },
+        {
+          "suffix": "src/services/creative/creativeOrchestrator.service.ts",
+          "linesPct": 95,
+          "branchesPct": 45
+        }
+      ]
+    },
+    "regressionSuite": {
+      "testPaths": [
+        "src/modules/chat/runtime/ChatRuntimeOrchestrator.test.ts",
+        "src/modules/chat/runtime/ScopeService.test.ts",
+        "src/modules/chat/runtime/EvidenceValidator.test.ts",
+        "src/services/chat/turnRouter.service.test.ts",
+        "src/services/chat/guardrails/editorMode.guard.test.ts",
+        "src/services/core/banks/runtimeWiringIntegrity.service.test.ts",
+        "src/services/core/retrieval/evidenceGate.service.test.ts",
+        "src/services/editing/editOrchestrator.proof.test.ts",
+        "src/services/editing/editOrchestrator.stalePlan.test.ts",
+        "src/services/editing/editOrchestrator.coverage.test.ts",
+        "src/services/preview/previewOrchestrator.service.test.ts",
+        "src/services/creative/creativeOrchestrator.service.test.ts",
+        "src/tests/memory-semantic-continuity.test.ts",
+        "src/tests/chatRuntimeCentralization.test.ts"
+      ],
+      "collectCoverageFrom": [
+        "src/modules/chat/runtime/ChatRuntimeOrchestrator.ts",
+        "src/modules/chat/runtime/ScopeService.ts",
+        "src/modules/chat/runtime/EvidenceValidator.ts",
+        "src/services/chat/turnRouter.service.ts",
+        "src/services/chat/guardrails/editorMode.guard.ts",
+        "src/services/editing/editOrchestrator.service.ts",
+        "src/services/preview/previewOrchestrator.service.ts",
+        "src/services/creative/creativeOrchestrator.service.ts"
+      ]
+    }
+  }
+}

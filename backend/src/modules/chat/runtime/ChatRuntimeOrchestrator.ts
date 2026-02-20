@@ -3,6 +3,8 @@ import type {
   StreamSink,
 } from "../../../services/llm/types/llmStreaming.types";
 import prisma from "../../../config/database";
+import { getBankLoaderInstance } from "../../../services/core/banks/bankLoader.service";
+import { logger } from "../../../utils/logger";
 import type {
   ChatMessageDTO,
   ChatRequest,
@@ -17,13 +19,121 @@ import { ContractNormalizer } from "./ContractNormalizer";
 import { EvidenceValidator } from "./EvidenceValidator";
 import { ScopeService } from "./ScopeService";
 
-/* ── Filename-detection helpers (borrowed from ScopeGateService) ─── */
+type ScopeRuntimeMentionConfig = {
+  tokenMinLength: number;
+  docNameMinLength: number;
+  tokenOverlapThreshold: number;
+  candidateFilenameRegex: RegExp[];
+  candidateDocRefRegex: RegExp[];
+  docStatusesAllowed: string[];
+  stopWords: Set<string>;
+};
 
-const FILE_EXT_RE =
-  /\b[\w][\w\-_. ]{0,160}\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g|webp)\b/gi;
+function resolveScopeRuntimeMentionConfig(): ScopeRuntimeMentionConfig {
+  const bank = getBankLoaderInstance().getBank<any>("memory_policy");
+  const runtime = bank?.config?.runtimeTuning?.scopeRuntime;
+  if (!runtime || typeof runtime !== "object") {
+    throw new Error("memory_policy.config.runtimeTuning.scopeRuntime is required");
+  }
 
-const DOC_REF_PHRASES_RE =
-  /(?:usando\s+(?:o\s+)?documento|using\s+(?:the\s+)?(?:document|file)|no\s+(?:documento|arquivo)|from\s+(?:the\s+)?(?:document|file)|about\s+(?:the\s+)?(?:document|file)|(?:documento|arquivo)\s+chamado)\s+[""]?([^"""\n]{3,120})[""]?/gi;
+  const tokenMinLength = Number(runtime.tokenMinLength);
+  const docNameMinLength = Number(runtime.docNameMinLength);
+  const tokenOverlapThreshold = Number(runtime.tokenOverlapThreshold);
+
+  if (!Number.isFinite(tokenMinLength) || tokenMinLength < 1) {
+    throw new Error(
+      "memory_policy.config.runtimeTuning.scopeRuntime.tokenMinLength is required",
+    );
+  }
+  if (!Number.isFinite(docNameMinLength) || docNameMinLength < 1) {
+    throw new Error(
+      "memory_policy.config.runtimeTuning.scopeRuntime.docNameMinLength is required",
+    );
+  }
+  if (
+    !Number.isFinite(tokenOverlapThreshold) ||
+    tokenOverlapThreshold <= 0 ||
+    tokenOverlapThreshold > 1
+  ) {
+    throw new Error(
+      "memory_policy.config.runtimeTuning.scopeRuntime.tokenOverlapThreshold is required",
+    );
+  }
+
+  const filenamePatterns = Array.isArray(runtime?.candidatePatterns?.filename)
+    ? runtime.candidatePatterns.filename
+    : [];
+  const phrasePatterns = Array.isArray(
+    runtime?.candidatePatterns?.docReferencePhrase,
+  )
+    ? runtime.candidatePatterns.docReferencePhrase
+    : [];
+  if (filenamePatterns.length === 0 || phrasePatterns.length === 0) {
+    throw new Error(
+      "memory_policy.config.runtimeTuning.scopeRuntime.candidatePatterns is required",
+    );
+  }
+
+  const candidateFilenameRegex = filenamePatterns.map((pattern: unknown) => {
+    const source = String(pattern || "").trim();
+    if (!source) {
+      throw new Error(
+        "memory_policy scopeRuntime candidate filename regex cannot be empty",
+      );
+    }
+    try {
+      return new RegExp(source, "gi");
+    } catch {
+      throw new Error(`Invalid scopeRuntime filename regex: ${source}`);
+    }
+  });
+  const candidateDocRefRegex = phrasePatterns.map((pattern: unknown) => {
+    const source = String(pattern || "").trim();
+    if (!source) {
+      throw new Error(
+        "memory_policy scopeRuntime doc reference regex cannot be empty",
+      );
+    }
+    try {
+      return new RegExp(source, "gi");
+    } catch {
+      throw new Error(`Invalid scopeRuntime doc reference regex: ${source}`);
+    }
+  });
+
+  const docStatusesAllowed = (Array.isArray(runtime.docStatusesAllowed)
+    ? runtime.docStatusesAllowed
+    : []
+  )
+    .map((value: unknown) => String(value || "").trim())
+    .filter(Boolean);
+  if (docStatusesAllowed.length === 0) {
+    throw new Error(
+      "memory_policy.config.runtimeTuning.scopeRuntime.docStatusesAllowed is required",
+    );
+  }
+
+  const stopWords = new Set<string>(
+    (Array.isArray(runtime.docStopWords) ? runtime.docStopWords : [])
+      .map((value: unknown) => lower(String(value || "")))
+      .filter((value: string): value is string => value.length > 0),
+  );
+  if (stopWords.size === 0) {
+    throw new Error(
+      "memory_policy.config.runtimeTuning.scopeRuntime.docStopWords is required",
+    );
+  }
+
+  return {
+    tokenMinLength: Math.floor(tokenMinLength),
+    docNameMinLength: Math.floor(docNameMinLength),
+    tokenOverlapThreshold,
+    candidateFilenameRegex,
+    candidateDocRefRegex,
+    docStatusesAllowed,
+    stopWords,
+  };
+}
 
 function normSpace(s: string): string {
   return (s ?? "").trim().replace(/\s+/g, " ");
@@ -41,37 +151,17 @@ function simpleTokens(s: string): string[] {
     .filter(Boolean);
 }
 
-function tokenOverlap(aTokens: string[], bTokens: string[]): number {
-  const a = new Set(aTokens.filter((t) => t.length >= 2));
-  const b = new Set(bTokens.filter((t) => t.length >= 2));
+function tokenOverlap(
+  aTokens: string[],
+  bTokens: string[],
+  minTokenLength: number,
+): number {
+  const a = new Set(aTokens.filter((t) => t.length >= minTokenLength));
+  const b = new Set(bTokens.filter((t) => t.length >= minTokenLength));
   if (!a.size || !b.size) return 0;
   let hit = 0;
   for (const t of a) if (b.has(t)) hit++;
   return hit / Math.max(a.size, b.size);
-}
-
-const DOC_STOPWORDS = new Set([
-  "file",
-  "document",
-  "doc",
-  "report",
-  "spreadsheet",
-  "sheet",
-  "arquivo",
-  "documento",
-  "relatório",
-  "relatorio",
-  "planilha",
-  "usando",
-  "using",
-  "from",
-  "about",
-  "the",
-  "no",
-]);
-
-function docnameTokens(s: string): string[] {
-  return simpleTokens(s).filter((t) => !DOC_STOPWORDS.has(t));
 }
 
 export type RuntimeDelegate = {
@@ -122,8 +212,13 @@ export class ChatRuntimeOrchestrator {
   private readonly normalizer = new ContractNormalizer();
   private readonly evidenceValidator = new EvidenceValidator();
   private readonly scopeService = new ScopeService();
+  private readonly scopeRuntime = resolveScopeRuntimeMentionConfig();
 
   constructor(private readonly delegate: RuntimeDelegate) {}
+
+  private docnameTokens(s: string): string[] {
+    return simpleTokens(s).filter((t) => !this.scopeRuntime.stopWords.has(t));
+  }
 
   async chat(req: ChatRequest): Promise<ChatResult> {
     const preparedReq = await this.prepareRequest(req);
@@ -227,7 +322,10 @@ export class ChatRuntimeOrchestrator {
         req.message,
       );
       if (detected.length > 0) {
-        console.log("[Scope] detected document mentions:", detected);
+        logger.debug("[Scope] detected document mentions", {
+          detected,
+          userId: req.userId,
+        });
         next.attachedDocumentIds = detected;
       }
     }
@@ -273,17 +371,24 @@ export class ChatRuntimeOrchestrator {
 
     const candidates = new Set<string>();
 
-    // Strategy 1: match file-extension tokens (e.g. "OBA_marketing.pdf")
-    const extMatches = message.matchAll(FILE_EXT_RE);
-    for (const m of extMatches) {
-      candidates.add(lower(m[0]));
+    for (const pattern of this.scopeRuntime.candidateFilenameRegex) {
+      const extMatches = message.matchAll(pattern);
+      for (const m of extMatches) {
+        const matched = lower(m[0]);
+        if (matched.length >= this.scopeRuntime.docNameMinLength) {
+          candidates.add(matched);
+        }
+      }
     }
 
-    // Strategy 2: match "using document X" / "usando o documento X" phrases
-    const phraseMatches = message.matchAll(DOC_REF_PHRASES_RE);
-    for (const m of phraseMatches) {
-      const raw = (m[1] || "").trim();
-      if (raw.length >= 3) candidates.add(lower(raw));
+    for (const pattern of this.scopeRuntime.candidateDocRefRegex) {
+      const phraseMatches = message.matchAll(pattern);
+      for (const m of phraseMatches) {
+        const raw = String(m[1] || "").trim();
+        if (raw.length >= this.scopeRuntime.docNameMinLength) {
+          candidates.add(lower(raw));
+        }
+      }
     }
 
     if (candidates.size === 0) return [];
@@ -292,9 +397,7 @@ export class ChatRuntimeOrchestrator {
     const docs = await prisma.document.findMany({
       where: {
         userId,
-        status: {
-          in: ["ready", "indexed", "available", "enriching", "completed"],
-        },
+        status: { in: this.scopeRuntime.docStatusesAllowed },
       },
       select: { id: true, filename: true },
     });
@@ -303,7 +406,7 @@ export class ChatRuntimeOrchestrator {
     const matched = new Set<string>();
 
     for (const candidate of candidates) {
-      const candidateTokens = docnameTokens(candidate);
+      const candidateTokens = this.docnameTokens(candidate);
 
       for (const doc of docs) {
         const fn = lower(doc.filename ?? "");
@@ -320,9 +423,13 @@ export class ChatRuntimeOrchestrator {
         }
 
         // Token overlap match (threshold 0.5 — same family as ScopeGateService)
-        const fnTokens = docnameTokens(doc.filename ?? "");
-        const overlap = tokenOverlap(candidateTokens, fnTokens);
-        if (overlap >= 0.5) {
+        const fnTokens = this.docnameTokens(doc.filename ?? "");
+        const overlap = tokenOverlap(
+          candidateTokens,
+          fnTokens,
+          this.scopeRuntime.tokenMinLength,
+        );
+        if (overlap >= this.scopeRuntime.tokenOverlapThreshold) {
           matched.add(doc.id);
         }
       }
@@ -363,7 +470,11 @@ export class ChatRuntimeOrchestrator {
     const scopeForValidation =
       attachedScope.length > 0 ? attachedScope : persistedScope;
     if (scopeForValidation.length > 0) {
-      console.log("[Scope] persisted scope:", scopeForValidation);
+      logger.debug("[Scope] persisted scope", {
+        scopeForValidation,
+        userId: req.userId,
+        conversationId,
+      });
     }
     const scoped = this.evidenceValidator.enforceScope(
       normalized,

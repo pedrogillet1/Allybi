@@ -3,8 +3,9 @@ import path from "path";
 
 type AnyObj = Record<string, any>;
 
-function readJson(relPath: string): AnyObj {
+function readJson(relPath: string): AnyObj | null {
   const p = path.resolve(__dirname, "..", relPath);
+  if (!fs.existsSync(p)) return null;
   return JSON.parse(fs.readFileSync(p, "utf8"));
 }
 

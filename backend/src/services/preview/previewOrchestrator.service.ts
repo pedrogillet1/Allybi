@@ -11,6 +11,7 @@
  */
 
 import prisma from "../../config/database";
+import { logger } from "../../utils/logger";
 import {
   needsPreviewPdfGeneration,
   getPreviewPdfStatus,
@@ -112,14 +113,18 @@ async function triggerPreviewGeneration(
       mimeType,
     });
 
-    console.log(
-      `[PreviewOrchestrator] Triggered preview generation for ${documentId.substring(0, 8)}`,
-    );
+    logger.info("[PreviewOrchestrator] triggered preview generation", {
+      documentIdPrefix: documentId.substring(0, 8),
+      userId,
+      mimeType,
+    });
   } catch (error: any) {
-    console.error(
-      `[PreviewOrchestrator] Failed to trigger preview:`,
-      error.message,
-    );
+    logger.error("[PreviewOrchestrator] failed to trigger preview", {
+      documentId,
+      userId,
+      mimeType,
+      error: String(error?.message || error),
+    });
   }
 }
 

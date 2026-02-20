@@ -29,6 +29,26 @@ function context(messageText: string, ranges: any[]): TurnContext {
 }
 
 describe("EditorModeGuard", () => {
+  test("no viewer mode leaves routing unconstrained", () => {
+    const guard = new EditorModeGuard({
+      isConnectorTurn: () => false,
+    });
+    const result = guard.enforce({
+      userId: "u1",
+      conversationId: "c1",
+      messageText: "hello",
+      locale: "en",
+      now: new Date(),
+      attachedDocuments: [],
+      connectors: { activeConnector: null, connected: {} },
+      request: { userId: "u1", message: "hello", conversationId: "c1" },
+    } as any);
+    expect(result).toEqual({
+      routeForcedToEditor: false,
+      allowConnectorEscape: true,
+    });
+  });
+
   test("selection in viewer mode forces editor route", () => {
     const guard = new EditorModeGuard({
       isConnectorTurn: () => false,
@@ -58,5 +78,6 @@ describe("EditorModeGuard", () => {
     const result = guard.enforce(context("make this red", []));
     expect(result.routeForcedToEditor).toBe(true);
     expect(result.errorCode).toBe("DOCX_TARGET_REQUIRED");
+    expect(typeof result.message).toBe("string");
   });
 });

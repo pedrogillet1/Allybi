@@ -31,6 +31,8 @@ export function toRuntimePolicyErrorCode(
   const message = String((error as any)?.message || "");
   if (
     message.includes("memory_policy.config.runtimeTuning") ||
+    message.includes("memory_policy.config.integrationHooks") ||
+    message.includes("memory_policy integration hook banks missing") ||
     message.includes("Required bank missing: memory_policy")
   ) {
     return "RUNTIME_POLICY_INVALID";

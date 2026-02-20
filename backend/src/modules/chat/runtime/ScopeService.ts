@@ -1,22 +1,71 @@
 import prisma from "../../../config/database";
+import { getBankLoaderInstance } from "../../../services/core/banks/bankLoader.service";
 import type { ChatRequest } from "../domain/chat.contracts";
 
-const MAX_SCOPE_DOCS = 20;
+type ScopeRuntimeConfig = {
+  maxScopeDocs: number;
+  clearScopeRegex: RegExp[];
+};
 
-function normalizeDocIds(ids: string[]): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const raw of ids || []) {
-    const id = String(raw || "").trim();
-    if (!id || seen.has(id)) continue;
-    seen.add(id);
-    out.push(id);
-    if (out.length >= MAX_SCOPE_DOCS) break;
+function resolveScopeRuntimeConfig(): ScopeRuntimeConfig {
+  const policyBank = getBankLoaderInstance().getBank<any>("memory_policy");
+  const runtime = policyBank?.config?.runtimeTuning?.scopeRuntime;
+  if (!runtime || typeof runtime !== "object") {
+    throw new Error("memory_policy.config.runtimeTuning.scopeRuntime is required");
   }
-  return out;
+
+  const maxScopeDocs = Number(runtime.maxScopeDocs);
+  if (!Number.isFinite(maxScopeDocs) || maxScopeDocs <= 0) {
+    throw new Error(
+      "memory_policy.config.runtimeTuning.scopeRuntime.maxScopeDocs is required",
+    );
+  }
+
+  const patterns = runtime.clearScopePatterns;
+  if (!Array.isArray(patterns) || patterns.length === 0) {
+    throw new Error(
+      "memory_policy.config.runtimeTuning.scopeRuntime.clearScopePatterns is required",
+    );
+  }
+
+  const clearScopeRegex = patterns.map((pattern: unknown) => {
+    const source = String(pattern || "").trim();
+    if (!source) {
+      throw new Error(
+        "memory_policy.config.runtimeTuning.scopeRuntime.clearScopePatterns contains an empty pattern",
+      );
+    }
+    try {
+      return new RegExp(source, "i");
+    } catch {
+      throw new Error(
+        `Invalid clear scope regex in memory_policy scopeRuntime: ${source}`,
+      );
+    }
+  });
+
+  return {
+    maxScopeDocs: Math.floor(maxScopeDocs),
+    clearScopeRegex,
+  };
 }
 
 export class ScopeService {
+  private readonly runtimeConfig = resolveScopeRuntimeConfig();
+
+  private normalizeDocIds(ids: string[]): string[] {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const raw of ids || []) {
+      const id = String(raw || "").trim();
+      if (!id || seen.has(id)) continue;
+      seen.add(id);
+      out.push(id);
+      if (out.length >= this.runtimeConfig.maxScopeDocs) break;
+    }
+    return out;
+  }
+
   async getConversationScope(
     userId: string,
     conversationId: string,
@@ -28,7 +77,7 @@ export class ScopeService {
     const ids = Array.isArray(row?.scopeDocumentIds)
       ? (row?.scopeDocumentIds as string[])
       : [];
-    return normalizeDocIds(ids);
+    return this.normalizeDocIds(ids);
   }
 
   async setConversationScope(
@@ -36,7 +85,7 @@ export class ScopeService {
     conversationId: string,
     docIds: string[],
   ): Promise<void> {
-    const normalized = normalizeDocIds(docIds);
+    const normalized = this.normalizeDocIds(docIds);
     await prisma.conversation.updateMany({
       where: { id: conversationId, userId, isDeleted: false },
       data: { scopeDocumentIds: normalized, updatedAt: new Date() },
@@ -58,14 +107,11 @@ export class ScopeService {
     if (explicit) return true;
 
     const q = String(req.message || "").toLowerCase();
-    return (
-      /\b(clear|reset|remove)\s+(scope|context|attachments?)\b/.test(q) ||
-      /\b(use|search)\s+(all|entire)\s+(documents?|library)\b/.test(q)
-    );
+    return this.runtimeConfig.clearScopeRegex.some((pattern) => pattern.test(q));
   }
 
   attachedScope(req: ChatRequest): string[] {
-    return normalizeDocIds(
+    return this.normalizeDocIds(
       Array.isArray(req.attachedDocumentIds) ? req.attachedDocumentIds : [],
     );
   }

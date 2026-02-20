@@ -3,19 +3,18 @@
     "id": "bank_aliases",
     "version": "1.0.0",
     "description": "Canonical alias map for Koda data banks. Provides backward-compatible bank ID resolution and safe migration support when banks are renamed, moved, split, or merged. Aliases must never change meaning; they only redirect to the canonical bank id.",
-    "languages": ["any"],
+    "languages": [
+      "any"
+    ],
     "lastUpdated": "2026-01-25"
   },
-
   "config": {
     "enabled": true,
-
     "_comment": "Strict aliasing prevents ambiguous routing. One alias → one canonical id.",
     "strict": true,
     "caseSensitive": false,
     "stripDiacritics": true,
     "collapseWhitespace": true,
-
     "_comment2": "If an alias points to a bank that doesn't exist, boot must fail in prod/staging.",
     "failOnDanglingAliasByEnv": {
       "production": true,
@@ -23,10 +22,8 @@
       "dev": false,
       "local": false
     },
-
     "_comment3": "If canonical id exists but alias is duplicate or colliding, boot must fail.",
     "failOnCollision": true,
-
     "_comment4": "Optional: allow old bank IDs to remain valid for a grace period (migration windows).",
     "migrationPolicy": {
       "enabled": true,
@@ -34,18 +31,10 @@
       "maxGraceDays": 365
     }
   },
-
   "aliases": [
     {
       "alias": "intent_patterns",
       "canonicalId": "intent_patterns",
-      "reason": "Canonical id (self-alias for stability).",
-      "addedAt": "2026-01-25",
-      "expiresInDays": null
-    },
-    {
-      "alias": "answer_mode_router",
-      "canonicalId": "answer_mode_router",
       "reason": "Canonical id (self-alias for stability).",
       "addedAt": "2026-01-25",
       "expiresInDays": null
@@ -65,20 +54,6 @@
       "expiresInDays": 180
     },
     {
-      "alias": "scoped_not_found",
-      "canonicalId": "not_found_scope_messages",
-      "reason": "Legacy short name used by older fallback engines. Now points to microcopy bank.",
-      "addedAt": "2026-01-26",
-      "expiresInDays": 180
-    },
-    {
-      "alias": "scoped_not_found_messages",
-      "canonicalId": "not_found_scope_messages",
-      "reason": "Old microcopy filename. Renamed to not_found_scope_messages for clarity.",
-      "addedAt": "2026-01-26",
-      "expiresInDays": 180
-    },
-    {
       "alias": "fallback_not_found_scoped",
       "canonicalId": "fallback_not_found_scope",
       "reason": "Earlier builds used 'scoped' suffix; canonical policy uses 'scope'.",
@@ -86,32 +61,11 @@
       "expiresInDays": 365
     },
     {
-      "alias": "fallback_scope_empty_messages",
-      "canonicalId": "scope_empty_messages",
-      "reason": "Old microcopy filename. Now points to scope_empty_messages.",
-      "addedAt": "2026-01-26",
-      "expiresInDays": 180
-    },
-    {
       "alias": "fallback_processing_messages",
       "canonicalId": "processing_messages",
       "reason": "Old microcopy filename. Now points to processing_messages.",
       "addedAt": "2026-01-26",
       "expiresInDays": 180
-    },
-    {
-      "alias": "fallback_extraction_recovery_messages",
-      "canonicalId": "extraction_recovery_messages",
-      "reason": "Old microcopy filename. Now points to extraction_recovery_messages.",
-      "addedAt": "2026-01-26",
-      "expiresInDays": 180
-    },
-    {
-      "alias": "dedupe_and_repetition",
-      "canonicalId": "dedupe_and_repetition",
-      "reason": "Some repos accidentally placed this under rendering/. Canonical id remains unchanged.",
-      "addedAt": "2026-01-25",
-      "expiresInDays": 365
     },
     {
       "alias": "synonyms",
@@ -126,16 +80,8 @@
       "reason": "Singular form used by older code; canonical uses plural.",
       "addedAt": "2026-01-25",
       "expiresInDays": 365
-    },
-    {
-      "alias": "operator_priority",
-      "canonicalId": "routing_priority",
-      "reason": "IntentEngine uses 'operator_priority' but canonical bank is 'routing_priority'. Alias provides backward compatibility.",
-      "addedAt": "2026-02-07",
-      "expiresInDays": null
     }
   ],
-
   "normalizationRules": {
     "_comment": "Alias key normalization rules. Applied to lookup only — canonical ids are unchanged.",
     "lowercase": true,
@@ -143,9 +89,14 @@
     "stripDiacritics": true,
     "collapseWhitespace": true,
     "replaceSeparatorsWithUnderscore": true,
-    "separatorChars": ["-", " ", ".", "/", "\\"]
+    "separatorChars": [
+      "-",
+      " ",
+      ".",
+      "/",
+      "\\"
+    ]
   },
-
   "tests": {
     "_comment": "These are deterministic and should be enforced at boot.",
     "cases": [

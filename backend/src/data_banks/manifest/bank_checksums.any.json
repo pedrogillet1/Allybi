@@ -77,77 +77,12 @@
       "required": true,
       "category": "schemas"
     },
-    "schemas/router_input_schema.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "schemas"
-    },
-    "schemas/scope_output_schema.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "schemas"
-    },
-    "schemas/candidate_filters_schema.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "schemas"
-    },
-    "schemas/retrieval_output_schema.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "schemas"
-    },
-    "schemas/evidence_schema.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "schemas"
-    },
-    "schemas/attachment_schema.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "schemas"
-    },
     "routing/intent_patterns.any.json": {
       "sha256": "",
       "required": true,
       "category": "routing"
     },
-    "routing/answer_mode_router.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "routing"
-    },
-    "routing/routing_priority.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "routing"
-    },
-    "routing/operator_priority.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "routing"
-    },
-    "routing/routing_operator_tiebreakers.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "routing"
-    },
-    "routing/followup_detection.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "routing"
-    },
-    "routing/query_rewrite.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "routing"
-    },
     "routing/intent_config.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "routing"
-    },
-    "routing/tool_router.any.json": {
       "sha256": "",
       "required": true,
       "category": "routing"
@@ -182,42 +117,17 @@
       "required": true,
       "category": "operators"
     },
-    "operators/operator_negatives.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "operators"
-    },
-    "operators/list_first_operators.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "operators"
-    },
     "operators/nav_pills_operators.any.json": {
       "sha256": "",
       "required": true,
       "category": "operators"
-    },
-    "normalizers/query_normalization.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "normalizers"
     },
     "normalizers/language_indicators.any.json": {
       "sha256": "",
       "required": true,
       "category": "normalizers"
     },
-    "normalizers/abbreviations.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "normalizers"
-    },
     "normalizers/synonym_expansion.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "normalizers"
-    },
-    "normalizers/filename_normalization.any.json": {
       "sha256": "",
       "required": true,
       "category": "normalizers"
@@ -232,32 +142,7 @@
       "required": true,
       "category": "normalizers"
     },
-    "normalizers/number_normalization.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "normalizers"
-    },
-    "normalizers/units_normalization.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "normalizers"
-    },
-    "negatives/negation_and_exclusions.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "negatives"
-    },
-    "negatives/denylist_terms.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "negatives"
-    },
     "negatives/stopwords_query.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "negatives"
-    },
-    "negatives/weak_terms.any.json": {
       "sha256": "",
       "required": false,
       "category": "negatives"
@@ -265,11 +150,6 @@
     "negatives/ambiguous_terms.any.json": {
       "sha256": "",
       "required": false,
-      "category": "negatives"
-    },
-    "negatives/unsafe_patterns.any.json": {
-      "sha256": "",
-      "required": true,
       "category": "negatives"
     },
     "retrieval/semantic_search_config.any.json": {
@@ -332,26 +212,6 @@
       "required": false,
       "category": "formatting"
     },
-    "formatting/list_styles.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "formatting"
-    },
-    "formatting/table_styles.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "formatting"
-    },
-    "formatting/quote_styles.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "formatting"
-    },
-    "formatting/citation_styles.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "formatting"
-    },
     "formatting/truncation_and_limits.any.json": {
       "sha256": "",
       "required": true,
@@ -365,21 +225,6 @@
     "formatting/banned_phrases.any.json": {
       "sha256": "",
       "required": true,
-      "category": "formatting"
-    },
-    "formatting/answer_openers.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "formatting"
-    },
-    "formatting/answer_closers.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "formatting"
-    },
-    "formatting/followup_templates.any.json": {
-      "sha256": "",
-      "required": false,
       "category": "formatting"
     },
     "microcopy/conversation_messages.any.json": {
@@ -412,21 +257,6 @@
       "required": true,
       "category": "microcopy"
     },
-    "microcopy/extraction_recovery_messages.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "microcopy"
-    },
-    "microcopy/not_found_scope_messages.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "microcopy"
-    },
-    "microcopy/scope_empty_messages.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "microcopy"
-    },
     "overlays/scope_hints.any.json": {
       "sha256": "",
       "required": false,
@@ -438,21 +268,6 @@
       "category": "overlays"
     },
     "overlays/ui_contracts.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "overlays"
-    },
-    "overlays/routing_overlays.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "overlays"
-    },
-    "overlays/retrieval_overlays.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "overlays"
-    },
-    "overlays/formatting_overlays.any.json": {
       "sha256": "",
       "required": false,
       "category": "overlays"
@@ -497,75 +312,10 @@
       "required": true,
       "category": "quality"
     },
-    "quality/doc_grounding_checks.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "quality"
-    },
-    "quality/hallucination_guards.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "quality"
-    },
-    "quality/dedupe_and_repetition.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "quality"
-    },
-    "quality/numeric_integrity_rules.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "quality"
-    },
-    "quality/privacy_minimal_rules.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "quality"
-    },
-    "quality/refusal_phrases.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "quality"
-    },
-    "quality/pii_field_labels.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "quality"
-    },
     "scope/scope_resolution.any.json": {
       "sha256": "",
       "required": true,
       "category": "scope"
-    },
-    "scope/candidate_filters.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "scope"
-    },
-    "scope/active_doc_rules.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "scope"
-    },
-    "state/conversation_state_schema.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "state"
-    },
-    "state/state_update_rules.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "state"
-    },
-    "state/memory_decay_rules.any.json": {
-      "sha256": "",
-      "required": true,
-      "category": "state"
-    },
-    "state/state_debug_policy.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "state"
     },
     "ambiguity/ambiguity_rank_features.any.json": {
       "sha256": "",
@@ -577,95 +327,15 @@
       "required": true,
       "category": "ambiguity"
     },
-    "ambiguity/disambiguation_render_policy.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "ambiguity"
-    },
     "ambiguity/clarification_phrases.any.json": {
       "sha256": "",
       "required": true,
       "category": "ambiguity"
     },
-    "triggers/intent_triggers.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "triggers"
-    },
-    "triggers/operator_triggers.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "triggers"
-    },
-    "triggers/format_triggers.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "triggers"
-    },
-    "triggers/nav_triggers.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "triggers"
-    },
-    "triggers/domain_triggers.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "triggers"
-    },
     "triggers/language_triggers.any.json": {
       "sha256": "",
       "required": false,
       "category": "triggers"
-    },
-    "probes/probes_manifest.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "probes"
-    },
-    "probes/regression_queries.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "probes"
-    },
-    "probes/parity_queries.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "probes"
-    },
-    "probes/hallucination_probes.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "probes"
-    },
-    "probes/numeric_probes.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "probes"
-    },
-    "probes/ui_probes.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "probes"
-    },
-    "probes/load_tests.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "probes"
-    },
-    "probes/failure_mode_tests.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "probes"
-    },
-    "policies/tests/memory_policy_tests.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "tests"
-    },
-    "tests/memory_semantic_continuity.any.json": {
-      "sha256": "",
-      "required": false,
-      "category": "tests"
     }
   },
   "envOverrides": {

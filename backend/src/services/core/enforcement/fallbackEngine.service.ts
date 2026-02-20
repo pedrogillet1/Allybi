@@ -15,7 +15,7 @@
  *
  * Output: a structured plan for the renderer/composer to realize:
  *  - answerMode / outputShape constraints (nav_pills vs doc_grounded)
- *  - ui_copy_tokens + fragment intents (NOT hardcoded sentences)
+ *  - semantic UI tokens + fragment intents (NOT hardcoded sentences)
  *  - optional: single clarification question intent (max 1)
  *
  * The composer/renderer should turn tokens into unique, adaptive wording.
@@ -190,7 +190,7 @@ export interface FallbackPlan {
     suppressActions: boolean;
   };
 
-  // Semantic UI tokens (must be realized by ui_copy_tokens / fragment banks)
+  // Semantic UI tokens (must be realized by fragment banks)
   uiTokens: string[];
 
   // Fragment intents (realized by fragment banks like ui_next_step_suggestion / ui_soft_close)
@@ -290,7 +290,6 @@ export class FallbackEngineService {
     const clarificationPolicy = this.safeGetBank<any>("clarification_policy");
     const clarificationPhrases = this.safeGetBank<any>("clarification_phrases");
     const uiContracts = this.safeGetBank<any>("ui_contracts");
-    const uiCopyTokens = this.safeGetBank<any>("ui_copy_tokens");
     const nextStepFragments = this.safeGetBank<any>("ui_next_step_suggestion");
     const softCloseFragments = this.safeGetBank<any>("ui_soft_close");
 

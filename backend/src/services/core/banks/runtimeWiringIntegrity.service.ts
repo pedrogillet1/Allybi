@@ -16,6 +16,11 @@ export interface RuntimeWiringIntegrityResult {
   legacyChatRuntimeImports: string[];
   dormantCoreRoutingImports: string[];
   turnRoutePolicyDynamicFallback: string[];
+  hardcodedRuntimeHeuristics: string[];
+  rawConsoleRuntimeUsage: string[];
+  memoryDelegateDirectInstantiation: string[];
+  memoryRawPersistencePatterns: string[];
+  memoryPolicyHookEngineMissing: string[];
 }
 
 function asTrimmedString(value: unknown): string {
@@ -225,6 +230,164 @@ function collectTurnRoutePolicyDynamicFallback(): string[] {
   return failures;
 }
 
+function collectHardcodedRuntimeHeuristics(): string[] {
+  const candidatePaths = [
+    path.join(
+      process.cwd(),
+      "backend/src/modules/chat/runtime/ChatRuntimeOrchestrator.ts",
+    ),
+    path.join(process.cwd(), "backend/src/modules/chat/runtime/ScopeService.ts"),
+    path.join(
+      process.cwd(),
+      "backend/src/services/core/retrieval/evidenceGate.service.ts",
+    ),
+    path.join(
+      process.cwd(),
+      "backend/src/services/chat/guardrails/editorMode.guard.ts",
+    ),
+  ];
+
+  const suspectPatterns = [
+    /\bFILE_EXT_RE\b/,
+    /\bDOC_REF_PHRASES_RE\b/,
+    /\bMAX_SCOPE_DOCS\b/,
+    /\bEXPLICIT_CONNECTOR_PATTERN\b/,
+    /\bFACT_REQUIRING_PATTERNS\b/,
+    /\bNARRATIVE_RISK_PATTERNS\b/,
+    /\bEVIDENCE_KEYWORDS\b/,
+  ];
+
+  const failures: string[] = [];
+  for (const filePath of candidatePaths) {
+    if (!fs.existsSync(filePath)) continue;
+    try {
+      const src = fs.readFileSync(filePath, "utf8");
+      if (suspectPatterns.some((pattern) => pattern.test(src))) {
+        failures.push(filePath);
+      }
+    } catch {
+      failures.push(filePath);
+    }
+  }
+  return failures;
+}
+
+function collectRawConsoleRuntimeUsage(): string[] {
+  const candidatePaths = [
+    path.join(
+      process.cwd(),
+      "backend/src/modules/chat/runtime/ChatRuntimeOrchestrator.ts",
+    ),
+    path.join(
+      process.cwd(),
+      "backend/src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+    ),
+    path.join(
+      process.cwd(),
+      "backend/src/services/preview/previewOrchestrator.service.ts",
+    ),
+    path.join(
+      process.cwd(),
+      "backend/src/services/creative/creativeOrchestrator.service.ts",
+    ),
+  ];
+  const failures: string[] = [];
+  for (const filePath of candidatePaths) {
+    if (!fs.existsSync(filePath)) continue;
+    try {
+      const src = fs.readFileSync(filePath, "utf8");
+      if (/console\.(log|warn|error|info|debug)\(/.test(src)) {
+        failures.push(filePath);
+      }
+    } catch {
+      failures.push(filePath);
+    }
+  }
+  return failures;
+}
+
+function collectMemoryDelegateDirectInstantiation(): string[] {
+  const candidatePaths = [
+    path.join(
+      process.cwd(),
+      "backend/src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+    ),
+    path.join(
+      process.cwd(),
+      "src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+    ),
+  ];
+  const failures: string[] = [];
+  for (const filePath of candidatePaths) {
+    if (!fs.existsSync(filePath)) continue;
+    try {
+      const src = fs.readFileSync(filePath, "utf8");
+      if (/\bnew ConversationMemoryService\(/.test(src)) {
+        failures.push(filePath);
+      }
+    } catch {
+      failures.push(filePath);
+    }
+  }
+  return failures;
+}
+
+function collectMemoryRawPersistencePatterns(): string[] {
+  const candidatePaths = [
+    path.join(
+      process.cwd(),
+      "backend/src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+    ),
+    path.join(
+      process.cwd(),
+      "src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+    ),
+  ];
+  const failures: string[] = [];
+  for (const filePath of candidatePaths) {
+    if (!fs.existsSync(filePath)) continue;
+    try {
+      const src = fs.readFileSync(filePath, "utf8");
+      if (
+        /content:\s*sanitizeSnippet\(input\.content|summary:\s*summary\b|summary:\s*nextConversationSummary\b/.test(
+          src,
+        )
+      ) {
+        failures.push(filePath);
+      }
+    } catch {
+      failures.push(filePath);
+    }
+  }
+  return failures;
+}
+
+function collectMemoryPolicyHookEngineMissing(): string[] {
+  const candidatePaths = [
+    path.join(process.cwd(), "backend/src/services/memory/memoryPolicyEngine.service.ts"),
+    path.join(process.cwd(), "src/services/memory/memoryPolicyEngine.service.ts"),
+  ];
+  const failures: string[] = [];
+  for (const filePath of candidatePaths) {
+    if (!fs.existsSync(filePath)) {
+      failures.push(filePath);
+      continue;
+    }
+    try {
+      const src = fs.readFileSync(filePath, "utf8");
+      if (
+        !/integrationHooks/.test(src) ||
+        !/memory_policy integration hook banks missing/.test(src)
+      ) {
+        failures.push(filePath);
+      }
+    } catch {
+      failures.push(filePath);
+    }
+  }
+  return failures;
+}
+
 export class RuntimeWiringIntegrityService {
   validate(): RuntimeWiringIntegrityResult {
     const requiredBanks = [
@@ -234,6 +397,9 @@ export class RuntimeWiringIntegrityService {
       "operator_contracts",
       "operator_output_shapes",
       "prompt_registry",
+      "language_triggers",
+      "processing_messages",
+      "edit_error_catalog",
       "operator_catalog",
       "allybi_capabilities",
       "intent_patterns_docx_en",
@@ -302,6 +468,13 @@ export class RuntimeWiringIntegrityService {
     const dormantCoreRoutingImports = collectDormantCoreRoutingImports();
     const turnRoutePolicyDynamicFallback =
       collectTurnRoutePolicyDynamicFallback();
+    const hardcodedRuntimeHeuristics = collectHardcodedRuntimeHeuristics();
+    const rawConsoleRuntimeUsage = collectRawConsoleRuntimeUsage();
+    const memoryDelegateDirectInstantiation =
+      collectMemoryDelegateDirectInstantiation();
+    const memoryRawPersistencePatterns = collectMemoryRawPersistencePatterns();
+    const memoryPolicyHookEngineMissing =
+      collectMemoryPolicyHookEngineMissing();
 
     return {
       ok:
@@ -313,7 +486,12 @@ export class RuntimeWiringIntegrityService {
         unreachablePromptSelectionRules.length === 0 &&
         legacyChatRuntimeImports.length === 0 &&
         dormantCoreRoutingImports.length === 0 &&
-        turnRoutePolicyDynamicFallback.length === 0,
+        turnRoutePolicyDynamicFallback.length === 0 &&
+        hardcodedRuntimeHeuristics.length === 0 &&
+        rawConsoleRuntimeUsage.length === 0 &&
+        memoryDelegateDirectInstantiation.length === 0 &&
+        memoryRawPersistencePatterns.length === 0 &&
+        memoryPolicyHookEngineMissing.length === 0,
       missingBanks,
       missingOperatorContracts,
       missingOperatorOutputShapes,
@@ -323,6 +501,11 @@ export class RuntimeWiringIntegrityService {
       legacyChatRuntimeImports,
       dormantCoreRoutingImports,
       turnRoutePolicyDynamicFallback,
+      hardcodedRuntimeHeuristics,
+      rawConsoleRuntimeUsage,
+      memoryDelegateDirectInstantiation,
+      memoryRawPersistencePatterns,
+      memoryPolicyHookEngineMissing,
     };
   }
 }

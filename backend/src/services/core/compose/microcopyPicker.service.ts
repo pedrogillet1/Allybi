@@ -23,7 +23,6 @@
  *  - violate your "no hardcoded copy" rule
  *
  * Instead it outputs a MicrocopyPlan that the renderer realizes using:
- *  - ui_copy_tokens.any.json (token dictionary / realization rules)
  *  - ui_next_step_suggestion.any.json (fragment intents)
  *  - ui_soft_close.any.json (fragment intents)
  *  - nav_microcopy.any.json, file_actions_microcopy.any.json, disambiguation_microcopy.any.json, etc.
@@ -117,7 +116,7 @@ export interface FragmentSelection {
 }
 
 export interface MicrocopyPlan {
-  // Tokens to be realized by ui_copy_tokens + other microcopy banks (not full sentences here)
+  // Semantic UI tokens to be realized by microcopy banks (not full sentences here)
   uiTokens: string[];
 
   // Fragment intents (for fragment banks)
@@ -195,7 +194,6 @@ export class MicrocopyPickerService {
     };
 
     // Load relevant banks (soft)
-    const uiTokensBank = this.safeGetBank<any>("ui_copy_tokens");
     const navMicrocopy = this.safeGetBank<any>("nav_microcopy");
     const fileActionsMicrocopy = this.safeGetBank<any>(
       "file_actions_microcopy",
@@ -204,13 +202,9 @@ export class MicrocopyPickerService {
     const nextStepBank = this.safeGetBank<any>("ui_next_step_suggestion");
     const softCloseBank = this.safeGetBank<any>("ui_soft_close");
 
-    // Variation controls (default if bank missing)
-    const entropyWindow = Number(
-      uiTokensBank?.config?.variationControl?.entropyWindow ?? 7,
-    );
-    const cooldownTurns = Number(
-      uiTokensBank?.config?.variationControl?.cooldownTurns ?? 3,
-    );
+    // Variation controls
+    const entropyWindow = 7;
+    const cooldownTurns = 3;
 
     const turnId = state.ephemeral?.turn?.turnId ?? 0;
     const seedBase =
@@ -443,7 +437,7 @@ export class MicrocopyPickerService {
       const seen = recent.includes(key);
       if (!seen) continue;
 
-      // Stable sibling mapping: same semantic role but different realization path in ui_copy_tokens
+      // Stable sibling mapping: same semantic role but different realization path
       const sibling = this.siblingToken(t, seedBase, turnId);
       if (sibling && sibling !== t) {
         finalTokens[i] = sibling;

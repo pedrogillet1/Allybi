@@ -74,6 +74,7 @@ async function startServer() {
 
     const container = getContainer();
     console.log(`[Server] Container ready: ${container.isInitialized()}`);
+    const sharedConversationMemory = container.getConversationMemory();
 
     // 2. Connect to database
     const prisma = (await import("./config/database")).default;
@@ -133,7 +134,9 @@ async function startServer() {
         modelId: geminiCfg.models.defaultDraft,
       });
 
-      chatService = new PrismaChatService(bankBackedChatEngine);
+      chatService = new PrismaChatService(bankBackedChatEngine, {
+        conversationMemory: sharedConversationMemory || undefined,
+      });
       console.log("[Server] Chat service wired with LLM engine");
     } catch (llmErr: any) {
       console.warn(
@@ -152,7 +155,9 @@ async function startServer() {
           };
         },
       };
-      chatService = new PrismaChatService(stubEngine as any);
+      chatService = new PrismaChatService(stubEngine as any, {
+        conversationMemory: sharedConversationMemory || undefined,
+      });
     }
 
     // 5. Wire services into app.locals so controllers can resolve them

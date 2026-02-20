@@ -24,6 +24,8 @@
       "recentContextLimit": 180,
       "historyClampMax": 320,
       "inMemoryMessageCacheLimit": 240,
+      "inMemoryConversationCacheLimit": 1200,
+      "inMemoryCacheTtlSeconds": 900,
       "defaultStateSummary": "Conversation active.",
       "defaultStateTopic": "General inquiry",
       "memorySummaryMaxChars": 1800,
@@ -146,6 +148,113 @@
         "preferActiveScopeWhenFollowup": true,
         "staleScopePenalty": 0.22,
         "maxGlobalRetrievalsPerTurn": 1
+      },
+      "scopeRuntime": {
+        "maxScopeDocs": 20,
+        "tokenMinLength": 2,
+        "docNameMinLength": 3,
+        "tokenOverlapThreshold": 0.5,
+        "candidatePatterns": {
+          "filename": [
+            "\\b[\\w][\\w\\-_. ]{0,160}\\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g|webp)\\b"
+          ],
+          "docReferencePhrase": [
+            "(?:usando\\s+(?:o\\s+)?documento|using\\s+(?:the\\s+)?(?:document|file)|no\\s+(?:documento|arquivo)|from\\s+(?:the\\s+)?(?:document|file)|about\\s+(?:the\\s+)?(?:document|file)|(?:documento|arquivo)\\s+chamado)\\s+[\"“”']?([^\"“”'\\n]{3,120})[\"“”']?"
+          ]
+        },
+        "clearScopePatterns": [
+          "\\b(clear|reset|remove)\\s+(scope|context|attachments?)\\b",
+          "\\b(use|search)\\s+(all|entire)\\s+(documents?|library)\\b",
+          "\\b(limpar|remover|resetar)\\s+(escopo|contexto|anexos?)\\b",
+          "\\b(usar|pesquisar)\\s+(todos|toda)\\s+(documentos?|biblioteca)\\b",
+          "\\b(limpiar|quitar|restablecer)\\s+(alcance|contexto|adjuntos?)\\b",
+          "\\b(usar|buscar)\\s+(todos|toda)\\s+(documentos?|biblioteca)\\b"
+        ],
+        "docStatusesAllowed": [
+          "ready",
+          "indexed",
+          "available",
+          "enriching",
+          "completed"
+        ],
+        "docStopWords": [
+          "file",
+          "document",
+          "doc",
+          "report",
+          "spreadsheet",
+          "sheet",
+          "arquivo",
+          "documento",
+          "relatorio",
+          "planilha",
+          "usando",
+          "using",
+          "from",
+          "about",
+          "the",
+          "no",
+          "el",
+          "la",
+          "de",
+          "del",
+          "archivo"
+        ]
+      },
+      "evidenceGate": {
+        "factRequiringPatterns": {
+          "dates": [
+            "\\b(when|quando|em que ano|what year|founded|fundad[oa]|surgiu|criou|started)\\b",
+            "\\b(in|em|en)\\s+\\d{4}\\b"
+          ],
+          "numbers": [
+            "\\b(how much|quanto|custo|price|valor|amount|quantidad)\\b",
+            "\\b(percentage|percentual|porcentagem|%)\\b"
+          ],
+          "names": [
+            "\\b(who|quem|founder|fundador|owner|dono|ceo|presidente)\\b",
+            "\\b(where|onde|location|localiza[çc][ãa]o|endere[çc]o|address)\\b"
+          ],
+          "specifics": [
+            "\\b(exactly|exatamente|specifically|especificamente)\\b",
+            "\\b(precise|preciso|exact|exato)\\b"
+          ]
+        },
+        "narrativeRiskPatterns": [
+          "\\b(history|historia|story|trajetoria)\\b",
+          "\\b(evolution|evolu[çc][ãa]o|growth|crescimento)\\b",
+          "\\b(mission|missao|vision|visao|values|valores)\\b",
+          "\\b(culture|cultura|philosophy|filosofia)\\b"
+        ],
+        "evidenceKeywords": {
+          "dates": "\\b(19|20)\\d{2}\\b",
+          "numbers": "\\b\\d+([.,]\\d+)?(%|R\\$|\\$|€|£)?\\b",
+          "names": "\\b[A-Z][a-z]+\\s+[A-Z][a-z]+\\b",
+          "quotes": "[\"“”][^\"“”]+[\"“”]",
+          "specifics": "\\b(artigo|clausula|secao|slide|pagina|row|column|cell)\\s+\\d+\\b"
+        },
+        "richContentMinWords": 100,
+        "strengthThresholds": {
+          "strong": 0.8,
+          "moderate": 0.5
+        },
+        "copy": {
+          "clarifyQuestion": {
+            "en": "I couldn't find specific details about this in your documents. Can you tell me which file I should check?",
+            "pt": "Nao encontrei detalhes especificos sobre isso nos seus documentos. Voce pode me dizer qual arquivo devo verificar?",
+            "es": "No encontre detalles especificos sobre esto en tus documentos. Puedes decirme que archivo debo revisar?"
+          },
+          "hedgePrefixWeak": {
+            "en": "Based on the limited information available, ",
+            "pt": "Com base nas informacoes limitadas disponiveis, ",
+            "es": "Con base en la informacion limitada disponible, "
+          },
+          "hedgePrefixModerateNarrative": {
+            "en": "According to the available documents, ",
+            "pt": "De acordo com os documentos disponiveis, ",
+            "es": "Segun los documentos disponibles, "
+          }
+        }
       }
     }
   },

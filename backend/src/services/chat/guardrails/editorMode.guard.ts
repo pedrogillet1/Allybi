@@ -1,4 +1,5 @@
 import type { TurnContext } from "../chat.types";
+import { resolveEditorTargetRequiredMessage } from "../chatMicrocopy.service";
 import { TurnRoutePolicyService } from "../turnRoutePolicy.service";
 
 export type EditorGuardResult = {
@@ -38,7 +39,7 @@ export class EditorModeGuard {
       routeForcedToEditor: true,
       allowConnectorEscape: false,
       errorCode: "DOCX_TARGET_REQUIRED",
-      message: "Select content to edit or specify a concrete target.",
+      message: resolveEditorTargetRequiredMessage(ctx.locale),
     };
   }
 }

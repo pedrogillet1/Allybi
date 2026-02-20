@@ -12,7 +12,7 @@
  *
  * Allybi design:
  *  - The prompt does not contain user-facing microcopy templates.
- *  - Microcopy is selected separately (microcopyPicker + ui_copy_tokens).
+ *  - Microcopy is selected separately (microcopyPicker + fragment banks).
  *  - This builder only creates internal "how to respond" constraints.
  *
  * Sources:

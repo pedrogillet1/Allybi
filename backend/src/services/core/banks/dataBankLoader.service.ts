@@ -715,6 +715,10 @@ export class DataBankLoaderService {
     entry: BankRegistryEntry,
     filePath: string,
   ): Promise<void> {
+    if (!this.opts.strict) {
+      return;
+    }
+
     // Registry is self-referential; validating its own checksum against a mutable
     // manifest creates an impossible fixed point and can hard-fail startup.
     if (

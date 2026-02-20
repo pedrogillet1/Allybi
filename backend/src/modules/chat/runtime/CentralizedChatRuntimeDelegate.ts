@@ -21,7 +21,13 @@ import type {
 import { ConversationNotFoundError } from "../domain/chat.contracts";
 import type { EncryptedChatRepo } from "../../../services/chat/encryptedChatRepo.service";
 import type { EncryptedChatContextService } from "../../../services/chat/encryptedChatContext.service";
+import { resolveRuntimeFallbackMessage } from "../../../services/chat/chatMicrocopy.service";
 import { ConversationMemoryService } from "../../../services/memory/conversationMemory.service";
+import {
+  MemoryPolicyEngine,
+  type MemoryPolicyRuntimeConfig,
+} from "../../../services/memory/memoryPolicyEngine.service";
+import { MemoryRedactionService } from "../../../services/memory/memoryRedaction.service";
 import { getBankLoaderInstance } from "../../../services/core/banks/bankLoader.service";
 import {
   RetrievalEngineService,
@@ -37,6 +43,7 @@ import {
   isRuntimePolicyError,
   toRuntimePolicyErrorCode,
 } from "./runtimePolicyError";
+import { logger as appLogger } from "../../../utils/logger";
 
 function mkTraceId(): string {
   return `tr_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
@@ -204,6 +211,10 @@ type MemoryRuntimeTuning = {
     recentMessageIdMaxItems?: number;
     recallBufferMaxItems?: number;
     keyTopicMaxItems?: number;
+    summaryRefreshAssistantEveryTurns?: number;
+    staleTopicDecayTurns?: number;
+    maxPersistedSourceDocumentIds?: number;
+    maxPersistedRecallBytes?: number;
   };
   semanticSignals?: {
     regexFlags?: string;
@@ -213,6 +224,9 @@ type MemoryRuntimeTuning = {
     enableGlobalEvidenceSearch?: boolean;
     globalSearchMinQueryChars?: number;
     maxEvidenceItemsForAnswer?: number;
+    preferActiveScopeWhenFollowup?: boolean;
+    staleScopePenalty?: number;
+    maxGlobalRetrievalsPerTurn?: number;
   };
 };
 
@@ -254,15 +268,16 @@ function mergeAttachments(
   return [sourceButtonsAttachment, ...model];
 }
 
-function buildEmptyAssistantText(language?: string): string {
-  const lang = String(language || "en").toLowerCase();
-  if (lang === "pt") {
-    return "Nao consegui concluir esta resposta. Tente novamente com uma pergunta mais especifica.";
-  }
-  if (lang === "es") {
-    return "No pude completar esta respuesta. Intenta de nuevo con una pregunta mas especifica.";
-  }
-  return "I couldn't complete this answer. Please try again with a more specific question.";
+function buildEmptyAssistantText(params: {
+  language?: string;
+  reasonCode?: string | null;
+  seed: string;
+}): string {
+  return resolveRuntimeFallbackMessage({
+    language: params.language,
+    reasonCode: params.reasonCode,
+    seed: params.seed,
+  });
 }
 
 function normalizeFinishReason(value: unknown): string {
@@ -286,12 +301,23 @@ function buildTruncationFromTelemetry(
   };
 }
 
+function normalizeChatLanguage(
+  value: unknown,
+): "en" | "pt" | "es" {
+  const lang = String(value || "")
+    .trim()
+    .toLowerCase();
+  if (lang === "pt" || lang === "es") return lang;
+  return "en";
+}
+
 function isRuntimePolicyFailure(error: unknown): boolean {
   if (isRuntimePolicyError(error)) return true;
   const message = String((error as any)?.message || "");
   return (
     message.includes("memory_policy.config.runtimeTuning") ||
-    message.includes("Required bank missing: memory_policy")
+    message.includes("Required bank missing: memory_policy") ||
+    message.includes("memory_policy.config.integrationHooks")
   );
 }
 
@@ -300,17 +326,29 @@ export class CentralizedChatRuntimeDelegate {
   private encryptedContext?: EncryptedChatContextService;
   private readonly retrievalFactory = new PrismaRetrievalAdapterFactory();
   private readonly evidenceGate = new EvidenceGateService();
-  private readonly conversationMemory = new ConversationMemoryService();
+  private readonly conversationMemory: ConversationMemoryService;
+  private readonly memoryPolicyEngine: MemoryPolicyEngine;
+  private readonly memoryRedaction: MemoryRedactionService;
 
   constructor(
     private readonly engine: ChatEngine,
     opts?: {
       encryptedRepo?: EncryptedChatRepo;
       encryptedContext?: EncryptedChatContextService;
+      conversationMemory?: ConversationMemoryService;
     },
   ) {
     this.encryptedRepo = opts?.encryptedRepo;
     this.encryptedContext = opts?.encryptedContext;
+    this.conversationMemory = opts?.conversationMemory as ConversationMemoryService;
+    if (!this.conversationMemory) {
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
+        "CentralizedChatRuntimeDelegate requires conversationMemory dependency",
+      );
+    }
+    this.memoryPolicyEngine = new MemoryPolicyEngine();
+    this.memoryRedaction = new MemoryRedactionService();
   }
 
   wireEncryption(
@@ -357,8 +395,10 @@ export class CentralizedChatRuntimeDelegate {
         req.message,
         retrievalPack,
       );
-      const sourceButtonsAttachment =
-        this.buildSourceButtonsAttachment(retrievalPack);
+      const sourceButtonsAttachment = this.buildSourceButtonsAttachment(
+        retrievalPack,
+        req.preferredLanguage,
+      );
 
       const generated = await this.engine.generate({
         traceId,
@@ -370,18 +410,23 @@ export class CentralizedChatRuntimeDelegate {
       });
 
       const assistantTextRaw = String(generated.text || "").trim();
+      const fallbackReasonCode = this.resolveFallbackReasonCode(
+        req,
+        retrievalPack,
+      );
       const assistantText =
-        assistantTextRaw || buildEmptyAssistantText(req.preferredLanguage);
+        assistantTextRaw ||
+        buildEmptyAssistantText({
+          language: req.preferredLanguage,
+          reasonCode: fallbackReasonCode,
+          seed: `${conversationId}:chat:${fallbackReasonCode || "empty_model_response"}`,
+        });
       const sources: ChatSourceEntry[] = buildSourcesFromEvidence(
         retrievalPack?.evidence ?? [],
       );
       const attachmentsPayload = mergeAttachments(
         generated.attachmentsPayload,
         sourceButtonsAttachment,
-      );
-      const fallbackReasonCode = this.resolveFallbackReasonCode(
-        req,
-        retrievalPack,
       );
 
       const assistantMessage = await this.createMessage({
@@ -495,8 +540,10 @@ export class CentralizedChatRuntimeDelegate {
         req.message,
         retrievalPack,
       );
-      const sourceButtonsAttachment =
-        this.buildSourceButtonsAttachment(retrievalPack);
+      const sourceButtonsAttachment = this.buildSourceButtonsAttachment(
+        retrievalPack,
+        req.preferredLanguage,
+      );
       const sources: ChatSourceEntry[] = buildSourcesFromEvidence(
         retrievalPack?.evidence ?? [],
       );
@@ -532,15 +579,20 @@ export class CentralizedChatRuntimeDelegate {
       });
 
       const assistantTextRaw = String(streamed.finalText || "").trim();
-      const assistantText =
-        assistantTextRaw || buildEmptyAssistantText(req.preferredLanguage);
-      const attachmentsPayload = mergeAttachments(
-        streamed.attachmentsPayload,
-        sourceButtonsAttachment,
-      );
       const fallbackReasonCode = this.resolveFallbackReasonCode(
         req,
         retrievalPack,
+      );
+      const assistantText =
+        assistantTextRaw ||
+        buildEmptyAssistantText({
+          language: req.preferredLanguage,
+          reasonCode: fallbackReasonCode,
+          seed: `${conversationId}:stream:${fallbackReasonCode || "empty_model_response"}`,
+        });
+      const attachmentsPayload = mergeAttachments(
+        streamed.attachmentsPayload,
+        sourceButtonsAttachment,
       );
 
       const assistantMessage = await this.createMessage({
@@ -967,7 +1019,11 @@ export class CentralizedChatRuntimeDelegate {
         userId: req.userId,
       }));
 
-    const assistantText = buildEmptyAssistantText(req.preferredLanguage);
+    const assistantText = buildEmptyAssistantText({
+      language: req.preferredLanguage,
+      reasonCode: input.code,
+      seed: `${conversationId}:runtime_policy:${input.code}`,
+    });
     const answerMode: AnswerMode =
       (req.attachedDocumentIds || []).length > 0
         ? "fallback"
@@ -1065,24 +1121,12 @@ export class CentralizedChatRuntimeDelegate {
     return this.getMemoryRuntimeTuning().recentContextLimit;
   }
 
+  private getMemoryPolicyRuntimeConfig(): MemoryPolicyRuntimeConfig {
+    return this.memoryPolicyEngine.resolveRuntimeConfig();
+  }
+
   private getMemoryRuntimeTuning(): MemoryRuntimeTuning {
-    let policyBank: any;
-    try {
-      policyBank = getBankLoaderInstance().getBank<any>("memory_policy");
-    } catch {
-      throw new RuntimePolicyError(
-        "RUNTIME_POLICY_MISSING",
-        "Required bank missing: memory_policy",
-      );
-    }
-    const tuning = policyBank?.config?.runtimeTuning;
-    if (!tuning || typeof tuning !== "object") {
-      throw new RuntimePolicyError(
-        "RUNTIME_POLICY_INVALID",
-        "memory_policy.config.runtimeTuning is required",
-      );
-    }
-    return tuning as MemoryRuntimeTuning;
+    return this.getMemoryPolicyRuntimeConfig().runtimeTuning as MemoryRuntimeTuning;
   }
 
   private resolveSemanticSignalRegexFlags(): string {
@@ -1193,7 +1237,6 @@ export class CentralizedChatRuntimeDelegate {
       Number(memoryStoreCfg.keyTopicMaxItems || 0) || 0,
     );
 
-    let convoSummary = "";
     let memoryMeta: Record<string, unknown> = {};
     try {
       const conversation = await prisma.conversation.findFirst({
@@ -1207,7 +1250,6 @@ export class CentralizedChatRuntimeDelegate {
           contextMeta: true,
         },
       });
-      convoSummary = String(conversation?.summary || "").trim();
       const contextMeta = asObject(conversation?.contextMeta);
       memoryMeta = asObject(contextMeta.memory);
     } catch {
@@ -1215,9 +1257,7 @@ export class CentralizedChatRuntimeDelegate {
     }
 
     const stateSummary = sanitizeSnippet(
-      convoSummary ||
-        String(memoryMeta.summary || "").trim() ||
-        cfg.defaultStateSummary,
+      String(memoryMeta.summary || "").trim() || cfg.defaultStateSummary,
       cfg.memorySummaryMaxChars,
     );
     const currentTopic = String(memoryMeta.currentTopic || "").trim();
@@ -1254,7 +1294,6 @@ export class CentralizedChatRuntimeDelegate {
 
     const recallCandidates: Array<{
       summary: string;
-      content: string;
       createdAt: number;
     }> = [];
 
@@ -1263,47 +1302,20 @@ export class CentralizedChatRuntimeDelegate {
       : []) {
       const record = asObject(entry);
       const summary = String(record.summary || "").trim();
-      const content = String(record.content || "").trim();
       const createdAtRaw = String(record.createdAt || "");
       const createdAtTs = Date.parse(createdAtRaw);
-      if (!summary && !content) continue;
+      if (!summary) continue;
       recallCandidates.push({
         summary,
-        content,
         createdAt: Number.isFinite(createdAtTs) ? createdAtTs : 0,
       });
       if (recallCandidates.length >= recallBufferMaxItems) break;
     }
 
-    if (recallCandidates.length === 0) {
-      try {
-        const rows = await prisma.message.findMany({
-          where: { conversationId: params.conversationId },
-          orderBy: { createdAt: "desc" },
-          take: recallBufferMaxItems,
-          select: {
-            content: true,
-            createdAt: true,
-          },
-        });
-        for (const row of rows) {
-          const content = String(row.content || "").trim();
-          if (!content) continue;
-          recallCandidates.push({
-            summary: sanitizeSnippet(content, cfg.memoryRecallSnippetChars),
-            content,
-            createdAt: row.createdAt.getTime(),
-          });
-        }
-      } catch {
-        // Non-fatal.
-      }
-    }
-
     if (recallCandidates.length > 0) {
       const ranked = recallCandidates
         .map((entry) => {
-          const text = `${entry.summary} ${entry.content}`.toLowerCase();
+          const text = `${entry.summary}`.toLowerCase();
           const score = keywords.reduce(
             (acc, term) => (text.includes(term) ? acc + 1 : acc),
             0,
@@ -1323,11 +1335,7 @@ export class CentralizedChatRuntimeDelegate {
           content: [
             "CONVERSATION_MEMORY_RECALL",
             ...ranked.map(
-              (entry, idx) =>
-                `${idx + 1}. ${sanitizeSnippet(
-                  entry.summary || entry.content,
-                  cfg.memoryRecallSnippetChars,
-                )}`,
+              (entry, idx) => `${idx + 1}. ${entry.summary}`,
             ),
           ].join("\n"),
         });
@@ -1337,6 +1345,7 @@ export class CentralizedChatRuntimeDelegate {
     try {
       const inMemoryContext = await this.conversationMemory.getContext(
         params.conversationId,
+        params.userId,
       );
       const inMemoryMessages = inMemoryContext?.messages || [];
       if (inMemoryMessages.length > 0) {
@@ -1373,14 +1382,27 @@ export class CentralizedChatRuntimeDelegate {
     if (!input.userId) return;
 
     const cfg = this.getMemoryRuntimeTuning();
+    const policyConfig = this.getMemoryPolicyRuntimeConfig();
     const memoryRole =
       input.role === "user" || input.role === "assistant" ? input.role : null;
 
-    const sourceDocumentIds = Array.isArray((input.metadata as any)?.sources)
+    const rawSourceDocumentIds = Array.isArray((input.metadata as any)?.sources)
       ? (input.metadata as any).sources
           .map((source: any) => String(source?.documentId || "").trim())
           .filter(Boolean)
       : [];
+    const storeCfg = asObject(cfg.memoryArtifactStore);
+    const maxPersistedSourceDocumentIds = Math.max(
+      1,
+      Number(storeCfg.maxPersistedSourceDocumentIds || 0) || 0,
+    );
+    const sourceDocumentIds = this.memoryRedaction.sanitizeSourceDocumentIds(
+      rawSourceDocumentIds,
+      maxPersistedSourceDocumentIds,
+    );
+    const intentFamily = this.memoryRedaction.normalizeIntentFamily(
+      (input.metadata as any)?.intentFamily,
+    );
 
     try {
       if (memoryRole) {
@@ -1395,17 +1417,19 @@ export class CentralizedChatRuntimeDelegate {
                 : undefined,
             sourceDocumentIds,
           },
+          input.userId,
         );
       }
-    } catch {
-      // Non-fatal in-memory mirror update.
+    } catch (error) {
+      appLogger.warn("[Memory] in-memory mirror update failed", {
+        conversationId: input.conversationId,
+        messageId: input.messageId,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
 
-    const summary = sanitizeSnippet(input.content, cfg.memorySummaryMaxChars);
     const now = input.createdAt;
     const nowIso = now.toISOString();
-    const keywordTopics = this.extractQueryKeywords(input.content);
-    const storeCfg = asObject(cfg.memoryArtifactStore);
     const recentMessageIdMaxItems = Math.max(
       1,
       Number(storeCfg.recentMessageIdMaxItems || 0) || 0,
@@ -1418,106 +1442,187 @@ export class CentralizedChatRuntimeDelegate {
       1,
       Number(storeCfg.keyTopicMaxItems || 0) || 0,
     );
+    const summaryRefreshAssistantEveryTurns = Math.max(
+      1,
+      Number(storeCfg.summaryRefreshAssistantEveryTurns || 0) || 1,
+    );
+    const staleTopicDecayTurns = Math.max(
+      1,
+      Number(storeCfg.staleTopicDecayTurns || 0) || 1,
+    );
+    const maxPersistedRecallBytes = Math.max(
+      256,
+      Number(storeCfg.maxPersistedRecallBytes || 0) || 24000,
+    );
 
     try {
-      const existing = await prisma.conversation.findFirst({
-        where: {
-          id: input.conversationId,
-          userId: input.userId,
-          isDeleted: false,
-        },
-        select: {
-          summary: true,
-          contextMeta: true,
-        },
-      });
+      const maxAttempts = 3;
+      for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        const existing = await prisma.conversation.findFirst({
+          where: {
+            id: input.conversationId,
+            userId: input.userId,
+            isDeleted: false,
+          },
+          select: {
+            summary: true,
+            contextMeta: true,
+            updatedAt: true,
+          },
+        });
+        if (!existing) return;
 
-      const contextMeta = asObject(existing?.contextMeta);
-      const priorMemory = asObject(contextMeta.memory);
-      const priorRecentMessageIds = toStringArray(priorMemory.recentMessageIds);
-      const priorKeyTopics = toStringArray(priorMemory.keyTopics);
-      const priorSourceDocumentIds = toStringArray(
-        priorMemory.sourceDocumentIds,
-      );
-      const priorRecall = Array.isArray(priorMemory.recall)
-        ? priorMemory.recall
-        : [];
-      const priorTurnsSinceLastSummary = Number(
-        priorMemory.turnsSinceLastSummary,
-      );
+        const contextMeta = asObject(existing.contextMeta);
+        const priorMemory = asObject(contextMeta.memory);
+        const priorRecentMessageIds = toStringArray(priorMemory.recentMessageIds);
+        if (priorRecentMessageIds.includes(input.messageId)) {
+          return;
+        }
+        const priorKeyTopics = toStringArray(priorMemory.keyTopics);
+        const priorSourceDocumentIds = toStringArray(
+          priorMemory.sourceDocumentIds,
+        );
+        const priorRecall = Array.isArray(priorMemory.recall)
+          ? priorMemory.recall
+          : [];
+        const priorTurnsSinceLastSummary = Number(
+          priorMemory.turnsSinceLastSummary,
+        );
 
-      const nextRecentMessageIds = [
-        input.messageId,
-        ...priorRecentMessageIds,
-      ].slice(0, recentMessageIdMaxItems);
-      const nextKeyTopics = Array.from(
-        new Set([
-          ...priorKeyTopics,
-          ...keywordTopics,
-          typeof input.metadata.intentFamily === "string"
-            ? String(input.metadata.intentFamily)
-            : "",
-        ]),
-      )
-        .filter(Boolean)
-        .slice(0, keyTopicMaxItems);
+        const nextRecentMessageIds = [
+          input.messageId,
+          ...priorRecentMessageIds,
+        ].slice(0, recentMessageIdMaxItems);
+        const nextKeyTopics = Array.from(
+          new Set([
+            ...priorKeyTopics,
+            intentFamily,
+          ]),
+        )
+          .filter(Boolean)
+          .slice(0, keyTopicMaxItems);
 
-      const nextSourceDocumentIds = Array.from(
-        new Set([...priorSourceDocumentIds, ...sourceDocumentIds]),
-      );
+        const nextSourceDocumentIds = this.memoryRedaction.sanitizeSourceDocumentIds(
+          [...priorSourceDocumentIds, ...sourceDocumentIds],
+          maxPersistedSourceDocumentIds,
+        );
 
-      const nextRecall = [
-        {
-          messageId: input.messageId,
-          role: input.role,
-          summary: summary || cfg.defaultStateSummary,
-          content: sanitizeSnippet(input.content, cfg.memorySummaryMaxChars),
-          createdAt: nowIso,
-        },
-        ...priorRecall.map((entry) => asObject(entry)),
-      ].slice(0, recallBufferMaxItems);
+        const nextRecall = [
+          this.memoryRedaction.buildPersistedRecallEntry({
+            messageId: input.messageId,
+            role: memoryRole || "assistant",
+            intentFamily,
+            sourceDocumentIds,
+            content: input.content,
+            createdAt: now,
+          }),
+          ...priorRecall.map((entry) => {
+            const record = asObject(entry);
+            return {
+              messageId: String(record.messageId || ""),
+              role:
+                String(record.role || "").toLowerCase() === "assistant"
+                  ? "assistant"
+                  : "user",
+              intentFamily: this.memoryRedaction.normalizeIntentFamily(
+                record.intentFamily,
+              ),
+              sourceDocumentIds: this.memoryRedaction.sanitizeSourceDocumentIds(
+                toStringArray(record.sourceDocumentIds),
+                maxPersistedSourceDocumentIds,
+              ),
+              sourceCount: Math.max(
+                0,
+                Number(record.sourceCount || toStringArray(record.sourceDocumentIds).length) ||
+                  0,
+              ),
+              summary: String(record.summary || "").trim(),
+              contentHash: String(record.contentHash || "").trim(),
+              createdAt: String(record.createdAt || nowIso),
+            };
+          }),
+        ]
+          .filter((entry) => entry.messageId && entry.summary)
+          .slice(0, recallBufferMaxItems);
 
-      const nextTurnsSinceLastSummary =
-        input.role === "assistant"
-          ? 0
-          : Number.isFinite(priorTurnsSinceLastSummary)
-            ? Math.max(0, Math.floor(priorTurnsSinceLastSummary) + 1)
-            : 1;
+        while (
+          nextRecall.length > 1 &&
+          this.memoryRedaction.approximateBytes(nextRecall) >
+            maxPersistedRecallBytes
+        ) {
+          nextRecall.pop();
+        }
 
-      const nextTopic = nextKeyTopics[0] || cfg.defaultStateTopic;
-      const nextConversationSummary =
-        input.role === "assistant" && summary
-          ? summary
-          : String(existing?.summary || priorMemory.summary || "").trim() ||
-            cfg.defaultStateSummary;
+        const nextTurnsSinceLastSummary =
+          input.role === "assistant"
+            ? (Math.max(0, Math.floor(priorTurnsSinceLastSummary || 0)) + 1) %
+              summaryRefreshAssistantEveryTurns
+            : Number.isFinite(priorTurnsSinceLastSummary)
+              ? Math.max(0, Math.floor(priorTurnsSinceLastSummary) + 1)
+              : 1;
 
-      const nextMemory = {
-        ...priorMemory,
-        summary: nextConversationSummary,
-        currentTopic: nextTopic,
-        keyTopics: nextKeyTopics,
-        recentMessageIds: nextRecentMessageIds,
-        sourceDocumentIds: nextSourceDocumentIds,
-        recall: nextRecall,
-        turnsSinceLastSummary: nextTurnsSinceLastSummary,
-        lastSummaryAt: nowIso,
-        lastRole: input.role,
-        lastMessageId: input.messageId,
-      };
+        const topicHasDecayed =
+          nextTurnsSinceLastSummary >= staleTopicDecayTurns &&
+          input.role !== "assistant";
+        const effectiveKeyTopics = topicHasDecayed ? [] : nextKeyTopics;
+        const nextTopic = effectiveKeyTopics[0] || cfg.defaultStateTopic;
+        const nextConversationSummary = cfg.defaultStateSummary;
 
-      await prisma.conversation.update({
-        where: { id: input.conversationId },
-        data: {
-          updatedAt: now,
+        const nextMemory = {
+          ...priorMemory,
           summary: nextConversationSummary,
-          contextMeta: {
-            ...contextMeta,
-            memory: nextMemory,
-          } as any,
-        },
+          summaryMode: "structural",
+          currentTopic: nextTopic,
+          keyTopics: effectiveKeyTopics,
+          recentMessageIds: nextRecentMessageIds,
+          sourceDocumentIds: nextSourceDocumentIds,
+          recall: nextRecall,
+          turnsSinceLastSummary: nextTurnsSinceLastSummary,
+          lastSummaryAt: nowIso,
+          lastRole: input.role,
+          lastMessageId: input.messageId,
+        };
+
+        if (policyConfig.privacy.doNotPersistExtractedPIIValues) {
+          delete (nextMemory as any).rawUserTextHistory;
+          delete (nextMemory as any).fullRetrievedChunks;
+          delete (nextMemory as any).debugTraces;
+        }
+        if (policyConfig.privacy.doNotPersistRawNumbersFromDocs) {
+          delete (nextMemory as any).numericSnapshots;
+          delete (nextMemory as any).rawNumbers;
+        }
+
+        const updated = await prisma.conversation.updateMany({
+          where: {
+            id: input.conversationId,
+            userId: input.userId,
+            isDeleted: false,
+            updatedAt: existing.updatedAt,
+          },
+          data: {
+            updatedAt: now,
+            summary: nextConversationSummary,
+            contextMeta: {
+              ...contextMeta,
+              memory: nextMemory,
+            } as any,
+          },
+        });
+
+        if (updated.count > 0) return;
+      }
+
+      appLogger.warn("[Memory] durable artifact write retried out", {
+        conversationId: input.conversationId,
+        messageId: input.messageId,
       });
-    } catch {
-      // Non-fatal when durable context metadata cannot be written.
+    } catch (error) {
+      appLogger.warn("[Memory] durable artifact write failed", {
+        conversationId: input.conversationId,
+        messageId: input.messageId,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 
@@ -1525,11 +1630,43 @@ export class CentralizedChatRuntimeDelegate {
     req: ChatRequest,
   ): Promise<EvidencePack | null> {
     const cfg = this.getMemoryRuntimeTuning();
-    const attached = Array.isArray(req.attachedDocumentIds)
+    const attachedBase = Array.isArray(req.attachedDocumentIds)
       ? req.attachedDocumentIds.filter(
           (id) => typeof id === "string" && id.trim(),
         )
       : [];
+    const contextSignals = asObject((req.context as any)?.signals || {});
+    const preferActiveScopeWhenFollowup = Boolean(
+      cfg.semanticRetrieval?.preferActiveScopeWhenFollowup,
+    );
+    const staleScopePenalty = Number(cfg.semanticRetrieval?.staleScopePenalty);
+    if (!Number.isFinite(staleScopePenalty) || staleScopePenalty < 0) {
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
+        "memory_policy.config.runtimeTuning.semanticRetrieval.staleScopePenalty is required",
+      );
+    }
+    const maxGlobalRetrievalsPerTurn = Number(
+      cfg.semanticRetrieval?.maxGlobalRetrievalsPerTurn,
+    );
+    if (
+      !Number.isFinite(maxGlobalRetrievalsPerTurn) ||
+      maxGlobalRetrievalsPerTurn < 0
+    ) {
+      throw new RuntimePolicyError(
+        "RUNTIME_POLICY_INVALID",
+        "memory_policy.config.runtimeTuning.semanticRetrieval.maxGlobalRetrievalsPerTurn is required",
+      );
+    }
+    const followupActive = contextSignals.isFollowup === true;
+    const activeDocHint = String(contextSignals.activeDocId || "").trim();
+    const attached =
+      attachedBase.length === 0 &&
+      preferActiveScopeWhenFollowup &&
+      followupActive &&
+      activeDocHint
+        ? [activeDocHint]
+        : attachedBase;
 
     const globalSearchEnabled = Boolean(
       cfg.semanticRetrieval?.enableGlobalEvidenceSearch,
@@ -1546,6 +1683,7 @@ export class CentralizedChatRuntimeDelegate {
     const allowGlobalScope =
       attached.length === 0 &&
       globalSearchEnabled &&
+      maxGlobalRetrievalsPerTurn > 0 &&
       String(req.message || "").trim().length >= minGlobalChars;
 
     if (attached.length === 0 && !allowGlobalScope) return null;
@@ -1558,7 +1696,6 @@ export class CentralizedChatRuntimeDelegate {
       dependencies.lexicalIndex,
       dependencies.structuralIndex,
     );
-    const contextSignals = asObject((req.context as any)?.signals || {});
     const semanticSignals = this.collectSemanticSignals(
       req.message,
       contextSignals,
@@ -1583,7 +1720,6 @@ export class CentralizedChatRuntimeDelegate {
         resolvedDocId: attached.length === 1 ? attached[0] : null,
         hardScopeActive: attached.length > 0,
         singleDocIntent: attached.length === 1,
-        allowExpansion: contextSignals.allowExpansion !== false,
         hasQuotedText: semanticSignals.hasQuotedText,
         hasFilename: semanticSignals.hasFilename,
         userAskedForTable: semanticSignals.userAskedForTable,
@@ -1604,6 +1740,9 @@ export class CentralizedChatRuntimeDelegate {
         tableExpected: semanticSignals.tableExpected,
         corpusSearchAllowed: allowGlobalScope,
         unsafeGate: contextSignals.unsafeGate === true,
+        allowExpansion:
+          contextSignals.allowExpansion !== false &&
+          !(followupActive && attached.length === 0 && staleScopePenalty >= 0.5),
       },
     };
 
@@ -1791,6 +1930,7 @@ export class CentralizedChatRuntimeDelegate {
 
   private buildSourceButtonsAttachment(
     retrievalPack: EvidencePack | null,
+    preferredLanguage?: string,
   ): unknown | null {
     if (!retrievalPack || retrievalPack.evidence.length === 0) return null;
     const sourceButtonsService = getSourceButtonsService();
@@ -1804,7 +1944,7 @@ export class CentralizedChatRuntimeDelegate {
     }));
     return sourceButtonsService.buildSourceButtons(rawSources, {
       context: "qa",
-      language: "en",
+      language: normalizeChatLanguage(preferredLanguage),
     });
   }
 }

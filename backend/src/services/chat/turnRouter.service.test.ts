@@ -114,4 +114,32 @@ describe("TurnRouterService", () => {
 
     expect(router.decide(ctx)).toBe("KNOWLEDGE");
   });
+
+  test("routes to connector outside viewer mode when connector intent exists", () => {
+    const router = new TurnRouterService();
+    const ctx = baseContext({
+      messageText: "compose an email follow-up",
+      attachedDocuments: [],
+    });
+    expect(router.decide(ctx)).toBe("CONNECTOR");
+  });
+
+  test("routes to knowledge when active document exists outside viewer mode", () => {
+    const router = new TurnRouterService();
+    const ctx = baseContext({
+      messageText: "summarize current file",
+      activeDocument: { id: "doc-active" } as any,
+    });
+    expect(router.decide(ctx)).toBe("KNOWLEDGE");
+  });
+
+  test("routes to general outside viewer mode when no connector and no docs", () => {
+    const router = new TurnRouterService();
+    const ctx = baseContext({
+      messageText: "hello there",
+      attachedDocuments: [],
+      activeDocument: null as any,
+    });
+    expect(router.decide(ctx)).toBe("GENERAL");
+  });
 });
