@@ -164,6 +164,32 @@
       },
       "reasonCode": "cross_doc_overload_single_intent",
       "severity": "high"
+    },
+    {
+      "id": "role_confusion_penalty",
+      "scope": "extraction",
+      "description": "When slot extraction is active and a chunk contains a forbidden-role anchor but NOT the target-role anchor, apply a soft penalty (dynamic from confusion graph).",
+      "appliesTo": ["retrieval_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.isExtractionQuery", "op": "eq", "value": true },
+          { "path": "signals.slotContract", "op": "neq", "value": null },
+          { "path": "metrics.hasForbiddenRoleAnchor", "op": "eq", "value": true },
+          { "path": "metrics.hasTargetRoleAnchor", "op": "eq", "value": false }
+        ]
+      },
+      "action": {
+        "type": "soft_penalty_dynamic",
+        "penaltySource": "slotContract.confusionPenalties",
+        "defaultPenalty": 0.25
+      },
+      "reasonCode": "role_confusion_penalty",
+      "severity": "high"
     }
   ],
   "tests": {
@@ -215,6 +241,14 @@
         },
         "input": "resume este documento",
         "expect": { "hardBlocked": true }
+      },
+      {
+        "id": "RN_008_role_confusion_penalty",
+        "context": {
+          "signals": { "isExtractionQuery": true, "slotContract": { "targetRoleId": "owner" } },
+          "metrics": { "hasForbiddenRoleAnchor": true, "hasTargetRoleAnchor": false }
+        },
+        "expect": { "penalized": true, "reasonCode": "role_confusion_penalty" }
       }
     ]
   }

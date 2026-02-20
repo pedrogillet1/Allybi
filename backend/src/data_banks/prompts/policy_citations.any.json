@@ -12,7 +12,7 @@
       {
         "role": "system",
         "content": {
-          "any": "Citation policy: if retrieved evidence is used, append a `Sources` section at the end. Each source must use a human title (not internal filenames when avoidable) plus a stable locator (page, section, sheet, slide, or paragraph anchor) when available. Never fabricate citations. If no retrieved evidence is used, do not include a Sources section."
+          "any": "Citation policy: never render an inline `Sources` section in answer text. When retrieved evidence exists, citations must be represented through source attachments/buttons with human-readable titles and stable locators when available. Never fabricate citations."
         }
       }
     ]

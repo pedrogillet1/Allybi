@@ -496,7 +496,7 @@ export class PromptRegistryService {
       "- Use only the provided evidence/context. Do not invent sources or details.",
     );
     guards.push(
-      "- Citation contract: when evidence exists, append a `Sources` block with human-readable source names and stable locators; when no evidence exists, omit the `Sources` block.",
+      "- Do NOT include a Sources section in the text — sources are provided separately via UI buttons.",
     );
 
     const guardMsg: PromptMessage = {
@@ -537,7 +537,7 @@ export class PromptRegistryService {
       "Do not output raw JSON to the user.",
       "Use short paragraphs and bullets when listing.",
       "Ask at most one question only if blocked.",
-      "If evidence is present, append a Sources block with source titles and locators. If no evidence is present, omit Sources.",
+      "Do NOT include a Sources section in the text — sources are provided separately via UI buttons.",
     ];
 
     if ((ctx.answerMode ?? "") === "nav_pills") {

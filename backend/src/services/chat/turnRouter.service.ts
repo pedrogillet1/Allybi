@@ -30,8 +30,7 @@ function hasDocRefSignal(message: string): boolean {
   return (
     /\b(document|doc|pdf|file|spreadsheet|sheet|slide|presentation|arquivo|documento|planilha|apresentacao|apresentação)\b/.test(
       input,
-    ) ||
-    /[a-z0-9_ -]+\.(pdf|docx|xlsx|pptx|txt|csv)\b/.test(input)
+    ) || /[a-z0-9_ -]+\.(pdf|docx|xlsx|pptx|txt|csv)\b/.test(input)
   );
 }
 
@@ -77,7 +76,10 @@ export class TurnRouterService {
       EditorModeGuard,
       "enforce"
     > = new EditorModeGuard(routePolicy),
-    private readonly intentConfig: Pick<IntentConfigService, "decide"> = new IntentConfigService(),
+    private readonly intentConfig: Pick<
+      IntentConfigService,
+      "decide"
+    > = new IntentConfigService(),
   ) {}
 
   private buildCandidates(

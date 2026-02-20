@@ -52,7 +52,7 @@
       "id": "policy_citations",
       "path": "prompts/policy_citations.any.json",
       "required": true,
-      "purpose": "Single citation contract.",
+      "purpose": "Attachment-based citation contract (no inline Sources block).",
       "appliesTo": { "allOperators": true, "allDomains": true }
     },
     {

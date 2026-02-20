@@ -18,7 +18,7 @@
         {
           "role": "system",
           "content": {
-            "any": "Answer task contract: produce a concise user-facing answer and end with a `Sources` section. Sources must be grounded in provided evidence only and include human-readable titles plus locators when available."
+            "any": "Answer task contract: produce a concise user-facing answer grounded in provided evidence only. Do NOT include an inline `Sources` section — citations are rendered via source attachments/buttons."
           }
         }
       ]
@@ -31,7 +31,7 @@
         {
           "role": "system",
           "content": {
-            "any": "Answer task contract: produce user-facing markdown only. Do not include a Sources section when no retrieved evidence was used."
+            "any": "Answer task contract: produce user-facing markdown only. Do NOT include an inline `Sources` section."
           }
         }
       ]

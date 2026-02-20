@@ -225,7 +225,7 @@ describe("prompt compilation + selection regression", () => {
     expect((disambReq.kodaMeta as any)?.promptType).toBe("disambiguation");
   });
 
-  test("citation contract selects rag Sources template only when evidence is used", () => {
+  test("citation contract enforces attachment-based citations", () => {
     const rag = builder.build(
       mkInput({
         userText: "List the key revenue numbers.",
@@ -255,8 +255,10 @@ describe("prompt compilation + selection regression", () => {
     const ragPrompt = rag.messages.map((m) => m.content || "").join("\n");
     const noRagPrompt = noRag.messages.map((m) => m.content || "").join("\n");
 
-    expect(ragPrompt).toMatch(/Sources/i);
-    expect(noRagPrompt).toMatch(/no retrieved evidence/i);
+    expect(ragPrompt).toMatch(/Do NOT include.*Sources section/i);
+    expect(noRagPrompt).toMatch(/Do NOT include.*Sources section/i);
+    expect(ragPrompt).not.toMatch(/append a [`']?Sources/i);
+    expect(noRagPrompt).not.toMatch(/append a [`']?Sources/i);
     const ragTemplateIds = (
       (rag.kodaMeta as any)?.promptTrace?.orderedPrompts || []
     ).map((p: any) => String(p?.templateId || ""));

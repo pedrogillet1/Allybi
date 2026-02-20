@@ -1,0 +1,24 @@
+{
+  "_meta": { "id": "extraction_policy", "version": "1.0.0", "description": "Extraction mode policies and evidence budgets for entity-role slot extraction.", "languages": ["any"], "lastUpdated": "2026-02-20", "owner": "koda-retrieval", "compat": ">=1.0.0" },
+  "config": { "enabled": true, "defaultMode": "STRICT_EXTRACT" },
+  "modes": {
+    "STRICT_EXTRACT": {
+      "allowInference": false,
+      "requireExactRoleAnchor": true,
+      "minConfidence": 0.85,
+      "onNotFound": "EXPLICIT_NOT_FOUND",
+      "neverFallbackToAdjacentRole": true
+    },
+    "ALLOW_INFERENCE": {
+      "allowInference": true,
+      "requireExactRoleAnchor": false,
+      "minConfidence": 0.60,
+      "onNotFound": "INFER_OR_NOT_FOUND",
+      "neverFallbackToAdjacentRole": true
+    }
+  },
+  "evidenceBudget": {
+    "extraction": { "maxEvidenceItems": 16, "maxSnippetChars": 520 },
+    "default": { "maxEvidenceItems": 8, "maxSnippetChars": 260 }
+  }
+}

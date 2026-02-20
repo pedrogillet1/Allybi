@@ -80,8 +80,23 @@ export class ComposePromptBuilder {
         (m: any) => (m.role ?? "developer") === "developer",
       );
       if (dev) base = localizedText(dev.content, lang);
+    } else if (bank?.variants && typeof bank.variants === "object") {
+      const variantId =
+        (bank?.config?.defaultVariant as string) ??
+        Object.keys(bank.variants)[0] ??
+        "";
+      const variant = bank.variants[variantId];
+      if (Array.isArray(variant?.template)) {
+        base = variant.template.join("\n");
+      }
     } else {
       base = bank?._meta?.description ?? "";
+    }
+
+    if (Array.isArray(bank?.systemRules?.rules)) {
+      base = normalizeWs(
+        [bank.systemRules.rules.join("\n"), base].join("\n\n"),
+      );
     }
 
     const maxQuestions =
@@ -109,13 +124,13 @@ export class ComposePromptBuilder {
       contract.push(
         "QUOTE_MODE:",
         "- Provide short, exact excerpts only when evidence contains the exact wording.",
-        "- Keep quotes concise; attribute each quote to its source location.",
+        "- Keep quotes concise; do not add inline source labels in the answer text.",
       );
     }
 
     if (
       ctx.answerMode === "doc_grounded_table" ||
-      ctx.formatBias?.preferTables
+      (ctx as any).formatBias?.preferTables
     ) {
       contract.push(
         "TABLE_MODE:",

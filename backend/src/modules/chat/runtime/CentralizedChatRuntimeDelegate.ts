@@ -41,6 +41,7 @@ import {
 } from "../../../services/core/retrieval/evidenceGate.service";
 import { getSourceButtonsService } from "../../../services/core/retrieval/sourceButtons.service";
 import { PrismaRetrievalAdapterFactory } from "../../../services/core/retrieval/prismaRetrievalAdapters.service";
+import { resolveSlot } from "../../../services/core/retrieval/slotResolver.service";
 import {
   RuntimePolicyError,
   isRuntimePolicyError,
@@ -1869,6 +1870,10 @@ export class CentralizedChatRuntimeDelegate {
       contextSignals,
     );
 
+    // Slot extraction: resolve entity-role contract from query
+    const detectedLanguage = normalizeChatLanguage(req.preferredLanguage);
+    const slotResult = resolveSlot(req.message, detectedLanguage);
+
     const retrievalReq: RetrievalRequest = {
       query: req.message,
       env: normalizeEnv(),
@@ -1908,6 +1913,8 @@ export class CentralizedChatRuntimeDelegate {
         tableExpected: semanticSignals.tableExpected,
         corpusSearchAllowed: allowGlobalScope,
         unsafeGate: contextSignals.unsafeGate === true,
+        slotContract: slotResult.contract,
+        isExtractionQuery: slotResult.isExtractionQuery,
         allowExpansion:
           contextSignals.allowExpansion !== false &&
           !(

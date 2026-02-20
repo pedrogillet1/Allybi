@@ -48,6 +48,7 @@
       "{{evidencePack}}"
     ],
     "optional": [
+      "{{brandName}}",
       "{{domainId}}",
       "{{domainLabel}}",
       "{{formattingProfile}}",

@@ -39,6 +39,13 @@ import { clamp } from "../../../utils";
 
 import * as crypto from "crypto";
 import { getBank } from "../banks/bankLoader.service";
+import ComposePromptBuilder from "../../llm/prompts/composePrompt.builder";
+import {
+  compile as compileExtraction,
+  type ExtractionResult,
+  type ExtractionStatus,
+} from "./extractionCompiler.service";
+import type { SlotContract } from "../retrieval/slotResolver.service";
 
 // If you already have these types in src/types/, import them instead.
 export type LanguageCode = "en" | "pt" | "es";
@@ -179,6 +186,10 @@ export interface AnswerSignals {
   // explicit doc ref detected upstream
   hasExplicitDocRef?: boolean;
 
+  // slot extraction signals
+  slotContract?: SlotContract | null;
+  isExtractionQuery?: boolean;
+
   // any other signal keys
   [k: string]: any;
 }
@@ -259,16 +270,17 @@ interface ComposeAnswerPromptBank {
   config: {
     enabled: boolean;
     // global defaults
-    defaultTemperature: number;
-    defaultMaxTokens: number;
+    defaultTemperature?: number;
+    defaultMaxTokens?: number;
+    shortMaxTokens?: number;
     // how much evidence to include in prompt
-    evidence: {
+    evidence?: {
       maxCharsPerChunk: number;
       maxChunks: number;
       includeLocations: boolean;
     };
     // style hooks
-    styleHooks: {
+    styleHooks?: {
       requireShortParagraphs: boolean;
       maxSentencesPerParagraph: number;
       maxCharsPerParagraph: number;
@@ -277,10 +289,27 @@ interface ComposeAnswerPromptBank {
       forbidJson: boolean;
     };
   };
-  templates: {
-    system: Record<LanguageCode, string>;
-    user: Record<LanguageCode, string>;
+  placeholders?: {
+    required?: string[];
+    optional?: string[];
   };
+  systemRules?: {
+    rules?: string[];
+  };
+  templates?: {
+    system?: Record<LanguageCode, string>;
+    user?: Record<LanguageCode, string>;
+  };
+  variants?: Record<
+    string,
+    {
+      template?: string[];
+      domainFamily?: string;
+      toneProfile?: string;
+      formattingProfile?: string;
+      evidencePreference?: string[];
+    }
+  >;
 }
 
 interface DomainOntologyBank {
@@ -402,7 +431,56 @@ export class KodaAnswerEngineV3Service {
     // If retrieval returned empty with a reasonCode, DO NOT fabricate.
     // Return a structured empty response that QualityGates/FallbackEngine can transform.
     if (!retrieval.evidence || retrieval.evidence.length === 0) {
+      // Extraction queries get explicit NOT_FOUND instead of generic fallback
+      if (req.signals?.isExtractionQuery && req.signals?.slotContract) {
+        return this.emitExtractionNotFound(req, retrieval, { variationSeed });
+      }
       return this.emitEmptyForFallback(req, retrieval, { variationSeed });
+    }
+
+    // 1.5) Extraction compiler: when slot contract active, try deterministic extraction
+    if (req.signals?.isExtractionQuery && req.signals?.slotContract) {
+      const extractionResult = compileExtraction(
+        retrieval.evidence.map((e) => ({
+          docId: e.docId,
+          locationKey: e.chunkId || e.docId,
+          snippet: e.text,
+          score: { finalScore: e.score },
+        })),
+        req.signals.slotContract,
+        req.language,
+      );
+
+      if (
+        extractionResult.status === "EXACT" &&
+        extractionResult.compilerAnswer
+      ) {
+        // EXACT: skip LLM — return compiler answer directly
+        const sourceButtons = this.buildSourceButtons(req, retrieval.evidence);
+        return {
+          content: extractionResult.compilerAnswer,
+          attachments: sourceButtons ? [sourceButtons] : [],
+          language: req.language,
+          meta: {
+            composedBy: "KodaAnswerEngineV3:extractionCompiler",
+            variationSeed,
+            extractionStatus: extractionResult.status,
+            targetSlotId: extractionResult.targetSlotId,
+            candidateCount: extractionResult.candidates.length,
+          },
+        };
+      }
+
+      if (extractionResult.status === "NOT_FOUND") {
+        return this.emitExtractionNotFound(req, retrieval, { variationSeed });
+      }
+
+      // INFERRED: pass hints to LLM as constraints, then let LLM generate
+      // (falls through to normal LLM path with extraction hints attached to signals)
+      (req.signals as any)._extractionHints = {
+        candidates: extractionResult.candidates.map((c) => c.entityText),
+        forbiddenMentions: extractionResult.forbiddenMentions,
+      };
     }
 
     // 2) Build LLM prompt messages (bank-driven)
@@ -472,13 +550,40 @@ export class KodaAnswerEngineV3Service {
     };
   }
 
+  private emitExtractionNotFound(
+    req: AnswerRequest,
+    retrieval: RetrievalResult,
+    meta: { variationSeed: string },
+  ): ComposedResponse {
+    const slotId = req.signals?.slotContract?.slotId ?? "unknown";
+    const roleId = req.signals?.slotContract?.targetRoleId ?? "unknown";
+    return {
+      content: "",
+      attachments: [],
+      language: req.language,
+      meta: {
+        composedBy: "KodaAnswerEngineV3:extractionNotFound",
+        variationSeed: meta.variationSeed,
+        extractionStatus: "NOT_FOUND" as ExtractionStatus,
+        targetSlotId: slotId,
+        targetRoleId: roleId,
+        retrievalReasonCode:
+          retrieval.reasonCode ?? "extraction_target_not_found",
+        answerMode: req.answerMode,
+        operator: req.operator,
+        intentFamily: req.intentFamily,
+        scope: req.scope,
+      },
+    };
+  }
+
   // -------------------------------------------------------------------------------------------------
   // Prompt building
   // -------------------------------------------------------------------------------------------------
   private buildComposeMessages(
     req: AnswerRequest,
     evidence: EvidenceChunk[],
-    meta: { variationSeed: string },
+    _meta: { variationSeed: string },
   ): LLMMessage[] {
     if (!this.composePrompt?.config?.enabled) {
       // If prompt banks are missing, still avoid hardcoding a “voice”.
@@ -496,17 +601,14 @@ export class KodaAnswerEngineV3Service {
       ];
     }
 
-    const sysT =
-      this.composePrompt.templates.system[req.language] ??
-      this.composePrompt.templates.system.en;
-    const userT =
-      this.composePrompt.templates.user[req.language] ??
-      this.composePrompt.templates.user.en;
-
     const domainStyle = this.resolveDomainStyle(req);
 
     // Evidence formatting for prompt (truncated)
-    const eCfg = this.composePrompt.config.evidence;
+    const eCfg = this.composePrompt?.config?.evidence ?? {
+      maxCharsPerChunk: 800,
+      maxChunks: 6,
+      includeLocations: true,
+    };
     const evidenceText = this.renderEvidenceForPrompt(
       evidence,
       req.language,
@@ -515,45 +617,89 @@ export class KodaAnswerEngineV3Service {
       eCfg.includeLocations,
     );
 
-    // Insert variables into templates (simple placeholders)
-    const sys = fillTemplate(sysT, {
-      language: req.language,
-      operator: req.operator,
-      answerMode: req.answerMode,
-      domain: domainStyle.domainId,
-      domainTone: domainStyle.tone,
-      formattingProfile: domainStyle.formattingProfile,
-      requireShortParagraphs: String(
-        this.composePrompt.config.styleHooks.requireShortParagraphs,
-      ),
-      maxSentencesPerParagraph: String(
-        this.composePrompt.config.styleHooks.maxSentencesPerParagraph,
-      ),
-      maxCharsPerParagraph: String(
-        this.composePrompt.config.styleHooks.maxCharsPerParagraph,
-      ),
-      requireIntroConclusion: String(
-        this.composePrompt.config.styleHooks.requireIntroConclusion,
-      ),
-      bulletMaxSentences: String(
-        this.composePrompt.config.styleHooks.bulletMaxSentences,
-      ),
-      forbidJson: String(this.composePrompt.config.styleHooks.forbidJson),
+    const styleHooks = this.composePrompt?.config?.styleHooks;
+    const sys = this.buildComposeSystemPrompt(req, domainStyle, evidenceText, {
+      requireShortParagraphs: styleHooks?.requireShortParagraphs ?? true,
+      maxSentencesPerParagraph: styleHooks?.maxSentencesPerParagraph ?? 2,
+      maxCharsPerParagraph: styleHooks?.maxCharsPerParagraph ?? 260,
+      requireIntroConclusion: styleHooks?.requireIntroConclusion ?? true,
+      bulletMaxSentences: styleHooks?.bulletMaxSentences ?? 3,
+      forbidJson: styleHooks?.forbidJson ?? true,
     });
 
-    const user = fillTemplate(userT, {
-      query: req.query,
-      operator: req.operator,
-      answerMode: req.answerMode,
-      constraints: JSON.stringify(this.safeConstraintSummary(req.constraints)),
-      signals: JSON.stringify(this.safeSignalSummary(req.signals)),
-      evidence: evidenceText,
-    });
+    const user = [
+      "USER QUERY:",
+      req.query,
+      "",
+      "EVIDENCE PACK (use only this):",
+      evidenceText,
+    ].join("\n");
 
     return [
       { role: "system", content: sys },
       { role: "user", content: user },
     ];
+  }
+
+  private buildComposeSystemPrompt(
+    req: AnswerRequest,
+    domainStyle: { domainId: string; formattingProfile: string; tone: string },
+    evidenceText: string,
+    styleHooks: {
+      requireShortParagraphs: boolean;
+      maxSentencesPerParagraph: number;
+      maxCharsPerParagraph: number;
+      requireIntroConclusion: boolean;
+      bulletMaxSentences: number;
+      forbidJson: boolean;
+    },
+  ): string {
+    const builder = new ComposePromptBuilder({
+      getBank<T = any>(bankId: string): T {
+        return getBank<T>(bankId);
+      },
+    });
+
+    const built = builder.build({
+      env: "production",
+      outputLanguage: req.language,
+      answerMode: req.answerMode,
+      intentFamily: req.intentFamily,
+      operator: req.operator,
+      maxQuestions: req.constraints?.maxFollowups ?? 1,
+      evidenceSummary: {
+        evidenceCount: undefined,
+        uniqueDocs: undefined,
+      },
+      slots: {
+        brandName: "Allybi",
+        language: req.language,
+        userQuery: req.query,
+        query: req.query,
+        operator: req.operator,
+        answerMode: req.answerMode,
+        profile: this.derivePromptProfile(req),
+        docScopeSummary: this.describeDocScope(req.scope),
+        constraints: JSON.stringify(
+          this.safeConstraintSummary(req.constraints),
+        ),
+        signals: JSON.stringify(this.safeSignalSummary(req.signals)),
+        evidencePack: evidenceText,
+        evidence: evidenceText,
+        domainId: domainStyle.domainId,
+        formattingProfile: domainStyle.formattingProfile,
+        toneProfile: domainStyle.tone,
+        domainTone: domainStyle.tone,
+        requireShortParagraphs: String(styleHooks.requireShortParagraphs),
+        maxSentencesPerParagraph: String(styleHooks.maxSentencesPerParagraph),
+        maxCharsPerParagraph: String(styleHooks.maxCharsPerParagraph),
+        requireIntroConclusion: String(styleHooks.requireIntroConclusion),
+        bulletMaxSentences: String(styleHooks.bulletMaxSentences),
+        forbidJson: String(styleHooks.forbidJson),
+      },
+    } as any);
+
+    return built.content;
   }
 
   private renderEvidenceForPrompt(
@@ -624,6 +770,49 @@ export class KodaAnswerEngineV3Service {
     };
   }
 
+  private derivePromptProfile(req: AnswerRequest): string {
+    if (
+      req.answerMode === "nav_pills" ||
+      req.operator === "open" ||
+      req.operator === "locate_file"
+    ) {
+      return "micro";
+    }
+
+    if (
+      req.constraints.userRequestedShort ||
+      req.signals.shortOverview ||
+      (req.constraints.maxSentences && req.constraints.maxSentences <= 3)
+    ) {
+      return "brief";
+    }
+
+    if (req.constraints.requireTable || req.signals.userAskedForTable) {
+      return "concise";
+    }
+
+    if (req.signals.userRequestedDetailed) return "deep";
+    return "standard";
+  }
+
+  private describeDocScope(scope: ScopeConstraints): string {
+    const hard = scope?.hard;
+    if (!hard) return "all_docs";
+
+    const parts: string[] = [];
+    if (hard.docIdAllowlist?.length) {
+      parts.push(`docIds:${hard.docIdAllowlist.slice(0, 4).join(",")}`);
+    }
+    if (hard.filenameMustContain?.length) {
+      parts.push(`filename:${hard.filenameMustContain.slice(0, 3).join(",")}`);
+    }
+    if (hard.docTypeAllowlist?.length) {
+      parts.push(`docType:${hard.docTypeAllowlist.slice(0, 3).join(",")}`);
+    }
+
+    return parts.length ? parts.join(" | ") : "scoped";
+  }
+
   // -------------------------------------------------------------------------------------------------
   // Domain style resolution (tone/format)
   // -------------------------------------------------------------------------------------------------
@@ -663,13 +852,14 @@ export class KodaAnswerEngineV3Service {
   ) {
     const baseTemp = this.composePrompt?.config?.defaultTemperature ?? 0.35;
     const baseMax = this.composePrompt?.config?.defaultMaxTokens ?? 900;
+    const shortMax = this.composePrompt?.config?.shortMaxTokens ?? 360;
 
     // Short answers: lower tokens
     const short =
       !!req.constraints.userRequestedShort ||
       !!req.signals.shortOverview ||
       (req.constraints.maxSentences && req.constraints.maxSentences <= 3);
-    const maxTokens = short ? Math.min(baseMax, 360) : baseMax;
+    const maxTokens = short ? Math.min(baseMax, shortMax) : baseMax;
 
     const temperature = computeTemperature(
       baseTemp,
@@ -768,21 +958,6 @@ function truncate(s: string, max: number) {
   const t = (s ?? "").trim();
   if (t.length <= max) return t;
   return t.slice(0, Math.max(0, max - 1)) + "…";
-}
-
-function fillTemplate(tpl: string, vars: Record<string, string>) {
-  let out = tpl;
-  for (const [k, v] of Object.entries(vars)) {
-    out = out.replace(
-      new RegExp(`\\{\\{\\s*${escapeRegExp(k)}\\s*\\}\\}`, "g"),
-      v,
-    );
-  }
-  return out;
-}
-
-function escapeRegExp(s: string) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function bestLocation(

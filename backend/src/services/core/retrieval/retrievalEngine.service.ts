@@ -81,6 +81,10 @@ export interface RetrievalRequest {
 
     // Safety gate (retrieval should not proceed if unsafe gate is set upstream)
     unsafeGate?: boolean;
+
+    // Slot extraction signals (from slotResolver)
+    slotContract?: import("./slotResolver.service").SlotContract | null;
+    isExtractionQuery?: boolean;
   };
 
   // Optional: if you store recent fallback history/anti-repetition
@@ -924,6 +928,44 @@ export class RetrievalEngineService {
       ? (signals.activeDocId ?? null)
       : null;
 
+    // Slot extraction: precompute role anchors for confusion penalty
+    const slotContract = signals.slotContract;
+    const isExtraction = Boolean(signals.isExtractionQuery && slotContract);
+    let targetAnchors: string[] = [];
+    let forbiddenAnchorsFlat: string[] = [];
+    let confusionPenaltyDefault = 0.25;
+
+    if (isExtraction && slotContract) {
+      targetAnchors = (slotContract.anchorLabels || []).map((a) =>
+        a.toLowerCase(),
+      );
+      // Load ontology for broader anchor coverage
+      const ontology = this.safeGetBank<any>("entity_role_ontology");
+      if (ontology?.roles) {
+        for (const forbiddenRoleId of slotContract.forbidden) {
+          const role = ontology.roles.find(
+            (r: any) => r.id === forbiddenRoleId,
+          );
+          if (role?.anchors) {
+            const anchors =
+              role.anchors[req.query ? "en" : "en"] ?? role.anchors["en"] ?? [];
+            for (const a of anchors) {
+              const lower = a.toLowerCase();
+              if (!forbiddenAnchorsFlat.includes(lower)) {
+                forbiddenAnchorsFlat.push(lower);
+              }
+            }
+          }
+        }
+      }
+      // Ranker config for slot extraction penalties
+      const rankerCfg = this.safeGetBank<any>("retrieval_ranker_config");
+      confusionPenaltyDefault = safeNumber(
+        rankerCfg?.config?.slotExtraction?.forbiddenRolePenalty,
+        0.25,
+      );
+    }
+
     const out: CandidateChunk[] = [];
     for (const c of candidates) {
       // Hard block: explicit doc lock violation (unless discovery)
@@ -944,9 +986,33 @@ export class RetrievalEngineService {
       );
       if (topScore < minRelevance) {
         c.signals.lowRelevanceChunk = true;
-        // Many systems exclude; your negatives bank shows exclude_chunk.
-        // We'll exclude to avoid weak evidence misleading the answer.
         continue;
+      }
+
+      // Slot extraction: role-confusion penalty
+      if (isExtraction && slotContract) {
+        const snippetLower = (c.snippet ?? "").toLowerCase();
+        const hasTarget = targetAnchors.some((a) => snippetLower.includes(a));
+        const hasForbidden = forbiddenAnchorsFlat.some((a) =>
+          snippetLower.includes(a),
+        );
+
+        if (hasForbidden && !hasTarget) {
+          // Apply confusion penalty — keep chunk but penalize score
+          c.scores.penalties = clamp01(
+            (c.scores.penalties ?? 0) + confusionPenaltyDefault,
+          );
+        } else if (hasTarget) {
+          // Boost chunks containing target role anchors
+          const rankerCfg = this.safeGetBank<any>("retrieval_ranker_config");
+          const anchorBoost = safeNumber(
+            rankerCfg?.config?.slotExtraction?.roleAnchorBoost,
+            0.15,
+          );
+          c.scores.keywordBoost = clamp01(
+            (c.scores.keywordBoost ?? 0) + anchorBoost,
+          );
+        }
       }
 
       out.push(c);
@@ -1223,13 +1289,35 @@ export class RetrievalEngineService {
       0.58,
     );
 
+    // When extraction query is active, apply a lower threshold for scoped docs
+    // so that we don't discard evidence that the extraction compiler needs.
+    const isExtraction = Boolean(
+      signals.isExtractionQuery && signals.slotContract,
+    );
+    const scopeDocSet =
+      Array.isArray(ctx.scope.candidateDocIds) &&
+      ctx.scope.candidateDocIds.length > 0
+        ? new Set(ctx.scope.candidateDocIds)
+        : null;
+    let extractionMinScore = minFinalScore;
+    if (isExtraction) {
+      const rankerCfg = this.safeGetBank<any>("retrieval_ranker_config");
+      extractionMinScore = safeNumber(
+        rankerCfg?.config?.slotExtraction?.scopedMinFinalScoreOverride,
+        0.45,
+      );
+    }
+
     const evidence: EvidenceItem[] = [];
     const perDoc = new Map<string, number>();
 
     for (const c of candidates) {
       if (!c.provenanceOk) continue;
       const final = c.scores.final ?? 0;
-      if (final < minFinalScore) continue;
+      const isScoped = scopeDocSet && scopeDocSet.has(c.docId);
+      const effectiveMin =
+        isExtraction && isScoped ? extractionMinScore : minFinalScore;
+      if (final < effectiveMin) continue;
 
       const n = perDoc.get(c.docId) ?? 0;
       if (n >= maxPerDocHard) continue;

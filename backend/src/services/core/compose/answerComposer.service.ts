@@ -142,6 +142,12 @@ type StyleProfile =
   | "detailed"
   | "deep";
 
+interface ProfileSelectionRule {
+  whenAny?: string[];
+  whenAll?: string[];
+  choose?: StyleProfile;
+}
+
 interface AnswerStylePolicyBank {
   _meta: any;
   config: { enabled: boolean; globalRules?: any };
@@ -167,6 +173,10 @@ interface AnswerStylePolicyBank {
   blockPlanner: {
     plansByProfile: Record<StyleProfile, { default: string[] }>;
     operatorOverrides?: Record<string, Partial<Record<StyleProfile, string[]>>>;
+  };
+  profileSelection?: {
+    rulesOrder?: string[];
+    rules?: Record<string, ProfileSelectionRule>;
   };
   blockRules?: any;
   tests?: any;
@@ -439,6 +449,9 @@ export class AnswerComposerService {
   // ---------------------------------------------------------------------------
 
   private selectProfile(ctx: ComposerContext): StyleProfile {
+    const selectedFromBank = this.selectProfileFromBank(ctx);
+    if (selectedFromBank) return selectedFromBank;
+
     // Minimal deterministic selection; your intent engine can override this by passing constraints/profile.
     if (ctx.answerMode === "nav_pills") return "micro";
 
@@ -462,6 +475,105 @@ export class AnswerComposerService {
     if (ctx.intentFamily === "help") return "concise";
 
     return "standard";
+  }
+
+  private selectProfileFromBank(ctx: ComposerContext): StyleProfile | null {
+    const selection = this.styleBank?.profileSelection;
+    const rules = selection?.rules;
+    const order = selection?.rulesOrder;
+
+    if (!rules || !order || !Array.isArray(order) || order.length === 0) {
+      return null;
+    }
+
+    for (const ruleId of order) {
+      const rule = rules[ruleId];
+      if (!rule) continue;
+      if (!this.matchesProfileRule(rule, ctx)) continue;
+      if (rule.choose && this.isKnownProfile(rule.choose)) return rule.choose;
+    }
+
+    return null;
+  }
+
+  private matchesProfileRule(
+    rule: ProfileSelectionRule,
+    ctx: ComposerContext,
+  ): boolean {
+    const whenAny = Array.isArray(rule.whenAny) ? rule.whenAny : [];
+    const whenAll = Array.isArray(rule.whenAll) ? rule.whenAll : [];
+
+    if (
+      whenAny.length > 0 &&
+      !whenAny.some((t) => this.evalSelectorToken(t, ctx))
+    ) {
+      return false;
+    }
+    if (
+      whenAll.length > 0 &&
+      !whenAll.every((t) => this.evalSelectorToken(t, ctx))
+    ) {
+      return false;
+    }
+
+    return whenAny.length > 0 || whenAll.length > 0;
+  }
+
+  private evalSelectorToken(tokenRaw: string, ctx: ComposerContext): boolean {
+    const token = String(tokenRaw || "").trim();
+    if (!token) return false;
+
+    if (token === "always") return true;
+
+    if (token.startsWith("answerModeIs:")) {
+      const expected = token.slice("answerModeIs:".length).trim();
+      return ctx.answerMode === expected;
+    }
+
+    if (token.startsWith("operatorIs:")) {
+      const expected = token.slice("operatorIs:".length).trim();
+      return (ctx.operator || "").toLowerCase() === expected.toLowerCase();
+    }
+
+    if (token === "constraints.maxSentencesLte3") {
+      return (
+        typeof ctx.constraints?.maxSentences === "number" &&
+        ctx.constraints.maxSentences <= 3
+      );
+    }
+
+    if (token.startsWith("signals.")) {
+      const path = token.slice("signals.".length);
+      const v = this.readPath(ctx.signals, path);
+      return v === true;
+    }
+
+    if (token.startsWith("constraints.")) {
+      const path = token.slice("constraints.".length);
+      const v = this.readPath(ctx.constraints, path);
+      return v === true;
+    }
+
+    return false;
+  }
+
+  private readPath(obj: any, path: string): any {
+    if (!obj || !path) return undefined;
+    return path
+      .split(".")
+      .filter(Boolean)
+      .reduce<any>((acc, key) => (acc == null ? undefined : acc[key]), obj);
+  }
+
+  private isKnownProfile(profile: string): profile is StyleProfile {
+    return (
+      profile === "micro" ||
+      profile === "brief" ||
+      profile === "concise" ||
+      profile === "standard" ||
+      profile === "detailed" ||
+      profile === "deep"
+    );
   }
 
   private planBlocks(profile: StyleProfile, operator: string): string[] {

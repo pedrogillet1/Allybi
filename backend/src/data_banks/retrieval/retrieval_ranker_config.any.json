@@ -167,6 +167,13 @@
         "evidence_packaging"
       ]
     },
+    "slotExtraction": {
+      "enabled": true,
+      "roleAnchorBoost": 0.15,
+      "forbiddenRolePenalty": 0.25,
+      "enforceMinFinalScoreForScoped": true,
+      "scopedMinFinalScoreOverride": 0.45
+    },
     "memoryContinuity": {
       "enabled": true,
       "boosts": {

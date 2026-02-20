@@ -417,7 +417,7 @@
       "version": "6.1.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "4d78ccc1b69f97467a81de7824e8793393c849d80f02edcba64de6380211bbfb"
+      "checksumSha256": "e02550e731395cca717cdbed1f17a1a108248465d6a6f8560ad74b66a67e9694"
     },
     {
       "id": "bank_aliases",
@@ -718,7 +718,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "d23b2c49452c9d55d063e777180df6bdf40d4aac63d784f7de8d3ec77ed59b56"
+      "checksumSha256": "c7d33eba5b978193737a73eb59ea2efbd8e9c6852cb83394a61175c09023cea2"
     },
     {
       "id": "connectors_routing",
@@ -1842,6 +1842,28 @@
       "lastUpdated": "2026-02-20"
     },
     {
+      "id": "slot_extraction_cases",
+      "category": "tests",
+      "path": "tests/slot_extraction_cases.any.json",
+      "filename": "slot_extraction_cases.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "2719a32a8ada4b1b1c3846d2dcee127332f8328d32011617a8592d8b8f7ba05b",
+      "lastUpdated": "2026-02-20"
+    },
+    {
       "id": "mode_chat",
       "category": "prompts",
       "path": "prompts/mode_chat.any.json",
@@ -2039,7 +2061,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-19",
-      "checksumSha256": "386e850e4e7c6ea6a282184c38235bb426175f68ff35a3e0bfd59fd58199aad0"
+      "checksumSha256": "1fc5929d9b2910c2be592d15e155ffb5a43e09fdfbca6194caddda5932e63b70"
     },
     {
       "id": "processing_messages",
@@ -2059,7 +2081,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "5b91d275a98a472c04260b1f738f2ea85fe658f93b67290f0216f2f08b04239e"
+      "checksumSha256": "0f6c06586649d0e1ffc7f8da6f21d39988d3657bad929d6f8b1780c56c716ab3"
     },
     {
       "id": "quality_gates",
@@ -2144,7 +2166,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "0ed14f2e912bfecf75dad2330e51d66a3404a95cbfc1bb06a8b0c2edbace3e39",
+      "checksumSha256": "e148efb5952cdd8518df7ff45e2757d152af30bf15455e1a4129d930a23dd3ed",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -2165,7 +2187,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "18067d001b712e84a1d46919cc3977057fb1dad4f3fc914f9133facc8e649a91"
+      "checksumSha256": "571eb86eed6bbf3fbfbc1eb448c72d05632570b250813d59baf448b6c5657728"
     },
     {
       "id": "routing_priority",
@@ -2330,7 +2352,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-19",
-      "checksumSha256": "34f6b15ff3024321353f2b98c864879654f546d703b4f4fd57d6a706fc35e79f"
+      "checksumSha256": "354d77ee67faedc5fb5a4b972575913fcd186aa90a92af5107b37dd63d138f0c"
     },
     {
       "id": "task_plan_generation",
@@ -2427,6 +2449,81 @@
       },
       "checksumSha256": "1a15774d34248e86f06757de506ac362dc5266e91d34b8af66e1c30c0e0ba21d",
       "lastUpdated": "2026-01-25"
+    },
+    {
+      "id": "query_slot_contracts",
+      "category": "semantics",
+      "path": "semantics/query_slot_contracts.any.json",
+      "filename": "query_slot_contracts.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "lastUpdated": "2026-02-20",
+      "checksumSha256": "4b46ff088e636ddf328098040451529eb1a91051803da23d858363f9ecf193af"
+    },
+    {
+      "id": "entity_role_ontology",
+      "category": "semantics",
+      "path": "semantics/entity_role_ontology.any.json",
+      "filename": "entity_role_ontology.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "lastUpdated": "2026-02-20",
+      "checksumSha256": "8a60d5687fcccf52b052276d2cc8c9b10144f482324df5fd46b5d1edf5534ee3"
+    },
+    {
+      "id": "extraction_policy",
+      "category": "semantics",
+      "path": "semantics/extraction_policy.any.json",
+      "filename": "extraction_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "query_slot_contracts",
+        "entity_role_ontology"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "lastUpdated": "2026-02-20",
+      "checksumSha256": "9c4c430bda61a8431fd0c3ef43d7fb19fba47ad6adf2471f69ec2c167707b5b6"
     }
   ],
   "tests": [

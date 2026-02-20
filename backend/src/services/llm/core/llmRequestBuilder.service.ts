@@ -158,6 +158,9 @@ export interface BuildRequestInput {
 
     // nav pills
     navType?: "open" | "where" | "discover" | null;
+
+    // slot extraction
+    isExtractionQuery?: boolean;
   };
 
   // Evidence pack produced by retrieval
@@ -399,7 +402,12 @@ export class LlmRequestBuilderService {
       Array.isArray(input.evidencePack.evidence) &&
       input.evidencePack.evidence.length
     ) {
-      parts.push(this.renderEvidenceForPrompt(input.evidencePack));
+      parts.push(
+        this.renderEvidenceForPrompt(
+          input.evidencePack,
+          input.signals.isExtractionQuery,
+        ),
+      );
     }
 
     // Disambiguation options (if active) — keep minimal; prompt handles rendering policy
@@ -436,9 +444,15 @@ export class LlmRequestBuilderService {
     return parts.join("\n\n").trim();
   }
 
-  private renderEvidenceForPrompt(pack: EvidencePackLike): string {
-    // Keep compact: top 8 evidence items max (enough for grounding, not a dump)
-    const top = pack.evidence.slice(0, 8);
+  private renderEvidenceForPrompt(
+    pack: EvidencePackLike,
+    isExtractionQuery?: boolean,
+  ): string {
+    // Dynamic evidence budget: extraction queries get more items + longer snippets
+    const maxItems = isExtractionQuery ? 16 : 8;
+    const maxSnippetChars = isExtractionQuery ? 520 : 260;
+
+    const top = pack.evidence.slice(0, maxItems);
 
     const lines: string[] = [];
     lines.push("### Evidence (use only this)");
@@ -456,9 +470,10 @@ export class LlmRequestBuilderService {
                 : "";
 
       const snippet = (e.snippet || "").trim().replace(/\s+/g, " ");
-      // Keep snippet short
       const clipped =
-        snippet.length > 260 ? snippet.slice(0, 259) + "…" : snippet;
+        snippet.length > maxSnippetChars
+          ? snippet.slice(0, maxSnippetChars - 1) + "…"
+          : snippet;
 
       lines.push(`- [${title}]${loc ? ` (${loc})` : ""}: ${clipped}`);
     }

@@ -13,9 +13,6 @@
     "integrationHooks": {
       "truncationBankId": "truncation_and_limits",
       "bannedPhrasesBankId": "banned_phrases",
-      "followupTemplatesBankId": "followup_templates",
-      "hallucinationGuardsBankId": "hallucination_guards",
-      "docGroundingChecksBankId": "doc_grounding_checks",
       "renderPolicyBankId": "render_policy"
     },
 

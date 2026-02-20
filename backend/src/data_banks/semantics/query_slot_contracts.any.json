@@ -1,0 +1,135 @@
+{
+  "_meta": { "id": "query_slot_contracts", "version": "1.0.0", "description": "Maps query patterns to entity-role slot targets with forbidden confusion roles for extraction precision.", "languages": ["any", "en", "pt"], "lastUpdated": "2026-02-20", "owner": "koda-retrieval", "compat": ">=1.0.0" },
+  "config": { "enabled": true, "minPatternConfidence": 0.75 },
+  "slots": [
+    {
+      "id": "contract_owner_names",
+      "patterns": {
+        "en": ["who\\s+(?:is|are)\\s+(?:the\\s+)?owners?", "(?:name|identify)\\s+(?:the\\s+)?owners?", "(?:list|show)\\s+(?:the\\s+)?owners?", "owner(?:s)?\\s+(?:of|for)\\s+(?:the|this)"],
+        "pt": ["quem\\s+(?:é|são)\\s+(?:o(?:s)?\\s+)?(?:proprietário|dono|locador)", "(?:nome|identifique)\\s+(?:o(?:s)?\\s+)?(?:proprietário|dono|locador)", "(?:liste|mostre)\\s+(?:o(?:s)?\\s+)?(?:proprietário|dono|locador)"]
+      },
+      "targetRoleId": "owner",
+      "extractionMode": "STRICT_EXTRACT",
+      "forbidden": ["signatory", "witness", "guarantor", "representative"],
+      "confusionPenalties": [
+        { "role": "signatory", "penalty": 0.40 },
+        { "role": "witness", "penalty": 0.30 },
+        { "role": "guarantor", "penalty": 0.35 },
+        { "role": "representative", "penalty": 0.25 }
+      ],
+      "anchorLabels": { "en": ["owner", "proprietor", "landlord", "lessor"], "pt": ["proprietário", "dono", "locador", "senhorio"] }
+    },
+    {
+      "id": "contract_signatory_names",
+      "patterns": {
+        "en": ["who\\s+signed", "(?:name|identify)\\s+(?:the\\s+)?signat(?:ory|ories)", "(?:list|show)\\s+(?:the\\s+)?signat(?:ory|ories)", "signat(?:ory|ories)\\s+(?:of|for|on)"],
+        "pt": ["quem\\s+assinou", "(?:nome|identifique)\\s+(?:o(?:s)?\\s+)?(?:signatário|assinante)", "(?:liste|mostre)\\s+(?:o(?:s)?\\s+)?(?:signatário|assinante)"]
+      },
+      "targetRoleId": "signatory",
+      "extractionMode": "STRICT_EXTRACT",
+      "forbidden": ["owner", "witness", "beneficiary"],
+      "confusionPenalties": [
+        { "role": "owner", "penalty": 0.40 },
+        { "role": "witness", "penalty": 0.35 },
+        { "role": "beneficiary", "penalty": 0.25 }
+      ],
+      "anchorLabels": { "en": ["signatory", "signed by", "signer", "subscriber"], "pt": ["signatário", "assinado por", "assinante", "subscritor"] }
+    },
+    {
+      "id": "contract_witness_names",
+      "patterns": {
+        "en": ["who\\s+(?:is|are)\\s+(?:the\\s+)?witness(?:es)?", "(?:name|identify)\\s+(?:the\\s+)?witness(?:es)?", "(?:list|show)\\s+(?:the\\s+)?witness(?:es)?"],
+        "pt": ["quem\\s+(?:é|são)\\s+(?:a(?:s)?\\s+)?testemunha(?:s)?", "(?:nome|identifique)\\s+(?:a(?:s)?\\s+)?testemunha(?:s)?"]
+      },
+      "targetRoleId": "witness",
+      "extractionMode": "STRICT_EXTRACT",
+      "forbidden": ["signatory", "owner", "guarantor"],
+      "confusionPenalties": [
+        { "role": "signatory", "penalty": 0.35 },
+        { "role": "owner", "penalty": 0.30 },
+        { "role": "guarantor", "penalty": 0.30 }
+      ],
+      "anchorLabels": { "en": ["witness", "attested by", "witnessed by"], "pt": ["testemunha", "atestado por", "presenciado por"] }
+    },
+    {
+      "id": "contract_guarantor_names",
+      "patterns": {
+        "en": ["who\\s+(?:is|are)\\s+(?:the\\s+)?guarantors?", "(?:name|identify)\\s+(?:the\\s+)?guarantors?", "(?:list|show)\\s+(?:the\\s+)?guarantors?"],
+        "pt": ["quem\\s+(?:é|são)\\s+(?:o(?:s)?\\s+)?(?:fiador|avalista|garantidor)", "(?:nome|identifique)\\s+(?:o(?:s)?\\s+)?(?:fiador|avalista|garantidor)"]
+      },
+      "targetRoleId": "guarantor",
+      "extractionMode": "STRICT_EXTRACT",
+      "forbidden": ["signatory", "owner", "witness"],
+      "confusionPenalties": [
+        { "role": "signatory", "penalty": 0.35 },
+        { "role": "owner", "penalty": 0.35 },
+        { "role": "witness", "penalty": 0.25 }
+      ],
+      "anchorLabels": { "en": ["guarantor", "surety", "co-signer", "guarantee"], "pt": ["fiador", "avalista", "garantidor", "caucionante"] }
+    },
+    {
+      "id": "contract_party_a",
+      "patterns": {
+        "en": ["who\\s+is\\s+party\\s*a", "(?:name|identify)\\s+party\\s*a", "(?:first|1st)\\s+party"],
+        "pt": ["quem\\s+(?:é|são)\\s+(?:a\\s+)?parte\\s*a", "(?:primeiro|1[ºo])\\s+(?:contratante|parte)"]
+      },
+      "targetRoleId": "party_a",
+      "extractionMode": "STRICT_EXTRACT",
+      "forbidden": ["party_b", "witness", "guarantor"],
+      "confusionPenalties": [
+        { "role": "party_b", "penalty": 0.50 },
+        { "role": "witness", "penalty": 0.25 },
+        { "role": "guarantor", "penalty": 0.25 }
+      ],
+      "anchorLabels": { "en": ["party a", "first party", "contracting party"], "pt": ["parte a", "primeiro contratante", "contratante"] }
+    },
+    {
+      "id": "contract_party_b",
+      "patterns": {
+        "en": ["who\\s+is\\s+party\\s*b", "(?:name|identify)\\s+party\\s*b", "(?:second|2nd)\\s+party"],
+        "pt": ["quem\\s+(?:é|são)\\s+(?:a\\s+)?parte\\s*b", "(?:segundo|2[ºo])\\s+(?:contratante|parte)"]
+      },
+      "targetRoleId": "party_b",
+      "extractionMode": "STRICT_EXTRACT",
+      "forbidden": ["party_a", "witness", "guarantor"],
+      "confusionPenalties": [
+        { "role": "party_a", "penalty": 0.50 },
+        { "role": "witness", "penalty": 0.25 },
+        { "role": "guarantor", "penalty": 0.25 }
+      ],
+      "anchorLabels": { "en": ["party b", "second party", "contracted party"], "pt": ["parte b", "segundo contratante", "contratado"] }
+    },
+    {
+      "id": "contract_beneficiary_names",
+      "patterns": {
+        "en": ["who\\s+(?:is|are)\\s+(?:the\\s+)?beneficiar(?:y|ies)", "(?:name|identify)\\s+(?:the\\s+)?beneficiar(?:y|ies)"],
+        "pt": ["quem\\s+(?:é|são)\\s+(?:o(?:s)?\\s+)?beneficiário(?:s)?", "(?:nome|identifique)\\s+(?:o(?:s)?\\s+)?beneficiário(?:s)?"]
+      },
+      "targetRoleId": "beneficiary",
+      "extractionMode": "STRICT_EXTRACT",
+      "forbidden": ["signatory", "guarantor", "witness"],
+      "confusionPenalties": [
+        { "role": "signatory", "penalty": 0.30 },
+        { "role": "guarantor", "penalty": 0.30 },
+        { "role": "witness", "penalty": 0.25 }
+      ],
+      "anchorLabels": { "en": ["beneficiary", "payee", "recipient"], "pt": ["beneficiário", "favorecido", "destinatário"] }
+    },
+    {
+      "id": "contract_tenant_names",
+      "patterns": {
+        "en": ["who\\s+(?:is|are)\\s+(?:the\\s+)?tenants?", "(?:name|identify)\\s+(?:the\\s+)?tenants?", "(?:list|show)\\s+(?:the\\s+)?tenants?", "tenants?\\s+(?:of|for|on)\\s+(?:the|this)"],
+        "pt": ["quem\\s+(?:é|são)\\s+(?:o(?:s)?\\s+)?(?:inquilino|locatário|arrendatário)", "(?:nome|identifique)\\s+(?:o(?:s)?\\s+)?(?:inquilino|locatário|arrendatário)"]
+      },
+      "targetRoleId": "tenant",
+      "extractionMode": "STRICT_EXTRACT",
+      "forbidden": ["owner", "signatory", "guarantor"],
+      "confusionPenalties": [
+        { "role": "owner", "penalty": 0.45 },
+        { "role": "signatory", "penalty": 0.30 },
+        { "role": "guarantor", "penalty": 0.30 }
+      ],
+      "anchorLabels": { "en": ["tenant", "lessee", "renter", "occupant"], "pt": ["inquilino", "locatário", "arrendatário"] }
+    }
+  ]
+}

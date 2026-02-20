@@ -831,6 +831,19 @@ router.post(
       return;
     }
 
+    const rawMeta = req.body?.meta as Record<string, unknown> | undefined;
+    const meta: Record<string, unknown> = {
+      ...(rawMeta || {}),
+      viewerMode: false,
+    };
+    delete (meta as any).viewerContext;
+    delete (meta as any).viewerSelection;
+    delete (meta as any).viewerHistory;
+    const context = req.body?.context as Record<string, unknown> | undefined;
+    const connectorContext = req.body?.connectorContext as
+      | Record<string, unknown>
+      | undefined;
+
     try {
       const chat = getChatService(req);
       const result = await chat.chat({
@@ -842,6 +855,9 @@ router.post(
           req.body?.language,
           message,
         ),
+        meta,
+        context,
+        connectorContext: connectorContext as any,
       });
 
       const envelope = toChatHttpEnvelope(result);
@@ -896,6 +912,19 @@ router.post(
       return;
     }
 
+    const rawMeta = req.body?.meta as Record<string, unknown> | undefined;
+    const meta: Record<string, unknown> = {
+      ...(rawMeta || {}),
+      viewerMode: false,
+    };
+    delete (meta as any).viewerContext;
+    delete (meta as any).viewerSelection;
+    delete (meta as any).viewerHistory;
+    const context = req.body?.context as Record<string, unknown> | undefined;
+    const connectorContext = req.body?.connectorContext as
+      | Record<string, unknown>
+      | undefined;
+
     try {
       const chat = getChatService(req);
       const result = await chat.chat({
@@ -907,6 +936,9 @@ router.post(
           req.body?.language,
           message,
         ),
+        meta,
+        context,
+        connectorContext: connectorContext as any,
       });
 
       const envelope = toChatHttpEnvelope(result);
@@ -955,6 +987,19 @@ router.post(
       return;
     }
 
+    const rawMeta = req.body?.meta as Record<string, unknown> | undefined;
+    const meta: Record<string, unknown> = {
+      ...(rawMeta || {}),
+      viewerMode: false,
+    };
+    delete (meta as any).viewerContext;
+    delete (meta as any).viewerSelection;
+    delete (meta as any).viewerHistory;
+    const context = req.body?.context as Record<string, unknown> | undefined;
+    const connectorContext = req.body?.connectorContext as
+      | Record<string, unknown>
+      | undefined;
+
     try {
       const chat = getChatService(req);
 
@@ -987,6 +1032,9 @@ router.post(
             message,
             attachedDocumentIds: extractAttachedDocumentIdsFromBody(req.body),
             preferredLanguage,
+            connectorContext: connectorContext as any,
+            meta,
+            context,
           },
           sink,
           streamingConfig: DEFAULT_STREAMING_CONFIG,
