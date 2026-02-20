@@ -6,6 +6,7 @@ import { useDropzone } from 'react-dropzone';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import LeftNav from '../app-shell/LeftNav';
+import NotificationPanel from '../notifications/NotificationPanel';
 import { formatFileSize } from '../../utils/security/crypto';
 import api from '../../services/api';
 // ✅ FIX BREACH #2: Use centralized upload config for consistent limits
@@ -20,6 +21,7 @@ const Upload = () => {
     const [notificationType, setNotificationType] = useState('success');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [allDocuments, setAllDocuments] = useState([]);
+    const [showNotificationsPopup, setShowNotificationsPopup] = useState(false);
 
     // Load existing documents
     useEffect(() => {
@@ -159,7 +161,7 @@ const Upload = () => {
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row'
       }}>
-            {!isMobile && <LeftNav />}
+            {!isMobile && <LeftNav onNotificationClick={() => setShowNotificationsPopup(true)} />}
 
             {/* Main Content */}
             <div style={{flex: '1 1 0', height: '100vh', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
@@ -733,6 +735,10 @@ const Upload = () => {
                     }
                 }
             `}} />
+            <NotificationPanel
+              showNotificationsPopup={showNotificationsPopup}
+              setShowNotificationsPopup={setShowNotificationsPopup}
+            />
         </div>
     );
 };

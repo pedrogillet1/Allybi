@@ -483,6 +483,8 @@
     "uploadsComplete_plural": "{{count}} uploads Complete",
     "preparingRetry": "Preparing retry...",
     "processingTakingLonger": "Document processing is taking longer than expected. Your file will be ready for AI chat soon.",
+    "uploadAll": "Upload All",
+    "acceptAll": "Accept All",
     "notifications": {
       "uploadComplete": "Upload Complete",
       "uploadCompleteText": "{{count}} document has been successfully uploaded.",
@@ -1811,6 +1813,21 @@
         "label": "Slack",
         "description": "Connect Slack to search messages and share documents with your team."
       }
+    }
+  },
+  "scanner": {
+    "errors": {
+      "title": "Camera Error",
+      "permissionDenied": "Camera permission denied. To enable, go to Settings > Safari > Camera and allow access for this site.",
+      "notFound": "No camera found. Please connect a camera and try again.",
+      "notReadable": "Camera is in use by another app. Please close other apps using the camera.",
+      "overconstrained": "Camera does not support the requested settings. Please try again.",
+      "timeout": "Camera initialization timed out. Please try again.",
+      "policyBlocked": "Camera access is blocked by site policy. Please contact support.",
+      "fallbackFailed": "Failed to process the image. Please try again.",
+      "iosSafariHint": "On iOS: Settings \u2192 Safari \u2192 Camera, or tap \uD83D\uDD12 in the address bar \u2192 Website Settings \u2192 Camera \u2192 Allow.",
+      "tryAgain": "Try Again",
+      "useCameraUpload": "Use Camera Upload Instead"
     }
   }
 }

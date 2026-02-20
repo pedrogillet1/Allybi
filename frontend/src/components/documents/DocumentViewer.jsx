@@ -586,6 +586,23 @@ const DocumentViewer = () => {
     setInjectedEditSession(null);
   }, [injectedEditSession, supportsViewerEditing, showInfo, t]);
 
+  // On mobile, allow native pinch-zoom while viewing documents.
+  // The global viewport meta has user-scalable=no which iOS Safari partially
+  // ignores but then snaps back on long-press for text selection, causing
+  // zoom-out, shift, and blur. Allow scaling so Safari treats zoomed state as valid.
+  useEffect(() => {
+    if (!isMobile) return;
+    const meta = window.document.querySelector('meta[name="viewport"]');
+    if (!meta) return;
+    const original = meta.getAttribute('content');
+    meta.setAttribute('content',
+      'width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=yes, maximum-scale=5'
+    );
+    return () => {
+      meta.setAttribute('content', original);
+    };
+  }, [isMobile]);
+
   // Session-only behavior: when leaving the document viewer (or switching docs),
   // delete the backing conversation so it never becomes part of the main chat universe.
   useEffect(() => {
@@ -4443,10 +4460,14 @@ const DocumentViewer = () => {
         display: 'flex',
         position: 'relative',
         background: currentFileType === 'excel' ? 'white' : '#F5F5F5',
-        WebkitOverflowScrolling: 'touch',
+        // NOTE: -webkit-overflow-scrolling: touch removed — modern iOS (13+) has native
+        // momentum scrolling and the property creates an extra stacking context that
+        // breaks coordinate mapping for text selection after pinch-zoom.
         boxShadow: 'none',
         borderTop: '1px solid #E6E6EC',
-        scrollbarGutter: currentFileType === 'excel' ? undefined : 'stable'
+        scrollbarGutter: currentFileType === 'excel' ? undefined : 'stable',
+        // Allow pinch-zoom + pan; prevent double-tap zoom interference with selection
+        touchAction: isMobile ? 'manipulation' : undefined
       }}
     >
       {/* Frozen selection overlay: stays attached to the selected content while scrolling. */}

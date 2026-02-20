@@ -173,6 +173,7 @@ function AppContent() {
               {/* Root: auth screen if not signed in, chat if signed in */}
               <Route path="/" element={<RootRoute />} />
               <Route path={ROUTES.CHAT_CONVERSATION} element={<ChatScreen />} />
+              <Route path={ROUTES.CHAT} element={<ProtectedRoute><ChatScreen /></ProtectedRoute>} />
 
               {/* Protected app routes */}
               <Route path={ROUTES.UPLOAD} element={<ProtectedRoute><Upload /></ProtectedRoute>} />

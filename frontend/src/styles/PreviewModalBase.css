@@ -230,7 +230,10 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  -webkit-overflow-scrolling: touch;
+  /* NOTE: -webkit-overflow-scrolling: touch removed — modern iOS has native
+     momentum scrolling and the property creates stacking context issues that
+     break text selection after pinch-zoom on iOS Safari. */
+  touch-action: manipulation;
 }
 
 .preview-modal-content.mobile {

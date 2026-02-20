@@ -309,7 +309,7 @@ export default function FirstDocumentUpload() {
               cursor: 'pointer',
             }}
           >
-            Select Files
+            {t('upload.selectFiles')}
           </button>
           <button
             type="button"
@@ -327,7 +327,7 @@ export default function FirstDocumentUpload() {
               cursor: 'pointer',
             }}
           >
-            Select Folder
+            {t('upload.selectFolder')}
           </button>
         </div>
 

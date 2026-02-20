@@ -375,6 +375,7 @@ const DocumentScanner = ({
 
   const [state, setState] = useState(SCANNER_STATES.INITIALIZING);
   const [error, setError] = useState(null);
+  const [errorType, setErrorType] = useState(null); // permission_denied | not_found | timeout | etc.
   const [isAutoMode, setIsAutoMode] = useState(true);
   const [torchSupported, setTorchSupported] = useState(false);
   const [torchOn, setTorchOn] = useState(false);
@@ -409,6 +410,7 @@ const DocumentScanner = ({
   const reviewCanvasRef = useRef(null);
   const imageContainerRef = useRef(null);
   const initTimeoutRef = useRef(null);
+  const fallbackInputRef = useRef(null);
 
   const clearInitTimeout = useCallback(() => {
     if (initTimeoutRef.current) {
@@ -453,6 +455,7 @@ const DocumentScanner = ({
     try {
       clearInitTimeout();
       setError(null);
+      setErrorType(null);
       setTorchSupported(false);
       setTorchOn(false);
       setState(SCANNER_STATES.INITIALIZING);
@@ -550,17 +553,30 @@ const DocumentScanner = ({
       logFailure('initialize', err);
 
       let errorMessage = err.message;
+      let errorType = 'generic';
       if (err.name === 'NotAllowedError') {
-        errorMessage = 'Camera permission denied. Please allow camera access in your browser settings.';
+        errorMessage = t('scanner.errors.permissionDenied', 'Camera permission denied. To enable, go to Settings > Safari > Camera and allow access for this site.');
+        errorType = 'permission_denied';
       } else if (err.name === 'NotFoundError') {
-        errorMessage = 'No camera found. Please connect a camera and try again.';
+        errorMessage = t('scanner.errors.notFound', 'No camera found. Please connect a camera and try again.');
+        errorType = 'not_found';
       } else if (err.name === 'NotReadableError') {
-        errorMessage = 'Camera is in use by another app. Please close other apps using the camera.';
+        errorMessage = t('scanner.errors.notReadable', 'Camera is in use by another app. Please close other apps using the camera.');
+        errorType = 'not_readable';
+      } else if (err.name === 'OverconstrainedError') {
+        errorMessage = t('scanner.errors.overconstrained', 'Camera does not support the requested settings. Please try again.');
+        errorType = 'overconstrained';
       } else if (String(err.message || '').toLowerCase().includes('timed out')) {
-        errorMessage = 'Camera initialization timed out. Please try again.';
+        errorMessage = t('scanner.errors.timeout', 'Camera initialization timed out. Please try again.');
+        errorType = 'timeout';
+      } else if (String(err.message || '').toLowerCase().includes('permission') || String(err.message || '').toLowerCase().includes('policy')) {
+        errorMessage = t('scanner.errors.policyBlocked', 'Camera access is blocked by site policy. Please contact support.');
+        errorType = 'policy_blocked';
       }
 
+      console.error('[Scanner] Camera failure:', { errorType, name: err?.name, message: err?.message });
       setError(errorMessage);
+      setErrorType(errorType);
       setState(SCANNER_STATES.ERROR);
     }
   }, [clearInitTimeout, stopActiveStream]);
@@ -1029,6 +1045,50 @@ const DocumentScanner = ({
     }
   }, [pages, folderId, onScanComplete]);
 
+  // Fallback: user picks/captures a photo via file input when camera fails
+  const handleFallbackCapture = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setState(SCANNER_STATES.GENERATING_PDF);
+
+      // Convert image file to a canvas, then generate a single-page PDF
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = url;
+      });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+
+      const fakePage = {
+        id: Date.now(),
+        canvas,
+        originalCanvas: canvas,
+        corners: null,
+        thumbnailUrl: null,
+        filter: FILTER_TYPES.COLOR,
+        rotation: 0
+      };
+
+      const pdfFile = await generatePDF([fakePage]);
+      onScanComplete?.(pdfFile, folderId);
+      handleClose();
+    } catch (err) {
+      console.error('[Scanner] Fallback capture failed:', err);
+      setError(t('scanner.errors.fallbackFailed', 'Failed to process the image. Please try again.'));
+      setState(SCANNER_STATES.ERROR);
+    }
+  }, [folderId, onScanComplete, t]);
+
   const handleClose = useCallback(() => {
     // Confirm if pages exist
     if (pages.length > 0 && state !== SCANNER_STATES.GENERATING_PDF) {
@@ -1054,6 +1114,7 @@ const DocumentScanner = ({
     setCurrentPageIndex(-1);
     setDetectedCorners(null);
     setError(null);
+    setErrorType(null);
     setState(SCANNER_STATES.INITIALIZING);
 
     onClose?.();
@@ -1138,24 +1199,69 @@ const DocumentScanner = ({
         <>
           <div style={styles.header}>
             <button style={styles.headerButton} onClick={handleClose}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
           </div>
           <div style={styles.errorContainer}>
-            <div style={styles.errorTitle}>Camera Error</div>
+            <div style={{ fontSize: 40, marginBottom: 16 }} aria-hidden="true">
+              {errorType === 'permission_denied' ? '\uD83D\uDD12' : '\uD83D\uDCF7'}
+            </div>
+            <div style={styles.errorTitle}>
+              {t('scanner.errors.title', 'Camera Error')}
+            </div>
             <div style={styles.errorMessage}>{error}</div>
-            <button
-              style={{
-                ...styles.actionButton,
-                background: '#fff',
-                color: '#000',
-                maxWidth: 200
-              }}
-              onClick={initializeCamera}
-            >
-              Try Again
-            </button>
+
+            {/* iOS Safari permission hint for denied access */}
+            {errorType === 'permission_denied' && (
+              <div style={{
+                fontSize: 12,
+                color: 'rgba(255,255,255,0.5)',
+                marginBottom: 20,
+                lineHeight: 1.5,
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                maxWidth: 280,
+              }}>
+                {t('scanner.errors.iosSafariHint', 'On iOS: Settings \u2192 Safari \u2192 Camera, or tap \uD83D\uDD12 in the address bar \u2192 Website Settings \u2192 Camera \u2192 Allow.')}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 260 }}>
+              <button
+                style={{
+                  ...styles.actionButton,
+                  background: '#fff',
+                  color: '#000',
+                  flex: 'none',
+                }}
+                onClick={initializeCamera}
+              >
+                {t('scanner.errors.tryAgain', 'Try Again')}
+              </button>
+
+              {/* Fallback: capture via file input */}
+              <button
+                style={{
+                  ...styles.actionButton,
+                  background: 'rgba(255,255,255,0.15)',
+                  color: '#fff',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  flex: 'none',
+                }}
+                onClick={() => fallbackInputRef.current?.click()}
+              >
+                {t('scanner.errors.useCameraUpload', 'Use Camera Upload Instead')}
+              </button>
+            </div>
           </div>
+          {/* Hidden file input for fallback camera capture */}
+          <input
+            ref={fallbackInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            style={{ display: 'none' }}
+            onChange={handleFallbackCapture}
+          />
         </>
       )}
 

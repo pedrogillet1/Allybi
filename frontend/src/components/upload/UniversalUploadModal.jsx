@@ -932,7 +932,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                 f.id === itemId ? {
                   ...f,
                   progress: monotonicPct, // MONOTONIC: Only increases
-                  processingStage: progress.message || 'Uploading...',
+                  processingStage: progress.message || t('upload.uploading'),
                   // 🔧 GOOGLE DRIVE STYLE: Store throughput data per entry
                   throughputMbps: progress.throughputMbps,
                   etaSeconds: progress.etaSeconds,
@@ -1086,7 +1086,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
             f.id === itemId ? {
               ...f,
               progress: monotonicPct,
-              processingStage: progress.message || 'Uploading...',
+              processingStage: progress.message || t('upload.uploading'),
               bytesUploaded: safeBytesUploaded,
               totalBytes: safeTotalBytes,
               throughputMbps: progress.throughputMbps,
@@ -1985,7 +1985,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                       {item.isFolder ? (
                         // Folder status display
                         item.status === 'failed'
-                          ? 'Upload failed. Try again.'
+                          ? t('upload.uploadFailed')
                           : item.status === 'completed'
                           ? `${formatFileSize(item.totalSize || (item.allFiles?.reduce((sum, f) => sum + (f.size || 0), 0) || 0))} • ${item.fileCount} file${item.fileCount > 1 ? 's' : ''}`
                           : item.status === 'uploading'
@@ -2030,7 +2030,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                       ) : (
                         // File status display
                         item.status === 'failed'
-                          ? 'Upload failed. Try again.'
+                          ? t('upload.uploadFailed')
                           : item.status === 'completed'
                           ? `${formatFileSize(item.file.size)}`
                           : item.status === 'uploading'
@@ -2230,7 +2230,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                   lineHeight: '18px',
                   wordWrap: 'break-word'
                 }}>
-                  {errorMessage || 'Upload failed. Please try again.'}
+                  {errorMessage || t('upload.uploadFailed')}
                 </div>
               </>
             )}

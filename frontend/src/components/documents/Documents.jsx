@@ -1126,7 +1126,7 @@ const Documents = () => {
                   onMouseLeave={(e) => { if (!isMobile) { e.currentTarget.style.background = '#181818'; e.currentTarget.style.transform = 'translateY(0)'; }}}
                 >
                   <UploadIcon style={{width: 18, height: 18, filter: 'brightness(0) invert(1)'}} aria-hidden="true" />
-                  {!isMobile && <span style={{fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 600, lineHeight: '20px'}}>Upload</span>}
+                  {!isMobile && <span style={{fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 600, lineHeight: '20px'}}>{t('nav.upload')}</span>}
                 </button>
               </>
             )}

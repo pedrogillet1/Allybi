@@ -447,6 +447,8 @@
     "uploadsComplete_plural": "{{count}} envios Concluídos",
     "preparingRetry": "Preparando nova tentativa...",
     "processingTakingLonger": "O processamento do documento está demorando mais do que o esperado. Seu arquivo estará pronto para o chat de IA em breve.",
+    "uploadAll": "Enviar Tudo",
+    "acceptAll": "Aceitar Tudo",
     "filesStillUploading": "Arquivos ainda estão sendo enviados. Tem certeza de que deseja fechar?",
     "library": "Biblioteca",
     "uploadedProgress": "{{size}} - {{percent}}% enviado",
@@ -471,6 +473,25 @@
       "storageAlmostFullText": "Você usou {{percent}}% do seu armazenamento. Atualize agora para evitar falhas nos envios.",
       "storageRunningLow": "Armazenamento Baixo",
       "storageRunningLowText": "Você usou {{percent}}% do seu armazenamento. Considere atualizar seu plano."
+    },
+    "fileTypeDetected": {
+      "title": "Arquivos detectados",
+      "message": "{{count}} arquivos em {{formats}} formatos"
+    },
+    "unsupportedFiles": {
+      "title": "{{count}} arquivo não suportado",
+      "title_plural": "{{count}} arquivos não suportados",
+      "message": "Estes tipos de arquivo não serão processados: {{extensions}}"
+    },
+    "limitedSupport": {
+      "title": "{{count}} arquivo tem suporte limitado",
+      "title_plural": "{{count}} arquivos têm suporte limitado",
+      "message": "A extração de texto pode estar incompleta para: {{extensions}}"
+    },
+    "noTextDetected": {
+      "title": "{{count}} arquivo pode não ter texto",
+      "title_plural": "{{count}} arquivos podem não ter texto",
+      "message": "Estes arquivos parecem não conter texto extraível. Considere usar uma fonte ou formato diferente."
     }
   },
   "header": {
@@ -578,27 +599,6 @@
       "smsFailed": "Falha ao enviar SMS de verificação",
       "phoneAdded": "Número de telefone adicionado! SMS de verificação enviado.",
       "phoneFailed": "Falha ao adicionar número de telefone"
-    }
-  },
-  "upload": {
-    "fileTypeDetected": {
-      "title": "Arquivos detectados",
-      "message": "{{count}} arquivos em {{formats}} formatos"
-    },
-    "unsupportedFiles": {
-      "title": "{{count}} arquivo não suportado",
-      "title_plural": "{{count}} arquivos não suportados",
-      "message": "Estes tipos de arquivo não serão processados: {{extensions}}"
-    },
-    "limitedSupport": {
-      "title": "{{count}} arquivo tem suporte limitado",
-      "title_plural": "{{count}} arquivos têm suporte limitado",
-      "message": "A extração de texto pode estar incompleta para: {{extensions}}"
-    },
-    "noTextDetected": {
-      "title": "{{count}} arquivo pode não ter texto",
-      "title_plural": "{{count}} arquivos podem não ter texto",
-      "message": "Estes arquivos parecem não conter texto extraível. Considere usar uma fonte ou formato diferente."
     }
   },
   "errors": {
@@ -1778,6 +1778,21 @@
         "label": "Slack",
         "description": "Conecte o Slack para pesquisar mensagens e compartilhar documentos com sua equipe."
       }
+    }
+  },
+  "scanner": {
+    "errors": {
+      "title": "Erro da c\u00e2mera",
+      "permissionDenied": "Permiss\u00e3o da c\u00e2mera negada. Para habilitar, v\u00e1 em Ajustes > Safari > C\u00e2mera e permita o acesso para este site.",
+      "notFound": "Nenhuma c\u00e2mera encontrada. Conecte uma c\u00e2mera e tente novamente.",
+      "notReadable": "A c\u00e2mera est\u00e1 sendo usada por outro aplicativo. Feche os outros apps que usam a c\u00e2mera.",
+      "overconstrained": "A c\u00e2mera n\u00e3o suporta as configura\u00e7\u00f5es solicitadas. Tente novamente.",
+      "timeout": "A inicializa\u00e7\u00e3o da c\u00e2mera expirou. Tente novamente.",
+      "policyBlocked": "O acesso \u00e0 c\u00e2mera est\u00e1 bloqueado pela pol\u00edtica do site. Entre em contato com o suporte.",
+      "fallbackFailed": "Falha ao processar a imagem. Tente novamente.",
+      "iosSafariHint": "No iOS: Ajustes \u2192 Safari \u2192 C\u00e2mera, ou toque em \uD83D\uDD12 na barra de endere\u00e7os \u2192 Configura\u00e7\u00f5es do site \u2192 C\u00e2mera \u2192 Permitir.",
+      "tryAgain": "Tentar novamente",
+      "useCameraUpload": "Usar captura de c\u00e2mera"
     }
   }
 }

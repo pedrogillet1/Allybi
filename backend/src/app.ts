@@ -50,6 +50,7 @@ const allowedOrigins = [
   "http://127.0.0.1:3003",
   // Local network for mobile testing
   "http://192.168.15.63:3000",
+  "http://192.168.15.63:3002",
   config.FRONTEND_URL,
 ].filter(Boolean) as string[];
 
@@ -151,7 +152,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   res.setHeader(
     "Permissions-Policy",
-    "geolocation=(), microphone=(), camera=()",
+    "geolocation=(), microphone=(), camera=(self)",
   );
 
   if (process.env.NODE_ENV === "production") {

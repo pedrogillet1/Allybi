@@ -1,5 +1,6 @@
 // src/components/chat/MessageActions.jsx
 import React, { useMemo, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import copyDuplicateIcon from "../../../assets/copy-duplicate.svg";
 import refreshSyncIcon from "../../../assets/refresh-sync.svg";
 
@@ -30,6 +31,7 @@ export default function MessageActions({
   className = "",
   style = {},
 }) {
+  const { t } = useTranslation();
   const canCopy =
     message?.role === "assistant" && (message?.content || "").trim().length > 0;
 
@@ -47,7 +49,7 @@ export default function MessageActions({
       className={`koda-msg-actions ${className}`}
       style={style}
       role="group"
-      aria-label="Message actions"
+      aria-label={t('messageActions.copy')}
     >
       {actions.includes("copy") ? (
         <CopyAction
@@ -58,7 +60,7 @@ export default function MessageActions({
 
       {actions.includes("regen") ? (
         <IconButton
-          label={isRegenerating ? "Regenerating…" : "Regenerate"}
+          label={isRegenerating ? t('messageActions.sending') : t('messageActions.regenerate')}
           disabled={isRegenerating}
           onClick={() => onRegenerate?.(message?.id)}
         >
@@ -72,6 +74,7 @@ export default function MessageActions({
 }
 
 function CopyAction({ message, onCopy }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(async () => {
@@ -90,7 +93,7 @@ function CopyAction({ message, onCopy }) {
   }, [message, onCopy]);
 
   return (
-    <IconButton label={copied ? "Copied" : "Copy"} onClick={handleCopy}>
+    <IconButton label={copied ? t('generatedDocument.copied') : t('messageActions.copy')} onClick={handleCopy}>
       <CopyIcon />
     </IconButton>
   );

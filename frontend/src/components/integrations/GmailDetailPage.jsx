@@ -5,6 +5,7 @@ import { ROUTES } from '../../constants/routes';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useIntegrationStatus } from '../../hooks/useIntegrationStatus';
 import LeftNav from '../app-shell/LeftNav';
+import NotificationPanel from '../notifications/NotificationPanel';
 import { ReactComponent as ArrowLeft } from '../../assets/arrow-narrow-left.svg';
 import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
 import gmailSvg from '../../assets/Gmail.svg';
@@ -602,6 +603,7 @@ export default function GmailDetailPage() {
   const [showComposer, setShowComposer] = useState(false);
   const [composerData, setComposerData] = useState({ to: '', subject: '', body: '' });
   const [sending, setSending] = useState(false);
+  const [showNotificationsPopup, setShowNotificationsPopup] = useState(false);
 
   // Try to fetch real emails if connected
   useEffect(() => {
@@ -738,7 +740,7 @@ export default function GmailDetailPage() {
       display: 'flex',
       flexDirection: 'row',
     }}>
-      <LeftNav />
+      <LeftNav onNotificationClick={() => setShowNotificationsPopup(true)} />
 
       <div style={{
         flex: 1,
@@ -812,6 +814,10 @@ export default function GmailDetailPage() {
           />
         </div>
       </div>
+      <NotificationPanel
+        showNotificationsPopup={showNotificationsPopup}
+        setShowNotificationsPopup={setShowNotificationsPopup}
+      />
     </div>
   );
 }

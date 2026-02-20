@@ -263,6 +263,24 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
     }
   };
 
+  // On mobile, allow native pinch-zoom while the preview modal is open.
+  // The global viewport meta has user-scalable=no which iOS Safari partially
+  // ignores (it allows pinch-zoom for accessibility) but then snaps back on
+  // long-press for text selection, causing zoom-out, shift, and blur.
+  // Temporarily allowing scaling makes Safari treat the zoomed state as valid.
+  useEffect(() => {
+    if (!isOpen || !isMobile) return;
+    const meta = window.document.querySelector('meta[name="viewport"]');
+    if (!meta) return;
+    const original = meta.getAttribute('content');
+    meta.setAttribute('content',
+      'width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=yes, maximum-scale=5'
+    );
+    return () => {
+      meta.setAttribute('content', original);
+    };
+  }, [isOpen, isMobile]);
+
   // Handle Esc key to close
   useEffect(() => {
     const handleEsc = (e) => {
@@ -676,7 +694,7 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'flex-start',
-            WebkitOverflowScrolling: 'touch'
+            touchAction: isMobile ? 'manipulation' : undefined
           }}
         >
           {isLoading ? (

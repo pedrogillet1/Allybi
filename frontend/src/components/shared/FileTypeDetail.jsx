@@ -8,6 +8,7 @@ import cleanDocumentName from '../../utils/cleanDocumentName';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useNotifications } from '../../context/NotificationsStore';
 import LeftNav from '../app-shell/LeftNav';
+import NotificationPanel from '../notifications/NotificationPanel';
 import DeleteConfirmationModal from '../library/DeleteConfirmationModal';
 import MoveToCategoryModal from '../library/MoveToCategoryModal';
 import CreateCategoryModal from '../library/CreateCategoryModal';
@@ -52,6 +53,7 @@ const FileTypeDetail = () => {
   const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [itemToRename, setItemToRename] = useState(null);
+  const [showNotificationsPopup, setShowNotificationsPopup] = useState(false);
   const [newName, setNewName] = useState('');
 
   const {
@@ -361,7 +363,7 @@ const FileTypeDetail = () => {
       display: 'flex',
       flexDirection: isMobile ? 'column' : 'row'
     }}>
-      <LeftNav />
+      <LeftNav onNotificationClick={() => setShowNotificationsPopup(true)} />
       <div style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
         {/* Header - Title Row */}
         <div data-file-type-header="true" className="file-type-header mobile-sticky-header" style={{ background: 'white', padding: isMobile && isSelectMode ? 0 : (isMobile ? '16px' : '20px 32px'), paddingTop: isMobile && isSelectMode ? 0 : (isMobile ? 'max(env(safe-area-inset-top), 16px)' : '20px'), borderBottom: isMobile && isSelectMode ? 'none' : '1px solid #E5E7EB', position: isMobile ? 'sticky' : 'relative', top: isMobile ? 0 : 'auto', zIndex: isMobile ? 10 : 'auto', flexShrink: 0 }}>
@@ -867,6 +869,10 @@ const FileTypeDetail = () => {
           </div>
         </div>
       )}
+      <NotificationPanel
+        showNotificationsPopup={showNotificationsPopup}
+        setShowNotificationsPopup={setShowNotificationsPopup}
+      />
     </div>
   );
 };

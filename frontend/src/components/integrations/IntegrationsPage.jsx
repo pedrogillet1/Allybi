@@ -5,6 +5,7 @@ import { ROUTES } from '../../constants/routes';
 import { useIntegrationStatus } from '../../hooks/useIntegrationStatus';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import LeftNav from '../app-shell/LeftNav';
+import NotificationPanel from '../notifications/NotificationPanel';
 import { ReactComponent as ArrowLeft } from '../../assets/arrow-narrow-left.svg';
 import gmailSvg from '../../assets/Gmail.svg';
 import outlookSvg from '../../assets/outlook.svg';
@@ -300,6 +301,7 @@ export default function IntegrationsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = useIsMobile();
   const { providers, loading, connectProvider, disconnectProvider, syncNow, refetch } = useIntegrationStatus();
+  const [showNotificationsPopup, setShowNotificationsPopup] = useState(false);
 
   // Handle OAuth callback redirect: when the backend redirects the popup here
   // with ?oauth_connected=<provider>, signal the opener and close the popup.
@@ -359,7 +361,7 @@ export default function IntegrationsPage() {
       display: 'flex',
       flexDirection: isMobile ? 'column' : 'row',
     }}>
-      <LeftNav />
+      <LeftNav onNotificationClick={() => setShowNotificationsPopup(true)} />
 
       <div style={{
         flex: 1,
@@ -460,6 +462,10 @@ export default function IntegrationsPage() {
           )}
         </div>
       </div>
+      <NotificationPanel
+        showNotificationsPopup={showNotificationsPopup}
+        setShowNotificationsPopup={setShowNotificationsPopup}
+      />
     </div>
   );
 }
