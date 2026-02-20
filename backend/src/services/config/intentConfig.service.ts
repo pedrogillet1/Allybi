@@ -24,7 +24,7 @@
 // That's the piece that makes "follow-ups keep the same intent/operator unless
 // the user clearly switches," which is exactly what ChatGPT-parity aims for.
 
-import { getBank } from "../core/banks/bankLoader.service";
+import { getOptionalBank } from "../core/banks/bankLoader.service";
 
 // -----------------------------
 // Types
@@ -242,13 +242,33 @@ export class IntentConfigService {
   // If you want hot reload in dev/local, lower this.
   private readonly CACHE_TTL_MS = 5_000;
 
+  private isStrictEnv(): boolean {
+    const env = String(process.env.NODE_ENV || "").toLowerCase();
+    return env === "production" || env === "staging";
+  }
+
   getConfig(): IntentConfigBank {
     const now = Date.now();
     if (this.cache && now - this.loadedAtMs < this.CACHE_TTL_MS)
       return this.cache;
 
-    const bank = getBank<IntentConfigBank>("intent_config");
+    const bank = getOptionalBank<IntentConfigBank>("intent_config");
+    if (!bank) {
+      if (this.isStrictEnv()) {
+        throw new Error(
+          "intent_config bank is required in strict runtime environments.",
+        );
+      }
+      this.cache = FALLBACK_BANK;
+      this.loadedAtMs = now;
+      return this.cache;
+    }
     if (!bank?.config?.enabled) {
+      if (this.isStrictEnv()) {
+        throw new Error(
+          "intent_config bank must be enabled in strict runtime environments.",
+        );
+      }
       this.cache = FALLBACK_BANK;
       this.loadedAtMs = now;
       return this.cache;
@@ -487,39 +507,163 @@ export class IntentConfigService {
   }
 
   private softValidate(bank: IntentConfigBank): IntentConfigBank {
+    const sourceConfig = (bank.config || {}) as Record<string, any>;
+    const sourceThresholds = (sourceConfig.thresholds || {}) as Record<
+      string,
+      number
+    >;
+    const sourceDefaults = (sourceConfig.defaults || {}) as Record<
+      string,
+      string | number
+    >;
+    const sourceOperatorOverrides = (sourceConfig.operatorOverrides ||
+      {}) as Record<string, string>;
+    const sourceIntentFamilies = Array.isArray(sourceConfig.intentFamilies)
+      ? sourceConfig.intentFamilies.reduce(
+          (acc, entry) => {
+            const id = String(entry?.id || "").trim();
+            if (!id) return acc;
+            acc[id] = {
+              id,
+              defaultOperator: String(
+                entry?.defaultOperator ||
+                  sourceConfig.defaultOperatorByFamily?.[id] ||
+                  "",
+              ).trim(),
+              allowedOperators: Array.isArray(entry?.operatorsAllowed)
+                ? entry.operatorsAllowed
+                : undefined,
+            };
+            return acc;
+          },
+          {} as Record<
+            string,
+            {
+              id: string;
+              defaultOperator: string;
+              allowedOperators?: string[];
+            }
+          >,
+        )
+      : ((sourceConfig.intentFamilies || {}) as Record<
+          string,
+          {
+            id: string;
+            defaultOperator: string;
+            allowedOperators?: string[];
+          }
+        >);
+    const sourceIntents = Array.isArray(sourceConfig.intents)
+      ? sourceConfig.intents.reduce(
+          (acc, entry) => {
+            const id = String(entry?.id || "").trim();
+            if (!id) return acc;
+            acc[id] = {
+              id,
+              family: String(entry?.intentFamily || entry?.family || "").trim(),
+              defaultOperator: String(entry?.defaultOperator || "").trim(),
+              preferredOperators: Array.isArray(entry?.operatorsAllowed)
+                ? entry.operatorsAllowed
+                : undefined,
+            };
+            return acc;
+          },
+          {} as Record<
+            string,
+            {
+              id: string;
+              family: string;
+              defaultOperator?: string;
+              preferredOperators?: string[];
+            }
+          >,
+        )
+      : ((sourceConfig.intents || {}) as Record<
+          string,
+          {
+            id: string;
+            family: string;
+            defaultOperator?: string;
+            preferredOperators?: string[];
+          }
+        >);
+
+    const defaultIntentFamily = String(
+      sourceConfig.defaultIntentFamily ||
+        sourceDefaults.defaultIntentFamily ||
+        sourceDefaults.fallbackIntentFamily ||
+        FALLBACK_BANK.config.defaults.defaultIntentFamily,
+    ).trim();
+    const defaultOperator = String(
+      sourceDefaults.defaultOperatorId ||
+        sourceDefaults.fallbackOperator ||
+        FALLBACK_BANK.config.defaults.defaultOperatorId,
+    ).trim();
+    const defaultDomainId = String(
+      sourceDefaults.defaultDomainId ||
+        sourceDefaults.fallbackDomainId ||
+        FALLBACK_BANK.config.defaults.defaultDomainId,
+    ).trim();
+    const defaultConfidence = Number(
+      sourceDefaults.defaultConfidence ??
+        sourceThresholds.conversationConfidenceFloor ??
+        FALLBACK_BANK.config.defaults.defaultConfidence,
+    );
+
     // We do minimal merging with FALLBACK_BANK to prevent missing fields causing crashes.
     const merged: IntentConfigBank = {
       _meta: bank._meta ?? FALLBACK_BANK._meta,
       config: {
         ...FALLBACK_BANK.config,
-        ...(bank.config ?? {}),
+        ...sourceConfig,
         thresholds: {
           ...FALLBACK_BANK.config.thresholds,
-          ...(bank.config?.thresholds ?? {}),
+          ...sourceThresholds,
+          minEmitScore:
+            sourceThresholds.minEmitScore ??
+            sourceThresholds.minEmitConfidence ??
+            FALLBACK_BANK.config.thresholds.minEmitScore,
+          autopickScoreGte:
+            sourceThresholds.autopickScoreGte ??
+            sourceThresholds.conversationConfidenceFloor ??
+            FALLBACK_BANK.config.thresholds.autopickScoreGte,
+          forceClarifyTopBelow:
+            sourceThresholds.forceClarifyTopBelow ??
+            sourceThresholds.forceClarifyBelow ??
+            FALLBACK_BANK.config.thresholds.forceClarifyTopBelow,
         },
         followupStability: {
           ...FALLBACK_BANK.config.followupStability,
-          ...(bank.config?.followupStability ?? {}),
+          ...(sourceConfig.followupStability ?? {}),
         },
         env: {
           ...FALLBACK_BANK.config.env,
-          ...(bank.config?.env ?? {}),
+          ...(sourceConfig.env ?? {}),
         },
         defaults: {
           ...FALLBACK_BANK.config.defaults,
-          ...(bank.config?.defaults ?? {}),
+          ...sourceDefaults,
+          defaultIntentId:
+            String(sourceDefaults.defaultIntentId || "").trim() ||
+            defaultIntentFamily,
+          defaultIntentFamily,
+          defaultOperatorId: defaultOperator || "extract",
+          defaultDomainId: defaultDomainId || "general",
+          defaultConfidence: Number.isFinite(defaultConfidence)
+            ? Math.max(0, Math.min(1, defaultConfidence))
+            : FALLBACK_BANK.config.defaults.defaultConfidence,
         },
         operatorOverrides: {
           ...FALLBACK_BANK.config.operatorOverrides,
-          ...(bank.config?.operatorOverrides ?? {}),
+          ...sourceOperatorOverrides,
         },
         intentFamilies: {
           ...FALLBACK_BANK.config.intentFamilies,
-          ...(bank.config?.intentFamilies ?? {}),
+          ...sourceIntentFamilies,
         },
         intents: {
           ...FALLBACK_BANK.config.intents,
-          ...(bank.config?.intents ?? {}),
+          ...sourceIntents,
         },
       },
       tests: bank.tests ?? FALLBACK_BANK.tests,

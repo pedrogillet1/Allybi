@@ -73,7 +73,9 @@ describe("chatMicrocopy.service", () => {
       return null;
     });
 
-    expect(resolveEditorTargetRequiredMessage("en")).toBe("Select exact target");
+    expect(resolveEditorTargetRequiredMessage("en")).toBe(
+      "Select exact target",
+    );
     expect(resolveEditErrorMessage("TARGET_NOT_RESOLVED", "en")).toBe(
       "Select exact target",
     );

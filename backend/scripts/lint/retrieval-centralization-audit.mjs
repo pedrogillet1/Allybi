@@ -92,6 +92,14 @@ const sourceButtonsFile = path.join(
   SRC,
   "services/core/retrieval/sourceButtons.service.ts",
 );
+const delegateFile = path.join(
+  SRC,
+  "modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+);
+const retrievalEngineFile = path.join(
+  SRC,
+  "services/core/retrieval/retrievalEngine.service.ts",
+);
 const sourceButtonsBankDriven = hasPattern(
   sourceButtonsFile,
   /getOptionalBank<SourceEngineDataBank>\("source_engine"\)/,
@@ -162,6 +170,42 @@ const configIntegrityOk =
   !missingLegacySystemPromptsRef;
 const deployReadinessOk =
   healthHasRetrievalChecks && containerHasRetrievalRegistration;
+const evidenceGateEnforced =
+  hasPattern(delegateFile, /evaluateEvidenceGateDecision\(/) &&
+  hasPattern(delegateFile, /resolveEvidenceGateBypass\(/) &&
+  hasPattern(delegateFile, /applyEvidenceGatePostProcessText\(/);
+const failClosedRequiredBanks =
+  hasPattern(
+    retrievalEngineFile,
+    /getRequiredBank<any>\("semantic_search_config"\)/,
+  ) &&
+  hasPattern(
+    retrievalEngineFile,
+    /getRequiredBank<any>\("retrieval_ranker_config"\)/,
+  ) &&
+  hasPattern(
+    retrievalEngineFile,
+    /getRequiredBank<any>\("retrieval_negatives"\)/,
+  ) &&
+  hasPattern(retrievalEngineFile, /getRequiredBank<any>\("evidence_packaging"\)/) &&
+  !hasPattern(
+    retrievalEngineFile,
+    /safeGetBank<any>\("retrieval_negatives"\)|safeGetBank<any>\("evidence_packaging"\)/,
+  );
+const retrievalPhaseCountersAccurate =
+  hasPattern(retrievalEngineFile, /phaseCounts:\s*RetrievalPhaseCounts/) &&
+  hasPattern(
+    retrievalEngineFile,
+    /candidatesAfterNegatives:\s*ctx\.phaseCounts\.afterNegatives/,
+  ) &&
+  hasPattern(
+    retrievalEngineFile,
+    /candidatesAfterBoosts:\s*ctx\.phaseCounts\.afterBoosts/,
+  ) &&
+  hasPattern(
+    retrievalEngineFile,
+    /candidatesAfterDiversification:\s*ctx\.phaseCounts\.afterDiversification/,
+  );
 
 const scoreBreakdown = {
   centralization: scoreBucket(centralizationOk, 4),
@@ -226,6 +270,21 @@ if (!containerHasRetrievalRegistration) {
     `[retrieval-audit] FAIL container missing retrieval/answer runtime registration`,
   );
 }
+if (!evidenceGateEnforced) {
+  lines.push(
+    `[retrieval-audit] FAIL evidence gate result is not enforced in centralized chat runtime`,
+  );
+}
+if (!failClosedRequiredBanks) {
+  lines.push(
+    `[retrieval-audit] FAIL retrieval engine still allows fail-open required bank loading`,
+  );
+}
+if (!retrievalPhaseCountersAccurate) {
+  lines.push(
+    `[retrieval-audit] FAIL retrieval stats counters are not phase-accurate`,
+  );
+}
 if (legacyRetrievalUnused.length > 0) {
   lines.push(
     `[retrieval-audit] WARN unused legacy retrieval services: ${legacyRetrievalUnused.join(", ")}`,
@@ -241,7 +300,10 @@ const strictFail =
   runtimeLegacyRetrievalImports.length > 0 ||
   legacyRuntimeImportLeakFiles.length > 0 ||
   !configIntegrityOk ||
-  !deployReadinessOk;
+  !deployReadinessOk ||
+  !evidenceGateEnforced ||
+  !failClosedRequiredBanks ||
+  !retrievalPhaseCountersAccurate;
 
 if (STRICT && strictFail) {
   process.exit(1);

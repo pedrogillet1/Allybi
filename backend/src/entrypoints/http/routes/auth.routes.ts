@@ -10,7 +10,10 @@ import type { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 import passport from "../../../config/passport";
 
-import { authenticateToken, optionalAuth } from "../../../middleware/auth.middleware";
+import {
+  authenticateToken,
+  optionalAuth,
+} from "../../../middleware/auth.middleware";
 
 import {
   authLimiter,

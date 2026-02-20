@@ -7,6 +7,9 @@ import type { ClassifiedIntent } from "./intentClassifier";
 export interface AllybiOperatorPlan {
   canonicalOperator: string;
   runtimeOperator: string;
+  planStatus?: "ok" | "blocked";
+  blockedReasonCode?: string;
+  blockedReasonMessage?: string;
   domain: EditDomain;
   requiresConfirmation: boolean;
   previewRenderType: string;
@@ -304,6 +307,63 @@ function preferFormattingOperator(domain: EditDomain): string {
   return domain === "sheets" ? "XLSX_FORMAT_RANGE" : "DOCX_SET_RUN_STYLE";
 }
 
+function resolveRuntimeOperator(input: {
+  domain: EditDomain;
+  canonicalOperator: string;
+  instruction: string;
+}): string | null {
+  const mapped = normalizeEditOperator(input.canonicalOperator, {
+    domain: input.domain,
+    instruction: input.instruction,
+  });
+  if (mapped.operator) return mapped.operator;
+
+  const fromCatalog = String(
+    operatorFromCatalog(input.domain, input.canonicalOperator)
+      ?.runtimeOperator || "",
+  ).trim();
+  return fromCatalog || null;
+}
+
+function buildBlockedPlan(input: {
+  domain: EditDomain;
+  canonicalOperator: string;
+  scope: AllybiScopeResolution;
+  language: "en" | "pt";
+  formattingOnly: boolean;
+  blockedRewrite: boolean;
+  fontFamily?: string;
+  operatorClass: AllybiOperatorClass;
+  reasonCode: string;
+  reasonMessage: string;
+  clarificationRequired?: boolean;
+  clarificationMessage?: string;
+}): AllybiOperatorPlan {
+  return {
+    canonicalOperator: input.canonicalOperator,
+    runtimeOperator: "",
+    planStatus: "blocked",
+    blockedReasonCode: input.reasonCode,
+    blockedReasonMessage: input.reasonMessage,
+    domain: input.domain,
+    requiresConfirmation: true,
+    previewRenderType: mapRenderType(
+      input.domain,
+      input.canonicalOperator,
+      input.formattingOnly ? "inline_format_diff" : "text_diff",
+    ),
+    operatorClass: input.operatorClass,
+    targetHint: input.scope.targetHint,
+    scopeKind: input.scope.scopeKind,
+    isFormattingOnly: input.formattingOnly,
+    blockedRewrite: input.blockedRewrite,
+    fontFamily: input.fontFamily,
+    language: input.language,
+    clarificationRequired: input.clarificationRequired,
+    clarificationMessage: input.clarificationMessage,
+  };
+}
+
 function mapRenderType(
   domain: EditDomain,
   canonicalOperator: string,
@@ -389,7 +449,6 @@ export function planAllybiOperator(input: {
   classifiedIntent: ClassifiedIntent | null;
   scope: AllybiScopeResolution;
 }): AllybiOperatorPlan | null {
-  const domainForIntent = input.domain === "sheets" ? "xlsx" : input.domain;
   const language = input.classifiedIntent?.language || "en";
   const formattingOnly =
     Boolean(input.classifiedIntent?.isFormattingIntent) ||
@@ -429,12 +488,35 @@ export function planAllybiOperator(input: {
   if (input.classifiedIntent?.clarificationRequired) {
     const clarificationOperator =
       candidate || classSpecificFallback || preferredFormattingOp;
+    const clarificationRuntime = resolveRuntimeOperator({
+      domain: input.domain,
+      canonicalOperator: clarificationOperator,
+      instruction: input.message,
+    });
+    const clarificationMessage = resolveClarificationMessage(
+      language,
+      input.classifiedIntent?.fontCandidates || [],
+    );
+    if (!clarificationRuntime) {
+      return buildBlockedPlan({
+        domain: input.domain,
+        canonicalOperator: clarificationOperator,
+        scope: input.scope,
+        language,
+        formattingOnly: true,
+        blockedRewrite,
+        fontFamily: input.classifiedIntent?.fontFamily,
+        operatorClass: expectedOperatorClass,
+        reasonCode: "OPERATOR_MAPPING_MISSING",
+        reasonMessage: `No runtime operator mapping found for ${clarificationOperator}.`,
+        clarificationRequired: true,
+        clarificationMessage,
+      });
+    }
     return {
       canonicalOperator: clarificationOperator,
-      runtimeOperator: String(
-        operatorFromCatalog(input.domain, clarificationOperator)
-          ?.runtimeOperator || "",
-      ),
+      runtimeOperator: clarificationRuntime,
+      planStatus: "ok",
       domain: input.domain,
       requiresConfirmation: true,
       previewRenderType: mapRenderType(
@@ -449,23 +531,35 @@ export function planAllybiOperator(input: {
       blockedRewrite,
       language,
       clarificationRequired: true,
-      clarificationMessage: resolveClarificationMessage(
-        language,
-        input.classifiedIntent?.fontCandidates || [],
-      ),
+      clarificationMessage,
     };
   }
 
   if (candidate) {
     const info = operatorFromCatalog(input.domain, candidate) || {};
-    const mapped = normalizeEditOperator(candidate, {
+    const runtimeOperator = resolveRuntimeOperator({
       domain: input.domain,
+      canonicalOperator: candidate,
       instruction: input.message,
     });
-    if (!mapped.operator) return null;
+    if (!runtimeOperator) {
+      return buildBlockedPlan({
+        domain: input.domain,
+        canonicalOperator: candidate,
+        scope: input.scope,
+        language,
+        formattingOnly,
+        blockedRewrite,
+        fontFamily: input.classifiedIntent?.fontFamily,
+        operatorClass: expectedOperatorClass,
+        reasonCode: "OPERATOR_MAPPING_MISSING",
+        reasonMessage: `No runtime operator mapping found for ${candidate}.`,
+      });
+    }
     return {
       canonicalOperator: candidate,
-      runtimeOperator: mapped.operator,
+      runtimeOperator,
+      planStatus: "ok",
       domain: input.domain,
       requiresConfirmation: Boolean(
         info?.confirmationPolicy?.requiresExplicitConfirm ??
@@ -492,34 +586,49 @@ export function planAllybiOperator(input: {
     };
   }
 
-  const fallback = normalizeEditOperator("edit.plan", {
-    domain: input.domain,
-    instruction: input.message,
-  });
   const canonicalFallback = classSpecificFallback
     ? classSpecificFallback
     : formattingOnly
       ? preferredFormattingOp
-      : domainForIntent === "docx"
-        ? "DOCX_REWRITE_PARAGRAPH"
-        : domainForIntent === "xlsx"
-          ? "XLSX_SET_RANGE_VALUES"
-          : "DOCX_REWRITE_PARAGRAPH";
-  const runtimeFromCanonicalFallback = String(
-    operatorFromCatalog(input.domain, canonicalFallback)?.runtimeOperator || "",
-  ).trim();
-  const runtimeFallback =
-    runtimeFromCanonicalFallback ||
-    fallback.operator ||
-    (input.domain === "docx"
-      ? "EDIT_PARAGRAPH"
-      : input.domain === "sheets"
-        ? "EDIT_RANGE"
-        : "REWRITE_SLIDE_TEXT");
+      : null;
+  if (!canonicalFallback) {
+    return buildBlockedPlan({
+      domain: input.domain,
+      canonicalOperator: preferredFormattingOp,
+      scope: input.scope,
+      language,
+      formattingOnly,
+      blockedRewrite,
+      fontFamily: input.classifiedIntent?.fontFamily,
+      operatorClass: expectedOperatorClass,
+      reasonCode: "INTENT_PLAN_NOT_RESOLVED",
+      reasonMessage: "No operator candidate satisfied intent constraints.",
+    });
+  }
+  const runtimeFallback = resolveRuntimeOperator({
+    domain: input.domain,
+    canonicalOperator: canonicalFallback,
+    instruction: input.message,
+  });
+  if (!runtimeFallback) {
+    return buildBlockedPlan({
+      domain: input.domain,
+      canonicalOperator: canonicalFallback,
+      scope: input.scope,
+      language,
+      formattingOnly,
+      blockedRewrite,
+      fontFamily: input.classifiedIntent?.fontFamily,
+      operatorClass: expectedOperatorClass,
+      reasonCode: "OPERATOR_MAPPING_MISSING",
+      reasonMessage: `No runtime operator mapping found for ${canonicalFallback}.`,
+    });
+  }
 
   return {
     canonicalOperator: canonicalFallback,
     runtimeOperator: runtimeFallback,
+    planStatus: "ok",
     domain: input.domain,
     requiresConfirmation: input.scope.requiresDisambiguation,
     previewRenderType: mapRenderType(

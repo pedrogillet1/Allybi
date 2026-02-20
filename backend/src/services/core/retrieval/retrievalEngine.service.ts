@@ -241,6 +241,13 @@ export interface EvidencePack {
   };
 }
 
+interface RetrievalPhaseCounts {
+  considered: number;
+  afterNegatives: number;
+  afterBoosts: number;
+  afterDiversification: number;
+}
+
 /**
  * Bank loader interface:
  * You can wire your existing bankLoader.service.ts here.
@@ -382,15 +389,15 @@ export class RetrievalEngineService {
     }
 
     // 1) Load banks (single source of truth)
-    const semanticCfg = this.bankLoader.getBank<any>("semantic_search_config");
-    const rankerCfg = this.bankLoader.getBank<any>("retrieval_ranker_config");
+    const semanticCfg = this.getRequiredBank<any>("semantic_search_config");
+    const rankerCfg = this.getRequiredBank<any>("retrieval_ranker_config");
     const boostsKeyword = this.safeGetBank<any>("keyword_boost_rules");
     const boostsTitle = this.safeGetBank<any>("doc_title_boost_rules");
     const boostsType = this.safeGetBank<any>("doc_type_boost_rules");
     const boostsRecency = this.safeGetBank<any>("recency_boost_rules");
-    const diversification = this.safeGetBank<any>("diversification_rules");
-    const negatives = this.safeGetBank<any>("retrieval_negatives");
-    const packaging = this.bankLoader.getBank<any>("evidence_packaging");
+    const diversification = this.getRequiredBank<any>("diversification_rules");
+    const negatives = this.getRequiredBank<any>("retrieval_negatives");
+    const packaging = this.getRequiredBank<any>("evidence_packaging");
 
     // 2) Normalize query (bank-driven normalization should happen upstream, but we support it here too)
     const norm = await this.normalizeQuery(req);
@@ -418,8 +425,13 @@ export class RetrievalEngineService {
 
     // 4) Expansion gating (never expand literals; only when allowed)
     const expansion = this.computeExpansionPolicy(req, signals, semanticCfg);
+    const expansionDisabledByOverride = Boolean(
+      req.overrides?.disableExpansion,
+    );
     const expandedQueries = expansion.enabled
-      ? this.expandQuery(queryNormalized, signals)
+      ? expansionDisabledByOverride
+        ? []
+        : this.expandQuery(queryNormalized, signals)
       : [];
     const queryForSearch = expandedQueries.length
       ? expandedQueries.join(" ")
@@ -434,6 +446,12 @@ export class RetrievalEngineService {
 
     // 6) Merge into CandidateChunks with provenance + stable ids
     let candidates = this.mergePhaseCandidates(phaseResults, scope, req);
+    const phaseCounts: RetrievalPhaseCounts = {
+      considered: candidates.length,
+      afterNegatives: candidates.length,
+      afterBoosts: candidates.length,
+      afterDiversification: candidates.length,
+    };
 
     // 7) Apply retrieval negatives (hard blocks + soft penalties) deterministically
     candidates = this.applyRetrievalNegatives(
@@ -442,6 +460,7 @@ export class RetrievalEngineService {
       signals,
       negatives,
     );
+    phaseCounts.afterNegatives = candidates.length;
 
     // 8) Apply boosts (keyword/title/type/recency), with caps and guards
     candidates = this.applyBoosts(candidates, req, signals, {
@@ -450,17 +469,21 @@ export class RetrievalEngineService {
       boostsType,
       boostsRecency,
     });
+    phaseCounts.afterBoosts = candidates.length;
 
     // 9) Rank candidates using ranker config (weights + normalization + tie-breakers)
     candidates = this.rankCandidates(candidates, req, signals, rankerCfg);
 
     // 10) Diversify (doc/section spread + near-dup control) unless disabled by overrides/lock policy
-    candidates = this.applyDiversification(
-      candidates,
-      req,
-      signals,
-      diversification,
-    );
+    if (!req.overrides?.disableDiversification) {
+      candidates = this.applyDiversification(
+        candidates,
+        req,
+        signals,
+        diversification,
+      );
+    }
+    phaseCounts.afterDiversification = candidates.length;
 
     // 11) Package evidence (strict provenance + caps) into EvidencePack
     const pack = this.packageEvidence(candidates, req, signals, packaging, {
@@ -468,6 +491,7 @@ export class RetrievalEngineService {
       queryNormalized,
       expandedQueries,
       scope,
+      phaseCounts,
     });
 
     // 12) Final safety: never include raw debug in production (still keep internal stats)
@@ -535,6 +559,15 @@ export class RetrievalEngineService {
   }> {
     const docs = await this.docStore.listDocs();
     const allDocIds = docs.map((d) => d.docId);
+    const overrideCap = Number(req.overrides?.maxCandidateDocsHard);
+    const maxCandidateDocsHard =
+      Number.isFinite(overrideCap) && overrideCap > 0
+        ? Math.floor(overrideCap)
+        : 0;
+    const allDocIdsCapped =
+      maxCandidateDocsHard > 0
+        ? allDocIds.slice(0, maxCandidateDocsHard)
+        : allDocIds;
 
     const explicitDocId = signals.resolvedDocId ?? null;
     const activeDocId = signals.activeDocId ?? null;
@@ -583,7 +616,7 @@ export class RetrievalEngineService {
     // Otherwise corpus-wide candidates (later doc selection/ranker will narrow)
     // Note: semantic_search_config may cap candidate docs; keep all here, cap later.
     return {
-      candidateDocIds: allDocIds,
+      candidateDocIds: allDocIdsCapped,
       hardScopeActive: Boolean(
         activeDocId || explicitDocId || signals.hardScopeActive,
       ),
@@ -1015,11 +1048,6 @@ export class RetrievalEngineService {
       typeBoost: 0.03,
       recencyBoost: 0.03,
     };
-    const minFinal = safeNumber(
-      cfg?.actionsContract?.thresholds?.minFinalScore,
-      0.58,
-    );
-
     for (const c of candidates) {
       const semantic = clamp01(c.scores.semantic ?? 0);
       const lexical = clamp01(c.scores.lexical ?? 0);
@@ -1178,6 +1206,7 @@ export class RetrievalEngineService {
         sheetName?: string | null;
         rangeA1?: string | null;
       };
+      phaseCounts: RetrievalPhaseCounts;
     },
   ): EvidencePack {
     const cfg = packagingBank?.config ?? {};
@@ -1263,10 +1292,10 @@ export class RetrievalEngineService {
         rangeA1: ctx.scope.rangeA1 ?? null,
       },
       stats: {
-        candidatesConsidered: candidates.length,
-        candidatesAfterNegatives: candidates.length, // (we already filtered in-place; keep simple)
-        candidatesAfterBoosts: candidates.length,
-        candidatesAfterDiversification: candidates.length,
+        candidatesConsidered: ctx.phaseCounts.considered,
+        candidatesAfterNegatives: ctx.phaseCounts.afterNegatives,
+        candidatesAfterBoosts: ctx.phaseCounts.afterBoosts,
+        candidatesAfterDiversification: ctx.phaseCounts.afterDiversification,
         evidenceItems: evidence.length,
         uniqueDocsInEvidence: uniqueDocs.size,
         topScore,
@@ -1292,6 +1321,10 @@ export class RetrievalEngineService {
     } catch {
       return null;
     }
+  }
+
+  private getRequiredBank<T = any>(bankId: string): T {
+    return this.bankLoader.getBank<T>(bankId);
   }
 
   private simpleTokens(q: string): string[] {

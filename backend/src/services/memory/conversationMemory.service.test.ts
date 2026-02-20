@@ -44,8 +44,20 @@ describe("ConversationMemoryService", () => {
 
   it("isolates cache entries per user for the same conversation id", async () => {
     const service = new ConversationMemoryService();
-    await service.addMessage("conv-1", "user", "hello from user-1", {}, "user-1");
-    await service.addMessage("conv-1", "user", "hello from user-2", {}, "user-2");
+    await service.addMessage(
+      "conv-1",
+      "user",
+      "hello from user-1",
+      {},
+      "user-1",
+    );
+    await service.addMessage(
+      "conv-1",
+      "user",
+      "hello from user-2",
+      {},
+      "user-2",
+    );
 
     const first = await service.getContext("conv-1", "user-1");
     const second = await service.getContext("conv-1", "user-2");
@@ -59,7 +71,9 @@ describe("ConversationMemoryService", () => {
   it("expires cache entries after the configured ttl", async () => {
     const service = new ConversationMemoryService();
     await service.addMessage("conv-ttl", "assistant", "cached", {}, "user-ttl");
-    expect((await service.getContext("conv-ttl", "user-ttl"))?.messages).toHaveLength(1);
+    expect(
+      (await service.getContext("conv-ttl", "user-ttl"))?.messages,
+    ).toHaveLength(1);
 
     jest.advanceTimersByTime(1500);
 
@@ -78,11 +92,11 @@ describe("ConversationMemoryService", () => {
     const stats = service.getStats();
     expect(stats.activeConversations).toBe(2);
     expect(await service.getContext("conv-a", "user-1")).toBeNull();
-    expect((await service.getContext("conv-b", "user-1"))?.messages[0]?.content).toBe(
-      "B",
-    );
-    expect((await service.getContext("conv-c", "user-1"))?.messages[0]?.content).toBe(
-      "C",
-    );
+    expect(
+      (await service.getContext("conv-b", "user-1"))?.messages[0]?.content,
+    ).toBe("B");
+    expect(
+      (await service.getContext("conv-c", "user-1"))?.messages[0]?.content,
+    ).toBe("C");
   });
 });

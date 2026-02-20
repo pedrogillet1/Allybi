@@ -1,0 +1,26 @@
+{
+  "_meta": {
+    "id": "routing_priority",
+    "version": "1.0.0",
+    "description": "Deterministic intent family base priorities and tie-break pipeline for centralized routing."
+  },
+  "config": {
+    "enabled": true
+  },
+  "intentFamilyBasePriority": {
+    "file_actions": 100,
+    "editing": 95,
+    "documents": 90,
+    "connectors": 85,
+    "help": 60,
+    "conversation": 40,
+    "general": 10
+  },
+  "tiebreakStages": [
+    { "id": "locked_scope_first", "weight": 100 },
+    { "id": "explicit_document_reference", "weight": 95 },
+    { "id": "operator_confidence", "weight": 90 },
+    { "id": "intent_family_priority", "weight": 80 },
+    { "id": "recency_and_followup", "weight": 60 }
+  ]
+}

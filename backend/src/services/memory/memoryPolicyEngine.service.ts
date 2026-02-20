@@ -167,7 +167,10 @@ export class MemoryPolicyEngine {
         true,
       ),
       persistOnlyStructuralHints,
-      debugTracesNotPersisted: toBoolean(privacyRaw.debugTracesNotPersisted, true),
+      debugTracesNotPersisted: toBoolean(
+        privacyRaw.debugTracesNotPersisted,
+        true,
+      ),
     };
 
     this.cachedConfig = {
@@ -183,4 +186,3 @@ export class MemoryPolicyEngine {
     return this.cachedConfig;
   }
 }
-

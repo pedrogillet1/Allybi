@@ -11,7 +11,9 @@ function resolveScopeRuntimeConfig(): ScopeRuntimeConfig {
   const policyBank = getBankLoaderInstance().getBank<any>("memory_policy");
   const runtime = policyBank?.config?.runtimeTuning?.scopeRuntime;
   if (!runtime || typeof runtime !== "object") {
-    throw new Error("memory_policy.config.runtimeTuning.scopeRuntime is required");
+    throw new Error(
+      "memory_policy.config.runtimeTuning.scopeRuntime is required",
+    );
   }
 
   const maxScopeDocs = Number(runtime.maxScopeDocs);
@@ -107,7 +109,9 @@ export class ScopeService {
     if (explicit) return true;
 
     const q = String(req.message || "").toLowerCase();
-    return this.runtimeConfig.clearScopeRegex.some((pattern) => pattern.test(q));
+    return this.runtimeConfig.clearScopeRegex.some((pattern) =>
+      pattern.test(q),
+    );
   }
 
   attachedScope(req: ChatRequest): string[] {

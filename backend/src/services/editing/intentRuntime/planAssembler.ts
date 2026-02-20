@@ -204,6 +204,25 @@ function validateRequiredSlots(
   return missing;
 }
 
+function expandMultiRangeSteps(
+  op: string,
+  params: Record<string, unknown>,
+): Array<{ op: string; params: Record<string, unknown> }> {
+  const rangeA1 = params.rangeA1;
+  if (!Array.isArray(rangeA1)) return [{ op, params }];
+  const ranges = rangeA1
+    .map((value) => String(value || "").trim())
+    .filter(Boolean);
+  if (ranges.length === 0)
+    return [{ op, params: { ...params, rangeA1: null } }];
+  if (ranges.length === 1)
+    return [{ op, params: { ...params, rangeA1: ranges[0] } }];
+  return ranges.map((range) => ({
+    op,
+    params: { ...params, rangeA1: range },
+  }));
+}
+
 // ---------------------------------------------------------------------------
 // UI Metadata
 // ---------------------------------------------------------------------------
@@ -357,14 +376,17 @@ export function assemblePlan(
         }
       }
 
-      steps.push({
-        op: opStr,
-        params,
-        stepId: `step_${steps.length + 1}`,
-        ...(slots.localeConversions?.length
-          ? { localeConversions: slots.localeConversions }
-          : {}),
-      });
+      const expanded = expandMultiRangeSteps(opStr, params);
+      for (const entry of expanded) {
+        steps.push({
+          op: entry.op,
+          params: entry.params,
+          stepId: `step_${steps.length + 1}`,
+          ...(slots.localeConversions?.length
+            ? { localeConversions: slots.localeConversions }
+            : {}),
+        });
+      }
     }
   }
 

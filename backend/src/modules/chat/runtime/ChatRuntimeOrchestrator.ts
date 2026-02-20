@@ -33,7 +33,9 @@ function resolveScopeRuntimeMentionConfig(): ScopeRuntimeMentionConfig {
   const bank = getBankLoaderInstance().getBank<any>("memory_policy");
   const runtime = bank?.config?.runtimeTuning?.scopeRuntime;
   if (!runtime || typeof runtime !== "object") {
-    throw new Error("memory_policy.config.runtimeTuning.scopeRuntime is required");
+    throw new Error(
+      "memory_policy.config.runtimeTuning.scopeRuntime is required",
+    );
   }
 
   const tokenMinLength = Number(runtime.tokenMinLength);
@@ -101,9 +103,8 @@ function resolveScopeRuntimeMentionConfig(): ScopeRuntimeMentionConfig {
     }
   });
 
-  const docStatusesAllowed = (Array.isArray(runtime.docStatusesAllowed)
-    ? runtime.docStatusesAllowed
-    : []
+  const docStatusesAllowed = (
+    Array.isArray(runtime.docStatusesAllowed) ? runtime.docStatusesAllowed : []
   )
     .map((value: unknown) => String(value || "").trim())
     .filter(Boolean);

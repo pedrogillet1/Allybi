@@ -17,7 +17,9 @@ describe("EvidenceValidator", () => {
   it("returns original result when no allowed scope is provided", () => {
     const validator = new EvidenceValidator();
     const result = baseResult({
-      sources: [{ documentId: "doc-1", filename: "a.pdf", mimeType: null, page: 1 }],
+      sources: [
+        { documentId: "doc-1", filename: "a.pdf", mimeType: null, page: 1 },
+      ],
     });
     const out = validator.enforceScope(result, []);
     expect(out).toBe(result);
@@ -48,7 +50,9 @@ describe("EvidenceValidator", () => {
     const out = validator.enforceScope(
       baseResult({
         status: "success",
-        sources: [{ documentId: "doc-2", filename: "b.pdf", mimeType: null, page: 2 }],
+        sources: [
+          { documentId: "doc-2", filename: "b.pdf", mimeType: null, page: 2 },
+        ],
         evidence: { required: true, provided: true, sourceIds: ["doc-2"] },
       }),
       ["doc-1"],
@@ -67,7 +71,9 @@ describe("EvidenceValidator", () => {
     const out = validator.enforceScope(
       baseResult({
         status: "success",
-        sources: [{ documentId: "doc-2", filename: "b.pdf", mimeType: null, page: 2 }],
+        sources: [
+          { documentId: "doc-2", filename: "b.pdf", mimeType: null, page: 2 },
+        ],
         evidence: { required: false, provided: true, sourceIds: ["doc-2"] },
       }),
       ["doc-1"],
@@ -87,7 +93,9 @@ describe("EvidenceValidator", () => {
           missingSlots: ["slot_a"],
           nextAction: "custom",
         },
-        sources: [{ documentId: "doc-2", filename: "b.pdf", mimeType: null, page: 2 }],
+        sources: [
+          { documentId: "doc-2", filename: "b.pdf", mimeType: null, page: 2 },
+        ],
         evidence: { required: true, provided: true, sourceIds: ["doc-2"] },
       }),
       ["doc-1"],
@@ -101,7 +109,9 @@ describe("EvidenceValidator", () => {
     const validator = new EvidenceValidator();
     const out = validator.enforceScope(
       baseResult({
-        sources: [{ documentId: " doc-1 ", filename: "a.pdf", mimeType: null, page: 1 }],
+        sources: [
+          { documentId: " doc-1 ", filename: "a.pdf", mimeType: null, page: 1 },
+        ],
       }),
       [" doc-1 "],
     );

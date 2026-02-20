@@ -45,7 +45,10 @@ export const apiRouteMounts: HttpRouteMount[] = [
   { basePath: "/api/auth/admin", router: adminAuthRoutes },
   { basePath: "/api/admin/telemetry", router: adminTelemetryRoutes },
   { basePath: "/api/admin/analytics", router: adminAnalyticsRoutes },
-  { basePath: "/api/recovery-verification", router: recoveryVerificationRoutes },
+  {
+    basePath: "/api/recovery-verification",
+    router: recoveryVerificationRoutes,
+  },
   { basePath: "/api/integrations", router: integrationsRoutes },
   { basePath: "/api/editor-session", router: editorSessionRoutes },
   { basePath: "/api/editing", router: editingRoutes },

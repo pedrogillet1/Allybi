@@ -29,7 +29,7 @@ describe("EvidenceGateService", () => {
                   dates: "\\b(19|20)\\d{2}\\b",
                   numbers: "\\b\\d+\\b",
                   names: "\\b[A-Z][a-z]+\\s+[A-Z][a-z]+\\b",
-                  quotes: "\"[^\"]+\"",
+                  quotes: '"[^"]+"',
                   specifics: "\\bpage\\s+\\d+\\b",
                 },
                 richContentMinWords: 3,

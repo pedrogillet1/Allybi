@@ -23,7 +23,9 @@ export class MemoryRedactionService {
   }
 
   hashText(input: string): string {
-    const normalized = String(input || "").trim().toLowerCase();
+    const normalized = String(input || "")
+      .trim()
+      .toLowerCase();
     return crypto
       .createHash("sha256")
       .update(`${this.salt}:${normalized}`, "utf8")
@@ -82,4 +84,3 @@ export class MemoryRedactionService {
     }
   }
 }
-

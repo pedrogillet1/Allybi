@@ -23,6 +23,11 @@ interface SupportContractInput {
   canonicalOperator?: string | null;
   intentSource?: EditIntentSource;
   resolvedTargetId?: string | null;
+  viewerContext?: {
+    selection?: unknown;
+    sheetName?: string;
+    frozenSelection?: unknown;
+  };
 }
 
 export interface SupportContractResult {
@@ -123,7 +128,7 @@ export class SupportContractService {
       const runtime = analyzeMessageToPlan({
         message: input.instruction,
         domain: rtDomain,
-        viewerContext: {},
+        viewerContext: input.viewerContext || {},
       });
 
       if (!runtime) {

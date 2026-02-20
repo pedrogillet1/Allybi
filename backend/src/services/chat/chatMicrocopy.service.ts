@@ -106,7 +106,9 @@ export function resolveEditErrorMessage(
   code: string,
   lang: unknown,
 ): string | null {
-  const key = String(code || "").trim().toUpperCase();
+  const key = String(code || "")
+    .trim()
+    .toUpperCase();
   if (!key) return null;
 
   const bank = getOptionalBank<EditErrorCatalogBank>("edit_error_catalog");

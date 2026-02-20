@@ -179,32 +179,58 @@ async function extractText(
 
     const visionService = getGoogleVisionOcrService();
     if (!visionService.isAvailable()) {
-      throw new Error(
-        `Image OCR unavailable (Google Vision not initialized): ${visionService.getInitError() || "no credentials"}`,
-      );
-    }
-    // Use extractTextWithRetry to handle transient RST_STREAM errors
-    const ocrResult = await visionService.extractTextWithRetry(buffer, {
-      mode: "document",
-    });
-    if (!ocrResult.text || ocrResult.text.trim().length === 0) {
-      logger.info("[OCR] Image OCR produced no text, saving as visual-only", {
+      const reason = `Image OCR unavailable (Google Vision not initialized): ${visionService.getInitError() || "no credentials"}`;
+      logger.warn("[OCR] Provider unavailable, saving as visual-only", {
         filename,
         mimeType,
+        reason,
       });
       return {
         text: "",
         wordCount: 0,
-        confidence: 1.0,
+        confidence: 0,
         skipped: true,
-        skipReason: "Image contains no text (visual-only)",
+        skipReason: `Image saved as visual-only (${reason})`,
       };
     }
-    return {
-      text: ocrResult.text,
-      wordCount: ocrResult.text.split(/\s+/).length,
-      confidence: ocrResult.confidence ?? 0.8,
-    };
+    try {
+      // Use extractTextWithRetry to handle transient RST_STREAM errors
+      const ocrResult = await visionService.extractTextWithRetry(buffer, {
+        mode: "document",
+      });
+      if (!ocrResult.text || ocrResult.text.trim().length === 0) {
+        logger.info("[OCR] Image OCR produced no text, saving as visual-only", {
+          filename,
+          mimeType,
+        });
+        return {
+          text: "",
+          wordCount: 0,
+          confidence: 1.0,
+          skipped: true,
+          skipReason: "Image contains no text (visual-only)",
+        };
+      }
+      return {
+        text: ocrResult.text,
+        wordCount: ocrResult.text.split(/\s+/).length,
+        confidence: ocrResult.confidence ?? 0.8,
+      };
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      logger.warn("[OCR] OCR processing failed, saving as visual-only", {
+        filename,
+        mimeType,
+        reason,
+      });
+      return {
+        text: "",
+        wordCount: 0,
+        confidence: 0,
+        skipped: true,
+        skipReason: `Image saved as visual-only (ocr_error: ${reason})`,
+      };
+    }
   }
   throw new Error(`Unsupported mimeType for extraction: ${mimeType}`);
 }

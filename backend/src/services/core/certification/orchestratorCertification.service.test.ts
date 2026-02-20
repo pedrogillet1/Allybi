@@ -18,7 +18,9 @@ describe("OrchestratorCertificationService", () => {
       coverageSummary: {},
       regressionPassed: false,
     });
-    const regressionGate = report.gates.find((gate) => gate.id === "regression");
+    const regressionGate = report.gates.find(
+      (gate) => gate.id === "regression",
+    );
     expect(regressionGate?.status).toBe("fail");
     expect((regressionGate?.findings || []).length).toBeGreaterThan(0);
   });

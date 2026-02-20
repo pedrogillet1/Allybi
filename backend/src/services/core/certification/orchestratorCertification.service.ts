@@ -2,9 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { RuntimeWiringIntegrityService } from "../banks/runtimeWiringIntegrity.service";
-import {
-  loadOrchestratorCertificationPolicy,
-} from "./orchestratorCertificationPolicy";
+import { loadOrchestratorCertificationPolicy } from "./orchestratorCertificationPolicy";
 import type {
   CertificationCoverageSummary,
   CertificationFailureCode,
@@ -112,7 +110,9 @@ export class OrchestratorCertificationService {
     });
 
     const databankFindings: CertificationFinding[] = [];
-    const memoryPolicyRaw = readIfExists("src/data_banks/policies/memory_policy.any.json");
+    const memoryPolicyRaw = readIfExists(
+      "src/data_banks/policies/memory_policy.any.json",
+    );
     if (!memoryPolicyRaw) {
       databankFindings.push(
         makeFinding({
@@ -131,7 +131,8 @@ export class OrchestratorCertificationService {
         databankFindings.push(
           makeFinding({
             code: "MISSING_RUNTIME_TUNING",
-            message: "memory_policy runtime tuning is missing required sections.",
+            message:
+              "memory_policy runtime tuning is missing required sections.",
             evidence: missing.map(
               (key) => `memory_policy.config.runtimeTuning.${key}`,
             ),
@@ -285,10 +286,12 @@ export class OrchestratorCertificationService {
     const score = gates.reduce((acc, gate) => acc + gate.score, 0);
     const maxScore = gates.reduce((acc, gate) => acc + gate.maxScore, 0);
     const hardFailCount = gates.reduce(
-      (acc, gate) => acc + gate.findings.filter((finding) => finding.blocking).length,
+      (acc, gate) =>
+        acc + gate.findings.filter((finding) => finding.blocking).length,
       0,
     );
-    const passed = hardFailCount === 0 && gates.every((gate) => gate.status === "pass");
+    const passed =
+      hardFailCount === 0 && gates.every((gate) => gate.status === "pass");
 
     return {
       generatedAt: new Date().toISOString(),
@@ -300,4 +303,3 @@ export class OrchestratorCertificationService {
     };
   }
 }
-

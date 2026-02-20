@@ -159,7 +159,9 @@ describe("ChatRuntimeOrchestrator", () => {
     const delegate = createDelegate();
     const orchestrator = new ChatRuntimeOrchestrator(delegate as any);
     mockConversationUpdateMany.mockResolvedValue({ count: 1 });
-    mockConversationFindFirst.mockResolvedValue({ scopeDocumentIds: ["doc-1"] });
+    mockConversationFindFirst.mockResolvedValue({
+      scopeDocumentIds: ["doc-1"],
+    });
 
     await orchestrator.chat({
       userId: "user-1",
@@ -200,11 +202,17 @@ describe("ChatRuntimeOrchestrator", () => {
           { documentId: "doc-1", filename: "a.pdf", mimeType: null, page: 1 },
           { documentId: "doc-2", filename: "b.pdf", mimeType: null, page: 2 },
         ],
-        evidence: { required: true, provided: true, sourceIds: ["doc-1", "doc-2"] },
+        evidence: {
+          required: true,
+          provided: true,
+          sourceIds: ["doc-1", "doc-2"],
+        },
       }),
     });
     const orchestrator = new ChatRuntimeOrchestrator(delegate as any);
-    mockConversationFindFirst.mockResolvedValue({ scopeDocumentIds: ["doc-1"] });
+    mockConversationFindFirst.mockResolvedValue({
+      scopeDocumentIds: ["doc-1"],
+    });
     mockConversationUpdateMany.mockResolvedValue({ count: 1 });
 
     const result = await orchestrator.chat({
@@ -300,7 +308,9 @@ describe("ChatRuntimeOrchestrator", () => {
   });
 
   test("streamChat applies request preparation and post-processing", async () => {
-    mockConversationFindFirst.mockResolvedValue({ scopeDocumentIds: ["doc-1"] });
+    mockConversationFindFirst.mockResolvedValue({
+      scopeDocumentIds: ["doc-1"],
+    });
     const delegate = createDelegate({
       chatResult: baseResult({
         conversationId: "c1",
@@ -353,13 +363,19 @@ describe("ChatRuntimeOrchestrator", () => {
     expect(delegate.createConversation).toHaveBeenCalled();
     expect(delegate.listConversations).toHaveBeenCalledWith("u1", { limit: 1 });
     expect(delegate.getConversation).toHaveBeenCalledWith("u1", "c1");
-    expect(delegate.getConversationWithMessages).toHaveBeenCalledWith("u1", "c1", {
-      limit: 1,
-    });
+    expect(delegate.getConversationWithMessages).toHaveBeenCalledWith(
+      "u1",
+      "c1",
+      {
+        limit: 1,
+      },
+    );
     expect(delegate.updateTitle).toHaveBeenCalledWith("u1", "c1", "new");
     expect(delegate.deleteConversation).toHaveBeenCalledWith("u1", "c1");
     expect(delegate.deleteAllConversations).toHaveBeenCalledWith("u1");
-    expect(delegate.listMessages).toHaveBeenCalledWith("u1", "c1", { limit: 1 });
+    expect(delegate.listMessages).toHaveBeenCalledWith("u1", "c1", {
+      limit: 1,
+    });
     expect(delegate.createMessage).toHaveBeenCalled();
   });
 });

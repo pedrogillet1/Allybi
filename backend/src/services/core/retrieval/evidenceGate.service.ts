@@ -30,7 +30,9 @@ type EvidenceGateRuntimeConfig = {
 };
 
 function normalizeLang(language: string): "en" | "pt" | "es" {
-  const normalized = String(language || "en").trim().toLowerCase();
+  const normalized = String(language || "en")
+    .trim()
+    .toLowerCase();
   return normalized === "pt" || normalized === "es" ? normalized : "en";
 }
 
@@ -80,7 +82,9 @@ function compileRegexMap(
     );
   }
   const out: Record<string, RegExp> = {};
-  for (const [key, value] of Object.entries(patterns as Record<string, unknown>)) {
+  for (const [key, value] of Object.entries(
+    patterns as Record<string, unknown>,
+  )) {
     const source = String(value || "").trim();
     if (!source) {
       throw new Error(`evidenceGate.${label}.${key} cannot be empty`);
@@ -88,7 +92,9 @@ function compileRegexMap(
     try {
       out[key] = new RegExp(source, flags);
     } catch {
-      throw new Error(`Invalid evidenceGate regex for ${label}.${key}: ${source}`);
+      throw new Error(
+        `Invalid evidenceGate regex for ${label}.${key}: ${source}`,
+      );
     }
   }
   if (Object.keys(out).length === 0) {
@@ -103,7 +109,9 @@ function resolveEvidenceGateRuntimeConfig(): EvidenceGateRuntimeConfig {
   const policyBank = getBankLoaderInstance().getBank<any>("memory_policy");
   const gate = policyBank?.config?.runtimeTuning?.evidenceGate;
   if (!gate || typeof gate !== "object") {
-    throw new Error("memory_policy.config.runtimeTuning.evidenceGate is required");
+    throw new Error(
+      "memory_policy.config.runtimeTuning.evidenceGate is required",
+    );
   }
 
   const factPatternsRaw =
@@ -117,7 +125,11 @@ function resolveEvidenceGateRuntimeConfig(): EvidenceGateRuntimeConfig {
   }
   const factPatterns: Record<string, RegExp[]> = {};
   for (const [key, value] of Object.entries(factPatternsRaw)) {
-    factPatterns[key] = compileRegexList(`factRequiringPatterns.${key}`, value, "i");
+    factPatterns[key] = compileRegexList(
+      `factRequiringPatterns.${key}`,
+      value,
+      "i",
+    );
   }
 
   const narrativeRiskPatterns = compileRegexList(

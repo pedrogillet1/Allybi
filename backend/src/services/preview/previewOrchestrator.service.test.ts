@@ -95,7 +95,9 @@ describe("previewOrchestrator.ensurePreview", () => {
       isStale: false,
       attempts: 0,
     });
-    await expect(ensurePreview("doc-1", "u1", "application/pdf")).resolves.toEqual({
+    await expect(
+      ensurePreview("doc-1", "u1", "application/pdf"),
+    ).resolves.toEqual({
       status: "pending",
     });
   });
@@ -129,7 +131,9 @@ describe("previewOrchestrator.ensurePreview", () => {
     mockFindUnique.mockResolvedValue({ filename: "doc.pdf" });
     mockAddPreviewGenerationJob.mockResolvedValue(undefined);
 
-    await expect(ensurePreview("doc-1", "u1", "application/pdf")).resolves.toEqual({
+    await expect(
+      ensurePreview("doc-1", "u1", "application/pdf"),
+    ).resolves.toEqual({
       status: "triggered",
     });
   });
@@ -144,7 +148,9 @@ describe("previewOrchestrator.ensurePreview", () => {
       attempts: 8,
       error: "",
     });
-    await expect(ensurePreview("doc-1", "u1", "application/pdf")).resolves.toEqual({
+    await expect(
+      ensurePreview("doc-1", "u1", "application/pdf"),
+    ).resolves.toEqual({
       status: "failed",
       error: "Max retries exceeded",
     });
@@ -162,7 +168,9 @@ describe("previewOrchestrator.ensurePreview", () => {
     });
     mockFindUnique.mockRejectedValue(new Error("db down"));
     mockAddPreviewGenerationJob.mockRejectedValue(new Error("queue down"));
-    await expect(ensurePreview("doc-1", "u1", "application/pdf")).resolves.toEqual({
+    await expect(
+      ensurePreview("doc-1", "u1", "application/pdf"),
+    ).resolves.toEqual({
       status: "triggered",
       error: "temporary",
     });

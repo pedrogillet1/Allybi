@@ -97,14 +97,17 @@ function extractSheetName(text: string): string | null {
 // Number / text extraction
 // ---------------------------------------------------------------------------
 
-function extractNumberOrText(text: string): string | number | null {
+function extractNumberOrText(
+  text: string,
+  lang: "en" | "pt",
+): string | number | null {
   // Look for "to X" or "= X" patterns
   const toMatch = text.match(
     /\b(?:to|=|with|value|valor)\s+["']?([^"',]+?)["']?\s*$/i,
   );
   if (toMatch) {
     const val = toMatch[1].trim();
-    const num = parseNumber(val);
+    const num = parseNumber(val, lang);
     if (num !== null) return num;
     return val;
   }
@@ -112,17 +115,51 @@ function extractNumberOrText(text: string): string | number | null {
   // Look for standalone numbers
   const numMatch = text.match(/\b(\d[\d,.]*)\b/);
   if (numMatch) {
-    const num = parseNumber(numMatch[1]);
+    const num = parseNumber(numMatch[1], lang);
     if (num !== null) return num;
   }
 
   return null;
 }
 
-function parseNumber(val: string): number | null {
-  const cleaned = val.replace(/,/g, "");
-  const num = Number(cleaned);
-  return isNaN(num) ? null : num;
+function parseNumber(val: string, lang: "en" | "pt"): number | null {
+  const raw = String(val || "")
+    .trim()
+    .replace(/\s+/g, "");
+  if (!raw || /[a-z]/i.test(raw)) return null;
+
+  const parse = (normalized: string): number | null => {
+    const n = Number(normalized);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  // pt-BR style: 1.234,56 -> 1234.56
+  if (/^-?\d{1,3}(?:\.\d{3})+,\d+$/.test(raw)) {
+    return parse(raw.replace(/\./g, "").replace(",", "."));
+  }
+  // pt-BR decimal comma: 1,5 -> 1.5
+  if (/^-?\d+,\d+$/.test(raw)) {
+    return parse(raw.replace(",", "."));
+  }
+  // Integer with thousand separators: 1.234.567
+  if (/^-?\d{1,3}(?:\.\d{3})+$/.test(raw)) {
+    return parse(raw.replace(/\./g, ""));
+  }
+
+  // en-US style: 1,234.56 -> 1234.56
+  if (/^-?\d{1,3}(?:,\d{3})+(?:\.\d+)?$/.test(raw)) {
+    return parse(raw.replace(/,/g, ""));
+  }
+
+  // Locale-aware fallback for ambiguous comma values.
+  if (lang === "pt" && /^-?\d+,\d+$/.test(raw)) {
+    return parse(raw.replace(",", "."));
+  }
+  if (lang === "en" && /,-?\d+$/.test(raw)) {
+    return null;
+  }
+
+  return parse(raw);
 }
 
 // ---------------------------------------------------------------------------
@@ -618,8 +655,9 @@ function runExtractor(
   switch (extractor.type) {
     case "A1_RANGE": {
       const ranges = extractA1Ranges(text);
-      if (ranges.length > 0)
-        return { value: ranges.length === 1 ? ranges[0] : ranges[0] };
+      if (ranges.length > 0) {
+        return { value: ranges.length === 1 ? ranges[0] : ranges };
+      }
 
       // Fallback to viewer context
       if (viewerContext.selection) {
@@ -642,7 +680,7 @@ function runExtractor(
     }
 
     case "NUMBER_OR_TEXT":
-      return { value: extractNumberOrText(text) };
+      return { value: extractNumberOrText(text, lang) };
 
     case "COLOR":
       return { value: extractColor(text, lang) };

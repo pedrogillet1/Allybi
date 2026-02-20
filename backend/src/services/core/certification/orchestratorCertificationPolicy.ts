@@ -92,7 +92,8 @@ export type OrchestratorCertificationPolicy = {
   };
 };
 
-const POLICY_PATH = "src/data_banks/policies/orchestrator_certification.any.json";
+const POLICY_PATH =
+  "src/data_banks/policies/orchestrator_certification.any.json";
 
 function readPolicyRaw(): OrchestratorCertificationPolicyRaw {
   const abs = path.resolve(process.cwd(), POLICY_PATH);
@@ -125,11 +126,16 @@ function asRegexRule(input: {
   const pattern = asString(input.pattern);
   const flags = asString(input.flags) || undefined;
   const mode = asString(input.mode) as RegexCheckMode;
-  if (!code) throw new Error("Certification policy regex rule is missing code.");
-  if (!message) throw new Error("Certification policy regex rule is missing message.");
-  if (!pattern) throw new Error("Certification policy regex rule is missing pattern.");
+  if (!code)
+    throw new Error("Certification policy regex rule is missing code.");
+  if (!message)
+    throw new Error("Certification policy regex rule is missing message.");
+  if (!pattern)
+    throw new Error("Certification policy regex rule is missing pattern.");
   if (mode !== "must_match" && mode !== "must_not_match") {
-    throw new Error(`Certification policy regex rule has invalid mode: ${mode}`);
+    throw new Error(
+      `Certification policy regex rule has invalid mode: ${mode}`,
+    );
   }
   try {
     // Validate regex eagerly so failures are deterministic.
@@ -221,7 +227,9 @@ export function loadOrchestratorCertificationPolicy(): OrchestratorCertification
   ).map((check) => {
     const filePath = asString(check?.filePath);
     if (!filePath) {
-      throw new Error("Certification policy memorySemantics check missing filePath.");
+      throw new Error(
+        "Certification policy memorySemantics check missing filePath.",
+      );
     }
     return {
       ...asRegexRule({
@@ -252,7 +260,9 @@ export function loadOrchestratorCertificationPolicy(): OrchestratorCertification
     config.regressionSuite?.collectCoverageFrom,
   );
   if (testPaths.length === 0) {
-    throw new Error("Certification policy regressionSuite.testPaths is required.");
+    throw new Error(
+      "Certification policy regressionSuite.testPaths is required.",
+    );
   }
   if (collectCoverageFrom.length === 0) {
     throw new Error(
@@ -282,4 +292,3 @@ export function loadOrchestratorCertificationPolicy(): OrchestratorCertification
     },
   };
 }
-

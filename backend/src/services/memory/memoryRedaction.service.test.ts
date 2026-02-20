@@ -31,7 +31,9 @@ describe("MemoryRedactionService", () => {
       createdAt: new Date("2026-01-01T00:00:00.000Z"),
     });
 
-    expect(entry.summary).toBe("role:assistant;intent:compare_numbers;sources:2");
+    expect(entry.summary).toBe(
+      "role:assistant;intent:compare_numbers;sources:2",
+    );
     expect(entry.sourceCount).toBe(2);
     expect(entry.contentHash).not.toContain("Sensitive clause text here");
   });

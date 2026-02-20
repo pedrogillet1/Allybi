@@ -11,7 +11,10 @@ import prisma from "../../../config/database";
 import { GcsStorageService } from "../../../services/retrieval/gcsStorage.service";
 import { UPLOAD_CONFIG } from "../../../config/upload.config";
 import { randomUUID } from "crypto";
-import { addDocumentJob, addDocumentJobsBulk } from "../../../queues/document.queue";
+import {
+  addDocumentJob,
+  addDocumentJobsBulk,
+} from "../../../queues/document.queue";
 import {
   publishExtractFanoutJobsBulk,
   publishExtractJob,

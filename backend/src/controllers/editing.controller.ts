@@ -171,7 +171,11 @@ function resolveOperatorWithAllybiFallback(input: {
   runtimeOperator: ReturnType<typeof normalizeEditOperator>["operator"];
   canonicalOperator: string | null;
   canonicalOperators?: string[];
+  blockedReasonCode?: string;
+  blockedReasonMessage?: string;
+  clarificationRequired?: boolean;
 } {
+  const explicitOperator = asString(input.rawOperator);
   const normalized = normalizeEditOperator(input.rawOperator, {
     domain: input.domain,
     instruction: input.instruction,
@@ -180,6 +184,15 @@ function resolveOperatorWithAllybiFallback(input: {
     return {
       runtimeOperator: normalized.operator,
       canonicalOperator: normalized.canonicalOperator ?? null,
+    };
+  }
+  if (explicitOperator) {
+    return {
+      runtimeOperator: null,
+      canonicalOperator: normalized.canonicalOperator ?? explicitOperator,
+      canonicalOperators: [],
+      blockedReasonCode: "OPERATOR_MAPPING_MISSING",
+      blockedReasonMessage: `No runtime operator mapping found for '${explicitOperator}'.`,
     };
   }
 
@@ -196,6 +209,9 @@ function resolveOperatorWithAllybiFallback(input: {
       runtimeOperator: null,
       canonicalOperator: null,
       canonicalOperators: [],
+      blockedReasonCode: "INTENT_DOMAIN_UNSUPPORTED",
+      blockedReasonMessage:
+        "Unsupported domain for intent-based operator resolution.",
     };
   }
 
@@ -205,7 +221,24 @@ function resolveOperatorWithAllybiFallback(input: {
     explicitTarget: input.targetHint || null,
   });
   if (Array.isArray(multiPlan.steps) && multiPlan.steps.length > 0) {
-    const first = multiPlan.steps[0];
+    const first = multiPlan.steps.find((step) =>
+      Boolean(String(step.runtimeOperator || "").trim()),
+    );
+    if (!first) {
+      const blocked = multiPlan.steps[0];
+      return {
+        runtimeOperator: null,
+        canonicalOperator: blocked?.canonicalOperator || null,
+        canonicalOperators: multiPlan.steps
+          .map((s) => String(s.canonicalOperator || "").trim())
+          .filter(Boolean),
+        blockedReasonCode: blocked?.blockedReasonCode || "INTENT_PLAN_BLOCKED",
+        blockedReasonMessage:
+          blocked?.blockedReasonMessage ||
+          "Unable to resolve a valid runtime operator for this request.",
+        clarificationRequired: blocked?.clarificationRequired === true,
+      };
+    }
     const canonicalOperators = multiPlan.steps
       .map((s) => String(s.canonicalOperator || "").trim())
       .filter(Boolean);
@@ -215,6 +248,7 @@ function resolveOperatorWithAllybiFallback(input: {
       >["operator"],
       canonicalOperator: first?.canonicalOperator || null,
       canonicalOperators,
+      clarificationRequired: first?.clarificationRequired === true,
     };
   }
 
@@ -237,8 +271,13 @@ function resolveOperatorWithAllybiFallback(input: {
   if (!plan?.runtimeOperator)
     return {
       runtimeOperator: null,
-      canonicalOperator: null,
+      canonicalOperator: plan?.canonicalOperator || null,
       canonicalOperators: [],
+      blockedReasonCode: plan?.blockedReasonCode || "INTENT_PLAN_NOT_RESOLVED",
+      blockedReasonMessage:
+        plan?.blockedReasonMessage ||
+        "Unable to resolve a valid runtime operator for this request.",
+      clarificationRequired: plan?.clarificationRequired === true,
     };
   return {
     runtimeOperator: plan.runtimeOperator as ReturnType<
@@ -246,6 +285,7 @@ function resolveOperatorWithAllybiFallback(input: {
     >["operator"],
     canonicalOperator: plan.canonicalOperator,
     canonicalOperators: plan.canonicalOperator ? [plan.canonicalOperator] : [],
+    clarificationRequired: plan.clarificationRequired === true,
   };
 }
 
@@ -412,6 +452,14 @@ export class EditingController {
         })
       : { runtimeOperator: null, canonicalOperator: null };
     const intentSource = intentSourceFromRawOperator(operator);
+    if (normalized.blockedReasonCode) {
+      return sendErr(
+        res,
+        normalized.blockedReasonCode,
+        normalized.blockedReasonMessage || "Unable to resolve edit operator.",
+        normalized.clarificationRequired ? 409 : 422,
+      );
+    }
 
     if (
       !instruction ||
@@ -490,6 +538,14 @@ export class EditingController {
         })
       : { runtimeOperator: null, canonicalOperator: null };
     const intentSource = intentSourceFromRawOperator(operator);
+    if (normalized.blockedReasonCode) {
+      return sendErr(
+        res,
+        normalized.blockedReasonCode,
+        normalized.blockedReasonMessage || "Unable to resolve edit operator.",
+        normalized.clarificationRequired ? 409 : 422,
+      );
+    }
 
     const forceDocxBundle =
       domain === "docx" &&
@@ -594,6 +650,14 @@ export class EditingController {
         })
       : { runtimeOperator: null, canonicalOperator: null };
     const intentSource = intentSourceFromRawOperator(operator);
+    if (normalized.blockedReasonCode) {
+      return sendErr(
+        res,
+        normalized.blockedReasonCode,
+        normalized.blockedReasonMessage || "Unable to resolve edit operator.",
+        normalized.clarificationRequired ? 409 : 422,
+      );
+    }
 
     const forceDocxBundle =
       domain === "docx" &&

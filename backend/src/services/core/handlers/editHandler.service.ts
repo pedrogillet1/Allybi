@@ -72,6 +72,67 @@ function syntheticTarget(label: string): ResolvedTarget {
   };
 }
 
+function parseSheetAndRange(text: string | undefined): {
+  sheetName: string | null;
+  rangeA1: string | null;
+} {
+  const raw = String(text || "").trim();
+  if (!raw) return { sheetName: null, rangeA1: null };
+
+  const sheetRange = raw.match(
+    /(?:'([^']+)'|([A-Za-z0-9_][A-Za-z0-9_ ]*))!([A-Za-z]{1,3}\d{1,7}(?::[A-Za-z]{1,3}\d{1,7})?)/,
+  );
+  if (sheetRange) {
+    return {
+      sheetName: (sheetRange[1] || sheetRange[2] || "").trim() || null,
+      rangeA1: String(sheetRange[3] || "").trim() || null,
+    };
+  }
+
+  const bareRange = raw.match(
+    /\b([A-Za-z]{1,3}\d{1,7}(?::[A-Za-z]{1,3}\d{1,7})?)\b/,
+  );
+  if (bareRange?.[1]) {
+    return { sheetName: null, rangeA1: String(bareRange[1]).trim() };
+  }
+
+  return { sheetName: null, rangeA1: null };
+}
+
+function buildSupportViewerContext(
+  plan: EditPlan,
+  target: ResolvedTarget,
+): {
+  selection?: unknown;
+  sheetName?: string;
+  frozenSelection?: unknown;
+} {
+  if (plan.domain === "sheets") {
+    const fromTarget = parseSheetAndRange(`${target.label} ${target.id}`);
+    const fromHint = parseSheetAndRange(plan.targetHint);
+    const sheetName = fromTarget.sheetName || fromHint.sheetName || undefined;
+    const rangeA1 = fromTarget.rangeA1 || fromHint.rangeA1;
+    if (!rangeA1 && !sheetName) return {};
+    return {
+      selection: {
+        rangeA1: rangeA1 || undefined,
+        a1: rangeA1 || undefined,
+      },
+      ...(sheetName ? { sheetName } : {}),
+    };
+  }
+
+  if (plan.domain === "docx") {
+    return {
+      selection: {
+        paragraphId: target.id,
+      },
+    };
+  }
+
+  return {};
+}
+
 export class EditHandlerService {
   private readonly orchestrator: EditOrchestratorService;
   private readonly targetResolver: TargetResolverService;
@@ -191,6 +252,7 @@ export class EditHandlerService {
       canonicalOperator: planned.plan.canonicalOperator || null,
       intentSource: planned.plan.intentSource,
       resolvedTargetId: resolvedTarget.id,
+      viewerContext: buildSupportViewerContext(planned.plan, resolvedTarget),
     });
 
     if (!contract.ok) {

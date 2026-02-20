@@ -1,6 +1,9 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
-import { authMiddleware, optionalAuth } from "../../../middleware/auth.middleware";
+import {
+  authMiddleware,
+  optionalAuth,
+} from "../../../middleware/auth.middleware";
 import prisma from "../../../config/database";
 import createStorageRouter from "../../../controllers/storage.controller";
 import path from "path";

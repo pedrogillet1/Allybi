@@ -21,6 +21,7 @@ export interface RuntimeWiringIntegrityResult {
   memoryDelegateDirectInstantiation: string[];
   memoryRawPersistencePatterns: string[];
   memoryPolicyHookEngineMissing: string[];
+  dormantIntentConfigUsage: string[];
 }
 
 function asTrimmedString(value: unknown): string {
@@ -236,7 +237,10 @@ function collectHardcodedRuntimeHeuristics(): string[] {
       process.cwd(),
       "backend/src/modules/chat/runtime/ChatRuntimeOrchestrator.ts",
     ),
-    path.join(process.cwd(), "backend/src/modules/chat/runtime/ScopeService.ts"),
+    path.join(
+      process.cwd(),
+      "backend/src/modules/chat/runtime/ScopeService.ts",
+    ),
     path.join(
       process.cwd(),
       "backend/src/services/core/retrieval/evidenceGate.service.ts",
@@ -364,8 +368,14 @@ function collectMemoryRawPersistencePatterns(): string[] {
 
 function collectMemoryPolicyHookEngineMissing(): string[] {
   const candidatePaths = [
-    path.join(process.cwd(), "backend/src/services/memory/memoryPolicyEngine.service.ts"),
-    path.join(process.cwd(), "src/services/memory/memoryPolicyEngine.service.ts"),
+    path.join(
+      process.cwd(),
+      "backend/src/services/memory/memoryPolicyEngine.service.ts",
+    ),
+    path.join(
+      process.cwd(),
+      "src/services/memory/memoryPolicyEngine.service.ts",
+    ),
   ];
   const failures: string[] = [];
   for (const filePath of candidatePaths) {
@@ -379,6 +389,28 @@ function collectMemoryPolicyHookEngineMissing(): string[] {
         !/integrationHooks/.test(src) ||
         !/memory_policy integration hook banks missing/.test(src)
       ) {
+        failures.push(filePath);
+      }
+    } catch {
+      failures.push(filePath);
+    }
+  }
+  return failures;
+}
+
+function collectDormantIntentConfigUsage(): string[] {
+  const candidatePaths = [
+    path.join(process.cwd(), "backend/src/services/chat/turnRouter.service.ts"),
+    path.join(process.cwd(), "src/services/chat/turnRouter.service.ts"),
+  ];
+  const failures: string[] = [];
+  for (const filePath of candidatePaths) {
+    if (!fs.existsSync(filePath)) continue;
+    try {
+      const src = fs.readFileSync(filePath, "utf8");
+      const hasServiceRef = /\bIntentConfigService\b/.test(src);
+      const hasDecideCall = /\bintentConfig\.(?:decide)\(/.test(src);
+      if (!hasServiceRef || !hasDecideCall) {
         failures.push(filePath);
       }
     } catch {
@@ -475,6 +507,7 @@ export class RuntimeWiringIntegrityService {
     const memoryRawPersistencePatterns = collectMemoryRawPersistencePatterns();
     const memoryPolicyHookEngineMissing =
       collectMemoryPolicyHookEngineMissing();
+    const dormantIntentConfigUsage = collectDormantIntentConfigUsage();
 
     return {
       ok:
@@ -491,7 +524,8 @@ export class RuntimeWiringIntegrityService {
         rawConsoleRuntimeUsage.length === 0 &&
         memoryDelegateDirectInstantiation.length === 0 &&
         memoryRawPersistencePatterns.length === 0 &&
-        memoryPolicyHookEngineMissing.length === 0,
+        memoryPolicyHookEngineMissing.length === 0 &&
+        dormantIntentConfigUsage.length === 0,
       missingBanks,
       missingOperatorContracts,
       missingOperatorOutputShapes,
@@ -506,6 +540,7 @@ export class RuntimeWiringIntegrityService {
       memoryDelegateDirectInstantiation,
       memoryRawPersistencePatterns,
       memoryPolicyHookEngineMissing,
+      dormantIntentConfigUsage,
     };
   }
 }

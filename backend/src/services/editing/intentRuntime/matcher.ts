@@ -57,7 +57,17 @@ const POINTS = {
   NEGATIVE_PENALTY: 15,
 };
 
-function scorePattern(pattern: IntentPattern, text: string): number {
+type PatternScore = {
+  score: number;
+  matchedTriggers: string[];
+};
+
+function isStrictIntentRuntimeEnv(): boolean {
+  const env = String(process.env.NODE_ENV || "").toLowerCase();
+  return env === "production" || env === "staging";
+}
+
+function scorePattern(pattern: IntentPattern, text: string): PatternScore {
   const normText = normalize(text);
   const textTokens = tokenize(text);
   let score = 0;
@@ -72,7 +82,11 @@ function scorePattern(pattern: IntentPattern, text: string): number {
           matchedTriggers.push(`regex:${rgx.slice(0, 40)}`);
         }
       } catch {
-        // Skip invalid regex
+        if (isStrictIntentRuntimeEnv()) {
+          throw new Error(
+            `Invalid regex in intent pattern ${pattern.id}: ${String(rgx)}`,
+          );
+        }
       }
     }
   }
@@ -106,7 +120,7 @@ function scorePattern(pattern: IntentPattern, text: string): number {
     for (const tok of pattern.triggers.tokens_none) {
       const normTok = normalize(tok);
       if (textTokens.has(normTok) || normText.includes(normTok)) {
-        return { score: 0, matchedTriggers: [] } as any;
+        return { score: 0, matchedTriggers: [] };
       }
     }
   }
@@ -127,7 +141,7 @@ function scorePattern(pattern: IntentPattern, text: string): number {
     }
   }
 
-  return { score, matchedTriggers } as any;
+  return { score, matchedTriggers };
 }
 
 function jaccardScore(a: string, b: string): number {
@@ -155,10 +169,7 @@ export function matchSegment(
   const candidates: MatchCandidate[] = [];
 
   for (const pattern of patterns) {
-    const result = scorePattern(pattern, segment.text) as unknown as {
-      score: number;
-      matchedTriggers: string[];
-    };
+    const result = scorePattern(pattern, segment.text);
 
     if (result.score <= 0) continue;
 

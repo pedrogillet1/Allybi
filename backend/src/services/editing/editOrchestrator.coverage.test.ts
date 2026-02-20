@@ -55,7 +55,9 @@ function target(overrides: Partial<ResolvedTarget> = {}): ResolvedTarget {
   };
 }
 
-function previewRequest(overrides: Partial<EditPreviewRequest> = {}): EditPreviewRequest {
+function previewRequest(
+  overrides: Partial<EditPreviewRequest> = {},
+): EditPreviewRequest {
   return {
     plan: plan(),
     target: target(),
@@ -76,7 +78,9 @@ describe("EditOrchestratorService coverage branches", () => {
   it("tracks failed and successful planning outcomes", async () => {
     const telemetry = { track: jest.fn(async () => undefined) };
     const serviceFail = new EditOrchestratorService({
-      planService: { plan: jest.fn(() => ({ ok: false, error: "bad plan" })) } as any,
+      planService: {
+        plan: jest.fn(() => ({ ok: false, error: "bad plan" })),
+      } as any,
       telemetry: telemetry as any,
       policy: permissivePolicy,
     });
@@ -96,7 +100,13 @@ describe("EditOrchestratorService coverage branches", () => {
       planService: {
         plan: jest.fn(() => ({
           ok: true,
-          plan: plan({ diagnostics: { extractedEntities: [], extractedHints: [], checks: [] } }),
+          plan: plan({
+            diagnostics: {
+              extractedEntities: [],
+              extractedHints: [],
+              checks: [],
+            },
+          }),
         })),
       } as any,
       telemetry: telemetry as any,
@@ -336,7 +346,9 @@ describe("EditOrchestratorService coverage branches", () => {
 
     const okStore = {
       createRevision: jest.fn(),
-      undoToRevision: jest.fn(async () => ({ restoredRevisionId: "rev_restored" })),
+      undoToRevision: jest.fn(async () => ({
+        restoredRevisionId: "rev_restored",
+      })),
     };
     const okService = new EditOrchestratorService({
       revisionStore: okStore as any,
@@ -367,4 +379,3 @@ describe("EditOrchestratorService coverage branches", () => {
     expect(String(failOut.error || "")).toContain("undo failed");
   });
 });
-

@@ -39,6 +39,11 @@ const DEFAULT_CONNECTORS_PT = [
   "e",
 ];
 
+function isStrictIntentRuntimeEnv(): boolean {
+  const env = String(process.env.NODE_ENV || "").toLowerCase();
+  return env === "production" || env === "staging";
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -53,6 +58,11 @@ export function segmentMessage(
   // Try loading connectors from lexicon banks, fall back to defaults
   let connectors = getConnectors(language);
   if (!connectors.length) {
+    if (isStrictIntentRuntimeEnv()) {
+      throw new Error(
+        `intentRuntime connectors missing for language '${language}' (multi_intent_connectors)`,
+      );
+    }
     connectors =
       language === "pt" ? DEFAULT_CONNECTORS_PT : DEFAULT_CONNECTORS_EN;
   }

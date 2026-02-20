@@ -72,14 +72,11 @@ describe("Centralized memory/semantic continuity wiring", () => {
     () => {
       const bank = JSON.parse(fs.readFileSync(memoryPolicyTestsPath, "utf8"));
       const cases = Array.isArray(bank?.cases) ? bank.cases : [];
-      const counts = cases.reduce(
-        (acc: Record<string, number>, entry: any) => {
-          const lang = String(entry?.language || "any").toLowerCase();
-          acc[lang] = (acc[lang] || 0) + 1;
-          return acc;
-        },
-        {},
-      );
+      const counts = cases.reduce((acc: Record<string, number>, entry: any) => {
+        const lang = String(entry?.language || "any").toLowerCase();
+        acc[lang] = (acc[lang] || 0) + 1;
+        return acc;
+      }, {});
 
       expect(cases.length).toBeGreaterThanOrEqual(45);
       expect(counts.en || 0).toBeGreaterThanOrEqual(12);

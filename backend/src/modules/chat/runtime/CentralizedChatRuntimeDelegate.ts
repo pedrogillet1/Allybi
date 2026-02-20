@@ -35,7 +35,10 @@ import {
   type EvidenceItem,
   type RetrievalRequest,
 } from "../../../services/core/retrieval/retrievalEngine.service";
-import { EvidenceGateService } from "../../../services/core/retrieval/evidenceGate.service";
+import {
+  EvidenceGateService,
+  type EvidenceCheckResult,
+} from "../../../services/core/retrieval/evidenceGate.service";
 import { getSourceButtonsService } from "../../../services/core/retrieval/sourceButtons.service";
 import { PrismaRetrievalAdapterFactory } from "../../../services/core/retrieval/prismaRetrievalAdapters.service";
 import {
@@ -301,9 +304,7 @@ function buildTruncationFromTelemetry(
   };
 }
 
-function normalizeChatLanguage(
-  value: unknown,
-): "en" | "pt" | "es" {
+function normalizeChatLanguage(value: unknown): "en" | "pt" | "es" {
   const lang = String(value || "")
     .trim()
     .toLowerCase();
@@ -340,7 +341,8 @@ export class CentralizedChatRuntimeDelegate {
   ) {
     this.encryptedRepo = opts?.encryptedRepo;
     this.encryptedContext = opts?.encryptedContext;
-    this.conversationMemory = opts?.conversationMemory as ConversationMemoryService;
+    this.conversationMemory =
+      opts?.conversationMemory as ConversationMemoryService;
     if (!this.conversationMemory) {
       throw new RuntimePolicyError(
         "RUNTIME_POLICY_INVALID",
@@ -385,28 +387,98 @@ export class CentralizedChatRuntimeDelegate {
         req.message,
       );
       const retrievalPack = await this.retrieveEvidence(req);
+      const evidenceGateDecision = this.evaluateEvidenceGateDecision(
+        req,
+        retrievalPack,
+      );
       const answerMode = this.resolveAnswerMode(req, retrievalPack);
       const answerClass: AnswerClass =
         answerMode === "general_answer" ? "GENERAL" : "DOCUMENT";
       const navType: NavType = null;
 
-      const messages = this.buildEngineMessages(
-        history,
-        req.message,
-        retrievalPack,
-      );
       const sourceButtonsAttachment = this.buildSourceButtonsAttachment(
         retrievalPack,
         req.preferredLanguage,
       );
+      const sources: ChatSourceEntry[] = buildSourcesFromEvidence(
+        retrievalPack?.evidence ?? [],
+      );
+      const bypass = this.resolveEvidenceGateBypass(
+        evidenceGateDecision,
+        req.preferredLanguage,
+      );
+      if (bypass) {
+        const assistantMessage = await this.createMessage({
+          conversationId,
+          role: "assistant",
+          content: bypass.text,
+          userId: req.userId,
+          attachments: sourceButtonsAttachment,
+          telemetry: null,
+          metadata: {
+            sources,
+            answerMode,
+            answerClass,
+            navType,
+            fallbackReasonCode: bypass.failureCode,
+            evidenceGate: {
+              action: evidenceGateDecision?.suggestedAction ?? "unknown",
+              strength: evidenceGateDecision?.evidenceStrength ?? "none",
+            },
+          },
+        });
+        return {
+          conversationId,
+          userMessageId: userMessage.id,
+          assistantMessageId: assistantMessage.id,
+          assistantText: bypass.text,
+          attachmentsPayload: sourceButtonsAttachment,
+          assistantTelemetry: undefined,
+          sources: [...sources],
+          followups: [],
+          answerMode,
+          answerClass,
+          navType,
+          fallbackReasonCode: bypass.failureCode,
+          status: "partial",
+          failureCode: bypass.failureCode,
+          completion: {
+            answered: false,
+            missingSlots: [],
+            nextAction: null,
+          },
+          truncation: {
+            occurred: false,
+            reason: null,
+            resumeToken: null,
+          },
+          evidence: {
+            required: (req.attachedDocumentIds || []).length > 0,
+            provided: sources.length > 0,
+            sourceIds: sources.map((s) => s.documentId),
+          },
+        };
+      }
 
+      const messages = this.buildEngineMessages(
+        history,
+        req.message,
+        retrievalPack,
+        req.preferredLanguage,
+        evidenceGateDecision,
+      );
       const generated = await this.engine.generate({
         traceId,
         userId: req.userId,
         conversationId,
         messages,
         context: this.buildRuntimeContext(req, retrievalPack),
-        meta: this.buildRuntimeMeta(req, retrievalPack, answerMode),
+        meta: this.buildRuntimeMeta(
+          req,
+          retrievalPack,
+          answerMode,
+          evidenceGateDecision,
+        ),
       });
 
       const assistantTextRaw = String(generated.text || "").trim();
@@ -414,15 +486,16 @@ export class CentralizedChatRuntimeDelegate {
         req,
         retrievalPack,
       );
-      const assistantText =
+      const assistantTextBase =
         assistantTextRaw ||
         buildEmptyAssistantText({
           language: req.preferredLanguage,
           reasonCode: fallbackReasonCode,
           seed: `${conversationId}:chat:${fallbackReasonCode || "empty_model_response"}`,
         });
-      const sources: ChatSourceEntry[] = buildSourcesFromEvidence(
-        retrievalPack?.evidence ?? [],
+      const assistantText = this.applyEvidenceGatePostProcessText(
+        assistantTextBase,
+        evidenceGateDecision,
       );
       const attachmentsPayload = mergeAttachments(
         generated.attachmentsPayload,
@@ -442,6 +515,12 @@ export class CentralizedChatRuntimeDelegate {
           answerClass,
           navType,
           fallbackReasonCode,
+          evidenceGate: evidenceGateDecision
+            ? {
+                action: evidenceGateDecision.suggestedAction,
+                strength: evidenceGateDecision.evidenceStrength,
+              }
+            : null,
         },
       });
 
@@ -530,22 +609,95 @@ export class CentralizedChatRuntimeDelegate {
         req.message,
       );
       const retrievalPack = await this.retrieveEvidence(req);
+      const evidenceGateDecision = this.evaluateEvidenceGateDecision(
+        req,
+        retrievalPack,
+      );
       const answerMode = this.resolveAnswerMode(req, retrievalPack);
       const answerClass: AnswerClass =
         answerMode === "general_answer" ? "GENERAL" : "DOCUMENT";
       const navType: NavType = null;
 
-      const messages = this.buildEngineMessages(
-        history,
-        req.message,
-        retrievalPack,
-      );
       const sourceButtonsAttachment = this.buildSourceButtonsAttachment(
         retrievalPack,
         req.preferredLanguage,
       );
       const sources: ChatSourceEntry[] = buildSourcesFromEvidence(
         retrievalPack?.evidence ?? [],
+      );
+      const bypass = this.resolveEvidenceGateBypass(
+        evidenceGateDecision,
+        req.preferredLanguage,
+      );
+      if (bypass) {
+        if (sink.isOpen()) {
+          sink.write({
+            event: "progress",
+            data: {
+              stage: "validation",
+              message: "Evidence policy requested clarification",
+              t: Date.now(),
+            },
+          });
+        }
+        const assistantMessage = await this.createMessage({
+          conversationId,
+          role: "assistant",
+          content: bypass.text,
+          userId: req.userId,
+          attachments: sourceButtonsAttachment,
+          telemetry: null,
+          metadata: {
+            sources,
+            answerMode,
+            answerClass,
+            navType,
+            fallbackReasonCode: bypass.failureCode,
+            evidenceGate: {
+              action: evidenceGateDecision?.suggestedAction ?? "unknown",
+              strength: evidenceGateDecision?.evidenceStrength ?? "none",
+            },
+          },
+        });
+        return {
+          conversationId,
+          userMessageId: userMessage.id,
+          assistantMessageId: assistantMessage.id,
+          assistantText: bypass.text,
+          attachmentsPayload: sourceButtonsAttachment,
+          assistantTelemetry: undefined,
+          sources: [...sources],
+          followups: [],
+          answerMode,
+          answerClass,
+          navType,
+          fallbackReasonCode: bypass.failureCode,
+          status: "partial",
+          failureCode: bypass.failureCode,
+          completion: {
+            answered: false,
+            missingSlots: [],
+            nextAction: null,
+          },
+          truncation: {
+            occurred: false,
+            reason: null,
+            resumeToken: null,
+          },
+          evidence: {
+            required: (req.attachedDocumentIds || []).length > 0,
+            provided: sources.length > 0,
+            sourceIds: sources.map((s) => s.documentId),
+          },
+        };
+      }
+
+      const messages = this.buildEngineMessages(
+        history,
+        req.message,
+        retrievalPack,
+        req.preferredLanguage,
+        evidenceGateDecision,
       );
 
       if (sink.isOpen() && sources.length > 0) {
@@ -573,7 +725,12 @@ export class CentralizedChatRuntimeDelegate {
         conversationId,
         messages,
         context: this.buildRuntimeContext(req, retrievalPack),
-        meta: this.buildRuntimeMeta(req, retrievalPack, answerMode),
+        meta: this.buildRuntimeMeta(
+          req,
+          retrievalPack,
+          answerMode,
+          evidenceGateDecision,
+        ),
         sink,
         streamingConfig,
       });
@@ -583,13 +740,17 @@ export class CentralizedChatRuntimeDelegate {
         req,
         retrievalPack,
       );
-      const assistantText =
+      const assistantTextBase =
         assistantTextRaw ||
         buildEmptyAssistantText({
           language: req.preferredLanguage,
           reasonCode: fallbackReasonCode,
           seed: `${conversationId}:stream:${fallbackReasonCode || "empty_model_response"}`,
         });
+      const assistantText = this.applyEvidenceGatePostProcessText(
+        assistantTextBase,
+        evidenceGateDecision,
+      );
       const attachmentsPayload = mergeAttachments(
         streamed.attachmentsPayload,
         sourceButtonsAttachment,
@@ -608,6 +769,12 @@ export class CentralizedChatRuntimeDelegate {
           answerClass,
           navType,
           fallbackReasonCode,
+          evidenceGate: evidenceGateDecision
+            ? {
+                action: evidenceGateDecision.suggestedAction,
+                strength: evidenceGateDecision.evidenceStrength,
+              }
+            : null,
         },
       });
 
@@ -1126,7 +1293,8 @@ export class CentralizedChatRuntimeDelegate {
   }
 
   private getMemoryRuntimeTuning(): MemoryRuntimeTuning {
-    return this.getMemoryPolicyRuntimeConfig().runtimeTuning as MemoryRuntimeTuning;
+    return this.getMemoryPolicyRuntimeConfig()
+      .runtimeTuning as MemoryRuntimeTuning;
   }
 
   private resolveSemanticSignalRegexFlags(): string {
@@ -1334,9 +1502,7 @@ export class CentralizedChatRuntimeDelegate {
           role: "system",
           content: [
             "CONVERSATION_MEMORY_RECALL",
-            ...ranked.map(
-              (entry, idx) => `${idx + 1}. ${entry.summary}`,
-            ),
+            ...ranked.map((entry, idx) => `${idx + 1}. ${entry.summary}`),
           ].join("\n"),
         });
       }
@@ -1474,7 +1640,9 @@ export class CentralizedChatRuntimeDelegate {
 
         const contextMeta = asObject(existing.contextMeta);
         const priorMemory = asObject(contextMeta.memory);
-        const priorRecentMessageIds = toStringArray(priorMemory.recentMessageIds);
+        const priorRecentMessageIds = toStringArray(
+          priorMemory.recentMessageIds,
+        );
         if (priorRecentMessageIds.includes(input.messageId)) {
           return;
         }
@@ -1494,18 +1662,16 @@ export class CentralizedChatRuntimeDelegate {
           ...priorRecentMessageIds,
         ].slice(0, recentMessageIdMaxItems);
         const nextKeyTopics = Array.from(
-          new Set([
-            ...priorKeyTopics,
-            intentFamily,
-          ]),
+          new Set([...priorKeyTopics, intentFamily]),
         )
           .filter(Boolean)
           .slice(0, keyTopicMaxItems);
 
-        const nextSourceDocumentIds = this.memoryRedaction.sanitizeSourceDocumentIds(
-          [...priorSourceDocumentIds, ...sourceDocumentIds],
-          maxPersistedSourceDocumentIds,
-        );
+        const nextSourceDocumentIds =
+          this.memoryRedaction.sanitizeSourceDocumentIds(
+            [...priorSourceDocumentIds, ...sourceDocumentIds],
+            maxPersistedSourceDocumentIds,
+          );
 
         const nextRecall = [
           this.memoryRedaction.buildPersistedRecallEntry({
@@ -1533,8 +1699,10 @@ export class CentralizedChatRuntimeDelegate {
               ),
               sourceCount: Math.max(
                 0,
-                Number(record.sourceCount || toStringArray(record.sourceDocumentIds).length) ||
-                  0,
+                Number(
+                  record.sourceCount ||
+                    toStringArray(record.sourceDocumentIds).length,
+                ) || 0,
               ),
               summary: String(record.summary || "").trim(),
               contentHash: String(record.contentHash || "").trim(),
@@ -1742,7 +1910,11 @@ export class CentralizedChatRuntimeDelegate {
         unsafeGate: contextSignals.unsafeGate === true,
         allowExpansion:
           contextSignals.allowExpansion !== false &&
-          !(followupActive && attached.length === 0 && staleScopePenalty >= 0.5),
+          !(
+            followupActive &&
+            attached.length === 0 &&
+            staleScopePenalty >= 0.5
+          ),
       },
     };
 
@@ -1758,14 +1930,6 @@ export class CentralizedChatRuntimeDelegate {
     }
     pack.evidence = pack.evidence.slice(0, Math.floor(maxEvidence));
 
-    if (pack.evidence.length > 0) {
-      this.evidenceGate.checkEvidence(
-        req.message,
-        pack.evidence.map((item) => ({ text: item.snippet ?? "" })),
-        req.preferredLanguage || "en",
-      );
-    }
-
     return pack;
   }
 
@@ -1773,6 +1937,8 @@ export class CentralizedChatRuntimeDelegate {
     history: Array<{ role: ChatRole; content: string }>,
     userText: string,
     retrievalPack: EvidencePack | null,
+    preferredLanguage?: string,
+    evidenceGateDecision?: EvidenceCheckResult | null,
   ): Array<{ role: ChatRole; content: string; attachments?: unknown | null }> {
     const cleanedHistory = textForRoleHistory(
       history.map((item, idx) => ({
@@ -1801,6 +1967,16 @@ export class CentralizedChatRuntimeDelegate {
       withEvidence.push({
         role: "system",
         content: this.renderEvidenceSystemBlock(retrievalPack),
+      });
+    }
+    const gatePrompt = this.renderEvidenceGatePromptBlock(
+      evidenceGateDecision || null,
+      preferredLanguage,
+    );
+    if (gatePrompt) {
+      withEvidence.push({
+        role: "system",
+        content: gatePrompt,
       });
     }
 
@@ -1857,6 +2033,7 @@ export class CentralizedChatRuntimeDelegate {
     req: ChatRequest,
     retrievalPack: EvidencePack | null,
     answerMode: AnswerMode,
+    evidenceGateDecision?: EvidenceCheckResult | null,
   ): Record<string, unknown> {
     const sourceCount = retrievalPack?.evidence.length ?? 0;
     return {
@@ -1867,7 +2044,100 @@ export class CentralizedChatRuntimeDelegate {
       operator: sourceCount > 0 ? "answer_with_sources" : "answer",
       fallbackReasonCode: this.resolveFallbackReasonCode(req, retrievalPack),
       retrievalStats: retrievalPack?.stats ?? null,
+      evidenceGate: evidenceGateDecision
+        ? {
+            action: evidenceGateDecision.suggestedAction,
+            strength: evidenceGateDecision.evidenceStrength,
+            missingEvidence: evidenceGateDecision.missingEvidence,
+          }
+        : null,
     };
+  }
+
+  private evaluateEvidenceGateDecision(
+    req: ChatRequest,
+    retrievalPack: EvidencePack | null,
+  ): EvidenceCheckResult | null {
+    if (!retrievalPack) return null;
+    const hasDocContext =
+      (req.attachedDocumentIds || []).length > 0 ||
+      Boolean(retrievalPack.scope?.hardScopeActive) ||
+      retrievalPack.evidence.length > 0;
+    if (!hasDocContext) return null;
+    return this.evidenceGate.checkEvidence(
+      req.message,
+      retrievalPack.evidence.map((item) => ({ text: item.snippet ?? "" })),
+      normalizeChatLanguage(req.preferredLanguage || "en"),
+    );
+  }
+
+  private resolveEvidenceGateBypass(
+    decision: EvidenceCheckResult | null | undefined,
+    language?: string,
+  ): { text: string; failureCode: string } | null {
+    if (!decision) return null;
+    const lang = normalizeChatLanguage(language);
+    if (decision.suggestedAction === "clarify") {
+      const question =
+        String(decision.clarifyQuestion || "").trim() ||
+        (lang === "pt"
+          ? "Qual parte exata você quer validar no documento?"
+          : lang === "es"
+            ? "¿Qué parte exacta quieres validar en el documento?"
+            : "Which exact part do you want me to validate in the document?");
+      const prompt =
+        lang === "pt"
+          ? `Preciso de uma confirmação para responder com precisão: ${question}`
+          : lang === "es"
+            ? `Necesito una confirmación para responder con precisión: ${question}`
+            : `I need one clarification to answer precisely: ${question}`;
+      return {
+        text: prompt,
+        failureCode: "EVIDENCE_NEEDS_CLARIFICATION",
+      };
+    }
+    if (decision.suggestedAction === "apologize") {
+      const text =
+        lang === "pt"
+          ? "Não encontrei evidência suficiente nos documentos para responder com segurança."
+          : lang === "es"
+            ? "No encontré evidencia suficiente en los documentos para responder con seguridad."
+            : "I could not find enough evidence in your documents to answer safely.";
+      return {
+        text,
+        failureCode: "EVIDENCE_INSUFFICIENT",
+      };
+    }
+    return null;
+  }
+
+  private applyEvidenceGatePostProcessText(
+    text: string,
+    decision: EvidenceCheckResult | null | undefined,
+  ): string {
+    const normalized = String(text || "").trim();
+    if (!normalized || !decision) return normalized;
+    if (decision.suggestedAction !== "hedge") return normalized;
+    const prefix = String(decision.hedgePrefix || "").trim();
+    if (!prefix) return normalized;
+    const startsWithPrefix =
+      normalized.toLowerCase().startsWith(prefix.toLowerCase()) ||
+      normalized.toLowerCase().startsWith(`${prefix.toLowerCase()},`);
+    if (startsWithPrefix) return normalized;
+    return `${prefix} ${normalized}`.trim();
+  }
+
+  private renderEvidenceGatePromptBlock(
+    decision: EvidenceCheckResult | null,
+    language?: string,
+  ): string | null {
+    if (!decision) return null;
+    const prompt = this.evidenceGate.getPromptModification(
+      decision,
+      normalizeChatLanguage(language || "en"),
+    );
+    const trimmed = String(prompt || "").trim();
+    return trimmed || null;
   }
 
   private buildRuntimeContext(
