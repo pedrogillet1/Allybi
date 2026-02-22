@@ -76,3 +76,4 @@ frontend/e2e/test-results/
 tmpclaude-*-cwd/
 *.patch
 backend/src/services/analytics/feedbackLogger.service.ts
+.worktrees/
