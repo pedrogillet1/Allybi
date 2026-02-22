@@ -63,7 +63,7 @@ describe("EvidenceGateService", () => {
     });
   });
 
-  it("asks for clarification when evidence is weak and query is narrative-risk", async () => {
+  it("apologizes when evidence is off-topic and query asks for dates", async () => {
     const { EvidenceGateService } = await import("./evidenceGate.service");
     const gate = new EvidenceGateService();
     const result = gate.checkEvidence(
@@ -71,6 +71,20 @@ describe("EvidenceGateService", () => {
       [{ text: "This section provides broad context without exact dates." }],
       "en",
     );
+    // Evidence has no dates and no topic overlap → insufficient evidence
+    expect(result.suggestedAction).toBe("apologize");
+    expect(result.evidenceStrength).toBe("none");
+  });
+
+  it("asks for clarification when evidence is weak and query is narrative-risk", async () => {
+    const { EvidenceGateService } = await import("./evidenceGate.service");
+    const gate = new EvidenceGateService();
+    const result = gate.checkEvidence(
+      "what is the company history and background",
+      [{ text: "The company was established in a competitive market environment with various stakeholders." }],
+      "en",
+    );
+    // Evidence has topic overlap ("company") but no required facts → weak + narrative risk = clarify
     expect(result.suggestedAction).toBe("clarify");
     expect(result.clarifyQuestion).toBe("Which file should I use?");
   });

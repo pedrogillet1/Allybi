@@ -208,10 +208,12 @@ export class EvidenceGateService {
 
     const combinedText = chunks.map((c) => c.text).join("\n");
     const foundEvidence = this.findEvidence(combinedText);
+    const topicOverlap = this.computeQueryTopicOverlap(queryLower, combinedText);
     const evidenceStrength = this.calculateStrength(
       requiredFactTypes,
       foundEvidence,
       chunks.length,
+      topicOverlap,
     );
 
     const result = this.determineAction(
@@ -227,6 +229,7 @@ export class EvidenceGateService {
       requiredFactTypes,
       foundEvidence,
       evidenceStrength,
+      topicOverlap: topicOverlap.toFixed(2),
       action: result.suggestedAction,
       isNarrativeRisk,
     });
@@ -263,13 +266,68 @@ export class EvidenceGateService {
     return found;
   }
 
+  /**
+   * Extract meaningful keywords from query text for topic overlap check.
+   * Strips common stop words and returns lowercased terms (≥3 chars).
+   */
+  private extractQueryKeywords(queryLower: string): string[] {
+    const stopWords = new Set([
+      // English
+      "the", "and", "for", "are", "but", "not", "you", "all", "can", "had",
+      "her", "was", "one", "our", "out", "has", "his", "how", "its", "may",
+      "who", "did", "get", "let", "say", "she", "too", "use", "what", "which",
+      "will", "with", "this", "that", "from", "they", "been", "have", "many",
+      "some", "them", "than", "each", "make", "like", "does", "into", "over",
+      "such", "when", "very", "much", "about", "could", "would", "should",
+      "there", "these", "those", "where", "being", "other", "their",
+      // Portuguese
+      "que", "para", "com", "uma", "por", "mais", "como", "mas", "dos",
+      "das", "nos", "nas", "foi", "são", "tem", "ser", "ter", "seu", "sua",
+      "seus", "suas", "este", "esta", "estes", "estas", "isso", "esse", "essa",
+      "quais", "qual", "sobre", "entre", "todos", "todas", "cada", "muito",
+      // Spanish
+      "que", "para", "con", "una", "por", "más", "como", "pero", "del",
+      "los", "las", "fue", "son", "tiene", "ser", "este", "esta",
+    ]);
+    return queryLower
+      .replace(/[^a-záàâãéèêíïóôõöúçñ0-9\s]/gi, " ")
+      .split(/\s+/)
+      .filter((w) => w.length >= 3 && !stopWords.has(w));
+  }
+
+  /**
+   * Compute what fraction of the query's topic keywords appear in the evidence.
+   * Returns 0.0 (no overlap) to 1.0 (all query keywords found in evidence).
+   */
+  private computeQueryTopicOverlap(
+    queryLower: string,
+    evidenceText: string,
+  ): number {
+    const keywords = this.extractQueryKeywords(queryLower);
+    if (keywords.length === 0) return 1.0; // No meaningful keywords → assume generic query, pass through
+    const evidenceLower = evidenceText.toLowerCase();
+    const matched = keywords.filter((kw) => evidenceLower.includes(kw));
+    return matched.length / keywords.length;
+  }
+
   private calculateStrength(
     required: string[],
     found: string[],
     chunkCount: number,
+    topicOverlap: number,
   ): "strong" | "moderate" | "weak" | "none" {
-    if (required.length === 0 && chunkCount > 0) {
-      return found.includes("rich_content") ? "strong" : "moderate";
+    // No chunks at all → no evidence
+    if (chunkCount === 0) return "none";
+
+    // When no specific fact types were required, use topic overlap to determine strength.
+    // This prevents the gate from always returning "strong" for generic evidence.
+    if (required.length === 0) {
+      const hasRichContent = found.includes("rich_content");
+      if (topicOverlap >= 0.6 && hasRichContent) return "strong";
+      if (topicOverlap >= 0.4 && hasRichContent) return "moderate";
+      if (topicOverlap >= 0.2) return "weak";
+      // Very low topic overlap — evidence doesn't match the question at all
+      return hasRichContent ? "weak" : "none";
     }
 
     const matchedRequired = required.filter((r) => {
@@ -287,9 +345,12 @@ export class EvidenceGateService {
 
     const matchRatio =
       required.length > 0 ? matchedRequired.length / required.length : 0;
+
+    // When fact types are explicitly required and matched, trust the fact-pattern matching.
+    // Fact patterns already encode "what the user needs", so high match → strong.
     if (matchRatio >= this.runtimeConfig.strongThreshold) return "strong";
     if (matchRatio >= this.runtimeConfig.moderateThreshold) return "moderate";
-    if (matchRatio > 0 || found.includes("rich_content")) return "weak";
+    if (matchRatio > 0 || (found.includes("rich_content") && topicOverlap >= 0.3)) return "weak";
     return "none";
   }
 

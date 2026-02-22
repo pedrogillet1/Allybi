@@ -2,9 +2,9 @@
   "_meta": {
     "id": "fallback_router",
     "version": "1.0.0",
-    "description": "Deterministic fallback router for Koda. Selects a fallback action based on stage + reason codes + doc-lock + risk tier. No user-facing microcopy; outputs action + reasonCode + optional nextOperator/provider directives.",
-    "languages": ["any"],
-    "lastUpdated": "2026-01-27"
+    "description": "Deterministic fallback router for Koda. Selects a fallback action based on stage + reason codes + doc-lock + risk tier. Includes user-facing fallback scenarios with localized microcopy for NO_DOCUMENTS, OUT_OF_SCOPE, and AMBIGUOUS_QUESTION.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-22"
   },
   "config": {
     "enabled": true,
@@ -341,6 +341,86 @@
         "fallbackModelKey": "OLLAMA_DEFAULT_STREAM",
         "telemetryReason": "PROVIDER_DOWN"
       }
+    }
+  ],
+  "scenarios": [
+    {
+      "key": "NO_DOCUMENTS",
+      "category": "retrieval_failure",
+      "description": "Retrieval found no relevant content in the attached documents for the user's question.",
+      "styles": [
+        {
+          "id": "transparent_guidance",
+          "tone": "helpful",
+          "renderHint": { "layout": "simple", "showIcon": true, "icon": "info" },
+          "languages": {
+            "en": {
+              "template": "I searched your documents but couldn't find content relevant to this question. {{reason}} Could you rephrase or point me to which document might have this information?",
+              "placeholders": ["reason"]
+            },
+            "pt": {
+              "template": "Pesquisei nos seus documentos, mas não encontrei conteúdo relevante para esta pergunta. {{reason}} Poderia reformular ou indicar qual documento pode ter essa informação?",
+              "placeholders": ["reason"]
+            },
+            "es": {
+              "template": "Busqué en sus documentos pero no encontré contenido relevante para esta pregunta. {{reason}} ¿Podría reformular o indicar qué documento podría tener esta información?",
+              "placeholders": ["reason"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "OUT_OF_SCOPE",
+      "category": "scope_mismatch",
+      "description": "The question does not appear to be covered by the attached documents.",
+      "styles": [
+        {
+          "id": "transparent_guidance",
+          "tone": "helpful",
+          "renderHint": { "layout": "simple", "showIcon": true, "icon": "info" },
+          "languages": {
+            "en": {
+              "template": "This question doesn't appear to be covered in the attached documents. The documents I have access to cover: {{topics}}. Would you like to ask something about those topics instead?",
+              "placeholders": ["topics"]
+            },
+            "pt": {
+              "template": "Esta pergunta não parece estar coberta nos documentos anexados. Os documentos que tenho acesso cobrem: {{topics}}. Gostaria de perguntar algo sobre esses temas?",
+              "placeholders": ["topics"]
+            },
+            "es": {
+              "template": "Esta pregunta no parece estar cubierta en los documentos adjuntos. Los documentos a los que tengo acceso cubren: {{topics}}. ¿Le gustaría preguntar algo sobre esos temas?",
+              "placeholders": ["topics"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "AMBIGUOUS_QUESTION",
+      "category": "clarification_needed",
+      "description": "The question is too broad or ambiguous to produce a focused answer from the available evidence.",
+      "styles": [
+        {
+          "id": "one_clarification",
+          "tone": "collaborative",
+          "renderHint": { "layout": "simple", "showIcon": false },
+          "languages": {
+            "en": {
+              "template": "I found information in your documents, but your question could refer to several topics. Could you clarify which aspect you'd like me to focus on? {{suggestion}}",
+              "placeholders": ["suggestion"]
+            },
+            "pt": {
+              "template": "Encontrei informações nos seus documentos, mas sua pergunta pode se referir a vários temas. Poderia esclarecer em qual aspecto gostaria que eu focasse? {{suggestion}}",
+              "placeholders": ["suggestion"]
+            },
+            "es": {
+              "template": "Encontré información en sus documentos, pero su pregunta podría referirse a varios temas. ¿Podría aclarar en qué aspecto le gustaría que me enfocara? {{suggestion}}",
+              "placeholders": ["suggestion"]
+            }
+          }
+        }
+      ]
     }
   ]
 }

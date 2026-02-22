@@ -439,14 +439,21 @@ function safeErrorString(e: unknown): string {
 
 /**
  * Cache safety: do not store raw content by default unless your policy allows it.
- * Here we store role + length + hashes only, to keep cache deterministic without content leakage.
- * If you need full caching for speed, do it behind an explicit config flag and privacy bank.
+ * We store role + a content hash (SHA-256, first 16 hex chars) to keep cache
+ * deterministic without content leakage.
+ *
+ * RC6 fix: previously only hashed role + length, which could collide for
+ * different prompts of the same length. Now hashes actual content.
  */
 function sanitizeMessagesForCache(
   req: LLMRequest,
-): Array<{ role: string; len: number }> {
+): Array<{ role: string; hash: string }> {
+  const { createHash } = require("node:crypto") as typeof import("node:crypto");
   return req.messages.map((m) => ({
     role: m.role,
-    len: (m.content ?? "").length,
+    hash: createHash("sha256")
+      .update((m.content ?? "").slice(0, 2000))
+      .digest("hex")
+      .slice(0, 16),
   }));
 }

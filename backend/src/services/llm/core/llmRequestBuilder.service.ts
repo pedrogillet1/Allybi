@@ -220,18 +220,36 @@ export class LlmRequestBuilderService {
       content: this.buildUserPayload(input, disambiguationSignal),
     });
 
+    // Token budget by answer mode — doc-grounded modes get more tokens to avoid
+    // mid-sentence truncation, especially for Portuguese (which is ~20% more verbose).
+    const langMultiplier =
+      input.outputLanguage === "pt" || input.outputLanguage === "es" ? 1.2 : 1.0;
+    const answerMode = input.signals.answerMode;
+    let baseTokenBudget: number;
+    if (answerMode === "doc_grounded_multi") {
+      baseTokenBudget = 1500;
+    } else if (
+      answerMode === "doc_grounded_single" ||
+      answerMode === "doc_grounded_quote"
+    ) {
+      baseTokenBudget = 1200;
+    } else {
+      baseTokenBudget = input.route.stage === "final" ? 900 : 700;
+    }
+    const maxOutputTokens = Math.round(baseTokenBudget * langMultiplier);
+
     // Generation options (streaming by default, ChatGPT-like)
     const options: LlmGenerationOptions = {
       stream: true,
       deterministic: input.route.stage === "final",
       temperature: input.route.stage === "final" ? 0.2 : 0.4,
       topP: 0.9,
-      maxOutputTokens: input.route.stage === "final" ? 900 : 700,
+      maxOutputTokens,
       ...input.options,
     };
 
     // Special case: nav_pills should be short and fast
-    if (input.signals.answerMode === "nav_pills") {
+    if (answerMode === "nav_pills") {
       options.temperature = 0.2;
       options.maxOutputTokens = Math.min(options.maxOutputTokens ?? 300, 220);
     }
@@ -455,7 +473,7 @@ export class LlmRequestBuilderService {
     const top = pack.evidence.slice(0, maxItems);
 
     const lines: string[] = [];
-    lines.push("### Evidence (use only this)");
+    lines.push("### Evidence (use only this — answer the specific question, not a generic overview)");
     for (const e of top) {
       const title = e.title || e.filename || e.docId;
       const loc =
