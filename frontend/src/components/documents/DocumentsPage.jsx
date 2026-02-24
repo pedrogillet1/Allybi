@@ -796,7 +796,7 @@ const DocumentsPage = () => {
 
                 <div onClick={() => setShowUniversalUploadModal(true)} style={{height: 44, paddingLeft: 20, paddingRight: 20, background: '#181818', borderRadius: 9999, border: 'none', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', flexShrink: 0, transition: 'background 120ms ease, transform 160ms cubic-bezier(0.2,0.8,0.2,1)', color: 'white'}} onMouseEnter={(e) => { e.currentTarget.style.background = '#0F0F0F'; e.currentTarget.style.transform = 'translateY(-1px)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = '#181818'; e.currentTarget.style.transform = 'translateY(0)'; }}>
                   <UploadIcon style={{width: 18, height: 18, filter: 'brightness(0) invert(1)'}} />
-                  <span style={{fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 600, lineHeight: '20px'}}>{t('nav.upload')}</span>
+                  <span style={{fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 600, lineHeight: '20px'}}>Upload</span>
                 </div>
               </>
             )}

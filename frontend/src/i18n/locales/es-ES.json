@@ -437,8 +437,6 @@
     "uploadsComplete_plural": "{{count}} subidas Completadas",
     "preparingRetry": "Preparando reintento...",
     "processingTakingLonger": "El procesamiento del documento está tardando más de lo esperado. Tu archivo estará listo para el chat de IA pronto.",
-    "uploadAll": "Subir Todo",
-    "acceptAll": "Aceptar Todo",
     "filesStillUploading": "Los archivos aún se están subiendo. ¿Estás seguro de que deseas cerrar?",
     "library": "Biblioteca",
     "uploadedProgress": "{{size}} - {{percent}}% subido",
@@ -463,25 +461,6 @@
       "storageAlmostFullText": "Has usado {{percent}}% de tu almacenamiento. Actualiza ahora para evitar fallos en las subidas.",
       "storageRunningLow": "Almacenamiento Bajo",
       "storageRunningLowText": "Has usado {{percent}}% de tu almacenamiento. Considera actualizar tu plan."
-    },
-    "fileTypeDetected": {
-      "title": "Archivos detectados",
-      "message": "{{count}} archivos en {{formats}} formatos"
-    },
-    "unsupportedFiles": {
-      "title": "{{count}} archivo no soportado",
-      "title_plural": "{{count}} archivos no soportados",
-      "message": "Estos tipos de archivo no serán procesados: {{extensions}}"
-    },
-    "limitedSupport": {
-      "title": "{{count}} archivo tiene soporte limitado",
-      "title_plural": "{{count}} archivos tienen soporte limitado",
-      "message": "La extracción de texto puede estar incompleta para: {{extensions}}"
-    },
-    "noTextDetected": {
-      "title": "{{count}} archivo puede no tener texto",
-      "title_plural": "{{count}} archivos pueden no tener texto",
-      "message": "Estos archivos parecen no contener texto extraíble. Considera usar una fuente o formato diferente."
     }
   },
   "header": {
@@ -589,6 +568,27 @@
       "smsFailed": "Error al enviar SMS de verificación",
       "phoneAdded": "¡Número de teléfono agregado! SMS de verificación enviado.",
       "phoneFailed": "Error al agregar número de teléfono"
+    }
+  },
+  "upload": {
+    "fileTypeDetected": {
+      "title": "Archivos detectados",
+      "message": "{{count}} archivos en {{formats}} formatos"
+    },
+    "unsupportedFiles": {
+      "title": "{{count}} archivo no soportado",
+      "title_plural": "{{count}} archivos no soportados",
+      "message": "Estos tipos de archivo no serán procesados: {{extensions}}"
+    },
+    "limitedSupport": {
+      "title": "{{count}} archivo tiene soporte limitado",
+      "title_plural": "{{count}} archivos tienen soporte limitado",
+      "message": "La extracción de texto puede estar incompleta para: {{extensions}}"
+    },
+    "noTextDetected": {
+      "title": "{{count}} archivo puede no tener texto",
+      "title_plural": "{{count}} archivos pueden no tener texto",
+      "message": "Estos archivos parecen no contener texto extraíble. Considera usar una fuente o formato diferente."
     }
   },
   "errors": {
@@ -1805,21 +1805,6 @@
         "label": "Slack",
         "description": "Conecta Slack para buscar mensajes y compartir documentos con tu equipo."
       }
-    }
-  },
-  "scanner": {
-    "errors": {
-      "title": "Error de c\u00e1mara",
-      "permissionDenied": "Permiso de c\u00e1mara denegado. Para habilitarlo, ve a Ajustes > Safari > C\u00e1mara y permite el acceso para este sitio.",
-      "notFound": "No se encontr\u00f3 ninguna c\u00e1mara. Conecta una c\u00e1mara e int\u00e9ntalo de nuevo.",
-      "notReadable": "La c\u00e1mara est\u00e1 en uso por otra aplicaci\u00f3n. Cierra las dem\u00e1s apps que usen la c\u00e1mara.",
-      "overconstrained": "La c\u00e1mara no soporta la configuraci\u00f3n solicitada. Int\u00e9ntalo de nuevo.",
-      "timeout": "La inicializaci\u00f3n de la c\u00e1mara agot\u00f3 el tiempo. Int\u00e9ntalo de nuevo.",
-      "policyBlocked": "El acceso a la c\u00e1mara est\u00e1 bloqueado por la pol\u00edtica del sitio. Contacta a soporte.",
-      "fallbackFailed": "Error al procesar la imagen. Int\u00e9ntalo de nuevo.",
-      "iosSafariHint": "En iOS: Ajustes \u2192 Safari \u2192 C\u00e1mara, o toca \uD83D\uDD12 en la barra de direcciones \u2192 Ajustes del sitio \u2192 C\u00e1mara \u2192 Permitir.",
-      "tryAgain": "Intentar de nuevo",
-      "useCameraUpload": "Usar captura de c\u00e1mara"
     }
   }
 }

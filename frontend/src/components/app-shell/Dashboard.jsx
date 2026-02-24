@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import CategoryGrid from '../library/CategoryGrid';
@@ -7,12 +7,10 @@ import UpcomingActions from './UpcomingActions';
 import QuickAccess from './QuickAccess';
 import { useIsMobile, useMobileBreakpoints } from '../../hooks/useIsMobile';
 import LeftNav from './LeftNav';
-import NotificationPanel from '../notifications/NotificationPanel';
 
 const Dashboard = () => {
   const isMobile = useIsMobile();
   const mobile = useMobileBreakpoints();
-  const [showNotificationsPopup, setShowNotificationsPopup] = useState(false);
 
   // Adaptive spacing - MOBILE ONLY changes
   const contentPadding = isMobile ? mobile.padding.base : 20;
@@ -30,7 +28,7 @@ const Dashboard = () => {
       flexDirection: isMobile ? 'column' : 'row' // MOBILE ONLY: Column layout
     }}>
       {/* Use LeftNav for mobile, Sidebar for desktop */}
-      {isMobile ? <LeftNav onNotificationClick={() => setShowNotificationsPopup(true)} /> : <Sidebar />}
+      {isMobile ? <LeftNav /> : <Sidebar />}
 
       <div style={{
         flex: '1 1 0',
@@ -95,10 +93,6 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      <NotificationPanel
-        showNotificationsPopup={showNotificationsPopup}
-        setShowNotificationsPopup={setShowNotificationsPopup}
-      />
     </div>
   );
 };

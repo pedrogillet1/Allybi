@@ -376,7 +376,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                     textTransform: 'capitalize',
                     lineHeight: '30px'
                   }}>
-                    {t('upload.uploadOrDragDrop')}
+                    Upload Documents or Drag-n-drop
                   </div>
                 </div>
                 <div style={{
@@ -388,7 +388,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                   fontWeight: '500',
                   lineHeight: '24px'
                 }}>
-                  {t('upload.uploadDescription')}
+                  Upload your documents • All file types supported (max 500MB)
                 </div>
               </div>
 
@@ -432,7 +432,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                     textTransform: 'capitalize',
                     lineHeight: '24px'
                   }}>
-                  {t('upload.selectFiles')}
+                  Select Files
                 </button>
                 <button
                   onClick={(e) => {
@@ -465,7 +465,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                     textTransform: 'capitalize',
                     lineHeight: '24px'
                   }}>
-                  {t('upload.selectFolder')}
+                  Select Folder
                 </button>
               </div>
 
@@ -538,7 +538,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                       textTransform: 'capitalize',
                       lineHeight: '30px'
                     }}>
-                      {t('upload.uploadOrDragDrop')}
+                      Upload Documents or Drag-n-drop
                     </div>
                   </div>
                   <div style={{
@@ -550,7 +550,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                     fontWeight: '500',
                     lineHeight: '24px'
                   }}>
-                    {t('upload.uploadDescription')}
+                    Upload your documents • All file types supported (max 500MB)
                   </div>
                 </div>
 
@@ -587,7 +587,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                     lineHeight: '24px'
                   }}
                 >
-                  {t('upload.selectFiles')}
+                  Select Files
                 </button>
               </div>
 
@@ -702,7 +702,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                             fontWeight: '500',
                             lineHeight: '15.40px'
                           }}>
-                            {t('upload.uploadingToCloud')}
+                            Uploading to cloud...
                           </div>
                         </div>
                       </div>
@@ -835,7 +835,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                             fontWeight: '500',
                             lineHeight: '15.40px'
                           }}>
-                            {formatFileSize(file.size)} – {t('upload.uploaded')}
+                            {formatFileSize(file.size)} – 100% uploaded
                           </div>
                         </div>
                       </div>
@@ -918,7 +918,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                   textTransform: 'capitalize',
                   lineHeight: '24px'
                 }}>
-                  {t('upload.cancel')}
+                  Cancel
                 </div>
               </button>
             </div>
@@ -956,7 +956,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                     lineHeight: '24px'
                   }}
                 >
-                  {t('upload.cancel')}
+                  Cancel
                 </button>
               </div>
               <button
@@ -981,7 +981,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                   lineHeight: '24px'
                 }}
               >
-                {t('upload.uploadAll')}
+                Upload All
               </button>
             </>
           )}
@@ -1053,7 +1053,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                     textTransform: 'capitalize',
                     lineHeight: '24px'
                   }}>
-                    {t('upload.acceptAll')}
+                    Accept All
                   </div>
                 </button>
               </div>

@@ -601,6 +601,13 @@ export class KodaAnswerEngineV3Service {
       ];
     }
 
+    const sysT =
+      this.composePrompt.templates.system[req.language] ??
+      this.composePrompt.templates.system.en;
+    const userT =
+      this.composePrompt.templates.user[req.language] ??
+      this.composePrompt.templates.user.en;
+
     const domainStyle = this.resolveDomainStyle(req);
 
     // Evidence formatting for prompt (truncated)
@@ -958,6 +965,21 @@ function truncate(s: string, max: number) {
   const t = (s ?? "").trim();
   if (t.length <= max) return t;
   return t.slice(0, Math.max(0, max - 1)) + "…";
+}
+
+function fillTemplate(tpl: string, vars: Record<string, string>) {
+  let out = tpl;
+  for (const [k, v] of Object.entries(vars)) {
+    out = out.replace(
+      new RegExp(`\\{\\{\\s*${escapeRegExp(k)}\\s*\\}\\}`, "g"),
+      v,
+    );
+  }
+  return out;
+}
+
+function escapeRegExp(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function bestLocation(

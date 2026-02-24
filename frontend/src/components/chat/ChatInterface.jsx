@@ -4109,7 +4109,7 @@ export default function ChatInterface({
           onMouseEnter={e => e.target.style.opacity = '0.85'}
           onMouseLeave={e => e.target.style.opacity = '1'}
         >
-          {confirmation.confirmLabel || t('common.confirm')}
+          {confirmation.confirmLabel || 'Confirm'}
         </button>
         <button
           type="button"
@@ -4129,7 +4129,7 @@ export default function ChatInterface({
           onMouseEnter={e => e.target.style.opacity = '0.85'}
           onMouseLeave={e => e.target.style.opacity = '1'}
         >
-          {confirmation.cancelLabel || t('common.cancel')}
+          {confirmation.cancelLabel || 'Cancel'}
         </button>
       </div>
     );
@@ -4411,9 +4411,9 @@ export default function ChatInterface({
             right: 0,
             // When keyboard is open: position at bottom (keyboard pushes viewport)
             // When keyboard is closed: position above tab bar (70px)
-            bottom: isKeyboardVisible ? 8 : 78,
+            bottom: isKeyboardVisible ? 8 : 70,
             padding: '8px 16px',
-            background: 'transparent',
+            background: '#F5F5F5',
             zIndex: isKeyboardVisible ? 9999 : 21, // Above bottom nav (z-index: 20)
             transition: 'bottom 0.15s ease-out',
           }}

@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useLocation, Navigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { AUTH_MODES, STORAGE_KEYS } from '../../constants/routes';
 import { useAuthModal } from '../../context/AuthModalContext';
@@ -46,7 +46,7 @@ const getAuthRedirectMode = () => {
  * Includes mobile bottom navigation for authenticated users.
  */
 const ProtectedRoute = ({ children }) => {
-    const { loading, isAuthenticated } = useAuth();
+    const { loading } = useAuth();
 
     if (loading) {
         return (
@@ -68,10 +68,6 @@ const ProtectedRoute = ({ children }) => {
                 </div>
             </div>
         );
-    }
-
-    if (!isAuthenticated) {
-        return <Navigate to="/" replace />;
     }
 
     return children;

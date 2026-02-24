@@ -358,19 +358,10 @@ textarea {
   image-rendering: auto;
 }
 
-.pdf-text-layer,
-.textLayer,
-.react-pdf__Page__textContent {
+.pdf-text-layer {
   /* Safari: Enable text selection in PDFs */
-  -webkit-user-select: text !important;
-  user-select: text !important;
-  -webkit-touch-callout: default !important;
-}
-
-.textLayer span,
-.react-pdf__Page__textContent span {
-  -webkit-user-select: text !important;
-  user-select: text !important;
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 /* ============================================
@@ -593,25 +584,32 @@ textarea {
 }
 
 /* Main swipe viewport container */
-/* NOTE: Do NOT apply persistent transform: translateZ(0) here.
-   On iOS Safari, a permanent transform on an ancestor creates a containing
-   block that breaks coordinate mapping for text selection after pinch-zoom
-   in nested scroll containers (e.g. PDF viewer jumps to blank area).
-   GPU acceleration is applied only during active swipes via JS. */
 .swipe-viewport {
+  /* GPU acceleration */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  /* Prevent iOS rubber banding from interfering */
   -webkit-overflow-scrolling: touch;
 }
 
 /* Content container during swipe */
-/* GPU hints (will-change, backface-visibility) are applied via JS only
-   when actively swiping to avoid permanent stacking context side-effects. */
 .swipe-content {
+  /* GPU acceleration for transforms */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  /* Smooth sub-pixel rendering */
   -webkit-font-smoothing: antialiased;
 }
 
 /* Tab preview panel */
 .swipe-tab-preview {
-  /* No persistent transform — promoted to GPU layer only when animating */
+  /* GPU layer promotion */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 /* Prevent text selection during swipe */
@@ -631,6 +629,9 @@ textarea {
 
 /* Edge indicators */
 .swipe-edge-indicator {
+  /* GPU acceleration */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   pointer-events: none;
 }
 
@@ -652,9 +653,8 @@ textarea {
 /* iOS Safari specific fixes */
 @supports (-webkit-touch-callout: none) {
   .swipe-viewport {
-    /* Allow pinch-zoom + pan so PDF text selection works after zoom.
-       Tab swipe is handled via JS touch handlers, not CSS touch-action. */
-    touch-action: manipulation;
+    /* Prevent iOS Safari from triggering its own gestures */
+    touch-action: pan-y;
   }
 
   .swipe-viewport[data-swiping="true"] {
@@ -667,8 +667,9 @@ textarea {
 .swipe-tab-content {
   /* Ensure proper stacking */
   isolation: isolate;
-  /* NOTE: Persistent transform: translateZ(0) removed — creates containing
-     block that breaks iOS text selection coordinate mapping after pinch-zoom. */
+  /* GPU layer */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 /* Active tab indicator dot (optional visual enhancement) */

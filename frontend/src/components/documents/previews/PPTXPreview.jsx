@@ -20,7 +20,6 @@ import { ReactComponent as ArrowLeftIcon } from '../../../assets/arrow-narrow-le
 import { ReactComponent as ArrowRightIcon } from '../../../assets/arrow-narrow-right.svg';
 import { getPreviewCountForFile, getFileExtension } from '../../../utils/files/previewCount';
 import { getApiBaseUrl } from '../../../services/runtimeConfig';
-import { useIsMobile } from '../../../hooks/useIsMobile';
 import '../../../styles/PreviewModalBase.css';
 
 // Set up the worker for pdf.js
@@ -83,7 +82,6 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
   const [imageLoadFailed, setImageLoadFailed] = useState(false); // Track which slide is being retried
   const [slideAspectRatio, setSlideAspectRatio] = useState(16 / 9); // Default to 16:9, updated on image load
   const [isPreloadingImages, setIsPreloadingImages] = useState(false);
-  const isMobile = useIsMobile();
   const [preloadProgress, setPreloadProgress] = useState({ loaded: 0, total: 0 });
 
   // ✅ FIX: Refs to prevent reset loops and track stable state
@@ -969,65 +967,6 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
     );
   }
 
-  // Mobile PDF Mode - all pages stacked vertically
-  if (isMobile && pdfMode && pdfFile) {
-    const mobilePageWidth = (containerWidth || window.innerWidth) - 32;
-    return (
-      <div
-        ref={containerRef}
-        style={{
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 12,
-          padding: '0 16px 120px',
-        }}
-      >
-        <Document
-          file={pdfFile}
-          onLoadSuccess={onPdfLoadSuccess}
-          onLoadError={(error) => {
-            console.error('PDF load error:', error);
-            setError('Failed to load presentation PDF');
-            setPdfMode(false);
-          }}
-          options={pdfOptions}
-          loading={
-            <div style={{
-              padding: 60,
-              color: '#6C6B6E',
-              fontSize: 14,
-              fontFamily: 'Plus Jakarta Sans',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 12
-            }}>
-              <div className="preview-modal-loading-spinner" />
-              {t('pptxPreview.loadingPresentation')}
-            </div>
-          }
-        >
-          {numPages && Array.from({ length: numPages }, (_, i) => (
-            <div key={i} style={{
-              width: '100%',
-              borderRadius: 12,
-              overflow: 'hidden',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-            }}>
-              <Page
-                pageNumber={i + 1}
-                width={mobilePageWidth}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-              />
-            </div>
-          ))}
-        </Document>
-      </div>
-    );
-  }
-
   // PDF Mode - render using react-pdf when LibreOffice conversion is available
   if (pdfMode && pdfFile) {
     // ✅ FIX: Compute stageWidth to fill available canvas space
@@ -1310,60 +1249,6 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
   // ✅ SAFETY NET: Detect if all slides have no images (text-only mode)
   const allSlidesNoImages = slides.length > 0 && slides.every(slide => slide.hasImage === false);
   const isTextOnlyMode = allSlidesNoImages && !pdfMode;
-
-  // Mobile slides mode - all slides stacked vertically
-  if (isMobile) {
-    return (
-      <div style={{
-        width: '100%',
-        padding: '0 0 120px',
-      }}>
-        {slides.map((slide, index) => (
-          <div key={index} style={{
-            width: '100%',
-            borderRadius: 12,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-            marginBottom: 12,
-            background: '#F9FAFB',
-          }}>
-            {slide.hasImage && slide.imageUrl ? (
-              <img
-                src={slide.imageUrl}
-                alt={`Slide ${index + 1}`}
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  display: 'block',
-                  borderRadius: 12,
-                }}
-              />
-            ) : slide.content ? (
-              <div style={{
-                padding: 16,
-                fontSize: 14,
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                color: '#32302C',
-                lineHeight: 1.6,
-                whiteSpace: 'pre-wrap',
-              }}>
-                {slide.content}
-              </div>
-            ) : (
-              <div style={{
-                padding: 24,
-                textAlign: 'center',
-                color: '#6C6B6E',
-                fontSize: 14,
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}>
-                {t('pptxPreview.slideEmpty')}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  }
 
   return (
     <div style={{
