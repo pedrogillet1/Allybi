@@ -1,1 +1,3 @@
-// modules/documents barrel — re-exports will be added during migration
+export * from './application';
+export * from './infra';
+export * from './http';

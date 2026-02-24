@@ -74,9 +74,29 @@ communication goes through contracts defined in `shared/contracts/`.
 
 ## Migration phases
 
-1. **Scaffold** (this commit) — create directories + empty barrels
-2. **shared/** — move remaining utils/types into shared subfolders
-3. **platform/** — move LLM, DB, queue adapters
-4. **modules/** — move services into vertical slices
-5. **app/** — move server.ts, route registration, worker entrypoints
-6. **Cleanup** — remove old empty directories, update tsconfig paths
+1. **Scaffold** — create directories + empty barrels *(done)*
+2. **Wire barrels** — populate every barrel with real re-exports from current
+   service locations so modules are importable today *(done)*
+3. **shared/** — move remaining utils/types into shared subfolders
+4. **platform/** — move LLM, DB, queue adapters
+5. **modules/** — move services into vertical slices
+6. **app/** — move server.ts, route registration, worker entrypoints
+7. **Cleanup** — remove old empty directories, update tsconfig paths
+
+## Current barrel contents (phase 2)
+
+| Barrel | Re-exports |
+|--------|-----------|
+| `shared/index.ts` | errors, logging, text, types (common + result), utils (assert, hash, id, timing), validation |
+| `platform/index.ts` | prisma client |
+| `app/http/index.ts` | HttpRouteMount, apiRouteMounts, healthRoutes |
+| `app/workers/index.ts` | document-worker, edit-worker, connector-worker |
+| `modules/chat/index.ts` | domain contracts + types, runtime (orchestrator, delegate, scope, evidence, normalizer, policy errors), api envelope, application service, infra (EncryptedChatRepo) |
+| `modules/retrieval/application/` | RetrievalEngineService, EvidenceGateService, SourceButtonsService, SlotResolver, ScopeGateService, DiscourseSignals |
+| `modules/retrieval/infra/` | PrismaRetrievalAdapterFactory, scopeDocStoreAdapter, EmbeddingsService, PineconeService, vectorEmbedding, ChunkCrypto, GcsStorage |
+| `modules/documents/application/` | outline, compare, export, revision, extraction pipeline, ingestion pipeline |
+| `modules/documents/infra/` | EncryptedDocumentRepo |
+| `modules/editing/application/` | EditHandlerService, EditOrchestrator, EditingFacade, Allybi, intentRuntime (analyzeMessageToPlan) |
+| `modules/editing/infra/` | DocxEditor, DocxAnchors, XlsxFileEditor, spreadsheetModel, SheetsEditor, SlidesEditor |
+| `modules/domain/application/` | DomainPackService, DomainEditingConstraintService |
+| `modules/domain/infra/` | BankLoaderService, RuntimeWiringIntegrityService |

@@ -1,1 +1,2 @@
-// modules/documents/infra barrel — re-exports will be added during migration
+// Encrypted document repository — handles document persistence with encryption
+export { EncryptedDocumentRepo } from '../../../services/documents/encryptedDocumentRepo.service';

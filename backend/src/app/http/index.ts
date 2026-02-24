@@ -1,1 +1,2 @@
-// app/http barrel — re-exports will be added during migration
+export type { HttpRouteMount } from '../../entrypoints/http/routes';
+export { apiRouteMounts, healthRoutes } from '../../entrypoints/http/routes';

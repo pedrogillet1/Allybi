@@ -1,1 +1,2 @@
-// modules/editing/http barrel — re-exports will be added during migration
+// Editing HTTP routes are currently registered via entrypoints/http/routes/editing.routes.ts.
+export type { HttpRouteMount } from '../../../entrypoints/http/routes';

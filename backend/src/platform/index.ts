@@ -1,1 +1,2 @@
-// platform barrel — re-exports will be added during migration
+// ── Database ──
+export { default as prisma } from './db/prismaClient';

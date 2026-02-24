@@ -1,1 +1,2 @@
-// modules/chat/infra barrel — re-exports will be added during migration
+// Encrypted chat repository — handles conversation persistence and encryption
+export { EncryptedChatRepo } from '../../../services/chat/encryptedChatRepo.service';
