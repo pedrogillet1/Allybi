@@ -590,7 +590,9 @@ export function planAllybiOperator(input: {
     ? classSpecificFallback
     : formattingOnly
       ? preferredFormattingOp
-      : null;
+      : input.domain === "sheets"
+        ? "XLSX_SET_RANGE_VALUES"
+        : null;
   if (!canonicalFallback) {
     return buildBlockedPlan({
       domain: input.domain,

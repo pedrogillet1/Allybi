@@ -7,7 +7,7 @@ export {
   getBankLoaderHealth,
   getBankLoaderInstance,
   BankLoaderService,
-} from '../../../services/core/banks/bankLoader.service';
+} from "../../../services/core/banks/bankLoader.service";
 
 // Runtime wiring integrity — validates bank wiring at startup
-export { RuntimeWiringIntegrityService } from '../../../services/core/banks/runtimeWiringIntegrity.service';
+export { RuntimeWiringIntegrityService } from "../../../services/core/banks/runtimeWiringIntegrity.service";

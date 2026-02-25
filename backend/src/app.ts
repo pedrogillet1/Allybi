@@ -17,6 +17,7 @@ import { auditLog } from "./middleware/auditLog.middleware";
 import { errorHandler } from "./middleware/error.middleware";
 import { secureLogsMiddleware } from "./middleware/secureLogs.middleware";
 import { csrfProtection } from "./middleware/csrf.middleware";
+import { requestIdMiddleware } from "./middleware/requestId.middleware";
 
 import { apiRouteMounts, healthRoutes } from "./entrypoints/http/routes";
 
@@ -100,6 +101,8 @@ const corsOptions: cors.CorsOptions = {
     "pragma",
   ],
   exposedHeaders: [
+    "X-Request-Id",
+    "x-request-id",
     "RateLimit-Limit",
     "RateLimit-Remaining",
     "RateLimit-Reset",
@@ -111,6 +114,7 @@ const corsOptions: cors.CorsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(requestIdMiddleware);
 
 /** -----------------------------
  * Cookie parser (needed for Safari auth cookie fallback)

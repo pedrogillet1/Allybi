@@ -559,10 +559,15 @@ function toComputeOp(
     case "XLSX_SET_RANGE_VALUES": {
       if (params.convertToNumeric === true) return null;
       if (!rangeA1 || !("value" in params)) return null;
+      const normalizedRange = rangeA1.replace(
+        /^([^!]+!)?([A-Z]{1,3}\d{1,7})$/i,
+        (_full, sheetPrefix = "", cellA1 = "") =>
+          `${sheetPrefix}${String(cellA1).toUpperCase()}:${String(cellA1).toUpperCase()}`,
+      );
       const scalar = coerceScalar(params.value);
       return {
         kind: "set_values",
-        rangeA1,
+        rangeA1: normalizedRange,
         values: [[scalar]],
       };
     }

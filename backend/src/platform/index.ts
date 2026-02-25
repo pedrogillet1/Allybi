@@ -1,2 +1,2 @@
 // ── Database ──
-export { default as prisma } from './db/prismaClient';
+export { default as prisma } from "./db/prismaClient";

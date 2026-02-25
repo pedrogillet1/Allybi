@@ -25,6 +25,7 @@ export type LangCode = "any" | "en" | "pt" | "es";
  */
 export interface AuthUser {
   id: string;
+  role?: string;
 }
 
 /**

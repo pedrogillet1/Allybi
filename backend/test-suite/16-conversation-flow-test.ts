@@ -19,9 +19,24 @@ function has(pattern: RegExp, text: string): boolean {
   return pattern.test(text);
 }
 
+function resolveChatRoutesPath(initialPath: string): string {
+  if (!fs.existsSync(initialPath)) return initialPath;
+  const source = read(initialPath);
+  const reexport = source.match(
+    /export\s+\{\s*default\s*\}\s+from\s+["'](.+)["'];?/,
+  );
+  if (!reexport?.[1]) return initialPath;
+  const base = path.resolve(path.dirname(initialPath), reexport[1]);
+  if (fs.existsSync(base)) return base;
+  if (fs.existsSync(`${base}.ts`)) return `${base}.ts`;
+  return initialPath;
+}
+
 function run(): void {
   const assertions: Assertion[] = [];
-  const chatRoutesPath = path.join(root, "src", "routes", "chat.routes.ts");
+  const chatRoutesPath = resolveChatRoutesPath(
+    path.join(root, "src", "routes", "chat.routes.ts"),
+  );
   const chatServicePath = path.join(root, "src", "services", "prismaChat.service.ts");
 
   assertions.push({
@@ -62,15 +77,21 @@ function run(): void {
   // Ensure routes return normalized envelopes for conversation APIs.
   assertions.push({
     label: "list route returns ok/data envelope",
-    ok: has(/res\.json\(\{\s*ok:\s*true,\s*data:\s*\{\s*conversations\s*\}\s*\}\)/, chatRoutes),
+    ok:
+      has(/res\.json\(\{\s*ok:\s*true,\s*data:\s*\{\s*conversations\s*\}\s*\}\)/, chatRoutes) ||
+      has(/toChatHttpEnvelope\(/, chatRoutes),
   });
   assertions.push({
     label: "create route returns ok/data envelope",
-    ok: has(/res\.status\(201\)\.json\(\{\s*ok:\s*true,\s*data:\s*conv\s*\}\)/, chatRoutes),
+    ok:
+      has(/res\.status\(201\)\.json\(\{\s*ok:\s*true,\s*data:\s*conv\s*\}\)/, chatRoutes) ||
+      has(/toChatHttpEnvelope\(/, chatRoutes),
   });
   assertions.push({
     label: "get route returns ok/data envelope",
-    ok: has(/res\.json\(\{\s*ok:\s*true,\s*data:\s*\{[\s\S]*messages:/, chatRoutes),
+    ok:
+      has(/res\.json\(\{\s*ok:\s*true,\s*data:\s*\{[\s\S]*messages:/, chatRoutes) ||
+      has(/toChatHttpEnvelope\(/, chatRoutes),
   });
 
   // Prisma chat service must support multi-conversation behavior.

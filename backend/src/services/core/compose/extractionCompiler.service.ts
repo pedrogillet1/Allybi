@@ -135,8 +135,7 @@ function findAllEntities(
   }
 
   // Company names: "Capitalized ACRONYM" (e.g., "Beta LLC", "Acme Inc")
-  const companyRx =
-    /\b([A-Z\u00C0-\u024F][a-z\u00C0-\u024F]+\s+[A-Z]{2,})\b/g;
+  const companyRx = /\b([A-Z\u00C0-\u024F][a-z\u00C0-\u024F]+\s+[A-Z]{2,})\b/g;
   while ((m = companyRx.exec(text)) !== null) {
     const val = m[1].trim();
     if (val.length >= 3 && !found.some((f) => f.entity === val)) {
@@ -301,10 +300,7 @@ export function compile(
           : Infinity;
 
       // Skip entities not within proximity window of any anchor
-      if (
-        minTargetDist > proximityWindow &&
-        minForbiddenDist > proximityWindow
-      )
+      if (minTargetDist > proximityWindow && minForbiddenDist > proximityWindow)
         continue;
 
       if (minTargetDist <= minForbiddenDist) {

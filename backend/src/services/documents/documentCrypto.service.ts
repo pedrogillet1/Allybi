@@ -106,6 +106,34 @@ export class DocumentCryptoService {
     );
   }
 
+  encryptRenderableContent(
+    userId: string,
+    documentId: string,
+    content: string,
+    dk: Buffer,
+  ): string {
+    const key = this.keyFor(dk, "renderableContent");
+    return this.enc.encryptStringToJson(
+      content,
+      key,
+      this.aad(userId, documentId, "renderableContent"),
+    );
+  }
+
+  decryptRenderableContent(
+    userId: string,
+    documentId: string,
+    payloadJson: string,
+    dk: Buffer,
+  ): string {
+    const key = this.keyFor(dk, "renderableContent");
+    return this.enc.decryptStringFromJson(
+      payloadJson,
+      key,
+      this.aad(userId, documentId, "renderableContent"),
+    );
+  }
+
   encryptDisplayTitle(
     userId: string,
     documentId: string,

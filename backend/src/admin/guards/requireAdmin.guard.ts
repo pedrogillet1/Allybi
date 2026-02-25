@@ -81,20 +81,7 @@ function isOwnerUser(req: Request): boolean {
 
   // Check authenticated user ID from session/JWT
   const userId = (req as Request & { user?: { id: string } }).user?.id;
-  if (userId && safeCompare(userId, OWNER_USER_ID)) {
-    return true;
-  }
-
-  // Check X-User-ID header (for internal services)
-  const headerUserId = req.headers["x-user-id"];
-  if (
-    typeof headerUserId === "string" &&
-    safeCompare(headerUserId, OWNER_USER_ID)
-  ) {
-    return true;
-  }
-
-  return false;
+  return Boolean(userId && safeCompare(userId, OWNER_USER_ID));
 }
 
 /**

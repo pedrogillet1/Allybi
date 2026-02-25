@@ -33,6 +33,13 @@
 
 import type { Attachment } from "../../../types/handlerResult.types";
 import { getBank } from "../banks/bankLoader.service";
+import type { ChatProvenanceDTO } from "../../../modules/chat/domain/chat.contracts";
+import { validateChatProvenance } from "../../../modules/chat/runtime/provenance/ProvenanceValidator";
+import {
+  estimateTokenCount,
+  resolveOutputTokenBudget,
+  trimTextToTokenBudget,
+} from "./tokenBudget.service";
 
 // -----------------------------------------------------------------------------
 // Types
@@ -69,6 +76,9 @@ export interface ResponseContractContext {
 
   constraints?: {
     maxChars?: number;
+    maxOutputTokens?: number;
+    hardMaxOutputTokens?: number;
+    expectedOutputTokens?: number;
     maxSentences?: number;
     exactBulletCount?: number;
     outputShape?:
@@ -82,6 +92,16 @@ export interface ResponseContractContext {
   };
 
   signals?: Record<string, unknown>;
+  evidenceRequired?: boolean;
+  allowedDocumentIds?: string[];
+  provenance?: ChatProvenanceDTO | null;
+  evidenceMapSchemaVersion?: "v1" | string;
+  evidenceMap?: Array<{
+    evidenceId: string;
+    documentId: string;
+    locationKey: string;
+    snippetHash: string;
+  }>;
 }
 
 export interface DraftResponse {
@@ -154,6 +174,21 @@ type TruncationLimitsBank = {
     maxCharsHard?: number;
     maxSentencesHard?: number;
   };
+  globalLimits?: {
+    maxResponseCharsHard?: number;
+    maxResponseTokensHard?: number;
+  };
+  answerModeLimits?: Record<
+    string,
+    {
+      maxChars?: number;
+      maxCharsDefault?: number;
+      maxTokens?: number;
+      maxTokensDefault?: number;
+      maxOutputTokens?: number;
+      maxOutputTokensDefault?: number;
+    }
+  >;
 };
 
 type BulletRulesBank = {
@@ -266,6 +301,12 @@ function countSentences(text: string): number {
   return m ? m.length : 0;
 }
 
+function toPositiveInt(input: unknown): number | null {
+  const value = Number(input);
+  if (!Number.isFinite(value) || value <= 0) return null;
+  return Math.floor(value);
+}
+
 function limitChars(
   text: string,
   maxChars: number,
@@ -293,6 +334,69 @@ function keepFirstSentence(text: string, maxChars: number = 90): string {
   return first.length > maxChars
     ? first.slice(0, maxChars).trim()
     : first.trim();
+}
+
+function validateProvenanceAgainstEvidenceMap(params: {
+  provenance?: ChatProvenanceDTO | null;
+  evidenceMap?: Array<{
+    evidenceId: string;
+    documentId: string;
+    locationKey: string;
+    snippetHash: string;
+  }>;
+  required: boolean;
+}): { ok: boolean; failureCode?: string; warnings: string[] } {
+  if (!params.required) return { ok: true, warnings: [] };
+  const provenance = params.provenance || null;
+  const evidenceMap = Array.isArray(params.evidenceMap)
+    ? params.evidenceMap
+    : [];
+  if (!provenance || provenance.snippetRefs.length === 0) {
+    return { ok: false, failureCode: "missing_provenance", warnings: [] };
+  }
+  if (evidenceMap.length === 0) {
+    return { ok: false, failureCode: "missing_evidence_map", warnings: [] };
+  }
+  const map = new Map(
+    evidenceMap.map((entry) => [
+      String(entry.evidenceId || "").trim(),
+      {
+        documentId: String(entry.documentId || "").trim(),
+        locationKey: String(entry.locationKey || "").trim(),
+        snippetHash: String(entry.snippetHash || "").trim(),
+      },
+    ]),
+  );
+
+  for (const ref of provenance.snippetRefs) {
+    const key = String(ref.evidenceId || "").trim();
+    const mapped = map.get(key);
+    if (!mapped) {
+      return {
+        ok: false,
+        failureCode: "evidence_map_mismatch",
+        warnings: ["PROVENANCE_REF_NOT_IN_EVIDENCE_MAP"],
+      };
+    }
+    if (
+      mapped.documentId !== String(ref.documentId || "").trim() ||
+      mapped.locationKey !== String(ref.locationKey || "").trim()
+    ) {
+      return {
+        ok: false,
+        failureCode: "evidence_map_mismatch",
+        warnings: ["PROVENANCE_REF_LOCATION_MISMATCH"],
+      };
+    }
+    if (mapped.snippetHash !== String(ref.snippetHash || "").trim()) {
+      return {
+        ok: false,
+        failureCode: "evidence_map_hash_mismatch",
+        warnings: ["PROVENANCE_REF_HASH_MISMATCH"],
+      };
+    }
+  }
+  return { ok: true, warnings: [] };
 }
 
 function getSourceButtonsCount(attachments: Attachment[] = []): number {
@@ -326,6 +430,59 @@ export class ResponseContractEnforcerService {
     this.tableRules = getBank<TableRulesBank>("table_rules");
   }
 
+  private resolveSoftTokenLimit(ctx: ResponseContractContext): number {
+    const explicit = toPositiveInt(ctx.constraints?.maxOutputTokens);
+    if (explicit) return explicit;
+
+    const modeLimits =
+      this.truncation?.answerModeLimits?.[String(ctx.answerMode || "")];
+    const modeTokenLimit =
+      toPositiveInt(modeLimits?.maxOutputTokens) ??
+      toPositiveInt(modeLimits?.maxOutputTokensDefault) ??
+      toPositiveInt(modeLimits?.maxTokens) ??
+      toPositiveInt(modeLimits?.maxTokensDefault);
+    if (modeTokenLimit) return modeTokenLimit;
+
+    const charBasedModeLimit =
+      toPositiveInt(modeLimits?.maxChars) ??
+      toPositiveInt(modeLimits?.maxCharsDefault);
+    if (charBasedModeLimit)
+      return Math.max(120, Math.floor(charBasedModeLimit / 4));
+
+    return resolveOutputTokenBudget({
+      answerMode: ctx.answerMode,
+      outputLanguage: ctx.language,
+      routeStage: "final",
+      operator: ctx.operator,
+    }).maxOutputTokens;
+  }
+
+  private resolveHardTokenLimit(
+    ctx: ResponseContractContext,
+    softLimit: number,
+  ): number {
+    const explicit = toPositiveInt(ctx.constraints?.hardMaxOutputTokens);
+    if (explicit) return explicit;
+
+    const bankHard = toPositiveInt(
+      this.truncation?.globalLimits?.maxResponseTokensHard,
+    );
+    if (bankHard) return bankHard;
+
+    const expected = toPositiveInt(ctx.constraints?.expectedOutputTokens);
+    if (expected) return Math.max(softLimit, Math.ceil(expected * 1.15));
+
+    return Math.max(Math.ceil(softLimit * 1.2), softLimit + 120);
+  }
+
+  private resolveHardCharLimit(): number {
+    return (
+      toPositiveInt(this.truncation?.globalLimits?.maxResponseCharsHard) ??
+      toPositiveInt(this.truncation?.config?.maxCharsHard) ??
+      4200
+    );
+  }
+
   enforce(
     draft: DraftResponse,
     ctx: ResponseContractContext,
@@ -336,6 +493,9 @@ export class ResponseContractEnforcerService {
       ? draft.attachments
       : [];
     let content = draft.content || "";
+    const requiresProvenance =
+      Boolean(ctx.evidenceRequired) ||
+      String(ctx.answerMode || "").startsWith("doc_grounded");
 
     // 0) Normalize whitespace/newlines
     const maxNL =
@@ -377,6 +537,43 @@ export class ResponseContractEnforcerService {
         attachments,
         enforcement: { repairs, warnings, blocked: false },
       };
+    }
+
+    if (requiresProvenance) {
+      const provenanceCheck = validateChatProvenance({
+        provenance: ctx.provenance,
+        answerMode: ctx.answerMode as any,
+        allowedDocumentIds: ctx.allowedDocumentIds || [],
+      });
+      if (!provenanceCheck.ok) {
+        return {
+          content: "",
+          attachments,
+          enforcement: {
+            repairs,
+            warnings: [...warnings, ...provenanceCheck.warnings],
+            blocked: true,
+            reasonCode: provenanceCheck.failureCode || "missing_provenance",
+          },
+        };
+      }
+      const mapCheck = validateProvenanceAgainstEvidenceMap({
+        provenance: ctx.provenance,
+        evidenceMap: ctx.evidenceMap,
+        required: requiresProvenance,
+      });
+      if (!mapCheck.ok) {
+        return {
+          content: "",
+          attachments,
+          enforcement: {
+            repairs,
+            warnings: [...warnings, ...mapCheck.warnings],
+            blocked: true,
+            reasonCode: mapCheck.failureCode || "missing_evidence_map",
+          },
+        };
+      }
     }
 
     // 2) Strip "Sources:" leakage (all non-nav modes)
@@ -424,8 +621,29 @@ export class ResponseContractEnforcerService {
       (ctx.constraints?.maxSentences && ctx.constraints.maxSentences <= 3)
     ) {
       const maxChars = ctx.constraints?.maxChars ?? 420;
+      const requestedShortTokenLimit = toPositiveInt(
+        ctx.constraints?.maxOutputTokens,
+      );
+      const shortTokenLimit = Math.max(
+        24,
+        requestedShortTokenLimit ??
+          Math.min(this.resolveSoftTokenLimit(ctx), 180),
+      );
+      const shortTokenLimited = trimTextToTokenBudget(
+        content,
+        shortTokenLimit,
+        {
+          preserveSentenceBoundary: true,
+        },
+      );
+      if (shortTokenLimited.truncated) {
+        repairs.push("SHORT_CONSTRAINT_TRIMMED_TOKENS");
+      }
+      content = shortTokenLimited.text;
+
       const limited = limitChars(content, maxChars);
-      if (limited.changed) repairs.push("SHORT_CONSTRAINT_TRIMMED_CHARS");
+      if (limited.changed)
+        repairs.push("SHORT_CONSTRAINT_TRIMMED_CHARS_FALLBACK");
       content = limited.text;
 
       const sent = countSentences(content);
@@ -437,11 +655,40 @@ export class ResponseContractEnforcerService {
       }
     }
 
-    // 5) Hard max length (safety)
-    const hardMaxChars = this.truncation?.config?.maxCharsHard ?? 4200;
+    // 5) Token-aware hard max length (safety)
+    const softTokenLimit = this.resolveSoftTokenLimit(ctx);
+    const softTokenLimited = trimTextToTokenBudget(content, softTokenLimit, {
+      preserveSentenceBoundary: true,
+    });
+    if (softTokenLimited.truncated) {
+      repairs.push("SOFT_MAX_TOKENS_TRIMMED");
+    }
+    content = softTokenLimited.text;
+
+    const hardTokenLimit = this.resolveHardTokenLimit(ctx, softTokenLimit);
+    const hardTokenLimited = trimTextToTokenBudget(content, hardTokenLimit, {
+      preserveSentenceBoundary: true,
+    });
+    if (hardTokenLimited.truncated) {
+      repairs.push("HARD_MAX_TOKENS_TRIMMED");
+    }
+    content = hardTokenLimited.text;
+
+    // 5b) Char fallback guard (legacy safety net)
+    const hardMaxChars = this.resolveHardCharLimit();
     const hardLimited = limitChars(content, hardMaxChars);
     if (hardLimited.changed) repairs.push("HARD_MAX_CHARS_TRIMMED");
     content = hardLimited.text;
+
+    const estimatedTokens = estimateTokenCount(content);
+    if (estimatedTokens > hardTokenLimit) {
+      const emergency = trimTextToTokenBudget(content, hardTokenLimit, {
+        preserveSentenceBoundary: true,
+      });
+      if (emergency.truncated)
+        repairs.push("HARD_MAX_TOKENS_EMERGENCY_TRIMMED");
+      content = emergency.text;
+    }
 
     // 6) Remove banned leakage patterns (source leakage regexes, etc.)
     const leakagePatterns = this.bannedPhrases?.sourceLeakage?.patterns || [];

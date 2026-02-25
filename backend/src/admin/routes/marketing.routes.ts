@@ -4,7 +4,7 @@
  */
 
 import { Router, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../config/database";
 import {
   getDomains,
   getIntents,
@@ -14,7 +14,6 @@ import {
 } from "../../services/admin";
 
 const router = Router();
-const prisma = new PrismaClient();
 
 /**
  * GET /api/admin/marketing/domains

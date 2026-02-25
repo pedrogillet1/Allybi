@@ -5,6 +5,11 @@ export { EditingFacadeService } from "./entrypoints/editingFacade.service";
 export { ApplyVerificationService } from "./apply/applyVerification.service";
 export { BankIntegrityService } from "./banks/bankIntegrity.service";
 export { EditingPolicyService } from "./policy/EditingPolicyService";
+export {
+  getRuntimeOperatorContract,
+  isCertifiedEditingOperator,
+  listRuntimeOperatorContracts,
+} from "./contracts";
 export * as AllybiEditing from "./allybi";
 
 export type {

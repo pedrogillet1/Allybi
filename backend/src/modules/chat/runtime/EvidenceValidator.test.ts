@@ -118,4 +118,83 @@ describe("EvidenceValidator", () => {
     expect(out.sources).toHaveLength(1);
     expect(out.evidence?.sourceIds).toEqual([" doc-1 "]);
   });
+
+  it("filters provenance snippet refs to allowed scope", () => {
+    const validator = new EvidenceValidator();
+    const out = validator.enforceScope(
+      baseResult({
+        sources: [
+          { documentId: "doc-1", filename: "a.pdf", mimeType: null, page: 1 },
+          { documentId: "doc-2", filename: "b.pdf", mimeType: null, page: 2 },
+        ],
+        provenance: {
+          mode: "hidden_map",
+          required: true,
+          validated: true,
+          failureCode: null,
+          evidenceIdsUsed: ["doc-1:loc-1", "doc-2:loc-2"],
+          sourceDocumentIds: ["doc-1", "doc-2"],
+          snippetRefs: [
+            {
+              evidenceId: "doc-1:loc-1",
+              documentId: "doc-1",
+              locationKey: "loc-1",
+              snippetHash: "abc",
+              coverageScore: 0.8,
+            },
+            {
+              evidenceId: "doc-2:loc-2",
+              documentId: "doc-2",
+              locationKey: "loc-2",
+              snippetHash: "def",
+              coverageScore: 0.6,
+            },
+          ],
+          coverageScore: 1,
+        },
+        evidence: { required: true, provided: true, sourceIds: ["doc-1"] },
+      }),
+      ["doc-1"],
+    );
+
+    expect(out.provenance?.snippetRefs).toHaveLength(1);
+    expect(out.provenance?.sourceDocumentIds).toEqual(["doc-1"]);
+    expect(out.provenance?.validated).toBe(true);
+  });
+
+  it("fails partial when scoped result loses all provenance refs", () => {
+    const validator = new EvidenceValidator();
+    const out = validator.enforceScope(
+      baseResult({
+        status: "success",
+        sources: [
+          { documentId: "doc-1", filename: "a.pdf", mimeType: null, page: 1 },
+        ],
+        provenance: {
+          mode: "hidden_map",
+          required: true,
+          validated: true,
+          failureCode: null,
+          evidenceIdsUsed: ["doc-2:loc-2"],
+          sourceDocumentIds: ["doc-2"],
+          snippetRefs: [
+            {
+              evidenceId: "doc-2:loc-2",
+              documentId: "doc-2",
+              locationKey: "loc-2",
+              snippetHash: "def",
+              coverageScore: 0.6,
+            },
+          ],
+          coverageScore: 1,
+        },
+        evidence: { required: true, provided: true, sourceIds: ["doc-1"] },
+      }),
+      ["doc-1"],
+    );
+
+    expect(out.status).toBe("partial");
+    expect(out.failureCode).toBe("missing_provenance");
+    expect(out.provenance?.validated).toBe(false);
+  });
 });

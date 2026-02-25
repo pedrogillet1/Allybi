@@ -21,6 +21,7 @@
 import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
 import { authMiddleware } from "../../../middleware/auth.middleware";
+import { authorizeByMethod } from "../../../middleware/authorize.middleware";
 import { rateLimitMiddleware } from "../../../middleware/rateLimit.middleware";
 import {
   chatRequestSchema,
@@ -46,6 +47,7 @@ import type {
 } from "../../../services/llm/types/llmStreaming.types";
 
 const router = Router();
+const authorizeChat = authorizeByMethod("chat");
 
 function getChatService(req: Request): any {
   const svc = (req.app.locals?.services as any)?.chat;
@@ -57,6 +59,26 @@ function getUserId(req: Request): string | null {
   const anyReq = req as any;
   const userId = anyReq?.user?.id || anyReq?.userId || anyReq?.auth?.userId;
   return typeof userId === "string" && userId.trim() ? userId.trim() : null;
+}
+
+function resolveRequestId(req: Request): string | null {
+  const reqId = typeof req.requestId === "string" ? req.requestId.trim() : "";
+  if (reqId) return reqId;
+  const header =
+    typeof req.headers["x-request-id"] === "string"
+      ? req.headers["x-request-id"].trim()
+      : "";
+  return header || null;
+}
+
+function attachRequestIdToMeta(
+  req: Request,
+  meta: Record<string, unknown>,
+): void {
+  const requestId = resolveRequestId(req);
+  if (requestId && !meta.requestId) {
+    meta.requestId = requestId;
+  }
 }
 
 type ChatLanguage = "en" | "pt" | "es";
@@ -283,6 +305,7 @@ class SseStreamSink implements StreamSink {
 router.post(
   "/stream",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
@@ -316,6 +339,7 @@ router.post(
       ...(rawMeta || {}),
       viewerMode: false,
     };
+    attachRequestIdToMeta(req, meta);
     // Never trust viewer-only context on the normal chat endpoint.
     delete (meta as any).viewerContext;
     delete (meta as any).viewerSelection;
@@ -427,6 +451,7 @@ router.post(
 router.post(
   "/viewer/stream",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
@@ -480,6 +505,7 @@ router.post(
         ...(rawMeta || {}),
         viewerMode: true,
       };
+      attachRequestIdToMeta(req, meta);
       const context = (parsed.data as any).context as
         | Record<string, unknown>
         | undefined;
@@ -564,6 +590,7 @@ router.post(
 router.post(
   "/chat",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
@@ -597,6 +624,7 @@ router.post(
         ...(rawMeta || {}),
         viewerMode: false,
       };
+      attachRequestIdToMeta(req, meta);
       delete (meta as any).viewerContext;
       delete (meta as any).viewerSelection;
       delete (meta as any).viewerHistory;
@@ -644,6 +672,7 @@ router.post(
 router.get(
   "/conversations",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
@@ -675,6 +704,7 @@ router.get(
 router.post(
   "/conversations",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
@@ -702,6 +732,7 @@ router.post(
 router.post(
   "/conversations/new",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
@@ -729,6 +760,7 @@ router.post(
 router.get(
   "/conversations/:conversationId",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
@@ -781,6 +813,7 @@ router.get(
 router.get(
   "/conversations/:conversationId/messages",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
@@ -816,6 +849,7 @@ router.get(
 router.post(
   "/conversations/:conversationId/messages",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
@@ -836,6 +870,7 @@ router.post(
       ...(rawMeta || {}),
       viewerMode: false,
     };
+    attachRequestIdToMeta(req, meta);
     delete (meta as any).viewerContext;
     delete (meta as any).viewerSelection;
     delete (meta as any).viewerHistory;
@@ -897,6 +932,7 @@ router.post(
 router.post(
   "/conversations/:conversationId/messages/adaptive",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
@@ -917,6 +953,7 @@ router.post(
       ...(rawMeta || {}),
       viewerMode: false,
     };
+    attachRequestIdToMeta(req, meta);
     delete (meta as any).viewerContext;
     delete (meta as any).viewerSelection;
     delete (meta as any).viewerHistory;
@@ -972,6 +1009,7 @@ router.post(
 router.post(
   "/conversations/:conversationId/messages/adaptive/stream",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
@@ -992,6 +1030,7 @@ router.post(
       ...(rawMeta || {}),
       viewerMode: false,
     };
+    attachRequestIdToMeta(req, meta);
     delete (meta as any).viewerContext;
     delete (meta as any).viewerSelection;
     delete (meta as any).viewerHistory;
@@ -1087,6 +1126,7 @@ router.post(
 router.patch(
   "/conversations/:conversationId/title",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   validate(titleUpdateSchema),
   async (req: Request, res: Response): Promise<void> => {
@@ -1123,6 +1163,7 @@ router.patch(
 router.delete(
   "/conversations/empty",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
@@ -1174,6 +1215,7 @@ router.delete(
 router.delete(
   "/conversations/:conversationId",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);
@@ -1202,6 +1244,7 @@ router.delete(
 router.delete(
   "/conversations",
   authMiddleware,
+  authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
     const userId = getUserId(req);

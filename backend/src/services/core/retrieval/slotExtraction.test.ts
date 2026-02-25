@@ -110,11 +110,29 @@ interface ExtractionResult {
 }
 
 const SKIP_WORDS = new Set([
-  "The", "This", "That", "Party", "Contract", "Agreement",
-  "Section", "Article", "Clause", "Document", "Property",
-  "Evidence", "Witness", "Owner", "Guarantor", "Signatory",
-  "Beneficiary", "Tenant", "Signed", "Between", "Whereas",
-  "Hereinafter", "Hereby",
+  "The",
+  "This",
+  "That",
+  "Party",
+  "Contract",
+  "Agreement",
+  "Section",
+  "Article",
+  "Clause",
+  "Document",
+  "Property",
+  "Evidence",
+  "Witness",
+  "Owner",
+  "Guarantor",
+  "Signatory",
+  "Beneficiary",
+  "Tenant",
+  "Signed",
+  "Between",
+  "Whereas",
+  "Hereinafter",
+  "Hereby",
 ]);
 
 function findAllEntities(
@@ -134,8 +152,7 @@ function findAllEntities(
   }
 
   // Company names: "Capitalized ACRONYM" (e.g., "Beta LLC", "Acme Inc")
-  const companyRx =
-    /\b([A-Z\u00C0-\u024F][a-z\u00C0-\u024F]+\s+[A-Z]{2,})\b/g;
+  const companyRx = /\b([A-Z\u00C0-\u024F][a-z\u00C0-\u024F]+\s+[A-Z]{2,})\b/g;
   while ((m = companyRx.exec(text)) !== null) {
     const val = m[1].trim();
     if (val.length >= 3 && !found.some((f) => f.entity === val)) {
@@ -268,10 +285,7 @@ function compileExtraction(
             )
           : Infinity;
 
-      if (
-        minTargetDist > proximityWindow &&
-        minForbiddenDist > proximityWindow
-      )
+      if (minTargetDist > proximityWindow && minForbiddenDist > proximityWindow)
         continue;
 
       if (minTargetDist <= minForbiddenDist) {

@@ -4,6 +4,7 @@ import prisma from "../../config/database";
 import { uploadFile } from "../../config/storage";
 import vectorEmbeddingService from "../retrieval/vectorEmbedding.service";
 import type { ConnectorProvider } from "./connectorsRegistry";
+import { documentContentVault } from "../documents/documentContentVault.service";
 
 export interface ConnectorDocument {
   sourceType: ConnectorProvider;
@@ -43,6 +44,11 @@ export class ConnectorsIngestionService {
       String(process.env.CONNECTORS_INGEST_AS_DOCUMENTS || "").toLowerCase() ===
       "true";
     if (!ingestEnabled) return [];
+    if (documentContentVault.isStrict() && !documentContentVault.isEnabled()) {
+      throw new Error(
+        "SECURITY_REQUIRE_DOC_ENCRYPTION is enabled but document encryption runtime is not configured.",
+      );
+    }
 
     const results: ConnectorIngestionResultItem[] = [];
 
@@ -73,6 +79,8 @@ export class ConnectorsIngestionService {
         const textContent = this.buildTextPayload(normalized);
         const storageKey = `users/${ctx.userId}/connectors/${normalized.sourceType}/${documentId}/${filename}`;
         const fileHash = createHash("sha256").update(textContent).digest("hex");
+        const encryptDocumentText =
+          documentContentVault.isEnabled() || documentContentVault.isStrict();
 
         await uploadFile(
           storageKey,
@@ -92,8 +100,11 @@ export class ConnectorsIngestionService {
               fileHash,
               status: "uploaded",
               displayTitle: normalized.title,
-              rawText: textContent,
-              renderableContent: textContent,
+              rawText: encryptDocumentText ? null : textContent,
+              previewText: encryptDocumentText
+                ? null
+                : textContent.slice(0, 4000),
+              renderableContent: encryptDocumentText ? null : textContent,
               language: "en",
             },
           });
@@ -101,7 +112,7 @@ export class ConnectorsIngestionService {
           await tx.documentMetadata.create({
             data: {
               documentId,
-              extractedText: textContent,
+              extractedText: encryptDocumentText ? null : textContent,
               wordCount: wordCount(textContent),
               characterCount: textContent.length,
               summary: normalized.title,
@@ -116,6 +127,18 @@ export class ConnectorsIngestionService {
             },
           });
         });
+
+        if (encryptDocumentText) {
+          await documentContentVault.encryptDocumentFields(
+            ctx.userId,
+            documentId,
+            {
+              rawText: textContent,
+              previewText: textContent.slice(0, 4000),
+              renderableContent: textContent,
+            },
+          );
+        }
 
         await this.enqueueOrIndexFallback(
           {

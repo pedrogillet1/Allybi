@@ -2,6 +2,7 @@
 
 import { Router, Request, Response } from "express";
 import { authMiddleware } from "../../../middleware/auth.middleware";
+import { authorizeByMethod } from "../../../middleware/authorize.middleware";
 import {
   rateLimitMiddleware,
   statusPollingLimiter,
@@ -79,6 +80,7 @@ const { PDFParse } = require("pdf-parse");
 
 // All document endpoints require auth
 router.use(authMiddleware);
+router.use(authorizeByMethod("documents"));
 
 // Lazy controller: resolves DocumentService from app.locals on first request
 let _ctrl: DocumentController | null = null;

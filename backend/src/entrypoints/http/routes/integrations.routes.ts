@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { authMiddleware } from "../../../middleware/auth.middleware";
+import { authorizeByMethod } from "../../../middleware/authorize.middleware";
 import { rateLimitMiddleware } from "../../../middleware/rateLimit.middleware";
 import { createIntegrationsController } from "../../../controllers/integrations.controller";
 
@@ -21,6 +22,7 @@ import { TokenVaultService } from "../../../services/connectors/tokenVault.servi
 import { PrismaDocumentService } from "../../../services/prismaDocument.service";
 
 const router = Router();
+const authorizeIntegrations = authorizeByMethod("integrations");
 
 registerConnector("gmail", {
   capabilities: { oauth: true, sync: true, search: true },
@@ -163,6 +165,7 @@ router.get("/slack/events/health", (req, res) => slackEvents.health(req, res));
 router.post(
   "/email/send-token",
   authMiddleware,
+  authorizeIntegrations,
   rateLimitMiddleware,
   async (req: any, res) => {
     const userId = req.user?.id;
@@ -266,6 +269,7 @@ router.post(
 router.get(
   "/email/messages/:provider/:messageId",
   authMiddleware,
+  authorizeIntegrations,
   rateLimitMiddleware,
   async (req: any, res) => {
     const userId = req.user?.id;
@@ -410,6 +414,7 @@ router.get(
 router.post(
   "/email/attachments/save",
   authMiddleware,
+  authorizeIntegrations,
   rateLimitMiddleware,
   async (req: any, res) => {
     const userId = req.user?.id;
@@ -567,6 +572,7 @@ router.post(
 router.post(
   "/email/attachments/save-all",
   authMiddleware,
+  authorizeIntegrations,
   rateLimitMiddleware,
   async (req: any, res) => {
     const userId = req.user?.id;
@@ -708,36 +714,45 @@ router.post(
 router.get(
   "/:provider/start",
   authMiddleware,
+  authorizeIntegrations,
   rateLimitMiddleware,
   (req, res) => controller.startConnect(req, res),
 );
 router.get("/:provider/callback", rateLimitMiddleware, (req, res) =>
   controller.oauthCallback(req, res),
 );
-router.get("/status", authMiddleware, rateLimitMiddleware, (req, res) =>
-  controller.status(req, res),
+router.get(
+  "/status",
+  authMiddleware,
+  authorizeIntegrations,
+  rateLimitMiddleware,
+  (req, res) => controller.status(req, res),
 );
 router.post(
   "/:provider/sync",
   authMiddleware,
+  authorizeIntegrations,
   rateLimitMiddleware,
   (req, res) => controller.sync(req, res),
 );
 router.get(
   "/:provider/search",
   authMiddleware,
+  authorizeIntegrations,
   rateLimitMiddleware,
   (req, res) => controller.search(req, res),
 );
 router.post(
   "/:provider/send",
   authMiddleware,
+  authorizeIntegrations,
   rateLimitMiddleware,
   (req, res) => controller.send(req, res),
 );
 router.post(
   "/:provider/disconnect",
   authMiddleware,
+  authorizeIntegrations,
   rateLimitMiddleware,
   (req, res) => controller.disconnect(req, res),
 );

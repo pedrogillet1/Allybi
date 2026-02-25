@@ -12,6 +12,7 @@ import {
   isPubSubAvailable,
   publishExtractJob,
 } from "./jobs/pubsubPublisher.service";
+import { documentContentVault } from "./documents/documentContentVault.service";
 import type {
   DocumentService,
   DocumentRecord,
@@ -302,12 +303,25 @@ export class PrismaDocumentService implements DocumentService {
   }): Promise<DocumentPreview> {
     const doc = await prisma.document.findFirst({
       where: { id: input.documentId, userId: input.userId },
-      select: { previewText: true, renderableContent: true },
+      select: {
+        rawText: true,
+        previewText: true,
+        renderableContent: true,
+        extractedTextEncrypted: true,
+        previewTextEncrypted: true,
+        renderableContentEncrypted: true,
+      },
     });
+
+    const content = await documentContentVault.resolvePreviewText(
+      input.userId,
+      input.documentId,
+      doc,
+    );
+
     return {
       kind: "text",
-      content:
-        doc?.renderableContent || doc?.previewText || "(No preview available)",
+      content: content || "(No preview available)",
     };
   }
 

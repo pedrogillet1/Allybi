@@ -25,6 +25,7 @@
   "globalLimits": {
     "_comment": "Absolute maximums that override all other settings.",
     "maxResponseCharsHard": 6000,
+    "maxResponseTokensHard": 3200,
     "maxParagraphsHard": 8,
     "maxBulletsHard": 7,
     "maxTableRowsHard": 25,
@@ -77,9 +78,10 @@
     }
   },
   "answerModeLimits": {
-    "_comment": "Mode-specific overrides that take precedence over profile budgets.",
+    "_comment": "Mode-specific overrides that take precedence over profile budgets. maxOutputTokens/maxOutputTokensDefault are token caps used by runtime enforcers/builders.",
     "nav_pills": {
       "maxChars": 90,
+      "maxOutputTokens": 220,
       "maxSentences": 1,
       "maxParagraphs": 1,
       "maxBullets": 0,
@@ -88,40 +90,74 @@
     },
     "rank_disambiguate": {
       "maxChars": 180,
+      "maxOutputTokens": 220,
       "maxSentences": 2,
       "maxParagraphs": 1,
       "maxBullets": 0,
       "maxTableRows": 0,
       "forceProfile": "brief"
     },
+    "rank_autopick": {
+      "maxCharsDefault": 600,
+      "maxOutputTokensDefault": 400,
+      "preferProfile": "concise"
+    },
     "doc_grounded_single": {
       "maxCharsDefault": 1200,
+      "maxOutputTokensDefault": 1200,
+      "preferProfile": "standard"
+    },
+    "doc_grounded_multi": {
+      "maxCharsDefault": 1800,
+      "maxOutputTokensDefault": 1600,
       "preferProfile": "standard"
     },
     "doc_grounded_table": {
       "maxCharsDefault": 1800,
+      "maxOutputTokensDefault": 1800,
       "maxTableRows": 20,
       "preferProfile": "detailed"
     },
     "doc_grounded_quote": {
       "maxCharsDefault": 800,
+      "maxOutputTokensDefault": 700,
       "maxQuoteLines": 8,
       "preferProfile": "concise"
     },
+    "doc_discovery_list": {
+      "maxCharsDefault": 1000,
+      "maxOutputTokensDefault": 800,
+      "maxBullets": 5,
+      "preferProfile": "standard"
+    },
     "help_steps": {
       "maxCharsDefault": 1000,
+      "maxOutputTokensDefault": 900,
       "maxBullets": 5,
       "preferProfile": "standard"
     },
     "no_docs": {
       "maxChars": 400,
+      "maxOutputTokens": 300,
       "maxSentences": 4,
+      "forceProfile": "brief"
+    },
+    "scoped_not_found": {
+      "maxChars": 280,
+      "maxOutputTokens": 220,
+      "maxSentences": 2,
       "forceProfile": "brief"
     },
     "refusal": {
       "maxChars": 200,
+      "maxOutputTokens": 220,
       "maxSentences": 2,
       "forceProfile": "micro"
+    },
+    "general_answer": {
+      "maxCharsDefault": 1200,
+      "maxOutputTokensDefault": 1000,
+      "preferProfile": "standard"
     }
   },
   "paragraphLimits": {
@@ -239,6 +275,16 @@
         "input": "First sentence. Second sentence. Third sentence that is very long.",
         "context": { "maxChars": 50 },
         "expect": { "endsAtSentenceBoundary": true }
+      },
+      {
+        "id": "TRUNC_005_global_token_hard_cap",
+        "context": {},
+        "expect": { "outputTokensHardMax": 3200 }
+      },
+      {
+        "id": "TRUNC_006_doc_grounded_multi_token_cap",
+        "context": { "answerMode": "doc_grounded_multi" },
+        "expect": { "maxOutputTokens": 1600 }
       }
     ]
   }

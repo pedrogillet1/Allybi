@@ -290,6 +290,11 @@ export interface UndoRequest {
 export interface UndoResult {
   ok: boolean;
   restoredRevisionId?: string;
+  beforeHash?: string;
+  restoredHash?: string;
+  referenceHash?: string;
+  verifiedBitwise?: boolean;
+  verificationReason?: string;
   receipt?: EditReceipt;
   error?: string;
 }
@@ -349,5 +354,12 @@ export interface EditRevisionStore {
     documentId: string;
     userId: string;
     revisionId?: string;
-  }): Promise<{ restoredRevisionId: string }>;
+  }): Promise<{
+    restoredRevisionId: string;
+    beforeHash?: string;
+    restoredHash?: string;
+    referenceHash?: string;
+    verifiedBitwise?: boolean;
+    verificationReason?: string;
+  }>;
 }

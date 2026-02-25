@@ -2,8 +2,8 @@
 export type {
   EditHandlerRequest,
   EditHandlerResponse,
-} from '../../../services/core/handlers/editHandler.service';
-export { EditHandlerService } from '../../../services/core/handlers/editHandler.service';
+} from "../../../services/core/handlers/editHandler.service";
+export { EditHandlerService } from "../../../services/core/handlers/editHandler.service";
 
 // Editing facade, orchestrator, and supporting services
 export {
@@ -15,7 +15,7 @@ export {
   BankIntegrityService,
   EditingPolicyService,
   AllybiEditing,
-} from '../../../services/editing';
+} from "../../../services/editing";
 
 export type {
   DocxParagraphNode,
@@ -49,7 +49,7 @@ export type {
   SlidesTargetNode,
   UndoRequest,
   UndoResult,
-} from '../../../services/editing';
+} from "../../../services/editing";
 
 // Intent runtime — pattern-matching pipeline for edit instructions
-export { analyzeMessageToPlan } from '../../../services/editing/intentRuntime';
+export { analyzeMessageToPlan } from "../../../services/editing/intentRuntime";

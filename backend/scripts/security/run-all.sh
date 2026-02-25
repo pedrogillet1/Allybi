@@ -13,7 +13,7 @@ echo ""
 FAILED=0
 
 # 1. Scan for hardcoded secrets
-echo "📌 [1/3] Scanning for hardcoded secrets..."
+echo "📌 [1/4] Scanning for hardcoded secrets..."
 if npx ts-node scripts/security/scan-secrets.ts; then
   echo "✅ Secrets scan passed"
 else
@@ -23,7 +23,7 @@ fi
 echo ""
 
 # 2. Scan for unprotected admin routes
-echo "📌 [2/3] Scanning for unprotected admin routes..."
+echo "📌 [2/4] Scanning for unprotected admin routes..."
 if npx ts-node scripts/security/scan-unprotected-routes.ts; then
   echo "✅ Route protection scan passed"
 else
@@ -32,8 +32,18 @@ else
 fi
 echo ""
 
-# 3. Scan for plaintext writes
-echo "📌 [3/3] Scanning for plaintext writes to sensitive fields..."
+# 3. Scan for RBAC wiring on protected module routes
+echo "📌 [3/4] Scanning for RBAC route protection..."
+if npx ts-node scripts/security/scan-rbac-protection.ts; then
+  echo "✅ RBAC scan passed"
+else
+  echo "❌ RBAC scan failed"
+  FAILED=1
+fi
+echo ""
+
+# 4. Scan for plaintext writes
+echo "📌 [4/4] Scanning for plaintext writes to sensitive fields..."
 if npx ts-node scripts/security/scan-plaintext.ts; then
   echo "✅ Plaintext scan passed"
 else

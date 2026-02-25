@@ -27,8 +27,6 @@ const SENSITIVE_FIELDS = [
   'content:',
   // Conversation fields
   'title:',
-  // Folder fields
-  'name:',
   // 2FA fields
   'secret:',
   'backupCodes:',

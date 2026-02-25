@@ -7,6 +7,7 @@
 
 import type { LLMProvider } from "./llmErrors.types";
 import type { StreamSink, LLMStreamingConfig } from "./llmStreaming.types";
+import type { EvidencePackLike } from "./llmRequestBuilder.service";
 
 import type { ChatEngine, ChatRole } from "../../prismaChat.service";
 import type { LlmGatewayService } from "./llmGateway.service";
@@ -39,6 +40,7 @@ export class LLMChatEngine implements ChatEngine {
       content: string;
       attachments?: unknown | null;
     }>;
+    evidencePack?: EvidencePackLike | null;
     context?: Record<string, unknown>;
     meta?: Record<string, unknown>;
   }): Promise<{
@@ -51,6 +53,7 @@ export class LLMChatEngine implements ChatEngine {
       userId: params.userId,
       conversationId: params.conversationId,
       messages: params.messages,
+      evidencePack: params.evidencePack,
       context: params.context,
       meta: params.meta,
     });
@@ -74,6 +77,7 @@ export class LLMChatEngine implements ChatEngine {
       content: string;
       attachments?: unknown | null;
     }>;
+    evidencePack?: EvidencePackLike | null;
     context?: Record<string, unknown>;
     meta?: Record<string, unknown>;
     sink: StreamSink;
@@ -88,6 +92,7 @@ export class LLMChatEngine implements ChatEngine {
       userId: params.userId,
       conversationId: params.conversationId,
       messages: params.messages,
+      evidencePack: params.evidencePack,
       context: params.context,
       meta: params.meta,
       sink: params.sink,

@@ -26,6 +26,7 @@ function inferStatus(result: ChatResult): ChatResultStatus {
 export class ContractNormalizer {
   normalize(input: ChatResult): ChatResult {
     const sources = Array.isArray(input.sources) ? input.sources : [];
+    const provenance = input.provenance;
     const evidenceRequired = isEvidenceRequired(input);
 
     const completion: ChatCompletionState = input.completion || {
@@ -59,6 +60,17 @@ export class ContractNormalizer {
       failureCode = failureCode || "MISSING_EVIDENCE";
     }
 
+    if (
+      status === "success" &&
+      evidence.required &&
+      (!provenance ||
+        provenance.validated !== true ||
+        provenance.snippetRefs.length === 0)
+    ) {
+      status = "partial";
+      failureCode = failureCode || "missing_provenance";
+    }
+
     if (truncation.occurred && status === "success") {
       status = "partial";
       failureCode = failureCode || "TRUNCATED_RESPONSE";
@@ -67,6 +79,7 @@ export class ContractNormalizer {
     return {
       ...input,
       sources,
+      provenance,
       status,
       failureCode,
       completion,

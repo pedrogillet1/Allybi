@@ -10,6 +10,7 @@ export interface AuthRequest extends Request {
     id: string;
     email: string;
     googleId: string | null;
+    role: string;
   };
 }
 
@@ -90,6 +91,7 @@ export const authenticateToken = async (
         id: true,
         email: true,
         googleId: true,
+        role: true,
       },
     });
 
@@ -164,6 +166,7 @@ export const optionalAuth = async (
           id: true,
           email: true,
           googleId: true,
+          role: true,
         },
       });
 

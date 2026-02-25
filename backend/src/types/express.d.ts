@@ -8,9 +8,11 @@ declare global {
       id: string;
       email?: string;
       role?: string;
+      roles?: string[];
     }
     interface Request {
       user?: User;
+      requestId?: string;
     }
   }
 }

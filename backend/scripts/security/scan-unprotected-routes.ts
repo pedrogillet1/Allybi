@@ -45,6 +45,7 @@ const PUBLIC_ROUTES = [
 // Admin route files that are exempt from global auth (auth endpoints themselves)
 const AUTH_ROUTE_FILES = [
   'adminAuth.routes.ts',
+  'admin-auth.routes.ts',
 ];
 
 function scanRouteFile(filePath: string): RouteViolation[] {
@@ -52,6 +53,11 @@ function scanRouteFile(filePath: string): RouteViolation[] {
   const content = fs.readFileSync(filePath, 'utf-8');
   const lines = content.split('\n');
   const fileName = path.basename(filePath);
+
+  // Re-export wrappers are validated in their source route file.
+  if (/^\s*export\s+\{[^}]*default[^}]*\}\s+from\s+["'`].+["'`]\s*;?\s*$/m.test(content)) {
+    return violations;
+  }
 
   // Check if this is an admin route file
   const isAdminFile = fileName.includes('admin') || fileName.includes('Admin');
@@ -133,7 +139,10 @@ function scanDirectory(dir: string): RouteViolation[] {
 function main() {
   console.log('🔍 Scanning for unprotected admin routes...\n');
 
-  const violations = scanDirectory('src/routes');
+  const violations = [
+    ...scanDirectory('src/routes'),
+    ...scanDirectory('src/entrypoints/http/routes'),
+  ];
 
   if (violations.length === 0) {
     console.log('✅ All admin routes are properly protected!\n');

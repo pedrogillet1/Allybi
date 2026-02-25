@@ -138,7 +138,7 @@ class PrismaRetrievalUserAdapter
         updatedAt: true,
       },
       take: 5000,
-      orderBy: { updatedAt: "desc" },
+      orderBy: { id: "asc" },
     });
 
     return docs.map((doc) => ({
@@ -286,7 +286,7 @@ class PrismaRetrievalUserAdapter
     const rows = (await prisma.documentChunk.findMany({
       where,
       take: Math.max(input.k * 8, 80),
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ documentId: "asc" }, { chunkIndex: "asc" }, { id: "asc" }],
       include: {
         document: {
           select: {
@@ -337,7 +337,13 @@ class PrismaRetrievalUserAdapter
       });
     }
 
-    scored.sort((a, b) => b.score - a.score);
+    scored.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      if (a.docId !== b.docId) return a.docId.localeCompare(b.docId);
+      if (a.locationKey !== b.locationKey)
+        return a.locationKey.localeCompare(b.locationKey);
+      return a.chunkId.localeCompare(b.chunkId);
+    });
 
     return scored.slice(0, Math.max(1, input.k));
   }

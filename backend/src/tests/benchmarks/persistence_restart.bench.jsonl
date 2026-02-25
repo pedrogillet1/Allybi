@@ -1,0 +1,2 @@
+{"id":"pr_001","resource":"connector_token","flow":["store","restart","read"],"expected":{"survivesRestart":true}}
+{"id":"pr_002","resource":"connector_token","flow":["store","restart","delete","restart","read"],"expected":{"deletedAfterRestart":true}}

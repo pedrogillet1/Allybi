@@ -718,7 +718,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "c7d33eba5b978193737a73eb59ea2efbd8e9c6852cb83394a61175c09023cea2"
+      "checksumSha256": "502c4a5ce50d3de451a52f41e329e23ddadb4247c9272c64a05eaad7ceec523c"
     },
     {
       "id": "connectors_routing",
@@ -1395,7 +1395,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-27",
-      "checksumSha256": "de69305ab0e6b43f5c1793cf3ef8e21c117c3e728cabe1f006c44d43af1a3bfe"
+      "checksumSha256": "66548abda344521bc9fb4dc0253a0489166422797c6f55739a6ea2fad8e1effc"
     },
     {
       "id": "fallback_scope_empty",
@@ -2101,7 +2101,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-19",
-      "checksumSha256": "f8bf187bd120d15c0a2b43320219e2dda914e78c5976c1517efc53e874627fce"
+      "checksumSha256": "be0c17f3970e50776c2e6b7bd60ad043ede0a551fb44f3fcf729665a104bb94c"
     },
     {
       "id": "recency_boost_rules",
@@ -2382,7 +2382,7 @@
       "version": "2.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "f446cd983d094e05510320648d15efe727ea0f78e428997c4fd84e4c112f692d"
+      "checksumSha256": "06b08336bd48ae7d5c953d4403771eac2e4b7abdef9adc3664e80e83cc4478ff"
     },
     {
       "id": "ui_contracts",
@@ -2524,6 +2524,52 @@
       },
       "lastUpdated": "2026-02-20",
       "checksumSha256": "9c4c430bda61a8431fd0c3ef43d7fb19fba47ad6adf2471f69ec2c167707b5b6"
+    },
+    {
+      "id": "connector_operators",
+      "category": "operators",
+      "path": "operators/connector_operators.any.json",
+      "filename": "connector_operators.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "3f1f56eb3816b73920b5e14ff70c0979054c2ecb24da83bd9baba1be046983ea",
+      "lastUpdated": "2026-02-24"
+    },
+    {
+      "id": "creative_operators",
+      "category": "operators",
+      "path": "operators/creative_operators.any.json",
+      "filename": "creative_operators.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "f02116a9a863d860b0ecbd62919c1c59c8ff6c928ac2ec04b865f9a4fa122e20",
+      "lastUpdated": "2026-02-24"
     }
   ],
   "tests": [

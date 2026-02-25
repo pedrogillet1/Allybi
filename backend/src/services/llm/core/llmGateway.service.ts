@@ -41,6 +41,7 @@ export interface LlmGatewayRequest {
     content: string;
     attachments?: unknown | null;
   }>;
+  evidencePack?: EvidencePackLike | null;
   context?: Record<string, unknown>;
   meta?: Record<string, unknown>;
 }
@@ -112,6 +113,8 @@ export class LlmGatewayService {
         finishReason: response.finishReason || "unknown",
         usage: response.usage,
         promptType: prepared.promptType,
+        requestedMaxOutputTokens:
+          prepared.request.sampling?.maxOutputTokens ?? null,
         ...prepared.promptTrace,
       },
       promptTrace: prepared.promptTrace,
@@ -143,6 +146,8 @@ export class LlmGatewayService {
         finishReason: result.finishReason || "unknown",
         usage: result.usage,
         promptType: prepared.promptType,
+        requestedMaxOutputTokens:
+          prepared.request.sampling?.maxOutputTokens ?? null,
         ...prepared.promptTrace,
       },
       promptTrace: prepared.promptTrace,
@@ -187,7 +192,7 @@ export class LlmGatewayService {
         fallback: parsed.fallback,
         disambiguation: parsed.disambiguation,
       },
-      evidencePack: parsed.evidencePack,
+      evidencePack: params.evidencePack ?? parsed.evidencePack,
       memoryPack: parsed.memoryPack,
       toolContext: promptTask
         ? {
@@ -325,24 +330,9 @@ export class LlmGatewayService {
         }
       : undefined;
 
-    const evidence = this.extractEvidenceFromSystemBlocks(systemBlocks);
-    const uniqueDocs = new Set(evidence.map((e) => e.docId)).size;
-
-    const evidencePack = evidence.length
-      ? {
-          query: { original: userText, normalized: userText.toLowerCase() },
-          stats: {
-            evidenceItems: evidence.length,
-            uniqueDocsInEvidence: uniqueDocs,
-            topScore: null,
-            scoreGap: null,
-          },
-          evidence,
-        }
-      : undefined;
-
     const rawMeta = params.meta || {};
     const rawContext = params.context || {};
+    const evidencePack = params.evidencePack ?? undefined;
 
     const outputLanguage = this.detectOutputLanguage(
       rawMeta,
@@ -621,47 +611,6 @@ export class LlmGatewayService {
       maxOptions,
       maxQuestions,
     };
-  }
-
-  private extractEvidenceFromSystemBlocks(
-    systemBlocks: string[],
-  ): EvidencePackLike["evidence"] {
-    const out: EvidencePackLike["evidence"] = [];
-    const joined = systemBlocks.join("\n\n");
-
-    const excerptRegex =
-      /\[([^\]\n]+)\](?:\s*\{docId=([^,}\s]+)[^}]*\})?:\s*\n([\s\S]*?)(?=\n\n---\n\n|$)/g;
-    let match: RegExpExecArray | null;
-
-    while ((match = excerptRegex.exec(joined))) {
-      const label = String(match[1] || "").trim();
-      const docId =
-        String(match[2] || "").trim() ||
-        `doc:${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
-      const snippet = clampText(String(match[3] || "").trim(), 750);
-
-      if (!snippet) continue;
-
-      let title = label;
-      let page: number | null = null;
-
-      const pageMatch = /^(.*?),\s*p\.(\d+)$/i.exec(label);
-      if (pageMatch) {
-        title = pageMatch[1].trim();
-        page = Number(pageMatch[2]);
-      }
-
-      out.push({
-        docId,
-        title: title || docId,
-        filename: title || null,
-        location: page != null ? { page } : undefined,
-        snippet,
-        evidenceType: "text",
-      });
-    }
-
-    return out.slice(0, 12);
   }
 }
 

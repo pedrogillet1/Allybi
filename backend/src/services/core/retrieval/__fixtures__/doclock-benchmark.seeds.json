@@ -1,0 +1,48 @@
+{
+  "synthetic": {
+    "en": [
+      "summarize this document",
+      "extract key risks from the file",
+      "what are the top three findings here",
+      "give me the contract obligations",
+      "list action items from this report",
+      "what does this spreadsheet say about revenue"
+    ],
+    "pt": [
+      "resuma este documento",
+      "extraia os principais riscos do arquivo",
+      "quais são os três principais pontos aqui",
+      "me dê as obrigações do contrato",
+      "liste as ações deste relatório",
+      "o que esta planilha diz sobre receita"
+    ],
+    "es": [
+      "resume este documento",
+      "extrae los riesgos clave del archivo",
+      "cuáles son los tres hallazgos principales aquí",
+      "dame las obligaciones del contrato",
+      "enumera acciones de este informe",
+      "qué dice esta hoja sobre ingresos"
+    ]
+  },
+  "realLike": {
+    "en": [
+      "from the board packet, summarize the staffing risks in the current quarter",
+      "in the procurement memo, extract penalties and renewal dates",
+      "from the diligence report, list unresolved compliance items",
+      "in the operations review, pull KPIs that missed target"
+    ],
+    "pt": [
+      "no pacote do conselho, resuma os riscos de equipe do trimestre atual",
+      "no memorando de compras, extraia multas e datas de renovação",
+      "no relatório de diligência, liste itens de compliance pendentes",
+      "na revisão operacional, extraia os KPIs abaixo da meta"
+    ],
+    "es": [
+      "del paquete de junta, resume los riesgos de personal del trimestre actual",
+      "en el memo de compras, extrae multas y fechas de renovación",
+      "del informe de diligencia, lista ítems de cumplimiento pendientes",
+      "en la revisión operativa, extrae KPIs por debajo de la meta"
+    ]
+  }
+}

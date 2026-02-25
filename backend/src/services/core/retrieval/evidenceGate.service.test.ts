@@ -81,7 +81,11 @@ describe("EvidenceGateService", () => {
     const gate = new EvidenceGateService();
     const result = gate.checkEvidence(
       "what is the company history and background",
-      [{ text: "The company was established in a competitive market environment with various stakeholders." }],
+      [
+        {
+          text: "The company was established in a competitive market environment with various stakeholders.",
+        },
+      ],
       "en",
     );
     // Evidence has topic overlap ("company") but no required facts → weak + narrative risk = clarify

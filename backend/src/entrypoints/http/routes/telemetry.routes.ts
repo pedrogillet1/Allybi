@@ -3,10 +3,12 @@ import { createHash } from "crypto";
 import { z } from "zod";
 
 import { authMiddleware } from "../../../middleware/auth.middleware";
+import { authorizeByMethod } from "../../../middleware/authorize.middleware";
 import { rateLimitMiddleware } from "../../../middleware/rateLimit.middleware";
 import { USAGE_EVENT_TYPES } from "../../../services/telemetry/telemetry.constants";
 
 const router = Router();
+const authorizeTelemetry = authorizeByMethod("telemetry");
 
 const USAGE_EVENT_TYPE_SET = new Set<string>(
   USAGE_EVENT_TYPES as readonly string[],
@@ -97,6 +99,7 @@ const sanitizePublicMeta = (
 router.post(
   "/usage",
   authMiddleware,
+  authorizeTelemetry,
   rateLimitMiddleware,
   async (req: Request, res: Response) => {
     const parsed = usageEventSchema.safeParse(req.body || {});

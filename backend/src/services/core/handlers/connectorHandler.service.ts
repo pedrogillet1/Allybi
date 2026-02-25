@@ -425,7 +425,6 @@ export class ConnectorHandlerService {
         filename: { startsWith: `${provider}_` },
         OR: [
           { filename: { contains: q, mode: "insensitive" } },
-          { rawText: { contains: q, mode: "insensitive" } },
           { displayTitle: { contains: q, mode: "insensitive" } },
         ],
       },
@@ -435,14 +434,13 @@ export class ConnectorHandlerService {
         id: true,
         filename: true,
         displayTitle: true,
-        rawText: true,
       },
     });
 
     const hits: ConnectorSearchHit[] = docs.map((doc) => ({
       documentId: doc.id,
       title: doc.displayTitle || doc.filename || "(untitled)",
-      snippet: this.buildSnippet(doc.rawText || "", q),
+      snippet: this.buildSnippet(doc.displayTitle || doc.filename || "", q),
       source: provider,
     }));
 

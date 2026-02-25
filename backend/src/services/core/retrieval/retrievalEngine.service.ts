@@ -21,6 +21,10 @@
  */
 
 import crypto from "crypto";
+import {
+  resolveDocScopeLockFromSignals,
+  type DocScopeLock,
+} from "./docScopeLock";
 
 type EnvName = "production" | "staging" | "dev" | "local";
 type AnswerMode =
@@ -48,6 +52,8 @@ export interface RetrievalRequest {
     answerMode?: AnswerMode | null;
 
     // Scope controls
+    docScopeLock?: DocScopeLock | null;
+    allowedDocumentIds?: string[] | null;
     explicitDocLock?: boolean; // hard lock active
     activeDocId?: string | null; // locked/active doc id
     explicitDocRef?: boolean; // explicit filename/title reference in this turn
@@ -230,6 +236,9 @@ export interface EvidencePack {
     candidatesAfterNegatives: number;
     candidatesAfterBoosts: number;
     candidatesAfterDiversification: number;
+    scopeCandidatesDropped: number;
+    scopeViolationsDetected: number;
+    scopeViolationsThrown: number;
     evidenceItems: number;
     uniqueDocsInEvidence: number;
     topScore: number | null;
@@ -250,6 +259,50 @@ interface RetrievalPhaseCounts {
   afterNegatives: number;
   afterBoosts: number;
   afterDiversification: number;
+}
+
+type ScopeInvariantStage =
+  | "post_negatives"
+  | "post_diversification"
+  | "post_packaging";
+
+export interface RetrievalScopeViolationDetails {
+  stage: ScopeInvariantStage;
+  allowedDocIds: string[];
+  violatingDocIds: string[];
+  hardScopeActive: boolean;
+  explicitDocLock: boolean;
+  explicitDocRef: boolean;
+  singleDocIntent: boolean;
+  intentFamily?: string | null;
+}
+
+export class RetrievalScopeViolationError extends Error {
+  readonly code = "RETRIEVAL_SCOPE_VIOLATION";
+  readonly details: RetrievalScopeViolationDetails;
+
+  constructor(details: RetrievalScopeViolationDetails) {
+    super(
+      `Retrieval scope violation at ${details.stage}: ${details.violatingDocIds.join(", ")}`,
+    );
+    this.name = "RetrievalScopeViolationError";
+    this.details = details;
+  }
+}
+
+export class RetrievalScopeLockConfigurationError extends Error {
+  readonly code = "RETRIEVAL_SCOPE_LOCK_INVALID";
+
+  constructor(message: string) {
+    super(message);
+    this.name = "RetrievalScopeLockConfigurationError";
+  }
+}
+
+interface RetrievalScopeMetrics {
+  scopeCandidatesDropped: number;
+  scopeViolationsDetected: number;
+  scopeViolationsThrown: number;
 }
 
 /**
@@ -450,6 +503,11 @@ export class RetrievalEngineService {
 
     // 6) Merge into CandidateChunks with provenance + stable ids
     let candidates = this.mergePhaseCandidates(phaseResults, scope, req);
+    const scopeMetrics: RetrievalScopeMetrics = {
+      scopeCandidatesDropped: 0,
+      scopeViolationsDetected: 0,
+      scopeViolationsThrown: 0,
+    };
     const phaseCounts: RetrievalPhaseCounts = {
       considered: candidates.length,
       afterNegatives: candidates.length,
@@ -462,9 +520,18 @@ export class RetrievalEngineService {
       candidates,
       req,
       signals,
+      scope,
       negatives,
+      scopeMetrics,
     );
     phaseCounts.afterNegatives = candidates.length;
+    this.enforceScopeInvariant(
+      candidates.map((candidate) => candidate.docId),
+      scope,
+      signals,
+      "post_negatives",
+      scopeMetrics,
+    );
 
     // 8) Apply boosts (keyword/title/type/recency), with caps and guards
     candidates = this.applyBoosts(candidates, req, signals, {
@@ -488,6 +555,13 @@ export class RetrievalEngineService {
       );
     }
     phaseCounts.afterDiversification = candidates.length;
+    this.enforceScopeInvariant(
+      candidates.map((candidate) => candidate.docId),
+      scope,
+      signals,
+      "post_diversification",
+      scopeMetrics,
+    );
 
     // 11) Package evidence (strict provenance + caps) into EvidencePack
     const pack = this.packageEvidence(candidates, req, signals, packaging, {
@@ -496,7 +570,15 @@ export class RetrievalEngineService {
       expandedQueries,
       scope,
       phaseCounts,
+      scopeMetrics,
     });
+    this.enforceScopeInvariant(
+      pack.evidence.map((evidence) => evidence.docId),
+      scope,
+      signals,
+      "post_packaging",
+      scopeMetrics,
+    );
 
     // 12) Final safety: never include raw debug in production (still keep internal stats)
     if (pack.evidence.length === 0 && scope.hardScopeActive) {
@@ -562,7 +644,9 @@ export class RetrievalEngineService {
     rangeA1?: string | null;
   }> {
     const docs = await this.docStore.listDocs();
-    const allDocIds = docs.map((d) => d.docId);
+    const allDocIds = Array.from(
+      new Set(docs.map((d) => String(d.docId || "").trim()).filter(Boolean)),
+    ).sort((a, b) => a.localeCompare(b));
     const overrideCap = Number(req.overrides?.maxCandidateDocsHard);
     const maxCandidateDocsHard =
       Number.isFinite(overrideCap) && overrideCap > 0
@@ -575,11 +659,54 @@ export class RetrievalEngineService {
 
     const explicitDocId = signals.resolvedDocId ?? null;
     const activeDocId = signals.activeDocId ?? null;
+    const docScopeLock = resolveDocScopeLockFromSignals(signals);
 
     const isDiscovery = (signals.intentFamily ?? null) === "doc_discovery";
     const corpusAllowed = signals.corpusSearchAllowed ?? isDiscovery;
 
-    // Explicit doc ref always wins (hard lock candidate)
+    // Canonical scope lock owner:
+    // - single_doc: strict one-doc lock
+    // - docset: strict multi-doc lock
+    if (docScopeLock.mode === "single_doc" && !corpusAllowed) {
+      const singleDocId =
+        String(docScopeLock.activeDocumentId || "").trim() ||
+        docScopeLock.allowedDocumentIds[0] ||
+        "";
+      if (!singleDocId) {
+        return {
+          candidateDocIds: [],
+          hardScopeActive: true,
+          sheetName: signals.resolvedSheetName ?? null,
+          rangeA1: signals.resolvedRangeA1 ?? null,
+        };
+      }
+      return {
+        candidateDocIds: [singleDocId],
+        hardScopeActive: true,
+        sheetName: signals.resolvedSheetName ?? null,
+        rangeA1: signals.resolvedRangeA1 ?? null,
+      };
+    }
+
+    if (docScopeLock.mode === "docset" && !corpusAllowed) {
+      if (docScopeLock.allowedDocumentIds.length === 0) {
+        throw new RetrievalScopeLockConfigurationError(
+          "docScopeLock.mode=docset requires non-empty allowedDocumentIds.",
+        );
+      }
+      const allowedSet = new Set(docScopeLock.allowedDocumentIds);
+      const scopedDocIds = allDocIdsCapped.filter((docId) =>
+        allowedSet.has(docId),
+      );
+      return {
+        candidateDocIds: scopedDocIds,
+        hardScopeActive: true,
+        sheetName: signals.resolvedSheetName ?? null,
+        rangeA1: signals.resolvedRangeA1 ?? null,
+      };
+    }
+
+    // Legacy explicit doc ref always wins (hard lock candidate)
     if (signals.explicitDocRef) {
       if (!explicitDocId) {
         return {
@@ -597,7 +724,7 @@ export class RetrievalEngineService {
       };
     }
 
-    // Explicit doc lock: restrict to active doc unless discovery mode
+    // Legacy explicit doc lock: restrict to active doc unless discovery mode
     if (signals.explicitDocLock && activeDocId && !corpusAllowed) {
       return {
         candidateDocIds: [activeDocId],
@@ -607,7 +734,7 @@ export class RetrievalEngineService {
       };
     }
 
-    // Single-doc intent: prefer active doc if exists; else fall back to corpus
+    // Legacy single-doc intent: prefer active doc if exists; else fall back to corpus
     if (signals.singleDocIntent && activeDocId && !corpusAllowed) {
       return {
         candidateDocIds: [activeDocId],
@@ -913,7 +1040,14 @@ export class RetrievalEngineService {
     candidates: CandidateChunk[],
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
+    scope: {
+      candidateDocIds: string[];
+      hardScopeActive: boolean;
+      sheetName?: string | null;
+      rangeA1?: string | null;
+    },
     negativesBank: any | null,
+    scopeMetrics?: RetrievalScopeMetrics,
   ): CandidateChunk[] {
     if (!negativesBank?.config?.enabled) return candidates;
 
@@ -923,10 +1057,8 @@ export class RetrievalEngineService {
       0.55,
     );
 
-    // Hard lock enforcement (engine-side)
-    const lockedDocId = signals.explicitDocLock
-      ? (signals.activeDocId ?? null)
-      : null;
+    const scopeEnforced = this.shouldEnforceScopedDocSet(scope, signals);
+    const allowedDocSet = scopeEnforced ? new Set(scope.candidateDocIds) : null;
 
     // Slot extraction: precompute role anchors for confusion penalty
     const slotContract = signals.slotContract;
@@ -968,13 +1100,11 @@ export class RetrievalEngineService {
 
     const out: CandidateChunk[] = [];
     for (const c of candidates) {
-      // Hard block: explicit doc lock violation (unless discovery)
-      if (
-        lockedDocId &&
-        c.docId !== lockedDocId &&
-        signals.intentFamily !== "doc_discovery"
-      ) {
+      if (allowedDocSet && !allowedDocSet.has(c.docId)) {
         c.signals.scopeViolation = true;
+        if (scopeMetrics) {
+          scopeMetrics.scopeCandidatesDropped += 1;
+        }
         continue;
       }
 
@@ -1037,6 +1167,9 @@ export class RetrievalEngineService {
     },
   ): CandidateChunk[] {
     // Apply boosts as additive components with caps (final ranker may re-cap).
+    const allowRecencyBoost =
+      Boolean(signals.timeConstraintsPresent) &&
+      !Boolean(signals.explicitDocLock || signals.singleDocIntent);
     for (const c of candidates) {
       // Keyword boost (approximation): if query tokens appear in snippet, treat as body_text match.
       if (banks.boostsKeyword?.config?.enabled) {
@@ -1086,8 +1219,10 @@ export class RetrievalEngineService {
       }
 
       // Recency boost: requires doc metadata; apply lightly; reduce if time constraints present
-      if (banks.boostsRecency?.config?.enabled) {
+      if (banks.boostsRecency?.config?.enabled && allowRecencyBoost) {
         // Without doc meta age days we can’t compute precisely; keep 0 unless you wire doc meta.
+        c.scores.recencyBoost = 0;
+      } else {
         c.scores.recencyBoost = 0;
       }
     }
@@ -1273,6 +1408,7 @@ export class RetrievalEngineService {
         rangeA1?: string | null;
       };
       phaseCounts: RetrievalPhaseCounts;
+      scopeMetrics: RetrievalScopeMetrics;
     },
   ): EvidencePack {
     const cfg = packagingBank?.config ?? {};
@@ -1384,6 +1520,9 @@ export class RetrievalEngineService {
         candidatesAfterNegatives: ctx.phaseCounts.afterNegatives,
         candidatesAfterBoosts: ctx.phaseCounts.afterBoosts,
         candidatesAfterDiversification: ctx.phaseCounts.afterDiversification,
+        scopeCandidatesDropped: ctx.scopeMetrics.scopeCandidatesDropped,
+        scopeViolationsDetected: ctx.scopeMetrics.scopeViolationsDetected,
+        scopeViolationsThrown: ctx.scopeMetrics.scopeViolationsThrown,
         evidenceItems: evidence.length,
         uniqueDocsInEvidence: uniqueDocs.size,
         topScore,
@@ -1397,6 +1536,52 @@ export class RetrievalEngineService {
     };
 
     return pack;
+  }
+
+  private shouldEnforceScopedDocSet(
+    scope: { candidateDocIds: string[]; hardScopeActive: boolean },
+    signals: RetrievalRequest["signals"],
+  ): boolean {
+    const isDiscovery =
+      signals.intentFamily === "doc_discovery" ||
+      signals.corpusSearchAllowed === true;
+    if (isDiscovery) return false;
+    if (!scope.hardScopeActive) return false;
+    return (
+      Array.isArray(scope.candidateDocIds) && scope.candidateDocIds.length > 0
+    );
+  }
+
+  private enforceScopeInvariant(
+    docIds: string[],
+    scope: { candidateDocIds: string[]; hardScopeActive: boolean },
+    signals: RetrievalRequest["signals"],
+    stage: ScopeInvariantStage,
+    scopeMetrics: RetrievalScopeMetrics,
+  ): void {
+    if (!this.shouldEnforceScopedDocSet(scope, signals)) return;
+    const allowed = new Set(scope.candidateDocIds);
+    const violatingDocIds = Array.from(
+      new Set(
+        docIds
+          .map((docId) => String(docId || "").trim())
+          .filter((docId) => docId && !allowed.has(docId)),
+      ),
+    );
+    if (!violatingDocIds.length) return;
+
+    scopeMetrics.scopeViolationsDetected += violatingDocIds.length;
+    scopeMetrics.scopeViolationsThrown += 1;
+    throw new RetrievalScopeViolationError({
+      stage,
+      allowedDocIds: [...allowed].sort((a, b) => a.localeCompare(b)),
+      violatingDocIds,
+      hardScopeActive: scope.hardScopeActive,
+      explicitDocLock: Boolean(signals.explicitDocLock),
+      explicitDocRef: Boolean(signals.explicitDocRef),
+      singleDocIntent: Boolean(signals.singleDocIntent),
+      intentFamily: signals.intentFamily ?? null,
+    });
   }
 
   // -----------------------------
@@ -1443,6 +1628,9 @@ export class RetrievalEngineService {
         candidatesAfterNegatives: 0,
         candidatesAfterBoosts: 0,
         candidatesAfterDiversification: 0,
+        scopeCandidatesDropped: 0,
+        scopeViolationsDetected: 0,
+        scopeViolationsThrown: 0,
         evidenceItems: 0,
         uniqueDocsInEvidence: 0,
         topScore: null,

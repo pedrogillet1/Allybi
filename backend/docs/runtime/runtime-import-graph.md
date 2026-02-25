@@ -1,15 +1,22 @@
 # Runtime Import Graph Audit
 
-Generated: 2026-02-20T00:07:54.925Z
+Generated: 2026-02-24T23:56:38.833Z
 Seeds: src/server.ts, src/main/server.ts, src/app.ts
 
 ## Totals
 
-- Source files: 668
-- Reachable from runtime seeds: 345
-- Unreachable from runtime seeds: 323
-- Import edges: 909
-- Missing local refs: 1
+- Source files: 742
+- Reachable from runtime seeds: 364
+- Unreachable from runtime seeds: 378
+- Import edges: 966
+- Missing local refs: 0
+
+## Runtime Totals (Strict Denominator)
+
+- Runtime source files: 613
+- Runtime reachable from seeds: 364
+- Runtime unreachable from seeds: 249
+- Runtime coverage: 59.38%
 
 ## Top-Level Bucket Reachability
 
@@ -17,26 +24,29 @@ Seeds: src/server.ts, src/main/server.ts, src/app.ts
 |---|---:|---:|---:|
 | admin | 21 | 12 | 9 |
 | analytics | 16 | 0 | 16 |
+| app | 3 | 0 | 3 |
 | app.ts | 1 | 1 | 0 |
 | bootstrap | 4 | 3 | 1 |
 | config | 11 | 9 | 2 |
 | controllers | 15 | 13 | 2 |
-| data_banks | 5 | 0 | 5 |
+| data_banks | 7 | 0 | 7 |
 | entrypoints | 25 | 23 | 2 |
 | infra | 3 | 1 | 2 |
 | jobs | 2 | 0 | 2 |
 | main | 4 | 1 | 3 |
-| middleware | 11 | 11 | 0 |
-| modules | 13 | 10 | 3 |
+| middleware | 15 | 13 | 2 |
+| modules | 37 | 12 | 25 |
+| platform | 8 | 3 | 5 |
 | queues | 4 | 3 | 1 |
 | routes | 23 | 2 | 21 |
 | schemas | 4 | 1 | 3 |
 | semantics | 2 | 0 | 2 |
 | server.ts | 1 | 1 | 0 |
-| services | 396 | 213 | 183 |
+| services | 412 | 222 | 190 |
+| shared | 3 | 0 | 3 |
 | storage | 2 | 0 | 2 |
-| tests | 26 | 0 | 26 |
-| types | 30 | 4 | 26 |
+| tests | 40 | 0 | 40 |
+| types | 30 | 7 | 23 |
 | utils | 43 | 35 | 8 |
 | workers | 6 | 2 | 4 |
 

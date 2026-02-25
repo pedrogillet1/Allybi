@@ -4,7 +4,7 @@
  */
 
 import { Router, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../config/database";
 import {
   listErrors,
   listIngestionFailures,
@@ -17,7 +17,6 @@ import {
 import { getGoogleMetrics } from "../../services/admin/googleMetrics.service";
 
 const router = Router();
-const prisma = new PrismaClient();
 
 /**
  * Calculate percentile from sorted array

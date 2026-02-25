@@ -19,8 +19,8 @@ export type {
   ChatResult,
   ChatEngine,
   PrismaChatServicePort,
-} from './domain/chat.contracts';
-export { ConversationNotFoundError } from './domain/chat.contracts';
+} from "./domain/chat.contracts";
+export { ConversationNotFoundError } from "./domain/chat.contracts";
 
 export type {
   EditorSelectionRange,
@@ -28,27 +28,34 @@ export type {
   TurnRouteDecision,
   TurnRequest,
   TurnResult,
-} from './domain/chat.types';
+} from "./domain/chat.types";
 
 // ── Runtime ──
-export type { RuntimeDelegate } from './runtime/ChatRuntimeOrchestrator';
-export { ChatRuntimeOrchestrator } from './runtime/ChatRuntimeOrchestrator';
+export type { RuntimeDelegate } from "./runtime/ChatRuntimeOrchestrator";
+export { ChatRuntimeOrchestrator } from "./runtime/ChatRuntimeOrchestrator";
 
-export type { RuntimeRetrievalTelemetryInput } from './runtime/CentralizedChatRuntimeDelegate';
-export { CentralizedChatRuntimeDelegate, buildRuntimeRetrievalTelemetryMeta } from './runtime/CentralizedChatRuntimeDelegate';
+export { CentralizedChatRuntimeDelegate } from "./runtime/CentralizedChatRuntimeDelegate";
 
-export { ScopeService } from './runtime/ScopeService';
-export { EvidenceValidator } from './runtime/EvidenceValidator';
-export { ContractNormalizer } from './runtime/ContractNormalizer';
+export { ScopeService } from "./runtime/ScopeService";
+export { EvidenceValidator } from "./runtime/EvidenceValidator";
+export { ContractNormalizer } from "./runtime/ContractNormalizer";
 
-export type { RuntimePolicyErrorCode } from './runtime/runtimePolicyError';
-export { RuntimePolicyError, isRuntimePolicyError, toRuntimePolicyErrorCode } from './runtime/runtimePolicyError';
+export type { RuntimePolicyErrorCode } from "./runtime/runtimePolicyError";
+export {
+  RuntimePolicyError,
+  isRuntimePolicyError,
+  toRuntimePolicyErrorCode,
+} from "./runtime/runtimePolicyError";
 
 // ── API envelope ──
-export { normalizeChatResult, toChatFinalEvent, toChatHttpEnvelope } from './api/chatResultEnvelope';
+export {
+  normalizeChatResult,
+  toChatFinalEvent,
+  toChatHttpEnvelope,
+} from "./api/chatResultEnvelope";
 
 // ── Application ──
-export { ChatRuntimeService } from './application/chat-runtime.service';
+export { ChatRuntimeService } from "./application/chat-runtime.service";
 
 // ── Infra ──
-export * from './infra';
+export * from "./infra";

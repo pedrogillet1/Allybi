@@ -13,12 +13,19 @@ export type {
   StructuralIndex,
   DocStore,
   QueryNormalizer,
-} from '../../../services/core/retrieval/retrievalEngine.service';
-export { RetrievalEngineService } from '../../../services/core/retrieval/retrievalEngine.service';
+  RetrievalScopeViolationDetails,
+} from "../../../services/core/retrieval/retrievalEngine.service";
+export {
+  RetrievalEngineService,
+  RetrievalScopeViolationError,
+} from "../../../services/core/retrieval/retrievalEngine.service";
 
 // Evidence gate — evaluates evidence sufficiency
-export type { EvidenceCheckResult } from '../../../services/core/retrieval/evidenceGate.service';
-export { EvidenceGateService, getEvidenceGate } from '../../../services/core/retrieval/evidenceGate.service';
+export type { EvidenceCheckResult } from "../../../services/core/retrieval/evidenceGate.service";
+export {
+  EvidenceGateService,
+  getEvidenceGate,
+} from "../../../services/core/retrieval/evidenceGate.service";
 
 // Source buttons — UI-layer source attribution
 export type {
@@ -29,7 +36,7 @@ export type {
   RawSource,
   EvidenceChunkForFiltering,
   StandardResponse,
-} from '../../../services/core/retrieval/sourceButtons.service';
+} from "../../../services/core/retrieval/sourceButtons.service";
 export {
   SourceButtonsService,
   getSourceButtonsService,
@@ -39,11 +46,14 @@ export {
   buildFileActionResponse,
   buildFileListResponse,
   buildNoEvidenceResponse,
-} from '../../../services/core/retrieval/sourceButtons.service';
+} from "../../../services/core/retrieval/sourceButtons.service";
 
 // Slot resolver — entity-role slot matching
-export type { SlotContract, SlotResolutionResult } from '../../../services/core/retrieval/slotResolver.service';
-export { resolveSlot } from '../../../services/core/retrieval/slotResolver.service';
+export type {
+  SlotContract,
+  SlotResolutionResult,
+} from "../../../services/core/retrieval/slotResolver.service";
+export { resolveSlot } from "../../../services/core/retrieval/slotResolver.service";
 
 // Scope gate — document scope resolution
 export type {
@@ -51,9 +61,5 @@ export type {
   ScopeGateInput,
   ScopeCandidate,
   ScopeDecision,
-} from '../../../services/core/scope/scopeGate.service';
-export { ScopeGateService } from '../../../services/core/scope/scopeGate.service';
-
-// Discourse signals — query discourse analysis
-export type { DiscourseSignals } from '../../../services/core/scope/discourseSignal.service';
-export { analyzeDiscourseSignals } from '../../../services/core/scope/discourseSignal.service';
+} from "../../../services/core/scope/scopeGate.service";
+export { ScopeGateService } from "../../../services/core/scope/scopeGate.service";

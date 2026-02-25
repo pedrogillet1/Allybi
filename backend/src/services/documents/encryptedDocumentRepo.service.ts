@@ -125,6 +125,52 @@ export class EncryptedDocumentRepo {
     });
   }
 
+  async storeEncryptedRenderableContent(
+    userId: string,
+    documentId: string,
+    contentPlain: string,
+  ) {
+    const dk = await this.docKeys.getDocumentKey(userId, documentId);
+    const enc = this.docCrypto.encryptRenderableContent(
+      userId,
+      documentId,
+      contentPlain,
+      dk,
+    );
+
+    await this.prisma.document.update({
+      where: { id: documentId },
+      data: {
+        renderableContent: null,
+        renderableContentEncrypted: enc,
+      },
+    });
+  }
+
+  async getDecryptedRenderableContent(
+    userId: string,
+    documentId: string,
+  ): Promise<string | null> {
+    const dk = await this.docKeys.getDocumentKey(userId, documentId);
+
+    const doc = await this.prisma.document.findUnique({
+      where: { id: documentId },
+      select: { renderableContent: true, renderableContentEncrypted: true },
+    });
+    if (!doc) return null;
+
+    if (doc.renderableContentEncrypted) {
+      return this.docCrypto.decryptRenderableContent(
+        userId,
+        documentId,
+        doc.renderableContentEncrypted,
+        dk,
+      );
+    }
+
+    return doc.renderableContent ?? null;
+  }
+
   async storeEncryptedDisplayTitle(
     userId: string,
     documentId: string,

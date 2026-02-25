@@ -7,7 +7,11 @@ import { EditReceiptService } from "./editReceipt.service";
 import { RationaleBuilderService } from "./rationaleBuilder.service";
 import { ApplyVerificationService } from "./apply/applyVerification.service";
 import { EditingPolicyService } from "./policy/EditingPolicyService";
-import { validateEditResult } from "./contracts";
+import {
+  getRuntimeOperatorContract,
+  isCertifiedEditingOperator,
+  validateEditResult,
+} from "./contracts";
 import type {
   EditApplyRequest,
   EditApplyResult,
@@ -241,6 +245,22 @@ export class EditOrchestratorService {
         outcomeType: "engine_unsupported",
         preview,
         error: "Revision store is not configured.",
+      };
+    }
+
+    const operatorContract = getRuntimeOperatorContract(request.plan.operator);
+    if (!operatorContract || operatorContract.domain !== request.plan.domain) {
+      return {
+        ok: true,
+        applied: false,
+        outcomeType: "blocked",
+        preview,
+        error: "Operator contract mismatch for plan domain.",
+        blockedReason: {
+          code: "EDIT_OPERATOR_CONTRACT_MISMATCH",
+          gate: "operator_catalog",
+          message: `Operator ${request.plan.operator} is not valid for domain ${request.plan.domain}.`,
+        },
       };
     }
 
@@ -544,12 +564,41 @@ export class EditOrchestratorService {
           domain: request.plan.domain,
         }),
       };
-      // Contract validation (warn-only, never blocks)
+      // Contract validation (fail-closed for deploy-grade correctness)
       const contractCheck = validateEditResult(applyResult);
       if (!contractCheck.ok) {
-        logger.warn("[Editing] applyEdit result failed contract validation", {
+        return {
+          ok: true,
+          applied: false,
+          outcomeType: "blocked",
+          preview,
           error: contractCheck.error,
-        });
+          blockedReason: {
+            code: "EDIT_RESULT_CONTRACT_INVALID",
+            gate: "apply_proof",
+            message: contractCheck.error,
+          },
+        };
+      }
+
+      if (
+        applyResult.applied &&
+        isCertifiedEditingOperator(request.plan.operator) &&
+        (!applyResult.proof || !applyResult.proof.verified)
+      ) {
+        return {
+          ok: true,
+          applied: false,
+          outcomeType: "blocked",
+          preview,
+          error: "Certified operator apply proof is missing or unverified.",
+          blockedReason: {
+            code: "EDIT_CERTIFIED_PROOF_REQUIRED",
+            gate: "apply_proof",
+            message:
+              "Certified DOCX/XLSX operators require verified apply proof.",
+          },
+        };
       }
       return applyResult;
     } catch (error) {
@@ -767,6 +816,11 @@ export class EditOrchestratorService {
       return {
         ok: true,
         restoredRevisionId: restored.restoredRevisionId,
+        beforeHash: restored.beforeHash,
+        restoredHash: restored.restoredHash,
+        referenceHash: restored.referenceHash,
+        verifiedBitwise: restored.verifiedBitwise,
+        verificationReason: restored.verificationReason,
         receipt: this.receiptBuilder.build({
           stage: "applied",
           language: ctx.language || "en",

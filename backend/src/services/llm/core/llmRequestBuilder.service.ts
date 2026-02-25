@@ -1,5 +1,6 @@
 // src/services/llm/core/llmRequestBuilder.service.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { createHash } from "crypto";
 
 /**
  * LlmRequestBuilderService (Allybi, ChatGPT-parity)
@@ -39,6 +40,7 @@ import type {
 } from "../types/llm.types";
 
 import { BRAND_NAME } from "../../../config/brand";
+import { resolveOutputTokenBudget } from "../../core/enforcement/tokenBudget.service";
 
 export type LangCode = "any" | "en" | "pt" | "es";
 
@@ -220,23 +222,21 @@ export class LlmRequestBuilderService {
       content: this.buildUserPayload(input, disambiguationSignal),
     });
 
-    // Token budget by answer mode — doc-grounded modes get more tokens to avoid
-    // mid-sentence truncation, especially for Portuguese (which is ~20% more verbose).
-    const langMultiplier =
-      input.outputLanguage === "pt" || input.outputLanguage === "es" ? 1.2 : 1.0;
     const answerMode = input.signals.answerMode;
-    let baseTokenBudget: number;
-    if (answerMode === "doc_grounded_multi") {
-      baseTokenBudget = 1500;
-    } else if (
-      answerMode === "doc_grounded_single" ||
-      answerMode === "doc_grounded_quote"
-    ) {
-      baseTokenBudget = 1200;
-    } else {
-      baseTokenBudget = input.route.stage === "final" ? 900 : 700;
-    }
-    const maxOutputTokens = Math.round(baseTokenBudget * langMultiplier);
+    const outputBudget = resolveOutputTokenBudget({
+      answerMode,
+      outputLanguage: input.outputLanguage,
+      routeStage: input.route.stage,
+      operator: input.signals.operator,
+      userText: input.userText,
+      evidenceItems: input.evidencePack?.evidence?.length ?? 0,
+      hasTables:
+        input.evidencePack?.evidence?.some(
+          (item) => item.evidenceType === "table",
+        ) ?? false,
+      requestedOverride: input.options?.maxOutputTokens,
+    });
+    const maxOutputTokens = outputBudget.maxOutputTokens;
 
     // Generation options (streaming by default, ChatGPT-like)
     const options: LlmGenerationOptions = {
@@ -263,7 +263,10 @@ export class LlmRequestBuilderService {
     // Special case: quote mode often needs strictness, but keep length bounded
     if (input.signals.operator === "quote") {
       options.temperature = 0.15;
-      options.maxOutputTokens = Math.min(options.maxOutputTokens ?? 600, 500);
+      options.maxOutputTokens = Math.min(
+        options.maxOutputTokens ?? outputBudget.maxOutputTokens,
+        outputBudget.hardOutputTokens,
+      );
     }
 
     return {
@@ -283,6 +286,9 @@ export class LlmRequestBuilderService {
         reasonCodes: input.signals.fallback?.reasonCode
           ? [input.signals.fallback.reasonCode]
           : [],
+        outputBudget,
+        provenanceSchemaVersion: "v1",
+        evidenceMap: this.buildEvidenceMapMetadata(input.evidencePack),
       },
     };
   }
@@ -473,7 +479,9 @@ export class LlmRequestBuilderService {
     const top = pack.evidence.slice(0, maxItems);
 
     const lines: string[] = [];
-    lines.push("### Evidence (use only this — answer the specific question, not a generic overview)");
+    lines.push(
+      "### Evidence (use only this — answer the specific question, not a generic overview)",
+    );
     for (const e of top) {
       const title = e.title || e.filename || e.docId;
       const loc =
@@ -497,6 +505,45 @@ export class LlmRequestBuilderService {
     }
 
     return lines.join("\n");
+  }
+
+  private buildEvidenceMapMetadata(
+    evidencePack: EvidencePackLike | null | undefined,
+  ): Array<{
+    evidenceId: string;
+    documentId: string;
+    locationKey: string;
+    snippetHash: string;
+  }> {
+    if (!evidencePack || !Array.isArray(evidencePack.evidence)) return [];
+    const out: Array<{
+      evidenceId: string;
+      documentId: string;
+      locationKey: string;
+      snippetHash: string;
+    }> = [];
+    for (const item of evidencePack.evidence) {
+      const documentId = String(item.docId || "").trim();
+      const locationKey = String(item.locationKey || "").trim();
+      const snippet = String(item.snippet || "")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+      if (!documentId || !locationKey || !snippet) continue;
+      const evidenceId = `${documentId}:${locationKey}`;
+      out.push({
+        evidenceId,
+        documentId,
+        locationKey,
+        snippetHash: this.hashSnippet(snippet),
+      });
+    }
+    return out;
+  }
+
+  private hashSnippet(input: string): string {
+    // Keep deterministic and short for metadata transport.
+    return createHash("sha256").update(input).digest("hex").slice(0, 16);
   }
 
   // -------------------------

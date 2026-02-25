@@ -61,13 +61,34 @@ export interface ChatEvidenceState {
   sourceIds: string[];
 }
 
+export interface ChatProvenanceSnippetRefDTO {
+  evidenceId: string;
+  documentId: string;
+  locationKey: string;
+  snippetHash: string;
+  coverageScore: number;
+}
+
+export interface ChatProvenanceDTO {
+  mode: "hidden_map";
+  required: boolean;
+  validated: boolean;
+  failureCode?: string | null;
+  evidenceIdsUsed: string[];
+  sourceDocumentIds: string[];
+  snippetRefs: ChatProvenanceSnippetRefDTO[];
+  coverageScore: number;
+}
+
 export interface ChatResult {
   conversationId: string;
   userMessageId: string;
   assistantMessageId: string;
+  traceId?: string;
   assistantText: string;
   attachmentsPayload?: unknown;
   assistantTelemetry?: Record<string, unknown>;
+  provenance?: ChatProvenanceDTO;
   sources?: Array<{
     documentId: string;
     filename: string;

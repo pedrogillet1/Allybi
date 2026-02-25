@@ -1,0 +1,2 @@
+{"id":"wd_001","prompt":"Using document A, summarize quarterly revenue by month.","attachments":["doc_a","doc_b"],"expectedPolicy":{"strictDocLock":true,"allowedDocIds":["doc_a","doc_b"],"maxWrongDocRate":0}}
+{"id":"wd_002","prompt":"No documento Contrato_OBA.pdf, quem e o signatario principal?","attachments":["doc_contract","doc_noise"],"expectedPolicy":{"strictDocLock":true,"allowedDocIds":["doc_contract","doc_noise"],"maxWrongDocRate":0}}

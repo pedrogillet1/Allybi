@@ -1,0 +1,2 @@
+{"id":"tr_001","prompt":"Create a long markdown table with evidence citations for all rows.","mode":"doc_grounded_table","language":"en","expected":{"truncated":false,"structuralIntegrity":"table","maxBrokenRows":0}}
+{"id":"tr_002","prompt":"Crie uma resposta detalhada em portugues com tabela e conclusao final.","mode":"doc_grounded_multi","language":"pt","expected":{"truncated":false,"structuralIntegrity":"markdown","maxBrokenRows":0}}

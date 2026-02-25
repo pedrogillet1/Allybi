@@ -14,7 +14,7 @@ import {
 import RevisionService from "../documents/revision.service";
 import { logger } from "../../infra/logger";
 import cacheService from "../cache.service";
-import type { EditRevisionStore } from "./editing.types";
+import type { EditOperator, EditRevisionStore } from "./editing.types";
 import { DocxEditorService } from "./docx/docxEditor.service";
 import { buildDocxBundlePatchesFromMarkdown } from "./docx/docxMarkdownBridge.service";
 import { SlidesClientService } from "./slides/slidesClient.service";
@@ -32,6 +32,7 @@ import {
 import { looksLikeTruncatedSpanPayload } from "./docxSpanPayloadGuard";
 import SpreadsheetEngineService from "../spreadsheetEngine/spreadsheetEngine.service";
 import type { SpreadsheetEngineOp } from "../spreadsheetEngine/spreadsheetEngine.types";
+import { getRuntimeOperatorContract } from "./contracts";
 
 function asString(v: unknown): string | null {
   return typeof v === "string" && v.trim() ? v.trim() : null;
@@ -86,6 +87,19 @@ function keepUndoHistory(): boolean {
 
 function sha256(buffer: Buffer): string {
   return crypto.createHash("sha256").update(buffer).digest("hex");
+}
+
+function verifyBitwise(input: {
+  restoredBytes: Buffer;
+  referenceBytes: Buffer;
+}): { verified: boolean; restoredHash: string; referenceHash: string } {
+  const restoredHash = sha256(input.restoredBytes);
+  const referenceHash = sha256(input.referenceBytes);
+  return {
+    verified: restoredHash === referenceHash,
+    restoredHash,
+    referenceHash,
+  };
 }
 
 function isParagraphTargetNotFoundError(error: unknown): boolean {
@@ -405,6 +419,21 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     revisionId: string;
     fileHashBefore?: string;
     fileHashAfter?: string;
+    applyMetrics?: {
+      changedCellsCount?: number;
+      changedStructuresCount?: number;
+      affectedRanges?: string[];
+      affectedParagraphIds?: string[];
+      locateRange?: string | null;
+      changedSamples?: Array<{
+        sheetName: string;
+        cell: string;
+        before: string;
+        after: string;
+      }>;
+      rejectedOps?: string[];
+      patchesApplied?: number;
+    };
   }> {
     const docId = input.documentId.trim();
     const userId = input.userId.trim();
@@ -412,6 +441,10 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
     let op = asString(meta.operator) as EditOperatorLike | null;
     if (!op) throw new Error("Missing edit operator in revision metadata.");
+    const operatorContract = getRuntimeOperatorContract(op as EditOperator);
+    if (!operatorContract) {
+      throw new OperatorNotImplementedError(op);
+    }
 
     const rawTargetId = asString(meta.targetId) ?? null;
     const isSyntheticTarget = Boolean(rawTargetId?.startsWith("synthetic:"));
@@ -1807,7 +1840,14 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     documentId: string;
     userId: string;
     revisionId?: string;
-  }): Promise<{ restoredRevisionId: string }> {
+  }): Promise<{
+    restoredRevisionId: string;
+    beforeHash?: string;
+    restoredHash?: string;
+    referenceHash?: string;
+    verifiedBitwise?: boolean;
+    verificationReason?: string;
+  }> {
     const userId = input.userId.trim();
     const docId = input.documentId.trim();
 
@@ -1826,6 +1866,8 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       if (!target) throw new Error("Document not found or not accessible.");
       if (!target.encryptedFilename)
         throw new Error("Document storage key missing.");
+      const currentBytes = await downloadFile(target.encryptedFilename);
+      const beforeHash = sha256(currentBytes);
 
       const rootDocumentId = await this.resolveRootDocumentId(target.id);
       const chain = await prisma.document.findMany({
@@ -1858,7 +1900,6 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
       // Optional: backup current state before undo (kept hidden) so repeated undo doesn't destroy history.
       if (keepUndoHistory()) {
-        const currentBytes = await downloadFile(target.encryptedFilename);
         await this.revisionService.createRevision(
           {
             userId,
@@ -1915,14 +1956,35 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         encryptedFilename: target.encryptedFilename,
       });
 
-      return { restoredRevisionId: docId };
+      const restoredBytes = await downloadFile(target.encryptedFilename);
+      const verification = verifyBitwise({
+        restoredBytes,
+        referenceBytes: bytes,
+      });
+
+      return {
+        restoredRevisionId: docId,
+        beforeHash,
+        restoredHash: verification.restoredHash,
+        referenceHash: verification.referenceHash,
+        verifiedBitwise: verification.verified,
+        ...(verification.verified
+          ? {}
+          : {
+              verificationReason: "UNDO_RESTORE_HASH_MISMATCH_OVERWRITE_MODE",
+            }),
+      };
     }
 
     const source = await prisma.document.findFirst({
       where: { id: docId, userId },
-      select: { id: true, parentVersionId: true },
+      select: { id: true, parentVersionId: true, encryptedFilename: true },
     });
     if (!source) throw new Error("Document not found or not accessible.");
+    if (!source.encryptedFilename)
+      throw new Error("Document storage key missing.");
+    const sourceBytes = await downloadFile(source.encryptedFilename);
+    const beforeHash = sha256(sourceBytes);
 
     const rootDocumentId = await this.resolveRootDocumentId(source.id);
 
@@ -1970,12 +2032,40 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         filename: restoreDoc.filename || undefined,
         enqueueReindex: true,
         reason: `undo`,
-        metadata: { undoFrom: restoreDoc.id, rootDocumentId },
+        metadata: {
+          undoFrom: restoreDoc.id,
+          rootDocumentId,
+          undoVerificationHash: sha256(bytes),
+          undoVerificationMode: "bitwise",
+        },
       },
       { userId },
     );
+    const restoredDoc = await prisma.document.findUnique({
+      where: { id: created.id },
+      select: { encryptedFilename: true },
+    });
+    if (!restoredDoc?.encryptedFilename) {
+      throw new Error("Undo restored revision storage key missing.");
+    }
+    const restoredBytes = await downloadFile(restoredDoc.encryptedFilename);
+    const verification = verifyBitwise({
+      restoredBytes,
+      referenceBytes: bytes,
+    });
 
-    return { restoredRevisionId: created.id };
+    return {
+      restoredRevisionId: created.id,
+      beforeHash,
+      restoredHash: verification.restoredHash,
+      referenceHash: verification.referenceHash,
+      verifiedBitwise: verification.verified,
+      ...(verification.verified
+        ? {}
+        : {
+            verificationReason: "UNDO_RESTORE_HASH_MISMATCH_REVISION_MODE",
+          }),
+    };
   }
 
   private async resolveRootDocumentId(documentId: string): Promise<string> {

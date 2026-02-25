@@ -152,6 +152,20 @@ function simpleTokens(s: string): string[] {
     .filter(Boolean);
 }
 
+function splitDocReferenceCandidates(rawPhrase: string): string[] {
+  const phrase = String(rawPhrase || "").trim();
+  if (!phrase) return [];
+  return phrase
+    .split(/\s*(?:,|;|\band\b|\be\b|\by\b)\s*/i)
+    .map((part) =>
+      part
+        .replace(/^(?:the|document|file|o|a|os|as|documento|arquivo)\s+/i, "")
+        .replace(/[.?!:]+$/g, "")
+        .trim(),
+    )
+    .filter((part) => part.length > 0);
+}
+
 function tokenOverlap(
   aTokens: string[],
   bTokens: string[],
@@ -382,6 +396,7 @@ export class ChatRuntimeOrchestrator {
     const candidates = new Set<string>();
 
     for (const pattern of this.scopeRuntime.candidateFilenameRegex) {
+      pattern.lastIndex = 0;
       const extMatches = message.matchAll(pattern);
       for (const m of extMatches) {
         const matched = lower(m[0]);
@@ -392,11 +407,24 @@ export class ChatRuntimeOrchestrator {
     }
 
     for (const pattern of this.scopeRuntime.candidateDocRefRegex) {
+      pattern.lastIndex = 0;
       const phraseMatches = message.matchAll(pattern);
       for (const m of phraseMatches) {
         const raw = String(m[1] || "").trim();
-        if (raw.length >= this.scopeRuntime.docNameMinLength) {
-          candidates.add(lower(raw));
+        for (const part of splitDocReferenceCandidates(raw)) {
+          if (part.length < this.scopeRuntime.docNameMinLength) continue;
+          candidates.add(lower(part));
+          for (const filenamePattern of this.scopeRuntime
+            .candidateFilenameRegex) {
+            filenamePattern.lastIndex = 0;
+            const explicitMatches = part.matchAll(filenamePattern);
+            for (const explicit of explicitMatches) {
+              const explicitName = lower(String(explicit[0] || ""));
+              if (explicitName.length >= this.scopeRuntime.docNameMinLength) {
+                candidates.add(explicitName);
+              }
+            }
+          }
         }
       }
     }
@@ -424,7 +452,10 @@ export class ChatRuntimeOrchestrator {
     });
 
     const matched = new Set<string>();
-    const candidateResults: Record<string, { matchedDocId?: string; matchType?: string; failed?: boolean }> = {};
+    const candidateResults: Record<
+      string,
+      { matchedDocId?: string; matchType?: string; failed?: boolean }
+    > = {};
 
     for (const candidate of candidates) {
       const candidateTokens = this.docnameTokens(candidate);
@@ -441,7 +472,10 @@ export class ChatRuntimeOrchestrator {
           candidate.includes(fn)
         ) {
           matched.add(doc.id);
-          candidateResults[candidate] = { matchedDocId: doc.id, matchType: "exact/substring" };
+          candidateResults[candidate] = {
+            matchedDocId: doc.id,
+            matchType: "exact/substring",
+          };
           candidateMatched = true;
           break;
         }
@@ -455,7 +489,10 @@ export class ChatRuntimeOrchestrator {
         );
         if (overlap >= this.scopeRuntime.tokenOverlapThreshold) {
           matched.add(doc.id);
-          candidateResults[candidate] = { matchedDocId: doc.id, matchType: `token-overlap(${overlap.toFixed(2)})` };
+          candidateResults[candidate] = {
+            matchedDocId: doc.id,
+            matchType: `token-overlap(${overlap.toFixed(2)})`,
+          };
           candidateMatched = true;
           break;
         }

@@ -2,6 +2,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+const STRICT_RUNTIME =
+  process.argv.includes('--strict-runtime') ||
+  process.argv.includes('--strict');
+const MIN_RUNTIME_COVERAGE = Number.parseFloat(
+  process.env.RUNTIME_MIN_COVERAGE || '0.59',
+);
+
 const CWD = process.cwd();
 const BACKEND_ROOT = fs.existsSync(path.resolve(CWD, 'backend/src'))
   ? path.resolve(CWD, 'backend')
@@ -44,6 +51,9 @@ function listSourceFiles(root) {
 }
 
 function parseSpecifiers(code) {
+  const sanitized = String(code || '')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^\s*\/\/.*$/gm, '');
   const specs = new Set();
   const patterns = [
     /import\s+[^'"`]*?from\s*['"]([^'"`]+)['"]/g,
@@ -52,7 +62,7 @@ function parseSpecifiers(code) {
   ];
   for (const pattern of patterns) {
     let m;
-    while ((m = pattern.exec(code)) !== null) {
+    while ((m = pattern.exec(sanitized)) !== null) {
       const spec = String(m[1] || '').trim();
       if (spec) specs.add(spec);
     }
@@ -173,6 +183,26 @@ function buildMoveMap() {
   ];
 }
 
+function isRuntimeSourceFile(absPath) {
+  const rel = normalizeRel(absPath);
+  if (!rel.startsWith('src/')) return false;
+  if (rel.includes('/__tests__/')) return false;
+  if (
+    rel.includes('/tests/') ||
+    rel.endsWith('.test.ts') ||
+    rel.endsWith('.test.tsx') ||
+    rel.endsWith('.spec.ts') ||
+    rel.endsWith('.spec.tsx')
+  ) {
+    return false;
+  }
+  if (rel.startsWith('src/data_banks/')) return false;
+  if (rel.startsWith('src/analytics/')) return false;
+  if (rel.startsWith('src/main/health.ts')) return false;
+  if (rel.startsWith('src/jobs/')) return false;
+  return true;
+}
+
 function main() {
   const sourceFiles = listSourceFiles(SRC_ROOT);
   const sourceSet = new Set(sourceFiles.map((f) => path.resolve(f)));
@@ -218,6 +248,21 @@ function main() {
 
   const allRel = sourceFiles.map((f) => normalizeRel(f)).sort();
   const unreachableFiles = allRel.filter((rel) => !reachableSet.has(rel));
+  const runtimeRel = sourceFiles
+    .filter((file) => isRuntimeSourceFile(file))
+    .map((file) => normalizeRel(file))
+    .sort();
+  const runtimeRelSet = new Set(runtimeRel);
+  const runtimeReachableFiles = reachableFiles.filter((rel) =>
+    runtimeRelSet.has(rel),
+  );
+  const runtimeUnreachableFiles = runtimeRel.filter(
+    (rel) => !reachableSet.has(rel),
+  );
+  const runtimeCoverage =
+    runtimeRel.length > 0
+      ? runtimeReachableFiles.length / runtimeRel.length
+      : 1;
 
   const bucketStats = new Map();
   for (const file of sourceFiles) {
@@ -267,6 +312,12 @@ function main() {
       edges: edges.length,
       missingLocalRefs: missingLocalRefs.length,
     },
+    runtimeTotals: {
+      sourceFiles: runtimeRel.length,
+      reachableFiles: runtimeReachableFiles.length,
+      unreachableFiles: runtimeUnreachableFiles.length,
+      coverage: Number(runtimeCoverage.toFixed(4)),
+    },
     topLevelBuckets,
     routeWrapperFiles,
     legacyRouteWrappers,
@@ -294,6 +345,19 @@ function main() {
   mdLines.push(`- Unreachable from runtime seeds: ${report.totals.unreachableFiles}`);
   mdLines.push(`- Import edges: ${report.totals.edges}`);
   mdLines.push(`- Missing local refs: ${report.totals.missingLocalRefs}`);
+  mdLines.push('');
+  mdLines.push('## Runtime Totals (Strict Denominator)');
+  mdLines.push('');
+  mdLines.push(`- Runtime source files: ${report.runtimeTotals.sourceFiles}`);
+  mdLines.push(
+    `- Runtime reachable from seeds: ${report.runtimeTotals.reachableFiles}`,
+  );
+  mdLines.push(
+    `- Runtime unreachable from seeds: ${report.runtimeTotals.unreachableFiles}`,
+  );
+  mdLines.push(
+    `- Runtime coverage: ${(report.runtimeTotals.coverage * 100).toFixed(2)}%`,
+  );
   mdLines.push('');
   mdLines.push('## Top-Level Bucket Reachability');
   mdLines.push('');
@@ -331,6 +395,29 @@ function main() {
   console.log(
     `[runtime-graph] summary: reachable ${report.totals.reachableFiles}/${report.totals.sourceFiles}, legacy route wrappers ${report.legacyRouteWrappers.length}`,
   );
+
+  if (STRICT_RUNTIME) {
+    const failures = [];
+    if (report.runtimeTotals.coverage < MIN_RUNTIME_COVERAGE) {
+      failures.push(
+        `RUNTIME_COVERAGE_BELOW_MIN (${(report.runtimeTotals.coverage * 100).toFixed(2)}% < ${(MIN_RUNTIME_COVERAGE * 100).toFixed(2)}%)`,
+      );
+    }
+    if (report.totals.missingLocalRefs > 0) {
+      failures.push(`MISSING_LOCAL_REFS_NON_ZERO (${report.totals.missingLocalRefs})`);
+    }
+    if (report.legacyRouteWrappers.length > 0) {
+      failures.push(
+        `LEGACY_ROUTE_WRAPPERS_PRESENT (${report.legacyRouteWrappers.length})`,
+      );
+    }
+    if (failures.length > 0) {
+      for (const failure of failures) {
+        console.error(`[runtime-graph] ${failure}`);
+      }
+      process.exit(1);
+    }
+  }
 }
 
 main();

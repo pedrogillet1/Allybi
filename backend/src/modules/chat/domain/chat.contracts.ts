@@ -111,16 +111,37 @@ export interface ChatSourceDTO {
   page: number | null;
 }
 
+export interface ChatProvenanceSnippetRefDTO {
+  evidenceId: string;
+  documentId: string;
+  locationKey: string;
+  snippetHash: string;
+  coverageScore: number;
+}
+
+export interface ChatProvenanceDTO {
+  mode: "hidden_map";
+  required: boolean;
+  validated: boolean;
+  failureCode?: string | null;
+  evidenceIdsUsed: string[];
+  sourceDocumentIds: string[];
+  snippetRefs: ChatProvenanceSnippetRefDTO[];
+  coverageScore: number;
+}
+
 export interface ChatResult {
   conversationId: string;
   userMessageId: string;
   assistantMessageId: string;
+  traceId?: string;
   assistantText: string;
 
   attachmentsPayload?: unknown;
   assistantTelemetry?: Record<string, unknown>;
 
   sources?: ChatSourceDTO[];
+  provenance?: ChatProvenanceDTO;
   listing?: Array<{
     kind: "file" | "folder";
     id: string;
@@ -163,6 +184,31 @@ export interface ChatEngine {
       content: string;
       attachments?: unknown | null;
     }>;
+    evidencePack?: {
+      query?: { original?: string; normalized?: string };
+      scope?: { activeDocId?: string | null; explicitDocLock?: boolean };
+      stats?: {
+        evidenceItems?: number;
+        uniqueDocsInEvidence?: number;
+        topScore?: number | null;
+        scoreGap?: number | null;
+      };
+      evidence: Array<{
+        docId: string;
+        title?: string | null;
+        filename?: string | null;
+        location?: {
+          page?: number | null;
+          sheet?: string | null;
+          slide?: number | null;
+          sectionKey?: string | null;
+        };
+        locationKey?: string;
+        snippet?: string;
+        score?: { finalScore?: number };
+        evidenceType?: "text" | "table" | "image";
+      }>;
+    } | null;
     context?: Record<string, unknown>;
     meta?: Record<string, unknown>;
   }): Promise<{
@@ -180,6 +226,31 @@ export interface ChatEngine {
       content: string;
       attachments?: unknown | null;
     }>;
+    evidencePack?: {
+      query?: { original?: string; normalized?: string };
+      scope?: { activeDocId?: string | null; explicitDocLock?: boolean };
+      stats?: {
+        evidenceItems?: number;
+        uniqueDocsInEvidence?: number;
+        topScore?: number | null;
+        scoreGap?: number | null;
+      };
+      evidence: Array<{
+        docId: string;
+        title?: string | null;
+        filename?: string | null;
+        location?: {
+          page?: number | null;
+          sheet?: string | null;
+          slide?: number | null;
+          sectionKey?: string | null;
+        };
+        locationKey?: string;
+        snippet?: string;
+        score?: { finalScore?: number };
+        evidenceType?: "text" | "table" | "image";
+      }>;
+    } | null;
     context?: Record<string, unknown>;
     meta?: Record<string, unknown>;
     sink: StreamSink;

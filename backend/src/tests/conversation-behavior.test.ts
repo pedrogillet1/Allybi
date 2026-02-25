@@ -24,49 +24,61 @@ function run(command: Command): number {
   return result.status ?? 1;
 }
 
-const jestBin = path.resolve(
-  process.cwd(),
-  "node_modules",
-  "jest",
-  "bin",
-  "jest.js",
-);
-const tsNodeBin = path.resolve(
-  process.cwd(),
-  "node_modules",
-  "ts-node",
-  "dist",
-  "bin.js",
-);
+function runBehaviorSuite(): number {
+  const jestBin = path.resolve(
+    process.cwd(),
+    "node_modules",
+    "jest",
+    "bin",
+    "jest.js",
+  );
+  const tsNodeBin = path.resolve(
+    process.cwd(),
+    "node_modules",
+    "ts-node",
+    "dist",
+    "bin.js",
+  );
 
-const commands: Command[] = [
-  {
-    bin: process.execPath,
-    args: [
-      jestBin,
-      "--config",
-      "jest.config.cjs",
-      "--runInBand",
-      "--runTestsByPath",
-      "src/tests/prismaChatService.contract.test.ts",
-    ],
-    label: "prisma chat contract",
-  },
-  {
-    bin: process.execPath,
-    args: [
-      tsNodeBin,
-      "--transpile-only",
-      "test-suite/16-conversation-flow-test.ts",
-      "--quick",
-    ],
-    label: "conversation flow quick",
-  },
-];
+  const commands: Command[] = [
+    {
+      bin: process.execPath,
+      args: [
+        jestBin,
+        "--config",
+        "jest.config.cjs",
+        "--runInBand",
+        "--runTestsByPath",
+        "src/tests/prismaChatService.contract.test.ts",
+      ],
+      label: "prisma chat contract",
+    },
+    {
+      bin: process.execPath,
+      args: [
+        tsNodeBin,
+        "--transpile-only",
+        "test-suite/16-conversation-flow-test.ts",
+        "--quick",
+      ],
+      label: "conversation flow quick",
+    },
+  ];
 
-for (const command of commands) {
-  const status = run(command);
-  if (status !== 0) process.exit(status);
+  for (const command of commands) {
+    const status = run(command);
+    if (status !== 0) return status;
+  }
+  console.log("[test:behavior] All checks passed.");
+  return 0;
 }
 
-console.log("[test:behavior] All checks passed.");
+if (process.env.JEST_WORKER_ID) {
+  describe("conversation behavior delegated suite", () => {
+    test("passes delegated conversation contracts", () => {
+      expect(runBehaviorSuite()).toBe(0);
+    });
+  });
+} else {
+  process.exit(runBehaviorSuite());
+}
