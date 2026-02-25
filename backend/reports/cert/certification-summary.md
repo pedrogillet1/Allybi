@@ -1,6 +1,6 @@
 # Certification Summary
 
-- Generated: 2026-02-25T21:12:41.684Z
+- Generated: 2026-02-25T22:12:36.414Z
 - Passed: yes
 - Passed gates: 10/10
 
@@ -40,7 +40,7 @@
 ## runtime-wiring
 - Passed: yes
 - Failures: none
-- Metrics: `{"commandStatus":0,"reachableFiles":388,"reachableRuntimeFiles":360,"runtimeCoverage":0.9068,"missingLocalRefs":0,"legacyRouteWrappers":0,"missingCriticalPaths":0}`
+- Metrics: `{"commandStatus":0,"reachableFiles":388,"reachableRuntimeFiles":360,"runtimeCoverage":0.9917,"missingLocalRefs":0,"legacyRouteWrappers":0,"missingCriticalPaths":0}`
 
 ## enforcer-failclosed
 - Passed: yes

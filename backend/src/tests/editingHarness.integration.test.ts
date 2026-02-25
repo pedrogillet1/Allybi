@@ -17,7 +17,6 @@ import path from "path";
 import { classifyAllybiIntent } from "../services/editing/allybi/intentClassifier";
 import { buildMultiIntentPlan } from "../services/editing/allybi/multiIntentPlanner";
 import { validateAllybiOperatorPayload } from "../services/editing/allybi/operatorValidator";
-import { detectBulkEditIntent } from "../services/editing/bulkEditIntent";
 import { normalizeEditOperator } from "../services/editing/editOperatorAliases.service";
 import type { EditDomain } from "../services/editing/editing.types";
 
@@ -457,29 +456,7 @@ describe("Validator blocks invalid payloads", () => {
 });
 
 /* ------------------------------------------------------------------ */
-/*  7. Bulk edit intent — edge cases                                   */
-/* ------------------------------------------------------------------ */
-
-describe("Bulk edit intent edge cases", () => {
-  const allFixtures = [...loadFixtures("en"), ...loadFixtures("pt")];
-  const edgeCases = allFixtures.filter(
-    (f) => f.expectedBulkEditKind !== undefined,
-  );
-
-  for (const f of edgeCases) {
-    test(`[${f.id}] ${f.prompt.slice(0, 60)}`, () => {
-      const result = detectBulkEditIntent(f.prompt);
-      if (f.expectedBulkEditKind === null) {
-        expect(result).toBeNull();
-      } else {
-        expect(result?.kind).toBe(f.expectedBulkEditKind);
-      }
-    });
-  }
-});
-
-/* ------------------------------------------------------------------ */
-/*  8. Coverage report (not assertions — console output)               */
+/*  7. Coverage report (not assertions — console output)               */
 /* ------------------------------------------------------------------ */
 
 describe("Coverage summary", () => {
