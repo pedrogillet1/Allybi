@@ -34,9 +34,18 @@ function resolveChatRoutesPath(initialPath: string): string {
 
 function run(): void {
   const assertions: Assertion[] = [];
-  const chatRoutesPath = resolveChatRoutesPath(
-    path.join(root, "src", "routes", "chat.routes.ts"),
+  const canonicalChatRoutesPath = path.join(
+    root,
+    "src",
+    "entrypoints",
+    "http",
+    "routes",
+    "chat.routes.ts",
   );
+  const legacyChatRoutesPath = path.join(root, "src", "routes", "chat.routes.ts");
+  const chatRoutesPath = fs.existsSync(canonicalChatRoutesPath)
+    ? canonicalChatRoutesPath
+    : resolveChatRoutesPath(legacyChatRoutesPath);
   const chatServicePath = path.join(root, "src", "services", "prismaChat.service.ts");
 
   assertions.push({

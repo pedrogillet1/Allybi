@@ -20,6 +20,9 @@ const SEED_CANDIDATES = [
   path.join(SRC_ROOT, 'server.ts'),
   path.join(SRC_ROOT, 'main', 'server.ts'),
   path.join(SRC_ROOT, 'app.ts'),
+  path.join(SRC_ROOT, 'workers', 'document-worker.ts'),
+  path.join(SRC_ROOT, 'entrypoints', 'workers', 'document.worker.ts'),
+  path.join(SRC_ROOT, 'entrypoints', 'workers', 'jobs.worker.ts'),
 ];
 
 function normalizeRel(absPath) {
