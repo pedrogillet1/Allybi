@@ -32,6 +32,7 @@ function main() {
   if (wrongDoc.missing) {
     failures.push("P0-4_GATE_MISSING_WRONG_DOC");
   } else {
+    const totalCases = Number(wrongDoc?.metrics?.totalCases ?? 0);
     const wrongDocRate = Number(wrongDoc?.metrics?.wrongDocRate ?? 1);
     const emptyEvidenceRate = Number(wrongDoc?.metrics?.emptyEvidenceRate ?? 1);
     const multiDocsetCases = Number(wrongDoc?.metrics?.multiDocsetCases ?? 0);
@@ -42,16 +43,20 @@ function main() {
       gateId: "wrong-doc",
       passed: wrongDoc?.passed === true,
       metrics: {
+        totalCases,
         wrongDocRate,
         emptyEvidenceRate,
         multiDocsetCases,
         multiDocsetWrongDocRate,
       },
     });
+    if (strict && totalCases < 100)
+      failures.push("P0-6_WRONG_DOC_CERT_DEPTH_TOO_LOW");
     if (wrongDocRate !== 0) failures.push("P0-4_WRONG_DOC_RATE_NON_ZERO");
     if (emptyEvidenceRate !== 0)
       failures.push("P0-4_EMPTY_EVIDENCE_RATE_NON_ZERO");
-    if (strict && multiDocsetCases < 1) failures.push("P0-6_MULTI_DOCSET_NOT_TESTED");
+    if (strict && multiDocsetCases < 30)
+      failures.push("P0-6_MULTI_DOCSET_NOT_TESTED");
     if (strict && multiDocsetWrongDocRate !== 0) {
       failures.push("P0-6_MULTI_DOCSET_WRONG_DOC_RATE_NON_ZERO");
     }

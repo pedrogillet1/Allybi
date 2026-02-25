@@ -45,7 +45,7 @@ import { extractXlsxWithAnchors } from "../../../services/extraction/xlsxExtract
 import { SlidesClientService } from "../../../services/editing/slides/slidesClient.service";
 import { EditSuggestionsService } from "../../../services/editing/editSuggestions.service";
 import { buildDocumentCapabilities } from "../../../services/editing/allybi/capabilities.service";
-import RevisionService from "../../../services/documents/revision.service";
+import { RevisionService } from "../../../modules/documents/application";
 import { Document as DocxDocument, Packer, Paragraph } from "docx";
 import * as cloudConvert from "../../../services/conversion/cloudConvertPptx.service";
 import slidesStudioRouter from "../../../routes/slidesStudio.routes";

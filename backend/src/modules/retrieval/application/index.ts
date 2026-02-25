@@ -19,6 +19,9 @@ export {
   RetrievalEngineService,
   RetrievalScopeViolationError,
 } from "../../../services/core/retrieval/retrievalEngine.service";
+export { buildAttachmentDocScopeLock } from "../../../services/core/retrieval/docScopeLock";
+export type { PrismaRetrievalEngineDependencies } from "../../../services/core/retrieval/prismaRetrievalAdapters.service";
+export { PrismaRetrievalAdapterFactory } from "../../../services/core/retrieval/prismaRetrievalAdapters.service";
 
 // Evidence gate — evaluates evidence sufficiency
 export type { EvidenceCheckResult } from "../../../services/core/retrieval/evidenceGate.service";

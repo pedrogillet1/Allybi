@@ -1,10 +1,9 @@
 import type { Request, Response } from "express";
 import { randomUUID } from "crypto";
-
-import { type EditHandlerRequest } from "../services/core/handlers/editHandler.service";
-import { EditingFacadeService } from "../services/editing/entrypoints/editingFacade.service";
+import { EditingFacadeService } from "../modules/editing/application";
 
 import type {
+  EditHandlerRequest,
   DocxParagraphNode,
   EditDomain,
   EditOperator,
@@ -12,10 +11,10 @@ import type {
   ResolvedTargetCandidate,
   SheetsTargetNode,
   SlidesTargetNode,
-} from "../services/editing";
+} from "../modules/editing/application";
 import { normalizeEditOperator } from "../services/editing/editOperatorAliases.service";
 import DocumentRevisionStoreService from "../services/editing/documentRevisionStore.service";
-import prisma from "../config/database";
+import prisma from "../platform/db/prismaClient";
 
 import type {
   EditorSessionApplyRequest,

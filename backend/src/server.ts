@@ -13,6 +13,9 @@ import { Server as SocketIOServer } from "socket.io";
 import app from "./app";
 import { config } from "./config/env";
 import { createSecureServer } from "./config/ssl.config";
+import prisma from "./platform/db/prismaClient";
+import { gcsStorage } from "./platform/storage/gcsStorage.service";
+import { driveStorage } from "./platform/storage/driveStorage.service";
 import { initializeContainer, getContainer } from "./bootstrap/container";
 import { createAuthService } from "./bootstrap/authBridge";
 import { PrismaDocumentService } from "./services/prismaDocument.service";
@@ -22,6 +25,14 @@ import { PrismaHistoryService } from "./services/prismaHistory.service";
 import { TelemetryService } from "./services/telemetry";
 import { createAdminAuthService } from "./bootstrap/adminAuthBridge";
 import { createAdminTelemetryAdapter } from "./services/telemetry/adminTelemetryAdapter";
+import {
+  startDocumentWorker,
+  startPreviewGenerationWorker,
+  startPreviewReconciliationWorker,
+  startStuckDocSweeper,
+  startConnectorWorker,
+  startEditWorker,
+} from "./app/workers";
 
 // LLM wiring
 import { LLMClientFactory } from "./services/llm/core/llmClientFactory";
@@ -77,7 +88,6 @@ async function startServer() {
     const sharedConversationMemory = container.getConversationMemory();
 
     // 2. Connect to database
-    const prisma = (await import("./config/database")).default;
     try {
       await prisma.$connect();
       console.log("[Server] Database connected");
@@ -225,6 +235,10 @@ async function startServer() {
       chat: chatService,
       telemetry: telemetryService,
       adminTelemetryApp: createAdminTelemetryAdapter(prisma),
+      storage: {
+        gcs: gcsStorage,
+        drive: driveStorage,
+      },
       // Encryption services
       security: {
         encryption: encryptionService,
@@ -291,47 +305,32 @@ async function startServer() {
       console.log(`[Server] Environment: ${config.NODE_ENV}`);
     });
 
-    // 7. Try to start document queue worker + preview workers (non-fatal if missing)
+    // 7. Start document queue + preview workers (non-fatal on boot failures)
     try {
-      const queue = await import("./queues/document.queue");
-      if (queue.startDocumentWorker) {
-        queue.startDocumentWorker();
-        console.log("[Server] Document queue worker started");
-      }
-      if (queue.startPreviewGenerationWorker) {
-        queue.startPreviewGenerationWorker();
-        console.log("[Server] Preview generation worker started");
-      }
-      if (queue.startPreviewReconciliationWorker) {
-        queue.startPreviewReconciliationWorker();
-        console.log("[Server] Preview reconciliation worker started");
-      }
-      if (queue.startStuckDocSweeper) {
-        queue.startStuckDocSweeper();
-        console.log("[Server] Stuck document sweeper started");
-      }
+      startDocumentWorker();
+      console.log("[Server] Document queue worker started");
+      startPreviewGenerationWorker();
+      console.log("[Server] Preview generation worker started");
+      await startPreviewReconciliationWorker();
+      console.log("[Server] Preview reconciliation worker started");
+      await startStuckDocSweeper();
+      console.log("[Server] Stuck document sweeper started");
     } catch {
       console.warn("[Server] Document queue worker not available");
     }
 
     // 8. Start connector worker (non-fatal if missing)
     try {
-      const connectorWorker = await import("./workers/connector-worker");
-      if (connectorWorker.startWorker) {
-        connectorWorker.startWorker();
-        console.log("[Server] Connector worker started");
-      }
+      startConnectorWorker();
+      console.log("[Server] Connector worker started");
     } catch {
       console.warn("[Server] Connector worker not available");
     }
 
     // 9. Start edit worker (non-fatal if missing)
     try {
-      const editWorker = await import("./workers/edit-worker");
-      if (editWorker.startWorker) {
-        editWorker.startWorker();
-        console.log("[Server] Edit worker started");
-      }
+      startEditWorker();
+      console.log("[Server] Edit worker started");
     } catch {
       console.warn("[Server] Edit worker not available");
     }

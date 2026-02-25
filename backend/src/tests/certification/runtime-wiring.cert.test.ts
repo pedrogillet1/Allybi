@@ -5,6 +5,46 @@ import path from "path";
 
 import { writeCertificationGateReport } from "./reporting";
 
+function readThresholds() {
+  const defaultThresholds = {
+    minReachableFiles: 350,
+    minReachableRuntimeFiles: 360,
+    minRuntimeCoverage: 0.8,
+    maxMissingLocalRefs: 0,
+    maxLegacyRouteWrappers: 0,
+    maxMissingCriticalPaths: 0,
+  };
+  const budgetPath = path.resolve(
+    process.cwd(),
+    "scripts/audit/reachability-budget.json",
+  );
+  if (!fs.existsSync(budgetPath)) return defaultThresholds;
+  try {
+    const budget = JSON.parse(fs.readFileSync(budgetPath, "utf8")) as {
+      minRuntimeCoverage?: number;
+      minReachableFiles?: number;
+      minReachableRuntimeFiles?: number;
+    };
+    return {
+      ...defaultThresholds,
+      minReachableFiles:
+        typeof budget.minReachableFiles === "number"
+          ? budget.minReachableFiles
+          : defaultThresholds.minReachableFiles,
+      minReachableRuntimeFiles:
+        typeof budget.minReachableRuntimeFiles === "number"
+          ? budget.minReachableRuntimeFiles
+          : defaultThresholds.minReachableRuntimeFiles,
+      minRuntimeCoverage:
+        typeof budget.minRuntimeCoverage === "number"
+          ? budget.minRuntimeCoverage
+          : defaultThresholds.minRuntimeCoverage,
+    };
+  } catch {
+    return defaultThresholds;
+  }
+}
+
 describe("Certification: runtime wiring reachability", () => {
   test("runtime graph and critical wiring contracts are present", () => {
     const run = spawnSync(
@@ -35,6 +75,7 @@ describe("Certification: runtime wiring reachability", () => {
     const legacyRouteWrappers = Array.isArray(graph?.legacyRouteWrappers)
       ? graph.legacyRouteWrappers.length
       : 0;
+    const thresholds = readThresholds();
 
     const criticalPaths = [
       "src/controllers/rag.controller.test.ts",
@@ -50,11 +91,13 @@ describe("Certification: runtime wiring reachability", () => {
     const failures: string[] = [];
     if ((run.status ?? 1) !== 0) failures.push("RUNTIME_GRAPH_COMMAND_FAILED");
     if (!graphExists) failures.push("RUNTIME_GRAPH_MISSING");
-    if (reachableFiles < 350) failures.push("REACHABLE_FILES_BELOW_THRESHOLD");
-    if (reachableRuntimeFiles < 360) {
+    if (reachableFiles < thresholds.minReachableFiles) {
+      failures.push("REACHABLE_FILES_BELOW_THRESHOLD");
+    }
+    if (reachableRuntimeFiles < thresholds.minReachableRuntimeFiles) {
       failures.push("RUNTIME_REACHABLE_FILES_BELOW_THRESHOLD");
     }
-    if (runtimeCoverage < 0.59) {
+    if (runtimeCoverage < thresholds.minRuntimeCoverage) {
       failures.push("RUNTIME_COVERAGE_BELOW_THRESHOLD");
     }
     if (missingLocalRefs > 0)
@@ -75,14 +118,7 @@ describe("Certification: runtime wiring reachability", () => {
         legacyRouteWrappers,
         missingCriticalPaths: missingCriticalPaths.length,
       },
-      thresholds: {
-        minReachableFiles: 350,
-        minReachableRuntimeFiles: 360,
-        minRuntimeCoverage: 0.59,
-        maxMissingLocalRefs: 0,
-        maxLegacyRouteWrappers: 0,
-        maxMissingCriticalPaths: 0,
-      },
+      thresholds,
       failures,
     });
 

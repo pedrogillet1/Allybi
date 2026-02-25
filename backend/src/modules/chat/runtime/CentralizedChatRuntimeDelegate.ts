@@ -3,7 +3,7 @@ import type {
   StreamSink,
 } from "../../../services/llm/types/llmStreaming.types";
 import { createHash } from "crypto";
-import prisma from "../../../config/database";
+import prisma from "../../../platform/db/prismaClient";
 import type {
   ChatEngine,
   ChatMessageDTO,
@@ -30,21 +30,19 @@ import {
   type MemoryPolicyRuntimeConfig,
 } from "../../../services/memory/memoryPolicyEngine.service";
 import { MemoryRedactionService } from "../../../services/memory/memoryRedaction.service";
-import { getBankLoaderInstance } from "../../../services/core/banks/bankLoader.service";
+import { getBankLoaderInstance } from "../../domain/infra";
 import {
   RetrievalEngineService,
   type EvidencePack,
   type EvidenceItem,
   type RetrievalRequest,
-} from "../../../services/core/retrieval/retrievalEngine.service";
-import { buildAttachmentDocScopeLock } from "../../../services/core/retrieval/docScopeLock";
-import {
+  buildAttachmentDocScopeLock,
   EvidenceGateService,
   type EvidenceCheckResult,
-} from "../../../services/core/retrieval/evidenceGate.service";
-import { getSourceButtonsService } from "../../../services/core/retrieval/sourceButtons.service";
-import { PrismaRetrievalAdapterFactory } from "../../../services/core/retrieval/prismaRetrievalAdapters.service";
-import { resolveSlot } from "../../../services/core/retrieval/slotResolver.service";
+  getSourceButtonsService,
+  resolveSlot,
+  PrismaRetrievalAdapterFactory,
+} from "../../retrieval/application";
 import {
   RuntimePolicyError,
   isRuntimePolicyError,

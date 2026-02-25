@@ -22,7 +22,13 @@ function readJson(filePath) {
 
 function isRuntimeSourceFile(relPath) {
   if (!relPath.startsWith("src/")) return false;
+  if (relPath.endsWith(".d.ts")) return false;
   if (relPath.includes("/__tests__/")) return false;
+  if (relPath.startsWith("src/admin/types/")) return false;
+  if (relPath.startsWith("src/types/")) return false;
+  if (relPath.includes("/types/")) return false;
+  if (relPath.endsWith(".types.ts")) return false;
+  if (relPath.endsWith(".contracts.ts")) return false;
   if (
     relPath.includes("/tests/") ||
     relPath.endsWith(".test.ts") ||
@@ -60,9 +66,17 @@ function main() {
     : { minRuntimeCoverage: 0.59, maxRuntimeUnreachable: 9999 };
   const allowlist = fs.existsSync(allowlistPath)
     ? readJson(allowlistPath)
-    : { corePrefixes: [], allowUnreachableExact: [], allowUnreachablePatterns: [] };
+    : {
+        corePrefixes: [],
+        allowUnreachableExact: [],
+        allowUnreachablePatterns: [],
+      };
 
   const runtimeCoverage = Number(graph?.runtimeTotals?.coverage || 0);
+  const reachableFiles = Number(graph?.totals?.reachableFiles || 0);
+  const reachableRuntimeFiles = Number(
+    graph?.runtimeTotals?.reachableFiles || 0,
+  );
   const unreachable = Array.isArray(graph.unreachableFiles)
     ? graph.unreachableFiles
     : [];
@@ -85,12 +99,26 @@ function main() {
   );
 
   const failures = [];
+  const minReachableFiles = Number(budget.minReachableFiles || 0);
+  const minReachableRuntimeFiles = Number(budget.minReachableRuntimeFiles || 0);
+  if (reachableFiles < minReachableFiles) {
+    failures.push(
+      `REACHABLE_FILES_BELOW_MIN (${reachableFiles} < ${minReachableFiles})`,
+    );
+  }
+  if (reachableRuntimeFiles < minReachableRuntimeFiles) {
+    failures.push(
+      `RUNTIME_REACHABLE_FILES_BELOW_MIN (${reachableRuntimeFiles} < ${minReachableRuntimeFiles})`,
+    );
+  }
   if (runtimeCoverage < Number(budget.minRuntimeCoverage || 0)) {
     failures.push(
       `RUNTIME_COVERAGE_BELOW_MIN (${(runtimeCoverage * 100).toFixed(2)}% < ${(Number(budget.minRuntimeCoverage || 0) * 100).toFixed(2)}%)`,
     );
   }
-  if (runtimeUnreachable.length > Number(budget.maxRuntimeUnreachable || 9999)) {
+  if (
+    runtimeUnreachable.length > Number(budget.maxRuntimeUnreachable || 9999)
+  ) {
     failures.push(
       `RUNTIME_UNREACHABLE_ABOVE_MAX (${runtimeUnreachable.length} > ${Number(budget.maxRuntimeUnreachable || 9999)})`,
     );
@@ -105,9 +133,13 @@ function main() {
     generatedAt: new Date().toISOString(),
     strict,
     runtimeCoverage,
+    reachableFiles,
+    reachableRuntimeFiles,
     runtimeUnreachable: runtimeUnreachable.length,
     coreUnreachable: coreUnreachable.length,
     unallowlistedCoreUnreachable: unallowlistedCore,
+    minReachableFiles,
+    minReachableRuntimeFiles,
     minRuntimeCoverage: Number(budget.minRuntimeCoverage || 0),
     maxRuntimeUnreachable: Number(budget.maxRuntimeUnreachable || 9999),
     targetTrajectory: budget.targetTrajectory || [],
@@ -130,7 +162,8 @@ function main() {
   }
 
   if (!summary.passed) {
-    for (const failure of failures) console.error(`[reachability-budget] ${failure}`);
+    for (const failure of failures)
+      console.error(`[reachability-budget] ${failure}`);
     process.exit(1);
   }
 }

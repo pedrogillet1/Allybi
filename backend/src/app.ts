@@ -19,7 +19,7 @@ import { secureLogsMiddleware } from "./middleware/secureLogs.middleware";
 import { csrfProtection } from "./middleware/csrf.middleware";
 import { requestIdMiddleware } from "./middleware/requestId.middleware";
 
-import { apiRouteMounts, healthRoutes } from "./entrypoints/http/routes";
+import { apiRouteMounts, healthRoutes } from "./app/http";
 
 const app: Application = express();
 

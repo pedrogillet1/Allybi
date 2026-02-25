@@ -1,8 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import type {
-  ChatResult,
-  PrismaChatServicePort,
-} from "../services/chatRuntime.contracts";
+import type { ChatResult, PrismaChatServicePort } from "../modules/chat";
 import type {
   LLMStreamingConfig,
   StreamEvent,

@@ -1,6 +1,6 @@
 # Certification Summary
 
-- Generated: 2026-02-25T01:14:11.868Z
+- Generated: 2026-02-25T21:01:34.358Z
 - Passed: yes
 - Passed gates: 10/10
 
@@ -20,7 +20,7 @@
 ## wrong-doc
 - Passed: yes
 - Failures: none
-- Metrics: `{"totalCases":24,"outOfScopeCases":0,"wrongDocRate":0,"emptyEvidenceCases":0,"emptyEvidenceRate":0,"multiDocsetCases":6,"multiDocsetOutOfScopeCases":0,"multiDocsetWrongDocRate":0}`
+- Metrics: `{"totalCases":120,"outOfScopeCases":0,"wrongDocRate":0,"emptyEvidenceCases":0,"emptyEvidenceRate":0,"multiDocsetCases":30,"multiDocsetOutOfScopeCases":0,"multiDocsetWrongDocRate":0}`
 
 ## truncation
 - Passed: yes
@@ -40,7 +40,7 @@
 ## runtime-wiring
 - Passed: yes
 - Failures: none
-- Metrics: `{"commandStatus":0,"reachableFiles":367,"reachableRuntimeFiles":367,"runtimeCoverage":0.8013,"missingLocalRefs":0,"legacyRouteWrappers":0,"missingCriticalPaths":0}`
+- Metrics: `{"commandStatus":0,"reachableFiles":388,"reachableRuntimeFiles":360,"runtimeCoverage":0.9068,"missingLocalRefs":0,"legacyRouteWrappers":0,"missingCriticalPaths":0}`
 
 ## enforcer-failclosed
 - Passed: yes
@@ -60,7 +60,7 @@
 ## security-auth
 - Passed: yes
 - Failures: none
-- Metrics: `{"missingTokenRejected":true,"headerTrustPathPresent":false,"jwtVerificationUsed":true}`
+- Metrics: `{"missingTokenRejected":true,"forgedHeaderRejected":true,"forgedHeaderDidNotSetUser":true,"headerTrustPathPresent":false,"jwtVerificationUsed":true}`
 
 ## observability-integrity
 - Passed: yes

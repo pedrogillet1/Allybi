@@ -190,7 +190,10 @@ function buildSignals(mode: BenchmarkMode) {
 describe("Certification: wrong-doc contamination", () => {
   test("hard-lock benchmark has zero out-of-scope evidence", async () => {
     const engine = makeBenchmarkEngine();
-    const queriesByLang = toQueriesByLang((seeds as any).synthetic);
+    const benchmarkBatches = [
+      toQueriesByLang((seeds as any).synthetic),
+      toQueriesByLang((seeds as any).realLike),
+    ];
     const modes: BenchmarkMode[] = [
       "explicit_lock",
       "explicit_ref",
@@ -204,48 +207,50 @@ describe("Certification: wrong-doc contamination", () => {
     let multiDocsetCases = 0;
     let multiDocsetOutOfScopeCases = 0;
 
-    for (const language of ["en", "pt", "es"] as const) {
-      const sampledQueries = queriesByLang[language].slice(0, 2);
-      for (const query of sampledQueries) {
-        for (const mode of modes) {
-          totalCases += 1;
-          const pack = await engine.retrieve({
+    for (const queriesByLang of benchmarkBatches) {
+      for (const language of ["en", "pt", "es"] as const) {
+        const languageQueries = queriesByLang[language];
+        for (const query of languageQueries) {
+          for (const mode of modes) {
+            totalCases += 1;
+            const pack = await engine.retrieve({
+              query,
+              env: "dev",
+              signals: buildSignals(mode),
+            });
+            if (!Array.isArray(pack.evidence) || pack.evidence.length === 0) {
+              emptyEvidenceCases += 1;
+              continue;
+            }
+            const hasOutOfScope = pack.evidence.some(
+              (item) => item.docId !== LOCKED_DOC_ID,
+            );
+            if (hasOutOfScope) outOfScopeCases += 1;
+          }
+
+          // Multi-attachment lock: strict docset only (no corpus leakage).
+          multiDocsetCases += 1;
+          const docsetPack = await engine.retrieve({
             query,
             env: "dev",
-            signals: buildSignals(mode),
-          });
-          if (!Array.isArray(pack.evidence) || pack.evidence.length === 0) {
-            emptyEvidenceCases += 1;
-            continue;
-          }
-          const hasOutOfScope = pack.evidence.some(
-            (item) => item.docId !== LOCKED_DOC_ID,
-          );
-          if (hasOutOfScope) outOfScopeCases += 1;
-        }
-
-        // Multi-attachment lock: strict docset only (no corpus leakage).
-        multiDocsetCases += 1;
-        const docsetPack = await engine.retrieve({
-          query,
-          env: "dev",
-          signals: {
-            intentFamily: "documents",
-            allowExpansion: false,
-            docScopeLock: {
-              mode: "docset",
-              allowedDocumentIds: DOCSET_LOCK_IDS,
-              source: "attachments",
+            signals: {
+              intentFamily: "documents",
+              allowExpansion: false,
+              docScopeLock: {
+                mode: "docset",
+                allowedDocumentIds: DOCSET_LOCK_IDS,
+                source: "attachments",
+              },
+              explicitDocLock: true,
+              hardScopeActive: true,
             },
-            explicitDocLock: true,
-            hardScopeActive: true,
-          },
-        });
-        expect(docsetPack.evidence.length).toBeGreaterThan(0);
-        const hasDocsetLeak = docsetPack.evidence.some(
-          (item) => !DOCSET_LOCK_IDS.includes(item.docId),
-        );
-        if (hasDocsetLeak) multiDocsetOutOfScopeCases += 1;
+          });
+          expect(docsetPack.evidence.length).toBeGreaterThan(0);
+          const hasDocsetLeak = docsetPack.evidence.some(
+            (item) => !DOCSET_LOCK_IDS.includes(item.docId),
+          );
+          if (hasDocsetLeak) multiDocsetOutOfScopeCases += 1;
+        }
       }
     }
 
@@ -275,7 +280,8 @@ describe("Certification: wrong-doc contamination", () => {
         maxWrongDocRate: 0,
         maxEmptyEvidenceRate: 0,
         maxMultiDocsetWrongDocRate: 0,
-        minMultiDocsetCases: 1,
+        minMultiDocsetCases: 30,
+        minTotalCases: 100,
       },
       failures: [
         ...(wrongDocRate > 0 ? ["WRONG_DOC_RATE_NON_ZERO"] : []),
@@ -283,14 +289,15 @@ describe("Certification: wrong-doc contamination", () => {
         ...(multiDocsetWrongDocRate > 0
           ? ["MULTI_DOCSET_WRONG_DOC_RATE_NON_ZERO"]
           : []),
-        ...(multiDocsetCases <= 0 ? ["MULTI_DOCSET_CASES_MISSING"] : []),
+        ...(multiDocsetCases < 30 ? ["MULTI_DOCSET_CASES_TOO_FEW"] : []),
+        ...(totalCases < 100 ? ["TOTAL_CASES_TOO_FEW"] : []),
       ],
     });
 
-    expect(totalCases).toBeGreaterThan(0);
+    expect(totalCases).toBeGreaterThanOrEqual(100);
     expect(wrongDocRate).toBe(0);
     expect(emptyEvidenceRate).toBe(0);
-    expect(multiDocsetCases).toBeGreaterThan(0);
+    expect(multiDocsetCases).toBeGreaterThanOrEqual(30);
     expect(multiDocsetWrongDocRate).toBe(0);
   });
 });

@@ -7,28 +7,56 @@ import { writeCertificationGateReport } from "./reporting";
 
 describe("Certification: security auth hardening", () => {
   test("auth middleware rejects missing tokens and avoids x-user-id trust", async () => {
-    const req: any = {
+    const missingTokenReq: any = {
       headers: {},
       cookies: {},
     };
-    const resState: { status?: number; body?: unknown } = {};
-    const res: any = {
+    const missingTokenResState: { status?: number; body?: unknown } = {};
+    const missingTokenRes: any = {
       status(code: number) {
-        resState.status = code;
+        missingTokenResState.status = code;
         return this;
       },
       json(payload: unknown) {
-        resState.body = payload;
+        missingTokenResState.body = payload;
         return this;
       },
     };
-    let nextCalled = false;
+    let missingTokenNextCalled = false;
 
     await authenticateToken(
-      req as any,
-      res as any,
+      missingTokenReq as any,
+      missingTokenRes as any,
       (() => {
-        nextCalled = true;
+        missingTokenNextCalled = true;
+      }) as any,
+    );
+
+    const forgedHeaderReq: any = {
+      headers: {
+        authorization: "Bearer forged.invalid.token",
+        "x-user-id": "attacker-user-id",
+      },
+      cookies: {},
+    };
+    const forgedHeaderResState: { status?: number; body?: unknown } = {};
+    const forgedHeaderRes: any = {
+      status(code: number) {
+        forgedHeaderResState.status = code;
+        return this;
+      },
+      json(payload: unknown) {
+        forgedHeaderResState.body = payload;
+        return this;
+      },
+    };
+    let forgedHeaderNextCalled = false;
+
+    await authenticateToken(
+      forgedHeaderReq as any,
+      forgedHeaderRes as any,
+      (() => {
+        forgedHeaderNextCalled = true;
       }) as any,
     );
 
@@ -39,8 +67,14 @@ describe("Certification: security auth hardening", () => {
     const middlewareSource = fs.readFileSync(middlewarePath, "utf8");
     const failures: string[] = [];
 
-    if (nextCalled) failures.push("MISSING_TOKEN_DID_NOT_REJECT");
-    if (resState.status !== 401) failures.push("MISSING_TOKEN_STATUS_NOT_401");
+    if (missingTokenNextCalled) failures.push("MISSING_TOKEN_DID_NOT_REJECT");
+    if (missingTokenResState.status !== 401)
+      failures.push("MISSING_TOKEN_STATUS_NOT_401");
+    if (forgedHeaderNextCalled) failures.push("FORGED_TOKEN_DID_NOT_REJECT");
+    if (forgedHeaderResState.status !== 401)
+      failures.push("FORGED_TOKEN_STATUS_NOT_401");
+    if (forgedHeaderReq.user != null)
+      failures.push("FORGED_TOKEN_SET_AUTH_CONTEXT");
     if (/x-user-id/i.test(middlewareSource))
       failures.push("HEADER_TRUST_PATH_PRESENT");
     if (!/verifyAccessToken\(/.test(middlewareSource)) {
@@ -50,12 +84,18 @@ describe("Certification: security auth hardening", () => {
     writeCertificationGateReport("security-auth", {
       passed: failures.length === 0,
       metrics: {
-        missingTokenRejected: !nextCalled && resState.status === 401,
+        missingTokenRejected:
+          !missingTokenNextCalled && missingTokenResState.status === 401,
+        forgedHeaderRejected:
+          !forgedHeaderNextCalled && forgedHeaderResState.status === 401,
+        forgedHeaderDidNotSetUser: forgedHeaderReq.user == null,
         headerTrustPathPresent: /x-user-id/i.test(middlewareSource),
         jwtVerificationUsed: /verifyAccessToken\(/.test(middlewareSource),
       },
       thresholds: {
         missingTokenRejected: true,
+        forgedHeaderRejected: true,
+        forgedHeaderDidNotSetUser: true,
         headerTrustPathPresent: false,
         jwtVerificationUsed: true,
       },

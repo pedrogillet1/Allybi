@@ -32,12 +32,16 @@ function classify(relPath) {
     return {
       action: "MOVE",
       reason: "Test-only file under src should not count as runtime debt.",
+      owner: "qa-certification",
+      milestone: "R2-MOVE",
     };
   }
   if (/^src\/(tests|analytics|jobs|data_banks)\//.test(relPath)) {
     return {
       action: "MOVE",
       reason: "Non-runtime workload should live under scripts/tools or data.",
+      owner: "platform-runtime",
+      milestone: "R2-MOVE",
     };
   }
   if (/^src\/(app|modules|platform|shared)\//.test(relPath)) {
@@ -45,28 +49,40 @@ function classify(relPath) {
       return {
         action: "DELETE",
         reason: "Unreachable barrel wrapper with re-export-only body.",
+        owner: "platform-runtime",
+        milestone: "R2-DELETE",
       };
     }
     return {
       action: "WIRE",
       reason: "Runtime-layer file should be reachable from server seeds.",
+      owner: "platform-runtime",
+      milestone: "R2-WIRE",
     };
   }
-  if (/^src\/(routes|controllers|services|utils|types|workers)\//.test(relPath)) {
+  if (
+    /^src\/(routes|controllers|services|utils|types|workers)\//.test(relPath)
+  ) {
     if (relPath.endsWith("/index.ts") && isReexportOnly(relPath)) {
       return {
         action: "DELETE",
         reason: "Legacy wrapper re-export is unreachable and redundant.",
+        owner: "legacy-migration",
+        milestone: "R2-DELETE",
       };
     }
     return {
       action: "DELETE",
       reason: "Legacy runtime subtree file is unreachable from active seeds.",
+      owner: "legacy-migration",
+      milestone: "R2-DELETE",
     };
   }
   return {
     action: "MOVE",
     reason: "Unknown bucket: move to non-runtime location or wire explicitly.",
+    owner: "platform-runtime",
+    milestone: "R2-MOVE",
   };
 }
 
@@ -100,10 +116,12 @@ function buildMarkdown(report) {
   lines.push("");
   lines.push("## Detailed Triage");
   lines.push("");
-  lines.push("| File | Action | Reason |");
-  lines.push("|---|---|---|");
+  lines.push("| File | Action | Owner | Milestone | Reason |");
+  lines.push("|---|---|---|---|---|");
   for (const item of report.files) {
-    lines.push(`| ${item.file} | ${item.action} | ${item.reason} |`);
+    lines.push(
+      `| ${item.file} | ${item.action} | ${item.owner} | ${item.milestone} | ${item.reason} |`,
+    );
   }
   lines.push("");
   return lines.join("\n");

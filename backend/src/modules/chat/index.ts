@@ -56,6 +56,3 @@ export {
 
 // ── Application ──
 export { ChatRuntimeService } from "./application/chat-runtime.service";
-
-// ── Infra ──
-export * from "./infra";
