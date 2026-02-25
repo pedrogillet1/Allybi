@@ -62,7 +62,10 @@ import {
 import { trimTextToTokenBudget } from "../../../services/core/enforcement/tokenBudget.service";
 import { buildChatProvenance } from "./provenance/ProvenanceBuilder";
 import { validateChatProvenance } from "./provenance/ProvenanceValidator";
-import { TraceWriterService } from "../../../services/telemetry/traceWriter.service";
+import {
+  TraceWriterService,
+  type TurnDebugPacket,
+} from "../../../services/telemetry/traceWriter.service";
 
 function mkTraceId(): string {
   return `tr_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
@@ -530,6 +533,103 @@ export class CentralizedChatRuntimeDelegate {
     return { inputTokens, outputTokens };
   }
 
+  private buildTurnDebugPacket(params: {
+    traceId: string;
+    req: ChatRequest;
+    conversationId: string;
+    retrievalPack: EvidencePack | null;
+    answerMode: AnswerMode;
+    status: ChatResult["status"];
+    failureCode?: string | null;
+    telemetry?: Record<string, unknown> | null;
+    enforcement?: { repairs: string[]; warnings: string[] } | null;
+    enforcementBlocked?: boolean;
+    enforcementReasonCode?: string | null;
+    provenance?: ChatProvenanceDTO | null;
+  }): TurnDebugPacket {
+    const meta = asObject(params.req.meta);
+    const usage = this.extractTelemetryUsage(params.telemetry);
+    const requestedMaxOutputTokens = toPositiveInt(
+      asObject(params.telemetry).requestedMaxOutputTokens,
+    );
+    const observedOutputTokens = usage.outputTokens;
+    const hardMaxOutputTokens =
+      requestedMaxOutputTokens != null
+        ? Math.ceil(requestedMaxOutputTokens * 1.25)
+        : null;
+    const evidenceIds = (params.retrievalPack?.evidence || [])
+      .map((item) => `${item.docId}:${item.locationKey}`)
+      .slice(0, 24);
+    const evidenceMapHash =
+      evidenceIds.length > 0
+        ? createHash("sha256").update(evidenceIds.join("|")).digest("hex")
+        : null;
+    const attachedIds = Array.isArray(params.req.attachedDocumentIds)
+      ? params.req.attachedDocumentIds
+      : [];
+    const docScopeMode: "none" | "single_doc" | "docset" =
+      attachedIds.length > 1
+        ? "docset"
+        : attachedIds.length === 1
+          ? "single_doc"
+          : "none";
+
+    return {
+      traceId: params.traceId,
+      requestId:
+        typeof meta.requestId === "string" ? String(meta.requestId) : null,
+      conversationId: params.conversationId || null,
+      userIdHash: createHash("sha1")
+        .update(String(params.req.userId || ""))
+        .digest("hex")
+        .slice(0, 16),
+      answerMode: String(params.answerMode || "general_answer"),
+      docScopeLock: {
+        mode: docScopeMode,
+        allowedDocumentIdsCount: attachedIds.length,
+        activeDocumentId: attachedIds.length === 1 ? attachedIds[0] : null,
+      },
+      retrieval: {
+        candidates: params.retrievalPack?.stats.candidatesConsidered ?? 0,
+        selected: params.retrievalPack?.evidence.length ?? 0,
+        topScore: params.retrievalPack?.stats.topScore ?? null,
+        scopeCandidatesDropped:
+          params.retrievalPack?.stats.scopeCandidatesDropped ?? 0,
+        evidenceIds,
+        documentIds: [
+          ...new Set(
+            (params.retrievalPack?.evidence || []).map((e) => e.docId),
+          ),
+        ].slice(0, 24),
+      },
+      provenance: {
+        schemaVersion: "v1",
+        evidenceMapHash,
+        required: Boolean(params.provenance?.required),
+        validated: Boolean(params.provenance?.validated),
+        failureCode: params.provenance?.failureCode || null,
+      },
+      budget: {
+        requestedMaxOutputTokens,
+        hardMaxOutputTokens,
+        observedOutputTokens,
+      },
+      enforcement: {
+        blocked: Boolean(params.enforcementBlocked),
+        reasonCode: params.enforcementReasonCode || null,
+        repairs: params.enforcement?.repairs || [],
+        warnings: params.enforcement?.warnings || [],
+      },
+      output: {
+        sourceCount: params.retrievalPack?.evidence.length ?? 0,
+        wasTruncated: buildTruncationFromTelemetry(params.telemetry).occurred,
+        status: String(params.status || "success"),
+        failureCode: params.failureCode || null,
+      },
+      createdAt: new Date().toISOString(),
+    };
+  }
+
   private extractTraceKeywords(
     query: string,
   ): Array<{ keyword: string; weight: number }> {
@@ -622,6 +722,10 @@ export class CentralizedChatRuntimeDelegate {
     retrievalMs?: number | null;
     llmMs?: number | null;
     stream: boolean;
+    enforcement?: { repairs: string[]; warnings: string[] } | null;
+    enforcementBlocked?: boolean;
+    enforcementReasonCode?: string | null;
+    provenance?: ChatProvenanceDTO | null;
   }): Promise<void> {
     const distinctDocIds = [
       ...new Set(
@@ -661,6 +765,22 @@ export class CentralizedChatRuntimeDelegate {
     });
     this.traceWriter.recordKeywords(params.traceId, keywords);
     this.traceWriter.recordEntities(params.traceId, entities);
+    this.traceWriter.writeTurnDebugPacket(
+      this.buildTurnDebugPacket({
+        traceId: params.traceId,
+        req: params.req,
+        conversationId: params.conversationId,
+        retrievalPack: params.retrievalPack,
+        answerMode: params.answerMode,
+        status: params.status,
+        failureCode: params.failureCode,
+        telemetry: params.telemetry,
+        enforcement: params.enforcement || null,
+        enforcementBlocked: params.enforcementBlocked,
+        enforcementReasonCode: params.enforcementReasonCode,
+        provenance: params.provenance || null,
+      }),
+    );
 
     await Promise.all([
       this.traceWriter.upsertQueryTelemetry({
@@ -1125,6 +1245,10 @@ export class CentralizedChatRuntimeDelegate {
         retrievalMs,
         llmMs,
         stream: false,
+        enforcement: finalized.enforcement ?? null,
+        enforcementBlocked: Boolean(finalized.failureCode),
+        enforcementReasonCode: finalized.failureCode ?? null,
+        provenance: finalized.provenance ?? null,
       }).catch((error) => {
         appLogger.warn("[trace-writer] failed to persist chat trace", {
           traceId,
@@ -1616,6 +1740,10 @@ export class CentralizedChatRuntimeDelegate {
         retrievalMs,
         llmMs,
         stream: true,
+        enforcement: finalized.enforcement ?? null,
+        enforcementBlocked: Boolean(finalized.failureCode),
+        enforcementReasonCode: finalized.failureCode ?? null,
+        provenance: finalized.provenance ?? null,
       }).catch((error) => {
         appLogger.warn("[trace-writer] failed to persist stream trace", {
           traceId,

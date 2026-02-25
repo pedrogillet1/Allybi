@@ -17,6 +17,7 @@ import type {
   ExtractionResult,
   ExtractionCandidate,
 } from "../compose/extractionCompiler.service";
+import { resolveOutputTokenBudget } from "./tokenBudget.service";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -152,10 +153,21 @@ function gateEntityRoleConsistency(
 
 function gateBrevityCheck(
   response: string,
-  _ctx: QualityGateContext,
+  ctx: QualityGateContext,
 ): QualityGateResult {
   const gateName = "brevity_and_constraints";
-  const maxChars = 4200;
+  const hardOutputTokens = resolveOutputTokenBudget({
+    answerMode: ctx.answerMode || "general_answer",
+    outputLanguage: ctx.language || "en",
+    routeStage: "final",
+    hasTables:
+      ctx.answerMode === "doc_grounded_table" ||
+      ctx.answerMode === "doc_grounded_multi",
+    evidenceItems: Array.isArray(ctx.evidenceItems)
+      ? ctx.evidenceItems.length
+      : 0,
+  }).hardOutputTokens;
+  const maxChars = Math.max(1800, Math.ceil(hardOutputTokens * 4.5));
   const passed = response.length <= maxChars;
   return {
     passed,

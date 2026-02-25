@@ -17,6 +17,7 @@ const requiredGates = [
   "runtime-wiring",
   "enforcer-failclosed",
   "evidence-fidelity",
+  "turn-debug-packet",
   "security-auth",
   "observability-integrity",
 ];

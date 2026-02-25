@@ -1,14 +1,14 @@
 # Runtime Import Graph Audit
 
-Generated: 2026-02-24T23:56:38.833Z
+Generated: 2026-02-25T00:43:50.106Z
 Seeds: src/server.ts, src/main/server.ts, src/app.ts
 
 ## Totals
 
-- Source files: 742
+- Source files: 743
 - Reachable from runtime seeds: 364
-- Unreachable from runtime seeds: 378
-- Import edges: 966
+- Unreachable from runtime seeds: 379
+- Import edges: 967
 - Missing local refs: 0
 
 ## Runtime Totals (Strict Denominator)
@@ -45,7 +45,7 @@ Seeds: src/server.ts, src/main/server.ts, src/app.ts
 | services | 412 | 222 | 190 |
 | shared | 3 | 0 | 3 |
 | storage | 2 | 0 | 2 |
-| tests | 40 | 0 | 40 |
+| tests | 41 | 0 | 41 |
 | types | 30 | 7 | 23 |
 | utils | 43 | 35 | 8 |
 | workers | 6 | 2 | 4 |

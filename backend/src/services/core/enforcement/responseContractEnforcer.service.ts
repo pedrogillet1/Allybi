@@ -475,12 +475,17 @@ export class ResponseContractEnforcerService {
     return Math.max(Math.ceil(softLimit * 1.2), softLimit + 120);
   }
 
-  private resolveHardCharLimit(): number {
-    return (
+  private resolveHardCharLimit(ctx: ResponseContractContext): number {
+    const configuredLimit =
       toPositiveInt(this.truncation?.globalLimits?.maxResponseCharsHard) ??
-      toPositiveInt(this.truncation?.config?.maxCharsHard) ??
-      4200
+      toPositiveInt(this.truncation?.config?.maxCharsHard);
+    if (configuredLimit) return configuredLimit;
+
+    const hardOutputTokens = this.resolveHardTokenLimit(
+      ctx,
+      this.resolveSoftTokenLimit(ctx),
     );
+    return Math.max(1800, Math.ceil(hardOutputTokens * 4.5));
   }
 
   enforce(
@@ -675,7 +680,7 @@ export class ResponseContractEnforcerService {
     content = hardTokenLimited.text;
 
     // 5b) Char fallback guard (legacy safety net)
-    const hardMaxChars = this.resolveHardCharLimit();
+    const hardMaxChars = this.resolveHardCharLimit(ctx);
     const hardLimited = limitChars(content, hardMaxChars);
     if (hardLimited.changed) repairs.push("HARD_MAX_CHARS_TRIMMED");
     content = hardLimited.text;

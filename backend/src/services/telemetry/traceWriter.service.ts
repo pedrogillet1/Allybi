@@ -119,6 +119,52 @@ export interface RetrievalEventWriteInput {
   meta?: Record<string, unknown> | null;
 }
 
+export interface TurnDebugPacket {
+  traceId: string;
+  requestId: string | null;
+  conversationId: string | null;
+  userIdHash: string;
+  answerMode: string;
+  docScopeLock: {
+    mode: "none" | "single_doc" | "docset";
+    allowedDocumentIdsCount: number;
+    activeDocumentId: string | null;
+  };
+  retrieval: {
+    candidates: number;
+    selected: number;
+    topScore: number | null;
+    scopeCandidatesDropped: number;
+    evidenceIds: string[];
+    documentIds: string[];
+  };
+  provenance: {
+    schemaVersion: string;
+    evidenceMapHash: string | null;
+    required: boolean;
+    validated: boolean;
+    failureCode: string | null;
+  };
+  budget: {
+    requestedMaxOutputTokens: number | null;
+    hardMaxOutputTokens: number | null;
+    observedOutputTokens: number | null;
+  };
+  enforcement: {
+    blocked: boolean;
+    reasonCode: string | null;
+    repairs: string[];
+    warnings: string[];
+  };
+  output: {
+    sourceCount: number;
+    wasTruncated: boolean;
+    status: string;
+    failureCode: string | null;
+  };
+  createdAt: string;
+}
+
 function clampSamplePercent(value: unknown): number {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return 25;
@@ -161,6 +207,7 @@ function normalizeEnv(input?: string | null): string {
 
 export class TraceWriterService {
   private readonly buffers = new Map<string, TraceBuffer>();
+  private readonly turnDebugPackets = new Map<string, TurnDebugPacket>();
   private readonly enabled: boolean;
   private readonly successSamplePercent: number;
   private readonly maxBufferedTraces: number;
@@ -178,6 +225,24 @@ export class TraceWriterService {
       100,
       toIntOrNull(config.maxBufferedTraces) ?? 5000,
     );
+  }
+
+  writeTurnDebugPacket(packet: TurnDebugPacket): void {
+    const traceId = cleanShort(packet.traceId, 64);
+    if (!traceId) return;
+    if (this.turnDebugPackets.size >= this.maxBufferedTraces) {
+      const oldest = this.turnDebugPackets.keys().next().value as
+        | string
+        | undefined;
+      if (oldest) this.turnDebugPackets.delete(oldest);
+    }
+    this.turnDebugPackets.set(traceId, packet);
+  }
+
+  getLatestTurnDebugPacket(traceId: string): TurnDebugPacket | null {
+    const normalized = cleanShort(traceId, 64);
+    if (!normalized) return null;
+    return this.turnDebugPackets.get(normalized) || null;
   }
 
   startSpan(
