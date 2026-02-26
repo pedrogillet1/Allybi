@@ -1,4 +1,4 @@
-import { logger } from "../../infra/logger";
+import { logger } from "../../utils/logger";
 import {
   SpreadsheetEngineClient,
   SpreadsheetEngineClientError,

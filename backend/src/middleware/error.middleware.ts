@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "../utils/errors";
 import multer from "multer";
-import { logger } from "../infra/logger";
+import { logger } from "../utils/logger";
 import { captureError } from "../config/sentry.config";
 
 export const errorHandler = (

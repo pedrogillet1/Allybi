@@ -7,7 +7,7 @@ import {
   rateLimitMiddleware,
 } from "../../../middleware/rateLimit.middleware";
 import { createEditingController } from "../../../controllers/editing.controller";
-import { getOptionalBank } from "../../../services/core/banks/bankLoader.service";
+import { getEditingPolicySnapshot } from "../../../services/editing/editingPolicy.service";
 
 const router = Router();
 const controller = createEditingController();
@@ -19,38 +19,10 @@ router.get(
   authorizeEditing,
   rateLimitMiddleware,
   (_req, res) => {
-    const capabilities: any = getOptionalBank("allybi_capabilities");
-    const alwaysConfirmOperators = Array.isArray(
-      capabilities?.alwaysConfirmOperators,
-    )
-      ? capabilities.alwaysConfirmOperators.map((x: any) => String(x))
-      : [];
-    const silentExecuteConfidence =
-      typeof capabilities?.config?.silentExecuteConfidence === "number"
-        ? capabilities.config.silentExecuteConfidence
-        : 0.9;
-
-    const autoApplyInViewer =
-      typeof capabilities?.config?.autoApplyInViewer === "boolean"
-        ? capabilities.config.autoApplyInViewer
-        : true;
-
-    const autoApplyComputeBundles =
-      typeof capabilities?.config?.autoApplyComputeBundles === "boolean"
-        ? capabilities.config.autoApplyComputeBundles
-        : true;
-
+    const policy = getEditingPolicySnapshot();
     res.json({
       ok: true,
-      data: {
-        alwaysConfirmOperators,
-        silentExecuteConfidence,
-        autoApplyInViewer,
-        autoApplyComputeBundles,
-        databanksUsed: [
-          ...(capabilities?._meta?.id ? [String(capabilities._meta.id)] : []),
-        ],
-      },
+      data: policy,
     });
   },
 );

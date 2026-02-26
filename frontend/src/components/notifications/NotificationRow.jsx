@@ -14,7 +14,7 @@ import notificationUpload from '../../assets/upload.svg';
 import notificationCancel from '../../assets/notification-cancel.svg';
 import notificationTrash from '../../assets/notification-trash.svg';
 import notificationMove from '../../assets/notification-move.svg';
-import notificationStorage from '../../assets/notification-storage.svg';
+import notificationStorage from '../../assets/storage-icon.svg';
 
 /**
  * NotificationRow - Single notification in the center popup

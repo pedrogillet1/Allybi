@@ -20,7 +20,7 @@ import {
   DocumentController,
   createDocumentController,
 } from "../../../controllers/document.controller";
-import prisma from "../../../config/database";
+import prisma from "../../../platform/db/prismaClient";
 import {
   downloadFile,
   getSignedUrl,
@@ -88,7 +88,7 @@ function ctrl(req: any): DocumentController {
   if (!_ctrl) {
     const svc = req.app?.locals?.services?.documents;
     if (!svc) {
-      throw Object.assign(new Error("DocumentService not wired"), {
+      throw Object.assign(new Error("Document service unavailable"), {
         statusCode: 503,
       });
     }

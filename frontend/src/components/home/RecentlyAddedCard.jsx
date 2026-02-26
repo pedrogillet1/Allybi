@@ -8,7 +8,7 @@ import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
 import { ReactComponent as DownloadIcon } from '../../assets/download.svg';
 import { ReactComponent as EditIcon } from '../../assets/Edit 5.svg';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';
-import { ReactComponent as TrashCanIcon } from '../../assets/Trash can-red.svg';
+import { ReactComponent as TrashCanIcon } from '../../assets/Trash can.svg';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';
 import txtIcon from '../../assets/txt-icon.png';

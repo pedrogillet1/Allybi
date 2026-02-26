@@ -30,8 +30,10 @@ import {
 import { validate } from "../../../middleware/validate.middleware";
 import { logger } from "../../../utils/logger";
 import { ConversationNotFoundError } from "../../../services/prismaChat.service";
-import { getBankLoaderInstance } from "../../../services/core/banks/bankLoader.service";
-import { LanguageDetectorService } from "../../../services/core/inputs/languageDetector.service";
+import {
+  resolveChatPreferredLanguage,
+  type ChatLanguage,
+} from "../../../services/chat/chatLanguage.service";
 import { resolveGenericChatFailureMessage } from "../../../services/chat/chatMicrocopy.service";
 import {
   toChatFinalEvent,
@@ -81,48 +83,7 @@ function attachRequestIdToMeta(
   }
 }
 
-type ChatLanguage = "en" | "pt" | "es";
-const SUPPORTED_CHAT_LANGUAGES = new Set<ChatLanguage>(["en", "pt", "es"]);
-const languageDetector = new LanguageDetectorService(getBankLoaderInstance());
-
-function currentEnv(): "production" | "staging" | "dev" | "local" {
-  const raw = String(process.env.NODE_ENV || "local")
-    .trim()
-    .toLowerCase();
-  if (raw === "production" || raw === "staging" || raw === "dev") return raw;
-  if (raw === "development") return "dev";
-  return "local";
-}
-
-function resolvePreferredLanguage(
-  language: unknown,
-  message: string,
-): ChatLanguage {
-  if (String(message || "").trim()) {
-    const detection = languageDetector.detect({
-      env: currentEnv(),
-      text: message,
-      hint: {
-        preferredLanguage:
-          typeof language === "string" &&
-          SUPPORTED_CHAT_LANGUAGES.has(language as ChatLanguage)
-            ? (language as ChatLanguage)
-            : null,
-      },
-    });
-    const selected = String(detection.selectedLanguage || "").toLowerCase();
-    if (SUPPORTED_CHAT_LANGUAGES.has(selected as ChatLanguage)) {
-      return selected as ChatLanguage;
-    }
-  }
-  if (
-    typeof language === "string" &&
-    SUPPORTED_CHAT_LANGUAGES.has(language as ChatLanguage)
-  ) {
-    return language as ChatLanguage;
-  }
-  return "en";
-}
+const resolvePreferredLanguage = resolveChatPreferredLanguage;
 
 function extractAttachedDocumentIdsFromBody(body: any): string[] {
   const ids = new Set<string>();
@@ -1179,7 +1140,7 @@ router.delete(
       const graceCutoff = new Date(Date.now() - 60_000);
 
       const emptyConvos = await (
-        await import("../../../config/database")
+        await import("../../../platform/db/prismaClient")
       ).default.conversation.findMany({
         where: {
           userId,
@@ -1192,7 +1153,7 @@ router.delete(
 
       if (emptyConvos.length > 0) {
         await (
-          await import("../../../config/database")
+          await import("../../../platform/db/prismaClient")
         ).default.conversation.updateMany({
           where: { id: { in: emptyConvos.map((c: any) => c.id) } },
           data: { isDeleted: true, deletedAt: new Date() },

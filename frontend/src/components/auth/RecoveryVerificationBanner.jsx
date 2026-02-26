@@ -5,7 +5,7 @@ import 'react-phone-number-input/style.css';
 import '../../styles/RecoveryVerificationBanner.css';
 import { useNotifications } from '../../context/NotificationsStore';
 import api from '../../services/api';
-import phoneNotificationIcon from '../../assets/phone-notification.svg';
+import phoneNotificationIcon from '../../assets/notification-bell.svg';
 import emailIcon from '../../assets/email-icon.svg';
 import SettingsRow, { StatusPill, SettingsButton } from '../settings/SettingsRow';
 import SettingsIcon from '../settings/SettingsIcon';

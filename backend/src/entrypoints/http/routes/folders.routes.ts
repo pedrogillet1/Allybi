@@ -14,7 +14,7 @@ import {
   folderUpdateSchema,
   folderMoveSchema,
 } from "../../../schemas/request.schemas";
-import prisma from "../../../config/database";
+import prisma from "../../../platform/db/prismaClient";
 import { logger } from "../../../utils/logger";
 import AdmZip from "adm-zip";
 import { downloadFile } from "../../../config/storage";
@@ -27,7 +27,7 @@ function ctrl(req: any): FolderController {
   if (!_ctrl) {
     const svc = req.app?.locals?.services?.folders;
     if (!svc) {
-      throw Object.assign(new Error("FolderService not wired"), {
+      throw Object.assign(new Error("Folder service unavailable"), {
         statusCode: 503,
       });
     }

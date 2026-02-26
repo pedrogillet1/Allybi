@@ -3,8 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../constants/routes';
 import emailIcon from '../../assets/email-icon.svg';
-import authenticationIcon from '../../assets/authentication-icon.svg';
-import phoneIcon from '../../assets/phone-icon.svg';
+import authenticationIcon from '../../assets/profile-user-icon.svg';
+import phoneIcon from '../../assets/notification-bell.svg';
 
 const Authentication = ({ variant = 'page' }) => {
   const { t } = useTranslation();

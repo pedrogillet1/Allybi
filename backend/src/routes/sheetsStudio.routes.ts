@@ -1,6 +1,6 @@
 import { Router, type Response } from "express";
 import { randomUUID } from "crypto";
-import prisma from "../config/database";
+import prisma from "../platform/db/prismaClient";
 import { EditHandlerService } from "../services/core/handlers/editHandler.service";
 import DocumentRevisionStoreService from "../services/editing/documentRevisionStore.service";
 

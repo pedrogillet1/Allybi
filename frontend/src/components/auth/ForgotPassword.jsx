@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import { ROUTES } from '../../constants/routes';
-import phoneNotificationIcon from '../../assets/phone-notification.svg';
+import phoneNotificationIcon from '../../assets/notification-bell.svg';
 import forgotPasswordIcon from '../../assets/forgot-password-icon.svg';
 import emailIcon from '../../assets/email-icon.svg';
 

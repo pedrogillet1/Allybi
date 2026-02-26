@@ -5,7 +5,7 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 import gmailSvg from '../../assets/Gmail.svg';
 import outlookSvg from '../../assets/outlook.svg';
 import slackSvg from '../../assets/slack.svg';
-import allybiKnotBlack from '../../assets/allybi-knot-black.svg';
+import allybiKnotBlack from '../../assets/koda-knot-black.svg';
 
 const FONT = 'Plus Jakarta Sans, sans-serif';
 

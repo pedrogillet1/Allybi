@@ -31,7 +31,7 @@ import {
   authRefreshSchema,
 } from "../../../schemas/request.schemas";
 
-import prisma from "../../../config/database";
+import prisma from "../../../platform/db/prismaClient";
 import { config } from "../../../config/env";
 import { generateAccessToken, generateRefreshToken } from "../../../utils/jwt";
 import { setAuthCookies } from "../../../utils/authCookies";
@@ -161,7 +161,7 @@ function ctrl(req: any): AuthController {
   if (!_ctrl) {
     const svc = req.app?.locals?.services?.auth;
     if (!svc) {
-      throw Object.assign(new Error("AuthService not wired"), {
+      throw Object.assign(new Error("Authentication service unavailable"), {
         statusCode: 503,
       });
     }

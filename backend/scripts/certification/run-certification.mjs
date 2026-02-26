@@ -20,6 +20,7 @@ const requiredGates = [
   "turn-debug-packet",
   "security-auth",
   "observability-integrity",
+  "retrieval-behavioral",
 ];
 
 function readJson(filePath) {

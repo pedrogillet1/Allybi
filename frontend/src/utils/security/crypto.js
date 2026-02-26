@@ -13,26 +13,50 @@ export const calculateFileHash = async (file) => {
 
 /**
  * Encrypt file data using AES-256-GCM
- * NOTE: For now, this is a placeholder. In production, you would:
- * 1. Generate or retrieve an encryption key
- * 2. Encrypt the file buffer with AES-256-GCM
- * 3. Return encrypted buffer
- *
- * For Phase 3, we'll implement basic encryption. Full end-to-end encryption
- * comes in Phase 11 according to the project plan.
  *
  * @param {File} file - The file to encrypt
  * @param {string} encryptionKey - The encryption key (hex string)
  * @returns {Promise<{encryptedBuffer: ArrayBuffer, iv: string}>}
  */
+const hexToBytes = (hex) => {
+  if (typeof hex !== 'string' || !/^[0-9a-fA-F]+$/.test(hex) || hex.length % 2 !== 0) {
+    throw new Error('Invalid encryption key format');
+  }
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.slice(i, i + 2), 16);
+  }
+  return bytes;
+};
+
+const bytesToHex = (bytes) => Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('');
+
 export const encryptFile = async (file, encryptionKey) => {
-  // For now, return the file as-is
-  // TODO: Implement actual encryption in Phase 11
+  if (!encryptionKey) {
+    throw new Error('Missing encryption key');
+  }
+  const keyBytes = hexToBytes(encryptionKey);
+  if (keyBytes.length !== 32) {
+    throw new Error('Encryption key must be 32 bytes (64 hex chars)');
+  }
   const arrayBuffer = await file.arrayBuffer();
+  const key = await crypto.subtle.importKey(
+    'raw',
+    keyBytes,
+    { name: 'AES-GCM' },
+    false,
+    ['encrypt']
+  );
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encryptedBuffer = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    arrayBuffer
+  );
 
   return {
-    encryptedBuffer: arrayBuffer,
-    iv: null, // Initialization vector for AES-GCM
+    encryptedBuffer,
+    iv: bytesToHex(iv),
   };
 };
 

@@ -17,7 +17,7 @@ import { SlackClientService } from "../../../services/connectors/slack/slackClie
 import { SlackSyncService } from "../../../services/connectors/slack/slackSync.service";
 import SlackEventsController from "../../../services/connectors/slack/slackEvents.controller";
 import crypto from "crypto";
-import prisma from "../../../config/database";
+import prisma from "../../../platform/db/prismaClient";
 import { TokenVaultService } from "../../../services/connectors/tokenVault.service";
 import { PrismaDocumentService } from "../../../services/prismaDocument.service";
 

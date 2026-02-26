@@ -165,9 +165,11 @@ export const registerUser = async ({
     console.log(`Verification code sent to ${email.toLowerCase()}`);
   } catch (error) {
     console.error("Failed to send verification email:", error);
-    console.log(
-      `[DEV MODE] Verification code for ${email.toLowerCase()}: ${emailCode}`,
-    );
+    if (process.env.NODE_ENV !== "production") {
+      console.log(
+        `[DEV MODE] Verification code for ${email.toLowerCase()}: ${emailCode}`,
+      );
+    }
   }
 
   return {
@@ -236,9 +238,11 @@ export const resendPendingUserEmail = async (email: string) => {
     console.log(`Verification code resent to ${email}`);
   } catch (error) {
     console.error("Failed to resend verification email:", error);
-    console.log(
-      `[DEV MODE] Would resend verification code ${emailCode} to ${email}`,
-    );
+    if (process.env.NODE_ENV !== "production") {
+      console.log(
+        `[DEV MODE] Would resend verification code ${emailCode} to ${email}`,
+      );
+    }
   }
 
   return {
@@ -275,7 +279,10 @@ export const addPhoneToPendingUser = async (
     formattedPhone,
   );
 
-  console.log(`SMS Verification Code: ${phoneCode} for ${formattedPhone}`);
+  if (process.env.NODE_ENV !== "production") {
+    const maskedNum = formattedPhone.slice(0, -4).replace(/\d/g, "*") + formattedPhone.slice(-4);
+    console.log(`SMS Verification Code: ${phoneCode} for ${maskedNum}`);
+  }
 
   try {
     await smsService.sendVerificationSMS(formattedPhone, phoneCode);
@@ -481,9 +488,14 @@ export const verifyPhoneCode = async (userId: string, code: string) => {
     return updatedUser;
   });
 
-  console.log(
-    `Phone verified successfully for user ${userId}: ${result.phoneNumber}`,
-  );
+  if (process.env.NODE_ENV !== "production") {
+    const maskedPh = result.phoneNumber
+      ? result.phoneNumber.slice(0, -4).replace(/\d/g, "*") + result.phoneNumber.slice(-4)
+      : "unknown";
+    console.log(
+      `Phone verified successfully for user ${userId}: ${maskedPh}`,
+    );
+  }
 
   return {
     success: true,
@@ -596,7 +608,8 @@ export const requestPasswordReset = async ({
     try {
       const smsService = await import("./sms.service");
       await smsService.sendPasswordResetSMS(user.phoneNumber, code);
-      console.log(`Password reset code sent to ${user.phoneNumber}`);
+      const maskedResetPhone = user.phoneNumber!.slice(0, -4).replace(/\d/g, "*") + user.phoneNumber!.slice(-4);
+      console.log(`Password reset code sent to ${maskedResetPhone}`);
     } catch (error) {
       console.error("Failed to send password reset SMS:", error);
     }

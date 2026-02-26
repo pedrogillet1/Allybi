@@ -34,7 +34,7 @@ import useStageLabel from "./messages/useStageLabel";
 import FollowUpChips from "./followups/FollowUpChips";
 import StreamingWelcomeMessage from "./streaming/StreamingWelcomeMessage";
 // ChatEmptyState removed — empty state rendered inline below
-import kodaIcon from "../../assets/main-logo-b.svg";
+const kodaIcon = "/allybi-icon.svg";
 import kodaIconBlack from "../../assets/koda-dark-knot.svg";
 import thinkingVideo from "../../assets/koda-animation-final.mp4";
 import ChromaKeyVideo from "./ChromaKeyVideo";

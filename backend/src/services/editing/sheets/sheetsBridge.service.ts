@@ -3,7 +3,7 @@ import type { GoogleAuth } from "google-auth-library";
 import * as fs from "fs";
 import * as path from "path";
 import { Readable } from "stream";
-import { logger } from "../../../infra/logger";
+import { logger } from "../../../utils/logger";
 
 export interface SheetsBridgeContext {
   correlationId?: string;

@@ -4,7 +4,7 @@ import {
   authMiddleware,
   optionalAuth,
 } from "../../../middleware/auth.middleware";
-import prisma from "../../../config/database";
+import prisma from "../../../platform/db/prismaClient";
 import createStorageRouter from "../../../controllers/storage.controller";
 import path from "path";
 import fs from "fs";

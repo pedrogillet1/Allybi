@@ -25,7 +25,7 @@ import mp3Icon from '../../assets/mp3.svg';
 
 import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
 import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
-import { ReactComponent as TrashCanIcon } from '../../assets/Trash can-red.svg';
+import { ReactComponent as TrashCanIcon } from '../../assets/Trash can.svg';
 import { ReactComponent as DownloadIcon } from '../../assets/download.svg';
 import { ReactComponent as EditIcon } from '../../assets/Edit 5.svg';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';

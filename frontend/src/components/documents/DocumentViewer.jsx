@@ -17,7 +17,7 @@ import { ReactComponent as DownloadWhiteIcon } from '../../assets/download.svg';
 import logoSvg from '../../assets/logo.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 import { getApiBaseUrl } from '../../services/runtimeConfig';
-import sphereIcon from '../../assets/allybi-knot-black.svg';
+import sphereIcon from '../../assets/koda-knot-black.svg';
 import allybiLogoWhite from '../../assets/koda-knot-white.svg';
 import { ReactComponent as TrashCanIcon } from '../../assets/Trash can.svg';
 import printIcon from '../../assets/print-icon.svg';

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import backArrow from '../../assets/arrow-narrow-left.svg';
 import { ROUTES } from '../../constants/routes';
-import phoneIcon from '../../assets/phone-icon.svg';
+import phoneIcon from '../../assets/notification-bell.svg';
 
 const PhoneNumberPending = ({ variant = 'page' }) => {
   const { t } = useTranslation();

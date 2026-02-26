@@ -1,5 +1,5 @@
 import { Router, Response } from "express";
-import prisma from "../config/database";
+import prisma from "../platform/db/prismaClient";
 import { downloadFile, uploadFile, getSignedUrl } from "../config/storage";
 import { SlidesClientService } from "../services/editing/slides/slidesClient.service";
 import { UPLOAD_CONFIG } from "../config/upload.config";

@@ -288,7 +288,6 @@ export function useIntegrationStatus() {
         ...prev,
         [provider]: { ...prev[provider], syncing: false },
       }));
-      // TODO: add WebSocket live updates for sync progress
       setTimeout(() => { if (mountedRef.current) fetchStatus(); }, 2000);
     } catch (err) {
       if (!mountedRef.current) return;

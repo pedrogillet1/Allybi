@@ -206,7 +206,11 @@ type TableRulesBank = {
   config?: {
     enabled?: boolean;
     strictGfm?: boolean;
+    maxColumns?: number;
     maxColumnsBeforeWrap?: number;
+  };
+  formatting?: {
+    separatorCell?: string;
   };
 };
 
@@ -323,6 +327,76 @@ function limitChars(
   if (lastPunct > 80)
     return { text: slice.slice(0, lastPunct + 1).trim(), changed: true };
   return { text: slice.trim(), changed: true };
+}
+
+function charsPerToken(language: ResponseContractContext["language"]): number {
+  if (language === "pt" || language === "es") return 4.5;
+  return 4.0;
+}
+
+function resolveShortMaxChars(
+  ctx: ResponseContractContext,
+  shortTokenLimit: number,
+): number {
+  const explicitMaxChars = toPositiveInt(ctx.constraints?.maxChars);
+  if (explicitMaxChars) return explicitMaxChars;
+  return Math.max(
+    420,
+    Math.ceil(shortTokenLimit * charsPerToken(ctx.language)),
+  );
+}
+
+function normalizeMarkdownTableSeparators(
+  text: string,
+  tableRules?: TableRulesBank,
+): { text: string; changed: boolean } {
+  if (!tableRules?.config?.enabled) return { text, changed: false };
+
+  const separatorCellRaw = String(
+    tableRules.formatting?.separatorCell || "---",
+  ).trim();
+  const separatorCell = separatorCellRaw
+    .replace(/[^:-]/g, "-")
+    .replace(/-+/g, "-")
+    .padEnd(3, "-")
+    .slice(0, 3);
+  const lines = text.split("\n");
+  let changed = false;
+  const normalized = lines.map((line) => {
+    const trimmed = line.trim();
+    if (!trimmed.includes("|")) return line;
+    if (!/^-?[:|\s-]+$/.test(trimmed.replace(/\|/g, ""))) {
+      return line;
+    }
+
+    const hasLeadingPipe = trimmed.startsWith("|");
+    const hasTrailingPipe = trimmed.endsWith("|");
+    const cells = trimmed
+      .replace(/^\|/, "")
+      .replace(/\|$/, "")
+      .split("|")
+      .map((cell) => cell.trim());
+
+    if (cells.length < 2) return line;
+
+    const repairedCells = cells.map((cell) => {
+      const leftAligned = cell.startsWith(":");
+      const rightAligned = cell.endsWith(":");
+      const normalizedCell = `${leftAligned ? ":" : ""}${separatorCell}${rightAligned ? ":" : ""}`;
+      return normalizedCell;
+    });
+    const rebuilt = `${hasLeadingPipe ? "|" : ""}${repairedCells.join("|")}${hasTrailingPipe ? "|" : ""}`;
+    if (rebuilt !== line) changed = true;
+    return rebuilt;
+  });
+
+  const dashClamped = normalized.map((line) => {
+    const repaired = line.replace(/-{4,}/g, "---");
+    if (repaired !== line) changed = true;
+    return repaired;
+  });
+
+  return { text: dashClamped.join("\n"), changed };
 }
 
 function keepFirstSentence(text: string, maxChars: number = 90): string {
@@ -625,7 +699,6 @@ export class ResponseContractEnforcerService {
       ctx.constraints?.userRequestedShort ||
       (ctx.constraints?.maxSentences && ctx.constraints.maxSentences <= 3)
     ) {
-      const maxChars = ctx.constraints?.maxChars ?? 420;
       const requestedShortTokenLimit = toPositiveInt(
         ctx.constraints?.maxOutputTokens,
       );
@@ -634,6 +707,7 @@ export class ResponseContractEnforcerService {
         requestedShortTokenLimit ??
           Math.min(this.resolveSoftTokenLimit(ctx), 180),
       );
+      const maxChars = resolveShortMaxChars(ctx, shortTokenLimit);
       const shortTokenLimited = trimTextToTokenBudget(
         content,
         shortTokenLimit,
@@ -647,8 +721,7 @@ export class ResponseContractEnforcerService {
       content = shortTokenLimited.text;
 
       const limited = limitChars(content, maxChars);
-      if (limited.changed)
-        repairs.push("SHORT_CONSTRAINT_TRIMMED_CHARS_FALLBACK");
+      if (limited.changed) repairs.push("SHORT_CONSTRAINT_TRIMMED_CHARS");
       content = limited.text;
 
       const sent = countSentences(content);
@@ -706,6 +779,18 @@ export class ResponseContractEnforcerService {
         }
       } catch {
         // ignore invalid regex from bank
+      }
+    }
+
+    // 7) Normalize markdown table separators to prevent pathological dash runs.
+    {
+      const normalizedTables = normalizeMarkdownTableSeparators(
+        content,
+        this.tableRules,
+      );
+      if (normalizedTables.changed) {
+        repairs.push("TABLE_SEPARATOR_NORMALIZED");
+        content = normalizedTables.text;
       }
     }
 

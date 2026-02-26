@@ -68,7 +68,6 @@ const SignUp = () => {
       // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Save recovery key silently (no modal)
       if (response.recoveryKey) {
         console.log('🔐 [Recovery] Recovery key received:', response.recoveryKey);
-        // TODO: Consider adding recovery key to user profile or sending via email
       }
 
       // Check which flow the backend is using

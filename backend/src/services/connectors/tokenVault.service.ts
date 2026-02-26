@@ -45,6 +45,7 @@ export class TokenVaultService {
   private readonly envelope: EnvelopeService;
   private readonly storageRoot: string;
   private readonly storageMode: "file" | "prisma";
+  private readonly failClosedOnPrismaError: boolean;
 
   constructor(opts?: {
     storageRoot?: string;
@@ -56,6 +57,14 @@ export class TokenVaultService {
     this.storageMode =
       (process.env.CONNECTOR_TOKEN_STORAGE as any) ||
       (process.env.NODE_ENV === "production" ? "prisma" : "file");
+    const failClosedEnv = String(
+      process.env.CONNECTOR_TOKEN_VAULT_FAIL_CLOSED || "",
+    )
+      .trim()
+      .toLowerCase();
+    this.failClosedOnPrismaError =
+      failClosedEnv === "true" ||
+      (failClosedEnv !== "false" && process.env.NODE_ENV === "production");
   }
 
   async storeToken(
@@ -105,6 +114,11 @@ export class TokenVaultService {
         });
         return;
       } catch (e) {
+        if (this.failClosedOnPrismaError) {
+          throw new Error(
+            `Token vault persistence failed in fail-closed mode: ${e instanceof Error ? e.message : String(e)}`,
+          );
+        }
         // If migrations haven't been applied yet (dev) or DB is down, fall back to file storage.
       }
     }
@@ -175,7 +189,12 @@ export class TokenVaultService {
           where: { userId_provider: { userId, provider } },
         });
         return;
-      } catch {
+      } catch (e) {
+        if (this.failClosedOnPrismaError) {
+          throw new Error(
+            `Token vault delete failed in fail-closed mode: ${e instanceof Error ? e.message : String(e)}`,
+          );
+        }
         // Fall back to file storage below.
       }
     }
@@ -313,7 +332,12 @@ export class TokenVaultService {
             updatedAt: true,
           },
         });
-      } catch {
+      } catch (e) {
+        if (this.failClosedOnPrismaError) {
+          throw new Error(
+            `Token vault read failed in fail-closed mode: ${e instanceof Error ? e.message : String(e)}`,
+          );
+        }
         row = null;
       }
 
@@ -350,7 +374,12 @@ export class TokenVaultService {
               expiresAt: new Date(entry.expiresAt),
             },
           });
-        } catch {
+        } catch (e) {
+          if (this.failClosedOnPrismaError) {
+            throw new Error(
+              `Token vault hydration failed in fail-closed mode: ${e instanceof Error ? e.message : String(e)}`,
+            );
+          }
           // ignore
         }
       }

@@ -19,7 +19,7 @@ import { ReactComponent as ExpandIcon } from '../../assets/expand.svg';
 import { ReactComponent as DownloadIcon } from '../../assets/download.svg';
 import { ReactComponent as RenameIcon } from '../../assets/Edit 5.svg';
 import { ReactComponent as MoveIcon } from '../../assets/add.svg';
-import { ReactComponent as DeleteIcon } from '../../assets/Trash can-red.svg';
+import { ReactComponent as DeleteIcon } from '../../assets/Trash can.svg';
 import LayeredFolderIcon from '../folders/LayeredFolderIcon';
 import FolderBrowserModal from '../folders/FolderBrowserModal';
 import CategoryIcon from '../library/CategoryIcon';

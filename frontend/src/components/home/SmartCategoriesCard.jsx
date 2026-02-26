@@ -10,7 +10,7 @@ import { ReactComponent as EditIcon } from '../../assets/Edit 5.svg';
 import { ReactComponent as UploadIcon } from '../../assets/upload.svg';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';
 import { ReactComponent as DownloadIcon } from '../../assets/download.svg';
-import { ReactComponent as TrashCanIcon } from '../../assets/Trash can-red.svg';
+import { ReactComponent as TrashCanIcon } from '../../assets/Trash can.svg';
 
 export default function SmartCategoriesCard({
   categories = [],

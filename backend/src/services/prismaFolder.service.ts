@@ -329,7 +329,6 @@ export class PrismaFolderService implements FolderService {
     }
 
     // SECURITY:PLAINTEXT_FALLBACK - Backward compat when crypto not configured
-    // TODO: Remove this fallback once all deployments have encryption enabled
     const f = await prisma.folder.create({
       data: {
         userId: input.userId,
@@ -393,7 +392,6 @@ export class PrismaFolderService implements FolderService {
     }
 
     // SECURITY:PLAINTEXT_FALLBACK - Backward compat when crypto not configured
-    // TODO: Remove this fallback once all deployments have encryption enabled
     const f = await prisma.folder.update({
       where: { id: input.folderId },
       data: { name: input.name }, // SECURITY:PLAINTEXT_FALLBACK

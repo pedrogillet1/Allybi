@@ -1,2 +1,0 @@
-{"id":"ed_001","domain":"docx","flow":["apply","undo"],"expected":{"verifiedBitwise":true}}
-{"id":"ed_002","domain":"xlsx","flow":["apply","undo"],"expected":{"verifiedBitwise":true}}

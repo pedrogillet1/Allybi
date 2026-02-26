@@ -12,7 +12,7 @@ import {
   publishExtractJob,
 } from "../jobs/pubsubPublisher.service";
 import RevisionService from "../documents/revision.service";
-import { logger } from "../../infra/logger";
+import { logger } from "../../utils/logger";
 import cacheService from "../cache.service";
 import type { EditOperator, EditRevisionStore } from "./editing.types";
 import { DocxEditorService } from "./docx/docxEditor.service";

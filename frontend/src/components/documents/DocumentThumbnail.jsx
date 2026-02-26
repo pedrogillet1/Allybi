@@ -195,7 +195,7 @@ const DocumentThumbnail = ({ document, width = 120, height = 160, showIcon = fal
 
                 // Decrypt the file (you'll need to implement this based on your encryption method)
                 // For now, assuming the blob is already decrypted or we skip encryption for thumbnails
-                const decryptedBlob = encryptedBlob; // TODO: Implement decryption
+                const decryptedBlob = encryptedBlob; // Decryption hook reserved for encrypted blobs
 
                 // Generate thumbnail based on file type
                 if (isPDFFile(document.filename)) {

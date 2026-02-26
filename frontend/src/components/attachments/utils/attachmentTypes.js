@@ -25,7 +25,7 @@ import DocIcon from "../assets/doc.svg";
 import SheetIcon from "../assets/sheet.svg";
 import SlidesIcon from "../assets/slides.svg";
 import ImageIcon from "../assets/image.svg";
-import FolderIcon from "../assets/folder.svg";
+import FolderIcon from "../assets/folder_icon.svg";
 import FileIcon from "../assets/file.svg";
 
 /** ---------- Type detection ---------- */

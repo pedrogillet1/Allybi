@@ -5,7 +5,7 @@ import {
   authLimiter,
   adminLimiter,
 } from "../../../middleware/rateLimit.middleware";
-import prisma from "../../../config/database";
+import prisma from "../../../platform/db/prismaClient";
 
 const router = Router();
 
@@ -33,7 +33,7 @@ function svc(req: any): AdminAuthService {
   if (!_svc) {
     const s = req.app?.locals?.services?.adminAuth;
     if (!s) {
-      throw Object.assign(new Error("AdminAuthService not wired"), {
+      throw Object.assign(new Error("Admin authentication service unavailable"), {
         statusCode: 503,
       });
     }

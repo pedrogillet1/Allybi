@@ -494,6 +494,10 @@ export class LlmRequestBuilderService {
               : e.location?.sectionKey
                 ? `sec:${e.location.sectionKey}`
                 : "";
+      const locationKey = String(
+        e.locationKey || loc || `${e.docId}:${e.evidenceType || "text"}`,
+      ).trim();
+      const evidenceId = `${e.docId}:${locationKey}`;
 
       const snippet = (e.snippet || "").trim().replace(/\s+/g, " ");
       const clipped =
@@ -501,7 +505,9 @@ export class LlmRequestBuilderService {
           ? snippet.slice(0, maxSnippetChars - 1) + "…"
           : snippet;
 
-      lines.push(`- [${title}]${loc ? ` (${loc})` : ""}: ${clipped}`);
+      lines.push(
+        `- evidenceId=${evidenceId} | documentId=${e.docId} | locationKey=${locationKey} | title=${title}${loc ? ` | location=${loc}` : ""} | snippet=${clipped}`,
+      );
     }
 
     return lines.join("\n");

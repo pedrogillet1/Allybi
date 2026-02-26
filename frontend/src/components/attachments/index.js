@@ -17,4 +17,3 @@ export { default as FileActionCard } from './cards/FileActionCard';
 // utils/
 export * from './utils/attachmentTypes';
 export * from './utils/attachmentMapper';
-export * from './utils/attachmentHelpers';

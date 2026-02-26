@@ -5,7 +5,7 @@ import { applyEdit, extractVerifiedApply, isNoopResult, undoEdit } from '../../.
 import cleanDocumentName from '../../../utils/cleanDocumentName';
 import { getPreviewCountForFile, getFileExtension } from '../../../utils/files/previewCount';
 import EditorToolbar from '../editor/EditorToolbar';
-import sphereIcon from '../../../assets/allybi-knot-black.svg';
+import sphereIcon from '../../../assets/koda-knot-black.svg';
 import '../../../styles/ExcelPreview.css';
 
 function asSheetName(sheet) {

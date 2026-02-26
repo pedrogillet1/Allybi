@@ -229,7 +229,6 @@ export const NotificationsProvider = ({ children }) => {
       prev.map(n => n.id === notificationId ? { ...n, isRead: true } : n)
     );
 
-    // TODO: Call API when backend is ready
     // await notificationService.markAsRead(notificationId);
   }, []);
 
@@ -237,7 +236,6 @@ export const NotificationsProvider = ({ children }) => {
   const markAllAsRead = useCallback(async () => {
     setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
 
-    // TODO: Call API when backend is ready
     // await notificationService.markAllAsRead();
   }, []);
 
@@ -245,7 +243,6 @@ export const NotificationsProvider = ({ children }) => {
   const deleteNotification = useCallback(async (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
 
-    // TODO: Call API when backend is ready
     // await notificationService.deleteNotification(notificationId);
   }, []);
 

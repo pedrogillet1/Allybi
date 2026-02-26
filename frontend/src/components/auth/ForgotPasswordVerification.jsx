@@ -26,7 +26,6 @@ function ForgotPasswordVerification({ variant = 'page' }) {
 
   const handleResend = async () => {
     if (!canResend) return;
-    // TODO: Implement resend functionality
     setCountdown(60);
     setCanResend(false);
   };

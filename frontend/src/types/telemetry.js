@@ -130,5 +130,3 @@
  * @property {Array<{metric: string, value: string}>} dbPerformance
  * @property {Array<{operation: string, time: string}>} recentDbOperations
  */
-
-export {};

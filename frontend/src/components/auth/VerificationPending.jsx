@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { DEFAULT_AUTH_REDIRECT, ROUTES, STORAGE_KEYS } from '../../constants/routes';
-import phoneIcon from '../../assets/phone-icon.svg';
+import phoneIcon from '../../assets/notification-bell.svg';
 import { useAuthModal } from '../../context/AuthModalContext';
 
 const VerificationPending = ({ variant = 'page' }) => {

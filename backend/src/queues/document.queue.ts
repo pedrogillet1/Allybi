@@ -23,7 +23,7 @@
 import { Queue, Worker, Job } from "bullmq";
 import { config } from "../config/env";
 import prisma from "../config/database";
-import { logger } from "../infra/logger";
+import { logger } from "../utils/logger";
 import { downloadFile } from "../config/storage";
 import {
   isPubSubAvailable,

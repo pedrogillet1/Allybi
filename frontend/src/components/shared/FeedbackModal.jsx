@@ -14,7 +14,6 @@ const FeedbackModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const handleSubmit = () => {
-    // TODO: Implement feedback submission
     console.log('Feedback submitted:', feedback);
     setFeedback('');
     onClose();

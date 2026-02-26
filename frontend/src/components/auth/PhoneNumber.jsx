@@ -7,7 +7,7 @@ import 'react-phone-number-input/style.css';
 import './PhoneNumber.css';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import { ROUTES } from '../../constants/routes';
-import phoneNotificationIcon from '../../assets/phone-notification.svg';
+import phoneNotificationIcon from '../../assets/notification-bell.svg';
 
 const PhoneNumber = ({ variant = 'page' }) => {
     const { t } = useTranslation();

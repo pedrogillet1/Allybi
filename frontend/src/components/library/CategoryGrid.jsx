@@ -13,7 +13,7 @@ import DeleteCategoryModal from './DeleteCategoryModal';
 import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
 import { ReactComponent as EditIcon } from '../../assets/Edit 5.svg';
 import { ReactComponent as UploadIcon } from '../../assets/upload.svg';
-import { ReactComponent as TrashCanIcon } from '../../assets/Trash can-red.svg';
+import { ReactComponent as TrashCanIcon } from '../../assets/Trash can.svg';
 
 const CategoryGrid = () => {
   const { t } = useTranslation();

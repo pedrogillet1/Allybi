@@ -2,7 +2,7 @@ import * as crypto from "crypto";
 import prisma from "../../config/database";
 import { uploadFile } from "../../config/storage";
 import { addDocumentJob } from "../../queues/document.queue";
-import { logger } from "../../infra/logger";
+import { logger } from "../../utils/logger";
 
 export interface RevisionContext {
   correlationId?: string;
