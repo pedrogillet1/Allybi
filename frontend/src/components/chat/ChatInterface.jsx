@@ -3371,8 +3371,11 @@ export default function ChatInterface({
               const finalTextFromPayload = String(
                 msg.text || msg.content || evt.text || evt.content || ""
               ).trim();
+              // The backend final payload is authoritative because it already
+              // passed server-side enforcement/repair. Keep buffered text only
+              // as a fallback when final payload text is absent.
               const merged = normalizeWhitespace(
-                (m.content || "") + buffered + (((!(m.content || "").trim() && !buffered.trim()) && finalTextFromPayload) ? finalTextFromPayload : "")
+                finalTextFromPayload || ((m.content || "") + buffered)
               );
               const cleaned = fixCurrencyArtifacts(stripSourcesLabels(merged));
               const finalListing = Array.isArray(msg.listing) ? msg.listing : (Array.isArray(evt.listing) ? evt.listing : null);

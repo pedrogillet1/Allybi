@@ -42,7 +42,10 @@ describe("Certification: truncation and output formatting", () => {
 
     const content = buildLargeMarkdownTable(120);
     const enforcer = getResponseContractEnforcer();
-    const hardLimit = Math.max(160, Math.min(220, budget.hardOutputTokens));
+    const hardLimit = Math.max(
+      1000,
+      Math.min(budget.hardOutputTokens, budget.maxOutputTokens + 700),
+    );
 
     const enforced = enforcer.enforce(
       { content, attachments: [] },
@@ -88,6 +91,38 @@ describe("Certification: truncation and output formatting", () => {
     });
 
     expect(failures).toEqual([]);
+  });
+
+  test("does not trim complete content when it is within budget", () => {
+    const enforcer = getResponseContractEnforcer();
+    const content =
+      "| Campo | Valor |\n|---|---|\n| Objetivo | Entregar com qualidade |\n| Prazo | 2 semanas |";
+
+    const enforced = enforcer.enforce(
+      { content, attachments: [] },
+      {
+        answerMode: "general_answer",
+        language: "pt",
+        constraints: {
+          maxOutputTokens: 800,
+          hardMaxOutputTokens: 1000,
+          maxChars: 5000,
+        },
+      },
+    );
+
+    expect(enforced.enforcement.blocked).toBe(false);
+    expect(
+      enforced.enforcement.repairs.includes("SOFT_MAX_TOKENS_TRIMMED"),
+    ).toBe(false);
+    expect(
+      enforced.enforcement.repairs.includes("HARD_MAX_TOKENS_TRIMMED"),
+    ).toBe(false);
+    expect(
+      enforced.enforcement.repairs.includes("HARD_MAX_CHARS_TRIMMED"),
+    ).toBe(false);
+    expect(enforced.content).toContain("| Campo | Valor |");
+    expect(enforced.content).toContain("| Prazo | 2 semanas |");
   });
 
   test("portuguese output budget is not lower than english for same prompt", () => {

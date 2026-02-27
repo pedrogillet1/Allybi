@@ -129,13 +129,13 @@ function resolveModeMax(answerMode: string): number {
 
   if (answerMode === "nav_pills") return 220;
   if (answerMode === "rank_disambiguate") return 260;
-  if (answerMode === "doc_grounded_table") return 6500;
-  if (answerMode === "doc_grounded_multi") return 5000;
-  if (answerMode === "doc_grounded_single") return 4600;
+  if (answerMode === "doc_grounded_table") return 4000;
+  if (answerMode === "doc_grounded_multi") return 3400;
+  if (answerMode === "doc_grounded_single") return 3200;
   if (answerMode === "doc_grounded_quote") return 1200;
   if (answerMode === "help_steps") return 1600;
   if (answerMode === "no_docs" || answerMode === "refusal") return 320;
-  return 3800;
+  return 3400;
 }
 
 function resolveBaseBudget(

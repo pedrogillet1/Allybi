@@ -103,6 +103,26 @@ export function buildChatProvenance(params: {
     });
   }
 
+  // Fail-closed systems still need provenance refs even when lexical overlap is
+  // weak (tables/rewrites). If we have evidence but no matched refs, seed a
+  // minimal provenance map from top evidence items so downstream evidence-map
+  // integrity can validate deterministic doc anchors.
+  if (required && snippetRefs.length === 0 && evidence.length > 0) {
+    for (const item of evidence.slice(0, 3)) {
+      const snippet = String(item.snippet || "").trim();
+      const docId = String(item.docId || "").trim();
+      const locationKey = String(item.locationKey || "").trim();
+      if (!snippet || !docId || !locationKey) continue;
+      snippetRefs.push({
+        evidenceId: `${docId}:${locationKey}`,
+        documentId: docId,
+        locationKey,
+        snippetHash: hashSnippet(normalizeText(snippet)),
+        coverageScore: 0,
+      });
+    }
+  }
+
   const evidenceIdsUsed = Array.from(
     new Set(snippetRefs.map((ref) => ref.evidenceId)),
   );

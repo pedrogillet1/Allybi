@@ -1,0 +1,83 @@
+{
+  "_meta": {
+    "id": "slot_extraction_cases",
+    "version": "1.0.0",
+    "description": "Golden test cases for intent slot extraction: validates that the slot fill stage correctly extracts typed slots (COLOR, FONT_SIZE, SCOPE, TEXT_CASE, etc.) from user instructions.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-26",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true,
+    "devOnly": true
+  },
+  "fixtures": [
+    {
+      "id": "SLOT_001_color_en",
+      "language": "en",
+      "instruction": "make the title red",
+      "expected": {
+        "slots": [{ "type": "COLOR", "value": "red" }]
+      }
+    },
+    {
+      "id": "SLOT_002_font_size_en",
+      "language": "en",
+      "instruction": "change font size to 14",
+      "expected": {
+        "slots": [{ "type": "FONT_SIZE", "value": "14" }]
+      }
+    },
+    {
+      "id": "SLOT_003_scope_en",
+      "language": "en",
+      "instruction": "bold all headings",
+      "expected": {
+        "slots": [{ "type": "SCOPE", "value": "headings" }]
+      }
+    },
+    {
+      "id": "SLOT_004_text_case_en",
+      "language": "en",
+      "instruction": "convert to uppercase",
+      "expected": {
+        "slots": [{ "type": "TEXT_CASE", "value": "upper" }]
+      }
+    },
+    {
+      "id": "SLOT_005_color_pt",
+      "language": "pt",
+      "instruction": "mude o titulo para vermelho",
+      "expected": {
+        "slots": [{ "type": "COLOR", "value": "vermelho" }]
+      }
+    },
+    {
+      "id": "SLOT_006_multi_slot_en",
+      "language": "en",
+      "instruction": "make the title bold and red",
+      "expected": {
+        "slots": [
+          { "type": "SCOPE", "value": "title" },
+          { "type": "COLOR", "value": "red" }
+        ]
+      }
+    },
+    {
+      "id": "SLOT_007_list_type_en",
+      "language": "en",
+      "instruction": "convert to numbered list",
+      "expected": {
+        "slots": [{ "type": "LIST_TYPE", "value": "numbered" }]
+      }
+    },
+    {
+      "id": "SLOT_008_direction_en",
+      "language": "en",
+      "instruction": "move paragraph up",
+      "expected": {
+        "slots": [{ "type": "DIRECTION", "value": "up" }]
+      }
+    }
+  ]
+}

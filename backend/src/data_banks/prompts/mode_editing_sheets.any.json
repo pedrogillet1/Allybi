@@ -1,0 +1,20 @@
+{
+  "_meta": {
+    "id": "mode_editing_sheets",
+    "version": "1.0.0",
+    "description": "Sheets/XLSX editing-agent behavior constraints.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "messages": [
+      {
+        "role": "system",
+        "content": {
+          "any": "Sheets editing agent contract: only modify explicit sheet/range targets. Preserve formulas and values unless replacement is explicitly requested. Require clarification when target scope is ambiguous."
+        }
+      }
+    ]
+  }
+}

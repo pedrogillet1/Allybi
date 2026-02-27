@@ -1,0 +1,47 @@
+{
+  "_meta": {
+    "id": "editing_agent_policy",
+    "version": "1.0.0",
+    "description": "Routing and safety policy for domain-specific editing agents.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-27",
+    "owner": "koda-policies"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "defaultAgentId": "edit_agent_default",
+    "domainAgentMap": {
+      "docx": "edit_agent_docx",
+      "sheets": "edit_agent_sheets"
+    },
+    "fallbackForDomains": ["slides", "unknown"]
+  },
+  "rules": [
+    {
+      "id": "route_docx_to_docx_agent",
+      "when": {
+        "all": [{ "path": "domain", "op": "eq", "value": "docx" }]
+      },
+      "then": {
+        "agentId": "edit_agent_docx"
+      }
+    },
+    {
+      "id": "route_sheets_to_sheets_agent",
+      "when": {
+        "all": [{ "path": "domain", "op": "eq", "value": "sheets" }]
+      },
+      "then": {
+        "agentId": "edit_agent_sheets"
+      }
+    },
+    {
+      "id": "fallback_to_default_agent",
+      "when": { "any": true },
+      "then": {
+        "agentId": "edit_agent_default"
+      }
+    }
+  ]
+}

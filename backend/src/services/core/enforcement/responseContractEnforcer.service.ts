@@ -701,7 +701,20 @@ export class ResponseContractEnforcerService {
       repairs.push("JSON_STRIPPED");
     }
 
-    // 4) Enforce short constraints (if user requested short)
+    // 4) Normalize markdown table separators early so pathological
+    // dash runs do not consume token budget before truncation checks.
+    {
+      const normalizedTables = normalizeMarkdownTableSeparators(
+        content,
+        this.tableRules,
+      );
+      if (normalizedTables.changed) {
+        repairs.push("TABLE_SEPARATOR_NORMALIZED");
+        content = normalizedTables.text;
+      }
+    }
+
+    // 5) Enforce short constraints (if user requested short)
     if (
       ctx.constraints?.userRequestedShort ||
       (ctx.constraints?.maxSentences && ctx.constraints.maxSentences <= 3)
@@ -740,7 +753,7 @@ export class ResponseContractEnforcerService {
       }
     }
 
-    // 5) Token-aware hard max length (safety)
+    // 6) Token-aware hard max length (safety)
     const softTokenLimit = this.resolveSoftTokenLimit(ctx);
     const softTokenLimited = trimTextToTokenBudget(content, softTokenLimit, {
       preserveSentenceBoundary: true,
@@ -759,7 +772,7 @@ export class ResponseContractEnforcerService {
     }
     content = hardTokenLimited.text;
 
-    // 5b) Char fallback guard (legacy safety net)
+    // 6b) Char fallback guard (legacy safety net)
     const hardMaxChars = this.resolveHardCharLimit(ctx);
     const hardLimited = limitChars(content, hardMaxChars);
     if (hardLimited.changed) repairs.push("HARD_MAX_CHARS_TRIMMED");
@@ -775,7 +788,7 @@ export class ResponseContractEnforcerService {
       content = emergency.text;
     }
 
-    // 6) Remove banned leakage patterns (source leakage regexes, etc.)
+    // 7) Remove banned leakage patterns (source leakage regexes, etc.)
     const leakagePatterns = this.bannedPhrases?.sourceLeakage?.patterns || [];
     for (const pat of leakagePatterns) {
       try {
@@ -789,7 +802,7 @@ export class ResponseContractEnforcerService {
       }
     }
 
-    // 7) Normalize markdown table separators to prevent pathological dash runs.
+    // 8) Final markdown table separator normalize pass (idempotent).
     {
       const normalizedTables = normalizeMarkdownTableSeparators(
         content,

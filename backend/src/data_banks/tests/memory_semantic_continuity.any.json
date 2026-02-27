@@ -1,0 +1,69 @@
+{
+  "_meta": {
+    "id": "memory_semantic_continuity",
+    "version": "1.0.0",
+    "description": "Test fixtures for memory semantic continuity certification: validates that conversation memory round-trips correctly through persist, retrieve, and eviction cycles.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-26",
+    "owner": "allybi-memory"
+  },
+  "config": {
+    "enabled": true,
+    "devOnly": true
+  },
+  "fixtures": [
+    {
+      "id": "MSC_001_persist_retrieve",
+      "scenario": "basic_persist_retrieve",
+      "description": "Memory artifact persisted via addMessage is retrievable via getContext",
+      "input": {
+        "conversationId": "conv-001",
+        "userId": "user-001",
+        "message": { "role": "user", "content": "What is the revenue for Q3?" }
+      },
+      "expected": {
+        "contextRetrievable": true,
+        "messageCount": 1
+      }
+    },
+    {
+      "id": "MSC_002_eviction_bounded",
+      "scenario": "bounded_eviction",
+      "description": "Cache evicts oldest entry when capacity exceeded",
+      "input": {
+        "cacheLimit": 2,
+        "conversations": ["conv-A", "conv-B", "conv-C"]
+      },
+      "expected": {
+        "evictedConversation": "conv-A",
+        "survivingConversations": ["conv-B", "conv-C"]
+      }
+    },
+    {
+      "id": "MSC_003_ttl_expiry",
+      "scenario": "ttl_expiry",
+      "description": "Cached context expires after TTL and falls back to DB",
+      "input": {
+        "ttlSeconds": 900,
+        "elapsedSeconds": 901
+      },
+      "expected": {
+        "cacheHit": false,
+        "dbFallback": true
+      }
+    },
+    {
+      "id": "MSC_004_user_isolation",
+      "scenario": "user_scope_isolation",
+      "description": "Same conversationId with different userId produces isolated cache entries",
+      "input": {
+        "conversationId": "conv-shared",
+        "userIds": ["user-A", "user-B"]
+      },
+      "expected": {
+        "isolatedEntries": true,
+        "crossUserAccess": false
+      }
+    }
+  ]
+}

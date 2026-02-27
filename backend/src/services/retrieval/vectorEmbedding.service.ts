@@ -83,7 +83,8 @@ function normalizeChunk(
     ? (raw.pageNumber as number)
     : undefined;
 
-  const content = (raw.content ?? raw.text ?? "").trim();
+  // Strip null bytes (0x00) — PostgreSQL rejects them in text columns (error 22021)
+  const content = (raw.content ?? raw.text ?? "").replace(/\0/g, "").trim();
   const embedding = Array.isArray(raw.embedding) ? raw.embedding : [];
   const metadata = raw.metadata ?? {};
 

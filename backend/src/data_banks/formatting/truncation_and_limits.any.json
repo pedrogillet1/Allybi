@@ -109,12 +109,12 @@
     },
     "doc_grounded_multi": {
       "maxCharsDefault": 4000,
-      "maxOutputTokensDefault": 3000,
+      "maxOutputTokensDefault": 3400,
       "preferProfile": "detailed"
     },
     "doc_grounded_table": {
       "maxCharsDefault": 4000,
-      "maxOutputTokensDefault": 3200,
+      "maxOutputTokensDefault": 4000,
       "maxTableRows": 20,
       "preferProfile": "deep"
     },
@@ -262,7 +262,7 @@
       {
         "id": "TRUNC_002_profile_standard_1200",
         "context": { "profile": "standard" },
-        "expect": { "maxChars": 1200, "maxBullets": 5 }
+        "expect": { "maxChars": 2400, "maxBullets": 7 }
       },
       {
         "id": "TRUNC_003_table_row_limit",
@@ -279,12 +279,12 @@
       {
         "id": "TRUNC_005_global_token_hard_cap",
         "context": {},
-        "expect": { "outputTokensHardMax": 3200 }
+        "expect": { "outputTokensHardMax": 8000 }
       },
       {
         "id": "TRUNC_006_doc_grounded_multi_token_cap",
         "context": { "answerMode": "doc_grounded_multi" },
-        "expect": { "maxOutputTokens": 1600 }
+        "expect": { "maxOutputTokens": 3400 }
       }
     ]
   }

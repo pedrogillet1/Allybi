@@ -546,6 +546,27 @@ function resolveTruncationState(params: {
   };
 }
 
+export function shouldApplyPreEnforcerTrim(params: {
+  telemetry?: Record<string, unknown> | null;
+  finalText: string;
+  requestedMaxOutputTokens: number | null;
+}): boolean {
+  if (
+    !params.requestedMaxOutputTokens ||
+    params.requestedMaxOutputTokens <= 0
+  ) {
+    return false;
+  }
+  const provider = classifyProviderTruncation(params.telemetry);
+  if (!provider.occurred) return false;
+  const semantic = classifyVisibleTruncation({
+    finalText: params.finalText,
+    enforcementRepairs: [],
+    providerTruncation: provider,
+  });
+  return semantic.occurred;
+}
+
 function isRuntimePolicyFailure(error: unknown): boolean {
   if (isRuntimePolicyError(error)) return true;
   const message = String((error as any)?.message || "");
@@ -2408,6 +2429,78 @@ export class CentralizedChatRuntimeDelegate {
   }
 
   /**
+   * When provider overflow cuts a markdown table mid-structure, replace the
+   * broken scaffold with a complete short sentence so the user never receives
+   * a dangling header-only table.
+   */
+  private repairProviderOverflowStructuredOutput(
+    text: string,
+    telemetry?: Record<string, unknown> | null,
+    preferredLanguage?: string | null,
+  ): string {
+    const finishReason = normalizeFinishReason(
+      telemetry && typeof telemetry === "object" ? telemetry.finishReason : null,
+    );
+    const overflow = new Set(["length", "max_tokens", "max_output_tokens"]);
+    if (!overflow.has(finishReason)) return text;
+
+    const value = String(text || "").trim();
+    if (!value) return text;
+
+    const lines = value
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+    const semantic = classifyVisibleTruncation({
+      finalText: value,
+      enforcementRepairs: [],
+      providerTruncation: { occurred: true, reason: finishReason },
+    });
+    if (!semantic.occurred) return text;
+
+    const tableLines = lines.filter((line) => line.includes("|"));
+    if (!tableLines.length) {
+      const lang = normalizeChatLanguage(preferredLanguage);
+      if (lang === "pt") {
+        return "A resposta foi interrompida antes de concluir. Posso reenviar em bullets para garantir completude.";
+      }
+      if (lang === "es") {
+        return "La respuesta se interrumpió antes de terminar. Puedo reenviarla en viñetas para garantizar completitud.";
+      }
+      return "The response was interrupted before completion. I can resend it as bullets to guarantee completeness.";
+    }
+
+    const separatorOnly = (line: string): boolean =>
+      /^[:\-\|\s]+$/.test(line.replace(/\|/g, ""));
+    const contentRows = tableLines.filter((line) => !separatorOnly(line));
+    const incompleteTable =
+      contentRows.length <= 1 || /\|\s*$/.test(value) || lines.length < 3;
+    if (!incompleteTable) {
+      const lang = normalizeChatLanguage(preferredLanguage);
+      if (lang === "pt") {
+        return "A resposta foi interrompida antes de concluir. Posso reenviar em bullets para garantir completude.";
+      }
+      if (lang === "es") {
+        return "La respuesta se interrumpió antes de terminar. Puedo reenviarla en viñetas para garantizar completitud.";
+      }
+      return "The response was interrupted before completion. I can resend it as bullets to guarantee completeness.";
+    }
+
+    const lang = normalizeChatLanguage(preferredLanguage);
+    const narrative = lines.filter((line) => !line.includes("|")).join(" ").trim();
+    const fallback =
+      lang === "pt"
+        ? "A tabela foi interrompida antes de concluir. Posso reenviar em bullets para evitar corte."
+        : lang === "es"
+          ? "La tabla se interrumpió antes de terminar. Puedo reenviarla en viñetas para evitar cortes."
+          : "The table was cut before completion. I can resend it as bullets to avoid truncation.";
+
+    const base = narrative || fallback;
+    const punctuated = /[.!?]$/.test(base) ? base : `${base}.`;
+    return punctuated;
+  }
+
+  /**
    * Generate bank-driven followup suggestions for doc-grounded answers.
    */
   private generateFollowups(
@@ -2522,6 +2615,14 @@ export class CentralizedChatRuntimeDelegate {
   }> {
     let text = params.assistantText;
     let failureCode: string | null = null;
+    const sourceDocumentIdsFromSources = Array.from(
+      new Set(
+        (params.sources || [])
+          .map((source) => String(source.documentId || "").trim())
+          .filter(Boolean),
+      ),
+    );
+    const hasSourceEntries = sourceDocumentIdsFromSources.length > 0;
     const requestedMaxOutputTokens = toPositiveInt(
       params.telemetry &&
         typeof params.telemetry === "object" &&
@@ -2545,22 +2646,12 @@ export class CentralizedChatRuntimeDelegate {
 
     // 1. Sentence boundary recovery for truncated outputs
     text = this.applySentenceBoundaryRecovery(text, params.telemetry);
-    const finishReason = normalizeFinishReason(
-      params.telemetry && typeof params.telemetry === "object"
-        ? (params.telemetry as Record<string, unknown>).finishReason
-        : null,
-    );
-    const overflowReasons = new Set([
-      "length",
-      "max_tokens",
-      "max_output_tokens",
-    ]);
-    const likelyOverflow =
-      overflowReasons.has(finishReason) ||
-      (requestedMaxOutputTokens != null &&
-        observedOutputTokens != null &&
-        observedOutputTokens >= Math.max(1, requestedMaxOutputTokens - 8));
-    if (requestedMaxOutputTokens && likelyOverflow) {
+    const preEnforcerTrim = shouldApplyPreEnforcerTrim({
+      telemetry: (params.telemetry as Record<string, unknown>) ?? null,
+      finalText: text,
+      requestedMaxOutputTokens,
+    });
+    if (preEnforcerTrim && requestedMaxOutputTokens) {
       const trimmed = trimTextToTokenBudget(text, requestedMaxOutputTokens, {
         preserveSentenceBoundary: true,
       });
@@ -2586,14 +2677,22 @@ export class CentralizedChatRuntimeDelegate {
         Array.isArray(params.req.attachedDocumentIds) &&
         params.req.attachedDocumentIds.length > 0;
       const hasEvidence = (params.retrievalPack?.evidence?.length ?? 0) > 0;
+      const hardScopeActive = Boolean(
+        params.retrievalPack?.scope?.hardScopeActive,
+      );
+      const softPassEligible =
+        hasEvidence && (hasAttachedDocs || hasSourceEntries || hardScopeActive);
       // Soft-pass provenance when user explicitly attached docs and evidence
       // exists. Lexical-overlap metric is unreliable with keyword retrieval.
-      const softPass =
-        !provenanceValidation.ok && hasAttachedDocs && hasEvidence;
+      const softPass = !provenanceValidation.ok && softPassEligible;
       provenance = {
         ...provenance,
         validated: provenanceValidation.ok || softPass,
         failureCode: softPass ? null : provenanceValidation.failureCode,
+        sourceDocumentIds:
+          provenance.sourceDocumentIds.length > 0
+            ? provenance.sourceDocumentIds
+            : sourceDocumentIdsFromSources,
       };
     }
 
@@ -2696,6 +2795,11 @@ export class CentralizedChatRuntimeDelegate {
     }
 
     if (!failureCode) {
+      text = this.repairProviderOverflowStructuredOutput(
+        text,
+        (params.telemetry as Record<string, unknown>) ?? null,
+        params.req.preferredLanguage,
+      );
       const revalidatedProvenance = buildChatProvenance({
         answerText: text,
         answerMode: params.answerMode,
@@ -2712,7 +2816,12 @@ export class CentralizedChatRuntimeDelegate {
         Array.isArray(params.req.attachedDocumentIds) &&
         params.req.attachedDocumentIds.length > 0;
       const hasEvidence = (params.retrievalPack?.evidence?.length ?? 0) > 0;
-      if (!revalidated.ok && hasAttachedDocs && hasEvidence) {
+      const hardScopeActive = Boolean(
+        params.retrievalPack?.scope?.hardScopeActive,
+      );
+      const softPassEligible =
+        hasEvidence && (hasAttachedDocs || hasSourceEntries || hardScopeActive);
+      if (!revalidated.ok && softPassEligible) {
         // Soft-pass: provenance lexical-overlap metric is unreliable with
         // keyword retrieval. Preserve the generated answer and mark validated.
         provenance = {
@@ -2722,7 +2831,9 @@ export class CentralizedChatRuntimeDelegate {
           sourceDocumentIds:
             revalidatedProvenance.sourceDocumentIds.length > 0
               ? revalidatedProvenance.sourceDocumentIds
-              : provenance.sourceDocumentIds,
+              : provenance.sourceDocumentIds.length > 0
+                ? provenance.sourceDocumentIds
+                : sourceDocumentIdsFromSources,
           snippetRefs:
             revalidatedProvenance.snippetRefs.length > 0
               ? revalidatedProvenance.snippetRefs

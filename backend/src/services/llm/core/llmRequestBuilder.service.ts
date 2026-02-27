@@ -260,11 +260,6 @@ export class LlmRequestBuilderService {
       options.maxOutputTokens = Math.min(options.maxOutputTokens ?? 300, 220);
     }
 
-    // Special case: table mode needs minimum budget for header + data rows
-    if (answerMode === "doc_grounded_table") {
-      options.maxOutputTokens = Math.max(options.maxOutputTokens ?? 3200, 4000);
-    }
-
     // Special case: quote mode often needs strictness, but keep length bounded
     if (input.signals.operator === "quote") {
       options.temperature = 0.15;

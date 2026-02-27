@@ -43,7 +43,12 @@
     "test:e2e:harness": "npx playwright test -c playwright.harness.config.ts",
     "test:e2e:ui": "npx playwright test --ui",
     "test:e2e:headed": "npx playwright test --headed",
-    "test:e2e:harness:headed": "npx playwright test -c playwright.harness.config.ts --headed"
+    "test:e2e:harness:headed": "npx playwright test -c playwright.harness.config.ts --headed",
+    "reports:hygiene:prepare": "node e2e/grading/report-hygiene.mjs --prepare --reset-latest",
+    "reports:hygiene:check": "node e2e/grading/report-hygiene.mjs --check",
+    "grade:harsh": "node e2e/grading/run-harsh-rubric.mjs",
+    "test:preflight:frontend-queries": "node e2e/grading/preflight-queries.mjs",
+    "test:preflight:frontend-queries:full": "node e2e/grading/preflight-queries.mjs --run-100"
   },
   "eslintConfig": {
     "extends": [

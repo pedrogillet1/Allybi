@@ -2412,7 +2412,7 @@
       "version": "2.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "a5f8fc66509d2dd681ff1b0e788dd8da5f8d7b0e1d2ae8af32c1273589376320"
+      "checksumSha256": "03d180163e4a5783f2bd7eb216bc5fffbad2cf778011b54c545a466d5104cf06"
     },
     {
       "id": "ui_contracts",
