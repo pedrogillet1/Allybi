@@ -16,6 +16,9 @@ function defaultTruncation() {
     occurred: false,
     reason: null,
     resumeToken: null,
+    providerOccurred: false,
+    providerReason: null,
+    detectorVersion: null,
   };
 }
 

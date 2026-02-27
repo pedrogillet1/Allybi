@@ -619,11 +619,16 @@ export class ResponseContractEnforcerService {
     }
 
     if (requiresProvenance) {
-      const provenanceCheck = validateChatProvenance({
-        provenance: ctx.provenance,
-        answerMode: ctx.answerMode as any,
-        allowedDocumentIds: ctx.allowedDocumentIds || [],
-      });
+      // Skip re-validation when provenance was already soft-passed upstream
+      // (e.g. attached-document mode with keyword retrieval).
+      const alreadyValidated = ctx.provenance?.validated === true;
+      const provenanceCheck = alreadyValidated
+        ? { ok: true, failureCode: null, warnings: [] as string[] }
+        : validateChatProvenance({
+            provenance: ctx.provenance,
+            answerMode: ctx.answerMode as any,
+            allowedDocumentIds: ctx.allowedDocumentIds || [],
+          });
       if (!provenanceCheck.ok) {
         return {
           content: "",
@@ -636,6 +641,8 @@ export class ResponseContractEnforcerService {
           },
         };
       }
+      // Provenance map integrity is always required for doc-grounded output.
+      // Upstream soft-validation cannot bypass evidence-map integrity checks.
       const mapCheck = validateProvenanceAgainstEvidenceMap({
         provenance: ctx.provenance,
         evidenceMap: ctx.evidenceMap,

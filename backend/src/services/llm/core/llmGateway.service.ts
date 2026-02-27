@@ -203,7 +203,9 @@ export class LlmGatewayService {
       options: {
         stream: streaming,
         temperature: this.cfg.defaultTemperature,
-        maxOutputTokens: this.cfg.defaultMaxOutputTokens,
+        // maxOutputTokens intentionally omitted — let the token budget
+        // service compute the limit based on answerMode + complexity.
+        // Passing a value here would override the budget as requestedOverride.
       },
     };
 

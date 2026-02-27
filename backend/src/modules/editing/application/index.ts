@@ -11,6 +11,7 @@ export {
   EditTelemetryService,
   TargetResolverService,
   EditingFacadeService,
+  EditingAgentRouterService,
   ApplyVerificationService,
   BankIntegrityService,
   EditingPolicyService,
@@ -49,6 +50,8 @@ export type {
   SlidesTargetNode,
   UndoRequest,
   UndoResult,
+  EditingAgentExecution,
+  EditingAgentId,
 } from "../../../services/editing";
 
 // Intent runtime — pattern-matching pipeline for edit instructions

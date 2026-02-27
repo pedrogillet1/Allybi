@@ -193,8 +193,16 @@ function makeBenchmarkEngine(): RetrievalEngineService {
     },
   };
 
-  const lexicalIndex = { async search() { return []; } };
-  const structuralIndex = { async search() { return []; } };
+  const lexicalIndex = {
+    async search() {
+      return [];
+    },
+  };
+  const structuralIndex = {
+    async search() {
+      return [];
+    },
+  };
 
   return new RetrievalEngineService(
     bankLoader as any,
@@ -292,10 +300,7 @@ describe("Certification: retrieval behavioral regression", () => {
     const passRate = totalCases > 0 ? passCount / totalCases : 0;
 
     writeCertificationGateReport("retrieval-behavioral", {
-      passed:
-        wrongDocRate === 0 &&
-        missRate <= 0.02 &&
-        totalCases >= 100,
+      passed: wrongDocRate === 0 && missRate <= 0.02 && totalCases >= 100,
       metrics: {
         totalCases,
         wrongDocCount,

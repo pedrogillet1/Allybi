@@ -42,6 +42,20 @@
       "appliesTo": { "operators": ["rewrite", "translate", "format", "plan_edit"] }
     },
     {
+      "id": "mode_editing_docx",
+      "path": "prompts/mode_editing_docx.any.json",
+      "required": false,
+      "purpose": "Domain-specific editing mode for DOCX agent.",
+      "appliesTo": { "operators": ["plan_docx"] }
+    },
+    {
+      "id": "mode_editing_sheets",
+      "path": "prompts/mode_editing_sheets.any.json",
+      "required": false,
+      "purpose": "Domain-specific editing mode for Sheets agent.",
+      "appliesTo": { "operators": ["plan_xlsx"] }
+    },
+    {
       "id": "rag_policy",
       "path": "prompts/rag_policy.any.json",
       "required": true,
@@ -118,6 +132,8 @@
     "rulesOrder": [
       "use_disambiguation_prompt",
       "use_retrieval_prompt_for_discovery",
+      "use_docx_editing_mode_prompt",
+      "use_sheets_editing_mode_prompt",
       "use_fallback_prompt",
       "use_compose_answer_prompt_default"
     ],
@@ -141,6 +157,26 @@
           ]
         },
         "then": { "promptId": "retrieval_prompt" }
+      },
+      {
+        "id": "use_docx_editing_mode_prompt",
+        "when": {
+          "any": [
+            { "path": "domain", "op": "eq", "value": "docx" },
+            { "path": "editingAgent", "op": "eq", "value": "edit_agent_docx" }
+          ]
+        },
+        "then": { "promptId": "mode_editing_docx" }
+      },
+      {
+        "id": "use_sheets_editing_mode_prompt",
+        "when": {
+          "any": [
+            { "path": "domain", "op": "eq", "value": "sheets" },
+            { "path": "editingAgent", "op": "eq", "value": "edit_agent_sheets" }
+          ]
+        },
+        "then": { "promptId": "mode_editing_sheets" }
       },
       {
         "id": "use_fallback_prompt",

@@ -91,7 +91,8 @@ export function buildChatProvenance(params: {
       ? Math.max(lexicalCoverage, 1)
       : lexicalCoverage;
 
-    if (coverageScore < 0.18) continue;
+    const minCoverage = params.answerMode === "doc_grounded_multi" ? 0.1 : 0.18;
+    if (coverageScore < minCoverage) continue;
 
     snippetRefs.push({
       evidenceId: `${docId}:${locationKey}`,

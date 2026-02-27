@@ -37,12 +37,23 @@ import {
   type EvidenceItem,
   type RetrievalRequest,
   buildAttachmentDocScopeLock,
+  createDocScopeLock,
   EvidenceGateService,
   type EvidenceCheckResult,
   getSourceButtonsService,
   resolveSlot,
   PrismaRetrievalAdapterFactory,
 } from "../../retrieval/application";
+import {
+  resolveDocumentReference,
+  type DocumentReferenceDoc,
+} from "../../../services/core/scope/documentReferenceResolver.service";
+import {
+  extractUsedDocuments,
+  filterSourceButtonsByUsage,
+  type SourceButtonsAttachment,
+  type EvidenceChunkForFiltering,
+} from "../../../services/core/retrieval/sourceButtons.service";
 import {
   RuntimePolicyError,
   isRuntimePolicyError,
@@ -58,6 +69,13 @@ import {
   type ResponseContractContext,
 } from "../../../services/core/enforcement/responseContractEnforcer.service";
 import { trimTextToTokenBudget } from "../../../services/core/enforcement/tokenBudget.service";
+import {
+  SEMANTIC_TRUNCATION_DETECTOR_VERSION,
+  classifyProviderTruncation,
+  classifyVisibleTruncation,
+  isSemanticTruncationV2Enabled,
+  normalizeFinishReason,
+} from "./truncationClassifier";
 import { buildChatProvenance } from "./provenance/ProvenanceBuilder";
 import { validateChatProvenance } from "./provenance/ProvenanceValidator";
 import {
@@ -148,6 +166,13 @@ export function buildAttachmentDocScopeSignals(
     hardScopeActive: docScopeLock.mode !== "none",
     singleDocIntent: docScopeLock.mode === "single_doc",
   };
+}
+
+function fallbackSourceLabel(docId: string): string {
+  const shortId = String(docId || "")
+    .trim()
+    .slice(0, 8);
+  return shortId ? `Document ${shortId}` : "Document";
 }
 
 function toConversationDTO(row: {
@@ -328,7 +353,9 @@ function buildSourcesFromEvidence(evidence: EvidenceItem[]): ChatSourceEntry[] {
     seen.add(item.docId);
     out.push({
       documentId: item.docId,
-      filename: String(item.filename || item.title || "Document"),
+      filename: String(
+        item.filename || item.title || fallbackSourceLabel(item.docId),
+      ),
       mimeType: null,
       page: item.location.page ?? null,
     });
@@ -336,6 +363,67 @@ function buildSourcesFromEvidence(evidence: EvidenceItem[]): ChatSourceEntry[] {
   }
 
   return out;
+}
+
+function filterSourcesByProvenance(
+  sources: ChatSourceEntry[],
+  provenance: ChatProvenanceDTO | undefined,
+  answerText: string,
+  evidence: EvidenceItem[],
+): ChatSourceEntry[] {
+  if (!provenance || sources.length === 0) return sources;
+
+  // Primary: use provenance sourceDocumentIds
+  if (provenance.sourceDocumentIds.length > 0) {
+    const allowed = new Set(provenance.sourceDocumentIds);
+    const filtered = sources.filter((s) => allowed.has(s.documentId));
+    return filtered.length > 0 ? filtered : sources.slice(0, 1);
+  }
+
+  // Fallback: text-matching via extractUsedDocuments
+  const chunks: EvidenceChunkForFiltering[] = evidence.map((e) => ({
+    docId: e.docId,
+    fileName: String(e.filename || e.title || ""),
+    docTitle: String(e.title || e.filename || ""),
+    text: e.snippet || "",
+    pageStart: e.location?.page ?? undefined,
+    sheetName: e.location?.sheet ?? undefined,
+    slideNumber: e.location?.slide ?? undefined,
+  }));
+  const usedDocIds = extractUsedDocuments(answerText, chunks);
+  if (usedDocIds.size > 0) {
+    const filtered = sources.filter((s) => usedDocIds.has(s.documentId));
+    return filtered.length > 0 ? filtered : sources.slice(0, 1);
+  }
+
+  return sources;
+}
+
+function filterAttachmentByProvenance(
+  attachment: unknown | null,
+  provenance: ChatProvenanceDTO | undefined,
+  answerText: string,
+  evidence: EvidenceItem[],
+): unknown | null {
+  if (!attachment || !provenance) return attachment;
+
+  let allowedDocIds: Set<string>;
+  if (provenance.sourceDocumentIds.length > 0) {
+    allowedDocIds = new Set(provenance.sourceDocumentIds);
+  } else {
+    const chunks: EvidenceChunkForFiltering[] = evidence.map((e) => ({
+      docId: e.docId,
+      fileName: String(e.filename || e.title || ""),
+      docTitle: String(e.title || e.filename || ""),
+      text: e.snippet || "",
+    }));
+    allowedDocIds = extractUsedDocuments(answerText, chunks);
+  }
+  if (allowedDocIds.size === 0) return attachment;
+  return filterSourceButtonsByUsage(
+    attachment as SourceButtonsAttachment,
+    allowedDocIds,
+  );
 }
 
 function toEngineEvidencePack(pack: EvidencePack | null) {
@@ -409,27 +497,6 @@ function buildEmptyAssistantText(params: {
   });
 }
 
-function normalizeFinishReason(value: unknown): string {
-  return String(value || "")
-    .trim()
-    .toLowerCase();
-}
-
-function buildTruncationFromTelemetry(
-  telemetry?: Record<string, unknown> | null,
-): { occurred: boolean; reason: string | null; resumeToken: string | null } {
-  const finishReason = normalizeFinishReason(
-    telemetry && typeof telemetry === "object" ? telemetry.finishReason : null,
-  );
-  const truncated = new Set(["length", "max_tokens", "max_output_tokens"]);
-  const occurred = truncated.has(finishReason);
-  return {
-    occurred,
-    reason: occurred ? finishReason : null,
-    resumeToken: null,
-  };
-}
-
 function normalizeChatLanguage(value: unknown): "en" | "pt" | "es" {
   const lang = String(value || "")
     .trim()
@@ -442,6 +509,41 @@ function toPositiveInt(value: unknown): number | null {
   const num = Number(value);
   if (!Number.isFinite(num) || num <= 0) return null;
   return Math.floor(num);
+}
+
+type ResolvedTruncationState = {
+  contractOccurred: boolean;
+  contractReason: string | null;
+  providerOccurred: boolean;
+  providerReason: string | null;
+  semanticOccurred: boolean;
+  semanticReason: string | null;
+  detectorVersion: string;
+};
+
+function resolveTruncationState(params: {
+  telemetry?: Record<string, unknown> | null;
+  finalText: string;
+  enforcementRepairs?: string[] | null;
+}): ResolvedTruncationState {
+  const provider = classifyProviderTruncation(params.telemetry);
+  const semantic = classifyVisibleTruncation({
+    finalText: params.finalText,
+    enforcementRepairs: params.enforcementRepairs,
+    providerTruncation: provider,
+  });
+  const useSemanticV2 = isSemanticTruncationV2Enabled();
+
+  return {
+    contractOccurred: useSemanticV2 ? semantic.occurred : provider.occurred,
+    contractReason: useSemanticV2 ? semantic.reason : provider.reason,
+    providerOccurred: provider.occurred,
+    providerReason: provider.reason,
+    semanticOccurred: semantic.occurred,
+    semanticReason: semantic.reason,
+    detectorVersion:
+      semantic.detectorVersion || SEMANTIC_TRUNCATION_DETECTOR_VERSION,
+  };
 }
 
 function isRuntimePolicyFailure(error: unknown): boolean {
@@ -544,6 +646,7 @@ export class CentralizedChatRuntimeDelegate {
     enforcementBlocked?: boolean;
     enforcementReasonCode?: string | null;
     provenance?: ChatProvenanceDTO | null;
+    truncation?: ResolvedTruncationState | null;
   }): TurnDebugPacket {
     const meta = asObject(params.req.meta);
     const usage = this.extractTelemetryUsage(params.telemetry);
@@ -620,7 +723,15 @@ export class CentralizedChatRuntimeDelegate {
       },
       output: {
         sourceCount: params.retrievalPack?.evidence.length ?? 0,
-        wasTruncated: buildTruncationFromTelemetry(params.telemetry).occurred,
+        wasTruncated: Boolean(params.truncation?.contractOccurred),
+        wasProviderTruncated: Boolean(params.truncation?.providerOccurred),
+        wasSemanticallyTruncated: Boolean(params.truncation?.semanticOccurred),
+        truncationReason: params.truncation?.contractReason || null,
+        providerTruncationReason: params.truncation?.providerReason || null,
+        semanticTruncationReason: params.truncation?.semanticReason || null,
+        detectorVersion:
+          params.truncation?.detectorVersion ||
+          SEMANTIC_TRUNCATION_DETECTOR_VERSION,
         status: String(params.status || "success"),
         failureCode: params.failureCode || null,
       },
@@ -724,6 +835,7 @@ export class CentralizedChatRuntimeDelegate {
     enforcementBlocked?: boolean;
     enforcementReasonCode?: string | null;
     provenance?: ChatProvenanceDTO | null;
+    truncation?: ChatResult["truncation"] | null;
   }): Promise<void> {
     const distinctDocIds = [
       ...new Set(
@@ -743,6 +855,29 @@ export class CentralizedChatRuntimeDelegate {
     const fallbackReason =
       params.failureCode || params.fallbackReasonCode || null;
     const retrievalAdequate = (params.retrievalPack?.evidence.length ?? 0) > 0;
+    const derivedTruncation = resolveTruncationState({
+      telemetry: params.telemetry,
+      finalText: params.assistantText,
+      enforcementRepairs: params.enforcement?.repairs || [],
+    });
+    const truncation: ResolvedTruncationState = params.truncation
+      ? {
+          contractOccurred: Boolean(params.truncation.occurred),
+          contractReason: params.truncation.reason ?? null,
+          providerOccurred:
+            params.truncation.providerOccurred === undefined
+              ? derivedTruncation.providerOccurred
+              : Boolean(params.truncation.providerOccurred),
+          providerReason:
+            params.truncation.providerReason ??
+            derivedTruncation.providerReason,
+          semanticOccurred: derivedTruncation.semanticOccurred,
+          semanticReason: derivedTruncation.semanticReason,
+          detectorVersion:
+            params.truncation.detectorVersion ??
+            derivedTruncation.detectorVersion,
+        }
+      : derivedTruncation;
     const keywords = this.extractTraceKeywords(params.req.message);
     const entities = this.extractTraceEntities(
       params.req,
@@ -777,6 +912,7 @@ export class CentralizedChatRuntimeDelegate {
         enforcementBlocked: params.enforcementBlocked,
         enforcementReasonCode: params.enforcementReasonCode,
         provenance: params.provenance || null,
+        truncation,
       }),
     );
 
@@ -820,7 +956,11 @@ export class CentralizedChatRuntimeDelegate {
         hadFallback: Boolean(fallbackReason),
         fallbackScenario: fallbackReason,
         answerLength: String(params.assistantText || "").length,
-        wasTruncated: buildTruncationFromTelemetry(params.telemetry).occurred,
+        wasTruncated: truncation.contractOccurred,
+        wasProviderTruncated: truncation.providerOccurred,
+        truncationDetectorVersion: truncation.detectorVersion,
+        truncationReason: truncation.contractReason,
+        providerTruncationReason: truncation.providerReason,
         failureCode: params.failureCode || null,
         hasErrors: params.status === "failed" || Boolean(params.failureCode),
         warnings: fallbackReason ? [fallbackReason] : [],
@@ -902,8 +1042,11 @@ export class CentralizedChatRuntimeDelegate {
       },
     );
     let conversationId = "";
+    let lastDocumentId: string | null = null;
     let userMessage: ChatMessageDTO | null = null;
-    let retrievalPack: EvidencePack | null = null;
+    let retrievalPack:
+      | (EvidencePack & { resolvedDocId?: string | null })
+      | null = null;
     let evidenceGateDecision: EvidenceCheckResult | null = null;
     let answerMode: AnswerMode =
       (req.attachedDocumentIds || []).length > 0
@@ -912,10 +1055,12 @@ export class CentralizedChatRuntimeDelegate {
     let retrievalMs: number | null = null;
     let llmMs: number | null = null;
     try {
-      conversationId = await this.ensureConversation(
+      const conv = await this.ensureConversation(
         req.userId,
         req.conversationId,
       );
+      conversationId = conv.id;
+      lastDocumentId = conv.lastDocumentId;
 
       userMessage = await this.createMessage({
         conversationId,
@@ -941,8 +1086,20 @@ export class CentralizedChatRuntimeDelegate {
 
       const retrievalSpanId = this.traceWriter.startSpan(traceId, "retrieval");
       const retrievalStartedAt = Date.now();
-      retrievalPack = await this.retrieveEvidence(req);
+      retrievalPack = await this.retrieveEvidence(req, lastDocumentId);
       retrievalMs = Date.now() - retrievalStartedAt;
+
+      // Persist resolved doc for conversation-history follow-up scoping
+      const resolvedDocId = retrievalPack?.resolvedDocId ?? null;
+      if (resolvedDocId && resolvedDocId !== lastDocumentId) {
+        prisma.conversation
+          .update({
+            where: { id: conversationId },
+            data: { lastDocumentId: resolvedDocId },
+          })
+          .catch(() => {}); // fire-and-forget, non-blocking
+      }
+
       this.traceWriter.endSpan(traceId, retrievalSpanId, {
         status: "ok",
         metadata: {
@@ -1035,6 +1192,9 @@ export class CentralizedChatRuntimeDelegate {
             occurred: false,
             reason: null,
             resumeToken: null,
+            providerOccurred: false,
+            providerReason: null,
+            detectorVersion: SEMANTIC_TRUNCATION_DETECTOR_VERSION,
           },
           evidence: {
             required: (req.attachedDocumentIds || []).length > 0,
@@ -1060,6 +1220,7 @@ export class CentralizedChatRuntimeDelegate {
           retrievalMs,
           llmMs,
           stream: false,
+          truncation: result.truncation,
         }).catch((error) => {
           appLogger.warn("[trace-writer] failed to persist bypass trace", {
             traceId,
@@ -1146,9 +1307,21 @@ export class CentralizedChatRuntimeDelegate {
       });
 
       const assistantText = finalized.assistantText;
+      const filteredSources = filterSourcesByProvenance(
+        sources,
+        finalized.provenance,
+        assistantText,
+        retrievalPack?.evidence ?? [],
+      );
+      const filteredAttachment = filterAttachmentByProvenance(
+        sourceButtonsAttachment,
+        finalized.provenance,
+        assistantText,
+        retrievalPack?.evidence ?? [],
+      );
       const attachmentsPayload = mergeAttachments(
         generated.attachmentsPayload,
-        sourceButtonsAttachment,
+        filteredAttachment,
       );
 
       const outputSpanId = this.traceWriter.startSpan(
@@ -1163,7 +1336,7 @@ export class CentralizedChatRuntimeDelegate {
         attachments: attachmentsPayload,
         telemetry: generated.telemetry ?? null,
         metadata: {
-          sources,
+          sources: filteredSources,
           answerMode,
           answerClass,
           navType,
@@ -1186,9 +1359,19 @@ export class CentralizedChatRuntimeDelegate {
         },
       });
 
-      const truncation = buildTruncationFromTelemetry(
-        (generated.telemetry as Record<string, unknown>) ?? null,
-      );
+      const resolvedTruncation = resolveTruncationState({
+        telemetry: (generated.telemetry as Record<string, unknown>) ?? null,
+        finalText: assistantText,
+        enforcementRepairs: finalized.enforcement?.repairs || [],
+      });
+      const truncation = {
+        occurred: resolvedTruncation.contractOccurred,
+        reason: resolvedTruncation.contractReason,
+        resumeToken: null,
+        providerOccurred: resolvedTruncation.providerOccurred,
+        providerReason: resolvedTruncation.providerReason,
+        detectorVersion: resolvedTruncation.detectorVersion,
+      };
       const status =
         finalized.failureCode || !assistantTextRaw ? "partial" : "success";
       const failureCode =
@@ -1205,7 +1388,7 @@ export class CentralizedChatRuntimeDelegate {
         assistantTelemetry:
           (generated.telemetry as Record<string, unknown>) ?? undefined,
         provenance: finalized.provenance,
-        sources: [...sources],
+        sources: [...filteredSources],
         followups: finalized.followups,
         answerMode,
         answerClass,
@@ -1221,8 +1404,8 @@ export class CentralizedChatRuntimeDelegate {
         truncation,
         evidence: {
           required: (req.attachedDocumentIds || []).length > 0,
-          provided: sources.length > 0,
-          sourceIds: sources.map((s) => s.documentId),
+          provided: filteredSources.length > 0,
+          sourceIds: filteredSources.map((s) => s.documentId),
         },
       };
       await this.persistTraceArtifacts({
@@ -1247,6 +1430,7 @@ export class CentralizedChatRuntimeDelegate {
         enforcementBlocked: Boolean(finalized.failureCode),
         enforcementReasonCode: finalized.failureCode ?? null,
         provenance: finalized.provenance ?? null,
+        truncation,
       }).catch((error) => {
         appLogger.warn("[trace-writer] failed to persist chat trace", {
           traceId,
@@ -1343,8 +1527,11 @@ export class CentralizedChatRuntimeDelegate {
       },
     );
     let conversationId = "";
+    let lastDocumentId: string | null = null;
     let userMessage: ChatMessageDTO | null = null;
-    let retrievalPack: EvidencePack | null = null;
+    let retrievalPack:
+      | (EvidencePack & { resolvedDocId?: string | null })
+      | null = null;
     let evidenceGateDecision: EvidenceCheckResult | null = null;
     let answerMode: AnswerMode =
       (req.attachedDocumentIds || []).length > 0
@@ -1353,10 +1540,12 @@ export class CentralizedChatRuntimeDelegate {
     let retrievalMs: number | null = null;
     let llmMs: number | null = null;
     try {
-      conversationId = await this.ensureConversation(
+      const conv = await this.ensureConversation(
         req.userId,
         req.conversationId,
       );
+      conversationId = conv.id;
+      lastDocumentId = conv.lastDocumentId;
 
       userMessage = await this.createMessage({
         conversationId,
@@ -1395,8 +1584,20 @@ export class CentralizedChatRuntimeDelegate {
         stream: true,
       });
       const retrievalStartedAt = Date.now();
-      retrievalPack = await this.retrieveEvidence(req);
+      retrievalPack = await this.retrieveEvidence(req, lastDocumentId);
       retrievalMs = Date.now() - retrievalStartedAt;
+
+      // Persist resolved doc for conversation-history follow-up scoping
+      const resolvedDocId = retrievalPack?.resolvedDocId ?? null;
+      if (resolvedDocId && resolvedDocId !== lastDocumentId) {
+        prisma.conversation
+          .update({
+            where: { id: conversationId },
+            data: { lastDocumentId: resolvedDocId },
+          })
+          .catch(() => {}); // fire-and-forget, non-blocking
+      }
+
       this.traceWriter.endSpan(traceId, retrievalSpanId, {
         status: "ok",
         metadata: {
@@ -1500,6 +1701,9 @@ export class CentralizedChatRuntimeDelegate {
             occurred: false,
             reason: null,
             resumeToken: null,
+            providerOccurred: false,
+            providerReason: null,
+            detectorVersion: SEMANTIC_TRUNCATION_DETECTOR_VERSION,
           },
           evidence: {
             required: (req.attachedDocumentIds || []).length > 0,
@@ -1525,6 +1729,7 @@ export class CentralizedChatRuntimeDelegate {
           retrievalMs,
           llmMs,
           stream: true,
+          truncation: result.truncation,
         }).catch((error) => {
           appLogger.warn(
             "[trace-writer] failed to persist stream bypass trace",
@@ -1638,9 +1843,21 @@ export class CentralizedChatRuntimeDelegate {
       });
 
       const assistantText = finalized.assistantText;
+      const filteredSources = filterSourcesByProvenance(
+        sources,
+        finalized.provenance,
+        assistantText,
+        retrievalPack?.evidence ?? [],
+      );
+      const filteredAttachment = filterAttachmentByProvenance(
+        sourceButtonsAttachment,
+        finalized.provenance,
+        assistantText,
+        retrievalPack?.evidence ?? [],
+      );
       const attachmentsPayload = mergeAttachments(
         streamed.attachmentsPayload,
-        sourceButtonsAttachment,
+        filteredAttachment,
       );
 
       const outputSpanId = this.traceWriter.startSpan(
@@ -1658,7 +1875,7 @@ export class CentralizedChatRuntimeDelegate {
         attachments: attachmentsPayload,
         telemetry: streamed.telemetry ?? null,
         metadata: {
-          sources,
+          sources: filteredSources,
           answerMode,
           answerClass,
           navType,
@@ -1681,9 +1898,19 @@ export class CentralizedChatRuntimeDelegate {
         },
       });
 
-      const truncation = buildTruncationFromTelemetry(
-        (streamed.telemetry as Record<string, unknown>) ?? null,
-      );
+      const resolvedTruncation = resolveTruncationState({
+        telemetry: (streamed.telemetry as Record<string, unknown>) ?? null,
+        finalText: assistantText,
+        enforcementRepairs: finalized.enforcement?.repairs || [],
+      });
+      const truncation = {
+        occurred: resolvedTruncation.contractOccurred,
+        reason: resolvedTruncation.contractReason,
+        resumeToken: null,
+        providerOccurred: resolvedTruncation.providerOccurred,
+        providerReason: resolvedTruncation.providerReason,
+        detectorVersion: resolvedTruncation.detectorVersion,
+      };
       const status =
         finalized.failureCode || !assistantTextRaw ? "partial" : "success";
       const failureCode =
@@ -1700,7 +1927,7 @@ export class CentralizedChatRuntimeDelegate {
         assistantTelemetry:
           (streamed.telemetry as Record<string, unknown>) ?? undefined,
         provenance: finalized.provenance,
-        sources: [...sources],
+        sources: [...filteredSources],
         followups: finalized.followups,
         answerMode,
         answerClass,
@@ -1716,8 +1943,8 @@ export class CentralizedChatRuntimeDelegate {
         truncation,
         evidence: {
           required: (req.attachedDocumentIds || []).length > 0,
-          provided: sources.length > 0,
-          sourceIds: sources.map((s) => s.documentId),
+          provided: filteredSources.length > 0,
+          sourceIds: filteredSources.map((s) => s.documentId),
         },
       };
       await this.persistTraceArtifacts({
@@ -1742,6 +1969,7 @@ export class CentralizedChatRuntimeDelegate {
         enforcementBlocked: Boolean(finalized.failureCode),
         enforcementReasonCode: finalized.failureCode ?? null,
         provenance: finalized.provenance ?? null,
+        truncation,
       }).catch((error) => {
         appLogger.warn("[trace-writer] failed to persist stream trace", {
           traceId,
@@ -2200,52 +2428,70 @@ export class CentralizedChatRuntimeDelegate {
     const hasMultipleDocs =
       new Set(retrievalPack.evidence.map((e) => e.docId)).size > 1;
 
+    // Extract key topic from query for contextual follow-ups
+    const topicKeywords = this.extractQueryKeywords(req.message).slice(0, 3);
+    const topic = topicKeywords.join(" ");
+
     // Always suggest a deeper-dive question
     if (lang === "pt") {
       followups.push({
-        label: "Mais detalhes",
-        query: "Pode detalhar mais sobre isso?",
+        label: "Aprofundar",
+        query: topic
+          ? `Pode detalhar mais sobre ${topic}?`
+          : "Pode detalhar mais sobre isso?",
       });
       if (hasMultipleDocs) {
         followups.push({
           label: "Comparar documentos",
-          query: "Quais são as diferenças entre os documentos sobre este tema?",
+          query: topic
+            ? `Quais são as diferenças entre os documentos sobre ${topic}?`
+            : "Quais são as diferenças entre os documentos sobre este tema?",
         });
       }
       if (evidenceCount >= 1) {
         followups.push({
           label: "Resumo",
-          query: "Faça um resumo conciso dos pontos principais.",
+          query: topic
+            ? `Faça um resumo conciso sobre ${topic}.`
+            : "Faça um resumo conciso dos pontos principais.",
         });
       }
     } else if (lang === "es") {
       followups.push({
-        label: "Más detalles",
-        query: "¿Puede dar más detalles sobre esto?",
+        label: "Profundizar",
+        query: topic
+          ? `¿Puede dar más detalles sobre ${topic}?`
+          : "¿Puede dar más detalles sobre esto?",
       });
       if (hasMultipleDocs) {
         followups.push({
           label: "Comparar documentos",
-          query:
-            "¿Cuáles son las diferencias entre los documentos sobre este tema?",
+          query: topic
+            ? `¿Cuáles son las diferencias entre los documentos sobre ${topic}?`
+            : "¿Cuáles son las diferencias entre los documentos sobre este tema?",
         });
       }
     } else {
       followups.push({
         label: "More details",
-        query: "Can you elaborate on this?",
+        query: topic
+          ? `Can you elaborate on ${topic}?`
+          : "Can you elaborate on this?",
       });
       if (hasMultipleDocs) {
         followups.push({
           label: "Compare documents",
-          query:
-            "What are the differences between the documents on this topic?",
+          query: topic
+            ? `What are the differences between the documents on ${topic}?`
+            : "What are the differences between the documents on this topic?",
         });
       }
       if (evidenceCount >= 1) {
         followups.push({
           label: "Summary",
-          query: "Give me a concise summary of the key points.",
+          query: topic
+            ? `Give me a concise summary about ${topic}.`
+            : "Give me a concise summary of the key points.",
         });
       }
     }
@@ -2335,11 +2581,21 @@ export class CentralizedChatRuntimeDelegate {
       answerClass: params.answerClass,
       allowedDocumentIds: params.req.attachedDocumentIds || [],
     });
-    provenance = {
-      ...provenance,
-      validated: provenanceValidation.ok,
-      failureCode: provenanceValidation.failureCode,
-    };
+    {
+      const hasAttachedDocs =
+        Array.isArray(params.req.attachedDocumentIds) &&
+        params.req.attachedDocumentIds.length > 0;
+      const hasEvidence = (params.retrievalPack?.evidence?.length ?? 0) > 0;
+      // Soft-pass provenance when user explicitly attached docs and evidence
+      // exists. Lexical-overlap metric is unreliable with keyword retrieval.
+      const softPass =
+        !provenanceValidation.ok && hasAttachedDocs && hasEvidence;
+      provenance = {
+        ...provenance,
+        validated: provenanceValidation.ok || softPass,
+        failureCode: softPass ? null : provenanceValidation.failureCode,
+      };
+    }
 
     // 2. Run quality gates (format checks, brevity, markdown sanity)
     try {
@@ -2440,29 +2696,60 @@ export class CentralizedChatRuntimeDelegate {
     }
 
     if (!failureCode) {
+      const revalidatedProvenance = buildChatProvenance({
+        answerText: text,
+        answerMode: params.answerMode,
+        answerClass: params.answerClass,
+        retrievalPack: params.retrievalPack,
+      });
       const revalidated = validateChatProvenance({
-        provenance: buildChatProvenance({
-          answerText: text,
-          answerMode: params.answerMode,
-          answerClass: params.answerClass,
-          retrievalPack: params.retrievalPack,
-        }),
+        provenance: revalidatedProvenance,
         answerMode: params.answerMode,
         answerClass: params.answerClass,
         allowedDocumentIds: params.req.attachedDocumentIds || [],
       });
-      provenance = {
-        ...provenance,
-        validated: revalidated.ok,
-        failureCode: revalidated.failureCode,
-      };
-      if (!revalidated.ok) {
-        failureCode = revalidated.failureCode;
-        text = buildEmptyAssistantText({
-          language: params.req.preferredLanguage,
-          reasonCode: revalidated.failureCode,
-          seed: `${params.req.userId}:provenance:${revalidated.failureCode}`,
-        });
+      const hasAttachedDocs =
+        Array.isArray(params.req.attachedDocumentIds) &&
+        params.req.attachedDocumentIds.length > 0;
+      const hasEvidence = (params.retrievalPack?.evidence?.length ?? 0) > 0;
+      if (!revalidated.ok && hasAttachedDocs && hasEvidence) {
+        // Soft-pass: provenance lexical-overlap metric is unreliable with
+        // keyword retrieval. Preserve the generated answer and mark validated.
+        provenance = {
+          ...provenance,
+          validated: true,
+          failureCode: null,
+          sourceDocumentIds:
+            revalidatedProvenance.sourceDocumentIds.length > 0
+              ? revalidatedProvenance.sourceDocumentIds
+              : provenance.sourceDocumentIds,
+          snippetRefs:
+            revalidatedProvenance.snippetRefs.length > 0
+              ? revalidatedProvenance.snippetRefs
+              : provenance.snippetRefs,
+        };
+      } else {
+        provenance = {
+          ...provenance,
+          validated: revalidated.ok,
+          failureCode: revalidated.failureCode,
+          sourceDocumentIds:
+            revalidatedProvenance.sourceDocumentIds.length > 0
+              ? revalidatedProvenance.sourceDocumentIds
+              : provenance.sourceDocumentIds,
+          snippetRefs:
+            revalidatedProvenance.snippetRefs.length > 0
+              ? revalidatedProvenance.snippetRefs
+              : provenance.snippetRefs,
+        };
+        if (!revalidated.ok) {
+          failureCode = revalidated.failureCode;
+          text = buildEmptyAssistantText({
+            language: params.req.preferredLanguage,
+            reasonCode: revalidated.failureCode,
+            seed: `${params.req.userId}:provenance:${revalidated.failureCode}`,
+          });
+        }
       }
     }
 
@@ -2485,13 +2772,17 @@ export class CentralizedChatRuntimeDelegate {
   private async ensureConversation(
     userId: string,
     conversationId?: string,
-  ): Promise<string> {
+  ): Promise<{ id: string; lastDocumentId: string | null }> {
     if (conversationId) {
       const existing = await prisma.conversation.findFirst({
         where: { id: conversationId, userId, isDeleted: false },
-        select: { id: true },
+        select: { id: true, lastDocumentId: true },
       });
-      if (existing) return existing.id;
+      if (existing)
+        return {
+          id: existing.id,
+          lastDocumentId: existing.lastDocumentId ?? null,
+        };
       throw new ConversationNotFoundError(
         "Conversation not found for this account.",
       );
@@ -2501,7 +2792,7 @@ export class CentralizedChatRuntimeDelegate {
       userId,
       title: "New Chat",
     });
-    return created.id;
+    return { id: created.id, lastDocumentId: null };
   }
 
   private async buildRuntimePolicyFailureResult(input: {
@@ -2513,7 +2804,7 @@ export class CentralizedChatRuntimeDelegate {
     const req = input.req;
     const conversationId =
       input.conversationId ||
-      (await this.ensureConversation(req.userId, req.conversationId));
+      (await this.ensureConversation(req.userId, req.conversationId)).id;
     const userMessage =
       input.userMessage ||
       (await this.createMessage({
@@ -2571,6 +2862,9 @@ export class CentralizedChatRuntimeDelegate {
         occurred: false,
         reason: null,
         resumeToken: null,
+        providerOccurred: false,
+        providerReason: null,
+        detectorVersion: SEMANTIC_TRUNCATION_DETECTOR_VERSION,
       },
       evidence: {
         required: (req.attachedDocumentIds || []).length > 0,
@@ -3131,9 +3425,62 @@ export class CentralizedChatRuntimeDelegate {
     }
   }
 
+  /**
+   * Fuzzy-match the query text against attached document names to resolve
+   * an explicit document reference even when no file extension is present.
+   */
+  private async resolveDocNameFromQuery(
+    query: string,
+    attachedDocIds: string[],
+    userId: string,
+  ): Promise<{
+    resolvedDocId: string | null;
+    explicitDocRef: boolean;
+    matchedDocIds: string[];
+    confidence: number;
+  }> {
+    if (attachedDocIds.length === 0)
+      return {
+        resolvedDocId: null,
+        explicitDocRef: false,
+        matchedDocIds: [],
+        confidence: 0,
+      };
+
+    const dependencies = this.retrievalFactory.createForUser(userId);
+    const docs: DocumentReferenceDoc[] = [];
+    for (const docId of attachedDocIds) {
+      const meta = await dependencies.docStore.getDocMeta(docId);
+      if (meta) {
+        docs.push({
+          docId: meta.docId,
+          title: meta.title,
+          filename: meta.filename,
+        });
+      }
+    }
+
+    if (docs.length === 0)
+      return {
+        resolvedDocId: null,
+        explicitDocRef: false,
+        matchedDocIds: [],
+        confidence: 0,
+      };
+
+    const resolution = resolveDocumentReference(query, docs);
+    return {
+      resolvedDocId: resolution.resolvedDocId,
+      explicitDocRef: resolution.explicitDocRef,
+      matchedDocIds: resolution.matchedDocIds,
+      confidence: resolution.confidence,
+    };
+  }
+
   private async retrieveEvidence(
     req: ChatRequest,
-  ): Promise<EvidencePack | null> {
+    lastDocumentId?: string | null,
+  ): Promise<(EvidencePack & { resolvedDocId: string | null }) | null> {
     const cfg = this.getMemoryRuntimeTuning();
     const attachedBase = Array.isArray(req.attachedDocumentIds)
       ? req.attachedDocumentIds.filter(
@@ -3211,6 +3558,64 @@ export class CentralizedChatRuntimeDelegate {
     const slotResult = resolveSlot(req.message, detectedLanguage);
 
     const docScopeSignals = buildAttachmentDocScopeSignals(attached);
+
+    // Resolve document name reference from query (fuzzy match against doc names)
+    const docNameMatch = await this.resolveDocNameFromQuery(
+      req.message,
+      attached,
+      req.userId,
+    );
+    if (docNameMatch.matchedDocIds.length === 1 && docNameMatch.resolvedDocId) {
+      const resolvedDocId = docNameMatch.resolvedDocId;
+      docScopeSignals.docScopeLock = createDocScopeLock({
+        mode: "single_doc",
+        allowedDocumentIds: [resolvedDocId],
+        activeDocumentId: resolvedDocId,
+        source: "user_explicit",
+      });
+      docScopeSignals.explicitDocLock = true;
+      docScopeSignals.activeDocId = resolvedDocId;
+      docScopeSignals.explicitDocRef = true;
+      docScopeSignals.resolvedDocId = resolvedDocId;
+      docScopeSignals.hardScopeActive = true;
+      docScopeSignals.singleDocIntent = true;
+    } else if (docNameMatch.matchedDocIds.length > 1) {
+      docScopeSignals.docScopeLock = createDocScopeLock({
+        mode: "docset",
+        allowedDocumentIds: docNameMatch.matchedDocIds,
+        source: "user_explicit",
+      });
+      docScopeSignals.explicitDocLock = true;
+      docScopeSignals.activeDocId = null;
+      docScopeSignals.explicitDocRef = false;
+      docScopeSignals.resolvedDocId = null;
+      docScopeSignals.hardScopeActive = true;
+      docScopeSignals.singleDocIntent = false;
+    }
+
+    // Conversation-history fallback: if the resolver didn't match any doc,
+    // but the previous turn resolved a doc that's still in the attachment set,
+    // carry it forward as the active doc scope.
+    if (
+      !docScopeSignals.resolvedDocId &&
+      !docScopeSignals.singleDocIntent &&
+      lastDocumentId &&
+      attached.includes(lastDocumentId)
+    ) {
+      docScopeSignals.docScopeLock = createDocScopeLock({
+        mode: "single_doc",
+        allowedDocumentIds: [lastDocumentId],
+        activeDocumentId: lastDocumentId,
+        source: "conversation_history",
+      });
+      docScopeSignals.explicitDocLock = true;
+      docScopeSignals.activeDocId = lastDocumentId;
+      docScopeSignals.explicitDocRef = true;
+      docScopeSignals.resolvedDocId = lastDocumentId;
+      docScopeSignals.hardScopeActive = true;
+      docScopeSignals.singleDocIntent = true;
+    }
+
     const retrievalReq: RetrievalRequest = {
       query: req.message,
       env: normalizeEnv(),
@@ -3269,7 +3674,9 @@ export class CentralizedChatRuntimeDelegate {
     }
     pack.evidence = pack.evidence.slice(0, Math.floor(maxEvidence));
 
-    return pack;
+    return Object.assign(pack, {
+      resolvedDocId: docScopeSignals.resolvedDocId ?? null,
+    });
   }
 
   private buildEngineMessages(
@@ -3409,6 +3816,12 @@ export class CentralizedChatRuntimeDelegate {
       };
     }
     if (decision.suggestedAction === "apologize") {
+      // RC8 fix: When documents ARE attached and retrieval returned evidence,
+      // do not block entirely — let the LLM hedge instead of refusing.
+      // The user already provided documents; a full refusal is a false negative.
+      if (hasAttachedDocs && hasEvidence) {
+        return null;
+      }
       const text =
         lang === "pt"
           ? "Não encontrei evidência suficiente nos documentos para responder com segurança."
@@ -3485,9 +3898,9 @@ export class CentralizedChatRuntimeDelegate {
       semanticSignals.userAskedForTable || semanticSignals.tableExpected;
     const askForQuote = semanticSignals.userAskedForQuote;
     if (evidenceCount > 0 && askForQuote) return "doc_grounded_quote";
+    if (evidenceCount > 0 && askForTable) return "doc_grounded_table";
     if (evidenceCount > 1) return "doc_grounded_multi";
     if (evidenceCount === 1) return "doc_grounded_single";
-    if (evidenceCount > 0 && askForTable) return "doc_grounded_multi";
     if (docsAttached) return "fallback";
     return "general_answer";
   }
@@ -3518,7 +3931,9 @@ export class CentralizedChatRuntimeDelegate {
     const sourceButtonsService = getSourceButtonsService();
     const rawSources = retrievalPack.evidence.map((item) => ({
       documentId: item.docId,
-      filename: String(item.filename || item.title || "Document"),
+      filename: String(
+        item.filename || item.title || fallbackSourceLabel(item.docId),
+      ),
       pageNumber: item.location.page ?? undefined,
       sheetName: item.location.sheet ?? undefined,
       slideNumber: item.location.slide ?? undefined,

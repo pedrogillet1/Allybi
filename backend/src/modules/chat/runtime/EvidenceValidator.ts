@@ -22,6 +22,11 @@ export class EvidenceValidator {
           allowed.has(String(ref.documentId || "").trim()),
         )
       : [];
+    // If provenance was already soft-validated upstream (e.g. attached-document
+    // mode with keyword retrieval), preserve the validated state.
+    const upstreamSoftPass =
+      currentProvenance?.validated === true &&
+      currentProvenance.snippetRefs.length === 0;
     const nextProvenance = currentProvenance
       ? {
           ...currentProvenance,
@@ -40,9 +45,12 @@ export class EvidenceValidator {
                     1000,
                 ) / 1000
               : 0,
-          validated: scopedSnippetRefs.length > 0,
-          failureCode:
-            scopedSnippetRefs.length > 0 ? null : "out_of_scope_provenance",
+          validated: upstreamSoftPass || scopedSnippetRefs.length > 0,
+          failureCode: upstreamSoftPass
+            ? null
+            : scopedSnippetRefs.length > 0
+              ? null
+              : "out_of_scope_provenance",
         }
       : undefined;
 
@@ -65,6 +73,7 @@ export class EvidenceValidator {
 
     const provenanceMissing =
       Boolean(nextProvenance?.required) &&
+      !upstreamSoftPass &&
       (nextProvenance?.snippetRefs?.length ?? 0) === 0;
 
     if (evidenceRequired && (scopedSources.length === 0 || provenanceMissing)) {

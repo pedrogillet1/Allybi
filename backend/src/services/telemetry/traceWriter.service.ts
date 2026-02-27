@@ -57,6 +57,7 @@ export interface TraceWriterConfig {
   enabled?: boolean;
   successSamplePercent?: number;
   maxBufferedTraces?: number;
+  strictWriteFailures?: boolean;
 }
 
 export interface QueryTelemetryWriteInput {
@@ -81,6 +82,10 @@ export interface QueryTelemetryWriteInput {
   fallbackScenario?: string | null;
   answerLength?: number | null;
   wasTruncated?: boolean;
+  wasProviderTruncated?: boolean;
+  truncationDetectorVersion?: string | null;
+  truncationReason?: string | null;
+  providerTruncationReason?: string | null;
   failureCode?: string | null;
   hasErrors?: boolean;
   warnings?: string[];
@@ -159,6 +164,12 @@ export interface TurnDebugPacket {
   output: {
     sourceCount: number;
     wasTruncated: boolean;
+    wasProviderTruncated?: boolean;
+    wasSemanticallyTruncated?: boolean;
+    truncationReason?: string | null;
+    providerTruncationReason?: string | null;
+    semanticTruncationReason?: string | null;
+    detectorVersion?: string | null;
     status: string;
     failureCode: string | null;
   };
@@ -211,6 +222,7 @@ export class TraceWriterService {
   private readonly enabled: boolean;
   private readonly successSamplePercent: number;
   private readonly maxBufferedTraces: number;
+  private readonly strictWriteFailures: boolean;
 
   constructor(
     private readonly prisma: PrismaClient,
@@ -225,6 +237,11 @@ export class TraceWriterService {
       100,
       toIntOrNull(config.maxBufferedTraces) ?? 5000,
     );
+    this.strictWriteFailures =
+      config.strictWriteFailures ??
+      String(
+        process.env.OBS_TRACE_STRICT_WRITE_FAILURES || "",
+      ).toLowerCase() === "true";
   }
 
   writeTurnDebugPacket(packet: TurnDebugPacket): void {
@@ -477,6 +494,13 @@ export class TraceWriterService {
       fallbackScenario: cleanShort(input.fallbackScenario, 80),
       answerLength: toIntOrNull(input.answerLength) ?? 0,
       wasTruncated: Boolean(input.wasTruncated),
+      wasProviderTruncated: Boolean(input.wasProviderTruncated),
+      truncationDetectorVersion: cleanShort(
+        input.truncationDetectorVersion,
+        40,
+      ),
+      truncationReason: cleanShort(input.truncationReason, 120),
+      providerTruncationReason: cleanShort(input.providerTruncationReason, 120),
       failureCategory: cleanShort(input.failureCode, 80),
       hasErrors: Boolean(input.hasErrors),
       warnings: Array.isArray(input.warnings)
@@ -514,10 +538,11 @@ export class TraceWriterService {
         update: updateData,
       });
     } catch (error) {
-      logger.warn("[trace-writer] query telemetry upsert failed", {
-        traceId,
-        error: error instanceof Error ? error.message : String(error),
-      });
+      this.handleWriteFailure(
+        "query telemetry upsert failed",
+        { traceId },
+        error,
+      );
     }
   }
 
@@ -558,10 +583,11 @@ export class TraceWriterService {
     try {
       await (this.prisma as any).retrievalEvent.create({ data });
     } catch (error) {
-      logger.warn("[trace-writer] retrieval event write failed", {
-        traceId,
-        error: error instanceof Error ? error.message : String(error),
-      });
+      this.handleWriteFailure(
+        "retrieval event write failed",
+        { traceId },
+        error,
+      );
     }
   }
 
@@ -597,11 +623,29 @@ export class TraceWriterService {
         skipDuplicates: true,
       });
     } catch (error) {
-      logger.warn("[trace-writer] createMany failed", {
-        modelName,
-        rows: data.length,
-        error: error instanceof Error ? error.message : String(error),
-      });
+      this.handleWriteFailure(
+        "createMany failed",
+        { modelName, rows: data.length },
+        error,
+      );
+    }
+  }
+
+  private handleWriteFailure(
+    message: string,
+    context: Record<string, unknown>,
+    error: unknown,
+  ): void {
+    const reason = error instanceof Error ? error.message : String(error);
+    logger.warn(`[trace-writer] ${message}`, {
+      ...context,
+      error: reason,
+    });
+    if (this.strictWriteFailures) {
+      const strictError = new Error(`[trace-writer] ${message}: ${reason}`);
+      (strictError as Error & { code?: string }).code =
+        "TRACE_WRITER_STRICT_FAILURE";
+      throw strictError;
     }
   }
 }

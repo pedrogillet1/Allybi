@@ -9,6 +9,11 @@ export type EditorGuardResult = {
   message?: string;
 };
 
+/**
+ * @deprecated No longer used by ChatKernelService or TurnRouterService.
+ * Editor flows are now routed through the dedicated editing agent pipeline
+ * via /api/editor-session/assistant/stream. Kept for rollback safety.
+ */
 export class EditorModeGuard {
   constructor(
     private readonly routePolicy: Pick<

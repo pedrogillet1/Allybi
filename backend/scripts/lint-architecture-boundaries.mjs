@@ -5,6 +5,13 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 
+let useRipgrep = true;
+try {
+  execSync("rg --version", { stdio: "ignore" });
+} catch {
+  useRipgrep = false;
+}
+
 function existingTargets(targets) {
   return targets
     .map((target) => String(target || "").trim())
@@ -19,7 +26,10 @@ function buildRipgrepCommand(pattern, targets) {
   if (resolvedTargets.length === 0) {
     return null;
   }
-  return `rg -n "${pattern}" ${resolvedTargets.join(" ")}`;
+  if (useRipgrep) {
+    return `rg -n "${pattern}" ${resolvedTargets.join(" ")}`;
+  }
+  return `grep -rnE "${pattern}" ${resolvedTargets.join(" ")}`;
 }
 
 const checks = [

@@ -21,6 +21,11 @@ export type EditDomain = "docx" | "sheets" | "slides";
 
 export type EditIntentSource = "classified" | "explicit_operator";
 
+export type EditTrustLevel =
+  | "trusted_user"
+  | "normal_user"
+  | "untrusted_content";
+
 export type EditOutcomeType =
   | "applied"
   | "clarification_required"
@@ -35,6 +40,7 @@ export type EditSupportGateId =
   | "scope_resolution"
   | "operator_catalog"
   | "executor_branch"
+  | "trust_gate"
   | "apply_proof";
 
 export interface EditBlockedReason {
@@ -50,6 +56,7 @@ export interface EditExecutionContext {
   correlationId: string;
   clientMessageId: string;
   language?: LanguageCode;
+  trustLevel?: EditTrustLevel;
 }
 
 export interface EditConstraintSet {
@@ -226,13 +233,27 @@ export interface EditApplyRequest {
    * revision store may apply the richer representation to the underlying file.
    */
   proposedHtml?: string;
+  confirmationToken?: string;
+  trustLevel?: EditTrustLevel;
   userConfirmed: boolean;
+}
+
+export interface EditSafetyGateDecision {
+  decision: "allow" | "confirm" | "block";
+  trustLevel: EditTrustLevel;
+  riskScore: number;
+  destructive: boolean;
+  injectionDetected: boolean;
+  requiresConfirmationToken: boolean;
+  reasons: string[];
 }
 
 export interface EditApplyResult {
   ok: boolean;
   applied: boolean;
   outcomeType: EditOutcomeType;
+  executionPath?: "python_applied" | "python_bypassed" | "local_only";
+  safetyGate?: EditSafetyGateDecision;
   blockedReason?: EditBlockedReason;
   revisionId?: string;
   baseRevisionId?: string;
@@ -264,6 +285,10 @@ export interface EditApplyResult {
       createdChartsCount?: number;
       patchesApplied?: number;
     };
+    executionPath?: "python_applied" | "python_bypassed" | "local_only";
+    pythonTraceId?: string | null;
+    pythonOpProofsCount?: number;
+    pythonOpProofCoverage?: number;
     targets?: Array<{
       kind: "docx_paragraph" | "xlsx_range" | "target";
       id?: string;
@@ -340,6 +365,10 @@ export interface EditRevisionStore {
       affectedRanges?: string[];
       affectedParagraphIds?: string[];
       locateRange?: string | null;
+      executionPath?: "python_applied" | "python_bypassed" | "local_only";
+      pythonTraceId?: string | null;
+      pythonOpProofsCount?: number;
+      pythonOpProofCoverage?: number;
       changedSamples?: Array<{
         sheetName: string;
         cell: string;

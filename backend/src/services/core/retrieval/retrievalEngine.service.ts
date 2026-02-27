@@ -1109,12 +1109,20 @@ export class RetrievalEngineService {
       }
 
       // Soft/Hard: low relevance chunk exclusion
+      // When hard scope is active (user attached specific docs), use a much
+      // lower minRelevance threshold. The user explicitly chose these docs,
+      // so we should let more of their content through to the LLM rather
+      // than filtering aggressively on keyword-overlap relevance scores.
+      const isInScope = allowedDocSet && allowedDocSet.has(c.docId);
+      const effectiveMinRelevance = isInScope
+        ? Math.min(minRelevance, 0.05)
+        : minRelevance;
       const topScore = Math.max(
         c.scores.semantic ?? 0,
         c.scores.lexical ?? 0,
         c.scores.structural ?? 0,
       );
-      if (topScore < minRelevance) {
+      if (topScore < effectiveMinRelevance) {
         c.signals.lowRelevanceChunk = true;
         continue;
       }
@@ -1444,6 +1452,13 @@ export class RetrievalEngineService {
       );
     }
 
+    // When hard scope is active (user attached docs), effectively disable the
+    // min-score threshold for scoped documents. The user explicitly selected
+    // these docs — a strict keyword-overlap threshold blocks valid evidence,
+    // especially for Portuguese meta-questions whose tokens don't appear in
+    // document text. Any evidence from attached docs is better than none.
+    const scopedMinScore = ctx.scope.hardScopeActive ? 0 : minFinalScore;
+
     const evidence: EvidenceItem[] = [];
     const perDoc = new Map<string, number>();
 
@@ -1452,7 +1467,11 @@ export class RetrievalEngineService {
       const final = c.scores.final ?? 0;
       const isScoped = scopeDocSet && scopeDocSet.has(c.docId);
       const effectiveMin =
-        isExtraction && isScoped ? extractionMinScore : minFinalScore;
+        isExtraction && isScoped
+          ? extractionMinScore
+          : isScoped
+            ? scopedMinScore
+            : minFinalScore;
       if (final < effectiveMin) continue;
 
       const n = perDoc.get(c.docId) ?? 0;

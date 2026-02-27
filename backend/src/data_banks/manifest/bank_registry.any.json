@@ -744,8 +744,8 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "175a6247d5b77b0c0ed7e3f5e714cfea7645d76e91aeb212e9a78f860fa1e032",
-      "lastUpdated": "2026-02-07"
+      "checksumSha256": "245bf31ab98219f76dc7d7cce4f790a4ef00495995d8c7f8f104287c71f27b81",
+      "lastUpdated": "2026-02-27"
     },
     {
       "id": "conversation_messages",
@@ -1032,6 +1032,16 @@
       "checksumSha256": "01b8ca5e23f7a1841a1f6e3f1ff9c938c935c3d8d79e6736d4e84f0e4867ed4e"
     },
     {
+      "id": "editing_agent_policy",
+      "category": "policies",
+      "path": "policies/editing_agent_policy.any.json",
+      "filename": "editing_agent_policy.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-02-27",
+      "checksumSha256": "02bd4fb284fe3da5d861506970311d7c788ea65ea4ed54351f653d4c3a0a9eaa"
+    },
+    {
       "id": "editing_task_prompts",
       "category": "prompts",
       "path": "prompts/editing_task_prompts.any.json",
@@ -1128,7 +1138,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "30554c849b8b9b61f7bb789c990e0bf3d69bab6f888bf58c6f486f5f75d88903"
+      "checksumSha256": "7b8ae02108f4ead63d851071c7f288211aee899ce44352dc4c1ab63e9949f90e"
     },
     {
       "id": "excel_chart_types_en",
@@ -1795,7 +1805,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "6c621a4c74a1a8fed5b9cc5f61ad0b2078deba63dec0c0d213074a12f55f783c"
+      "checksumSha256": "7a00c69e395214b90899c45fd6ed1ba6ba1bd3a953f57fd2731f2c1089040936"
     },
     {
       "id": "memory_policy_tests",
@@ -1820,6 +1830,50 @@
       "lastUpdated": "2026-02-20"
     },
     {
+      "id": "memory_semantic_continuity",
+      "category": "tests",
+      "path": "tests/memory_semantic_continuity.any.json",
+      "filename": "memory_semantic_continuity.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "6dde0ac4894dfaf61f49e2241d39484f861b3031dfb60421420637e0c90eefcf",
+      "lastUpdated": "2026-02-26"
+    },
+    {
+      "id": "slot_extraction_cases",
+      "category": "tests",
+      "path": "tests/slot_extraction_cases.any.json",
+      "filename": "slot_extraction_cases.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "fcc28aeff25c9b3cf1609b06b7a33b357e9b8c09f41afa4c3a888c856def1017",
+      "lastUpdated": "2026-02-26"
+    },
+    {
       "id": "mode_chat",
       "category": "prompts",
       "path": "prompts/mode_chat.any.json",
@@ -1838,6 +1892,26 @@
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-19",
       "checksumSha256": "54f072ed1f1332820cf97bad759fec6c285d5df8ef03e291018630ddcad7eae1"
+    },
+    {
+      "id": "mode_editing_docx",
+      "category": "prompts",
+      "path": "prompts/mode_editing_docx.any.json",
+      "filename": "mode_editing_docx.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-02-27",
+      "checksumSha256": "baa1bd983efa61c170513269fad5d164861aa65eafb42cd81e5f01ae10953456"
+    },
+    {
+      "id": "mode_editing_sheets",
+      "category": "prompts",
+      "path": "prompts/mode_editing_sheets.any.json",
+      "filename": "mode_editing_sheets.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-02-27",
+      "checksumSha256": "b807421a5b2cae8194abcceac67b860a96b56fdf3de68f089907f6934773c261"
     },
     {
       "id": "month_normalization",
@@ -2006,7 +2080,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "73e0c109bca5e05b43ec120fe29109d37471c20009d42f4b692a0fbbd5ae8b2d",
+      "checksumSha256": "9efeafa0e13ead198e348ae140a56b320d5f4c71dd2d020b88e9d3a33035e0f6",
       "lastUpdated": "2026-02-20"
     },
     {
@@ -2036,8 +2110,8 @@
       "filename": "prompt_registry.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26",
-      "checksumSha256": "0f6c06586649d0e1ffc7f8da6f21d39988d3657bad929d6f8b1780c56c716ab3"
+      "lastUpdated": "2026-02-27",
+      "checksumSha256": "5d1c6f3b3a08e69ed2c7e05cd5ca99d7250eaa2b726de9f4b05fbe8512a5a504"
     },
     {
       "id": "quality_gates",
@@ -2057,7 +2131,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-19",
-      "checksumSha256": "be0c17f3970e50776c2e6b7bd60ad043ede0a551fb44f3fcf729665a104bb94c"
+      "checksumSha256": "7270c9044f348f0cd4afe4b9352e65dbcaa7f2530066c1d8048cfd1ac0852a7c"
     },
     {
       "id": "recency_boost_rules",
@@ -2143,7 +2217,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "571eb86eed6bbf3fbfbc1eb448c72d05632570b250813d59baf448b6c5657728"
+      "checksumSha256": "d00ebe53748bf873ad5ccf6bbf4661299573b78e824643533257805f7cc6e4df"
     },
     {
       "id": "routing_priority",
@@ -2164,7 +2238,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "73cc763de13d22ea795519e45610efdfd6429fee8d63347bda9d74bde8befc55",
+      "checksumSha256": "ad96022ff93d35597e36c7d0b3b772a4ea311be96edbb93ba18de2b57e55c233",
       "lastUpdated": "2026-02-20"
     },
     {
@@ -2278,7 +2352,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-19",
-      "checksumSha256": "0dcd2a8a990a3d5a8f7f78c1571fdbee608489c7e9e06ee7fe53fbb9f6ee8f1a"
+      "checksumSha256": "89c25521fbf4b4bc9a6ad92ed735e20b9d8580167d43d5f2a28adf8ed364029b"
     },
     {
       "id": "system_prompt",
@@ -2338,7 +2412,7 @@
       "version": "2.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "06b08336bd48ae7d5c953d4403771eac2e4b7abdef9adc3664e80e83cc4478ff"
+      "checksumSha256": "a5f8fc66509d2dd681ff1b0e788dd8da5f8d7b0e1d2ae8af32c1273589376320"
     },
     {
       "id": "ui_contracts",
@@ -2452,7 +2526,7 @@
         "local": false
       },
       "lastUpdated": "2026-02-20",
-      "checksumSha256": "8a60d5687fcccf52b052276d2cc8c9b10144f482324df5fd46b5d1edf5534ee3"
+      "checksumSha256": "221c0e41b5ab2a782ed63bd60e55007bd04eb2deff17dc781c0f32d83ce28feb"
     },
     {
       "id": "extraction_policy",

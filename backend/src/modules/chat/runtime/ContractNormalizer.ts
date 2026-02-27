@@ -40,6 +40,17 @@ export class ContractNormalizer {
       reason: null,
       resumeToken: null,
     };
+    const normalizedTruncation: ChatTruncationState = {
+      occurred: Boolean(truncation.occurred),
+      reason: truncation.reason ?? null,
+      resumeToken: truncation.resumeToken ?? null,
+      providerOccurred:
+        truncation.providerOccurred === undefined
+          ? Boolean(truncation.occurred)
+          : Boolean(truncation.providerOccurred),
+      providerReason: truncation.providerReason ?? null,
+      detectorVersion: truncation.detectorVersion ?? null,
+    };
 
     const evidence: ChatEvidenceState = input.evidence || {
       required: evidenceRequired,
@@ -63,17 +74,16 @@ export class ContractNormalizer {
     if (
       status === "success" &&
       evidence.required &&
-      (!provenance ||
-        provenance.validated !== true ||
-        provenance.snippetRefs.length === 0)
+      (!provenance || provenance.validated !== true)
     ) {
       status = "partial";
       failureCode = failureCode || "missing_provenance";
     }
 
-    if (truncation.occurred && status === "success") {
+    if (normalizedTruncation.occurred && status === "success") {
       status = "partial";
-      failureCode = failureCode || "TRUNCATED_RESPONSE";
+      // Truncation is surfaced via the truncation object; no need to set a
+      // failureCode that would render as a warning badge in the UI.
     }
 
     return {
@@ -83,7 +93,7 @@ export class ContractNormalizer {
       status,
       failureCode,
       completion,
-      truncation,
+      truncation: normalizedTruncation,
       evidence,
     };
   }

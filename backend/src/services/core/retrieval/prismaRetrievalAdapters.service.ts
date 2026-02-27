@@ -30,6 +30,7 @@ type ChunkWithDocument = {
     id: string;
     filename: string | null;
     displayTitle: string | null;
+    encryptedFilename?: string | null;
     mimeType: string;
     createdAt: Date;
     updatedAt: Date;
@@ -118,6 +119,31 @@ function toSnippet(text: string | null): string {
   return clean.length > 1200 ? `${clean.slice(0, 1199)}…` : clean;
 }
 
+function filenameFromStorageKey(
+  storageKey: string | null | undefined,
+): string | null {
+  const key = String(storageKey || "").trim();
+  if (!key) return null;
+  const tail = key.split("/").pop();
+  if (!tail) return null;
+  try {
+    return decodeURIComponent(tail);
+  } catch {
+    return tail;
+  }
+}
+
+function resolveDocLabel(doc: {
+  filename?: string | null;
+  displayTitle?: string | null;
+  encryptedFilename?: string | null;
+}): { title: string | null; filename: string | null } {
+  const fromStorage = filenameFromStorageKey(doc.encryptedFilename);
+  const filename = doc.filename || doc.displayTitle || fromStorage || null;
+  const title = doc.displayTitle || doc.filename || fromStorage || null;
+  return { title, filename };
+}
+
 class PrismaRetrievalUserAdapter
   implements DocStore, SemanticIndex, LexicalIndex, StructuralIndex
 {
@@ -133,6 +159,7 @@ class PrismaRetrievalUserAdapter
         id: true,
         filename: true,
         displayTitle: true,
+        encryptedFilename: true,
         mimeType: true,
         createdAt: true,
         updatedAt: true,
@@ -141,14 +168,17 @@ class PrismaRetrievalUserAdapter
       orderBy: { id: "asc" },
     });
 
-    return docs.map((doc) => ({
-      docId: doc.id,
-      title: doc.displayTitle || doc.filename || null,
-      filename: doc.filename || doc.displayTitle || null,
-      mimeType: doc.mimeType || null,
-      createdAt: doc.createdAt.toISOString(),
-      updatedAt: doc.updatedAt.toISOString(),
-    }));
+    return docs.map((doc) => {
+      const label = resolveDocLabel(doc);
+      return {
+        docId: doc.id,
+        title: label.title,
+        filename: label.filename,
+        mimeType: doc.mimeType || null,
+        createdAt: doc.createdAt.toISOString(),
+        updatedAt: doc.updatedAt.toISOString(),
+      };
+    });
   }
 
   async getDocMeta(docId: string): Promise<DocMeta | null> {
@@ -161,6 +191,7 @@ class PrismaRetrievalUserAdapter
         id: true,
         filename: true,
         displayTitle: true,
+        encryptedFilename: true,
         mimeType: true,
         createdAt: true,
         updatedAt: true,
@@ -168,10 +199,11 @@ class PrismaRetrievalUserAdapter
     });
 
     if (!doc) return null;
+    const label = resolveDocLabel(doc);
     return {
       docId: doc.id,
-      title: doc.displayTitle || doc.filename || null,
-      filename: doc.filename || doc.displayTitle || null,
+      title: label.title,
+      filename: label.filename,
       mimeType: doc.mimeType || null,
       createdAt: doc.createdAt.toISOString(),
       updatedAt: doc.updatedAt.toISOString(),
@@ -293,6 +325,7 @@ class PrismaRetrievalUserAdapter
             id: true,
             filename: true,
             displayTitle: true,
+            encryptedFilename: true,
             mimeType: true,
             createdAt: true,
             updatedAt: true,
@@ -319,10 +352,11 @@ class PrismaRetrievalUserAdapter
       const score = scoreChunkText(snippet, query, tokens, input.mode);
       if (score <= 0) continue;
 
+      const label = resolveDocLabel(row.document);
       scored.push({
         docId: row.documentId,
-        title: row.document.displayTitle || row.document.filename || null,
-        filename: row.document.filename || row.document.displayTitle || null,
+        title: label.title,
+        filename: label.filename,
         location: {
           page: row.page ?? null,
         } as ChunkLocation,
@@ -335,6 +369,88 @@ class PrismaRetrievalUserAdapter
         score,
         chunkId: row.id,
       });
+    }
+
+    // Scoped-document diversity fallback: when we have explicit docIds
+    // (attached documents), ensure EVERY document contributes at least a few
+    // chunks. Keyword search is biased toward docs whose text happens to
+    // contain query tokens — the other attached docs get zero representation.
+    // For multi-doc overview questions ("visão geral dos docs que anexei")
+    // the LLM needs context from ALL documents to give a useful answer.
+    if (input.docIds && input.docIds.length > 0) {
+      const representedDocs = new Set(scored.map((s) => s.docId));
+      const missingDocs = input.docIds.filter((id) => !representedDocs.has(id));
+      // Also backfill docs with very few chunks (< 3) for better coverage
+      const thinDocs: string[] = [];
+      const docCounts = new Map<string, number>();
+      for (const s of scored) {
+        docCounts.set(s.docId, (docCounts.get(s.docId) ?? 0) + 1);
+      }
+      for (const id of input.docIds) {
+        if ((docCounts.get(id) ?? 0) < 3 && !missingDocs.includes(id)) {
+          thinDocs.push(id);
+        }
+      }
+      const docsToBackfill = [...missingDocs, ...thinDocs];
+
+      if (docsToBackfill.length > 0) {
+        const perDocLimit = Math.max(
+          Math.ceil(input.k / input.docIds.length),
+          4,
+        );
+        const fallbackWhere: Prisma.DocumentChunkWhereInput = {
+          text: { not: null },
+          documentId: { in: docsToBackfill },
+          document: {
+            userId: this.userId,
+            status: { in: [...READY_DOCUMENT_STATUSES] },
+          },
+        };
+        const fallbackRows = (await prisma.documentChunk.findMany({
+          where: fallbackWhere,
+          take: perDocLimit * docsToBackfill.length,
+          orderBy: [{ documentId: "asc" }, { chunkIndex: "asc" }],
+          include: {
+            document: {
+              select: {
+                id: true,
+                filename: true,
+                displayTitle: true,
+                encryptedFilename: true,
+                mimeType: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+            },
+          },
+        })) as unknown as ChunkWithDocument[];
+
+        const existingKeys = new Set(scored.map((s) => s.chunkId));
+        const backfillPerDoc = new Map<string, number>();
+        for (const row of fallbackRows) {
+          if (existingKeys.has(row.id)) continue;
+          const count = backfillPerDoc.get(row.documentId) ?? 0;
+          if (count >= perDocLimit) continue;
+          const snippet = toSnippet(row.text);
+          if (!snippet) continue;
+          backfillPerDoc.set(row.documentId, count + 1);
+          const label = resolveDocLabel(row.document);
+          scored.push({
+            docId: row.documentId,
+            title: label.title,
+            filename: label.filename,
+            location: { page: row.page ?? null } as ChunkLocation,
+            locationKey: toLocationKey(
+              row.documentId,
+              row.page ?? null,
+              row.chunkIndex,
+            ),
+            snippet,
+            score: 0.55,
+            chunkId: row.id,
+          });
+        }
+      }
     }
 
     scored.sort((a, b) => {

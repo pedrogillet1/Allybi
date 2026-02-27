@@ -27,6 +27,7 @@ export type AnswerMode =
   | "doc_grounded_single"
   | "doc_grounded_multi"
   | "doc_grounded_quote"
+  | "doc_grounded_table"
   | "nav_pills"
   | "fallback"
   | "general_answer"
@@ -53,6 +54,9 @@ export interface ChatTruncationState {
   occurred: boolean;
   reason?: string | null;
   resumeToken?: string | null;
+  providerOccurred?: boolean;
+  providerReason?: string | null;
+  detectorVersion?: string | null;
 }
 
 export interface ChatEvidenceState {
@@ -152,7 +156,6 @@ export type TurnContext = {
 };
 
 export type TurnRouteDecision =
-  | "EDITOR"
   | "CONNECTOR"
   | "KNOWLEDGE"
   | "GENERAL"

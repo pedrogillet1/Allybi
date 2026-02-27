@@ -5,6 +5,11 @@ import type {
 import type { ChatResult, TurnContext } from "../chat.types";
 import type { TurnExecutor } from "./types";
 
+/**
+ * @deprecated No longer used by ChatKernelService.
+ * Editor flows are now routed through the dedicated editing agent pipeline
+ * via /api/editor-session/assistant/stream. Kept for rollback safety.
+ */
 export class EditorTurnHandler {
   constructor(private readonly executor: TurnExecutor) {}
 

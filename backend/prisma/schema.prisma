@@ -869,6 +869,10 @@ model QueryTelemetry {
   incompleteSummary    Boolean  @default(false)
   compareSingleDoc     Boolean  @default(false)
   wasTruncated         Boolean  @default(false)
+  wasProviderTruncated Boolean  @default(false)
+  truncationDetectorVersion String?
+  truncationReason     String?
+  providerTruncationReason String?
   ttft                 Int?
   retrievalMs          Int?
   llmMs                Int?

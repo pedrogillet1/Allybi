@@ -68,6 +68,9 @@ export interface EditorSessionStartRequest {
 export interface EditorSessionStartResponse {
   sessionId: string;
   status: EditorSessionStatus;
+  domain: EditDomain;
+  agentId: string;
+  executionPath: string;
   baseRevisionId?: string;
   baseDocumentUpdatedAtIso?: string;
   baseDocumentFileHash?: string;
@@ -106,6 +109,9 @@ export interface EditorSessionApplyRequest {
 export interface EditorSessionApplyResponse {
   sessionId: string;
   status: EditorSessionStatus;
+  domain?: EditDomain;
+  agentId?: string;
+  executionPath?: string;
   applyPath?: string;
   applied?: EditApplyResult;
   receipt?: EditReceipt | null;

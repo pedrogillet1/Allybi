@@ -33,7 +33,9 @@ function normalizeLang(language: string): "en" | "pt" | "es" {
   const normalized = String(language || "en")
     .trim()
     .toLowerCase();
-  return normalized === "pt" || normalized === "es" ? normalized : "en";
+  if (normalized.startsWith("pt")) return "pt";
+  if (normalized.startsWith("es")) return "es";
+  return "en";
 }
 
 function getLocalizedCopy(
@@ -427,13 +429,18 @@ export class EvidenceGateService {
 
     // When no specific fact types were required, use topic overlap to determine strength.
     // This prevents the gate from always returning "strong" for generic evidence.
+    // IMPORTANT: When chunks exist (chunkCount > 0) we never return "none" because
+    // the retrieval pipeline already scoped to attached/locked documents. Returning
+    // "none" would block the LLM entirely (apologize path), which is wrong when
+    // evidence was found — even if query keywords don't overlap with chunk text
+    // (common for Portuguese meta-questions like "me dá uma visão geral").
     if (required.length === 0) {
       const hasRichContent = found.includes("rich_content");
       if (topicOverlap >= 0.6 && hasRichContent) return "strong";
       if (topicOverlap >= 0.4 && hasRichContent) return "moderate";
       if (topicOverlap >= 0.2) return "weak";
-      // Very low topic overlap — evidence doesn't match the question at all
-      return hasRichContent ? "weak" : "none";
+      // Low topic overlap but chunks exist — hedge instead of blocking
+      return "weak";
     }
 
     const matchedRequired = required.filter((r) => {

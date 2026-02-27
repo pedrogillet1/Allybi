@@ -8,10 +8,35 @@ import {
 } from "../../../middleware/rateLimit.middleware";
 import { createEditingController } from "../../../controllers/editing.controller";
 import { getEditingPolicySnapshot } from "../../../services/editing/editingPolicy.service";
+import EditingCapabilityMatrixService from "../../../services/editing/capabilities/capabilityMatrix.service";
 
 const router = Router();
 const controller = createEditingController();
 const authorizeEditing = authorizeByMethod("editing");
+const capabilityMatrixService = new EditingCapabilityMatrixService();
+
+router.get(
+  "/capabilities",
+  authMiddleware,
+  authorizeEditing,
+  rateLimitMiddleware,
+  (req, res) => {
+    const domainRaw = String(req.query.domain || "")
+      .trim()
+      .toLowerCase();
+    const domain =
+      domainRaw === "docx"
+        ? "docx"
+        : domainRaw === "sheets"
+          ? "sheets"
+          : undefined;
+    const matrix = capabilityMatrixService.build(domain);
+    res.json({
+      ok: true,
+      data: matrix,
+    });
+  },
+);
 
 router.get(
   "/policy",

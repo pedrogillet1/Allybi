@@ -20,6 +20,7 @@ import integrationsRoutes from "./integrations.routes";
 import editorSessionRoutes from "./editor-session.routes";
 import editingRoutes from "./editing.routes";
 import telemetryRoutes from "./telemetry.routes";
+import searchRoutes from "./search.routes";
 import adminRoutes from "./admin.routes";
 
 export type HttpRouteMount = {
@@ -53,6 +54,7 @@ export const apiRouteMounts: HttpRouteMount[] = [
   { basePath: "/api/editor-session", router: editorSessionRoutes },
   { basePath: "/api/editing", router: editingRoutes },
   { basePath: "/api/telemetry", router: telemetryRoutes },
+  { basePath: "/api/search", router: searchRoutes },
   { basePath: "/api/admin", router: adminRoutes },
   { basePath: "/api/dashboard", router: adminRoutes },
 ];

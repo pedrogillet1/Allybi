@@ -280,13 +280,18 @@ export const addPhoneToPendingUser = async (
   );
 
   if (process.env.NODE_ENV !== "production") {
-    const maskedNum = formattedPhone.slice(0, -4).replace(/\d/g, "*") + formattedPhone.slice(-4);
+    const maskedNum =
+      formattedPhone.slice(0, -4).replace(/\d/g, "*") +
+      formattedPhone.slice(-4);
     console.log(`SMS Verification Code: ${phoneCode} for ${maskedNum}`);
   }
 
   try {
     await smsService.sendVerificationSMS(formattedPhone, phoneCode);
-    console.log(`SMS sent successfully to ${formattedPhone}`);
+    const maskedSms =
+      formattedPhone.slice(0, -4).replace(/\d/g, "*") +
+      formattedPhone.slice(-4);
+    console.log(`SMS sent successfully to ${maskedSms}`);
   } catch (error: any) {
     console.error(
       "Failed to send SMS (code still valid for testing):",
@@ -490,11 +495,10 @@ export const verifyPhoneCode = async (userId: string, code: string) => {
 
   if (process.env.NODE_ENV !== "production") {
     const maskedPh = result.phoneNumber
-      ? result.phoneNumber.slice(0, -4).replace(/\d/g, "*") + result.phoneNumber.slice(-4)
+      ? result.phoneNumber.slice(0, -4).replace(/\d/g, "*") +
+        result.phoneNumber.slice(-4)
       : "unknown";
-    console.log(
-      `Phone verified successfully for user ${userId}: ${maskedPh}`,
-    );
+    console.log(`Phone verified successfully for user ${userId}: ${maskedPh}`);
   }
 
   return {
@@ -608,7 +612,9 @@ export const requestPasswordReset = async ({
     try {
       const smsService = await import("./sms.service");
       await smsService.sendPasswordResetSMS(user.phoneNumber, code);
-      const maskedResetPhone = user.phoneNumber!.slice(0, -4).replace(/\d/g, "*") + user.phoneNumber!.slice(-4);
+      const maskedResetPhone =
+        user.phoneNumber!.slice(0, -4).replace(/\d/g, "*") +
+        user.phoneNumber!.slice(-4);
       console.log(`Password reset code sent to ${maskedResetPhone}`);
     } catch (error) {
       console.error("Failed to send password reset SMS:", error);

@@ -1014,66 +1014,6 @@ export const queryWithRAG = async (conversationId, query, researchMode = false) 
   }
 };
 
-/**
- * Answer a follow-up question using existing RAG context
- * @param {string} conversationId - Conversation ID
- * @param {string} query - Follow-up question
- * @param {string} previousContextId - Previous context ID
- * @returns {Promise<Object>} RAG response
- */
-export const answerFollowUp = async (conversationId, query, previousContextId) => {
-  const token = getCompatAccessToken();
-  try {
-    const response = await axios.post(
-      `${API_URL}/api/rag/follow-up`,
-      {
-        conversationId,
-        query,
-        previousContextId,
-      },
-      {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    // ✅ FIX #10: Better Error Messages
-    console.error('❌ RAG Follow-up error:', error);
-
-    // Extract error details from response
-    const errorData = error.response?.data || {};
-    const enhancedError = new Error(errorData.error || 'Failed to answer follow-up');
-    enhancedError.code = errorData.code || 'UNKNOWN_ERROR';
-    enhancedError.suggestion = errorData.suggestion || 'Please try again.';
-    enhancedError.retryable = errorData.retryable !== false;
-
-    throw enhancedError;
-  }
-};
-
-/**
- * Get RAG context for a specific response
- * @param {string} contextId - Context ID
- * @returns {Promise<Object>} RAG context
- */
-export const getRAGContext = async (contextId) => {
-  const token = getCompatAccessToken();
-  const response = await axios.get(
-    `${API_URL}/api/rag/context/${contextId}`,
-    {
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      withCredentials: true,
-    }
-  );
-  return response.data;
-};
-
 export default {
   initializeSocket,
   getSocket,
@@ -1110,6 +1050,4 @@ export default {
   onConversationUpdated,
   removeTitleListeners,
   queryWithRAG,
-  answerFollowUp,
-  getRAGContext,
 };

@@ -149,6 +149,13 @@ async function startServer() {
       });
       console.log("[Server] Chat service wired with LLM engine");
     } catch (llmErr: any) {
+      if (process.env.NODE_ENV === "production") {
+        console.error(
+          "[Server] FATAL: LLM initialization failed in production:",
+          llmErr.message,
+        );
+        process.exit(1);
+      }
       console.warn(
         "[Server] LLM not available, chat will use fallback:",
         llmErr.message,
@@ -304,6 +311,30 @@ async function startServer() {
       console.log(`[Server] Running on port ${PORT}`);
       console.log(`[Server] Environment: ${config.NODE_ENV}`);
     });
+
+    // Graceful shutdown handler — release port cleanly on SIGTERM/SIGINT
+    const gracefulShutdown = (signal: string) => {
+      console.log(`[Server] ${signal} received — shutting down gracefully...`);
+      httpServer.close(() => {
+        console.log("[Server] HTTP server closed.");
+        prisma
+          .$disconnect()
+          .then(() => {
+            console.log("[Server] Database disconnected.");
+            process.exit(0);
+          })
+          .catch(() => {
+            process.exit(0);
+          });
+      });
+      // Force exit after 10s if connections don't drain
+      setTimeout(() => {
+        console.warn("[Server] Forced shutdown after 10s timeout.");
+        process.exit(1);
+      }, 10_000).unref();
+    };
+    process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+    process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
     // 7. Start document queue + preview workers (non-fatal on boot failures)
     try {

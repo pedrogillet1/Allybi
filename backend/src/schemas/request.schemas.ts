@@ -17,7 +17,7 @@ export const chatRequestSchema = z
     message: z.string().min(1).max(10000),
     conversationId: z.string().uuid().optional(),
     documentIds: z.array(z.string().uuid()).optional(),
-    language: z.enum(["en", "pt", "es"]).optional(),
+    language: z.enum(["en", "pt", "es", "match"]).optional(),
     // Frontend may send these additional fields
     attachedDocuments: z
       .array(

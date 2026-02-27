@@ -334,6 +334,7 @@ export class EditOrchestratorService {
         documentId: request.plan.documentId,
         targetId: request.target.id,
         revisionId: created.revisionId,
+        trustLevel: request.trustLevel || ctx.trustLevel || "normal_user",
       });
 
       const hash = (value: string): string =>
@@ -398,12 +399,39 @@ export class EditOrchestratorService {
               0,
               Number((backendMetrics as any).patchesApplied || 0),
             ),
+            executionPath: (() => {
+              const raw = String((backendMetrics as any).executionPath || "")
+                .trim()
+                .toLowerCase();
+              if (raw === "python_applied" || raw === "python_bypassed")
+                return raw;
+              return "local_only";
+            })() as "python_applied" | "python_bypassed" | "local_only",
+            pythonTraceId:
+              typeof (backendMetrics as any).pythonTraceId === "string"
+                ? String((backendMetrics as any).pythonTraceId)
+                : null,
+            pythonOpProofsCount: Math.max(
+              0,
+              Number((backendMetrics as any).pythonOpProofsCount || 0),
+            ),
+            pythonOpProofCoverage: Math.max(
+              0,
+              Math.min(
+                1,
+                Number((backendMetrics as any).pythonOpProofCoverage || 0),
+              ),
+            ),
           }
         : {
             ...derivedMetrics,
             changedStructuresCount: 0,
             rejectedOps: [] as string[],
             patchesApplied: 0,
+            executionPath: "local_only" as const,
+            pythonTraceId: null,
+            pythonOpProofsCount: 0,
+            pythonOpProofCoverage: 0,
           };
       const diff = preview.diff;
       const changeCount = (() => {
@@ -469,6 +497,10 @@ export class EditOrchestratorService {
             ? { patchesApplied: Number(applyMetrics.patchesApplied || 0) }
             : {}),
         },
+        executionPath: applyMetrics.executionPath,
+        pythonTraceId: applyMetrics.pythonTraceId,
+        pythonOpProofsCount: applyMetrics.pythonOpProofsCount,
+        pythonOpProofCoverage: applyMetrics.pythonOpProofCoverage,
         targets: [
           ...applyMetrics.affectedParagraphIds.map((pid) => ({
             kind: "docx_paragraph" as const,
@@ -541,6 +573,7 @@ export class EditOrchestratorService {
         ok: true,
         applied: true,
         outcomeType: "applied",
+        executionPath: applyMetrics.executionPath,
         revisionId: created.revisionId,
         baseRevisionId: request.plan.documentId,
         newRevisionId: created.revisionId,

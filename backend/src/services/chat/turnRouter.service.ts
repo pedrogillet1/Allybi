@@ -1,5 +1,4 @@
 import type { TurnContext, TurnRouteDecision } from "./chat.types";
-import { EditorModeGuard } from "./guardrails/editorMode.guard";
 import { TurnRoutePolicyService } from "./turnRoutePolicy.service";
 import type {
   IntentDecisionOutput,
@@ -72,10 +71,6 @@ export class TurnRouterService {
       TurnRoutePolicyService,
       "isConnectorTurn"
     > = new TurnRoutePolicyService(),
-    private readonly editorGuard: Pick<
-      EditorModeGuard,
-      "enforce"
-    > = new EditorModeGuard(routePolicy),
     private readonly intentConfig: Pick<
       IntentConfigService,
       "decide"
@@ -173,15 +168,14 @@ export class TurnRouterService {
   }
 
   decide(ctx: TurnContext): TurnRouteDecision {
-    const guard = this.editorGuard.enforce(ctx);
-    if (guard.routeForcedToEditor) return "EDITOR";
-    const connectorIntent = ctx.viewer?.mode
-      ? guard.allowConnectorEscape
-      : this.routePolicy.isConnectorTurn(ctx.messageText || "", ctx.locale);
+    const connectorIntent = this.routePolicy.isConnectorTurn(
+      ctx.messageText || "",
+      ctx.locale,
+    );
 
     if (ctx.viewer?.mode) {
       if (connectorIntent) return "CONNECTOR";
-      return "EDITOR";
+      return "KNOWLEDGE";
     }
 
     if (connectorIntent) return "CONNECTOR";

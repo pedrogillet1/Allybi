@@ -362,20 +362,26 @@ export class SourceButtonsService {
     }>,
     language: "en" | "pt" | "es" = "en",
   ): SourceButtonsAttachment | null {
+    const fallbackTitle = (documentId: string): string =>
+      `Document ${String(documentId || "").slice(0, 8)}`;
+
     // Convert chunks to RawSource format
     const sources: RawSource[] = chunks
       .filter((chunk) => chunk.documentId || chunk.metadata?.documentId)
-      .map((chunk) => ({
-        documentId: (chunk.documentId || chunk.metadata?.documentId)!,
-        filename: chunk.metadata?.filename || "Document",
-        mimeType: chunk.metadata?.mimeType,
-        folderPath: chunk.metadata?.folderPath,
-        folderSegments: chunk.metadata?.folderSegments,
-        pageNumber: chunk.metadata?.pageNumber,
-        sheetName: chunk.metadata?.sheetName,
-        slideNumber: chunk.metadata?.slideNumber,
-        score: chunk.score,
-      }));
+      .map((chunk) => {
+        const documentId = (chunk.documentId || chunk.metadata?.documentId)!;
+        return {
+          documentId,
+          filename: chunk.metadata?.filename || fallbackTitle(documentId),
+          mimeType: chunk.metadata?.mimeType,
+          folderPath: chunk.metadata?.folderPath,
+          folderSegments: chunk.metadata?.folderSegments,
+          pageNumber: chunk.metadata?.pageNumber,
+          sheetName: chunk.metadata?.sheetName,
+          slideNumber: chunk.metadata?.slideNumber,
+          score: chunk.score,
+        };
+      });
 
     return this.buildSourceButtons(sources, { context: "qa", language });
   }

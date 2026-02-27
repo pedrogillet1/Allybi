@@ -39,9 +39,9 @@
         "redirectPreferencePriority": "over_boost"
       },
       "thresholds": {
-        "minFinalScore": 0.58,
-        "minSemanticScore": 0.55,
-        "minLexicalScore": 0.15,
+        "minFinalScore": 0.28,
+        "minSemanticScore": 0.20,
+        "minLexicalScore": 0.10,
         "maxPerDocChunksSoft": 6,
         "maxPerDocChunksHard": 10,
         "maxTotalChunksSoft": 18,
@@ -209,7 +209,7 @@
         "type": "score_and_rank",
         "formula": "final = wS*semantic + wL*lexical + wH*structural + wT*titleBoost + wY*typeBoost + wR*recencyBoost - penalties",
         "applyCaps": {
-          "minFinalScore": 0.58
+          "minFinalScore": 0.28
         }
       },
       "reasonCode": "ranker_score_computed",

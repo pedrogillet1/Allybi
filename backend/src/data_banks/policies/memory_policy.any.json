@@ -159,7 +159,15 @@
             "\\b[\\w][\\w\\-_. ]{0,160}\\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g|webp)\\b"
           ],
           "docReferencePhrase": [
-            "(?:usando\\s+(?:o\\s+)?documento|using\\s+(?:the\\s+)?(?:document|file)|no\\s+(?:documento|arquivo)|from\\s+(?:the\\s+)?(?:document|file)|about\\s+(?:the\\s+)?(?:document|file)|(?:documento|arquivo)\\s+chamado)\\s+[\"“”']?([^\"“”'\\n]{3,120})[\"“”']?"
+            "(?:usando\\s+(?:o\\s+)?documento|using\\s+(?:the\\s+)?(?:document|file)|no\\s+(?:documento|arquivo)|from\\s+(?:the\\s+)?(?:document|file)|about\\s+(?:the\\s+)?(?:document|file)|(?:documento|arquivo)\\s+chamado)\\s+[\"“”']?([^\"“”'\\n]{3,120})[\"“”']?",
+            "(?:(?:d|D)ocs?\\s+que\\s+(?:anexei|enviei|carreguei|subi)|(?:o|O)s\\s+documentos?\\s+(?:que\\s+)?(?:anexei|enviei|carreguei|subi))\\s*(?:[:(]\\s*)?([^\"\\u201c\\u201d\\'\\n)]{3,200})",
+            "(?:(?:e|E)m\\s+rela[çc][ãa]o\\s+a[o]?s?\\s+(?:docs?|documentos?|arquivos?))\\s*(?:[:(]\\s*)?([^\"\\u201c\\u201d\\'\\n)]{3,200})",
+            "(?:(?:n|N)os?\\s+(?:docs?|documentos?|arquivos?)\\s+(?:que|de|do|da)\\s+)([^\"\\u201c\\u201d\\'\\n]{3,200})",
+            "(?:(?:c|C)ome[cç]a\\s+pelo|(?:a|A)gora\\s+(?:no|na|nos|nas)|(?:v|V)amos\\s+para\\s+(?:o|a)|(?:n|N)o\\s+cap[ií]tulo\\s+de|(?:n|N)as?\\s+anota[cç][oõ]es|(?:s|S)obre\\s+(?:o|a)|(?:f|F)oca\\s+no?)\\s+([^\"\\u201c\\u201d\\'\\n)]{3,180})",
+            "(?:(?:s|S)tart\\s+with|(?:n|N)ow\\s+on|(?:l|L)et'?s\\s+go\\s+to|(?:f|F)ocus\\s+on|(?:a|A)bout\\s+the)\\s+([^\"\\u201c\\u201d\\'\\n)]{3,180})",
+            "(?:(?:e|E)mpecemos\\s+por|(?:a|A)hora\\s+en|(?:v|V)amos\\s+a|(?:e|E)n\\s+el\\s+cap[ií]tulo\\s+de|(?:s|S)obre\\s+el)\\s+([^\"\\u201c\\u201d\\'\\n)]{3,180})",
+            "(?:(?:l|L)os?\\s+documentos?\\s+que\\s+(?:adjunt[ée]|sub[ií]|envi[ée]|cargu[ée]))\\s*(?:[:(]\\s*)?([^\"\\u201c\\u201d\\'\\n)]{3,200})",
+            "(?:(?:t|T)he\\s+(?:docs?|documents?|files?)\\s+(?:I\\s+)?(?:attached|uploaded|sent))\\s*(?:[:(]\\s*)?([^\"\\u201c\\u201d\\'\\n)]{3,200})"
           ]
         },
         "clearScopePatterns": [

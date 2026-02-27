@@ -5,6 +5,10 @@ import type {
 import prisma from "../../../config/database";
 import { getBankLoaderInstance } from "../../../services/core/banks/bankLoader.service";
 import { logger } from "../../../utils/logger";
+import {
+  resolveDocumentReference,
+  type DocumentReferenceDoc,
+} from "../../../services/core/scope/documentReferenceResolver.service";
 import type {
   ChatMessageDTO,
   ChatRequest,
@@ -28,6 +32,20 @@ type ScopeRuntimeMentionConfig = {
   docStatusesAllowed: string[];
   stopWords: Set<string>;
 };
+
+function filenameFromStorageKey(
+  storageKey: string | null | undefined,
+): string | null {
+  const key = String(storageKey || "").trim();
+  if (!key) return null;
+  const tail = key.split("/").pop();
+  if (!tail) return null;
+  try {
+    return decodeURIComponent(tail);
+  } catch {
+    return tail;
+  }
+}
 
 function resolveScopeRuntimeMentionConfig(): ScopeRuntimeMentionConfig {
   const bank = getBankLoaderInstance().getBank<any>("memory_policy");
@@ -144,41 +162,6 @@ function lower(s: string): string {
   return normSpace(s).toLowerCase();
 }
 
-function simpleTokens(s: string): string[] {
-  return lower(s)
-    .replace(/["""]/g, " ")
-    .split(/[\s,;:.!?()]+/)
-    .map((t) => t.trim())
-    .filter(Boolean);
-}
-
-function splitDocReferenceCandidates(rawPhrase: string): string[] {
-  const phrase = String(rawPhrase || "").trim();
-  if (!phrase) return [];
-  return phrase
-    .split(/\s*(?:,|;|\band\b|\be\b|\by\b)\s*/i)
-    .map((part) =>
-      part
-        .replace(/^(?:the|document|file|o|a|os|as|documento|arquivo)\s+/i, "")
-        .replace(/[.?!:]+$/g, "")
-        .trim(),
-    )
-    .filter((part) => part.length > 0);
-}
-
-function tokenOverlap(
-  aTokens: string[],
-  bTokens: string[],
-  minTokenLength: number,
-): number {
-  const a = new Set(aTokens.filter((t) => t.length >= minTokenLength));
-  const b = new Set(bTokens.filter((t) => t.length >= minTokenLength));
-  if (!a.size || !b.size) return 0;
-  let hit = 0;
-  for (const t of a) if (b.has(t)) hit++;
-  return hit / Math.max(a.size, b.size);
-}
-
 export type RuntimeDelegate = {
   chat(req: ChatRequest): Promise<ChatResult>;
   streamChat(params: {
@@ -230,10 +213,6 @@ export class ChatRuntimeOrchestrator {
   private readonly scopeRuntime = resolveScopeRuntimeMentionConfig();
 
   constructor(private readonly delegate: RuntimeDelegate) {}
-
-  private docnameTokens(s: string): string[] {
-    return simpleTokens(s).filter((t) => !this.scopeRuntime.stopWords.has(t));
-  }
 
   async chat(req: ChatRequest): Promise<ChatResult> {
     const preparedReq = await this.prepareRequest(req);
@@ -327,38 +306,10 @@ export class ChatRuntimeOrchestrator {
         ? [...req.attachedDocumentIds]
         : [],
     };
-
-    // Check if the message has explicit doc-reference phrases (e.g., "Usando os documentos X, Y e Z").
-    // When present, always re-detect — even if attachedDocumentIds is pre-populated from
-    // persisted scope — so multi-doc queries resolve all mentioned documents.
-    const hasExplicitDocPhrase = this.scopeRuntime.candidateDocRefRegex.some(
-      (re: RegExp) => {
-        re.lastIndex = 0; // reset stateful regex
-        return re.test(req.message);
-      },
-    );
-
-    if (hasExplicitDocPhrase || (next.attachedDocumentIds || []).length === 0) {
-      const detected = await this.detectDocumentMentions(
-        req.userId,
-        req.message,
-      );
-      if (detected.length > 0) {
-        logger.debug("[Scope] detected document mentions", {
-          detected,
-          hadExplicitDocPhrase: hasExplicitDocPhrase,
-          previousIds: next.attachedDocumentIds,
-          userId: req.userId,
-        });
-        next.attachedDocumentIds = detected;
-      }
-    }
-
     const conversationId = String(req.conversationId || "").trim();
-    if (!conversationId) return next;
 
     // 1. Clear scope if requested
-    if (this.scopeService.shouldClearScope(req)) {
+    if (conversationId && this.scopeService.shouldClearScope(req)) {
       await this.scopeService.clearConversationScope(
         req.userId,
         conversationId,
@@ -367,8 +318,41 @@ export class ChatRuntimeOrchestrator {
       return next;
     }
 
-    // 2. If explicit attachedDocumentIds from UI → use them
-    if ((next.attachedDocumentIds || []).length > 0) {
+    const explicitScope = this.scopeService.attachedScope(next);
+    if (explicitScope.length > 0) {
+      const narrowedFromExplicit = await this.detectDocumentMentions(
+        req.userId,
+        req.message,
+        {
+          restrictToDocumentIds: explicitScope,
+        },
+      );
+      if (narrowedFromExplicit.length > 0) {
+        logger.debug("[Scope] narrowed explicit scope from semantic mention", {
+          detected: narrowedFromExplicit,
+          previousIds: explicitScope,
+          userId: req.userId,
+        });
+        next.attachedDocumentIds = narrowedFromExplicit;
+      } else {
+        next.attachedDocumentIds = explicitScope;
+      }
+      return next;
+    }
+
+    if (!conversationId) {
+      const detected = await this.detectDocumentMentions(
+        req.userId,
+        req.message,
+      );
+      if (detected.length > 0) {
+        logger.debug("[Scope] detected document mentions", {
+          detected,
+          previousIds: [],
+          userId: req.userId,
+        });
+        next.attachedDocumentIds = detected;
+      }
       return next;
     }
 
@@ -378,7 +362,34 @@ export class ChatRuntimeOrchestrator {
       conversationId,
     );
     if (persisted.length > 0) {
-      next.attachedDocumentIds = persisted;
+      const narrowedFromPersisted = await this.detectDocumentMentions(
+        req.userId,
+        req.message,
+        {
+          restrictToDocumentIds: persisted,
+        },
+      );
+      if (narrowedFromPersisted.length > 0) {
+        logger.debug("[Scope] narrowed persisted scope from semantic mention", {
+          detected: narrowedFromPersisted,
+          previousIds: persisted,
+          userId: req.userId,
+        });
+        next.attachedDocumentIds = narrowedFromPersisted;
+      } else {
+        next.attachedDocumentIds = persisted;
+      }
+      return next;
+    }
+
+    const detected = await this.detectDocumentMentions(req.userId, req.message);
+    if (detected.length > 0) {
+      logger.debug("[Scope] detected document mentions", {
+        detected,
+        previousIds: [],
+        userId: req.userId,
+      });
+      next.attachedDocumentIds = detected;
     }
     return next;
   }
@@ -390,126 +401,62 @@ export class ChatRuntimeOrchestrator {
   private async detectDocumentMentions(
     userId: string,
     message: string,
+    options?: {
+      restrictToDocumentIds?: string[];
+    },
   ): Promise<string[]> {
     if (!message || !userId) return [];
+    const restrictedDocIds = Array.isArray(options?.restrictToDocumentIds)
+      ? options?.restrictToDocumentIds
+          .map((id) => String(id || "").trim())
+          .filter(Boolean)
+      : [];
 
-    const candidates = new Set<string>();
-
-    for (const pattern of this.scopeRuntime.candidateFilenameRegex) {
-      pattern.lastIndex = 0;
-      const extMatches = message.matchAll(pattern);
-      for (const m of extMatches) {
-        const matched = lower(m[0]);
-        if (matched.length >= this.scopeRuntime.docNameMinLength) {
-          candidates.add(matched);
-        }
-      }
+    if (options?.restrictToDocumentIds && restrictedDocIds.length === 0) {
+      return [];
     }
-
-    for (const pattern of this.scopeRuntime.candidateDocRefRegex) {
-      pattern.lastIndex = 0;
-      const phraseMatches = message.matchAll(pattern);
-      for (const m of phraseMatches) {
-        const raw = String(m[1] || "").trim();
-        for (const part of splitDocReferenceCandidates(raw)) {
-          if (part.length < this.scopeRuntime.docNameMinLength) continue;
-          candidates.add(lower(part));
-          for (const filenamePattern of this.scopeRuntime
-            .candidateFilenameRegex) {
-            filenamePattern.lastIndex = 0;
-            const explicitMatches = part.matchAll(filenamePattern);
-            for (const explicit of explicitMatches) {
-              const explicitName = lower(String(explicit[0] || ""));
-              if (explicitName.length >= this.scopeRuntime.docNameMinLength) {
-                candidates.add(explicitName);
-              }
-            }
-          }
-        }
-      }
-    }
-
-    if (candidates.size === 0) return [];
-
-    logger.debug("[Scope] document mention candidates", {
-      candidates: Array.from(candidates),
-      userId,
-    });
 
     // Fetch user's ready/indexed documents
     const docs = await prisma.document.findMany({
       where: {
         userId,
         status: { in: this.scopeRuntime.docStatusesAllowed },
+        ...(restrictedDocIds.length > 0
+          ? { id: { in: restrictedDocIds } }
+          : {}),
       },
-      select: { id: true, filename: true },
+      select: {
+        id: true,
+        filename: true,
+        displayTitle: true,
+        encryptedFilename: true,
+      },
     });
     if (!docs.length) return [];
 
-    logger.debug("[Scope] user indexed documents", {
-      filenames: docs.map((d) => d.filename || "(none)"),
-      count: docs.length,
-    });
-
-    const matched = new Set<string>();
-    const candidateResults: Record<
-      string,
-      { matchedDocId?: string; matchType?: string; failed?: boolean }
-    > = {};
-
-    for (const candidate of candidates) {
-      const candidateTokens = this.docnameTokens(candidate);
-      let candidateMatched = false;
-
-      for (const doc of docs) {
-        const fn = lower(doc.filename ?? "");
-        if (!fn) continue;
-
-        // Exact or substring match
-        if (
-          fn === candidate ||
-          fn.includes(candidate) ||
-          candidate.includes(fn)
-        ) {
-          matched.add(doc.id);
-          candidateResults[candidate] = {
-            matchedDocId: doc.id,
-            matchType: "exact/substring",
-          };
-          candidateMatched = true;
-          break;
-        }
-
-        // Token overlap match (threshold 0.5 — same family as ScopeGateService)
-        const fnTokens = this.docnameTokens(doc.filename ?? "");
-        const overlap = tokenOverlap(
-          candidateTokens,
-          fnTokens,
-          this.scopeRuntime.tokenMinLength,
-        );
-        if (overlap >= this.scopeRuntime.tokenOverlapThreshold) {
-          matched.add(doc.id);
-          candidateResults[candidate] = {
-            matchedDocId: doc.id,
-            matchType: `token-overlap(${overlap.toFixed(2)})`,
-          };
-          candidateMatched = true;
-          break;
-        }
-      }
-
-      if (!candidateMatched) {
-        candidateResults[candidate] = { failed: true };
-      }
-    }
+    const referenceDocs: DocumentReferenceDoc[] = docs.map((doc) => ({
+      docId: doc.id,
+      filename:
+        doc.filename ||
+        doc.displayTitle ||
+        filenameFromStorageKey(doc.encryptedFilename),
+      title:
+        doc.displayTitle ||
+        doc.filename ||
+        filenameFromStorageKey(doc.encryptedFilename),
+    }));
+    const resolution = resolveDocumentReference(message, referenceDocs);
+    if (!resolution.explicitDocRef) return [];
 
     logger.debug("[Scope] document mention matches", {
-      matchedIds: Array.from(matched),
+      matchedIds: resolution.matchedDocIds,
       docsChecked: docs.length,
-      candidateResults,
+      confidence: resolution.confidence,
+      method: resolution.method,
+      candidates: resolution.candidates,
     });
 
-    return Array.from(matched);
+    return resolution.matchedDocIds;
   }
 
   private async postProcess(

@@ -33,9 +33,12 @@ function svc(req: any): AdminAuthService {
   if (!_svc) {
     const s = req.app?.locals?.services?.adminAuth;
     if (!s) {
-      throw Object.assign(new Error("Admin authentication service unavailable"), {
-        statusCode: 503,
-      });
+      throw Object.assign(
+        new Error("Admin authentication service unavailable"),
+        {
+          statusCode: 503,
+        },
+      );
     }
     _svc = s;
   }

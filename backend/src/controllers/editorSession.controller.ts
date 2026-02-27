@@ -76,7 +76,10 @@ function userIdFromReq(req: Request): string | null {
   return asString(typedReq.user?.id);
 }
 
-function buildContext(req: Request): EditHandlerRequest["context"] | null {
+function buildContext(
+  req: Request,
+  domainHint?: EditDomain | null,
+): EditHandlerRequest["context"] | null {
   const userId = userIdFromReq(req);
   if (!userId) return null;
 
@@ -92,10 +95,11 @@ function buildContext(req: Request): EditHandlerRequest["context"] | null {
     asString(body.clientMessageId) ||
     randomUUID();
 
+  const domainSegment = isEditDomain(domainHint) ? domainHint : "generic";
   const conversationId =
     asString(req.headers["x-conversation-id"]) ||
     asString(body.conversationId) ||
-    `editor:${userId}`;
+    `editing:${domainSegment}:${userId}`;
 
   const language = asString(body.language);
 
@@ -373,10 +377,6 @@ export class EditorSessionController {
   }
 
   start = async (req: Request, res: Response): Promise<Response> => {
-    const ctx = buildContext(req);
-    if (!ctx)
-      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
-
     const body = (req.body as Record<string, unknown> | undefined) ?? {};
     const documentId = asString(body.documentId);
     const instruction = asString(body.instruction);
@@ -408,6 +408,9 @@ export class EditorSessionController {
         400,
       );
     }
+    const ctx = buildContext(req, domain);
+    if (!ctx)
+      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const targetHint = asString(body.targetHint) || undefined;
     const preserveTokens = asStringArray(body.preserveTokens);
@@ -446,7 +449,7 @@ export class EditorSessionController {
       );
     }
 
-    const previewResult = await this.editingFacade.execute({
+    const previewExecution = await this.editingFacade.executeWithAgent({
       mode: "preview",
       context: ctx,
       planRequest: {
@@ -477,6 +480,7 @@ export class EditorSessionController {
           }
         : {}),
     });
+    const previewResult = previewExecution.response;
 
     if (!previewResult.ok) {
       const mapped = mapEditError(previewResult.error || "preview failed");
@@ -519,6 +523,9 @@ export class EditorSessionController {
     const data: EditorSessionStartResponse = {
       sessionId: stored.id,
       status: stored.status,
+      domain,
+      agentId: previewExecution.agentId,
+      executionPath: "editing_agent_router",
       baseRevisionId: stored.baseRevisionId,
       baseDocumentUpdatedAtIso: stored.baseDocumentUpdatedAtIso,
       baseDocumentFileHash: stored.baseDocumentFileHash,
@@ -576,8 +583,8 @@ export class EditorSessionController {
   };
 
   apply = async (req: Request, res: Response): Promise<Response> => {
-    const ctx = buildContext(req);
-    if (!ctx)
+    const userId = userIdFromReq(req);
+    if (!userId)
       return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const body = (req.body as Record<string, unknown> | undefined) ?? {};
@@ -585,7 +592,7 @@ export class EditorSessionController {
     if (!sessionId)
       return sendErr(res, "SESSION_ID_REQUIRED", "sessionId is required.", 400);
 
-    const session = this.store.getForUser(sessionId, ctx.userId);
+    const session = this.store.getForUser(sessionId, userId);
     if (!session)
       return sendErr(
         res,
@@ -604,6 +611,10 @@ export class EditorSessionController {
         409,
       );
     }
+    const ctx = buildContext(req, session.planRequest.domain);
+    if (!ctx)
+      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+
     session.status = "applying";
     this.store.update(session);
 
@@ -618,7 +629,7 @@ export class EditorSessionController {
 
     const idempotencyKey =
       asString(body.idempotencyKey) || `${session.id}:apply`;
-    const applied = await this.editingFacade.execute({
+    const applyExecution = await this.editingFacade.executeWithAgent({
       mode: "apply",
       context: ctx,
       planRequest: {
@@ -638,6 +649,7 @@ export class EditorSessionController {
       expectedDocumentFileHash: session.baseDocumentFileHash || undefined,
       ...(target ? { target } : {}),
     });
+    const applied = applyExecution.response;
 
     if (!applied.ok) {
       session.status = "error";
@@ -661,7 +673,10 @@ export class EditorSessionController {
       const data: EditorSessionApplyResponse = {
         sessionId: session.id,
         status: session.status,
-        applyPath: "editing_facade",
+        domain: session.planRequest.domain,
+        agentId: applyExecution.agentId,
+        executionPath: "editing_agent_router",
+        applyPath: "editing_agent_router",
         requiresUserChoice: true,
         previewIfChoiceRequired: applied.result as any,
         receipt: (applied.receipt as any) ?? null,
@@ -676,7 +691,10 @@ export class EditorSessionController {
     const data: EditorSessionApplyResponse = {
       sessionId: session.id,
       status: session.status,
-      applyPath: "editing_facade",
+      domain: session.planRequest.domain,
+      agentId: applyExecution.agentId,
+      executionPath: "editing_agent_router",
+      applyPath: "editing_agent_router",
       applied: applied.result as any,
       receipt: (applied.receipt as any) ?? null,
       requiresUserChoice: false,

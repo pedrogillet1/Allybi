@@ -33,8 +33,8 @@
         "maxEvidencePerDocHard": 10,
         "maxNearDuplicatesPerDoc": 3,
         "nearDuplicateWindowChars": 280,
-        "minChunkRelevance": 0.55,
-        "minFinalScore": 0.58,
+        "minChunkRelevance": 0.20,
+        "minFinalScore": 0.28,
         "minProvenanceFields": 3
       },
       "conflictResolution": {

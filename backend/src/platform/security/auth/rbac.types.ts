@@ -11,6 +11,7 @@ export type Resource =
   | "documents"
   | "editing"
   | "integrations"
+  | "rag"
   | "telemetry"
   | "admin";
 

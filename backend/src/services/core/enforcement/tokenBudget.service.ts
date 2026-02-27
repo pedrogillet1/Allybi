@@ -1,3 +1,5 @@
+import { getOptionalBank } from "../banks/bankLoader.service";
+
 export type BudgetComplexity = "low" | "medium" | "high";
 
 export interface OutputTokenBudgetInput {
@@ -38,6 +40,7 @@ type TokenizerRuntime = {
 };
 
 let tokenizerRuntime: TokenizerRuntime | null | undefined;
+let modeMaxBankCache: Record<string, number> | null | undefined;
 
 function clampInt(value: number, min: number, max: number): number {
   if (!Number.isFinite(value)) return min;
@@ -49,6 +52,42 @@ function toPositiveNumber(input: unknown): number | null {
   const num = Number(input);
   if (!Number.isFinite(num) || num <= 0) return null;
   return num;
+}
+
+function readModeMaxFromBank(answerMode: string): number | null {
+  if (modeMaxBankCache === undefined) {
+    modeMaxBankCache = null;
+    try {
+      const bank = getOptionalBank<any>("truncation_and_limits");
+      const rawLimits = bank?.answerModeLimits;
+      if (rawLimits && typeof rawLimits === "object") {
+        const next: Record<string, number> = {};
+        for (const [mode, value] of Object.entries(
+          rawLimits as Record<string, unknown>,
+        )) {
+          const asObject =
+            value && typeof value === "object"
+              ? (value as Record<string, unknown>)
+              : null;
+          if (!asObject) continue;
+          const tokenLimit =
+            toPositiveNumber(asObject.maxOutputTokens) ??
+            toPositiveNumber(asObject.maxOutputTokensDefault) ??
+            toPositiveNumber(asObject.maxTokens) ??
+            toPositiveNumber(asObject.maxTokensDefault);
+          if (tokenLimit) next[String(mode)] = Math.round(tokenLimit);
+        }
+        modeMaxBankCache = next;
+      }
+    } catch {
+      // Bank loader may not be initialized in narrow unit tests.
+      modeMaxBankCache = null;
+    }
+  }
+
+  if (!modeMaxBankCache) return null;
+  const value = modeMaxBankCache[answerMode];
+  return Number.isFinite(value) && value > 0 ? value : null;
 }
 
 function readTokenizerRuntime(): TokenizerRuntime | null {
@@ -85,15 +124,18 @@ function resolveModeMin(answerMode: string): number {
 }
 
 function resolveModeMax(answerMode: string): number {
+  const bankModeMax = readModeMaxFromBank(answerMode);
+  if (bankModeMax) return bankModeMax;
+
   if (answerMode === "nav_pills") return 220;
   if (answerMode === "rank_disambiguate") return 260;
-  if (answerMode === "doc_grounded_table") return 2400;
-  if (answerMode === "doc_grounded_multi") return 2200;
-  if (answerMode === "doc_grounded_single") return 1800;
-  if (answerMode === "doc_grounded_quote") return 900;
-  if (answerMode === "help_steps") return 1200;
+  if (answerMode === "doc_grounded_table") return 6500;
+  if (answerMode === "doc_grounded_multi") return 5000;
+  if (answerMode === "doc_grounded_single") return 4600;
+  if (answerMode === "doc_grounded_quote") return 1200;
+  if (answerMode === "help_steps") return 1600;
   if (answerMode === "no_docs" || answerMode === "refusal") return 320;
-  return 1400;
+  return 3800;
 }
 
 function resolveBaseBudget(
@@ -102,14 +144,15 @@ function resolveBaseBudget(
 ): number {
   if (answerMode === "nav_pills") return 180;
   if (answerMode === "rank_disambiguate") return 220;
-  if (answerMode === "doc_grounded_table") return 1500;
-  if (answerMode === "doc_grounded_multi") return 1300;
-  if (answerMode === "doc_grounded_single") return 1100;
-  if (answerMode === "doc_grounded_quote") return 700;
-  if (answerMode === "help_steps") return 900;
+  if (answerMode === "doc_grounded_table")
+    return routeStage === "final" ? 4000 : 2400;
+  if (answerMode === "doc_grounded_multi") return 3000;
+  if (answerMode === "doc_grounded_single") return 2800;
+  if (answerMode === "doc_grounded_quote") return 900;
+  if (answerMode === "help_steps") return 1200;
   if (answerMode === "no_docs") return 280;
   if (answerMode === "refusal") return 220;
-  return routeStage === "final" ? 900 : 700;
+  return routeStage === "final" ? 2200 : 1600;
 }
 
 function detectComplexity(params: {

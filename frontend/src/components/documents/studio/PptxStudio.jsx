@@ -18,7 +18,6 @@ import ListNumberedIcon from '../editor/allybi-toolbar/icons/list-numbered.svg';
 import DropdownIcon from '../editor/allybi-toolbar/icons/dropdown.svg';
 import UndoIcon from '../editor/allybi-toolbar/icons/undo.svg';
 import RedoIcon from '../editor/allybi-toolbar/icons/redo.svg';
-import PlusIcon from '../editor/allybi-toolbar/icons/plus.svg';
 import MinusIcon from '../editor/allybi-toolbar/icons/minus.svg';
 
 function clamp(n, a, b) {

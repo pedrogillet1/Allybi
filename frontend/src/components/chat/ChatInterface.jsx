@@ -33,8 +33,6 @@ import MessageActions from "./messages/MessageActions";
 import useStageLabel from "./messages/useStageLabel";
 import FollowUpChips from "./followups/FollowUpChips";
 import StreamingWelcomeMessage from "./streaming/StreamingWelcomeMessage";
-// ChatEmptyState removed — empty state rendered inline below
-const kodaIcon = "/allybi-icon.svg";
 import kodaIconBlack from "../../assets/koda-dark-knot.svg";
 import thinkingVideo from "../../assets/koda-animation-final.mp4";
 import ChromaKeyVideo from "./ChromaKeyVideo";
@@ -58,6 +56,8 @@ import { useDocuments } from "../../context/DocumentsContext";
 import "./streaming/MarkdownStyles.css";
 import "./streaming/StreamingAnimation.css";
 import "./streaming/SpacingUtilities.css";
+
+const kodaIcon = "/allybi-icon.svg";
 
 /**
  * ChatInterface.jsx (ChatGPT-parity, cleaned)
@@ -93,7 +93,10 @@ const getCompatAccessToken = () => {
   return localStorage.getItem("accessToken") || localStorage.getItem("token");
 };
 const ENDPOINT = process.env.REACT_APP_CHAT_STREAM_ENDPOINT || `${API_BASE}/api/chat/stream`;
-const VIEWER_ENDPOINT = process.env.REACT_APP_CHAT_VIEWER_STREAM_ENDPOINT || `${API_BASE}/api/chat/viewer/stream`;
+const VIEWER_ENDPOINT =
+  process.env.REACT_APP_EDITOR_ASSISTANT_STREAM_ENDPOINT ||
+  process.env.REACT_APP_CHAT_VIEWER_STREAM_ENDPOINT ||
+  `${API_BASE}/api/editor-session/assistant/stream`;
 const getCsrfToken = () => {
   if (typeof document === "undefined") return null;
   const match = document.cookie.split(";").map((c) => c.trim()).find((c) => c.startsWith("koda_csrf="));
@@ -1835,15 +1838,18 @@ export default function ChatInterface({
     return `${base}#slide=id.${slideObjectId}`;
   }, []);
 
-  // Detect language from user message text (for 'match' mode)
-  const detectMessageLang = useCallback((text) => {
+  // Lightweight language hint: detect PT/ES to send as a hint to the backend.
+  // Never sends "en" — the backend defaults to "en" when no PT/ES signal is found.
+  // Full detection (weighted scores, morphological patterns) is handled by the
+  // backend LanguageDetectorService using language_indicators data bank.
+  const detectMessageLangHint = useCallback((text) => {
     const q = String(text || "")
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
-    if (/\b(quais?|meus?|minhas?|documentos?|arquivos?|pastas?|tenho|esta|como|onde|qual|por que|porque|obrigad|ola|oi|tudo|pode|fazer|quero|preciso|ajuda|sobre|exame|resultado)\b/.test(q)) return 'pt';
-    if (/\b(cuales?|mis|archivos?|carpetas?|tengo|esta|como|donde|cual|porque|gracias|hola|todo|puede|hacer|quiero|necesito|ayuda|sobre|prueba|analisis|resultado)\b/.test(q)) return 'es';
-    return 'en';
+    if (/\b(quais?|meus?|minhas?|documentos?|arquivos?|pastas?|tenho|como|onde|qual|por que|porque|obrigad|ola|oi|tudo|pode|fazer|quero|preciso|ajuda|sobre|exame|resultado|agora|separa|beleza|vamos|comeca|faz|cria|traz|diz|analisa|compara|mostra|busca|organiza|monta|lista|explica|gera|extrai|identifica|sugere|marca|reescreve|resume|anota|prioriza|destaca|tenta|otimo|fechou|nesse|desses|deles|desse|disso|nisso|voce|nao|entrega|responde|pergunta|corrige|ortografia|extraido|sentido|perguntas|respostas|baseadas?|imagem|roteiro|apresentacao|minutos|investidor|pontos|fortes|riscos|formato|executiva|diferenciais|linguagem|comercial|me da|versao|tabela|matriz|conceito|evidencia|beneficio|servico|prazos|marcos|lacunas|conflitos|temas|cruza|fecha|bilingu|trilingu|bullets|relatorio|quem|sao|citados?)\b/.test(q)) return 'pt';
+    if (/\b(cuales?|mis|archivos?|carpetas?|tengo|donde|cual|gracias|hola|puede|hacer|quiero|necesito|ayuda|prueba|analisis)\b/.test(q)) return 'es';
+    return 'match';
   }, []);
 
   // Attachments (uploaded immediately, then attached to next send)
@@ -3051,10 +3057,10 @@ export default function ChatInterface({
     const controller = new AbortController();
     abortRef.current = controller;
 
-    // Detect language from message text when answerLanguage is 'match' (or unset)
+    // Send language hint — PT/ES detected upfront, 'match' means backend auto-detects
     const storedLangPref = localStorage.getItem('answerLanguage');
     const effectiveLang = (!storedLangPref || storedLangPref === 'match')
-      ? detectMessageLang(messageText)
+      ? detectMessageLangHint(messageText)
       : answerLang;
     setStreamingLang(effectiveLang);
 
@@ -3115,12 +3121,39 @@ export default function ChatInterface({
       }
       return next;
     })();
+    const inferredViewerDomain = (() => {
+      if (!isViewerVariant) return null;
+      const selDomain = String(effectiveViewerSelection?.domain || "").trim().toLowerCase();
+      if (selDomain === "docx") return "docx";
+      if (selDomain === "xlsx" || selDomain === "excel" || selDomain === "sheets") return "sheets";
+      const ft = String(viewerContext?.fileType || "").trim().toLowerCase();
+      if (ft === "excel" || ft === "xlsx" || ft === "sheet" || ft === "sheets" || ft === "spreadsheet") return "sheets";
+      return "docx";
+    })();
+    const inferredViewerDocumentId = (() => {
+      if (!isViewerVariant) return null;
+      const fromCtx = String(viewerContext?.activeDocumentId || "").trim();
+      if (fromCtx) return fromCtx;
+      const fromAttachments = Array.isArray(docAttachments) && docAttachments.length > 0
+        ? String(docAttachments[0]?.id || "").trim()
+        : "";
+      return fromAttachments || null;
+    })();
+    const inferredViewerBeforeText = isViewerVariant
+      ? String(effectiveViewerSelection?.text || "").trim()
+      : "";
 
     const body = {
-      ...(isViewerVariant ? {} : { conversationId: realConversationId }),
+      ...(isViewerVariant
+        ? {
+            ...(inferredViewerDocumentId ? { documentId: inferredViewerDocumentId } : {}),
+            ...(inferredViewerDomain ? { domain: inferredViewerDomain } : {}),
+            ...(inferredViewerBeforeText ? { beforeText: inferredViewerBeforeText } : {}),
+          }
+        : { conversationId: realConversationId }),
       message: messageText,
       attachedDocuments: docAttachments,
-      language: ["pt", "es"].includes(effectiveLang) ? effectiveLang : "en",
+      language: effectiveLang,
       client: { wantsStreaming: true },
       ...(isRegenerate ? { isRegenerate: true } : {}),
       ...(meta ? { meta } : {}),
@@ -3169,6 +3202,7 @@ export default function ChatInterface({
         headers: {
           "Content-Type": "application/json",
           Accept: "text/event-stream",
+          "x-request-id": crypto.randomUUID(),
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
           ...(csrfToken ? { "x-csrf-token": csrfToken } : {}),
         },
@@ -3179,15 +3213,23 @@ export default function ChatInterface({
     } catch {
       setStreamError("Network error.");
       setIsStreaming(false);
-      setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, status: "error" } : m)));
+      setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, status: "error", error: "Network error — could not reach the server." } : m)));
       abortRef.current = null;
       return;
     }
 
     if (!response.ok) {
-      setStreamError(`Request failed (${response.status})`);
+      let errorDetail = `Request failed (HTTP ${response.status})`;
+      try {
+        const errBody = await response.text();
+        const parsed = JSON.parse(errBody);
+        if (parsed?.error || parsed?.message) {
+          errorDetail = `${parsed.error || parsed.message} (HTTP ${response.status})`;
+        }
+      } catch { /* ignore parse errors */ }
+      setStreamError(errorDetail);
       setIsStreaming(false);
-      setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, status: "error" } : m)));
+      setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, status: "error", error: errorDetail } : m)));
       abortRef.current = null;
       return;
     }
@@ -3326,7 +3368,12 @@ export default function ChatInterface({
           setMessages((prev) =>
             prev.map((m) => {
               if (m.id !== assistantId) return m;
-              const merged = normalizeWhitespace((m.content || "") + buffered);
+              const finalTextFromPayload = String(
+                msg.text || msg.content || evt.text || evt.content || ""
+              ).trim();
+              const merged = normalizeWhitespace(
+                (m.content || "") + buffered + (((!(m.content || "").trim() && !buffered.trim()) && finalTextFromPayload) ? finalTextFromPayload : "")
+              );
               const cleaned = fixCurrencyArtifacts(stripSourcesLabels(merged));
               const finalListing = Array.isArray(msg.listing) ? msg.listing : (Array.isArray(evt.listing) ? evt.listing : null);
               const finalBreadcrumb = Array.isArray(msg.breadcrumb) ? msg.breadcrumb : (Array.isArray(evt.breadcrumb) ? evt.breadcrumb : null);
@@ -3519,7 +3566,7 @@ export default function ChatInterface({
     beginAssistantPlaceholder,
     conversationId,
     createConversationIfNeeded,
-    detectMessageLang,
+    detectMessageLangHint,
     answerLang,
     connectorStatus,
     activeConnectors,
@@ -3867,11 +3914,11 @@ export default function ChatInterface({
       return raw || "Document";
     };
 
-    // Deduplicate by filename, keep the first (most relevant) occurrence
+    // Deduplicate by document ID (stable), fallback to display name
     const seen = new Set();
     const unique = [];
     for (const s of sources) {
-      const key = resolveSourceDisplayName(s).toLowerCase();
+      const key = (s.docId || s.documentId || s.id || resolveSourceDisplayName(s)).toString().toLowerCase();
       if (key && !seen.has(key)) {
         seen.add(key);
         unique.push(s);
@@ -3953,17 +4000,19 @@ export default function ChatInterface({
         const overrideProvider = snapshot?.provider === "gmail" || snapshot?.provider === "outlook" ? snapshot.provider : null;
         const resendLang = (() => {
           const storedLangPref = localStorage.getItem("answerLanguage");
-          const inferred = (!storedLangPref || storedLangPref === "match")
-            ? detectMessageLang(userMsg.content)
+          return (!storedLangPref || storedLangPref === "match")
+            ? detectMessageLangHint(userMsg.content)
             : answerLang;
-          return ["pt", "es"].includes(inferred) ? inferred : "en";
         })();
+        const csrfTokenResend = getCsrfToken();
         const response = await fetch(ENDPOINT, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Accept: "text/event-stream",
+            "x-request-id": crypto.randomUUID(),
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(csrfTokenResend ? { "x-csrf-token": csrfTokenResend } : {}),
           },
           credentials: "include",
           body: JSON.stringify({
@@ -5366,6 +5415,8 @@ export default function ChatInterface({
                                   }}
                                   isRegenerating={isStreaming && m.id === lastAssistant?.id}
                                 />
+                                {m.truncation?.occurred && <span style={{ display: 'block', fontSize: 12, color: '#888', marginTop: 4 }}>(Response was truncated)</span>}
+                                {m.failureCode && m.failureCode !== 'none' && <span style={{ display: 'block', fontSize: 12, color: '#c9760c', marginTop: 4 }}>Warning: {m.failureCode}</span>}
                                 {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded')) || m.answerMode === 'action_receipt') ? renderSources(m) : null}
                               </div>
                               {(() => {

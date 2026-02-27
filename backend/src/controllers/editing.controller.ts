@@ -17,6 +17,7 @@ import {
   planAllybiOperator,
   buildMultiIntentPlan,
 } from "../services/editing/allybi";
+import { coerceEditTrustLevel } from "../services/editing/safety/editingSafetyGate.service";
 
 interface ApiError {
   code: string;
@@ -124,7 +125,10 @@ function userIdFromReq(req: Request): string | null {
   return asString(typedReq.user?.id);
 }
 
-function buildContext(req: Request): EditHandlerRequest["context"] | null {
+function buildContext(
+  req: Request,
+  domainHint?: EditDomain | null,
+): EditHandlerRequest["context"] | null {
   const userId = userIdFromReq(req);
   if (!userId) return null;
 
@@ -139,18 +143,27 @@ function buildContext(req: Request): EditHandlerRequest["context"] | null {
     asString(body.clientMessageId) ||
     randomUUID();
 
+  const domainSegment = isEditDomain(domainHint) ? domainHint : "generic";
   const conversationId =
     asString(req.headers["x-conversation-id"]) ||
     asString(body.conversationId) ||
-    `editing:${userId}`;
+    `editing:${domainSegment}:${userId}`;
 
   const language = asString(body.language);
+  const trustLevelFromHeader = asString(req.headers["x-edit-trust-level"]);
+  const trustLevelRaw =
+    trustLevelFromHeader ??
+    asString(body.trustLevel) ??
+    (body.untrustedContent === true || body.untrustedSource === true
+      ? "untrusted_content"
+      : null);
 
   return {
     userId,
     conversationId,
     correlationId,
     clientMessageId,
+    trustLevel: coerceEditTrustLevel(trustLevelRaw),
     ...(language &&
     (language === "en" || language === "pt" || language === "es")
       ? { language }
@@ -433,15 +446,14 @@ export class EditingController {
   ) {}
 
   plan = async (req: Request, res: Response): Promise<Response> => {
-    const context = buildContext(req);
-    if (!context)
-      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
-
     const body = (req.body as Record<string, unknown> | undefined) ?? {};
     const instruction = asString(body.instruction);
     const operator = body.operator;
     const domain = body.domain;
     const documentId = asString(body.documentId);
+    const context = buildContext(req, isEditDomain(domain) ? domain : null);
+    if (!context)
+      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const normalized = isEditDomain(domain)
       ? resolveOperatorWithAllybiFallback({
@@ -475,7 +487,7 @@ export class EditingController {
       );
     }
 
-    const result = await this.editingFacade.execute({
+    const executed = await this.editingFacade.executeWithAgent({
       mode: "plan",
       context,
       planRequest: {
@@ -490,6 +502,7 @@ export class EditingController {
         preserveTokens: asStringArray(body.preserveTokens),
       },
     });
+    const result = executed.response;
 
     if (!result.ok) {
       const mapped = mapEditError(result.error || "planning failed");
@@ -503,6 +516,9 @@ export class EditingController {
 
     return sendOk(res, {
       mode: "plan",
+      domain,
+      agentId: executed.agentId,
+      executionPath: "editing_agent_router",
       canonicalOperator: normalized.canonicalOperator,
       canonicalOperators: normalized.canonicalOperators || [],
       result: result.result,
@@ -511,10 +527,6 @@ export class EditingController {
   };
 
   preview = async (req: Request, res: Response): Promise<Response> => {
-    const context = buildContext(req);
-    if (!context)
-      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
-
     const body = (req.body as Record<string, unknown> | undefined) ?? {};
     const instruction = asString(body.instruction);
     const operator = body.operator;
@@ -528,6 +540,9 @@ export class EditingController {
       body.expectedDocumentUpdatedAtIso,
     );
     const expectedDocumentFileHash = asString(body.expectedDocumentFileHash);
+    const context = buildContext(req, isEditDomain(domain) ? domain : null);
+    if (!context)
+      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const normalized = isEditDomain(domain)
       ? resolveOperatorWithAllybiFallback({
@@ -578,7 +593,7 @@ export class EditingController {
       );
     }
 
-    const result = await this.editingFacade.execute({
+    const executed = await this.editingFacade.executeWithAgent({
       mode: "preview",
       context,
       planRequest: {
@@ -601,6 +616,7 @@ export class EditingController {
       sheetsCandidates: parseSheetsCandidates(body.sheetsCandidates),
       slidesCandidates: parseSlidesCandidates(body.slidesCandidates),
     });
+    const result = executed.response;
 
     if (!result.ok) {
       const mapped = mapEditError(result.error || "preview failed");
@@ -614,6 +630,9 @@ export class EditingController {
 
     return sendOk(res, {
       mode: "preview",
+      domain,
+      agentId: executed.agentId,
+      executionPath: "editing_agent_router",
       canonicalOperator,
       canonicalOperators: normalized.canonicalOperators || [],
       result: result.result,
@@ -623,10 +642,6 @@ export class EditingController {
   };
 
   apply = async (req: Request, res: Response): Promise<Response> => {
-    const context = buildContext(req);
-    if (!context)
-      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
-
     const body = (req.body as Record<string, unknown> | undefined) ?? {};
     const instruction = asString(body.instruction);
     const operator = body.operator;
@@ -640,6 +655,9 @@ export class EditingController {
       body.expectedDocumentUpdatedAtIso,
     );
     const expectedDocumentFileHash = asString(body.expectedDocumentFileHash);
+    const context = buildContext(req, isEditDomain(domain) ? domain : null);
+    if (!context)
+      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const normalized = isEditDomain(domain)
       ? resolveOperatorWithAllybiFallback({
@@ -690,7 +708,7 @@ export class EditingController {
       );
     }
 
-    const result = await this.editingFacade.execute({
+    const executed = await this.editingFacade.executeWithAgent({
       mode: "apply",
       context,
       planRequest: {
@@ -709,6 +727,14 @@ export class EditingController {
       proposedText,
       proposedHtml: proposedHtml || undefined,
       userConfirmed: asBoolean(body.userConfirmed),
+      confirmationToken: asString(body.confirmationToken) || undefined,
+      trustLevel: coerceEditTrustLevel(
+        asString(body.trustLevel) ||
+          asString(req.headers["x-edit-trust-level"]) ||
+          (body.untrustedContent === true || body.untrustedSource === true
+            ? "untrusted_content"
+            : null),
+      ),
       idempotencyKey: idempotencyKey || undefined,
       expectedDocumentUpdatedAtIso: expectedDocumentUpdatedAtIso || undefined,
       expectedDocumentFileHash: expectedDocumentFileHash || undefined,
@@ -717,6 +743,7 @@ export class EditingController {
       sheetsCandidates: parseSheetsCandidates(body.sheetsCandidates),
       slidesCandidates: parseSlidesCandidates(body.slidesCandidates),
     });
+    const result = executed.response;
 
     if (!result.ok) {
       const mapped = mapEditError(result.error || "apply failed");
@@ -733,7 +760,10 @@ export class EditingController {
         res,
         {
           mode: "apply",
-          applyPath: "editing_facade",
+          domain,
+          agentId: executed.agentId,
+          executionPath: "editing_agent_router",
+          applyPath: "editing_agent_router",
           canonicalOperator,
           canonicalOperators: normalized.canonicalOperators || [],
           result: result.result,
@@ -746,7 +776,10 @@ export class EditingController {
 
     return sendOk(res, {
       mode: "apply",
-      applyPath: "editing_facade",
+      domain,
+      agentId: executed.agentId,
+      executionPath: "editing_agent_router",
+      applyPath: "editing_agent_router",
       canonicalOperator,
       canonicalOperators: normalized.canonicalOperators || [],
       result: result.result,
@@ -756,11 +789,12 @@ export class EditingController {
   };
 
   undo = async (req: Request, res: Response): Promise<Response> => {
-    const context = buildContext(req);
+    const body = (req.body as Record<string, unknown> | undefined) ?? {};
+    const domainHint = isEditDomain(body.domain) ? body.domain : null;
+    const context = buildContext(req, domainHint);
     if (!context)
       return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
-    const body = (req.body as Record<string, unknown> | undefined) ?? {};
     const documentId = asString(body.documentId);
     if (!documentId)
       return sendErr(
@@ -770,7 +804,7 @@ export class EditingController {
         400,
       );
 
-    const result = await this.editingFacade.execute({
+    const executed = await this.editingFacade.executeWithAgent({
       mode: "undo",
       context,
       undo: {
@@ -778,6 +812,7 @@ export class EditingController {
         revisionId: asString(body.revisionId) || undefined,
       },
     });
+    const result = executed.response;
 
     if (!result.ok) {
       const mapped = mapEditError(result.error || "undo failed");
@@ -791,7 +826,10 @@ export class EditingController {
 
     return sendOk(res, {
       mode: "undo",
-      applyPath: "editing_facade",
+      domain: domainHint,
+      agentId: executed.agentId,
+      executionPath: "editing_agent_router",
+      applyPath: "editing_agent_router",
       result: result.result,
       receipt: result.receipt || null,
     });

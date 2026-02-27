@@ -186,19 +186,23 @@ function nowIso(): string {
  */
 function validateMinimalBankContract(bank: any, fileHint: string) {
   requireFields(bank, ["_meta", "config"], fileHint);
-  requireFields(
-    bank._meta,
-    ["id", "version", "description", "languages", "lastUpdated"],
-    fileHint,
-  );
+  requireFields(bank._meta, ["id", "version", "description"], fileHint);
   if (typeof bank._meta.id !== "string" || bank._meta.id.length < 1) {
     throw new DataBankError(`Invalid _meta.id in ${fileHint}`, { fileHint });
   }
-  if (!bank.config || typeof bank.config.enabled !== "boolean") {
+  if (
+    bank.config &&
+    typeof bank.config.enabled !== "undefined" &&
+    typeof bank.config.enabled !== "boolean"
+  ) {
     throw new DataBankError(
       `Invalid config.enabled in ${fileHint} (must be boolean)`,
       { fileHint },
     );
+  }
+  // Default config.enabled to true if missing
+  if (bank.config && typeof bank.config.enabled === "undefined") {
+    bank.config.enabled = true;
   }
 }
 

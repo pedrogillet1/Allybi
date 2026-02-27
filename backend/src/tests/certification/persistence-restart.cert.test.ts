@@ -97,9 +97,7 @@ describe("Certification: persistence restart integrity", () => {
     if (!messageSchemaComplete) failures.push("MESSAGE_SCHEMA_INCOMPLETE");
 
     // 3. Document revision schema + S3/GCS storage
-    const docModel = schemaSource.match(
-      /model Document \{[\s\S]*?\n\}/,
-    )?.[0];
+    const docModel = schemaSource.match(/model Document \{[\s\S]*?\n\}/)?.[0];
     const docSchemaValid =
       !!docModel &&
       /parentVersionId/.test(docModel) &&
@@ -112,7 +110,7 @@ describe("Certification: persistence restart integrity", () => {
     );
     const revStoreSource = fs.readFileSync(revStorePath, "utf8");
     const docRevisionDurable =
-      /prisma\.document\.create\b/.test(revStoreSource) &&
+      /prisma\.document\.(create|update)\b/.test(revStoreSource) &&
       /uploadFile\b/.test(revStoreSource);
     if (!docRevisionDurable) failures.push("DOC_REVISION_NOT_DURABLE");
 

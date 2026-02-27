@@ -16,6 +16,7 @@ import { logger } from "../../utils/logger";
 import cacheService from "../cache.service";
 import type { EditOperator, EditRevisionStore } from "./editing.types";
 import { DocxEditorService } from "./docx/docxEditor.service";
+import { DocxAnchorsService } from "./docx/docxAnchors.service";
 import { buildDocxBundlePatchesFromMarkdown } from "./docx/docxMarkdownBridge.service";
 import { SlidesClientService } from "./slides/slidesClient.service";
 import { SlidesEditorService } from "./slides/slidesEditor.service";
@@ -109,6 +110,30 @@ function isParagraphTargetNotFoundError(error: unknown): boolean {
 
 function looksLikeDocxAnnotatedMarkdown(value: string): boolean {
   return /<!--\s*docx:\d+\s*-->/i.test(String(value || ""));
+}
+
+function escapeRegex(text: string): string {
+  return String(text || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function buildFindReplaceRegex(input: {
+  findText: string;
+  useRegex: boolean;
+  matchCase: boolean;
+  wholeWord: boolean;
+}): RegExp {
+  const findText = String(input.findText || "");
+  if (!findText.trim()) {
+    throw new Error("DOCX_FIND_REPLACE requires findText.");
+  }
+  const sourceBase = input.useRegex ? findText : escapeRegex(findText);
+  const source = input.wholeWord ? `\\b${sourceBase}\\b` : sourceBase;
+  try {
+    return new RegExp(source, input.matchCase ? "g" : "gi");
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "invalid_pattern";
+    throw new Error(`DOCX_FIND_REPLACE_INVALID_PATTERN: ${message}`);
+  }
 }
 
 export class OperatorNotImplementedError extends Error {
@@ -425,6 +450,10 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       affectedRanges?: string[];
       affectedParagraphIds?: string[];
       locateRange?: string | null;
+      executionPath?: "python_applied" | "python_bypassed" | "local_only";
+      pythonTraceId?: string | null;
+      pythonOpProofsCount?: number;
+      pythonOpProofCoverage?: number;
       changedSamples?: Array<{
         sheetName: string;
         cell: string;
@@ -659,6 +688,7 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
       let buf = original;
       let patchesApplied = 0;
+      const dynamicAffectedParagraphIds = new Set<string>();
 
       // Phase 1: Apply all content edits (docx_paragraph) first
       for (const p of patches) {
@@ -972,6 +1002,23 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
               );
               break;
             }
+            case "docx_find_replace": {
+              const findReplace = await this.applyDocxFindReplacePatch(
+                buf,
+                p as Record<string, unknown>,
+              );
+              if (!findReplace.buffer.equals(buf)) {
+                buf = findReplace.buffer;
+                patchesApplied += Math.max(
+                  findReplace.affectedParagraphIds.length,
+                  1,
+                );
+                for (const paragraphId of findReplace.affectedParagraphIds) {
+                  dynamicAffectedParagraphIds.add(paragraphId);
+                }
+              }
+              break;
+            }
             default:
               // Unknown patch kind — skip (docx_paragraph and docx_delete_paragraph handled in other phases)
               continue;
@@ -1018,6 +1065,7 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       const affectedParagraphIds = Array.from(
         new Set(
           [
+            ...Array.from(dynamicAffectedParagraphIds),
             ...patches
               .map((patch: any) =>
                 String((patch as any)?.paragraphId || "").trim(),
@@ -2068,6 +2116,94 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     };
   }
 
+  private async applyDocxFindReplacePatch(
+    buffer: Buffer,
+    patch: Record<string, unknown>,
+  ): Promise<{
+    buffer: Buffer;
+    affectedParagraphIds: string[];
+    replacements: number;
+  }> {
+    const findText =
+      asString((patch as any).findText) || asString((patch as any).searchText);
+    if (!findText) {
+      return {
+        buffer,
+        affectedParagraphIds: [],
+        replacements: 0,
+      };
+    }
+
+    const replaceTextRaw =
+      (patch as any).replaceText ??
+      (patch as any).replacementText ??
+      (patch as any).replaceWith ??
+      "";
+    const replaceText = replaceTextRaw == null ? "" : String(replaceTextRaw);
+    const useRegex = Boolean((patch as any).useRegex);
+    const matchCase = Boolean(
+      (patch as any).matchCase ?? (patch as any).caseSensitive,
+    );
+    const wholeWord = Boolean((patch as any).wholeWord);
+    const matcher = buildFindReplaceRegex({
+      findText,
+      useRegex,
+      matchCase,
+      wholeWord,
+    });
+
+    const anchorsService = new DocxAnchorsService();
+    const anchors = await anchorsService.extractParagraphNodes(buffer);
+    let nextBuffer = buffer;
+    const affectedParagraphIds: string[] = [];
+    let replacements = 0;
+
+    for (const anchor of anchors) {
+      const paragraphId = String(anchor.paragraphId || "").trim();
+      const originalText = String(anchor.text || "");
+      if (!paragraphId || !originalText) continue;
+
+      matcher.lastIndex = 0;
+      const matches = originalText.match(matcher);
+      const count = matches ? matches.length : 0;
+      if (count === 0) continue;
+
+      matcher.lastIndex = 0;
+      const replacedText = originalText.replace(matcher, replaceText);
+      if (replacedText === originalText) continue;
+
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const updated = await this.docxEditor.applyParagraphEdit(
+          nextBuffer,
+          paragraphId,
+          replacedText,
+        );
+        if (updated.equals(nextBuffer)) continue;
+        nextBuffer = updated;
+        affectedParagraphIds.push(paragraphId);
+        replacements += count;
+      } catch (error) {
+        if (isParagraphTargetNotFoundError(error)) {
+          logger.warn(
+            "[Editing][DOCX_FIND_REPLACE] Skipping stale paragraph target",
+            {
+              paragraphId,
+            },
+          );
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    return {
+      buffer: nextBuffer,
+      affectedParagraphIds,
+      replacements,
+    };
+  }
+
   private async resolveRootDocumentId(documentId: string): Promise<string> {
     let currentId: string | null = documentId;
     let safety = 0;
@@ -2424,6 +2560,41 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       if (response?.proof && typeof response.proof === "object") {
         (input.meta as any).__pythonSpreadsheetProof = response.proof;
       }
+      const opProofsFromProof = Array.isArray(response?.proof?.ops)
+        ? response.proof.ops
+        : [];
+      const opProofsFromStatuses = Array.isArray(response?.applied_ops)
+        ? response.applied_ops
+            .map((status: any) => {
+              const index = Number(status?.index);
+              const kind = String(status?.kind || "").trim();
+              if (!Number.isFinite(index) || !kind) return null;
+              return {
+                index,
+                kind,
+                status: String(status?.status || "").trim() || "unknown",
+                ...(status?.message
+                  ? { message: String(status.message).slice(0, 300) }
+                  : {}),
+                ...(status?.before_hash
+                  ? { before_hash: String(status.before_hash) }
+                  : {}),
+                ...(status?.after_hash
+                  ? { after_hash: String(status.after_hash) }
+                  : {}),
+                ...(status?.proof && typeof status.proof === "object"
+                  ? { proof: status.proof as Record<string, unknown> }
+                  : {}),
+              };
+            })
+            .filter(Boolean)
+        : [];
+      const opProofs = [...opProofsFromProof, ...opProofsFromStatuses]
+        .filter((entry: any) => entry && typeof entry === "object")
+        .slice(0, 500);
+      if (opProofs.length) {
+        (input.meta as any).__pythonSpreadsheetOpProofs = opProofs;
+      }
       if (Array.isArray(response?.warnings)) {
         (input.meta as any).__pythonSpreadsheetWarnings = response.warnings
           .map((item: any) => String(item || "").trim())
@@ -2473,6 +2644,10 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
     const spreadsheetEngineOps = buildSpreadsheetEngineOps();
     const spreadsheetEngineMode = this.spreadsheetEngine.mode();
+    let spreadsheetExecutionPath:
+      | "local_only"
+      | "python_applied"
+      | "python_bypassed" = "local_only";
     const requiresRemotePython = spreadsheetEngineOps.some((op) => {
       const kind = String((op as any)?.kind || "")
         .trim()
@@ -2484,7 +2659,7 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     const shouldCallPythonEngine =
       input.op === "COMPUTE" &&
       this.spreadsheetEngine.enabled() &&
-      requiresRemotePython;
+      (requiresRemotePython || spreadsheetEngineMode !== "off");
 
     if (shouldCallPythonEngine) {
       try {
@@ -2526,6 +2701,7 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         });
 
         persistSpreadsheetEngineArtifacts(response);
+        spreadsheetExecutionPath = "python_applied";
 
         const statuses = Array.isArray(response?.applied_ops)
           ? response.applied_ops
@@ -2557,6 +2733,7 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
             `PYTHON_SPREADSHEET_ENGINE_FAILED: ${String(error?.message || error)}`,
           );
         }
+        spreadsheetExecutionPath = "python_bypassed";
         const warningList = Array.isArray(
           (input.meta as any).__pythonSpreadsheetWarnings,
         )
@@ -2640,7 +2817,21 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       changedCellsCount: diff.changedCellsCount,
       changedStructuresCount: diff.changedStructuresCount,
       locateRange: diff.locateRange,
+      executionPath: spreadsheetExecutionPath,
     };
+
+    const pythonOpProofs = Array.isArray(
+      (input.meta as any).__pythonSpreadsheetOpProofs,
+    )
+      ? ((input.meta as any).__pythonSpreadsheetOpProofs as Array<any>)
+      : [];
+    const opProofCoverage = pythonOpProofs.length
+      ? pythonOpProofs.filter((proof) => {
+          const beforeHash = String((proof as any)?.before_hash || "").trim();
+          const afterHash = String((proof as any)?.after_hash || "").trim();
+          return Boolean(beforeHash) && Boolean(afterHash);
+        }).length / pythonOpProofs.length
+      : 0;
 
     (input.meta as any).__applyMetrics = {
       changedCellsCount: diff.changedCellsCount,
@@ -2649,6 +2840,12 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       locateRange: diff.locateRange,
       changedSamples: diff.changedSamples,
       rejectedOps,
+      executionPath: spreadsheetExecutionPath,
+      pythonOpProofsCount: pythonOpProofs.length,
+      pythonOpProofCoverage: Number(opProofCoverage.toFixed(4)),
+      pythonTraceId: asString(
+        (input.meta as any).__pythonSpreadsheetProof?.trace_id,
+      ),
     };
 
     if (rejectedOps.length) {

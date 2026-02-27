@@ -38,6 +38,12 @@ describe("Certification: observability integrity", () => {
     const failures: string[] = [];
     if (missingInTraceType.length > 0) failures.push("TRACE_STEP_TYPE_MISSING");
     if (missingInDelegate.length > 0) failures.push("DELEGATE_SPAN_MISSING");
+    const strictModeWiringPresent =
+      traceWriterSource.includes("strictWriteFailures") &&
+      traceWriterSource.includes("OBS_TRACE_STRICT_WRITE_FAILURES") &&
+      traceWriterSource.includes("TRACE_WRITER_STRICT_FAILURE");
+    if (!strictModeWiringPresent)
+      failures.push("TRACE_WRITER_STRICT_MODE_NOT_WIRED");
 
     writeCertificationGateReport("observability-integrity", {
       passed: failures.length === 0,
@@ -45,10 +51,12 @@ describe("Certification: observability integrity", () => {
         requiredStepCount: REQUIRED_TRACE_STEPS.length,
         traceTypeMissingCount: missingInTraceType.length,
         delegateSpanMissingCount: missingInDelegate.length,
+        strictModeWiringPresent,
       },
       thresholds: {
         traceTypeMissingCount: 0,
         delegateSpanMissingCount: 0,
+        strictModeWiringPresent: true,
       },
       failures: [
         ...failures,

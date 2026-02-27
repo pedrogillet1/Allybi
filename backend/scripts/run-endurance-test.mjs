@@ -466,6 +466,7 @@ async function main() {
         const answerClass = data.answerClass || "unknown";
         const content = data.assistantText || "";
         const truncation = data.truncation || { occurred: false };
+        const providerTruncation = Boolean(data.truncation?.providerOccurred);
 
         const sourceFilenames = sources.map(
           (s) => s.fileName || s.filename || s.name || "unknown",
@@ -509,7 +510,11 @@ async function main() {
         const qcRelevance = checkAnswerRelevance(content, query, allResults);
         const qcDrift = checkThematicDrift(query, content);
 
-        const truncBadge = truncation.occurred ? " TRUNCATED" : "";
+        const truncBadge = truncation.occurred
+          ? " TRUNCATED"
+          : providerTruncation
+            ? " PROVIDER_TRUNC"
+            : "";
         const qcBadges = [
           !qcConsistency.ok ? "CONTRADICT" : "",
           qcFormat.refusal ? "REFUSAL" : !qcFormat.ok ? "NO_TABLE" : "",
@@ -538,6 +543,7 @@ async function main() {
           unexpectedSources,
           missingRequiredGroups,
           truncation,
+          providerTruncation,
           conversationId: data.conversationId,
           elapsed,
           qcConsistency,
@@ -585,6 +591,7 @@ async function main() {
   ).length;
   const errors = allResults.filter((t) => t.error).length;
   const truncated = allResults.filter((t) => t.truncation?.occurred).length;
+  const providerTruncated = allResults.filter((t) => t.providerTruncation).length;
   const totalTime = phaseTimings
     .reduce((s, p) => s + parseFloat(p.elapsed), 0)
     .toFixed(1);
@@ -607,6 +614,7 @@ async function main() {
   console.log(`  ⚠️  No sources: ${noSrc}/${totalQueries}`);
   console.log(`  ✗  Errors: ${errors}/${totalQueries}`);
   console.log(`  ✂️  Truncated: ${truncated}/${totalQueries}`);
+  console.log(`  🧭 Provider truncation: ${providerTruncated}/${totalQueries}`);
 
   console.log(`\n  Quality checks:`);
   console.log(`    Sources consistency: ${consistencyOk}/${successResults.length}`);
@@ -623,13 +631,14 @@ async function main() {
     const pMatch = pResults.filter((r) => r.allMatch).length;
     const pErr = pResults.filter((r) => r.error).length;
     const pTrunc = pResults.filter((r) => r.truncation?.occurred).length;
+    const pProviderTrunc = pResults.filter((r) => r.providerTruncation).length;
     const avgElapsed =
       pResults
         .filter((r) => !r.error)
         .reduce((s, r) => s + parseFloat(r.elapsed), 0) /
       Math.max(1, pResults.filter((r) => !r.error).length);
     console.log(
-      `    ${phase.name}: ${pMatch}/${pResults.length} match | ${pErr} err | ${pTrunc} trunc | avg ${avgElapsed.toFixed(1)}s`,
+      `    ${phase.name}: ${pMatch}/${pResults.length} match | ${pErr} err | ${pTrunc} trunc | ${pProviderTrunc} provider | avg ${avgElapsed.toFixed(1)}s`,
     );
   }
 

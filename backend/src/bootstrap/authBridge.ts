@@ -103,7 +103,9 @@ export function createAuthService(): AuthService {
       } catch (error) {
         console.error("Failed to send verification email:", error);
         if (process.env.NODE_ENV !== "production") {
-          console.log(`[DEV MODE] Verification code for ${email}: ${emailCode}`);
+          console.log(
+            `[DEV MODE] Verification code for ${email}: ${emailCode}`,
+          );
         }
       }
 

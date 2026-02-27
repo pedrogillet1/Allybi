@@ -42,6 +42,7 @@ function isRuntimeSourceFile(relPath) {
   if (relPath.startsWith("src/analytics/")) return false;
   if (relPath.startsWith("src/main/health.ts")) return false;
   if (relPath.startsWith("src/jobs/")) return false;
+  if (relPath.startsWith("src/services/core/certification/")) return false;
   return true;
 }
 

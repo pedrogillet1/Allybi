@@ -46,7 +46,8 @@ router.get("/", async (req: Request, res: Response) => {
 /**
  * GET /api/admin/live/stream
  * Server-Sent Events endpoint for real-time updates
- * Note: This is a placeholder - implement with actual SSE if needed
+ * Current behavior: keepalive stream (connected/ping events) for dashboard liveness.
+ * This endpoint is intentionally lightweight and does not stream domain events yet.
  */
 router.get("/stream", (req: Request, res: Response) => {
   res.setHeader("Content-Type", "text/event-stream");

@@ -260,6 +260,11 @@ export class LlmRequestBuilderService {
       options.maxOutputTokens = Math.min(options.maxOutputTokens ?? 300, 220);
     }
 
+    // Special case: table mode needs minimum budget for header + data rows
+    if (answerMode === "doc_grounded_table") {
+      options.maxOutputTokens = Math.max(options.maxOutputTokens ?? 3200, 4000);
+    }
+
     // Special case: quote mode often needs strictness, but keep length bounded
     if (input.signals.operator === "quote") {
       options.temperature = 0.15;
@@ -427,10 +432,10 @@ export class LlmRequestBuilderService {
       input.evidencePack.evidence.length
     ) {
       parts.push(
-        this.renderEvidenceForPrompt(
-          input.evidencePack,
-          input.signals.isExtractionQuery,
-        ),
+        this.renderEvidenceForPrompt(input.evidencePack, {
+          isExtractionQuery: input.signals.isExtractionQuery,
+          answerMode: input.signals.answerMode,
+        }),
       );
     }
 
@@ -470,18 +475,21 @@ export class LlmRequestBuilderService {
 
   private renderEvidenceForPrompt(
     pack: EvidencePackLike,
-    isExtractionQuery?: boolean,
+    opts?: { isExtractionQuery?: boolean; answerMode?: string },
   ): string {
-    // Dynamic evidence budget: extraction queries get more items + longer snippets
-    const maxItems = isExtractionQuery ? 16 : 8;
-    const maxSnippetChars = isExtractionQuery ? 520 : 260;
+    // Dynamic evidence budget: extraction + multi-doc queries get more items + longer snippets
+    const isMultiDoc = opts?.answerMode === "doc_grounded_multi";
+    const wideContext = isMultiDoc || opts?.isExtractionQuery;
+    const maxItems = wideContext ? 16 : 8;
+    const maxSnippetChars = wideContext ? 520 : 260;
 
     const top = pack.evidence.slice(0, maxItems);
 
     const lines: string[] = [];
-    lines.push(
-      "### Evidence (use only this — answer the specific question, not a generic overview)",
-    );
+    const header = isMultiDoc
+      ? "### Evidence (use only this — synthesize information from all relevant documents below)"
+      : "### Evidence (use only this — answer the specific question, not a generic overview)";
+    lines.push(header);
     for (const e of top) {
       const title = e.title || e.filename || e.docId;
       const loc =

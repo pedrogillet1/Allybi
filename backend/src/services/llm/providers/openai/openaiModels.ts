@@ -58,8 +58,8 @@ export const OPENAI_MODELS: Record<OpenAIModelId, OpenAIModelSpec> = {
     defaults: {
       temperatureDraft: 0.5,
       temperatureFinal: 0.25,
-      maxOutputTokensDraft: 700,
-      maxOutputTokensFinal: 900,
+      maxOutputTokensDraft: 1600,
+      maxOutputTokensFinal: 4096,
     },
   },
   "gpt-5.2": {
@@ -73,8 +73,8 @@ export const OPENAI_MODELS: Record<OpenAIModelId, OpenAIModelSpec> = {
     defaults: {
       temperatureDraft: 0.35,
       temperatureFinal: 0.2,
-      maxOutputTokensDraft: 700,
-      maxOutputTokensFinal: 900,
+      maxOutputTokensDraft: 1600,
+      maxOutputTokensFinal: 4096,
     },
   },
 };

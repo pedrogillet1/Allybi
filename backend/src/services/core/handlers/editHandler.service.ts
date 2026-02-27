@@ -1,4 +1,6 @@
 import {
+  EditingSafetyGateService,
+  EditingTextGenerationService,
   type EditApplyResult,
   EditOrchestratorService,
   type EditOutcomeType,
@@ -12,6 +14,7 @@ import {
   type EditPreviewResult,
   type EditRevisionStore,
   type EditTelemetry,
+  type EditTrustLevel,
   type ResolvedTarget,
   type SheetsTargetNode,
   type SlidesTargetNode,
@@ -21,6 +24,7 @@ import {
   SupportContractService,
   type SupportContractResult,
 } from "../../editing/allybi/supportContract.service";
+import { logger } from "../../../utils/logger";
 
 type EditActionMode = "plan" | "preview" | "apply" | "undo";
 
@@ -33,6 +37,8 @@ export interface EditHandlerRequest {
   proposedText?: string;
   proposedHtml?: string;
   userConfirmed?: boolean;
+  confirmationToken?: string;
+  trustLevel?: EditTrustLevel;
   idempotencyKey?: string;
   expectedDocumentUpdatedAtIso?: string;
   expectedDocumentFileHash?: string;
@@ -58,6 +64,14 @@ export interface EditHandlerResponse {
 
 function isNonEmpty(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function canSkipBeforeTextForPlan(plan: EditPlan): boolean {
+  if (plan.domain !== "docx") return false;
+  const canonical = String(plan.canonicalOperator || "")
+    .trim()
+    .toUpperCase();
+  return canonical === "DOCX_FIND_REPLACE";
 }
 
 function syntheticTarget(label: string): ResolvedTarget {
@@ -137,6 +151,8 @@ export class EditHandlerService {
   private readonly orchestrator: EditOrchestratorService;
   private readonly targetResolver: TargetResolverService;
   private readonly supportContract: SupportContractService;
+  private readonly safetyGate: EditingSafetyGateService;
+  private readonly textGeneration: EditingTextGenerationService;
 
   constructor(opts?: {
     revisionStore?: EditRevisionStore;
@@ -148,6 +164,8 @@ export class EditHandlerService {
     });
     this.targetResolver = new TargetResolverService();
     this.supportContract = new SupportContractService();
+    this.safetyGate = new EditingSafetyGateService();
+    this.textGeneration = new EditingTextGenerationService();
   }
 
   async execute(input: EditHandlerRequest): Promise<EditHandlerResponse> {
@@ -191,16 +209,11 @@ export class EditHandlerService {
       };
     }
 
-    if (
-      !input.planRequest ||
-      !isNonEmpty(input.beforeText) ||
-      !isNonEmpty(input.proposedText)
-    ) {
+    if (!input.planRequest) {
       return {
         ok: false,
         mode: input.mode,
-        error:
-          "Preview/apply requires planRequest, beforeText, and proposedText.",
+        error: "Preview/apply requires planRequest.",
       };
     }
 
@@ -216,6 +229,30 @@ export class EditHandlerService {
         error: planned.error || "Failed to build edit plan.",
       };
     }
+
+    const normalizedBeforeText = String(input.beforeText || "").trim();
+    if (!normalizedBeforeText && !canSkipBeforeTextForPlan(planned.plan)) {
+      return {
+        ok: false,
+        mode: input.mode,
+        error: "Preview/apply requires beforeText for this operator.",
+      };
+    }
+
+    const generation = await this.textGeneration.generateProposedText({
+      context: input.context,
+      plan: planned.plan,
+      beforeText: normalizedBeforeText,
+      proposedText: input.proposedText,
+    });
+    if (!generation.ok) {
+      return {
+        ok: false,
+        mode: input.mode,
+        error: generation.error,
+      };
+    }
+    const effectiveProposedText = generation.proposedText;
 
     const resolvedTarget =
       input.target ??
@@ -298,8 +335,8 @@ export class EditHandlerService {
       const preview = await this.orchestrator.previewEdit(input.context, {
         plan: planned.plan,
         target: resolvedTarget,
-        beforeText: input.beforeText,
-        proposedText: input.proposedText,
+        beforeText: normalizedBeforeText,
+        proposedText: effectiveProposedText,
         preserveTokens: input.preserveTokens,
       });
       return {
@@ -315,8 +352,8 @@ export class EditHandlerService {
       const preview = await this.orchestrator.previewEdit(input.context, {
         plan: planned.plan,
         target: resolvedTarget,
-        beforeText: input.beforeText,
-        proposedText: input.proposedText,
+        beforeText: normalizedBeforeText,
+        proposedText: effectiveProposedText,
         preserveTokens: input.preserveTokens,
       });
       return {
@@ -329,12 +366,65 @@ export class EditHandlerService {
       };
     }
 
+    const safetyDecision = this.safetyGate.evaluate({
+      plan: planned.plan,
+      beforeText: normalizedBeforeText,
+      proposedText: effectiveProposedText,
+      targetId: resolvedTarget.id,
+      userConfirmed: input.userConfirmed === true,
+      confirmationToken: input.confirmationToken,
+      trustLevel: input.trustLevel || input.context.trustLevel,
+    });
+    if (safetyDecision.decision !== "allow") {
+      logger.warn("[EditingSafetyGate] blocked_or_confirm_required", {
+        conversationId: input.context.conversationId,
+        correlationId: input.context.correlationId,
+        operator: planned.plan.operator,
+        domain: planned.plan.domain,
+        decision: safetyDecision.decision,
+        trustLevel: safetyDecision.trustLevel,
+        riskScore: safetyDecision.riskScore,
+        reasons: safetyDecision.reasons,
+      });
+      const code =
+        safetyDecision.decision === "block"
+          ? "SAFETY_GATE_BLOCKED"
+          : "SAFETY_GATE_CONFIRMATION_REQUIRED";
+      const blocked: EditApplyResult = {
+        ok: true,
+        applied: false,
+        outcomeType: "blocked",
+        safetyGate: safetyDecision,
+        blockedReason: {
+          code,
+          gate: "trust_gate",
+          message:
+            safetyDecision.decision === "block"
+              ? "Safety gate blocked this operation due to high-risk context."
+              : "Safety gate requires stronger confirmation before apply.",
+          details: {
+            reasons: safetyDecision.reasons,
+            trustLevel: safetyDecision.trustLevel,
+            riskScore: safetyDecision.riskScore,
+          },
+        },
+      };
+      return {
+        ok: true,
+        mode: "apply",
+        result: blocked,
+        requiresUserChoice: safetyDecision.decision === "confirm",
+      };
+    }
+
     const applied = await this.orchestrator.applyEdit(input.context, {
       plan: planned.plan,
       target: resolvedTarget,
-      beforeText: input.beforeText,
-      proposedText: input.proposedText,
+      beforeText: normalizedBeforeText,
+      proposedText: effectiveProposedText,
       proposedHtml: input.proposedHtml,
+      confirmationToken: input.confirmationToken,
+      trustLevel: input.trustLevel || input.context.trustLevel,
       idempotencyKey: input.idempotencyKey,
       expectedDocumentUpdatedAtIso: input.expectedDocumentUpdatedAtIso,
       expectedDocumentFileHash: input.expectedDocumentFileHash,
@@ -343,7 +433,10 @@ export class EditHandlerService {
     return {
       ok: applied.ok,
       mode: "apply",
-      result: applied,
+      result: {
+        ...applied,
+        safetyGate: applied.safetyGate || safetyDecision,
+      },
       receipt: applied.receipt,
       requiresUserChoice: resolvedTarget.isAmbiguous && !input.userConfirmed,
       error: applied.ok ? undefined : applied.error,

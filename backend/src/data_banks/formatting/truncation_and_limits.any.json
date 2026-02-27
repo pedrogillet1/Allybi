@@ -24,10 +24,10 @@
   },
   "globalLimits": {
     "_comment": "Absolute maximums that override all other settings.",
-    "maxResponseCharsHard": 6000,
-    "maxResponseTokensHard": 3200,
-    "maxParagraphsHard": 8,
-    "maxBulletsHard": 7,
+    "maxResponseCharsHard": 20000,
+    "maxResponseTokensHard": 8000,
+    "maxParagraphsHard": 14,
+    "maxBulletsHard": 14,
     "maxTableRowsHard": 25,
     "maxTableColumnsHard": 6,
     "maxQuestionsHard": 1
@@ -56,24 +56,24 @@
       "maxTableRows": 10
     },
     "standard": {
-      "maxChars": 1200,
-      "maxParagraphs": 5,
-      "maxSentences": 12,
-      "maxBullets": 5,
-      "maxTableRows": 15
-    },
-    "detailed": {
       "maxChars": 2400,
       "maxParagraphs": 7,
       "maxSentences": 20,
       "maxBullets": 7,
+      "maxTableRows": 15
+    },
+    "detailed": {
+      "maxChars": 4000,
+      "maxParagraphs": 10,
+      "maxSentences": 30,
+      "maxBullets": 10,
       "maxTableRows": 20
     },
     "deep": {
-      "maxChars": 4000,
-      "maxParagraphs": 8,
-      "maxSentences": 30,
-      "maxBullets": 7,
+      "maxChars": 6000,
+      "maxParagraphs": 12,
+      "maxSentences": 40,
+      "maxBullets": 12,
       "maxTableRows": 25
     }
   },
@@ -103,44 +103,44 @@
       "preferProfile": "concise"
     },
     "doc_grounded_single": {
-      "maxCharsDefault": 1200,
-      "maxOutputTokensDefault": 1200,
-      "preferProfile": "standard"
-    },
-    "doc_grounded_multi": {
-      "maxCharsDefault": 1800,
-      "maxOutputTokensDefault": 1600,
-      "preferProfile": "standard"
-    },
-    "doc_grounded_table": {
-      "maxCharsDefault": 1800,
-      "maxOutputTokensDefault": 1800,
-      "maxTableRows": 20,
+      "maxCharsDefault": 3200,
+      "maxOutputTokensDefault": 2800,
       "preferProfile": "detailed"
     },
+    "doc_grounded_multi": {
+      "maxCharsDefault": 4000,
+      "maxOutputTokensDefault": 3000,
+      "preferProfile": "detailed"
+    },
+    "doc_grounded_table": {
+      "maxCharsDefault": 4000,
+      "maxOutputTokensDefault": 3200,
+      "maxTableRows": 20,
+      "preferProfile": "deep"
+    },
     "doc_grounded_quote": {
-      "maxCharsDefault": 800,
-      "maxOutputTokensDefault": 700,
-      "maxQuoteLines": 8,
-      "preferProfile": "concise"
+      "maxCharsDefault": 1600,
+      "maxOutputTokensDefault": 1000,
+      "maxQuoteLines": 12,
+      "preferProfile": "standard"
     },
     "doc_discovery_list": {
-      "maxCharsDefault": 1000,
-      "maxOutputTokensDefault": 800,
-      "maxBullets": 5,
+      "maxCharsDefault": 2000,
+      "maxOutputTokensDefault": 1200,
+      "maxBullets": 7,
       "preferProfile": "standard"
     },
     "help_steps": {
-      "maxCharsDefault": 1000,
-      "maxOutputTokensDefault": 900,
-      "maxBullets": 5,
+      "maxCharsDefault": 2000,
+      "maxOutputTokensDefault": 1200,
+      "maxBullets": 7,
       "preferProfile": "standard"
     },
     "no_docs": {
-      "maxChars": 400,
-      "maxOutputTokens": 300,
-      "maxSentences": 4,
-      "forceProfile": "brief"
+      "maxChars": 800,
+      "maxOutputTokens": 600,
+      "maxSentences": 6,
+      "forceProfile": "concise"
     },
     "scoped_not_found": {
       "maxChars": 280,
@@ -155,9 +155,9 @@
       "forceProfile": "micro"
     },
     "general_answer": {
-      "maxCharsDefault": 1200,
-      "maxOutputTokensDefault": 1000,
-      "preferProfile": "standard"
+      "maxCharsDefault": 4000,
+      "maxOutputTokensDefault": 3000,
+      "preferProfile": "deep"
     }
   },
   "paragraphLimits": {

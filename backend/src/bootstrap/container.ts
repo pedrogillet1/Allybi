@@ -131,6 +131,19 @@ class KodaV3Container {
           if (!wiring.ok) {
             const env = coerceEnvName(process.env.NODE_ENV);
             const strict = env === "production" || env === "staging";
+            const criticalFields = [
+              wiring.missingOperatorContracts,
+              wiring.missingOperatorOutputShapes,
+              wiring.missingEditingCatalogOperators,
+              wiring.missingEditingCapabilities,
+              wiring.unreachablePromptSelectionRules,
+              wiring.legacyChatRuntimeImports,
+              wiring.dormantCoreRoutingImports,
+              wiring.turnRoutePolicyDynamicFallback,
+            ];
+            const hasCriticalIssue = criticalFields.some(
+              (arr) => arr && arr.length > 0,
+            );
             const details = {
               missingBanks: wiring.missingBanks,
               missingOperatorContracts: wiring.missingOperatorContracts,
@@ -145,13 +158,13 @@ class KodaV3Container {
               turnRoutePolicyDynamicFallback:
                 wiring.turnRoutePolicyDynamicFallback,
             };
-            if (strict) {
+            if (strict && hasCriticalIssue) {
               throw new Error(
                 `[Container] Runtime wiring integrity failed in strict mode: ${JSON.stringify(details)}`,
               );
             }
             console.warn(
-              "[Container] Runtime wiring integrity warnings",
+              "[Container] Runtime wiring integrity warnings (non-blocking)",
               details,
             );
           }

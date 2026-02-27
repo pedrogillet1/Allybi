@@ -160,7 +160,7 @@ const DEFAULTS: Omit<GeminiProviderConfig, "env" | "apiKey"> = {
       temperature: Number(process.env.GEMINI_DRAFT_TEMPERATURE || 0.5),
       topP: Number(process.env.GEMINI_DRAFT_TOP_P || 0.9),
       maxOutputTokens: Number(
-        process.env.GEMINI_DRAFT_MAX_OUTPUT_TOKENS || 700,
+        process.env.GEMINI_DRAFT_MAX_OUTPUT_TOKENS || 1600,
       ),
     },
 
@@ -169,7 +169,7 @@ const DEFAULTS: Omit<GeminiProviderConfig, "env" | "apiKey"> = {
       temperature: Number(process.env.GEMINI_FINAL_TEMPERATURE || 0.25),
       topP: Number(process.env.GEMINI_FINAL_TOP_P || 0.9),
       maxOutputTokens: Number(
-        process.env.GEMINI_FINAL_MAX_OUTPUT_TOKENS || 900,
+        process.env.GEMINI_FINAL_MAX_OUTPUT_TOKENS || 4096,
       ),
     },
 

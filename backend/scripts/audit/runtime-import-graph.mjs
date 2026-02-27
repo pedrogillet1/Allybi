@@ -80,6 +80,7 @@ function parseSpecifiers(code) {
   const specs = new Set();
   const patterns = [
     /import\s+[^'"`]*?from\s*['"]([^'"`]+)['"]/g,
+    /import\s*['"]([^'"`]+)['"]\s*;?/g,
     /export\s+[^'"`]*?from\s*['"]([^'"`]+)['"]/g,
     /import\(\s*['"]([^'"`]+)['"]\s*\)/g,
   ];
@@ -231,6 +232,7 @@ function isRuntimeSourceFile(absPath) {
   if (rel.startsWith("src/analytics/")) return false;
   if (rel.startsWith("src/main/health.ts")) return false;
   if (rel.startsWith("src/jobs/")) return false;
+  if (rel.startsWith("src/services/core/certification/")) return false;
   return true;
 }
 

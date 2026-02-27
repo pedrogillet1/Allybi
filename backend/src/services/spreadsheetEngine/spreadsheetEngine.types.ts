@@ -1,4 +1,4 @@
-export type SpreadsheetEngineMode = "off" | "shadow" | "enforced";
+export type SpreadsheetEngineMode = "off" | "shadow" | "enforced" | "degraded";
 
 export interface SpreadsheetEngineContext {
   activeSheetName?: string | null;
@@ -28,6 +28,9 @@ export interface SpreadsheetEngineAppliedOpStatus {
   kind: string;
   status: "applied" | "failed" | string;
   message?: string;
+  proof?: Record<string, unknown>;
+  before_hash?: string;
+  after_hash?: string;
 }
 
 export interface SpreadsheetEngineExecuteResponse {
@@ -43,6 +46,15 @@ export interface SpreadsheetEngineExecuteResponse {
     provider: string;
     timings_ms: number;
     trace_id: string;
+    ops?: Array<{
+      index: number;
+      kind: string;
+      status: string;
+      message?: string;
+      before_hash?: string;
+      after_hash?: string;
+      proof?: Record<string, unknown>;
+    }>;
   };
   warnings: string[];
 }
@@ -73,5 +85,6 @@ export function coerceSpreadsheetEngineMode(
     .toLowerCase();
   if (mode === "enforced") return "enforced";
   if (mode === "shadow") return "shadow";
+  if (mode === "degraded") return "degraded";
   return "off";
 }
