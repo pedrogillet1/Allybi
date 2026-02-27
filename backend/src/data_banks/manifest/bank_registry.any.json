@@ -1820,50 +1820,6 @@
       "lastUpdated": "2026-02-20"
     },
     {
-      "id": "memory_semantic_continuity",
-      "category": "tests",
-      "path": "tests/memory_semantic_continuity.any.json",
-      "filename": "memory_semantic_continuity.any.json",
-      "version": "1.0.0",
-      "schemaId": "bank_schema",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "574ac28c4709d3cbde86d884bf79e8ce98d051e07d83f6099c8da11d88b28a03",
-      "lastUpdated": "2026-02-20"
-    },
-    {
-      "id": "slot_extraction_cases",
-      "category": "tests",
-      "path": "tests/slot_extraction_cases.any.json",
-      "filename": "slot_extraction_cases.any.json",
-      "version": "1.0.0",
-      "schemaId": "bank_schema",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "2719a32a8ada4b1b1c3846d2dcee127332f8328d32011617a8592d8b8f7ba05b",
-      "lastUpdated": "2026-02-20"
-    },
-    {
       "id": "mode_chat",
       "category": "prompts",
       "path": "prompts/mode_chat.any.json",

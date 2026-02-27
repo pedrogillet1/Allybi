@@ -150,6 +150,7 @@ export default function TourEngine({
   hasSeenFn,
   markSeenFn,
   onAction,
+  onStepChange,
   onClose,
   displayTotal,
 }) {
@@ -237,6 +238,12 @@ export default function TourEngine({
     setTooltipPos({ top: result.top, left: result.left });
     setResolvedPlacement(result.resolvedPlacement);
   }, [targetRect, currentStep]);
+
+  // --- Step-change callback (defensive cleanup for consumers) -----------
+  useEffect(() => {
+    if (!active) return;
+    onStepChange?.(stepIndex);
+  }, [active, stepIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // --- Before-enter hooks -----------------------------------------------
   useEffect(() => {

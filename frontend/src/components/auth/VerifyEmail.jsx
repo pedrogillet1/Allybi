@@ -67,15 +67,19 @@ const VerifyEmail = ({ variant = 'page' }) => {
         setError('');
 
         try {
-            await verifyPendingEmail({ email, code: verificationCode });
-
-            console.log('✅ Email verified successfully');
-            // Set flag so new users go to first-upload onboarding
+            // Set flag BEFORE verify — verify triggers isAuthenticated which fires
+            // the safety-net useEffect; the flag must already be present.
             if (!localStorage.getItem(STORAGE_KEYS.FIRST_UPLOAD_DONE)) {
                 localStorage.setItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD, 'true');
             }
+
+            await verifyPendingEmail({ email, code: verificationCode });
+
+            console.log('✅ Email verified successfully');
             completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
         } catch (error) {
+            // Roll back the flag if verification failed
+            localStorage.removeItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD);
             console.error('Error verifying email:', error);
             setError(error.message || 'Invalid verification code');
         } finally {

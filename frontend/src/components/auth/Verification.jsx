@@ -106,6 +106,12 @@ const Verification = ({ variant = 'page' }) => {
             const isPendingRegistration = !!email;
 
             if (isPendingRegistration) {
+                // Set flag BEFORE verify — verify triggers isAuthenticated which fires
+                // the safety-net useEffect; the flag must already be present.
+                if (!localStorage.getItem(STORAGE_KEYS.FIRST_UPLOAD_DONE)) {
+                    localStorage.setItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD, 'true');
+                }
+
                 // Pending user registration - use AuthContext method
                 await verifyPendingPhone({
                     email: email,
@@ -114,10 +120,6 @@ const Verification = ({ variant = 'page' }) => {
 
                 console.log('✅ Phone verified successfully');
                 localStorage.removeItem('pendingEmail'); // Clean up
-                // Set flag so new users go to first-upload onboarding
-                if (!localStorage.getItem(STORAGE_KEYS.FIRST_UPLOAD_DONE)) {
-                    localStorage.setItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD, 'true');
-                }
                 completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
             } else {
                 // Existing user adding phone - requires auth
@@ -143,6 +145,8 @@ const Verification = ({ variant = 'page' }) => {
                 completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
             }
         } catch (error) {
+            // Roll back the flag if verification failed
+            localStorage.removeItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD);
             console.error('Error verifying code:', error);
             setError(error.message || t('settings.errors.invalidVerificationCode'));
         } finally {

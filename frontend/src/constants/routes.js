@@ -94,7 +94,7 @@ export const buildRoute = {
 };
 
 // Default post-auth redirect
-export const DEFAULT_AUTH_REDIRECT = ROUTES.CHAT;
+export const DEFAULT_AUTH_REDIRECT = ROUTES.HOME;
 
 // LocalStorage keys for first-time user detection
 export const STORAGE_KEYS = {

@@ -75,6 +75,11 @@ export default function HomeTour({ onOpenUploadModal, onCloseUploadModal }) {
         if (name === 'openUploadModal')  onOpenUploadModal?.();
         if (name === 'closeUploadModal') onCloseUploadModal?.();
       }}
+      onStepChange={(index) => {
+        // Only the dropzone step (index 1) should have the upload modal open.
+        // Close it defensively on every other step.
+        if (index !== 1) onCloseUploadModal?.();
+      }}
       onClose={() => {
         // Ensure upload modal is closed if tour ends while on dropzone step
         onCloseUploadModal?.();
