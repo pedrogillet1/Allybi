@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-12",
+    "lastUpdated": "2026-02-27",
     "owner": "allybi-editing"
   },
   "config": {
@@ -103,14 +103,18 @@
     },
     "XLSX_FILL_DOWN": {
       "domain": "excel",
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
+      "implemented": true,
       "requiredSlots": [
         "rangeA1"
       ],
       "optionalSlots": [
-        "sheetName"
+        "sheetName",
+        "sourceRow",
+        "value",
+        "formula"
       ],
       "conflictsWith": [],
       "previewable": true,
@@ -122,14 +126,18 @@
     },
     "XLSX_FILL_RIGHT": {
       "domain": "excel",
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
+      "implemented": true,
       "requiredSlots": [
         "rangeA1"
       ],
       "optionalSlots": [
-        "sheetName"
+        "sheetName",
+        "sourceCol",
+        "value",
+        "formula"
       ],
       "conflictsWith": [],
       "previewable": true,
@@ -141,15 +149,18 @@
     },
     "XLSX_FILL_SERIES": {
       "domain": "excel",
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
+      "implemented": true,
       "requiredSlots": [
         "rangeA1"
       ],
       "optionalSlots": [
         "sheetName",
-        "seriesType"
+        "startValue",
+        "step",
+        "type"
       ],
       "conflictsWith": [],
       "previewable": true,
@@ -206,9 +217,10 @@
     },
     "XLSX_MERGE_CELLS": {
       "domain": "excel",
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
+      "implemented": true,
       "requiredSlots": [
         "rangeA1"
       ],
@@ -225,15 +237,15 @@
     },
     "XLSX_WRAP_TEXT": {
       "domain": "excel",
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "requiresSelection": "optional",
       "supportsMultiTarget": true,
+      "implemented": true,
       "requiredSlots": [
         "rangeA1"
       ],
       "optionalSlots": [
-        "sheetName",
-        "enabled"
+        "sheetName"
       ],
       "conflictsWith": [],
       "previewable": true,
@@ -245,28 +257,30 @@
     },
     "XLSX_AUTO_FIT": {
       "domain": "excel",
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
-      "requiredSlots": [
-        "rangeA1"
-      ],
+      "implemented": true,
+      "requiredSlots": [],
       "optionalSlots": [
-        "sheetName"
+        "sheetName",
+        "columns",
+        "rangeA1"
       ],
       "conflictsWith": [],
       "previewable": false,
       "undoable": true,
       "uiStepTemplate": {
-        "en": "Auto-fitting columns in {{rangeA1}}...",
-        "pt": "Ajustando colunas automaticamente em {{rangeA1}}..."
+        "en": "Auto-fitting column widths...",
+        "pt": "Ajustando largura das colunas automaticamente..."
       }
     },
     "XLSX_COND_FORMAT_DATA_BARS": {
       "domain": "excel",
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
+      "implemented": true,
       "requiredSlots": [
         "rangeA1"
       ],
@@ -284,14 +298,18 @@
     },
     "XLSX_COND_FORMAT_COLOR_SCALE": {
       "domain": "excel",
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
+      "implemented": true,
       "requiredSlots": [
         "rangeA1"
       ],
       "optionalSlots": [
-        "sheetName"
+        "sheetName",
+        "minColor",
+        "maxColor",
+        "midColor"
       ],
       "conflictsWith": [],
       "previewable": true,
@@ -303,23 +321,25 @@
     },
     "XLSX_COND_FORMAT_TOP_N": {
       "domain": "excel",
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
+      "implemented": true,
       "requiredSlots": [
-        "rangeA1",
-        "topN"
+        "rangeA1"
       ],
       "optionalSlots": [
         "sheetName",
-        "color"
+        "n",
+        "percent",
+        "backgroundHex"
       ],
       "conflictsWith": [],
       "previewable": true,
       "undoable": true,
       "uiStepTemplate": {
-        "en": "Highlighting top {{topN}} in {{rangeA1}}...",
-        "pt": "Destacando top {{topN}} em {{rangeA1}}..."
+        "en": "Highlighting top values in {{rangeA1}}...",
+        "pt": "Destacando maiores valores em {{rangeA1}}..."
       }
     },
     "XLSX_SORT_RANGE": {
@@ -448,15 +468,15 @@
     },
     "XLSX_HIDE_ROWS_COLS": {
       "domain": "excel",
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
-      "requiredSlots": [
-        "rangeA1",
-        "axis"
-      ],
+      "implemented": true,
+      "requiredSlots": [],
       "optionalSlots": [
-        "sheetName"
+        "sheetName",
+        "rows",
+        "columns"
       ],
       "conflictsWith": [
         "XLSX_SHOW_ROWS_COLS"
@@ -464,21 +484,21 @@
       "previewable": false,
       "undoable": true,
       "uiStepTemplate": {
-        "en": "Hiding {{axis}} in {{rangeA1}}...",
-        "pt": "Ocultando {{axis}} em {{rangeA1}}..."
+        "en": "Hiding rows/columns...",
+        "pt": "Ocultando linhas/colunas..."
       }
     },
     "XLSX_SHOW_ROWS_COLS": {
       "domain": "excel",
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
-      "requiredSlots": [
-        "rangeA1",
-        "axis"
-      ],
+      "implemented": true,
+      "requiredSlots": [],
       "optionalSlots": [
-        "sheetName"
+        "sheetName",
+        "rows",
+        "columns"
       ],
       "conflictsWith": [
         "XLSX_HIDE_ROWS_COLS"
@@ -486,8 +506,8 @@
       "previewable": false,
       "undoable": true,
       "uiStepTemplate": {
-        "en": "Showing {{axis}} in {{rangeA1}}...",
-        "pt": "Exibindo {{axis}} em {{rangeA1}}..."
+        "en": "Showing rows/columns...",
+        "pt": "Exibindo linhas/colunas..."
       }
     },
     "XLSX_CHART_CREATE": {
@@ -495,20 +515,21 @@
       "runtimeOperator": "CREATE_CHART",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
+      "implemented": true,
       "requiredSlots": [
-        "chartType",
         "rangeA1"
       ],
       "optionalSlots": [
         "sheetName",
+        "type",
         "title"
       ],
       "conflictsWith": [],
       "previewable": true,
       "undoable": true,
       "uiStepTemplate": {
-        "en": "Creating {{chartType}} chart from {{rangeA1}}...",
-        "pt": "Criando gráfico {{chartType}} de {{rangeA1}}..."
+        "en": "Creating chart from {{rangeA1}}...",
+        "pt": "Criando gráfico de {{rangeA1}}..."
       }
     },
     "XLSX_CHART_SET_SERIES": {
@@ -516,11 +537,14 @@
       "runtimeOperator": "CREATE_CHART",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
+      "implemented": true,
       "requiredSlots": [
-        "chartId",
-        "series"
+        "rangeA1"
       ],
-      "optionalSlots": [],
+      "optionalSlots": [
+        "chartType",
+        "seriesRange"
+      ],
       "conflictsWith": [],
       "previewable": true,
       "undoable": true,
@@ -534,8 +558,9 @@
       "runtimeOperator": "CREATE_CHART",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
+      "implemented": true,
       "requiredSlots": [
-        "chartId"
+        "rangeA1"
       ],
       "optionalSlots": [
         "title",
@@ -555,12 +580,15 @@
       "runtimeOperator": "CREATE_CHART",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
+      "implemented": true,
       "requiredSlots": [
-        "chartId"
+        "rangeA1"
       ],
       "optionalSlots": [
-        "xAxis",
-        "yAxis"
+        "xAxisMin",
+        "xAxisMax",
+        "yAxisMin",
+        "yAxisMax"
       ],
       "conflictsWith": [],
       "previewable": true,
@@ -575,10 +603,12 @@
       "runtimeOperator": "CREATE_CHART",
       "requiresSelection": "optional",
       "supportsMultiTarget": false,
-      "requiredSlots": [
-        "chartId"
+      "implemented": true,
+      "requiredSlots": [],
+      "optionalSlots": [
+        "chartId",
+        "rangeA1"
       ],
-      "optionalSlots": [],
       "conflictsWith": [],
       "previewable": false,
       "undoable": true,
@@ -1228,6 +1258,85 @@
       "uiStepTemplate": {
         "en": "Applying {{targetCase}} to text...",
         "pt": "Aplicando {{targetCase}} ao texto..."
+      }
+    },
+    "DOCX_CREATE_TABLE": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "targets"
+      ],
+      "optionalSlots": [
+        "rows",
+        "cols",
+        "headerRow"
+      ],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Creating table...",
+        "pt": "Criando tabela..."
+      }
+    },
+    "DOCX_ADD_TABLE_ROW": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "tableIndex"
+      ],
+      "optionalSlots": [
+        "position",
+        "cellTexts"
+      ],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Adding table row...",
+        "pt": "Adicionando linha na tabela..."
+      }
+    },
+    "DOCX_DELETE_TABLE_ROW": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "tableIndex",
+        "rowIndex"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Deleting table row...",
+        "pt": "Removendo linha da tabela..."
+      }
+    },
+    "DOCX_SET_TABLE_CELL": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "tableIndex",
+        "rowIndex",
+        "colIndex",
+        "text"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Updating table cell...",
+        "pt": "Atualizando célula da tabela..."
       }
     }
   }

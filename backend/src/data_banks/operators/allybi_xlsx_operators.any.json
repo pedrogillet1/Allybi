@@ -8,7 +8,7 @@
       "en",
       "pt"
     ],
-    "lastUpdated": "2026-02-12",
+    "lastUpdated": "2026-02-27",
     "owner": "allybi-editing"
   },
   "config": {
@@ -155,10 +155,10 @@
       ]
     },
     "XLSX_FILL_DOWN": {
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "preview_render_type": "cell_diff",
       "requires_confirmation": false,
-      "undo_strategy": "restore_previous_range",
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
         "required": [
@@ -166,30 +166,36 @@
         ],
         "properties": {
           "rangeA1": {
-            "type": "string"
+            "type": "string",
+            "description": "Target range in A1 notation, e.g. B2:B100"
+          },
+          "sourceRow": {
+            "type": "number",
+            "description": "1-based row number of the source cell to copy from"
+          },
+          "value": {
+            "description": "Static value to fill down"
+          },
+          "formula": {
+            "type": "string",
+            "description": "Formula to fill down with relative references adjusted"
           }
         }
       },
       "examples_en": [
-        "Apply fill down to the selected range.",
-        "Run fill down on SUMMARY 1!D35:D48.",
-        "Please fill down in the current sheet selection.",
-        "Do fill down only on the highlighted cells.",
-        "Set up fill down without changing unrelated cells."
+        "Fill down the formula from B2 to B2:B100",
+        "Copy the value from A1 down to A1:A20"
       ],
       "examples_pt": [
-        "Aplique fill down no intervalo selecionado.",
-        "Execute fill down em SUMMARY 1!D35:D48.",
-        "Por favor, faça fill down na seleção da planilha atual.",
-        "Faça fill down apenas nas células destacadas.",
-        "Configure fill down sem alterar células não relacionadas."
+        "Preencher para baixo a fórmula de B2 até B2:B100",
+        "Copiar o valor de A1 para baixo até A1:A20"
       ]
     },
     "XLSX_FILL_RIGHT": {
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "preview_render_type": "cell_diff",
       "requires_confirmation": false,
-      "undo_strategy": "restore_previous_range",
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
         "required": [
@@ -197,30 +203,36 @@
         ],
         "properties": {
           "rangeA1": {
-            "type": "string"
+            "type": "string",
+            "description": "Target range in A1 notation, e.g. A1:E1"
+          },
+          "sourceCol": {
+            "type": "number",
+            "description": "1-based column number of the source cell to copy from"
+          },
+          "value": {
+            "description": "Static value to fill right"
+          },
+          "formula": {
+            "type": "string",
+            "description": "Formula to fill right with relative references adjusted"
           }
         }
       },
       "examples_en": [
-        "Apply fill right to the selected range.",
-        "Run fill right on SUMMARY 1!D35:D48.",
-        "Please fill right in the current sheet selection.",
-        "Do fill right only on the highlighted cells.",
-        "Set up fill right without changing unrelated cells."
+        "Fill right from A1 to A1:E1",
+        "Copy formula from A2 across to E2"
       ],
       "examples_pt": [
-        "Aplique fill right no intervalo selecionado.",
-        "Execute fill right em SUMMARY 1!D35:D48.",
-        "Por favor, faça fill right na seleção da planilha atual.",
-        "Faça fill right apenas nas células destacadas.",
-        "Configure fill right sem alterar células não relacionadas."
+        "Preencher para direita de A1 até E1",
+        "Copiar fórmula de A2 até E2"
       ]
     },
     "XLSX_FILL_SERIES": {
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "preview_render_type": "cell_diff",
-      "requires_confirmation": true,
-      "undo_strategy": "restore_previous_range",
+      "requires_confirmation": false,
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
         "required": [
@@ -228,26 +240,31 @@
         ],
         "properties": {
           "rangeA1": {
-            "type": "string"
+            "type": "string",
+            "description": "Target range in A1 notation, e.g. A1:A20"
           },
-          "seriesType": {
-            "type": "string"
+          "startValue": {
+            "type": "number",
+            "description": "Starting value for the series"
+          },
+          "step": {
+            "type": "number",
+            "description": "Increment between consecutive values"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["linear", "date"],
+            "description": "Series type: linear for numeric sequences, date for date sequences"
           }
         }
       },
       "examples_en": [
-        "Apply fill series to the selected range.",
-        "Run fill series on SUMMARY 1!D35:D48.",
-        "Please fill series in the current sheet selection.",
-        "Do fill series only on the highlighted cells.",
-        "Set up fill series without changing unrelated cells."
+        "Fill A1:A20 with numbers 1 to 20",
+        "Create a date series from Jan 1 to Jan 31"
       ],
       "examples_pt": [
-        "Aplique fill series no intervalo selecionado.",
-        "Execute fill series em SUMMARY 1!D35:D48.",
-        "Por favor, faça fill series na seleção da planilha atual.",
-        "Faça fill series apenas nas células destacadas.",
-        "Configure fill series sem alterar células não relacionadas."
+        "Preencher A1:A20 com números de 1 a 20",
+        "Criar série de datas de 1 a 31 de janeiro"
       ]
     },
     "XLSX_FORMAT_RANGE": {
@@ -320,10 +337,10 @@
       ]
     },
     "XLSX_MERGE_CELLS": {
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "preview_render_type": "structural_diff",
       "requires_confirmation": true,
-      "undo_strategy": "restore_previous_merge_state",
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
         "required": [
@@ -331,96 +348,79 @@
         ],
         "properties": {
           "rangeA1": {
-            "type": "string"
+            "type": "string",
+            "description": "Range to merge in A1 notation, e.g. A1:C1"
           }
         }
       },
       "examples_en": [
-        "Apply merge cells to the selected range.",
-        "Run merge cells on SUMMARY 1!D35:D48.",
-        "Please merge cells in the current sheet selection.",
-        "Do merge cells only on the highlighted cells.",
-        "Set up merge cells without changing unrelated cells."
+        "Merge cells A1 to C1",
+        "Combine A1:D1 into one cell"
       ],
       "examples_pt": [
-        "Aplique merge cells no intervalo selecionado.",
-        "Execute merge cells em SUMMARY 1!D35:D48.",
-        "Por favor, faça merge cells na seleção da planilha atual.",
-        "Faça merge cells apenas nas células destacadas.",
-        "Configure merge cells sem alterar células não relacionadas."
+        "Mesclar células A1 até C1",
+        "Combinar A1:D1 em uma célula"
       ]
     },
     "XLSX_WRAP_TEXT": {
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "preview_render_type": "format_diff",
       "requires_confirmation": false,
-      "undo_strategy": "restore_previous_format",
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
         "required": [
-          "rangeA1",
-          "enabled"
+          "rangeA1"
         ],
         "properties": {
           "rangeA1": {
-            "type": "string"
-          },
-          "enabled": {
-            "type": "boolean"
+            "type": "string",
+            "description": "Range to apply text wrapping to, in A1 notation"
           }
         }
       },
       "examples_en": [
-        "Apply wrap text to the selected range.",
-        "Run wrap text on SUMMARY 1!D35:D48.",
-        "Please wrap text in the current sheet selection.",
-        "Do wrap text only on the highlighted cells.",
-        "Set up wrap text without changing unrelated cells."
+        "Wrap text in column A",
+        "Enable text wrapping for A1:D10"
       ],
       "examples_pt": [
-        "Aplique wrap text no intervalo selecionado.",
-        "Execute wrap text em SUMMARY 1!D35:D48.",
-        "Por favor, faça wrap text na seleção da planilha atual.",
-        "Faça wrap text apenas nas células destacadas.",
-        "Configure wrap text sem alterar células não relacionadas."
+        "Quebrar texto na coluna A",
+        "Ativar quebra de texto em A1:D10"
       ]
     },
     "XLSX_AUTO_FIT": {
-      "runtimeOperator": "COMPUTE_BUNDLE",
-      "preview_render_type": "structural_diff",
+      "runtimeOperator": "EDIT_RANGE",
+      "preview_render_type": "format_diff",
       "requires_confirmation": false,
-      "undo_strategy": "restore_previous_column_width",
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
-        "required": [
-          "rangeA1"
-        ],
         "properties": {
+          "columns": {
+            "type": "array",
+            "items": { "type": "number" },
+            "description": "1-based column numbers to auto-fit"
+          },
           "rangeA1": {
-            "type": "string"
+            "type": "string",
+            "description": "Range whose columns should be auto-fitted, in A1 notation"
           }
         }
       },
       "examples_en": [
-        "Apply auto fit to the selected range.",
-        "Run auto fit on SUMMARY 1!D35:D48.",
-        "Please auto fit in the current sheet selection.",
-        "Do auto fit only on the highlighted cells.",
-        "Set up auto fit without changing unrelated cells."
+        "Auto-fit column widths for columns A to D",
+        "Resize columns to fit content"
       ],
       "examples_pt": [
-        "Aplique auto fit no intervalo selecionado.",
-        "Execute auto fit em SUMMARY 1!D35:D48.",
-        "Por favor, faça auto fit na seleção da planilha atual.",
-        "Faça auto fit apenas nas células destacadas.",
-        "Configure auto fit sem alterar células não relacionadas."
+        "Ajustar largura das colunas A até D",
+        "Redimensionar colunas para caber conteúdo"
       ]
     },
     "XLSX_COND_FORMAT_DATA_BARS": {
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "preview_render_type": "format_diff",
-      "requires_confirmation": true,
-      "undo_strategy": "restore_previous_conditional_format",
+      "requires_confirmation": false,
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
         "required": [
@@ -428,30 +428,29 @@
         ],
         "properties": {
           "rangeA1": {
-            "type": "string"
+            "type": "string",
+            "description": "Range to apply data bars to, in A1 notation"
+          },
+          "color": {
+            "type": "string",
+            "description": "Hex color for the data bars, e.g. #4472C4"
           }
         }
       },
       "examples_en": [
-        "Apply cond format data bars to the selected range.",
-        "Run cond format data bars on SUMMARY 1!D35:D48.",
-        "Please cond format data bars in the current sheet selection.",
-        "Do cond format data bars only on the highlighted cells.",
-        "Set up cond format data bars without changing unrelated cells."
+        "Add data bars to B2:B20",
+        "Show data bars in blue for the revenue column"
       ],
       "examples_pt": [
-        "Aplique cond format data bars no intervalo selecionado.",
-        "Execute cond format data bars em SUMMARY 1!D35:D48.",
-        "Por favor, faça cond format data bars na seleção da planilha atual.",
-        "Faça cond format data bars apenas nas células destacadas.",
-        "Configure cond format data bars sem alterar células não relacionadas."
+        "Adicionar barras de dados em B2:B20",
+        "Mostrar barras de dados em azul na coluna de receita"
       ]
     },
     "XLSX_COND_FORMAT_COLOR_SCALE": {
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "preview_render_type": "format_diff",
-      "requires_confirmation": true,
-      "undo_strategy": "restore_previous_conditional_format",
+      "requires_confirmation": false,
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
         "required": [
@@ -459,58 +458,68 @@
         ],
         "properties": {
           "rangeA1": {
-            "type": "string"
+            "type": "string",
+            "description": "Range to apply color scale to, in A1 notation"
+          },
+          "minColor": {
+            "type": "string",
+            "description": "Hex color for the minimum value, e.g. #FF0000"
+          },
+          "maxColor": {
+            "type": "string",
+            "description": "Hex color for the maximum value, e.g. #00B050"
+          },
+          "midColor": {
+            "type": "string",
+            "description": "Hex color for the midpoint value (optional 3-color scale)"
           }
         }
       },
       "examples_en": [
-        "Apply cond format color scale to the selected range.",
-        "Run cond format color scale on SUMMARY 1!D35:D48.",
-        "Please cond format color scale in the current sheet selection.",
-        "Do cond format color scale only on the highlighted cells.",
-        "Set up cond format color scale without changing unrelated cells."
+        "Apply color scale from red to green on B2:B20",
+        "Add heat map colors to the margin column"
       ],
       "examples_pt": [
-        "Aplique cond format color scale no intervalo selecionado.",
-        "Execute cond format color scale em SUMMARY 1!D35:D48.",
-        "Por favor, faça cond format color scale na seleção da planilha atual.",
-        "Faça cond format color scale apenas nas células destacadas.",
-        "Configure cond format color scale sem alterar células não relacionadas."
+        "Aplicar escala de cores de vermelho a verde em B2:B20",
+        "Adicionar cores de mapa de calor na coluna de margem"
       ]
     },
     "XLSX_COND_FORMAT_TOP_N": {
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "preview_render_type": "format_diff",
-      "requires_confirmation": true,
-      "undo_strategy": "restore_previous_conditional_format",
+      "requires_confirmation": false,
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
         "required": [
-          "rangeA1",
-          "topN"
+          "rangeA1"
         ],
         "properties": {
           "rangeA1": {
-            "type": "string"
+            "type": "string",
+            "description": "Range to apply top-N highlighting to, in A1 notation"
           },
-          "topN": {
-            "type": "number"
+          "n": {
+            "type": "number",
+            "description": "Number of top values to highlight (default 10)"
+          },
+          "percent": {
+            "type": "boolean",
+            "description": "If true, treat n as a percentage instead of absolute count"
+          },
+          "backgroundHex": {
+            "type": "string",
+            "description": "Background color hex for highlighted cells, e.g. #FFA500"
           }
         }
       },
       "examples_en": [
-        "Apply cond format top n to the selected range.",
-        "Run cond format top n on SUMMARY 1!D35:D48.",
-        "Please cond format top n in the current sheet selection.",
-        "Do cond format top n only on the highlighted cells.",
-        "Set up cond format top n without changing unrelated cells."
+        "Highlight top 10 values in B2:B50",
+        "Mark the top 5% in orange"
       ],
       "examples_pt": [
-        "Aplique cond format top n no intervalo selecionado.",
-        "Execute cond format top n em SUMMARY 1!D35:D48.",
-        "Por favor, faça cond format top n na seleção da planilha atual.",
-        "Faça cond format top n apenas nas células destacadas.",
-        "Configure cond format top n sem alterar células não relacionadas."
+        "Destacar os 10 maiores valores em B2:B50",
+        "Marcar os 5% maiores em laranja"
       ]
     },
     "XLSX_SORT_RANGE": {
@@ -725,223 +734,209 @@
       ]
     },
     "XLSX_HIDE_ROWS_COLS": {
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "preview_render_type": "structural_diff",
       "requires_confirmation": true,
-      "undo_strategy": "restore_previous_visibility_state",
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
-        "required": [
-          "rangeA1",
-          "axis"
-        ],
         "properties": {
-          "rangeA1": {
-            "type": "string"
+          "rows": {
+            "type": "array",
+            "items": { "type": "number" },
+            "description": "1-based row numbers to hide"
           },
-          "axis": {
-            "type": "string"
+          "columns": {
+            "type": "array",
+            "items": { "type": "number" },
+            "description": "1-based column numbers to hide"
           }
         }
       },
       "examples_en": [
-        "Apply hide rows cols to the selected range.",
-        "Run hide rows cols on SUMMARY 1!D35:D48.",
-        "Please hide rows cols in the current sheet selection.",
-        "Do hide rows cols only on the highlighted cells.",
-        "Set up hide rows cols without changing unrelated cells."
+        "Hide rows 5 through 10",
+        "Hide columns C and D"
       ],
       "examples_pt": [
-        "Aplique hide rows cols no intervalo selecionado.",
-        "Execute hide rows cols em SUMMARY 1!D35:D48.",
-        "Por favor, faça hide rows cols na seleção da planilha atual.",
-        "Faça hide rows cols apenas nas células destacadas.",
-        "Configure hide rows cols sem alterar células não relacionadas."
+        "Ocultar linhas 5 a 10",
+        "Ocultar colunas C e D"
       ]
     },
     "XLSX_SHOW_ROWS_COLS": {
-      "runtimeOperator": "COMPUTE_BUNDLE",
+      "runtimeOperator": "EDIT_RANGE",
       "preview_render_type": "structural_diff",
       "requires_confirmation": false,
-      "undo_strategy": "restore_previous_visibility_state",
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
-        "required": [
-          "rangeA1",
-          "axis"
-        ],
         "properties": {
-          "rangeA1": {
-            "type": "string"
+          "rows": {
+            "type": "array",
+            "items": { "type": "number" },
+            "description": "1-based row numbers to unhide"
           },
-          "axis": {
-            "type": "string"
+          "columns": {
+            "type": "array",
+            "items": { "type": "number" },
+            "description": "1-based column numbers to unhide"
           }
         }
       },
       "examples_en": [
-        "Apply show rows cols to the selected range.",
-        "Run show rows cols on SUMMARY 1!D35:D48.",
-        "Please show rows cols in the current sheet selection.",
-        "Do show rows cols only on the highlighted cells.",
-        "Set up show rows cols without changing unrelated cells."
+        "Show hidden rows 5 to 10",
+        "Unhide columns C and D"
       ],
       "examples_pt": [
-        "Aplique show rows cols no intervalo selecionado.",
-        "Execute show rows cols em SUMMARY 1!D35:D48.",
-        "Por favor, faça show rows cols na seleção da planilha atual.",
-        "Faça show rows cols apenas nas células destacadas.",
-        "Configure show rows cols sem alterar células não relacionadas."
+        "Mostrar linhas ocultas 5 a 10",
+        "Reexibir colunas C e D"
       ]
     },
     "XLSX_CHART_CREATE": {
       "runtimeOperator": "CREATE_CHART",
       "preview_render_type": "chart_diff",
       "requires_confirmation": true,
-      "undo_strategy": "delete_chart",
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
         "required": [
-          "type",
-          "range"
+          "rangeA1"
         ],
         "properties": {
-          "type": {
-            "type": "string"
+          "rangeA1": {
+            "type": "string",
+            "description": "Data range for the chart, in A1 notation"
           },
-          "range": {
-            "type": "string"
+          "type": {
+            "type": "string",
+            "description": "Chart type, e.g. bar, line, pie, scatter, area"
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "description": "Chart title"
           }
         }
       },
       "examples_en": [
-        "Apply chart create to the selected range.",
-        "Run chart create on SUMMARY 1!D35:D48.",
-        "Please chart create in the current sheet selection.",
-        "Do chart create only on the highlighted cells.",
-        "Set up chart create without changing unrelated cells."
+        "Create a bar chart from A1:C10",
+        "Make a pie chart of the sales data"
       ],
       "examples_pt": [
-        "Aplique chart create no intervalo selecionado.",
-        "Execute chart create em SUMMARY 1!D35:D48.",
-        "Por favor, faça chart create na seleção da planilha atual.",
-        "Faça chart create apenas nas células destacadas.",
-        "Configure chart create sem alterar células não relacionadas."
+        "Criar gráfico de barras de A1:C10",
+        "Fazer gráfico de pizza dos dados de vendas"
       ]
     },
     "XLSX_CHART_SET_SERIES": {
       "runtimeOperator": "CREATE_CHART",
       "preview_render_type": "chart_diff",
-      "requires_confirmation": true,
-      "undo_strategy": "restore_previous_chart_spec",
+      "requires_confirmation": false,
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
         "required": [
-          "chartId",
-          "series"
+          "rangeA1"
         ],
         "properties": {
-          "chartId": {
-            "type": "number"
+          "rangeA1": {
+            "type": "string",
+            "description": "Data range for the chart series, in A1 notation"
           },
-          "series": {
-            "type": "array"
+          "chartType": {
+            "type": "string",
+            "description": "Chart type to apply to the series"
+          },
+          "seriesRange": {
+            "type": "string",
+            "description": "Specific range for the series data"
           }
         }
       },
       "examples_en": [
-        "Apply chart set series to the selected range.",
-        "Run chart set series on SUMMARY 1!D35:D48.",
-        "Please chart set series in the current sheet selection.",
-        "Do chart set series only on the highlighted cells.",
-        "Set up chart set series without changing unrelated cells."
+        "Update chart series to include column D",
+        "Change chart data range to A1:D20"
       ],
       "examples_pt": [
-        "Aplique chart set series no intervalo selecionado.",
-        "Execute chart set series em SUMMARY 1!D35:D48.",
-        "Por favor, faça chart set series na seleção da planilha atual.",
-        "Faça chart set series apenas nas células destacadas.",
-        "Configure chart set series sem alterar células não relacionadas."
+        "Atualizar séries do gráfico para incluir coluna D",
+        "Mudar intervalo de dados do gráfico para A1:D20"
       ]
     },
     "XLSX_CHART_SET_TITLES": {
       "runtimeOperator": "CREATE_CHART",
       "preview_render_type": "chart_diff",
-      "requires_confirmation": true,
-      "undo_strategy": "restore_previous_chart_spec",
+      "requires_confirmation": false,
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
         "required": [
-          "chartId"
+          "rangeA1"
         ],
         "properties": {
-          "chartId": {
-            "type": "number"
+          "rangeA1": {
+            "type": "string",
+            "description": "Chart anchor range for identification"
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "description": "Main chart title"
           },
           "xAxisTitle": {
-            "type": "string"
+            "type": "string",
+            "description": "X-axis title label"
           },
           "yAxisTitle": {
-            "type": "string"
+            "type": "string",
+            "description": "Y-axis title label"
           }
         }
       },
       "examples_en": [
-        "Apply chart set titles to the selected range.",
-        "Run chart set titles on SUMMARY 1!D35:D48.",
-        "Please chart set titles in the current sheet selection.",
-        "Do chart set titles only on the highlighted cells.",
-        "Set up chart set titles without changing unrelated cells."
+        "Set chart title to 'Revenue by Month'",
+        "Add axis labels to the chart"
       ],
       "examples_pt": [
-        "Aplique chart set titles no intervalo selecionado.",
-        "Execute chart set titles em SUMMARY 1!D35:D48.",
-        "Por favor, faça chart set titles na seleção da planilha atual.",
-        "Faça chart set titles apenas nas células destacadas.",
-        "Configure chart set titles sem alterar células não relacionadas."
+        "Definir título do gráfico como 'Receita por Mês'",
+        "Adicionar rótulos de eixo ao gráfico"
       ]
     },
     "XLSX_CHART_SET_AXES": {
       "runtimeOperator": "CREATE_CHART",
       "preview_render_type": "chart_diff",
-      "requires_confirmation": true,
-      "undo_strategy": "restore_previous_chart_spec",
+      "requires_confirmation": false,
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
         "required": [
-          "chartId"
+          "rangeA1"
         ],
         "properties": {
-          "chartId": {
-            "type": "number"
+          "rangeA1": {
+            "type": "string",
+            "description": "Chart anchor range for identification"
           },
-          "xAxis": {
-            "type": "object"
+          "xAxisMin": {
+            "type": "number",
+            "description": "Minimum value for the X axis"
           },
-          "yAxis": {
-            "type": "object"
+          "xAxisMax": {
+            "type": "number",
+            "description": "Maximum value for the X axis"
+          },
+          "yAxisMin": {
+            "type": "number",
+            "description": "Minimum value for the Y axis"
+          },
+          "yAxisMax": {
+            "type": "number",
+            "description": "Maximum value for the Y axis"
           }
         }
       },
       "examples_en": [
-        "Apply chart set axes to the selected range.",
-        "Run chart set axes on SUMMARY 1!D35:D48.",
-        "Please chart set axes in the current sheet selection.",
-        "Do chart set axes only on the highlighted cells.",
-        "Set up chart set axes without changing unrelated cells."
+        "Set Y-axis range from 0 to 1000",
+        "Configure chart axes"
       ],
       "examples_pt": [
-        "Aplique chart set axes no intervalo selecionado.",
-        "Execute chart set axes em SUMMARY 1!D35:D48.",
-        "Por favor, faça chart set axes na seleção da planilha atual.",
-        "Faça chart set axes apenas nas células destacadas.",
-        "Configure chart set axes sem alterar células não relacionadas."
+        "Definir eixo Y de 0 a 1000",
+        "Configurar eixos do gráfico"
       ]
     },
     "XLSX_CHART_MOVE_RESIZE": {
@@ -982,31 +977,27 @@
       "runtimeOperator": "CREATE_CHART",
       "preview_render_type": "chart_diff",
       "requires_confirmation": true,
-      "undo_strategy": "restore_deleted_chart",
+      "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
-        "required": [
-          "chartId"
-        ],
         "properties": {
           "chartId": {
-            "type": "number"
+            "type": "string",
+            "description": "Identifier of the chart to delete"
+          },
+          "rangeA1": {
+            "type": "string",
+            "description": "Chart anchor range for identification if chartId is unknown"
           }
         }
       },
       "examples_en": [
-        "Apply chart delete to the selected range.",
-        "Run chart delete on SUMMARY 1!D35:D48.",
-        "Please chart delete in the current sheet selection.",
-        "Do chart delete only on the highlighted cells.",
-        "Set up chart delete without changing unrelated cells."
+        "Delete the chart",
+        "Remove the bar chart"
       ],
       "examples_pt": [
-        "Aplique chart delete no intervalo selecionado.",
-        "Execute chart delete em SUMMARY 1!D35:D48.",
-        "Por favor, faça chart delete na seleção da planilha atual.",
-        "Faça chart delete apenas nas células destacadas.",
-        "Configure chart delete sem alterar células não relacionadas."
+        "Excluir o gráfico",
+        "Remover o gráfico de barras"
       ]
     }
   }
