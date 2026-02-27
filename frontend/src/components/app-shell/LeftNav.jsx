@@ -289,6 +289,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                     {/* Home */}
                     <SidebarTooltip text={t('nav.home')} show={!isExpanded}>
                         <div
+                            data-tour="sidebar-home"
                             onClick={() => navigate(ROUTES.HOME)}
                             style={getButtonStyle(location.pathname === ROUTES.HOME)}
                             onMouseEnter={(e) => handleButtonHover(e, location.pathname === ROUTES.HOME)}
@@ -328,6 +329,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                     {/* Chat */}
                     <SidebarTooltip text={t('nav.chat')} show={!isExpanded}>
                         <div
+                            data-tour="sidebar-chat"
                             onClick={() => navigate(ROUTES.CHAT)}
                             style={getButtonStyle(location.pathname.startsWith(ROUTES.CHAT))}
                             onMouseEnter={(e) => handleButtonHover(e, location.pathname.startsWith(ROUTES.CHAT))}
@@ -367,6 +369,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                     {/* Upload */}
                     <SidebarTooltip text={t('nav.upload')} show={!isExpanded}>
                         <div
+                            data-tour="sidebar-upload"
                             onClick={() => navigate(ROUTES.UPLOAD_HUB)}
                             style={getButtonStyle(location.pathname === ROUTES.UPLOAD_HUB)}
                             onMouseEnter={(e) => handleButtonHover(e, location.pathname === ROUTES.UPLOAD_HUB)}
@@ -410,6 +413,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                     {/* Integrations */}
                     <SidebarTooltip text={t('nav.integrations')} show={!isExpanded}>
                         <div
+                            data-tour="sidebar-integrations"
                             onClick={() => navigate(ROUTES.INTEGRATIONS)}
                             style={getButtonStyle(location.pathname === ROUTES.INTEGRATIONS)}
                             onMouseEnter={(e) => handleButtonHover(e, location.pathname === ROUTES.INTEGRATIONS)}

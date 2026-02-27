@@ -123,6 +123,23 @@ function arrowStyle(placement, targetRect, pos, tw, th) {
 
 function clamp(v, min, max) { return Math.max(min, Math.min(v, max)); }
 
+// ─── Element poller (for route-aware steps) ─────────────────────────────────
+function pollForElement(selector, timeoutMs, onDone) {
+  const start = Date.now();
+  const id = setInterval(() => {
+    if (document.querySelector(selector) || Date.now() - start > timeoutMs) {
+      clearInterval(id);
+      onDone();
+    }
+  }, 100);
+  return id;
+}
+
+// ─── Rounded-rect SVG sub-path helper ───────────────────────────────────────
+function roundedRectSubpath(x, y, w, h, r) {
+  return `M${x + r},${y} H${x + w - r} Q${x + w},${y} ${x + w},${y + r} V${y + h - r} Q${x + w},${y + h} ${x + w - r},${y + h} H${x + r} Q${x},${y + h} ${x},${y + h - r} V${y + r} Q${x},${y} ${x + r},${y} Z`;
+}
+
 // ─── Pulse keyframes (injected once via <style>) ────────────────────────────
 const PULSE_CSS = `
 @keyframes tourHighlightPulse {
@@ -135,14 +152,21 @@ const PULSE_CSS = `
  * Shared Tour rendering engine.
  *
  * Props:
- *   steps        – array of { selector, i18nKey, preferredPlacement, fallbackPlacements?,
- *                              spotlightPadding?, spotlightRadius?, beforeEnter?, beforeLeave?, onBack? }
- *   namespace    – i18n namespace (e.g. 'homeTour')
- *   hasSeenFn    – (userId) => boolean
- *   markSeenFn   – (userId) => void
- *   onAction     – (hookName) => void  (called for beforeEnter / beforeLeave / onBack)
- *   onClose      – (stepIndex, steps) => void  (optional cleanup on tour close)
- *   displayTotal – optional override for displayed step count
+ *   steps            – array of step objects (see below)
+ *   namespace        – i18n namespace (e.g. 'homeTour')
+ *   hasSeenFn        – (userId) => boolean
+ *   markSeenFn       – (userId) => void
+ *   onAction         – (hookName) => void  (called for beforeEnter / beforeLeave / onBack)
+ *   onClose          – (stepIndex, steps) => void  (optional cleanup on tour close)
+ *   displayTotal     – optional override for displayed step count
+ *   navigate         – optional react-router navigate function (for cross-page tours)
+ *   onTourActiveChange – optional (isActive: boolean) => void
+ *
+ * Step fields:
+ *   selector, i18nKey, preferredPlacement, fallbackPlacements?, spotlightPadding?,
+ *   spotlightRadius?, beforeEnter?, beforeLeave?, onBack?,
+ *   secondarySelector?, secondarySpotlightPadding?, secondarySpotlightRadius?,
+ *   route?, sectionBadge?
  */
 export default function TourEngine({
   steps,
@@ -153,6 +177,8 @@ export default function TourEngine({
   onStepChange,
   onClose,
   displayTotal,
+  navigate,
+  onTourActiveChange,
 }) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -161,17 +187,29 @@ export default function TourEngine({
   const [active, setActive] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [targetRect, setTargetRect] = useState(null);
+  const [secondaryRect, setSecondaryRect] = useState(null);
   const [tooltipPos, setTooltipPos] = useState(null);
   const [resolvedPlacement, setResolvedPlacement] = useState(null);
 
   const tooltipRef = useRef(null);
   const rafRef = useRef(null);
-  // Guard: prevent measureTarget from auto-skipping while a beforeEnter is pending
+  const pollRef = useRef(null);
+  // Guard: prevent measureTarget from auto-skipping while a beforeEnter or route-change is pending
   const waitingForEnterRef = useRef(false);
 
   const userId = user?.id;
   const currentStep = steps[stepIndex] ?? null;
   const total = displayTotal || steps.length;
+
+  // --- Notify active state changes -----------------------------------------
+  useEffect(() => {
+    onTourActiveChange?.(active);
+  }, [active]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // --- Cleanup poll on unmount ---------------------------------------------
+  useEffect(() => {
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, []);
 
   // --- Launch decision ---------------------------------------------------
   useEffect(() => {
@@ -189,7 +227,7 @@ export default function TourEngine({
     if (!currentStep) return;
     const el = document.querySelector(currentStep.selector);
     if (!el) {
-      // Don't auto-skip if a beforeEnter action is pending (element may appear soon)
+      // Don't auto-skip if a beforeEnter action or route change is pending
       if (waitingForEnterRef.current) return;
       if (stepIndex < steps.length - 1) {
         setStepIndex((i) => i + 1);
@@ -201,6 +239,19 @@ export default function TourEngine({
     }
     const r = el.getBoundingClientRect();
     setTargetRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+
+    // Measure secondary target (sidebar nav item) if present
+    if (currentStep.secondarySelector) {
+      const secEl = document.querySelector(currentStep.secondarySelector);
+      if (secEl) {
+        const sr = secEl.getBoundingClientRect();
+        setSecondaryRect({ top: sr.top, left: sr.left, width: sr.width, height: sr.height });
+      } else {
+        setSecondaryRect(null);
+      }
+    } else {
+      setSecondaryRect(null);
+    }
 
     const viewH = window.innerHeight;
     if (r.top < 80 || r.bottom > viewH - 80) {
@@ -272,6 +323,32 @@ export default function TourEngine({
     };
   }, [active, stepIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // --- Route-aware step transition helper --------------------------------
+  const navigateToStep = useCallback((nextIndex) => {
+    const nextStep = steps[nextIndex];
+    if (!nextStep) return;
+
+    // If the step has a route and we need to navigate
+    if (nextStep.route && navigate && window.location.pathname !== nextStep.route) {
+      waitingForEnterRef.current = true;
+      // Clear current rects so tooltip hides during transition
+      setTargetRect(null);
+      setSecondaryRect(null);
+      setTooltipPos(null);
+      navigate(nextStep.route);
+      setStepIndex(nextIndex);
+      // Poll for the target element after route change
+      if (pollRef.current) clearInterval(pollRef.current);
+      pollRef.current = pollForElement(nextStep.selector, 3000, () => {
+        pollRef.current = null;
+        waitingForEnterRef.current = false;
+        // measureTarget will run via the active+measureTarget effect
+      });
+    } else {
+      setStepIndex(nextIndex);
+    }
+  }, [steps, navigate]);
+
   // --- Close tour --------------------------------------------------------
   const closeTour = useCallback(() => {
     const step = steps[stepIndex];
@@ -286,18 +363,18 @@ export default function TourEngine({
     const leaving = steps[stepIndex];
     if (leaving?.beforeLeave) onAction?.(leaving.beforeLeave);
     if (stepIndex < steps.length - 1) {
-      setStepIndex((i) => i + 1);
+      navigateToStep(stepIndex + 1);
     } else {
       closeTour();
     }
-  }, [stepIndex, steps, closeTour, onAction]);
+  }, [stepIndex, steps, closeTour, onAction, navigateToStep]);
 
   const goBack = useCallback(() => {
     if (stepIndex <= 0) return;
     const leaving = steps[stepIndex];
     if (leaving?.onBack) onAction?.(leaving.onBack);
-    setStepIndex((i) => i - 1);
-  }, [stepIndex, steps, onAction]);
+    navigateToStep(stepIndex - 1);
+  }, [stepIndex, steps, onAction, navigateToStep]);
 
   // --- Keyboard ----------------------------------------------------------
   useEffect(() => {
@@ -335,16 +412,29 @@ export default function TourEngine({
   // --- Clip path (overlay cutout) ----------------------------------------
   const spotPad = currentStep?.spotlightPadding ?? 8;
   const spotRad = currentStep?.spotlightRadius ?? 12;
+  const secPad = currentStep?.secondarySpotlightPadding ?? 6;
+  const secRad = currentStep?.secondarySpotlightRadius ?? 10;
 
   const clipPath = useMemo(() => {
     if (!targetRect) return 'none';
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    // Primary cutout
     const x = targetRect.left - spotPad;
     const y = targetRect.top  - spotPad;
     const w = targetRect.width  + spotPad * 2;
     const h = targetRect.height + spotPad * 2;
-    const r = spotRad;
-    return `path('M0,0 H${window.innerWidth} V${window.innerHeight} H0 Z M${x + r},${y} H${x + w - r} Q${x + w},${y} ${x + w},${y + r} V${y + h - r} Q${x + w},${y + h} ${x + w - r},${y + h} H${x + r} Q${x},${y + h} ${x},${y + h - r} V${y + r} Q${x},${y} ${x + r},${y} Z')`;
-  }, [targetRect, spotPad, spotRad]);
+    let d = `M0,0 H${vw} V${vh} H0 Z ` + roundedRectSubpath(x, y, w, h, spotRad);
+    // Secondary cutout (sidebar nav item)
+    if (secondaryRect) {
+      const sx = secondaryRect.left - secPad;
+      const sy = secondaryRect.top  - secPad;
+      const sw = secondaryRect.width  + secPad * 2;
+      const sh = secondaryRect.height + secPad * 2;
+      d += ' ' + roundedRectSubpath(sx, sy, sw, sh, secRad);
+    }
+    return `path(evenodd, '${d}')`;
+  }, [targetRect, spotPad, spotRad, secondaryRect, secPad, secRad]);
 
   // --- Arrow style -------------------------------------------------------
   const arrow = useMemo(() => {
@@ -371,7 +461,7 @@ export default function TourEngine({
       {/* Pulse animation keyframes */}
       <style>{PULSE_CSS}</style>
 
-      {/* Dark overlay with spotlight cutout */}
+      {/* Dark overlay with spotlight cutout(s) */}
       <div
         aria-hidden="true"
         style={{
@@ -381,7 +471,7 @@ export default function TourEngine({
         }}
       />
 
-      {/* Highlight ring around target */}
+      {/* Highlight ring around primary target */}
       {targetRect && (
         <div
           aria-hidden="true"
@@ -392,6 +482,27 @@ export default function TourEngine({
             width:  targetRect.width  + spotPad * 2,
             height: targetRect.height + spotPad * 2,
             borderRadius: spotRad,
+            border: '2px solid rgba(255, 255, 255, 0.70)',
+            boxShadow: '0 0 0 3px rgba(255,255,255,0.25)',
+            pointerEvents: 'none',
+            zIndex: 10001,
+            transition,
+            animation: reducedMotion ? 'none' : 'tourHighlightPulse 2s ease-in-out infinite',
+          }}
+        />
+      )}
+
+      {/* Highlight ring around secondary target (sidebar nav item) */}
+      {secondaryRect && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            top:    secondaryRect.top  - secPad,
+            left:   secondaryRect.left - secPad,
+            width:  secondaryRect.width  + secPad * 2,
+            height: secondaryRect.height + secPad * 2,
+            borderRadius: secRad,
             border: '2px solid rgba(255, 255, 255, 0.70)',
             boxShadow: '0 0 0 3px rgba(255,255,255,0.25)',
             pointerEvents: 'none',
@@ -441,6 +552,26 @@ export default function TourEngine({
       >
         {/* Arrow */}
         {arrow && <div aria-hidden="true" style={arrow} />}
+
+        {/* Section badge (sidebar-linked tours) */}
+        {currentStep.sectionBadge && (
+          <span
+            style={{
+              display: 'inline-block',
+              alignSelf: 'flex-start',
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase',
+              color: '#6C6B6E',
+              background: '#F1F0EF',
+              borderRadius: 6,
+              padding: '3px 8px',
+            }}
+          >
+            {t(currentStep.sectionBadge)}
+          </span>
+        )}
 
         {/* Step counter */}
         <span

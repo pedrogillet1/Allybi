@@ -1652,6 +1652,46 @@
       }
     }
   },
+  "sidebarTour": {
+    "ariaLabel": "Tour de incorporaci\u00f3n con barra lateral",
+    "stepOf": "{{current}}/{{total}}",
+    "skip": "Omitir",
+    "back": "Atr\u00e1s",
+    "next": "Siguiente",
+    "done": "Listo",
+    "sections": {
+      "home": "Secci\u00f3n: Inicio",
+      "upload": "Secci\u00f3n: Carga",
+      "chat": "Secci\u00f3n: Chat",
+      "integrations": "Secci\u00f3n: Integraciones"
+    },
+    "steps": {
+      "uploadCta": {
+        "title": "Empieza subiendo archivos",
+        "body": "Sube archivos o carpetas para activar b\u00fasqueda, categor\u00edas y an\u00e1lisis."
+      },
+      "smartCategories": {
+        "title": "Las Categor\u00edas Inteligentes se organizan solas",
+        "body": "Tus archivos se agrupan autom\u00e1ticamente \u2014 abre una categor\u00eda para explorar."
+      },
+      "search": {
+        "title": "Encuentra cualquier cosa r\u00e1pido",
+        "body": "Busca por nombre o contenido. Consejo: pulsa \u2318K en cualquier momento."
+      },
+      "dropzone": {
+        "title": "Centro de carga",
+        "body": "Arrastra y suelta archivos o carpetas aqu\u00ed. Elige un destino si lo necesitas."
+      },
+      "chatPlus": {
+        "title": "Pregunta a Allybi con el contexto adecuado",
+        "body": "Usa + para subir o conectar fuentes, luego haz tu pregunta abajo."
+      },
+      "integrations": {
+        "title": "Conecta integraciones (opcional)",
+        "body": "Conecta Gmail, Outlook o Slack para traer adjuntos a Allybi."
+      }
+    }
+  },
   "previewCount": {
     "pageOf": "Página {{current}} de {{total}}",
     "slideOf": "Diapositiva {{current}} de {{total}}",

@@ -1654,6 +1654,46 @@
       }
     }
   },
+  "sidebarTour": {
+    "ariaLabel": "Sidebar-linked onboarding tour",
+    "stepOf": "{{current}}/{{total}}",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "sections": {
+      "home": "Section: Home",
+      "upload": "Section: Upload",
+      "chat": "Section: Chat",
+      "integrations": "Section: Integrations"
+    },
+    "steps": {
+      "uploadCta": {
+        "title": "Start by uploading",
+        "body": "Upload files or folders to unlock search, categories, and insights."
+      },
+      "smartCategories": {
+        "title": "Smart Categories organize automatically",
+        "body": "Your files are grouped for you — open a category to browse."
+      },
+      "search": {
+        "title": "Find anything fast",
+        "body": "Search by name or content. Tip: press \u2318K anytime."
+      },
+      "dropzone": {
+        "title": "Upload hub",
+        "body": "Drag & drop files or folders here. Choose a destination if needed."
+      },
+      "chatPlus": {
+        "title": "Ask Allybi with the right context",
+        "body": "Use + to upload or connect sources, then ask your question below."
+      },
+      "integrations": {
+        "title": "Connect integrations (optional)",
+        "body": "Connect Gmail, Outlook, or Slack to bring attachments into Allybi."
+      }
+    }
+  },
   "previewCount": {
     "pageOf": "Page {{current}} of {{total}}",
     "slideOf": "Slide {{current}} of {{total}}",

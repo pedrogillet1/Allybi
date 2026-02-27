@@ -8,6 +8,9 @@ function getTourKey(userId) {
 
 export function hasSeenTour(userId) {
   if (!userId) return true;
+  // Suppress while sidebar-linked tour is active or hasn't been completed yet
+  if (sessionStorage.getItem('koda_sidebar_tour_active') === 'true') return true;
+  if (localStorage.getItem(`allybi:hasSeenSidebarLinkedHomeTour:${userId}`) !== 'true') return true;
   return localStorage.getItem(getTourKey(userId)) === 'true';
 }
 

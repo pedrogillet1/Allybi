@@ -54,6 +54,7 @@ import IntegrationsPage from './components/integrations/IntegrationsPage';
 import GmailDetailPage from './components/integrations/GmailDetailPage';
 import LegalPage from './components/legal/LegalPage';
 import FirstDocumentUpload from './components/onboarding/FirstDocumentUpload';
+import SidebarLinkedTour from './components/onboarding/SidebarLinkedTour';
 
 // Dev-only Chat Contract Harness
 import ChatContractHarness from './pages/ChatContractHarness';
@@ -218,6 +219,9 @@ function AppContent() {
 
           {/* Unified toast system (top-center, Koda design) */}
           <ToastContainer toasts={activeToasts} onDismiss={removeToast} />
+
+          {/* Sidebar-linked onboarding tour (cross-page, survives route changes) */}
+          <SidebarLinkedTour />
         </div>
 
         {/* Signed-out affordance */}
