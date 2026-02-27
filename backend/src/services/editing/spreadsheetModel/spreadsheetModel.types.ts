@@ -53,6 +53,13 @@ export type ConditionalFormatRule = {
   value?: string | number;
   backgroundHex?: string;
   textHex?: string;
+  color?: string;
+  minColor?: string;
+  midColor?: string;
+  maxColor?: string;
+  n?: number;
+  percent?: boolean;
+  style?: Partial<StyleModel>;
 };
 
 export type SortKey = {
@@ -131,6 +138,8 @@ export type SheetModel = {
     merges?: MergeRange[];
     freeze?: FreezeSpec;
     autoFilterRange?: string;
+    hiddenRows?: number[];
+    hiddenColumns?: number[];
   };
   cells: Record<string, CellModel>;
   validations?: Array<{ range: string; rule: ValidationRule }>;
@@ -164,6 +173,42 @@ export type SemanticIndex = {
   >;
   rowGroups: Array<{ label: string; startRow: number; endRow: number }>;
   keyCells: Record<string, { role: string; row: number; col: number }>;
+};
+
+export type ColumnTypeInference = {
+  kind:
+    | "currency"
+    | "percent"
+    | "date"
+    | "id"
+    | "categorical"
+    | "email"
+    | "url"
+    | "text"
+    | "number";
+  confidence: number;
+  sampleSize: number;
+};
+
+export type TableBounds = {
+  headerRow: number;
+  firstDataRow: number;
+  lastDataRow: number;
+  firstCol: number;
+  lastCol: number;
+};
+
+export type MultiHeaderRow = {
+  row: number;
+  mergedRanges: Array<{ label: string; startCol: number; endCol: number }>;
+};
+
+export type EnhancedSemanticIndex = SemanticIndex & {
+  tableBounds?: TableBounds;
+  multiHeaders?: MultiHeaderRow[];
+  columnSynonyms: Record<number, string[]>;
+  formulaSummaries: Record<number, string>;
+  columnTypeInference: Record<number, ColumnTypeInference>;
 };
 
 export type SpreadsheetModelDiff = {

@@ -94,6 +94,26 @@ export type PatchOp =
       sheet?: string;
       range: A1Range;
       chart: ChartSpec;
+    }
+  | { op: "MERGE_CELLS"; sheet?: string; range: A1Range }
+  | { op: "UNMERGE_CELLS"; sheet?: string; range: A1Range }
+  | {
+      op: "SET_ROW_VISIBILITY";
+      sheet: string;
+      rows: number[];
+      hidden: boolean;
+    }
+  | {
+      op: "SET_COL_VISIBILITY";
+      sheet: string;
+      cols: number[];
+      hidden: boolean;
+    }
+  | {
+      op: "SET_COL_WIDTH";
+      sheet: string;
+      cols: number[];
+      width: number | "auto";
     };
 
 export type PatchPlanTranslationResult = {
