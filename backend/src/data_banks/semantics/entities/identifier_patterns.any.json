@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "id": "identifier_patterns",
+    "version": "1.0.0",
+    "description": "Document identifier patterns (invoice, claim, contract, policy, MRN, and related ids).",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true
+  },
+  "rules": [
+    {
+      "id": "identifier_patterns_rule_001",
+      "pattern": "",
+      "notes": "Populate domain-specific extraction patterns."
+    }
+  ]
+}

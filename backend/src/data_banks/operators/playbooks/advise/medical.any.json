@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_advise_medical",
+    "version": "1.0.0",
+    "description": "advise operator playbook for medical documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "advise",
+    "domain": "medical"
+  },
+  "operator": "advise",
+  "domain": "medical",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "id": "sheetname_patterns",
+    "version": "1.0.0",
+    "description": "Spreadsheet sheet-name pattern normalization and canonical mapping.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true
+  },
+  "patterns": [
+    {
+      "canonical": "profit_and_loss",
+      "synonyms": [
+        "p&l",
+        "income statement",
+        "dre"
+      ]
+    },
+    {
+      "canonical": "budget",
+      "synonyms": [
+        "budget",
+        "forecast",
+        "plan"
+      ]
+    }
+  ]
+}

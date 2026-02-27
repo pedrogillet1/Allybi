@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_summarize_medical",
+    "version": "1.0.0",
+    "description": "summarize operator playbook for medical documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "summarize",
+    "domain": "medical"
+  },
+  "operator": "summarize",
+  "domain": "medical",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

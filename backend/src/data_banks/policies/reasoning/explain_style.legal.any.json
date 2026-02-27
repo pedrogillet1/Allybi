@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "id": "explain_style_legal",
+    "version": "1.0.0",
+    "description": "Explanation style policy for legal audiences and depth levels.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal"
+  },
+  "domain": "legal",
+  "audienceStyles": [
+    {
+      "audience": "expert",
+      "tone": "precise",
+      "defaultDepth": "detailed"
+    },
+    {
+      "audience": "general",
+      "tone": "clear",
+      "defaultDepth": "summary"
+    }
+  ],
+  "depthLadder": [
+    "paragraph",
+    "detailed",
+    "executive_brief"
+  ]
+}

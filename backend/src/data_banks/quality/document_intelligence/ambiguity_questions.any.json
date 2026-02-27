@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "id": "ambiguity_questions",
+    "version": "1.0.0",
+    "description": "Single-question ambiguity templates and rules per domain for unresolved high-impact uncertainty.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true
+  },
+  "rules": [],
+  "templates": {
+    "finance": [],
+    "legal": [],
+    "medical": [],
+    "ops": []
+  }
+}

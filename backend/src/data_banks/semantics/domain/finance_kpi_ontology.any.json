@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "id": "finance_kpi_ontology",
+    "version": "1.0.0",
+    "description": "Finance KPI ontology with definitions, formula metadata, and synonyms.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance"
+  },
+  "domain": "finance",
+  "definitions": [],
+  "rules": []
+}

@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "id": "finance_doc_logic",
+    "version": "1.0.0",
+    "description": "Finance document interpretation logic for budget-vs-actual-vs-forecast decisions.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance"
+  },
+  "domain": "finance",
+  "definitions": [],
+  "rules": []
+}

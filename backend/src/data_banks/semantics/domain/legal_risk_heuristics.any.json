@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "id": "legal_risk_heuristics",
+    "version": "1.0.0",
+    "description": "Legal risk heuristics for high-risk clause detection and ambiguity prompts.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal"
+  },
+  "domain": "legal",
+  "definitions": [],
+  "rules": []
+}

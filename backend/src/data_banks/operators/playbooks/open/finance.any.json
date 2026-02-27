@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_open_finance",
+    "version": "1.0.0",
+    "description": "open operator playbook for finance documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "open",
+    "domain": "finance"
+  },
+  "operator": "open",
+  "domain": "finance",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

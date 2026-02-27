@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "id": "table_header_ontology_legal",
+    "version": "1.0.0",
+    "description": "Table header ontology for legal.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal"
+  },
+  "domain": "legal",
+  "headers": [
+    {
+      "canonical": "legal_primary_header",
+      "synonyms": [],
+      "related": []
+    }
+  ]
+}

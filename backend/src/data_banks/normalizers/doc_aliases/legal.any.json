@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "id": "doc_aliases_legal",
+    "version": "1.0.0",
+    "description": "User alias mapping for legal documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "caseInsensitive": true
+  },
+  "domain": "legal",
+  "aliases": [
+    {
+      "alias": "legal document",
+      "docTypes": [],
+      "hints": {
+        "period": "unknown",
+        "owner": "unknown"
+      }
+    }
+  ]
+}

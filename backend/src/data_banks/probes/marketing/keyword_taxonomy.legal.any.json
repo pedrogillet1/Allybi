@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "id": "keyword_taxonomy_legal",
+    "version": "1.0.0",
+    "description": "Marketing keyword taxonomy for legal usage monitoring and product intelligence.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "telemetryOnly": true
+  },
+  "domain": "legal",
+  "clusters": []
+}

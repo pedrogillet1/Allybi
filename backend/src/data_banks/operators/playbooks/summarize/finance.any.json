@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_summarize_finance",
+    "version": "1.0.0",
+    "description": "summarize operator playbook for finance documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "summarize",
+    "domain": "finance"
+  },
+  "operator": "summarize",
+  "domain": "finance",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

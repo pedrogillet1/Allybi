@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-01-25"
+    "lastUpdated": "2026-02-27"
   },
   "config": {
     "enabled": true,
@@ -80,6 +80,1518 @@
       "reason": "Singular form used by older code; canonical uses plural.",
       "addedAt": "2026-01-25",
       "expiresInDays": 365
+    },
+    {
+      "alias": "document_intelligence_bank_map",
+      "canonicalId": "document_intelligence_bank_map",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "document.intelligence.bank.map",
+      "canonicalId": "document_intelligence_bank_map",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc_taxonomy",
+      "canonicalId": "doc_taxonomy",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc.taxonomy",
+      "canonicalId": "doc_taxonomy",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc_archetypes_finance",
+      "canonicalId": "doc_archetypes_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc.archetypes.finance",
+      "canonicalId": "doc_archetypes_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc_aliases_finance",
+      "canonicalId": "doc_aliases_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc.aliases.finance",
+      "canonicalId": "doc_aliases_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc_archetypes_legal",
+      "canonicalId": "doc_archetypes_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc.archetypes.legal",
+      "canonicalId": "doc_archetypes_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc_aliases_legal",
+      "canonicalId": "doc_aliases_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc.aliases.legal",
+      "canonicalId": "doc_aliases_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc_archetypes_medical",
+      "canonicalId": "doc_archetypes_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc.archetypes.medical",
+      "canonicalId": "doc_archetypes_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc_aliases_medical",
+      "canonicalId": "doc_aliases_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc.aliases.medical",
+      "canonicalId": "doc_aliases_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc_archetypes_ops",
+      "canonicalId": "doc_archetypes_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc.archetypes.ops",
+      "canonicalId": "doc_archetypes_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc_aliases_ops",
+      "canonicalId": "doc_aliases_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "doc.aliases.ops",
+      "canonicalId": "doc_aliases_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "headings_map",
+      "canonicalId": "headings_map",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "headings.map",
+      "canonicalId": "headings_map",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "table_header_ontology_finance",
+      "canonicalId": "table_header_ontology_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "table.header.ontology.finance",
+      "canonicalId": "table_header_ontology_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "table_header_ontology_legal",
+      "canonicalId": "table_header_ontology_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "table.header.ontology.legal",
+      "canonicalId": "table_header_ontology_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "table_header_ontology_medical",
+      "canonicalId": "table_header_ontology_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "table.header.ontology.medical",
+      "canonicalId": "table_header_ontology_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "table_header_ontology_ops",
+      "canonicalId": "table_header_ontology_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "table.header.ontology.ops",
+      "canonicalId": "table_header_ontology_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "sheetname_patterns",
+      "canonicalId": "sheetname_patterns",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "sheetname.patterns",
+      "canonicalId": "sheetname_patterns",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "layout_cues",
+      "canonicalId": "layout_cues",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "layout.cues",
+      "canonicalId": "layout_cues",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "money_patterns",
+      "canonicalId": "money_patterns",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "money.patterns",
+      "canonicalId": "money_patterns",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "date_patterns",
+      "canonicalId": "date_patterns",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "date.patterns",
+      "canonicalId": "date_patterns",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "party_patterns",
+      "canonicalId": "party_patterns",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "party.patterns",
+      "canonicalId": "party_patterns",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "identifier_patterns",
+      "canonicalId": "identifier_patterns",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "identifier.patterns",
+      "canonicalId": "identifier_patterns",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "finance_kpi_ontology",
+      "canonicalId": "finance_kpi_ontology",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "finance.kpi.ontology",
+      "canonicalId": "finance_kpi_ontology",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "accounting_rules",
+      "canonicalId": "accounting_rules",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "accounting.rules",
+      "canonicalId": "accounting_rules",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "finance_doc_logic",
+      "canonicalId": "finance_doc_logic",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "finance.doc.logic",
+      "canonicalId": "finance_doc_logic",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "legal_clause_ontology",
+      "canonicalId": "legal_clause_ontology",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "legal.clause.ontology",
+      "canonicalId": "legal_clause_ontology",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "legal_risk_heuristics",
+      "canonicalId": "legal_risk_heuristics",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "legal.risk.heuristics",
+      "canonicalId": "legal_risk_heuristics",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "legal_reference_rules",
+      "canonicalId": "legal_reference_rules",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "legal.reference.rules",
+      "canonicalId": "legal_reference_rules",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "medical_report_ontology",
+      "canonicalId": "medical_report_ontology",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "medical.report.ontology",
+      "canonicalId": "medical_report_ontology",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "medical_safety_boundaries",
+      "canonicalId": "medical_safety_boundaries",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "medical.safety.boundaries",
+      "canonicalId": "medical_safety_boundaries",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "medical_explanation_templates",
+      "canonicalId": "medical_explanation_templates",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "medical.explanation.templates",
+      "canonicalId": "medical_explanation_templates",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_navigate_finance",
+      "canonicalId": "operator_playbook_navigate_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.navigate.finance",
+      "canonicalId": "operator_playbook_navigate_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_navigate_legal",
+      "canonicalId": "operator_playbook_navigate_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.navigate.legal",
+      "canonicalId": "operator_playbook_navigate_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_navigate_medical",
+      "canonicalId": "operator_playbook_navigate_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.navigate.medical",
+      "canonicalId": "operator_playbook_navigate_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_navigate_ops",
+      "canonicalId": "operator_playbook_navigate_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.navigate.ops",
+      "canonicalId": "operator_playbook_navigate_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_open_finance",
+      "canonicalId": "operator_playbook_open_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.open.finance",
+      "canonicalId": "operator_playbook_open_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_open_legal",
+      "canonicalId": "operator_playbook_open_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.open.legal",
+      "canonicalId": "operator_playbook_open_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_open_medical",
+      "canonicalId": "operator_playbook_open_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.open.medical",
+      "canonicalId": "operator_playbook_open_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_open_ops",
+      "canonicalId": "operator_playbook_open_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.open.ops",
+      "canonicalId": "operator_playbook_open_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_extract_finance",
+      "canonicalId": "operator_playbook_extract_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.extract.finance",
+      "canonicalId": "operator_playbook_extract_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_extract_legal",
+      "canonicalId": "operator_playbook_extract_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.extract.legal",
+      "canonicalId": "operator_playbook_extract_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_extract_medical",
+      "canonicalId": "operator_playbook_extract_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.extract.medical",
+      "canonicalId": "operator_playbook_extract_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_extract_ops",
+      "canonicalId": "operator_playbook_extract_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.extract.ops",
+      "canonicalId": "operator_playbook_extract_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_summarize_finance",
+      "canonicalId": "operator_playbook_summarize_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.summarize.finance",
+      "canonicalId": "operator_playbook_summarize_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_summarize_legal",
+      "canonicalId": "operator_playbook_summarize_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.summarize.legal",
+      "canonicalId": "operator_playbook_summarize_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_summarize_medical",
+      "canonicalId": "operator_playbook_summarize_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.summarize.medical",
+      "canonicalId": "operator_playbook_summarize_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_summarize_ops",
+      "canonicalId": "operator_playbook_summarize_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.summarize.ops",
+      "canonicalId": "operator_playbook_summarize_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_compare_finance",
+      "canonicalId": "operator_playbook_compare_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.compare.finance",
+      "canonicalId": "operator_playbook_compare_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_compare_legal",
+      "canonicalId": "operator_playbook_compare_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.compare.legal",
+      "canonicalId": "operator_playbook_compare_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_compare_medical",
+      "canonicalId": "operator_playbook_compare_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.compare.medical",
+      "canonicalId": "operator_playbook_compare_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_compare_ops",
+      "canonicalId": "operator_playbook_compare_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.compare.ops",
+      "canonicalId": "operator_playbook_compare_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_locate_finance",
+      "canonicalId": "operator_playbook_locate_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.locate.finance",
+      "canonicalId": "operator_playbook_locate_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_locate_legal",
+      "canonicalId": "operator_playbook_locate_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.locate.legal",
+      "canonicalId": "operator_playbook_locate_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_locate_medical",
+      "canonicalId": "operator_playbook_locate_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.locate.medical",
+      "canonicalId": "operator_playbook_locate_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_locate_ops",
+      "canonicalId": "operator_playbook_locate_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.locate.ops",
+      "canonicalId": "operator_playbook_locate_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_calculate_finance",
+      "canonicalId": "operator_playbook_calculate_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.calculate.finance",
+      "canonicalId": "operator_playbook_calculate_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_calculate_legal",
+      "canonicalId": "operator_playbook_calculate_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.calculate.legal",
+      "canonicalId": "operator_playbook_calculate_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_calculate_medical",
+      "canonicalId": "operator_playbook_calculate_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.calculate.medical",
+      "canonicalId": "operator_playbook_calculate_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_calculate_ops",
+      "canonicalId": "operator_playbook_calculate_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.calculate.ops",
+      "canonicalId": "operator_playbook_calculate_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_evaluate_finance",
+      "canonicalId": "operator_playbook_evaluate_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.evaluate.finance",
+      "canonicalId": "operator_playbook_evaluate_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_evaluate_legal",
+      "canonicalId": "operator_playbook_evaluate_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.evaluate.legal",
+      "canonicalId": "operator_playbook_evaluate_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_evaluate_medical",
+      "canonicalId": "operator_playbook_evaluate_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.evaluate.medical",
+      "canonicalId": "operator_playbook_evaluate_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_evaluate_ops",
+      "canonicalId": "operator_playbook_evaluate_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.evaluate.ops",
+      "canonicalId": "operator_playbook_evaluate_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_validate_finance",
+      "canonicalId": "operator_playbook_validate_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.validate.finance",
+      "canonicalId": "operator_playbook_validate_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_validate_legal",
+      "canonicalId": "operator_playbook_validate_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.validate.legal",
+      "canonicalId": "operator_playbook_validate_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_validate_medical",
+      "canonicalId": "operator_playbook_validate_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.validate.medical",
+      "canonicalId": "operator_playbook_validate_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_validate_ops",
+      "canonicalId": "operator_playbook_validate_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.validate.ops",
+      "canonicalId": "operator_playbook_validate_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_advise_finance",
+      "canonicalId": "operator_playbook_advise_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.advise.finance",
+      "canonicalId": "operator_playbook_advise_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_advise_legal",
+      "canonicalId": "operator_playbook_advise_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.advise.legal",
+      "canonicalId": "operator_playbook_advise_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_advise_medical",
+      "canonicalId": "operator_playbook_advise_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.advise.medical",
+      "canonicalId": "operator_playbook_advise_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_advise_ops",
+      "canonicalId": "operator_playbook_advise_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.advise.ops",
+      "canonicalId": "operator_playbook_advise_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_monitor_finance",
+      "canonicalId": "operator_playbook_monitor_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.monitor.finance",
+      "canonicalId": "operator_playbook_monitor_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_monitor_legal",
+      "canonicalId": "operator_playbook_monitor_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.monitor.legal",
+      "canonicalId": "operator_playbook_monitor_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_monitor_medical",
+      "canonicalId": "operator_playbook_monitor_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.monitor.medical",
+      "canonicalId": "operator_playbook_monitor_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator_playbook_monitor_ops",
+      "canonicalId": "operator_playbook_monitor_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "operator.playbook.monitor.ops",
+      "canonicalId": "operator_playbook_monitor_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "explain_style_finance",
+      "canonicalId": "explain_style_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "explain.style.finance",
+      "canonicalId": "explain_style_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "decision_support_finance",
+      "canonicalId": "decision_support_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "decision.support.finance",
+      "canonicalId": "decision_support_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "explain_style_legal",
+      "canonicalId": "explain_style_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "explain.style.legal",
+      "canonicalId": "explain_style_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "decision_support_legal",
+      "canonicalId": "decision_support_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "decision.support.legal",
+      "canonicalId": "decision_support_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "explain_style_medical",
+      "canonicalId": "explain_style_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "explain.style.medical",
+      "canonicalId": "explain_style_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "decision_support_medical",
+      "canonicalId": "decision_support_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "decision.support.medical",
+      "canonicalId": "decision_support_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "explain_style_ops",
+      "canonicalId": "explain_style_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "explain.style.ops",
+      "canonicalId": "explain_style_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "decision_support_ops",
+      "canonicalId": "decision_support_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "decision.support.ops",
+      "canonicalId": "decision_support_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "assumption_policy",
+      "canonicalId": "assumption_policy",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "assumption.policy",
+      "canonicalId": "assumption_policy",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "numeric_integrity",
+      "canonicalId": "numeric_integrity",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "numeric.integrity",
+      "canonicalId": "numeric_integrity",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "wrong_doc_lock",
+      "canonicalId": "wrong_doc_lock",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "wrong.doc.lock",
+      "canonicalId": "wrong_doc_lock",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "source_policy",
+      "canonicalId": "source_policy",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "source.policy",
+      "canonicalId": "source_policy",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "ambiguity_questions",
+      "canonicalId": "ambiguity_questions",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "ambiguity.questions",
+      "canonicalId": "ambiguity_questions",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "query_rewrites_finance",
+      "canonicalId": "query_rewrites_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "query.rewrites.finance",
+      "canonicalId": "query_rewrites_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "boost_rules_finance",
+      "canonicalId": "boost_rules_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "boost.rules.finance",
+      "canonicalId": "boost_rules_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "section_priority_finance",
+      "canonicalId": "section_priority_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "section.priority.finance",
+      "canonicalId": "section_priority_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "query_rewrites_legal",
+      "canonicalId": "query_rewrites_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "query.rewrites.legal",
+      "canonicalId": "query_rewrites_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "boost_rules_legal",
+      "canonicalId": "boost_rules_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "boost.rules.legal",
+      "canonicalId": "boost_rules_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "section_priority_legal",
+      "canonicalId": "section_priority_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "section.priority.legal",
+      "canonicalId": "section_priority_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "query_rewrites_medical",
+      "canonicalId": "query_rewrites_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "query.rewrites.medical",
+      "canonicalId": "query_rewrites_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "boost_rules_medical",
+      "canonicalId": "boost_rules_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "boost.rules.medical",
+      "canonicalId": "boost_rules_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "section_priority_medical",
+      "canonicalId": "section_priority_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "section.priority.medical",
+      "canonicalId": "section_priority_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "query_rewrites_ops",
+      "canonicalId": "query_rewrites_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "query.rewrites.ops",
+      "canonicalId": "query_rewrites_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "boost_rules_ops",
+      "canonicalId": "boost_rules_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "boost.rules.ops",
+      "canonicalId": "boost_rules_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "section_priority_ops",
+      "canonicalId": "section_priority_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "section.priority.ops",
+      "canonicalId": "section_priority_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "keyword_taxonomy_finance",
+      "canonicalId": "keyword_taxonomy_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "keyword.taxonomy.finance",
+      "canonicalId": "keyword_taxonomy_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "pain_points_finance",
+      "canonicalId": "pain_points_finance",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "pain.points.finance",
+      "canonicalId": "pain_points_finance",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "keyword_taxonomy_legal",
+      "canonicalId": "keyword_taxonomy_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "keyword.taxonomy.legal",
+      "canonicalId": "keyword_taxonomy_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "pain_points_legal",
+      "canonicalId": "pain_points_legal",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "pain.points.legal",
+      "canonicalId": "pain_points_legal",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "keyword_taxonomy_medical",
+      "canonicalId": "keyword_taxonomy_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "keyword.taxonomy.medical",
+      "canonicalId": "keyword_taxonomy_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "pain_points_medical",
+      "canonicalId": "pain_points_medical",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "pain.points.medical",
+      "canonicalId": "pain_points_medical",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "keyword_taxonomy_ops",
+      "canonicalId": "keyword_taxonomy_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "keyword.taxonomy.ops",
+      "canonicalId": "keyword_taxonomy_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "pain_points_ops",
+      "canonicalId": "pain_points_ops",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "pain.points.ops",
+      "canonicalId": "pain_points_ops",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "pattern_library",
+      "canonicalId": "pattern_library",
+      "reason": "Canonical doc intelligence bank id (self-alias).",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
+    },
+    {
+      "alias": "pattern.library",
+      "canonicalId": "pattern_library",
+      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
+      "addedAt": "2026-02-27",
+      "expiresInDays": null
     }
   ],
   "normalizationRules": {

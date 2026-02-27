@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "id": "accounting_rules",
+    "version": "1.0.0",
+    "description": "Accounting interpretation policy: accrual/cash handling, recurring/non-recurring classification, and period logic.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance"
+  },
+  "domain": "finance",
+  "definitions": [],
+  "rules": []
+}

@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "id": "boost_rules_legal",
+    "version": "1.0.0",
+    "description": "Domain boost rules for legal retrieval ranking by intent and document type.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal"
+  },
+  "domain": "legal",
+  "rules": [
+    {
+      "id": "legal_boost_001",
+      "intents": [],
+      "boostDocTypes": [],
+      "weight": 0.2
+    }
+  ]
+}

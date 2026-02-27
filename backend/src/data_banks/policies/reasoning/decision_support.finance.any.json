@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "id": "decision_support_finance",
+    "version": "1.0.0",
+    "description": "Decision-support policy for finance recommendations with risks and evidence confidence framing.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance"
+  },
+  "domain": "finance",
+  "framework": {
+    "requireOptions": true,
+    "requireRiskTradeoffs": true,
+    "requireEvidenceSummary": true,
+    "forbidFalseCertainty": true
+  },
+  "templates": []
+}

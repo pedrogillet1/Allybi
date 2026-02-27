@@ -24,6 +24,25 @@ export interface RuntimeWiringIntegrityResult {
   dormantIntentConfigUsage: string[];
 }
 
+export const RUNTIME_REQUIRED_BANKS = [
+  "intent_config",
+  "intent_patterns",
+  "operator_families",
+  "operator_contracts",
+  "operator_output_shapes",
+  "prompt_registry",
+  "language_triggers",
+  "processing_messages",
+  "edit_error_catalog",
+  "operator_catalog",
+  "allybi_capabilities",
+  "intent_patterns_docx_en",
+  "intent_patterns_docx_pt",
+  "intent_patterns_excel_en",
+  "intent_patterns_excel_pt",
+  "document_intelligence_bank_map",
+] as const;
+
 function asTrimmedString(value: unknown): string {
   return String(value || "").trim();
 }
@@ -422,25 +441,9 @@ function collectDormantIntentConfigUsage(): string[] {
 
 export class RuntimeWiringIntegrityService {
   validate(): RuntimeWiringIntegrityResult {
-    const requiredBanks = [
-      "intent_config",
-      "intent_patterns",
-      "operator_families",
-      "operator_contracts",
-      "operator_output_shapes",
-      "prompt_registry",
-      "language_triggers",
-      "processing_messages",
-      "edit_error_catalog",
-      "operator_catalog",
-      "allybi_capabilities",
-      "intent_patterns_docx_en",
-      "intent_patterns_docx_pt",
-      "intent_patterns_excel_en",
-      "intent_patterns_excel_pt",
-    ];
-
-    const missingBanks = requiredBanks.filter((id) => !getOptionalBank(id));
+    const missingBanks = RUNTIME_REQUIRED_BANKS.filter(
+      (id) => !getOptionalBank(id),
+    );
 
     const intentConfig = getOptionalBank<any>("intent_config");
     const operatorFamilies = getOptionalBank<any>("operator_families");

@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "id": "legal_clause_ontology",
+    "version": "1.0.0",
+    "description": "Legal clause ontology and multilingual synonym mapping.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal"
+  },
+  "domain": "legal",
+  "definitions": [],
+  "rules": []
+}

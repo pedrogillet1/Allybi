@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_compare_finance",
+    "version": "1.0.0",
+    "description": "compare operator playbook for finance documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "compare",
+    "domain": "finance"
+  },
+  "operator": "compare",
+  "domain": "finance",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

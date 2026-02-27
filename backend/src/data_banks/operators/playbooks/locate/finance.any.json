@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_locate_finance",
+    "version": "1.0.0",
+    "description": "locate operator playbook for finance documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "locate",
+    "domain": "finance"
+  },
+  "operator": "locate",
+  "domain": "finance",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

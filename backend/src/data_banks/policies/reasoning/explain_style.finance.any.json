@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "id": "explain_style_finance",
+    "version": "1.0.0",
+    "description": "Explanation style policy for finance audiences and depth levels.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance"
+  },
+  "domain": "finance",
+  "audienceStyles": [
+    {
+      "audience": "expert",
+      "tone": "precise",
+      "defaultDepth": "detailed"
+    },
+    {
+      "audience": "general",
+      "tone": "clear",
+      "defaultDepth": "summary"
+    }
+  ],
+  "depthLadder": [
+    "paragraph",
+    "detailed",
+    "executive_brief"
+  ]
+}

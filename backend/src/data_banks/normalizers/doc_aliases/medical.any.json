@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "id": "doc_aliases_medical",
+    "version": "1.0.0",
+    "description": "User alias mapping for medical documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "caseInsensitive": true
+  },
+  "domain": "medical",
+  "aliases": [
+    {
+      "alias": "medical document",
+      "docTypes": [],
+      "hints": {
+        "period": "unknown",
+        "owner": "unknown"
+      }
+    }
+  ]
+}

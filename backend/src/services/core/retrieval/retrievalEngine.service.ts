@@ -82,6 +82,9 @@ export interface RetrievalRequest {
     // Table expectations
     tableExpected?: boolean;
 
+    // Optional domain hint for document-intelligence retrieval banks.
+    domainHint?: string | null;
+
     // Discovery mode can ignore doc lock for corpus search
     corpusSearchAllowed?: boolean;
 
@@ -490,15 +493,27 @@ export class RetrievalEngineService {
         ? []
         : this.expandQuery(queryNormalized, signals)
       : [];
-    const queryForSearch = expandedQueries.length
-      ? expandedQueries.join(" ")
-      : queryNormalized;
+    const domainRewriteQueries = this.getDomainRewriteQueries(
+      queryNormalized,
+      signals,
+    );
+    const queryForSearch = [
+      queryNormalized,
+      ...expandedQueries,
+      ...domainRewriteQueries,
+    ]
+      .map((q) => String(q || "").trim())
+      .filter(Boolean)
+      .join(" ");
+    const additionalStructuralAnchors =
+      this.getDomainStructuralAnchors(signals);
 
     // 5) Execute hybrid retrieval phases (semantic + lexical rescue + structural anchors)
     const phaseResults = await this.runPhases({
       query: queryForSearch,
       scopeDocIds: scope.candidateDocIds,
       semanticCfg,
+      additionalStructuralAnchors,
     });
 
     // 6) Merge into CandidateChunks with provenance + stable ids
@@ -567,7 +582,12 @@ export class RetrievalEngineService {
     const pack = this.packageEvidence(candidates, req, signals, packaging, {
       queryOriginal,
       queryNormalized,
-      expandedQueries,
+      expandedQueries: [
+        ...expandedQueries,
+        ...domainRewriteQueries.filter(
+          (q) => !expandedQueries.includes(q) && q !== queryNormalized,
+        ),
+      ],
       scope,
       phaseCounts,
       scopeMetrics,
@@ -879,6 +899,73 @@ export class RetrievalEngineService {
     return Array.from(expansions);
   }
 
+  private getDomainRewriteQueries(
+    normalizedQuery: string,
+    signals: RetrievalRequest["signals"],
+  ): string[] {
+    const domain = String(signals.domainHint || "")
+      .trim()
+      .toLowerCase();
+    if (!domain) return [];
+
+    const bank = this.safeGetBank<any>(`query_rewrites_${domain}`);
+    if (!bank || !Array.isArray(bank.rules)) return [];
+
+    const out: string[] = [];
+    for (const rule of bank.rules) {
+      const rewrites = Array.isArray(rule?.rewrites)
+        ? rule.rewrites
+            .map((r: unknown) => String(r || "").trim())
+            .filter(Boolean)
+        : [];
+      if (!rewrites.length) continue;
+
+      const patterns = Array.isArray(rule?.patterns)
+        ? rule.patterns
+            .map((p: unknown) => String(p || "").trim())
+            .filter(Boolean)
+        : [];
+
+      if (patterns.length === 0) {
+        out.push(...rewrites);
+        continue;
+      }
+
+      const matched = patterns.some((pattern: string) => {
+        try {
+          return new RegExp(pattern, "i").test(normalizedQuery);
+        } catch {
+          return false;
+        }
+      });
+      if (matched) out.push(...rewrites);
+    }
+
+    return Array.from(new Set(out)).slice(0, 12);
+  }
+
+  private getDomainStructuralAnchors(
+    signals: RetrievalRequest["signals"],
+  ): string[] {
+    const domain = String(signals.domainHint || "")
+      .trim()
+      .toLowerCase();
+    if (!domain) return [];
+
+    const bank = this.safeGetBank<any>(`section_priority_${domain}`);
+    if (!bank || !Array.isArray(bank.priorities)) return [];
+
+    const anchors = new Set<string>();
+    for (const priority of bank.priorities) {
+      const sections = Array.isArray(priority?.sections) ? priority.sections : [];
+      for (const section of sections) {
+        const value = String(section || "").trim();
+        if (value) anchors.add(value);
+      }
+    }
+    return Array.from(anchors).slice(0, 24);
+  }
+
   private escapeRegex(str: string): string {
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
@@ -891,6 +978,7 @@ export class RetrievalEngineService {
     query: string;
     scopeDocIds: string[];
     semanticCfg: any;
+    additionalStructuralAnchors?: string[];
   }): Promise<
     Array<{ phaseId: string; source: CandidateSource; hits: any[] }>
   > {
@@ -930,9 +1018,17 @@ export class RetrievalEngineService {
         });
       } else if (phase.type === "structural") {
         const k = safeNumber(phase.k, 60);
-        const anchors = Array.isArray(phase.anchors)
+        const phaseAnchors = Array.isArray(phase.anchors)
           ? phase.anchors
           : ["headings", "table_headers"];
+        const anchors = Array.from(
+          new Set([
+            ...phaseAnchors,
+            ...(Array.isArray(opts.additionalStructuralAnchors)
+              ? opts.additionalStructuralAnchors
+              : []),
+          ]),
+        ).slice(0, 24);
         const hits = await this.structuralIndex.search({
           query: opts.query,
           docIds: opts.scopeDocIds,

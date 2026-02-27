@@ -1,0 +1,29 @@
+{
+  "_meta": {
+    "id": "pattern_library",
+    "version": "1.0.0",
+    "description": "Cross-domain query pattern library for monitoring and product direction.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "telemetryOnly": true
+  },
+  "patterns": [
+    {
+      "id": "where_is_x",
+      "template": "where does it say {x}"
+    },
+    {
+      "id": "what_changed",
+      "template": "what changed between {a} and {b}"
+    },
+    {
+      "id": "extract_deadlines",
+      "template": "extract all obligations and deadlines"
+    }
+  ]
+}

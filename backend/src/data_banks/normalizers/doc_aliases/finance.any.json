@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "id": "doc_aliases_finance",
+    "version": "1.0.0",
+    "description": "User alias mapping for finance documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "caseInsensitive": true
+  },
+  "domain": "finance",
+  "aliases": [
+    {
+      "alias": "finance document",
+      "docTypes": [],
+      "hints": {
+        "period": "unknown",
+        "owner": "unknown"
+      }
+    }
+  ]
+}

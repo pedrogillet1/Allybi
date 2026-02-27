@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "id": "medical_explanation_templates",
+    "version": "1.0.0",
+    "description": "Medical explanation templates for plain-language summaries with reference ranges.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical"
+  },
+  "domain": "medical",
+  "definitions": [],
+  "rules": []
+}

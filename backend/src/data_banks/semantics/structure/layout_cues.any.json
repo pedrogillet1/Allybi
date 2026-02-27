@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "layout_cues",
+    "version": "1.0.0",
+    "description": "Layout cues for signatures, footers, appendices, and pagination semantics.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true
+  },
+  "cues": [
+    {
+      "id": "signature_block",
+      "patterns": [
+        "signed by",
+        "signature",
+        "assinatura"
+      ],
+      "meaning": "signature_block"
+    }
+  ]
+}

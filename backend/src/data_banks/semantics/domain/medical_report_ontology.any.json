@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "id": "medical_report_ontology",
+    "version": "1.0.0",
+    "description": "Medical report ontology with panels, abbreviations, and interpretation anchors.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical"
+  },
+  "domain": "medical",
+  "definitions": [],
+  "rules": []
+}

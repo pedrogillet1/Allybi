@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "id": "doc_taxonomy",
+    "version": "1.0.0",
+    "description": "Master taxonomy of document types across finance, legal, medical, and operations.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "defaultLanguage": "any"
+  },
+  "clusters": {
+    "finance": [
+      "profit_and_loss",
+      "balance_sheet",
+      "cash_flow",
+      "budget",
+      "forecast",
+      "board_pack",
+      "covenant_report"
+    ],
+    "legal": [
+      "msa",
+      "nda",
+      "lease",
+      "spa",
+      "employment_agreement",
+      "privacy_policy",
+      "terms_and_conditions"
+    ],
+    "medical": [
+      "lab_report",
+      "imaging_report",
+      "discharge_summary",
+      "prescription_list",
+      "referral_letter"
+    ],
+    "operations": [
+      "sop",
+      "runbook",
+      "incident_report",
+      "vendor_sla",
+      "audit_checklist"
+    ]
+  },
+  "typeDefinitions": []
+}

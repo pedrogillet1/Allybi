@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "id": "source_policy",
+    "version": "1.0.0",
+    "description": "Source rendering policy controlling citation/pills behavior per answer mode.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true
+  },
+  "rules": [],
+  "templates": {
+    "finance": [],
+    "legal": [],
+    "medical": [],
+    "ops": []
+  }
+}

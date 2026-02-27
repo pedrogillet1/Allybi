@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-19"
+    "lastUpdated": "2026-02-27"
   },
   "config": {
     "enabled": true,
@@ -442,7 +442,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "26fe90bcfd2d48da6c09053020174b45c9649c42e60fe9debdea191b5ca78004",
+      "checksumSha256": "3738b83c224b22dbd35534e274b61cbe795dec308fe1a6bf545f845766cdc3a4",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -463,7 +463,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "37f30260a2bb77b797c6a89674748993ed8b4bb6bec7b7a4907849d12c3cc076"
+      "checksumSha256": "0dc8bc3c8891c3fa82ad103a0bd4c199055d35fe427e22d823e8b6c70387d796"
     },
     {
       "id": "bank_manifest",
@@ -2600,6 +2600,2904 @@
       },
       "checksumSha256": "f02116a9a863d860b0ecbd62919c1c59c8ff6c928ac2ec04b865f9a4fa122e20",
       "lastUpdated": "2026-02-24"
+    },
+    {
+      "id": "document_intelligence_bank_map",
+      "category": "semantics",
+      "path": "semantics/document_intelligence_bank_map.any.json",
+      "filename": "document_intelligence_bank_map.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "bank_registry"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "675dfe14be4094e81b6a4ae977d1ede292c60f131ffa35602d9a7e59a80e29ce",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "doc_taxonomy",
+      "category": "semantics",
+      "path": "semantics/taxonomy/doc_taxonomy.any.json",
+      "filename": "doc_taxonomy.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "403281e227214ff4ca889ff52021b46d156bc8ad5876f8c70f59e7cac3521d6d",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "doc_archetypes_finance",
+      "category": "semantics",
+      "path": "semantics/taxonomy/doc_archetypes/finance.any.json",
+      "filename": "finance.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "a31734d46ad7dd348752b9828580e76ff439fbcea0c13cfdcfb27375fbe0cb06",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "doc_aliases_finance",
+      "category": "normalizers",
+      "path": "normalizers/doc_aliases/finance.any.json",
+      "filename": "finance.any.json",
+      "version": "1.0.0",
+      "contentType": "normalizers",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "a83064a3fc82ca18c0e5e34f8414d61a77c4d1b99bf117f938b2e054af443598",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "doc_archetypes_legal",
+      "category": "semantics",
+      "path": "semantics/taxonomy/doc_archetypes/legal.any.json",
+      "filename": "legal.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "c7904dfc74e6f05937ecc785306473dc3b47a3d36bcd7d42f912ff910eaf3d83",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "doc_aliases_legal",
+      "category": "normalizers",
+      "path": "normalizers/doc_aliases/legal.any.json",
+      "filename": "legal.any.json",
+      "version": "1.0.0",
+      "contentType": "normalizers",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "d13f6d1a13d98e80305067f59937cba9800a066ce75215c4905a6654ad8e0dbc",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "doc_archetypes_medical",
+      "category": "semantics",
+      "path": "semantics/taxonomy/doc_archetypes/medical.any.json",
+      "filename": "medical.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "c0c1ff214c0800e5d219d4cc154523b4de2134d27f38b02e844ae5d127deaced",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "doc_aliases_medical",
+      "category": "normalizers",
+      "path": "normalizers/doc_aliases/medical.any.json",
+      "filename": "medical.any.json",
+      "version": "1.0.0",
+      "contentType": "normalizers",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "271339ba35ffaca8ea5a962d6370b64af9db8159c4622b22a1deca81f1876082",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "doc_archetypes_ops",
+      "category": "semantics",
+      "path": "semantics/taxonomy/doc_archetypes/ops.any.json",
+      "filename": "ops.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "e4f6b7bab7420df81a5c58b5444911e5fdc4b42a6c3b57c9d692f9d860c875e8",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "doc_aliases_ops",
+      "category": "normalizers",
+      "path": "normalizers/doc_aliases/ops.any.json",
+      "filename": "ops.any.json",
+      "version": "1.0.0",
+      "contentType": "normalizers",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "ba98ce75c6e5dd64c82a07de26425e433f39c9f1bcf07e8fd6de30978fb43d3d",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "headings_map",
+      "category": "semantics",
+      "path": "semantics/structure/headings_map.any.json",
+      "filename": "headings_map.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "d2db6626af5262bbd76ba8ba397fb945d175fde0a32d94ee7513abbd75b902ed",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "table_header_ontology_finance",
+      "category": "semantics",
+      "path": "semantics/structure/table_header_ontology.finance.any.json",
+      "filename": "table_header_ontology.finance.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "f8f9d4f2de0701b97f662085aae7b2bfe199f586e1c5ebc504928425ebf3678b",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "table_header_ontology_legal",
+      "category": "semantics",
+      "path": "semantics/structure/table_header_ontology.legal.any.json",
+      "filename": "table_header_ontology.legal.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "24142dd1f21846373d2e87c288e38e8092d4b584e8b28076a8f1405155e21364",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "table_header_ontology_medical",
+      "category": "semantics",
+      "path": "semantics/structure/table_header_ontology.medical.any.json",
+      "filename": "table_header_ontology.medical.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "dd583333a4b04a6887d66b8b346159ca98bcf791d53f407268881598a6d8d20c",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "table_header_ontology_ops",
+      "category": "semantics",
+      "path": "semantics/structure/table_header_ontology.ops.any.json",
+      "filename": "table_header_ontology.ops.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "273b284c4978431588ba7263ad50f78a1be425ad00ca5582bea979f241580169",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "sheetname_patterns",
+      "category": "semantics",
+      "path": "semantics/structure/sheetname_patterns.any.json",
+      "filename": "sheetname_patterns.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "942bf6a2837f82e1faba81f7167c60059e43a26f06e6a8e5f6540a9f228c7a4a",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "layout_cues",
+      "category": "semantics",
+      "path": "semantics/structure/layout_cues.any.json",
+      "filename": "layout_cues.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "f4c46e3ede2c8b7097ef3d36a4188494e2dfe1ca05efec462bbc810b77079f5f",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "money_patterns",
+      "category": "semantics",
+      "path": "semantics/entities/money_patterns.any.json",
+      "filename": "money_patterns.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "0fe4d838a036c9bc878374cc7f34ad840988f65b11eb5e95cd4dd18d2b869152",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "date_patterns",
+      "category": "semantics",
+      "path": "semantics/entities/date_patterns.any.json",
+      "filename": "date_patterns.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "085371f74242f1b4fb069e4873a01e8890bc52ba0c613f130805822dbf61b702",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "party_patterns",
+      "category": "semantics",
+      "path": "semantics/entities/party_patterns.any.json",
+      "filename": "party_patterns.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "9b3b77e69135b2d5d141ff6f0c95cb24e43155a33e6c38523dac6a24229515bf",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "identifier_patterns",
+      "category": "semantics",
+      "path": "semantics/entities/identifier_patterns.any.json",
+      "filename": "identifier_patterns.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "ae2c908efd382b6110f051175d9ea36de224395d937c5ab1f6fcf563cb945b02",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "finance_kpi_ontology",
+      "category": "semantics",
+      "path": "semantics/domain/finance_kpi_ontology.any.json",
+      "filename": "finance_kpi_ontology.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "31d6a81b6e8e8b35c992a33295c7f2f474fc2beb7096b2edda4294790d259af2",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "accounting_rules",
+      "category": "semantics",
+      "path": "semantics/domain/accounting_rules.any.json",
+      "filename": "accounting_rules.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "230d6022474892325553fc33b72c4ed84a60c297b795adfc3f73bbf75473e531",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "finance_doc_logic",
+      "category": "semantics",
+      "path": "semantics/domain/finance_doc_logic.any.json",
+      "filename": "finance_doc_logic.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "4cd83f1727d037501147739f43172a39a97f687b9fe42feb5c894b5be79b07ac",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "legal_clause_ontology",
+      "category": "semantics",
+      "path": "semantics/domain/legal_clause_ontology.any.json",
+      "filename": "legal_clause_ontology.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "884afec0eb446f2a7dcad99bd89359e0fdb5858736ca945b86d1e384c3d17d7f",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "legal_risk_heuristics",
+      "category": "semantics",
+      "path": "semantics/domain/legal_risk_heuristics.any.json",
+      "filename": "legal_risk_heuristics.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "9a5601c1355c8fb02c50ec1316a536517031685168ce5232656009c96f46cbaa",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "legal_reference_rules",
+      "category": "semantics",
+      "path": "semantics/domain/legal_reference_rules.any.json",
+      "filename": "legal_reference_rules.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "0a2cf8c897bd0355d18c2060739cf0b3586ca07e6205bcb7fc8aec48f3f1c65c",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "medical_report_ontology",
+      "category": "semantics",
+      "path": "semantics/domain/medical_report_ontology.any.json",
+      "filename": "medical_report_ontology.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "7f57c9eb3fec2f8259177a7f67d17b6e2ea11beb52fd7f537e5b7e87dcd4af2e",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "medical_safety_boundaries",
+      "category": "semantics",
+      "path": "semantics/domain/medical_safety_boundaries.any.json",
+      "filename": "medical_safety_boundaries.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "7cbd0537df9c3e64dbfc27395505d4891cb25de93867914adce1adabbdea4423",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "medical_explanation_templates",
+      "category": "semantics",
+      "path": "semantics/domain/medical_explanation_templates.any.json",
+      "filename": "medical_explanation_templates.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "0416fa8d3d7825c8ace563fab49d685e5babad1a9c84355a7f8b6a88bb8775d1",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_navigate_finance",
+      "category": "operators",
+      "path": "operators/playbooks/navigate/finance.any.json",
+      "filename": "finance.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance",
+        "doc_aliases_finance",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "494203074c0eb0471c46593ea95d840745e8bf1be5a4ae587e4f6989b6647ece",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_navigate_legal",
+      "category": "operators",
+      "path": "operators/playbooks/navigate/legal.any.json",
+      "filename": "legal.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal",
+        "doc_aliases_legal",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "da45764f09acc236eb75b9f77ff1ab95c8a6274ddc47608d044394d1b7744aaa",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_navigate_medical",
+      "category": "operators",
+      "path": "operators/playbooks/navigate/medical.any.json",
+      "filename": "medical.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical",
+        "doc_aliases_medical",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "ef376a79e77e7b4c5675a6e1a47b62dc408ae7a9bd82a0814939716d53e4b666",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_navigate_ops",
+      "category": "operators",
+      "path": "operators/playbooks/navigate/ops.any.json",
+      "filename": "ops.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops",
+        "doc_aliases_ops",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "bcef666f64d97bacf69c407b2e75defde71c91ab3b4a55e09ed2cbe3222a10c2",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_open_finance",
+      "category": "operators",
+      "path": "operators/playbooks/open/finance.any.json",
+      "filename": "finance.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance",
+        "doc_aliases_finance",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "9184875158a82b7cd99da85edd9b713729a4363933482a6712dec96d7c660709",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_open_legal",
+      "category": "operators",
+      "path": "operators/playbooks/open/legal.any.json",
+      "filename": "legal.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal",
+        "doc_aliases_legal",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "e2a7471a6b82080cd997dd9baac9fc6a6aaf827be284bae5959a67e7efa00f34",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_open_medical",
+      "category": "operators",
+      "path": "operators/playbooks/open/medical.any.json",
+      "filename": "medical.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical",
+        "doc_aliases_medical",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "3a4d50001320d69a00daf94eae7e498d372085c603ee6595c29d388f04dbf87e",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_open_ops",
+      "category": "operators",
+      "path": "operators/playbooks/open/ops.any.json",
+      "filename": "ops.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops",
+        "doc_aliases_ops",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "a68438a35a99683cd64b5adbf9e1715f1b59d9b664c2e1f1b83430846fed1ba7",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_extract_finance",
+      "category": "operators",
+      "path": "operators/playbooks/extract/finance.any.json",
+      "filename": "finance.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance",
+        "doc_aliases_finance",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "10420ba8c945b1d730ce2e836cc7a0805965c52830fa2787ab24186870bfe28d",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_extract_legal",
+      "category": "operators",
+      "path": "operators/playbooks/extract/legal.any.json",
+      "filename": "legal.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal",
+        "doc_aliases_legal",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "49e2a73141a09bb5747500e8b7d99168af463b909504e205fa66964041f927af",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_extract_medical",
+      "category": "operators",
+      "path": "operators/playbooks/extract/medical.any.json",
+      "filename": "medical.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical",
+        "doc_aliases_medical",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "1eff122948776b7912f6e6448ba6b4bbebf0246f65100ebf18e9c2acd98621e8",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_extract_ops",
+      "category": "operators",
+      "path": "operators/playbooks/extract/ops.any.json",
+      "filename": "ops.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops",
+        "doc_aliases_ops",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "583945941f7a9817d0e9fb054b5c5519971c412154b38e0590c93fd00e59b3d8",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_summarize_finance",
+      "category": "operators",
+      "path": "operators/playbooks/summarize/finance.any.json",
+      "filename": "finance.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance",
+        "doc_aliases_finance",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "339a646b03bf9232259532afc4ed5f93ef97522e45097b35a377de93f87b12f4",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_summarize_legal",
+      "category": "operators",
+      "path": "operators/playbooks/summarize/legal.any.json",
+      "filename": "legal.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal",
+        "doc_aliases_legal",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "d6315dbefbaac9756b1c3e78ec4887d4c967d770c0537a0fac522357b29fab1d",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_summarize_medical",
+      "category": "operators",
+      "path": "operators/playbooks/summarize/medical.any.json",
+      "filename": "medical.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical",
+        "doc_aliases_medical",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "348262a69d2f32fa2e6eca8cab6100a3e5ce145b8446c1918c7727f756176adf",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_summarize_ops",
+      "category": "operators",
+      "path": "operators/playbooks/summarize/ops.any.json",
+      "filename": "ops.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops",
+        "doc_aliases_ops",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "a2802ba5211ba2f296e21904a6c8ec907c11c26d6f67f8bbe2e579ce6094aca9",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_compare_finance",
+      "category": "operators",
+      "path": "operators/playbooks/compare/finance.any.json",
+      "filename": "finance.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance",
+        "doc_aliases_finance",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "05721e59c9d2760ed96c1c31e07e3d16f04fa65200d56cda77f725d4b65f793e",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_compare_legal",
+      "category": "operators",
+      "path": "operators/playbooks/compare/legal.any.json",
+      "filename": "legal.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal",
+        "doc_aliases_legal",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "70acbe3b55590f8dc3639a9bdacc44cdf1f28a28ca695ebebe96afbbe5df5e5b",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_compare_medical",
+      "category": "operators",
+      "path": "operators/playbooks/compare/medical.any.json",
+      "filename": "medical.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical",
+        "doc_aliases_medical",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "d2ee6e36f72fb8e039cf63643502fa28f7248c8e8c4eefa8668d6f59c0232af0",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_compare_ops",
+      "category": "operators",
+      "path": "operators/playbooks/compare/ops.any.json",
+      "filename": "ops.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops",
+        "doc_aliases_ops",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "db96cf3c4935335db8263e68598be59f57fbe9446418e5071b2e7d95265b4e76",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_locate_finance",
+      "category": "operators",
+      "path": "operators/playbooks/locate/finance.any.json",
+      "filename": "finance.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance",
+        "doc_aliases_finance",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "a8d691053d9739c82eb0f7a8ca353b5a87a3b3a4695fb05b8f68d7d235fe1a79",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_locate_legal",
+      "category": "operators",
+      "path": "operators/playbooks/locate/legal.any.json",
+      "filename": "legal.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal",
+        "doc_aliases_legal",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "e843ddd94cc1078645f3ee97467ead4bf9acaa27f709e2a8012473674c0f4c6b",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_locate_medical",
+      "category": "operators",
+      "path": "operators/playbooks/locate/medical.any.json",
+      "filename": "medical.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical",
+        "doc_aliases_medical",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "9e61e9f6f881a28c5827eb75afcbee0473e3422a7aa72ea7899ab22ce81ba704",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_locate_ops",
+      "category": "operators",
+      "path": "operators/playbooks/locate/ops.any.json",
+      "filename": "ops.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops",
+        "doc_aliases_ops",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "986038a763c6fc2b7853cf5296196bfca7506b020c98aa6acc49151bf03453b4",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_calculate_finance",
+      "category": "operators",
+      "path": "operators/playbooks/calculate/finance.any.json",
+      "filename": "finance.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance",
+        "doc_aliases_finance",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "4d53fb86df9a7330281bd58ae4cdbd36b7b0fa9f138da372cb0fc19d0b772f27",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_calculate_legal",
+      "category": "operators",
+      "path": "operators/playbooks/calculate/legal.any.json",
+      "filename": "legal.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal",
+        "doc_aliases_legal",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "83849c6fbe7b850c4e51b886e4636a0b48bcc37fc1d7ddbc94c5bf3ffa7acdde",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_calculate_medical",
+      "category": "operators",
+      "path": "operators/playbooks/calculate/medical.any.json",
+      "filename": "medical.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical",
+        "doc_aliases_medical",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "f865ccd15eedae5b930a7c9dca4df7684fc44fd0dd62668b918c1bd9c77a95b8",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_calculate_ops",
+      "category": "operators",
+      "path": "operators/playbooks/calculate/ops.any.json",
+      "filename": "ops.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops",
+        "doc_aliases_ops",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "9ada54bfb593f51ed962c840c2d03568a309c9dedb48a3da110102810cf8a9ed",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_evaluate_finance",
+      "category": "operators",
+      "path": "operators/playbooks/evaluate/finance.any.json",
+      "filename": "finance.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance",
+        "doc_aliases_finance",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "ddecb603c68077e22e7509752ad365d39c482e635476a451485a8cca24e89367",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_evaluate_legal",
+      "category": "operators",
+      "path": "operators/playbooks/evaluate/legal.any.json",
+      "filename": "legal.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal",
+        "doc_aliases_legal",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "782c186ee425b763a81ee2af0572e5a6970b306dc312f8782c2c9bcc47d43e83",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_evaluate_medical",
+      "category": "operators",
+      "path": "operators/playbooks/evaluate/medical.any.json",
+      "filename": "medical.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical",
+        "doc_aliases_medical",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "f8e4940359e9b3be26b4e4ed137c1fa0f578d56c5dab8c82d2f58feabb80eba3",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_evaluate_ops",
+      "category": "operators",
+      "path": "operators/playbooks/evaluate/ops.any.json",
+      "filename": "ops.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops",
+        "doc_aliases_ops",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "7bff138183f844ad8de695ab33a96f5aad9730aa3b31a5d73e5050f1dda7aa2f",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_validate_finance",
+      "category": "operators",
+      "path": "operators/playbooks/validate/finance.any.json",
+      "filename": "finance.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance",
+        "doc_aliases_finance",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "e2a612c734fb2d637ea0df677e2ac0b43290cb30f689083c0a0b9e1a0b34c3c7",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_validate_legal",
+      "category": "operators",
+      "path": "operators/playbooks/validate/legal.any.json",
+      "filename": "legal.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal",
+        "doc_aliases_legal",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "05770d7efe26f7117bc4a1459e6a3e3999acde4acdadcadf48c0cef2437a9642",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_validate_medical",
+      "category": "operators",
+      "path": "operators/playbooks/validate/medical.any.json",
+      "filename": "medical.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical",
+        "doc_aliases_medical",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "e141c6129bddd4d74ecaae8fb3ef1cfe26f497487283adb06330927b4e6a948c",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_validate_ops",
+      "category": "operators",
+      "path": "operators/playbooks/validate/ops.any.json",
+      "filename": "ops.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops",
+        "doc_aliases_ops",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "c6382918a9fe14d9ef6035ff75de2a9484bd52834c5e50f68ad28cbe9b543c5e",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_advise_finance",
+      "category": "operators",
+      "path": "operators/playbooks/advise/finance.any.json",
+      "filename": "finance.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance",
+        "doc_aliases_finance",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "3a5ef1cfbb3f4f6e30bd4ef2bd5d2780b28dd8821bc8971fbe35df7200df20f4",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_advise_legal",
+      "category": "operators",
+      "path": "operators/playbooks/advise/legal.any.json",
+      "filename": "legal.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal",
+        "doc_aliases_legal",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "6e80e7ca3d64c8e421cf7d9c1c1c2fe00dec49cdb3d23f09053570ace7ee0faa",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_advise_medical",
+      "category": "operators",
+      "path": "operators/playbooks/advise/medical.any.json",
+      "filename": "medical.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical",
+        "doc_aliases_medical",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "08944f5b61bd82f455093c5ae8dc3210d53c1525384990d34762f6500879f121",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_advise_ops",
+      "category": "operators",
+      "path": "operators/playbooks/advise/ops.any.json",
+      "filename": "ops.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops",
+        "doc_aliases_ops",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "38daa1ebf3a27720dc0eba5bf3beea24fdffc0ef23902bd257227500be58187d",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_monitor_finance",
+      "category": "operators",
+      "path": "operators/playbooks/monitor/finance.any.json",
+      "filename": "finance.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance",
+        "doc_aliases_finance",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "9865c1cc3bdbacd483f06d3e7ff503d82ff3b1d4472a88b727473773b9590973",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_monitor_legal",
+      "category": "operators",
+      "path": "operators/playbooks/monitor/legal.any.json",
+      "filename": "legal.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal",
+        "doc_aliases_legal",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "df9c951acfef7a012e17ca96cf88974f147aa71f408dfea87e951e87e8bc07b0",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_monitor_medical",
+      "category": "operators",
+      "path": "operators/playbooks/monitor/medical.any.json",
+      "filename": "medical.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical",
+        "doc_aliases_medical",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "f658885f7041ec4f4de2ac8eabbb2e51af1b24a584dc59341ae5bf95535adebe",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "operator_playbook_monitor_ops",
+      "category": "operators",
+      "path": "operators/playbooks/monitor/ops.any.json",
+      "filename": "ops.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops",
+        "doc_aliases_ops",
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "c8e4ebe4e7e3a8ba3e87ce70535313ac0eb2f1da054d40ffbd8183226671d3f0",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "explain_style_finance",
+      "category": "policies",
+      "path": "policies/reasoning/explain_style.finance.any.json",
+      "filename": "explain_style.finance.any.json",
+      "version": "1.0.0",
+      "contentType": "policies",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "550935eb4a96d4c10f27df78177c1e50411b9d8220ff1ce563d18feabbbab8c9",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "decision_support_finance",
+      "category": "policies",
+      "path": "policies/reasoning/decision_support.finance.any.json",
+      "filename": "decision_support.finance.any.json",
+      "version": "1.0.0",
+      "contentType": "policies",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "explain_style_finance",
+        "assumption_policy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "986b7b04fa14008b12d66b149b3373c4b2156c25a2d8ea1a16d79fc794df38f5",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "explain_style_legal",
+      "category": "policies",
+      "path": "policies/reasoning/explain_style.legal.any.json",
+      "filename": "explain_style.legal.any.json",
+      "version": "1.0.0",
+      "contentType": "policies",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "c11cb5462193c07a87189885771c4f1e8f22a1a201543e89f9d3f466428b1213",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "decision_support_legal",
+      "category": "policies",
+      "path": "policies/reasoning/decision_support.legal.any.json",
+      "filename": "decision_support.legal.any.json",
+      "version": "1.0.0",
+      "contentType": "policies",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "explain_style_legal",
+        "assumption_policy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "9f761bd93093f3f277c45479e61db12cb1bf8fa1e94e95b33747b62b37ed9f98",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "explain_style_medical",
+      "category": "policies",
+      "path": "policies/reasoning/explain_style.medical.any.json",
+      "filename": "explain_style.medical.any.json",
+      "version": "1.0.0",
+      "contentType": "policies",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "be9cb94e17552e3e1f600e986bb7c05fefb1040e61bba75bdd08fe7d2ff5e428",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "decision_support_medical",
+      "category": "policies",
+      "path": "policies/reasoning/decision_support.medical.any.json",
+      "filename": "decision_support.medical.any.json",
+      "version": "1.0.0",
+      "contentType": "policies",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "explain_style_medical",
+        "assumption_policy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "d5ff6c70375d627afc621d6ac08ee2a1866c322882209db2c51f3700e441acc3",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "explain_style_ops",
+      "category": "policies",
+      "path": "policies/reasoning/explain_style.ops.any.json",
+      "filename": "explain_style.ops.any.json",
+      "version": "1.0.0",
+      "contentType": "policies",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "39ffacdbf6c6a845b60a1709c8a118eea18288463b7033cb6d1978c66b7b1458",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "decision_support_ops",
+      "category": "policies",
+      "path": "policies/reasoning/decision_support.ops.any.json",
+      "filename": "decision_support.ops.any.json",
+      "version": "1.0.0",
+      "contentType": "policies",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "explain_style_ops",
+        "assumption_policy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "712b9a2a7e29f2f97b8468cea596e830187754aa9644a2ebc0ad4e46aabad113",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "assumption_policy",
+      "category": "policies",
+      "path": "policies/reasoning/assumption_policy.any.json",
+      "filename": "assumption_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "policies",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "clarification_policy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "40f33b5d6a21149b63805b491cd300bc2bc74fe106b03e2035abee4ecd17043d",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "numeric_integrity",
+      "category": "quality",
+      "path": "quality/document_intelligence/numeric_integrity.any.json",
+      "filename": "numeric_integrity.any.json",
+      "version": "1.0.0",
+      "contentType": "quality",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "698ca9e4979baac9b5543d6efc8448452cee3bd9acb2e8fdada6beb30306b20b",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "wrong_doc_lock",
+      "category": "quality",
+      "path": "quality/document_intelligence/wrong_doc_lock.any.json",
+      "filename": "wrong_doc_lock.any.json",
+      "version": "1.0.0",
+      "contentType": "quality",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "06c088c42458adf1ed48b6b2ea7ddadfc67ad987a5639c41dbb1eafed0cfa82c",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "source_policy",
+      "category": "quality",
+      "path": "quality/document_intelligence/source_policy.any.json",
+      "filename": "source_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "quality",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "7e7d80b7212a6159664b18f888c5614c6e3816f2d0aa29a42e1927339cc91ce4",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "ambiguity_questions",
+      "category": "quality",
+      "path": "quality/document_intelligence/ambiguity_questions.any.json",
+      "filename": "ambiguity_questions.any.json",
+      "version": "1.0.0",
+      "contentType": "quality",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "fc222b306db051507d39a3713a6d54a913a61036cfb8281bcfea30f10223fb61",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "query_rewrites_finance",
+      "category": "retrieval",
+      "path": "retrieval/document_intelligence/query_rewrites.finance.any.json",
+      "filename": "query_rewrites.finance.any.json",
+      "version": "1.0.0",
+      "contentType": "retrieval",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_aliases_finance"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "8dc326e698f6e02a8c9305e303d3077350fd57cc350c047898bd4268f92b1208",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "boost_rules_finance",
+      "category": "retrieval",
+      "path": "retrieval/document_intelligence/boost_rules.finance.any.json",
+      "filename": "boost_rules.finance.any.json",
+      "version": "1.0.0",
+      "contentType": "retrieval",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "d2adf6534c19394a8849c2433acbe89ec8e918bb4bcb45b0366aeb412d1d0247",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "section_priority_finance",
+      "category": "retrieval",
+      "path": "retrieval/document_intelligence/section_priority.finance.any.json",
+      "filename": "section_priority.finance.any.json",
+      "version": "1.0.0",
+      "contentType": "retrieval",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "a08e50d13b5110ea598156762ce1a5e0d5cb1b6f64443e88362af8a5d59f78b6",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "query_rewrites_legal",
+      "category": "retrieval",
+      "path": "retrieval/document_intelligence/query_rewrites.legal.any.json",
+      "filename": "query_rewrites.legal.any.json",
+      "version": "1.0.0",
+      "contentType": "retrieval",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_aliases_legal"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "401299ed8e50360f434a54f0aadde543fa1ece8d87c95da8e1bef4f09c7e01c8",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "boost_rules_legal",
+      "category": "retrieval",
+      "path": "retrieval/document_intelligence/boost_rules.legal.any.json",
+      "filename": "boost_rules.legal.any.json",
+      "version": "1.0.0",
+      "contentType": "retrieval",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "de01430e2626ec99e7880086c0768960ef3f5c5a21a763aa5b5fc759665f8bdd",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "section_priority_legal",
+      "category": "retrieval",
+      "path": "retrieval/document_intelligence/section_priority.legal.any.json",
+      "filename": "section_priority.legal.any.json",
+      "version": "1.0.0",
+      "contentType": "retrieval",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "369c05f4701526d4e4470ffb041ae132159a295b3198e4dd3f115870c212e894",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "query_rewrites_medical",
+      "category": "retrieval",
+      "path": "retrieval/document_intelligence/query_rewrites.medical.any.json",
+      "filename": "query_rewrites.medical.any.json",
+      "version": "1.0.0",
+      "contentType": "retrieval",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_aliases_medical"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "743849ea07401463edf95e5388a3be0139275250a526a51705f78c7e8bc48909",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "boost_rules_medical",
+      "category": "retrieval",
+      "path": "retrieval/document_intelligence/boost_rules.medical.any.json",
+      "filename": "boost_rules.medical.any.json",
+      "version": "1.0.0",
+      "contentType": "retrieval",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "493b8edadd880d2ac2332a6699cae052bddd94b931fcb6524c87e8be95097eb9",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "section_priority_medical",
+      "category": "retrieval",
+      "path": "retrieval/document_intelligence/section_priority.medical.any.json",
+      "filename": "section_priority.medical.any.json",
+      "version": "1.0.0",
+      "contentType": "retrieval",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "39f2130e1817265503213f167a1e5827adf267ad71ce588e33f3fdfeb11688f9",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "query_rewrites_ops",
+      "category": "retrieval",
+      "path": "retrieval/document_intelligence/query_rewrites.ops.any.json",
+      "filename": "query_rewrites.ops.any.json",
+      "version": "1.0.0",
+      "contentType": "retrieval",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_aliases_ops"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "cdbbcfc7c5f4e5306965538b40ec47aaed32347c8d06d8e4f3810d689b2de34b",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "boost_rules_ops",
+      "category": "retrieval",
+      "path": "retrieval/document_intelligence/boost_rules.ops.any.json",
+      "filename": "boost_rules.ops.any.json",
+      "version": "1.0.0",
+      "contentType": "retrieval",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "9a4be6aea922a6b9bf311778a8ec5cff0d04452b9b3a700c6eb9079707cbfa77",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "section_priority_ops",
+      "category": "retrieval",
+      "path": "retrieval/document_intelligence/section_priority.ops.any.json",
+      "filename": "section_priority.ops.any.json",
+      "version": "1.0.0",
+      "contentType": "retrieval",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "0c9d9d24791347a3dfb4a2221ab4d3e5edb8f8a9fc4201c383a7eb9014d998e2",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "keyword_taxonomy_finance",
+      "category": "probes",
+      "path": "probes/marketing/keyword_taxonomy.finance.any.json",
+      "filename": "keyword_taxonomy.finance.any.json",
+      "version": "1.0.0",
+      "contentType": "probes",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "96d26d5ab53f8abf50b9cd52eda3edf0f0cd26f45dccb9a20715a5a8d0832ca0",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "pain_points_finance",
+      "category": "probes",
+      "path": "probes/marketing/pain_points.finance.any.json",
+      "filename": "pain_points.finance.any.json",
+      "version": "1.0.0",
+      "contentType": "probes",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "keyword_taxonomy_finance"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "c598158e26740fafa4b7f1ca2167bde45d00389ad859132c534898f63b0659ae",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "keyword_taxonomy_legal",
+      "category": "probes",
+      "path": "probes/marketing/keyword_taxonomy.legal.any.json",
+      "filename": "keyword_taxonomy.legal.any.json",
+      "version": "1.0.0",
+      "contentType": "probes",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "3e1db366dab4f6f159976989f7d262c614920c76619f9e5fc328ec1072ba6587",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "pain_points_legal",
+      "category": "probes",
+      "path": "probes/marketing/pain_points.legal.any.json",
+      "filename": "pain_points.legal.any.json",
+      "version": "1.0.0",
+      "contentType": "probes",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "keyword_taxonomy_legal"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "0580375f81cffe7161b185b5a8157d150a55c9475f11d0ebe83d27acfa98e9c1",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "keyword_taxonomy_medical",
+      "category": "probes",
+      "path": "probes/marketing/keyword_taxonomy.medical.any.json",
+      "filename": "keyword_taxonomy.medical.any.json",
+      "version": "1.0.0",
+      "contentType": "probes",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "6340b8373da39159c0c3c7c3ea04d9f188ebe55bf4d8a3d296c9b17e155a389a",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "pain_points_medical",
+      "category": "probes",
+      "path": "probes/marketing/pain_points.medical.any.json",
+      "filename": "pain_points.medical.any.json",
+      "version": "1.0.0",
+      "contentType": "probes",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "keyword_taxonomy_medical"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "30533d4ec3162e31b61c4f4f784f6c4c7550fc1ae86a27b200eac778f0fd638b",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "keyword_taxonomy_ops",
+      "category": "probes",
+      "path": "probes/marketing/keyword_taxonomy.ops.any.json",
+      "filename": "keyword_taxonomy.ops.any.json",
+      "version": "1.0.0",
+      "contentType": "probes",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_archetypes_ops"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "07520f921c2acbc6a261943b6db39fe53471adf59c3552b1d7a93a164fa6cb16",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "pain_points_ops",
+      "category": "probes",
+      "path": "probes/marketing/pain_points.ops.any.json",
+      "filename": "pain_points.ops.any.json",
+      "version": "1.0.0",
+      "contentType": "probes",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "keyword_taxonomy_ops"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "e8f23b1377cda956b8eae9c58972dda9073f9d3ae7b4b9269393695e21c50d27",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "pattern_library",
+      "category": "probes",
+      "path": "probes/marketing/pattern_library.any.json",
+      "filename": "pattern_library.any.json",
+      "version": "1.0.0",
+      "contentType": "probes",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "document_intelligence_bank_map"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "b3e5aee9866cacb51efe295b34aafa786a26a67ee3d96807fdca914d1dc1ba64",
+      "lastUpdated": "2026-02-27"
     }
   ],
   "tests": [

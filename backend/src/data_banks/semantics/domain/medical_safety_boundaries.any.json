@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "id": "medical_safety_boundaries",
+    "version": "1.0.0",
+    "description": "Medical safety boundary policy controlling caution language and escalation guidance.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical"
+  },
+  "domain": "medical",
+  "definitions": [],
+  "rules": []
+}

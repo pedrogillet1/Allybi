@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_navigate_finance",
+    "version": "1.0.0",
+    "description": "navigate operator playbook for finance documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "navigate",
+    "domain": "finance"
+  },
+  "operator": "navigate",
+  "domain": "finance",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

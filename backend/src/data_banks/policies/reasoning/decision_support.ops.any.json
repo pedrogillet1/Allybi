@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "id": "decision_support_ops",
+    "version": "1.0.0",
+    "description": "Decision-support policy for ops recommendations with risks and evidence confidence framing.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops"
+  },
+  "domain": "ops",
+  "framework": {
+    "requireOptions": true,
+    "requireRiskTradeoffs": true,
+    "requireEvidenceSummary": true,
+    "forbidFalseCertainty": true
+  },
+  "templates": []
+}

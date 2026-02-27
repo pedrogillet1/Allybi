@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "id": "doc_aliases_ops",
+    "version": "1.0.0",
+    "description": "User alias mapping for ops documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "caseInsensitive": true
+  },
+  "domain": "ops",
+  "aliases": [
+    {
+      "alias": "ops document",
+      "docTypes": [],
+      "hints": {
+        "period": "unknown",
+        "owner": "unknown"
+      }
+    }
+  ]
+}

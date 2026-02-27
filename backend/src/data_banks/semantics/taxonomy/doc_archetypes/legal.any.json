@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "doc_archetypes_legal",
+    "version": "1.0.0",
+    "description": "Document archetype definitions for legal.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal"
+  },
+  "domain": "legal",
+  "archetypes": [
+    {
+      "id": "legal_default_archetype",
+      "label": "legal default archetype",
+      "expectedSections": [],
+      "fieldFamilies": [],
+      "redFlags": []
+    }
+  ]
+}

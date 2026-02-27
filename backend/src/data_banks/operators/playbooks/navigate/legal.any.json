@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_navigate_legal",
+    "version": "1.0.0",
+    "description": "navigate operator playbook for legal documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "navigate",
+    "domain": "legal"
+  },
+  "operator": "navigate",
+  "domain": "legal",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

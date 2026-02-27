@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_validate_medical",
+    "version": "1.0.0",
+    "description": "validate operator playbook for medical documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "validate",
+    "domain": "medical"
+  },
+  "operator": "validate",
+  "domain": "medical",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

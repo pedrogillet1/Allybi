@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "id": "section_priority_medical",
+    "version": "1.0.0",
+    "description": "Section-priority rules for medical retrieval scanning order.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical"
+  },
+  "domain": "medical",
+  "priorities": [
+    {
+      "intent": "default",
+      "sections": []
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_extract_ops",
+    "version": "1.0.0",
+    "description": "extract operator playbook for ops documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "extract",
+    "domain": "ops"
+  },
+  "operator": "extract",
+  "domain": "ops",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

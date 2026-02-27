@@ -177,6 +177,43 @@ class KodaV3Container {
           );
         }
 
+        try {
+          const { DocumentIntelligenceIntegrityService } = await import(
+            "../services/core/banks/documentIntelligenceIntegrity.service"
+          );
+          const docInt = new DocumentIntelligenceIntegrityService().validate();
+          if (!docInt.ok) {
+            const env = coerceEnvName(process.env.NODE_ENV);
+            const strict = env === "production" || env === "staging";
+            const details = {
+              missingMapBank: docInt.missingMapBank,
+              missingCoreBanks: docInt.missingCoreBanks,
+              missingRegistryEntries: docInt.missingRegistryEntries,
+              missingBankFiles: docInt.missingBankFiles,
+              mapRequiredCoreCount: docInt.mapRequiredCoreCount,
+              mapOptionalCount: docInt.mapOptionalCount,
+            };
+            if (strict) {
+              throw new Error(
+                `[Container] Document intelligence integrity failed in strict mode: ${JSON.stringify(details)}`,
+              );
+            }
+            console.warn(
+              "[Container] Document intelligence integrity warnings (non-blocking)",
+              details,
+            );
+          }
+        } catch (docIntErr: any) {
+          const env = coerceEnvName(process.env.NODE_ENV);
+          const strict = env === "production" || env === "staging";
+          if (strict) {
+            throw docIntErr;
+          }
+          console.warn(
+            `[Container] Document intelligence integrity check failed (non-fatal): ${docIntErr?.message || docIntErr}`,
+          );
+        }
+
         this._banksInitialized = true;
         console.log("[Container] Banks initialized successfully");
       } catch (e: any) {

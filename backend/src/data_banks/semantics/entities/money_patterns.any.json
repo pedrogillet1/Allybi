@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "id": "money_patterns",
+    "version": "1.0.0",
+    "description": "Monetary extraction patterns including symbols, units, and accounting negatives.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true
+  },
+  "rules": [
+    {
+      "id": "money_patterns_rule_001",
+      "pattern": "",
+      "notes": "Populate domain-specific extraction patterns."
+    }
+  ]
+}

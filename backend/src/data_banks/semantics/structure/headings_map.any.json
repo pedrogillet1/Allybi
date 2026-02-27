@@ -1,0 +1,35 @@
+{
+  "_meta": {
+    "id": "headings_map",
+    "version": "1.0.0",
+    "description": "Canonical heading ontology with multilingual synonyms for structural section detection.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "languages": [
+      "en",
+      "pt"
+    ]
+  },
+  "headings": [
+    {
+      "canonical": "termination",
+      "synonyms": {
+        "en": [
+          "termination"
+        ],
+        "pt": [
+          "rescisao",
+          "encerramento"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    }
+  ]
+}

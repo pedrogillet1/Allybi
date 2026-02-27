@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_summarize_ops",
+    "version": "1.0.0",
+    "description": "summarize operator playbook for ops documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "summarize",
+    "domain": "ops"
+  },
+  "operator": "summarize",
+  "domain": "ops",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

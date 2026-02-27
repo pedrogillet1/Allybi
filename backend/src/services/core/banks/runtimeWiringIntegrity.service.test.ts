@@ -14,7 +14,10 @@ jest.mock("fs", () => ({
 
 // Import after mocks are registered so the service picks up the mocked versions.
 import { getOptionalBank } from "./bankLoader.service";
-import { RuntimeWiringIntegrityService } from "./runtimeWiringIntegrity.service";
+import {
+  RuntimeWiringIntegrityService,
+  RUNTIME_REQUIRED_BANKS,
+} from "./runtimeWiringIntegrity.service";
 
 // ---- typed mock helpers -------------------------------------------------------
 
@@ -36,7 +39,7 @@ const mockedReadFileSync = fs.readFileSync as jest.MockedFunction<
  * output-shape banks can cover it, keeping the cross-checks green.
  */
 function makeCleanBanks(): Record<string, unknown> {
-  return {
+  const out: Record<string, unknown> = {
     intent_config: {
       intentFamilies: [{ operatorsAllowed: ["op_a"] }],
     },
@@ -67,7 +70,15 @@ function makeCleanBanks(): Record<string, unknown> {
     intent_patterns_docx_pt: { patterns: [] },
     intent_patterns_excel_en: { patterns: [] },
     intent_patterns_excel_pt: { patterns: [] },
+    document_intelligence_bank_map: {
+      requiredCoreBankIds: [],
+      optionalBankIds: [],
+    },
   };
+  for (const id of RUNTIME_REQUIRED_BANKS) {
+    if (!(id in out)) out[id] = {};
+  }
+  return out;
 }
 
 // ---- shared setup ------------------------------------------------------------
@@ -203,30 +214,14 @@ describe("RuntimeWiringIntegrityService – all-clean scenario", () => {
     }
   });
 
-  test("all 15 required banks are queried during validate()", () => {
+  test("all required banks are queried during validate()", () => {
     wireCleanBanks();
     buildService().validate();
 
     const queriedIds = new Set(
       mockedGetOptionalBank.mock.calls.map(([id]) => id),
     );
-    const required = [
-      "intent_config",
-      "intent_patterns",
-      "operator_families",
-      "operator_contracts",
-      "operator_output_shapes",
-      "prompt_registry",
-      "language_triggers",
-      "processing_messages",
-      "edit_error_catalog",
-      "operator_catalog",
-      "allybi_capabilities",
-      "intent_patterns_docx_en",
-      "intent_patterns_docx_pt",
-      "intent_patterns_excel_en",
-      "intent_patterns_excel_pt",
-    ];
+    const required = [...RUNTIME_REQUIRED_BANKS];
     for (const id of required) {
       expect(queriedIds.has(id)).toBe(true);
     }
@@ -239,7 +234,7 @@ describe("RuntimeWiringIntegrityService – all-clean scenario", () => {
 
 describe("RuntimeWiringIntegrityService – missing banks", () => {
   test("ok is false when any required bank is missing", () => {
-    // Return null for every bank → all 15 are missing
+    // Return null for every bank → all required banks are missing
     mockedGetOptionalBank.mockReturnValue(null);
     const result = buildService().validate();
     expect(result.ok).toBe(false);
@@ -249,23 +244,7 @@ describe("RuntimeWiringIntegrityService – missing banks", () => {
     mockedGetOptionalBank.mockReturnValue(null);
     const result = buildService().validate();
 
-    const expectedMissing = [
-      "intent_config",
-      "intent_patterns",
-      "operator_families",
-      "operator_contracts",
-      "operator_output_shapes",
-      "prompt_registry",
-      "language_triggers",
-      "processing_messages",
-      "edit_error_catalog",
-      "operator_catalog",
-      "allybi_capabilities",
-      "intent_patterns_docx_en",
-      "intent_patterns_docx_pt",
-      "intent_patterns_excel_en",
-      "intent_patterns_excel_pt",
-    ];
+    const expectedMissing = [...RUNTIME_REQUIRED_BANKS];
 
     for (const bankId of expectedMissing) {
       expect(result.missingBanks).toContain(bankId);

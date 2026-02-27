@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_monitor_ops",
+    "version": "1.0.0",
+    "description": "monitor operator playbook for ops documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "monitor",
+    "domain": "ops"
+  },
+  "operator": "monitor",
+  "domain": "ops",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

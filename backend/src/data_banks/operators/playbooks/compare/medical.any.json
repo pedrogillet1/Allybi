@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_compare_medical",
+    "version": "1.0.0",
+    "description": "compare operator playbook for medical documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "compare",
+    "domain": "medical"
+  },
+  "operator": "compare",
+  "domain": "medical",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

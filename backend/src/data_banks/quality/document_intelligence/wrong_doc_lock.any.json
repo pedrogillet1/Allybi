@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "id": "wrong_doc_lock",
+    "version": "1.0.0",
+    "description": "Wrong-doc lock policy enforcing explicit filename/doc lock constraints and discovery exceptions.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true
+  },
+  "rules": [],
+  "templates": {
+    "finance": [],
+    "legal": [],
+    "medical": [],
+    "ops": []
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "doc_archetypes_finance",
+    "version": "1.0.0",
+    "description": "Document archetype definitions for finance.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance"
+  },
+  "domain": "finance",
+  "archetypes": [
+    {
+      "id": "finance_default_archetype",
+      "label": "finance default archetype",
+      "expectedSections": [],
+      "fieldFamilies": [],
+      "redFlags": []
+    }
+  ]
+}

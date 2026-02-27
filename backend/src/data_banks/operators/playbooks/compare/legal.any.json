@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_compare_legal",
+    "version": "1.0.0",
+    "description": "compare operator playbook for legal documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "compare",
+    "domain": "legal"
+  },
+  "operator": "compare",
+  "domain": "legal",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

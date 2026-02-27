@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "id": "section_priority_ops",
+    "version": "1.0.0",
+    "description": "Section-priority rules for ops retrieval scanning order.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops"
+  },
+  "domain": "ops",
+  "priorities": [
+    {
+      "intent": "default",
+      "sections": []
+    }
+  ]
+}

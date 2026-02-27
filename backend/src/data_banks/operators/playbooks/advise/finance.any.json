@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_advise_finance",
+    "version": "1.0.0",
+    "description": "advise operator playbook for finance documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "advise",
+    "domain": "finance"
+  },
+  "operator": "advise",
+  "domain": "finance",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

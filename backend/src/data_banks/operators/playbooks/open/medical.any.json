@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_open_medical",
+    "version": "1.0.0",
+    "description": "open operator playbook for medical documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "open",
+    "domain": "medical"
+  },
+  "operator": "open",
+  "domain": "medical",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

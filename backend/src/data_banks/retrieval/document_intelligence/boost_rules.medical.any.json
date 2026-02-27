@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "id": "boost_rules_medical",
+    "version": "1.0.0",
+    "description": "Domain boost rules for medical retrieval ranking by intent and document type.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical"
+  },
+  "domain": "medical",
+  "rules": [
+    {
+      "id": "medical_boost_001",
+      "intents": [],
+      "boostDocTypes": [],
+      "weight": 0.2
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "doc_archetypes_ops",
+    "version": "1.0.0",
+    "description": "Document archetype definitions for ops.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops"
+  },
+  "domain": "ops",
+  "archetypes": [
+    {
+      "id": "ops_default_archetype",
+      "label": "ops default archetype",
+      "expectedSections": [],
+      "fieldFamilies": [],
+      "redFlags": []
+    }
+  ]
+}

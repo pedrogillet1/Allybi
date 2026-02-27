@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "operator_playbook_navigate_ops",
+    "version": "1.0.0",
+    "description": "navigate operator playbook for ops documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "operator": "navigate",
+    "domain": "ops"
+  },
+  "operator": "navigate",
+  "domain": "ops",
+  "lookFor": [],
+  "outputStructure": {
+    "requiredBlocks": [],
+    "optionalBlocks": []
+  },
+  "validationChecks": [],
+  "askQuestionWhen": []
+}

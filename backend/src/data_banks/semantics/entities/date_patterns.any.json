@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "id": "date_patterns",
+    "version": "1.0.0",
+    "description": "Date extraction patterns with multilingual normalization and fiscal period hints.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true
+  },
+  "rules": [
+    {
+      "id": "date_patterns_rule_001",
+      "pattern": "",
+      "notes": "Populate domain-specific extraction patterns."
+    }
+  ]
+}

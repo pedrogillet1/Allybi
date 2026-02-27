@@ -1,0 +1,30 @@
+{
+  "_meta": {
+    "id": "assumption_policy",
+    "version": "1.0.0",
+    "description": "Assumption policy controlling when assumptions are allowed, when to ask clarifying questions, and how to label uncertainty.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "maxAssumptionsPerAnswer": 2
+  },
+  "rules": [
+    {
+      "id": "ASSUME_001",
+      "whenAllowed": [
+        "low_risk_context",
+        "explicit_user_permission"
+      ],
+      "whenForbidden": [
+        "legal_high_risk",
+        "medical_high_risk",
+        "financial_commitment"
+      ],
+      "labelFormat": "Assumption: {text}"
+    }
+  ]
+}

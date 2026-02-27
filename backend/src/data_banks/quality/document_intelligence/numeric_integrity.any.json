@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "id": "numeric_integrity",
+    "version": "1.0.0",
+    "description": "Numeric integrity policy for currency/percent/unit consistency, period alignment, and non-truncation guarantees.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true
+  },
+  "rules": [],
+  "templates": {
+    "finance": [],
+    "legal": [],
+    "medical": [],
+    "ops": []
+  }
+}

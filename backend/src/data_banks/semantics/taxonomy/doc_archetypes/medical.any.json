@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "id": "doc_archetypes_medical",
+    "version": "1.0.0",
+    "description": "Document archetype definitions for medical.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical"
+  },
+  "domain": "medical",
+  "archetypes": [
+    {
+      "id": "medical_default_archetype",
+      "label": "medical default archetype",
+      "expectedSections": [],
+      "fieldFamilies": [],
+      "redFlags": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "id": "keyword_taxonomy_ops",
+    "version": "1.0.0",
+    "description": "Marketing keyword taxonomy for ops usage monitoring and product intelligence.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "telemetryOnly": true
+  },
+  "domain": "ops",
+  "clusters": []
+}

@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "id": "party_patterns",
+    "version": "1.0.0",
+    "description": "Entity-role extraction patterns for counterparties, signatories, providers, and vendors.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true
+  },
+  "rules": [
+    {
+      "id": "party_patterns_rule_001",
+      "pattern": "",
+      "notes": "Populate domain-specific extraction patterns."
+    }
+  ]
+}

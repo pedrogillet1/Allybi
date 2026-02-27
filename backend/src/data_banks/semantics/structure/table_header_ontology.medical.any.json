@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "id": "table_header_ontology_medical",
+    "version": "1.0.0",
+    "description": "Table header ontology for medical.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical"
+  },
+  "domain": "medical",
+  "headers": [
+    {
+      "canonical": "medical_primary_header",
+      "synonyms": [],
+      "related": []
+    }
+  ]
+}
