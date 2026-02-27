@@ -7,6 +7,7 @@ import LeftNav from "../app-shell/LeftNav";
 import ChatHistory from "./ChatHistory";
 import ChatInterface from "./ChatInterface";
 import NotificationPanel from "../notifications/NotificationPanel";
+import ChatTour from "../onboarding/ChatTour";
 
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { useAuth } from "../../context/AuthContext";
@@ -74,6 +75,11 @@ export default function ChatScreen() {
   const updateConversationInListRef = useRef(null);
   // Used to force ChatHistory to reload conversations from the server
   const refreshConversationsRef = useRef(null);
+
+  // Tour control refs (cross-component state coordination)
+  const tourOpenConnectorMenuRef = useRef(null);
+  const tourCloseConnectorMenuRef = useRef(null);
+  const tourExpandDrawerRef = useRef(null);
 
   // Track onboarding open once per session
   const onboardingTriggeredRef = useRef(false);
@@ -368,6 +374,7 @@ export default function ChatScreen() {
         onNewChat={handleNewChat}
         onConversationUpdate={registerUpdateFunction}
         refreshConversationsRef={refreshConversationsRef}
+        tourExpandDrawerRef={tourExpandDrawerRef}
       />
 
       {/* Main chat thread */}
@@ -375,6 +382,8 @@ export default function ChatScreen() {
         currentConversation={currentConversation}
         onConversationUpdate={handleConversationUpdate}
         onConversationCreated={handleConversationCreated}
+        tourOpenConnectorMenuRef={tourOpenConnectorMenuRef}
+        tourCloseConnectorMenuRef={tourCloseConnectorMenuRef}
       />
 
       {/* Notifications */}
@@ -382,6 +391,15 @@ export default function ChatScreen() {
         showNotificationsPopup={showNotificationsPopup}
         setShowNotificationsPopup={setShowNotificationsPopup}
       />
+
+      {/* Chat Tour — shows once per user on first chat visit */}
+      {!isMobile && (
+        <ChatTour
+          onOpenConnectorMenu={() => tourOpenConnectorMenuRef.current?.()}
+          onCloseConnectorMenu={() => tourCloseConnectorMenuRef.current?.()}
+          onExpandDrawer={() => tourExpandDrawerRef.current?.()}
+        />
+      )}
     </div>
   );
 }

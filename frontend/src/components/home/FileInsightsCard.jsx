@@ -62,7 +62,7 @@ export default function FileInsightsCard() {
   }
 
   return (
-    <div style={{
+    <div data-tour="file-insights" style={{
       background: 'white',
       borderRadius: 16,
       border: '1px solid #E6E6EC',

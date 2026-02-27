@@ -2,7 +2,9 @@
   "_meta": {
     "id": "routing_priority",
     "version": "1.0.0",
-    "description": "Deterministic intent family base priorities and tie-break pipeline for centralized routing."
+    "description": "Deterministic intent family base priorities and tie-break pipeline for centralized routing.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-24"
   },
   "config": {
     "enabled": true

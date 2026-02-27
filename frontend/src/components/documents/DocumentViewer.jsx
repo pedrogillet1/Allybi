@@ -467,10 +467,6 @@ const DocumentViewer = () => {
   const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(initialPageParam);
   const [pendingInitialPage, setPendingInitialPage] = useState(initialPageParam);
-  const [showAskKoda, setShowAskKoda] = useState(() => {
-    // Only show if not dismissed in this session
-    return sessionStorage.getItem('askKodaDismissed') !== 'true';
-  });
   const [showExtractedText, setShowExtractedText] = useState(false);
   // PDF: default preview is the real PDF. Editing is done via "working copy" conversion to DOCX.
   const [pdfCanEditText, setPdfCanEditText] = useState(null); // null=unknown, true, false
@@ -1926,8 +1922,6 @@ const DocumentViewer = () => {
         setFrozenSelection(null);
       }
     }
-    setShowAskKoda(false);
-    try { sessionStorage.setItem('askKodaDismissed', 'true'); } catch {}
   }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, docxBlocks, clearSelectionBubble, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, refreshFrozenOverlay, supportsViewerEditing, showInfo, t, trackAskAllybiOpen]);
 
   const openEditingPanel = useCallback(({ seedSelection = true, focusInput = true, trackOpenClick = false, source = 'ask_button' } = {}) => {
@@ -5629,93 +5623,6 @@ const DocumentViewer = () => {
         );
       })() : null}
 
-      {/* Floating assistant hint (desktop only) */}
-      {showAskKoda && !isMobile && (
-        <div style={{ width: 277, height: 82, right: 20, bottom: 20, position: 'absolute' }}>
-          {/* Close button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              sessionStorage.setItem('askKodaDismissed', 'true');
-              setShowAskKoda(false);
-            }}
-            style={{
-              width: 24,
-              height: 24,
-              right: 0,
-              top: 0,
-              position: 'absolute',
-              background: 'white',
-              borderRadius: 100,
-              outline: '1px rgba(55, 53, 47, 0.09) solid',
-              outlineOffset: '-1px',
-              justifyContent: 'center',
-              alignItems: 'center',
-              display: 'inline-flex',
-              border: 'none',
-              cursor: 'pointer',
-              zIndex: 10
-            }}
-          >
-            <div style={{ width: 12, height: 12, position: 'relative', overflow: 'hidden' }}>
-              <XCloseIcon style={{ width: 12, height: 12, position: 'absolute', left: 0, top: 0 }} />
-            </div>
-          </button>
-          <div style={{ width: 14, height: 14, right: 44, top: 9, position: 'absolute', background: '#222222', borderRadius: 9999 }} />
-          <button
-            type="button"
-            onClick={() => {
-              if (!supportsViewerEditing) {
-                showInfo(t('documentViewer.comingSoon'));
-                return;
-              }
-              toggleEditingPanel({ source: 'floating_hint' });
-            }}
-            style={{
-              height: 60,
-              paddingLeft: 4,
-              paddingRight: 18,
-              paddingTop: 8,
-              paddingBottom: 8,
-              bottom: 0,
-              right: 0,
-              position: 'absolute',
-              background: '#222222',
-              borderRadius: 100,
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              display: 'inline-flex',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            <div style={{ justifyContent: 'flex-start', alignItems: 'center', gap: 0, display: 'flex' }}>
-              <img
-                src={allybiLogoWhite}
-                alt="Allybi"
-                style={{
-                  width: 36,
-                  height: 36,
-                  flexShrink: 0,
-                  marginLeft: 8,
-                  marginRight: -2
-                }}
-              />
-              <div style={{ color: 'white', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '20px', wordWrap: 'break-word' }}>{t('documentViewer.needHelpFindingSomething')}</div>
-            </div>
-          </button>
-          <div style={{ width: 7, height: 7, right: 33, top: 0, position: 'absolute', background: '#222222', borderRadius: 9999 }} />
-        </div>
-      )}
       <NotificationPanel
         showNotificationsPopup={showNotificationsPopup}
         setShowNotificationsPopup={setShowNotificationsPopup}

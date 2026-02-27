@@ -1544,6 +1544,116 @@
       "description": "Replay the welcome tour and learn how to use Allybi."
     }
   },
+  "homeTour": {
+    "ariaLabel": "Home dashboard tour",
+    "stepOf": "{{current}}/{{total}}",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "steps": {
+      "upload": {
+        "title": "Upload your first files",
+        "body": "Upload files or entire folders. Allybi auto-organizes them and makes them searchable."
+      },
+      "dropzone": {
+        "title": "Drag & drop files or folders",
+        "body": "Drop PDFs, docs, spreadsheets, or images here to get started."
+      },
+      "fileInsights": {
+        "title": "Instant file insights",
+        "body": "Get a quick snapshot of what's in your workspace—by file type and volume."
+      },
+      "smartCategories": {
+        "title": "Smart Categories",
+        "body": "Your uploads are grouped automatically. Click a category to browse, or create a new one."
+      },
+      "search": {
+        "title": "Find anything fast",
+        "body": "Search by filename or content. Tip: press ⌘K anytime."
+      },
+      "integrations": {
+        "title": "Connect integrations (optional)",
+        "body": "Connect Gmail, Outlook, or Slack to pull attachments into Allybi."
+      }
+    }
+  },
+  "uploadTour": {
+    "ariaLabel": "Upload hub tour",
+    "stepOf": "{{current}}/{{total}}",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "steps": {
+      "dropzone": {
+        "title": "Add files (left panel)",
+        "body": "Drag & drop files or folders here — or choose them below."
+      },
+      "selectFiles": {
+        "title": "Upload a few files",
+        "body": "Use this for quick uploads (PDFs, docs, spreadsheets)."
+      },
+      "selectFolder": {
+        "title": "Upload an entire folder",
+        "body": "Best for projects — we'll upload everything inside it."
+      },
+      "destination": {
+        "title": "Destination (right panel)",
+        "body": "Pick a destination category so your files land in the right place."
+      },
+      "destinationSearch": {
+        "title": "Find the right category instantly",
+        "body": "Search by name instead of scrolling."
+      },
+      "keepStructure": {
+        "title": "Keep your folder structure",
+        "body": "Turn this on to preserve subfolders when uploading a folder."
+      },
+      "queue": {
+        "title": "Upload queue (bottom)",
+        "body": "See upload status here. You can keep working while files finish uploading."
+      }
+    }
+  },
+  "chatTour": {
+    "ariaLabel": "Chat interface tour",
+    "stepOf": "{{current}}/{{total}}",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "steps": {
+      "hero": {
+        "title": "Ask questions across your files",
+        "body": "Allybi searches what you've uploaded (and connected) to answer with context."
+      },
+      "input": {
+        "title": "Type your question here",
+        "body": "Ask in plain language — like \"Find the termination clause\" or \"Summarize this report.\""
+      },
+      "send": {
+        "title": "Send to get an answer",
+        "body": "Press Enter to send."
+      },
+      "plus": {
+        "title": "Add files or connect sources",
+        "body": "Upload files/folders or connect Gmail, Outlook, and Slack."
+      },
+      "uploadFiles": {
+        "title": "Upload in one click",
+        "body": "Upload a single file — or a whole folder for a project."
+      },
+      "connectors": {
+        "title": "Connect integrations (optional)",
+        "body": "Bring attachments into Allybi so you can ask about them here."
+      },
+      "organized": {
+        "title": "Keep chats organized",
+        "body": "Start a new chat per project and search past conversations anytime."
+      }
+    }
+  },
   "previewCount": {
     "pageOf": "Page {{current}} of {{total}}",
     "slideOf": "Slide {{current}} of {{total}}",

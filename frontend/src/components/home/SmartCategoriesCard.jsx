@@ -58,7 +58,7 @@ export default function SmartCategoriesCard({
   const hasMore = categories.length > MAX_VISIBLE;
 
   return (
-    <div style={{
+    <div data-tour="smart-categories" style={{
       display: 'flex',
       flexDirection: 'column',
       gap: isMobile ? 8 : 12,

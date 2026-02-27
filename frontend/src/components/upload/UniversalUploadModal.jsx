@@ -1522,6 +1522,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           display: 'flex'
         }}>
           <div
+            data-tour="upload-dropzone"
             {...getRootProps({
               onDrop: handleDragDrop
             })}

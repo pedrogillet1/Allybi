@@ -37,10 +37,8 @@ import { ReactComponent as DownloadIcon } from '../../assets/download.svg';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';
 import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
 import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
-import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
 import logoSvg from '../../assets/logo.svg';
 import sphereIcon from '../../assets/sphere.svg';
-import kodaLogoWhite from '../../assets/koda-knot-white.svg';
 import kodaLogo from '../../assets/koda-logo_1.svg';
 import logoCopyWhite from '../../assets/Logo copy.svg';
 import filesIcon from '../../assets/files-icon.svg';
@@ -54,6 +52,7 @@ import IntegrationsCard from '../home/IntegrationsCard';
 import FileInsightsCard from '../home/FileInsightsCard';
 import RecentlyAddedCard from '../home/RecentlyAddedCard';
 import ContinueCard from '../home/ContinueCard';
+import HomeTour from '../onboarding/HomeTour';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';
 import txtIcon from '../../assets/txt-icon.png';
@@ -122,13 +121,6 @@ const Documents = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadCategoryId, setUploadCategoryId] = useState(null);
-  const [showAskKoda, setShowAskKoda] = useState(() => {
-    // Only show if not minimized via localStorage (persistent) or dismissed this session
-    return localStorage.getItem('askKodaMinimized') !== 'true' && sessionStorage.getItem('askKodaDismissed') !== 'true';
-  });
-  const [askKodaMinimized, setAskKodaMinimized] = useState(() => {
-    return localStorage.getItem('askKodaMinimized') === 'true';
-  });
   const [showUniversalUploadModal, setShowUniversalUploadModal] = useState(false);
   const [showCreateFromMoveModal, setShowCreateFromMoveModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -751,6 +743,7 @@ const Documents = () => {
             ) : (
               <>
                 <div
+                  data-tour="search"
                   style={{
                     position: 'relative',
                     height: 44,
@@ -1119,6 +1112,7 @@ const Documents = () => {
             </div>
 
                 <button
+                  data-tour="upload"
                   onClick={() => setShowUniversalUploadModal(true)}
                   aria-label={t('documents.uploadDocument')}
                   style={{height: isMobile ? 44 : 44, width: isMobile ? 44 : 'auto', paddingLeft: isMobile ? 0 : 20, paddingRight: isMobile ? 0 : 20, paddingTop: 0, paddingBottom: 0, background: '#181818', borderRadius: 9999, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', flexShrink: 0, transition: 'background 120ms ease, transform 160ms cubic-bezier(0.2,0.8,0.2,1)', color: 'white'}}
@@ -1559,109 +1553,18 @@ const Documents = () => {
         itemType={itemToRename?.type}
       />
 
-      {/* Ask Allybi Floating Button - with minimize support (desktop only) */}
-      {!isMobile && (askKodaMinimized ? (
-        /* Minimized state: small icon button → navigate to chat */
-        <button
-          onClick={() => navigate(ROUTES.CHAT)}
-          aria-label="Open chat"
-          title="Open chat"
-          style={{
-            position: 'absolute',
-            right: 32,
-            bottom: 32,
-            width: 48,
-            height: 48,
-            background: '#222222',
-            borderRadius: '50%',
-            border: 'none',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 30,
-            transition: 'transform 180ms ease, box-shadow 180ms ease',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+
+      {/* Home Dashboard Tour — shows once per user on first visit */}
+      {!isMobile && (
+        <HomeTour
+          onOpenUploadModal={() => setShowUniversalUploadModal(true)}
+          onCloseUploadModal={() => {
+            setShowUniversalUploadModal(false);
+            setDroppedFiles(null);
+            setUploadCategoryId(null);
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px) scale(1.05)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0) scale(1)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)'; }}
-        >
-          <img src={kodaLogoWhite} alt="" style={{ width: 28, height: 28 }} aria-hidden="true" />
-        </button>
-      ) : showAskKoda && (
-        /* Expanded state: full bubble */
-        <div style={{ width: 277, height: 82, right: 32, bottom: 32, position: 'absolute', zIndex: 30 }}>
-          {/* Close/minimize button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              localStorage.setItem('askKodaMinimized', 'true');
-              setAskKodaMinimized(true);
-              setShowAskKoda(false);
-            }}
-            aria-label="Minimize helper"
-            style={{
-              width: 24,
-              height: 24,
-              right: 0,
-              top: 0,
-              position: 'absolute',
-              background: 'white',
-              borderRadius: 100,
-              outline: '1px rgba(55, 53, 47, 0.09) solid',
-              outlineOffset: '-1px',
-              justifyContent: 'center',
-              alignItems: 'center',
-              display: 'inline-flex',
-              border: 'none',
-              cursor: 'pointer',
-              zIndex: 10
-            }}
-          >
-            <XCloseIcon style={{ width: 12, height: 12 }} aria-hidden="true" />
-          </button>
-          {/* Thinking bubble - Large circle */}
-          <div style={{ width: 14, height: 14, right: 44, top: 9, position: 'absolute', background: '#222222', borderRadius: 9999 }} aria-hidden="true" />
-          <button
-            onClick={() => navigate(ROUTES.CHAT)}
-            aria-label={t('documentViewer.needHelpFindingSomething')}
-            style={{
-              height: 60,
-              paddingLeft: 4,
-              paddingRight: 18,
-              paddingTop: 8,
-              paddingBottom: 8,
-              bottom: 0,
-              right: 0,
-              position: 'absolute',
-              background: '#222222',
-              borderRadius: 100,
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              display: 'inline-flex',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'transform 180ms ease, box-shadow 180ms ease'
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
-          >
-            <div style={{ justifyContent: 'flex-start', alignItems: 'center', gap: 0, display: 'flex' }}>
-              <img
-                src={kodaLogoWhite}
-                alt=""
-                aria-hidden="true"
-                style={{ width: 36, height: 36, flexShrink: 0, marginLeft: 8, marginRight: -2 }}
-              />
-              <div style={{ color: 'white', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '20px' }}>
-                {t('documentViewer.needHelpFindingSomething')}
-              </div>
-            </div>
-          </button>
-          {/* Thinking bubble - Small circle */}
-          <div style={{ width: 7, height: 7, right: 33, top: 0, position: 'absolute', background: '#222222', borderRadius: 9999 }} aria-hidden="true" />
-        </div>
-      ))}
+        />
+      )}
     </div>
   );
 };

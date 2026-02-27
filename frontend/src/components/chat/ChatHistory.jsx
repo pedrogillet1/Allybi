@@ -146,6 +146,7 @@ const ChatHistory = ({
   onNewChat,
   onConversationUpdate,
   refreshConversationsRef,
+  tourExpandDrawerRef,
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -153,6 +154,11 @@ const ChatHistory = ({
 
   // Sidebar open/closed (ChatGPT collapsible)
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Register tour control callback
+  useEffect(() => {
+    if (tourExpandDrawerRef) tourExpandDrawerRef.current = () => setIsExpanded(true);
+  }, [tourExpandDrawerRef]);
 
   // Swipe-to-close state for mobile drawer
   const [swipeOffset, setSwipeOffset] = useState(0);
@@ -878,6 +884,7 @@ const ChatHistory = ({
         {!isExpanded && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
             <IconButton
+              data-tour="chat-drawer-toggle"
               label="Expand"
               onClick={() => setIsExpanded(true)}
               isMobile={isMobile}
@@ -927,6 +934,7 @@ const ChatHistory = ({
         {isExpanded && (
           <>
             <button
+              data-tour="chat-new"
               onClick={handleMobileNewChat}
               style={{
                 width: '100%',
@@ -955,6 +963,7 @@ const ChatHistory = ({
             <div style={{ position: 'relative' }}>
               <SearchIcon style={{ width: 24, height: 24, position: 'absolute', left: 10, top: 10, filter: 'brightness(0) invert(0.2)' }} />
               <input
+                data-tour="chat-search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('chatHistory.searchConversation')}
@@ -1143,9 +1152,10 @@ const ChatHistory = ({
   );
 };
 
-function IconButton({ label, onClick, children, isMobile }) {
+function IconButton({ label, onClick, children, isMobile, ...rest }) {
   return (
     <div
+      {...rest}
       aria-label={label}
       role="button"
       tabIndex={0}

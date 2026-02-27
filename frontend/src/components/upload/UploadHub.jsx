@@ -28,6 +28,7 @@ import api from '../../services/api';
 // ✅ REFACTORED: Use unified upload service (replaces folderUploadService + presignedUploadService)
 import unifiedUploadService from '../../services/unifiedUploadService';
 import { DocumentScanner } from '../scanner';
+import UploadHubTour from '../onboarding/UploadHubTour';
 import { UPLOAD_CONFIG } from '../../config/upload.config';
 import { buildRoute } from '../../constants/routes';
 import pdfIcon from '../../assets/pdf-icon.png';
@@ -2839,7 +2840,7 @@ const UploadHub = () => {
           }}>
 
             {/* ═══ LEFT: Add files Card (span 8) ═══ */}
-            <div style={{
+            <div data-tour="upload-dropzone" style={{
               background: 'white', borderRadius: 16, border: '1px solid #E6E6EC',
               boxShadow: '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)',
               padding: 24, display: 'flex', flexDirection: 'column',
@@ -2918,7 +2919,7 @@ const UploadHub = () => {
 
                   {/* Buttons */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 16 }}>
-                    <button onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                    <button data-tour="upload-select-files" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                       style={{
                         height: 40, padding: '0 20px', background: '#181818', border: 'none',
                         borderRadius: 9999, fontSize: 14, fontWeight: '600', color: 'white',
@@ -2930,7 +2931,7 @@ const UploadHub = () => {
                       onMouseLeave={(e) => { e.currentTarget.style.background = '#181818'; }}>
                       {t('uploadHub.selectFiles')}
                     </button>
-                    <button onClick={(e) => { e.stopPropagation(); folderInputRef.current?.click(); }}
+                    <button data-tour="upload-select-folder" onClick={(e) => { e.stopPropagation(); folderInputRef.current?.click(); }}
                       style={{
                         height: 40, padding: '0 20px', background: 'white', border: '1px solid #E6E6EC',
                         borderRadius: 9999, fontSize: 14, fontWeight: '600', color: '#32302C',
@@ -2978,7 +2979,7 @@ const UploadHub = () => {
             </div>
 
             {/* ═══ RIGHT: Destination Card (span 4) — desktop only ═══ */}
-            {!isMobile && <div style={{
+            {!isMobile && <div data-tour="upload-destination-panel" style={{
               background: 'white', borderRadius: 16, border: '1px solid #E6E6EC',
               boxShadow: '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)',
               display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0,
@@ -3041,7 +3042,7 @@ const UploadHub = () => {
                 /* ── State B: Has categories — search + list ── */
                 <>
                   {/* ── Search input ── */}
-                  <div style={{ padding: '16px 24px 0' }}>
+                  <div data-tour="upload-destination-search" style={{ padding: '16px 24px 0' }}>
                       <div style={{ position: 'relative' }}>
                         <SearchIcon style={{
                           width: 16, height: 16, position: 'absolute', left: 14, top: 12,
@@ -3104,7 +3105,7 @@ const UploadHub = () => {
 
                   {/* ── Keep folder structure toggle ── */}
                   {uploadingFiles.some(f => f.isFolder) && (
-                    <div style={{ borderTop: '1px solid #E6E6EC', margin: '0 24px', paddingTop: 12, paddingBottom: 8, flexShrink: 0 }}>
+                    <div data-tour="upload-keep-structure" style={{ borderTop: '1px solid #E6E6EC', margin: '0 24px', paddingTop: 12, paddingBottom: 8, flexShrink: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: 14, fontWeight: '500', color: '#32302C', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '20px' }}>
                           Keep folder structure
@@ -3146,7 +3147,7 @@ const UploadHub = () => {
           </div>
 
           {/* Row 2: Files card (span 12, full width) */}
-          <div ref={filesCardRef} style={{
+          <div ref={filesCardRef} data-tour="upload-queue" style={{
             background: 'white', borderRadius: 16, border: '1px solid #E6E6EC',
             boxShadow: '0 1px 2px rgba(24,24,24,0.06), 0 12px 24px rgba(24,24,24,0.08)',
             padding: 24, marginTop: isMobile ? -8 : 24,
@@ -3878,6 +3879,9 @@ const UploadHub = () => {
         onClose={() => setShowScanner(false)}
         onScanComplete={handleScanComplete}
       />
+
+      {/* Upload Hub Tour — shows once per user on first visit */}
+      {!isMobile && <UploadHubTour />}
 
       {/* Animation Keyframes */}
       <style dangerouslySetInnerHTML={{ __html: `

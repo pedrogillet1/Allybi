@@ -1,6 +1,6 @@
 {
   "_meta": { "id": "entity_role_ontology", "version": "1.0.0", "description": "Defines entity roles, anchor labels, confusion graph, and proximity rules for contract field extraction.", "languages": ["any", "en", "pt"], "lastUpdated": "2026-02-20", "owner": "koda-retrieval", "compat": ">=1.0.0" },
-  "config": { "proximityWindowChars": 200, "anchorMatchMinLength": 3 },
+  "config": { "enabled": true, "proximityWindowChars": 200, "anchorMatchMinLength": 3 },
   "roles": [
     {
       "id": "owner",

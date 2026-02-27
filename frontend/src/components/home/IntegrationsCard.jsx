@@ -219,6 +219,7 @@ export default function IntegrationsCard() {
 
   return (
     <div
+      data-tour="integrations"
       style={{
         background: 'white',
         borderRadius: 16,

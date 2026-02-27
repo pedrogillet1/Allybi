@@ -1542,6 +1542,116 @@
       "description": "Reproduce el tour de bienvenida y aprende cómo usar Allybi."
     }
   },
+  "homeTour": {
+    "ariaLabel": "Tour del panel de inicio",
+    "stepOf": "{{current}}/{{total}}",
+    "skip": "Omitir",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "done": "Listo",
+    "steps": {
+      "upload": {
+        "title": "Sube tus primeros archivos",
+        "body": "Sube archivos o carpetas completas. Allybi los organiza automáticamente y los hace buscables."
+      },
+      "dropzone": {
+        "title": "Arrastra y suelta archivos o carpetas",
+        "body": "Suelta PDFs, documentos, hojas de cálculo o imágenes aquí para comenzar."
+      },
+      "fileInsights": {
+        "title": "Información instantánea de archivos",
+        "body": "Obtén una vista rápida de lo que hay en tu espacio de trabajo, por tipo de archivo y volumen."
+      },
+      "smartCategories": {
+        "title": "Categorías Inteligentes",
+        "body": "Tus archivos se agrupan automáticamente. Haz clic en una categoría para explorar o crea una nueva."
+      },
+      "search": {
+        "title": "Encuentra todo rápido",
+        "body": "Busca por nombre de archivo o contenido. Consejo: presiona ⌘K en cualquier momento."
+      },
+      "integrations": {
+        "title": "Conectar integraciones (opcional)",
+        "body": "Conecta Gmail, Outlook o Slack para traer archivos adjuntos a Allybi."
+      }
+    }
+  },
+  "uploadTour": {
+    "ariaLabel": "Tour del centro de carga",
+    "stepOf": "{{current}}/{{total}}",
+    "skip": "Omitir",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "done": "Listo",
+    "steps": {
+      "dropzone": {
+        "title": "Agrega archivos (panel izquierdo)",
+        "body": "Arrastra y suelta archivos o carpetas aquí, o elige abajo."
+      },
+      "selectFiles": {
+        "title": "Sube algunos archivos",
+        "body": "Usa esto para subidas rápidas (PDFs, documentos, hojas de cálculo)."
+      },
+      "selectFolder": {
+        "title": "Sube una carpeta completa",
+        "body": "Ideal para proyectos: subiremos todo lo que contenga."
+      },
+      "destination": {
+        "title": "Destino (panel derecho)",
+        "body": "Selecciona una categoría de destino para que tus archivos queden organizados."
+      },
+      "destinationSearch": {
+        "title": "Encuentra la categoría al instante",
+        "body": "Busca por nombre en vez de desplazarte."
+      },
+      "keepStructure": {
+        "title": "Conserva la estructura de carpetas",
+        "body": "Activa esto para preservar las subcarpetas al subir una carpeta."
+      },
+      "queue": {
+        "title": "Cola de subida (inferior)",
+        "body": "Mira el estado de la carga aquí. Puedes seguir trabajando mientras los archivos se suben."
+      }
+    }
+  },
+  "chatTour": {
+    "ariaLabel": "Tour de la interfaz de chat",
+    "stepOf": "{{current}}/{{total}}",
+    "skip": "Omitir",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "done": "Listo",
+    "steps": {
+      "hero": {
+        "title": "Haz preguntas sobre tus archivos",
+        "body": "Allybi busca en lo que has subido (y conectado) para responder con contexto."
+      },
+      "input": {
+        "title": "Escribe tu pregunta aquí",
+        "body": "Pregunta en lenguaje natural — como \"Encuentra la cláusula de terminación\" o \"Resume este informe.\""
+      },
+      "send": {
+        "title": "Envía para obtener una respuesta",
+        "body": "Presiona Enter para enviar."
+      },
+      "plus": {
+        "title": "Agrega archivos o conecta fuentes",
+        "body": "Sube archivos/carpetas o conecta Gmail, Outlook y Slack."
+      },
+      "uploadFiles": {
+        "title": "Sube en un clic",
+        "body": "Sube un solo archivo — o una carpeta completa para un proyecto."
+      },
+      "connectors": {
+        "title": "Conecta integraciones (opcional)",
+        "body": "Trae archivos adjuntos a Allybi para que puedas preguntar sobre ellos aquí."
+      },
+      "organized": {
+        "title": "Mantén los chats organizados",
+        "body": "Inicia un nuevo chat por proyecto y busca conversaciones anteriores en cualquier momento."
+      }
+    }
+  },
   "previewCount": {
     "pageOf": "Página {{current}} de {{total}}",
     "slideOf": "Diapositiva {{current}} de {{total}}",

@@ -1412,6 +1412,8 @@ export default function ChatInterface({
   focusNonce = 0,
   apiRef,
   onAssistantFinal,
+  tourOpenConnectorMenuRef,
+  tourCloseConnectorMenuRef,
 }) {
   const isMobile = useIsMobile();
   const isKeyboardVisible = useIsKeyboardVisible();
@@ -2011,6 +2013,13 @@ export default function ChatInterface({
   const [disconnectingConnector, setDisconnectingConnector] = useState(null);
   const [connectorError, setConnectorError] = useState(null);
   const [connectorMenuOpen, setConnectorMenuOpen] = useState(false);
+
+  // Register tour control callbacks for ChatTour
+  useEffect(() => {
+    if (tourOpenConnectorMenuRef) tourOpenConnectorMenuRef.current = () => setConnectorMenuOpen(true);
+    if (tourCloseConnectorMenuRef) tourCloseConnectorMenuRef.current = () => setConnectorMenuOpen(false);
+  }, [tourOpenConnectorMenuRef, tourCloseConnectorMenuRef]);
+
   // Active connector = the one currently "armed" for read/send actions.
   // This is what the pill above the input represents.
   const [activeConnectors, setActiveConnectors] = useState([]); // ['gmail','outlook','slack']
@@ -4710,7 +4719,7 @@ export default function ChatInterface({
                 </div>
               </div>
             ) : (
-              <div className="koda-welcome-enter" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+              <div data-tour="chat-hero" className="koda-welcome-enter" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                 <div style={{ textAlign: 'center' }}>
                   {/* Logo */}
                   <div style={{ margin: '0 auto 32px', position: 'relative' }}>
@@ -5719,6 +5728,7 @@ export default function ChatInterface({
                 `}</style>
                 <textarea
                   ref={inputRef}
+                  data-tour="chat-input"
                   data-chat-input="true"
                   data-testid="viewer-chat-input"
                   className="chat-v3-textarea"
@@ -5765,6 +5775,7 @@ export default function ChatInterface({
                 {!isViewerVariant ? (
                   <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
                     <motion.button
+                      data-tour="chat-plus"
                       ref={connectorMenuBtnRef}
                       type="button"
                       onClick={() => {
@@ -5794,6 +5805,7 @@ export default function ChatInterface({
                     <AnimatePresence>
                       {connectorMenuOpen ? (
                         <motion.div
+                          data-tour="chat-tools-popover"
                           ref={connectorMenuRef}
                           initial={{ opacity: 0, y: 6, scale: 0.98 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -5818,6 +5830,7 @@ export default function ChatInterface({
                             Tools
                           </div>
                           <button
+                            data-tour="chat-upload-files"
                             type="button"
                             onClick={() => {
                               if (isUnauthenticated) {
@@ -5850,6 +5863,7 @@ export default function ChatInterface({
                             <span>Upload files</span>
                           </button>
                           <button
+                            data-tour="chat-upload-folder"
                             type="button"
                             onClick={() => {
                               if (isUnauthenticated) {
@@ -5884,7 +5898,7 @@ export default function ChatInterface({
 
                           <div style={{ height: 1, background: "#F3F4F6", margin: "4px 6px" }} />
 
-                          <div style={{ padding: "8px 10px 4px", fontFamily: "Plus Jakarta Sans, sans-serif", fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", color: "#6B7280", textTransform: "uppercase" }}>
+                          <div data-tour="chat-connectors" style={{ padding: "8px 10px 4px", fontFamily: "Plus Jakarta Sans, sans-serif", fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", color: "#6B7280", textTransform: "uppercase" }}>
                             Connectors
                           </div>
                           {CONNECTOR_OPTIONS.map((opt) => {
@@ -6067,6 +6081,7 @@ export default function ChatInterface({
                   </motion.button>
                 ) : (
                   <motion.button
+                    data-tour="chat-send"
                     type="submit"
                     disabled={!input.trim() && attachedDocs.length === 0}
                     aria-label="Send"
