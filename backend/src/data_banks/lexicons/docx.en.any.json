@@ -1,9 +1,9 @@
 {
   "_meta": {
     "id": "docx_en",
-    "version": "1.0.0",
-    "description": "English DOCX-specific lexicon covering entity nouns, styles, formatting, layout, and list terms",
-    "lastUpdated": "2026-02-12",
+    "version": "2.0.0",
+    "description": "English DOCX-specific lexicon covering entity nouns, styles, formatting, layout, list, structural, case, scope, and heading terms",
+    "lastUpdated": "2026-02-27",
     "languages": [
       "en"
     ]
@@ -29,7 +29,14 @@
       "bullet",
       "list item",
       "footnote",
-      "endnote"
+      "endnote",
+      "table of contents",
+      "TOC",
+      "abstract",
+      "introduction",
+      "conclusion",
+      "summary",
+      "appendix"
     ],
     "style_terms": [
       "heading 1",
@@ -90,7 +97,75 @@
       "demote",
       "restart",
       "continue",
-      "multilevel"
+      "multilevel",
+      "bullet point",
+      "bullet list",
+      "numbered list",
+      "numbered steps",
+      "ordered list",
+      "unordered list",
+      "checklist",
+      "convert to bullets",
+      "convert to numbering"
+    ],
+    "structural_verbs": [
+      "merge",
+      "split",
+      "combine",
+      "separate",
+      "insert",
+      "delete",
+      "remove",
+      "add",
+      "append",
+      "prepend",
+      "convert",
+      "transform",
+      "move",
+      "reorder"
+    ],
+    "case_terms": [
+      "title case",
+      "sentence case",
+      "uppercase",
+      "lowercase",
+      "upper case",
+      "lower case",
+      "all caps",
+      "capitalize",
+      "UPPER",
+      "lower"
+    ],
+    "scope_terms": [
+      "selected text",
+      "highlighted",
+      "all highlighted",
+      "multiple selections",
+      "all paragraphs",
+      "all headings",
+      "this section",
+      "the entire document",
+      "all sections",
+      "this heading",
+      "the introduction",
+      "the conclusion",
+      "section 1",
+      "section 2",
+      "section 3",
+      "section 4"
+    ],
+    "heading_terms": [
+      "heading 1",
+      "heading 2",
+      "heading 3",
+      "heading 4",
+      "heading 5",
+      "heading 6",
+      "section title",
+      "chapter title",
+      "main heading",
+      "subheading",
+      "sub-heading"
     ]
   }
 }

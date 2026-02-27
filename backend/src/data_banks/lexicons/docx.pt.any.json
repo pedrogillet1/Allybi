@@ -1,9 +1,9 @@
 {
   "_meta": {
     "id": "docx_pt",
-    "version": "1.0.0",
-    "description": "Portuguese DOCX-specific lexicon covering entity nouns, styles, formatting, layout, and list terms",
-    "lastUpdated": "2026-02-12",
+    "version": "2.0.0",
+    "description": "Portuguese DOCX-specific lexicon covering entity nouns, styles, formatting, layout, list, structural, case, scope, and heading terms",
+    "lastUpdated": "2026-02-27",
     "languages": [
       "pt"
     ]
@@ -28,7 +28,15 @@
       "tópico",
       "item de lista",
       "nota de rodapé",
-      "nota de fim"
+      "nota de fim",
+      "sumário",
+      "índice",
+      "tabela de conteúdo",
+      "TOC",
+      "resumo",
+      "introdução",
+      "conclusão",
+      "apêndice"
     ],
     "style_terms": [
       "título 1",
@@ -88,7 +96,70 @@
       "rebaixar",
       "reiniciar",
       "continuar",
-      "multinível"
+      "multinível",
+      "item de marcador",
+      "lista de marcadores",
+      "lista numerada",
+      "passos numerados",
+      "lista ordenada",
+      "lista não ordenada",
+      "converter em marcadores",
+      "converter em numeração"
+    ],
+    "structural_verbs": [
+      "mesclar",
+      "dividir",
+      "combinar",
+      "separar",
+      "inserir",
+      "excluir",
+      "remover",
+      "adicionar",
+      "anexar",
+      "converter",
+      "transformar",
+      "mover",
+      "reordenar"
+    ],
+    "case_terms": [
+      "caixa de título",
+      "caixa de frase",
+      "maiúsculas",
+      "minúsculas",
+      "todas maiúsculas",
+      "capitalizar",
+      "MAIÚSCULAS",
+      "minúsculas"
+    ],
+    "scope_terms": [
+      "texto selecionado",
+      "realçado",
+      "todos os realçados",
+      "seleção múltipla",
+      "todos os parágrafos",
+      "todos os títulos",
+      "esta seção",
+      "o documento inteiro",
+      "todas as seções",
+      "este título",
+      "a introdução",
+      "a conclusão",
+      "seção 1",
+      "seção 2",
+      "seção 3",
+      "seção 4"
+    ],
+    "heading_terms": [
+      "título 1",
+      "título 2",
+      "título 3",
+      "título 4",
+      "título 5",
+      "título 6",
+      "título de seção",
+      "título de capítulo",
+      "título principal",
+      "subtítulo"
     ]
   }
 }
