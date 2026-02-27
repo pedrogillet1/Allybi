@@ -485,6 +485,450 @@ export function computeOpsToPatchPlan(input: {
         return;
       }
 
+      if (kind === "fill_down") {
+        if (!rangeA1) throw new Error("fill_down requires rangeA1");
+        const parsed = parseA1Range(
+          rangeA1,
+          activeSheetName || undefined,
+        );
+        const sourceRow =
+          typeof op.sourceRow === "number"
+            ? op.sourceRow
+            : parsed.start.row;
+        const formula = normalizeString(op.sourceFormula ?? op.formula);
+        for (
+          let c = parsed.start.col;
+          c <= parsed.end.col;
+          c += 1
+        ) {
+          for (
+            let r = parsed.start.row;
+            r <= parsed.end.row;
+            r += 1
+          ) {
+            if (r === sourceRow) continue;
+            const cellRange = `${parsed.sheetName}!${numberToCol(c)}${r}`;
+            if (formula) {
+              const rowDelta = r - sourceRow;
+              const adjusted = formula.replace(
+                /(\$?)([A-Z]{1,3})(\$?)(\d+)/g,
+                (_m, dollarCol, col, dollarRow, row) => {
+                  if (dollarRow === "$") return `${dollarCol}${col}${dollarRow}${row}`;
+                  return `${dollarCol}${col}${dollarRow}${Number(row) + rowDelta}`;
+                },
+              );
+              patchOps.push({
+                op: "SET_FORMULA",
+                range: cellRange,
+                ...(sheetName ? { sheet: sheetName } : {}),
+                formula: adjusted,
+              });
+            } else {
+              patchOps.push({
+                op: "SET_VALUE",
+                range: cellRange,
+                ...(sheetName ? { sheet: sheetName } : {}),
+                value: (op.value as string | number | boolean | null) ?? null,
+                mode: "broadcast",
+              });
+            }
+          }
+        }
+        return;
+      }
+
+      if (kind === "fill_right") {
+        if (!rangeA1) throw new Error("fill_right requires rangeA1");
+        const parsed = parseA1Range(
+          rangeA1,
+          activeSheetName || undefined,
+        );
+        const sourceCol =
+          typeof op.sourceCol === "number"
+            ? op.sourceCol
+            : parsed.start.col;
+        const formula = normalizeString(op.sourceFormula ?? op.formula);
+        for (
+          let r = parsed.start.row;
+          r <= parsed.end.row;
+          r += 1
+        ) {
+          for (
+            let c = parsed.start.col;
+            c <= parsed.end.col;
+            c += 1
+          ) {
+            if (c === sourceCol) continue;
+            const cellRange = `${parsed.sheetName}!${numberToCol(c)}${r}`;
+            if (formula) {
+              const colDelta = c - sourceCol;
+              const adjusted = formula.replace(
+                /(\$?)([A-Z]{1,3})(\$?)(\d+)/g,
+                (_m, dollarCol, col, dollarRow, row) => {
+                  if (dollarCol === "$") return `${dollarCol}${col}${dollarRow}${row}`;
+                  let colNum = 0;
+                  for (const ch of col) colNum = colNum * 26 + (ch.charCodeAt(0) - 64);
+                  const newCol = numberToCol(colNum + colDelta);
+                  return `${dollarCol}${newCol}${dollarRow}${row}`;
+                },
+              );
+              patchOps.push({
+                op: "SET_FORMULA",
+                range: cellRange,
+                ...(sheetName ? { sheet: sheetName } : {}),
+                formula: adjusted,
+              });
+            } else {
+              patchOps.push({
+                op: "SET_VALUE",
+                range: cellRange,
+                ...(sheetName ? { sheet: sheetName } : {}),
+                value: (op.value as string | number | boolean | null) ?? null,
+                mode: "broadcast",
+              });
+            }
+          }
+        }
+        return;
+      }
+
+      if (kind === "fill_series") {
+        if (!rangeA1) throw new Error("fill_series requires rangeA1");
+        const parsed = parseA1Range(
+          rangeA1,
+          activeSheetName || undefined,
+        );
+        const step = typeof op.step === "number" ? op.step : 1;
+        const seriesType = normalizeString(op.type).toLowerCase() || "linear";
+        const startValue =
+          typeof op.startValue === "number" ? op.startValue : 1;
+        const height = parsed.end.row - parsed.start.row + 1;
+        const width = parsed.end.col - parsed.start.col + 1;
+        const vertical = height >= width;
+        let idx = 0;
+        if (vertical) {
+          for (
+            let r = parsed.start.row;
+            r <= parsed.end.row;
+            r += 1
+          ) {
+            for (
+              let c = parsed.start.col;
+              c <= parsed.end.col;
+              c += 1
+            ) {
+              const cellRange = `${parsed.sheetName}!${numberToCol(c)}${r}`;
+              let value: string | number;
+              if (seriesType === "date") {
+                const base = new Date(
+                  typeof op.startValue === "string"
+                    ? op.startValue
+                    : "1970-01-01",
+                );
+                base.setDate(base.getDate() + idx * step);
+                value = base.toISOString().slice(0, 10);
+              } else {
+                value = startValue + idx * step;
+              }
+              patchOps.push({
+                op: "SET_VALUE",
+                range: cellRange,
+                ...(sheetName ? { sheet: sheetName } : {}),
+                value,
+                mode: "broadcast",
+              });
+              idx += 1;
+            }
+          }
+        } else {
+          for (
+            let c = parsed.start.col;
+            c <= parsed.end.col;
+            c += 1
+          ) {
+            for (
+              let r = parsed.start.row;
+              r <= parsed.end.row;
+              r += 1
+            ) {
+              const cellRange = `${parsed.sheetName}!${numberToCol(c)}${r}`;
+              let value: string | number;
+              if (seriesType === "date") {
+                const base = new Date(
+                  typeof op.startValue === "string"
+                    ? op.startValue
+                    : "1970-01-01",
+                );
+                base.setDate(base.getDate() + idx * step);
+                value = base.toISOString().slice(0, 10);
+              } else {
+                value = startValue + idx * step;
+              }
+              patchOps.push({
+                op: "SET_VALUE",
+                range: cellRange,
+                ...(sheetName ? { sheet: sheetName } : {}),
+                value,
+                mode: "broadcast",
+              });
+              idx += 1;
+            }
+          }
+        }
+        return;
+      }
+
+      if (kind === "merge_cells") {
+        if (!rangeA1) throw new Error("merge_cells requires rangeA1");
+        patchOps.push({
+          op: "MERGE_CELLS",
+          range: rangeA1,
+          ...(sheetName ? { sheet: sheetName } : {}),
+        });
+        return;
+      }
+
+      if (kind === "wrap_text") {
+        if (!rangeA1) throw new Error("wrap_text requires rangeA1");
+        patchOps.push({
+          op: "SET_STYLE",
+          range: rangeA1,
+          ...(sheetName ? { sheet: sheetName } : {}),
+          stylePatch: { align: { wrap: true } },
+          merge: "preserve",
+        });
+        return;
+      }
+
+      if (kind === "auto_fit") {
+        const cols: number[] = [];
+        if (Array.isArray(op.columns)) {
+          for (const c of op.columns as unknown[]) {
+            const n = Number(c);
+            if (Number.isFinite(n)) cols.push(Math.max(1, Math.trunc(n)));
+          }
+        } else if (rangeA1) {
+          const parsed = parseA1Range(
+            rangeA1,
+            activeSheetName || undefined,
+          );
+          for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
+            cols.push(c);
+          }
+        }
+        if (!cols.length) throw new Error("auto_fit requires columns or rangeA1");
+        patchOps.push({
+          op: "SET_COL_WIDTH",
+          sheet: sheetName || "Sheet1",
+          cols,
+          width: "auto",
+        });
+        return;
+      }
+
+      if (kind === "cond_format_data_bars") {
+        if (!rangeA1)
+          throw new Error("cond_format_data_bars requires rangeA1");
+        patchOps.push({
+          op: "SET_CONDITIONAL_FORMAT",
+          range: rangeA1,
+          ...(sheetName ? { sheet: sheetName } : {}),
+          rule: {
+            type: "DATA_BARS",
+            color: normalizeString(op.color) || "#4472C4",
+          },
+        });
+        return;
+      }
+
+      if (kind === "cond_format_color_scale") {
+        if (!rangeA1)
+          throw new Error("cond_format_color_scale requires rangeA1");
+        patchOps.push({
+          op: "SET_CONDITIONAL_FORMAT",
+          range: rangeA1,
+          ...(sheetName ? { sheet: sheetName } : {}),
+          rule: {
+            type: "COLOR_SCALE",
+            minColor: normalizeString(op.minColor) || "#F8696B",
+            maxColor: normalizeString(op.maxColor) || "#63BE7B",
+            ...(normalizeString(op.midColor)
+              ? { midColor: normalizeString(op.midColor) }
+              : {}),
+          },
+        });
+        return;
+      }
+
+      if (kind === "cond_format_top_n") {
+        if (!rangeA1)
+          throw new Error("cond_format_top_n requires rangeA1");
+        const styleObj =
+          op.style && typeof op.style === "object"
+            ? (op.style as Record<string, unknown>)
+            : {};
+        const bgHex =
+          normalizeString(styleObj.fill ?? op.backgroundHex) || "#FFC000";
+        patchOps.push({
+          op: "SET_CONDITIONAL_FORMAT",
+          range: rangeA1,
+          ...(sheetName ? { sheet: sheetName } : {}),
+          rule: {
+            type: "TOP_N",
+            n: typeof op.n === "number" ? op.n : 10,
+            ...(typeof op.percent === "boolean"
+              ? { percent: op.percent }
+              : {}),
+            backgroundHex: bgHex,
+          },
+        });
+        return;
+      }
+
+      if (kind === "hide_rows") {
+        const rows: number[] = [];
+        if (Array.isArray(op.rows)) {
+          for (const r of op.rows as unknown[]) {
+            const n = Number(r);
+            if (Number.isFinite(n)) rows.push(Math.max(1, Math.trunc(n)));
+          }
+        }
+        if (!rows.length) throw new Error("hide_rows requires rows");
+        patchOps.push({
+          op: "SET_ROW_VISIBILITY",
+          sheet: sheetName || "Sheet1",
+          rows,
+          hidden: true,
+        });
+        return;
+      }
+
+      if (kind === "show_rows") {
+        const rows: number[] = [];
+        if (Array.isArray(op.rows)) {
+          for (const r of op.rows as unknown[]) {
+            const n = Number(r);
+            if (Number.isFinite(n)) rows.push(Math.max(1, Math.trunc(n)));
+          }
+        }
+        if (!rows.length) throw new Error("show_rows requires rows");
+        patchOps.push({
+          op: "SET_ROW_VISIBILITY",
+          sheet: sheetName || "Sheet1",
+          rows,
+          hidden: false,
+        });
+        return;
+      }
+
+      if (kind === "hide_columns") {
+        const cols: number[] = [];
+        if (Array.isArray(op.columns)) {
+          for (const c of op.columns as unknown[]) {
+            const n = Number(c);
+            if (Number.isFinite(n)) cols.push(Math.max(1, Math.trunc(n)));
+          }
+        }
+        if (!cols.length) throw new Error("hide_columns requires columns");
+        patchOps.push({
+          op: "SET_COL_VISIBILITY",
+          sheet: sheetName || "Sheet1",
+          cols,
+          hidden: true,
+        });
+        return;
+      }
+
+      if (kind === "show_columns") {
+        const cols: number[] = [];
+        if (Array.isArray(op.columns)) {
+          for (const c of op.columns as unknown[]) {
+            const n = Number(c);
+            if (Number.isFinite(n)) cols.push(Math.max(1, Math.trunc(n)));
+          }
+        }
+        if (!cols.length) throw new Error("show_columns requires columns");
+        patchOps.push({
+          op: "SET_COL_VISIBILITY",
+          sheet: sheetName || "Sheet1",
+          cols,
+          hidden: false,
+        });
+        return;
+      }
+
+      if (kind === "aggregation") {
+        const fn = normalizeString(op.function).toUpperCase() || "SUM";
+        const sourceRange = normalizeRange(
+          op.sourceRange ?? op.source ?? op.dataRange,
+          activeSheetName || undefined,
+          input.semanticIndex,
+        );
+        const targetCell = normalizeRange(
+          op.targetCell ?? op.target ?? op.destination,
+          activeSheetName || undefined,
+          input.semanticIndex,
+        );
+        if (!sourceRange || !targetCell)
+          throw new Error("aggregation requires sourceRange and targetCell");
+
+        let formulaRef = sourceRange;
+        if (sourceRange.includes("!")) {
+          const srcSheet = sourceRange.split("!")[0].replace(/^'/, "").replace(/'$/, "");
+          const tgtSheet = targetCell.includes("!")
+            ? targetCell.split("!")[0].replace(/^'/, "").replace(/'$/, "")
+            : sheetName;
+          if (srcSheet === tgtSheet) {
+            formulaRef = sourceRange.split("!")[1];
+          }
+        }
+        patchOps.push({
+          op: "SET_FORMULA",
+          range: targetCell,
+          ...(sheetName ? { sheet: sheetName } : {}),
+          formula: `=${fn}(${formulaRef})`,
+        });
+        return;
+      }
+
+      if (
+        kind === "chart_set_series" ||
+        kind === "chart_set_titles" ||
+        kind === "chart_set_axes"
+      ) {
+        const spec =
+          op.spec && typeof op.spec === "object"
+            ? (op.spec as Record<string, unknown>)
+            : (op as Record<string, unknown>);
+        const chartRange = normalizeRange(
+          spec.range ?? op.rangeA1 ?? op.range,
+          activeSheetName || undefined,
+          input.semanticIndex,
+        );
+        if (!chartRange) throw new Error(`${kind} requires chart range`);
+        patchOps.push({
+          op: "CREATE_CHART_CARD",
+          range: chartRange,
+          ...(sheetName ? { sheet: sheetName } : {}),
+          chart: {
+            type: String(spec.type || "BAR").toUpperCase(),
+            ...(normalizeString(spec.title)
+              ? { title: normalizeString(spec.title) }
+              : {}),
+            range: chartRange,
+            settings: spec,
+          },
+        });
+        return;
+      }
+
+      if (kind === "chart_delete") {
+        rejectedOps.push(
+          `op#${index}:${kind}:agent_level_only — chart deletion requires model access`,
+        );
+        return;
+      }
+
       rejectedOps.push(`op#${index}:${kind}:unsupported`);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
