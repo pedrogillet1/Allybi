@@ -557,6 +557,86 @@ export function applyPatchOpsToSpreadsheetModel(
         model.charts = [...(model.charts || []), chart];
         changed = true;
         changedStructuresCount += 1;
+      } else if (op.op === "MERGE_CELLS") {
+        const parsed = parseA1Range(op.range, op.sheet);
+        const sheet = ensureSheetByName(model, parsed.sheetName);
+        if (!sheet.grid.merges) sheet.grid.merges = [];
+        const merge = {
+          r1: parsed.start.row,
+          c1: parsed.start.col,
+          r2: parsed.end.row,
+          c2: parsed.end.col,
+        };
+        const exists = sheet.grid.merges.some(
+          (m) =>
+            m.r1 === merge.r1 &&
+            m.c1 === merge.c1 &&
+            m.r2 === merge.r2 &&
+            m.c2 === merge.c2,
+        );
+        if (!exists) {
+          sheet.grid.merges.push(merge);
+          changed = true;
+          changedStructuresCount += 1;
+        }
+      } else if (op.op === "UNMERGE_CELLS") {
+        const parsed = parseA1Range(op.range, op.sheet);
+        const sheet = ensureSheetByName(model, parsed.sheetName);
+        if (Array.isArray(sheet.grid.merges)) {
+          const before = sheet.grid.merges.length;
+          sheet.grid.merges = sheet.grid.merges.filter(
+            (m) =>
+              !(
+                m.r1 === parsed.start.row &&
+                m.c1 === parsed.start.col &&
+                m.r2 === parsed.end.row &&
+                m.c2 === parsed.end.col
+              ),
+          );
+          changed = sheet.grid.merges.length !== before;
+          if (changed) changedStructuresCount += 1;
+        }
+      } else if (op.op === "SET_ROW_VISIBILITY") {
+        const sheet = ensureSheetByName(model, op.sheet);
+        if (!sheet.grid.hiddenRows) sheet.grid.hiddenRows = [];
+        const set = new Set(sheet.grid.hiddenRows);
+        for (const row of op.rows) {
+          if (op.hidden) {
+            if (!set.has(row)) { set.add(row); changed = true; }
+          } else {
+            if (set.has(row)) { set.delete(row); changed = true; }
+          }
+        }
+        sheet.grid.hiddenRows = Array.from(set).sort((a, b) => a - b);
+      } else if (op.op === "SET_COL_VISIBILITY") {
+        const sheet = ensureSheetByName(model, op.sheet);
+        if (!sheet.grid.hiddenColumns) sheet.grid.hiddenColumns = [];
+        const set = new Set(sheet.grid.hiddenColumns);
+        for (const col of op.cols) {
+          if (op.hidden) {
+            if (!set.has(col)) { set.add(col); changed = true; }
+          } else {
+            if (set.has(col)) { set.delete(col); changed = true; }
+          }
+        }
+        sheet.grid.hiddenColumns = Array.from(set).sort((a, b) => a - b);
+      } else if (op.op === "SET_COL_WIDTH") {
+        const sheet = ensureSheetByName(model, op.sheet);
+        if (!sheet.grid.colWidths) sheet.grid.colWidths = {};
+        for (const col of op.cols) {
+          if (op.width === "auto") {
+            let maxLen = 8;
+            for (let r = 1; r <= sheet.grid.maxRow; r += 1) {
+              const cell = sheet.cells[cellKey(r, col)];
+              const text = String(cell?.v ?? cell?.f ?? "");
+              maxLen = Math.max(maxLen, Math.min(text.length + 2, 60));
+            }
+            sheet.grid.colWidths[col] = maxLen;
+          } else {
+            sheet.grid.colWidths[col] = Math.max(1, Math.trunc(op.width));
+          }
+          changed = true;
+        }
       } else {
         const ranges = rangeList(op as any);
         for (const range of ranges) {

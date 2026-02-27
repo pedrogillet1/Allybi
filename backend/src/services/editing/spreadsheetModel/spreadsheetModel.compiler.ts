@@ -82,6 +82,22 @@ export async function compileSpreadsheetModelToXlsx(
         ws.getColumn(c).width = w;
     }
 
+    // Hidden rows
+    const hiddenRows = Array.isArray(sheet.grid.hiddenRows)
+      ? sheet.grid.hiddenRows
+      : [];
+    for (const r of hiddenRows) {
+      ws.getRow(r).hidden = true;
+    }
+
+    // Hidden columns
+    const hiddenCols = Array.isArray(sheet.grid.hiddenColumns)
+      ? sheet.grid.hiddenColumns
+      : [];
+    for (const c of hiddenCols) {
+      ws.getColumn(c).hidden = true;
+    }
+
     for (const [key, cellModel] of Object.entries(sheet.cells)) {
       const pos = parseCellKey(key);
       if (!pos) continue;
@@ -153,29 +169,86 @@ export async function compileSpreadsheetModelToXlsx(
       : [];
     if (typeof (ws as any).addConditionalFormatting === "function") {
       for (const item of conditionalFormats) {
-        const type = String(item.rule?.type || "NUMBER_GREATER").toUpperCase();
-        const op = type === "NUMBER_LESS" ? "lessThan" : "greaterThan";
-        const bg = toArgb(item.rule?.backgroundHex) || "FFFEF3C7";
-        const value = String(item.rule?.value ?? 0);
+        const ruleType = String(item.rule?.type || "NUMBER_GREATER").toUpperCase();
         try {
           const parsed = parseA1Range(item.range, sheet.name);
-          (ws as any).addConditionalFormatting({
-            ref: `${ws.getCell(parsed.start.row, parsed.start.col).address}:${ws.getCell(parsed.end.row, parsed.end.col).address}`,
-            rules: [
-              {
-                type: "cellIs",
-                operator: op,
-                formulae: [value],
-                style: {
-                  fill: {
-                    type: "pattern",
-                    pattern: "solid",
-                    fgColor: { argb: bg },
+          const ref = `${ws.getCell(parsed.start.row, parsed.start.col).address}:${ws.getCell(parsed.end.row, parsed.end.col).address}`;
+
+          if (ruleType === "DATA_BARS") {
+            (ws as any).addConditionalFormatting({
+              ref,
+              rules: [
+                {
+                  type: "dataBar",
+                  minLength: 0,
+                  maxLength: 100,
+                  gradient: true,
+                  border: false,
+                  negativeBarColorSameAsPositive: false,
+                  axisPosition: "auto",
+                },
+              ],
+            });
+          } else if (ruleType === "COLOR_SCALE") {
+            (ws as any).addConditionalFormatting({
+              ref,
+              rules: [
+                {
+                  type: "colorScale",
+                  cfvo: [
+                    { type: "min" },
+                    ...(item.rule?.midColor ? [{ type: "percentile", value: 50 }] : []),
+                    { type: "max" },
+                  ],
+                  color: [
+                    { argb: toArgb(item.rule?.minColor) || "FFFF0000" },
+                    ...(item.rule?.midColor ? [{ argb: toArgb(item.rule.midColor) || "FFFFFF00" }] : []),
+                    { argb: toArgb(item.rule?.maxColor) || "FF00FF00" },
+                  ],
+                },
+              ],
+            });
+          } else if (ruleType === "TOP_N") {
+            const bg = toArgb(item.rule?.backgroundHex) || "FFFFC000";
+            (ws as any).addConditionalFormatting({
+              ref,
+              rules: [
+                {
+                  type: "top10",
+                  rank: Number(item.rule?.n ?? 10),
+                  percent: Boolean(item.rule?.percent),
+                  style: {
+                    fill: {
+                      type: "pattern",
+                      pattern: "solid",
+                      fgColor: { argb: bg },
+                    },
                   },
                 },
-              },
-            ],
-          });
+              ],
+            });
+          } else {
+            const op = ruleType === "NUMBER_LESS" ? "lessThan" : "greaterThan";
+            const bg = toArgb(item.rule?.backgroundHex) || "FFFEF3C7";
+            const value = String(item.rule?.value ?? 0);
+            (ws as any).addConditionalFormatting({
+              ref,
+              rules: [
+                {
+                  type: "cellIs",
+                  operator: op,
+                  formulae: [value],
+                  style: {
+                    fill: {
+                      type: "pattern",
+                      pattern: "solid",
+                      fgColor: { argb: bg },
+                    },
+                  },
+                },
+              ],
+            });
+          }
         } catch {
           // ignore invalid conditional range
         }
