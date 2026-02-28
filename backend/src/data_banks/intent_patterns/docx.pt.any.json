@@ -1,10 +1,10 @@
 {
   "_meta": {
     "id": "intent_patterns_docx_pt",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "description": "Portuguese (pt-BR) intent patterns for DOCX editing operations.",
     "domain": "docx",
-    "lastUpdated": "2026-02-12",
+    "lastUpdated": "2026-02-27",
     "languages": [
       "pt"
     ]
@@ -17,7 +17,7 @@
       "id": "docx.rewrite.paragraph",
       "domain": "docx",
       "lang": "pt",
-      "priority": 80,
+      "priority": 75,
       "triggers": {
         "tokens_any": [
           "reescreva",
@@ -28,20 +28,32 @@
           "melhorar"
         ],
         "tokens_none": [
-          "marcadores",
-          "numeração",
-          "lista numerada",
-          "lista de marcadores",
-          "mescle",
-          "divida",
-          "combine",
-          "cabeçalho",
-          "negrito",
-          "itálico",
-          "sublinhado",
           "alinhe",
+          "cabeçalho",
+          "combine",
+          "converter",
+          "cor",
+          "divida",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "lista de marcadores",
+          "lista numerada",
+          "marcadores",
+          "mesclar",
+          "mescle",
+          "negrito",
+          "numeração",
           "recuo",
-          "traduza"
+          "remover",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "traduza",
+          "transformar",
+          "tópicos"
         ],
         "regex_any": [
           "\\b(?:reescreva|reformule|melhore|reescrever|reformular|melhorar)\\b.{0,30}\\b(?:o|este|esse|a|esta|essa)?\\s*(?:par[aá]grafo|texto|trecho)\\b",
@@ -79,13 +91,24 @@
           "Exclua o parágrafo",
           "Adicione um parágrafo"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
       "id": "docx.rewrite.formal",
       "domain": "docx",
       "lang": "pt",
-      "priority": 82,
+      "priority": 80,
       "triggers": {
         "tokens_any": [
           "formal",
@@ -95,6 +118,25 @@
           "\\b(?:deixe|torne|fa[cç]a)\\b.{0,20}\\b(?:mais\\s+)?(?:formal|profissional)\\b",
           "\\b(?:tom|linguagem)\\b.{0,20}\\b(?:formal|profissional)\\b",
           "\\b(?:formalizar|profissionalizar)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -129,13 +171,24 @@
           "Resuma o texto",
           "Traduza"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
       "id": "docx.rewrite.concise",
       "domain": "docx",
       "lang": "pt",
-      "priority": 82,
+      "priority": 80,
       "triggers": {
         "tokens_any": [
           "resuma",
@@ -148,6 +201,25 @@
           "\\b(?:resuma|resumir|encurte|encurtar)\\b.{0,30}\\b(?:o|este|esse|a|esta|essa)?\\s*(?:par[aá]grafo|texto|trecho|se[cç][aã]o)\\b",
           "\\b(?:deixe|torne|fa[cç]a)\\b.{0,20}\\b(?:mais\\s+)?(?:conciso|curto|breve|sucinto)\\b",
           "\\b(?:diminua|reduza)\\b.{0,20}\\b(?:o\\s+)?(?:texto|tamanho)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -182,13 +254,24 @@
           "Elabore mais",
           "Adicione detalhes"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
       "id": "docx.rewrite.expand",
       "domain": "docx",
       "lang": "pt",
-      "priority": 82,
+      "priority": 80,
       "triggers": {
         "tokens_any": [
           "expanda",
@@ -202,6 +285,25 @@
           "\\b(?:expanda|expandir|elabore|elaborar|detalhe|detalhar)\\b.{0,30}\\b(?:o|este|esse|a|esta|essa)?\\s*(?:par[aá]grafo|texto|trecho|se[cç][aã]o)\\b",
           "\\b(?:adicione|acrescente)\\b.{0,20}\\b(?:mais\\s+)?(?:detalhes|informa[cç][oõ]es|conte[uú]do)\\b",
           "\\b(?:deixe|torne|fa[cç]a)\\b.{0,20}\\b(?:mais\\s+)?(?:detalhado|completo|longo)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -236,13 +338,24 @@
           "Encurte",
           "Deixe mais conciso"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
       "id": "docx.replace.span",
       "domain": "docx",
       "lang": "pt",
-      "priority": 85,
+      "priority": 82,
       "triggers": {
         "tokens_any": [
           "substitua",
@@ -254,6 +367,17 @@
           "\\b(?:substitua|troque|substituir|trocar)\\b.{0,30}\\b(?:o|a|este|esta|esse|essa)?\\s*(?:trecho|parte|palavra|frase|sele[cç][aã]o)\\b",
           "\\b(?:mude|mudar|altere|alterar)\\b.{0,20}\\b(?:isto|isso|esta\\s+parte)\\b.{0,20}\\bpara\\b",
           "\\b(?:troque|trocar)\\b.{0,20}\\bpor\\b"
+        ],
+        "tokens_none": [
+          "localizar",
+          "marcadores",
+          "melhore",
+          "numeração",
+          "reescreva",
+          "reformule",
+          "resuma",
+          "todo o documento",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -262,8 +386,12 @@
           "out": "target"
         },
         {
+          "type": "LOCATOR_TEXT",
+          "out": "findText"
+        },
+        {
           "type": "NUMBER_OR_TEXT",
-          "out": "afterText"
+          "out": "replaceText"
         }
       ],
       "scopeRules": {
@@ -275,14 +403,13 @@
         {
           "op": "DOCX_REPLACE_SPAN",
           "targetId": "$target",
-          "start": "$start",
-          "end": "$end",
-          "afterText": "$afterText"
+          "findText": "$findText",
+          "afterText": "$replaceText"
         }
       ],
       "clarifyIfMissing": [
         {
-          "slot": "afterText",
+          "slot": "replaceText",
           "ask_en": "What should I replace it with?",
           "ask_pt": "Com o que devo substituir?"
         }
@@ -313,6 +440,25 @@
         "regex_any": [
           "\\b(?:reescreva|reformule|melhore|reescrever|reformular|melhorar)\\b.{0,30}\\b(?:a|esta|essa)?\\s*se[cç][aã]o\\b",
           "\\b(?:refazer|reescrever)\\b.{0,20}\\b(?:a|esta|essa)?\\s*se[cç][aã]o\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -322,7 +468,7 @@
         }
       ],
       "scopeRules": {
-        "defaultScope": "selection",
+        "defaultScope": "section",
         "allowScopeOverrideByExplicitRange": false,
         "allowNoSelectionIfRangeProvided": false
       },
@@ -344,13 +490,24 @@
           "Reescreva o parágrafo",
           "Exclua a seção"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
       "id": "docx.find_replace",
       "domain": "docx",
       "lang": "pt",
-      "priority": 84,
+      "priority": 85,
       "triggers": {
         "tokens_any": [
           "localizar",
@@ -363,6 +520,33 @@
           "\\b(?:localizar\\s+e\\s+substituir|localizar e trocar)\\b",
           "\\b(?:substitua|substituir|trocar|troque)\\s+(?:todas?|todos?)\\b",
           "\\b(?:substitua|troque)\\b.{0,30}\\bpor\\b.{0,30}\\b(?:em\\s+todo|no\\s+documento)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -416,11 +600,38 @@
       "id": "docx.find_replace.case_sensitive",
       "domain": "docx",
       "lang": "pt",
-      "priority": 86,
+      "priority": 88,
       "triggers": {
         "regex_any": [
           "\\b(?:substituir|substitua|trocar|troque)\\b.{0,40}\\b(?:respeitando|mantendo|preservando)\\b.{0,20}\\b(?:mai[uú]sculas|caixa|capitaliza[cç][aã]o)\\b",
           "\\b(?:localizar\\s+e\\s+substituir)\\b.{0,30}\\b(?:case\\s*sensitive|sens[ií]vel\\s+a\\s+mai[uú]sculas)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -484,12 +695,39 @@
         "regex_any": [
           "\\b(?:traduza|traduzir)\\b.{0,30}\\b(?:est[ea]|ess[ea])?\\s*(?:se[cç][aã]o|par[aá]grafo|trecho|parte|texto)\\b",
           "\\b(?:traduza|traduzir)\\b.{0,30}\\bpara\\b.{0,20}\\b(?:ingl[eê]s|portugu[eê]s|espanhol|franc[eê]s|alem[aã]o|italiano)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         },
         {
           "type": "LANGUAGE",
@@ -504,7 +742,9 @@
       "planTemplate": [
         {
           "op": "DOCX_TRANSLATE_SCOPE",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "targetLanguage": "$targetLanguage"
         }
       ],
@@ -525,18 +765,56 @@
           "Traduza o documento inteiro",
           "Reescreva em tom formal"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
       "id": "docx.translate.document",
       "domain": "docx",
       "lang": "pt",
-      "priority": 82,
+      "priority": 85,
       "triggers": {
         "regex_any": [
           "\\b(?:traduza|traduzir)\\b.{0,20}\\b(?:o\\s+)?documento\\s+(?:inteiro|todo|completo)\\b",
           "\\b(?:traduza|traduzir)\\b.{0,20}\\btudo\\b.{0,20}\\bpara\\b",
           "\\b(?:tradu[cç][aã]o)\\b.{0,20}\\b(?:completa|total|inteira)\\b.{0,20}\\bdo\\s+documento\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -591,24 +869,49 @@
         "regex_any": [
           "\\b(?:coloque|colocar|deixe|deixar|fa[cç]a|fazer|aplique|aplicar)\\b.{0,20}\\b(?:em\\s+)?negrito\\b",
           "\\bnegrito\\b.{0,20}\\b(?:isto|isso|este|esta|sele[cç][aã]o)\\b",
-          "\\b(?:colocar|deixar)\\b.{0,30}\\bem\\s+negrito\\b"
+          "\\b(?:colocar|deixar)\\b.{0,30}\\bem\\s+negrito\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b.{0,20}\\bnegrito\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         }
       ],
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_SET_RUN_STYLE",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "style": {
             "bold": true
           }
@@ -640,24 +943,49 @@
         ],
         "regex_any": [
           "\\b(?:coloque|colocar|deixe|deixar|fa[cç]a|fazer|aplique|aplicar)\\b.{0,20}\\b(?:em\\s+)?it[aá]lico\\b",
-          "\\bit[aá]lico\\b.{0,20}\\b(?:isto|isso|este|esta|sele[cç][aã]o)\\b"
+          "\\bit[aá]lico\\b.{0,20}\\b(?:isto|isso|este|esta|sele[cç][aã]o)\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b.{0,20}\\bit[aá]lico\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         }
       ],
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_SET_RUN_STYLE",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "style": {
             "italic": true
           }
@@ -689,24 +1017,49 @@
         ],
         "regex_any": [
           "\\b(?:coloque|colocar|deixe|deixar|fa[cç]a|fazer|aplique|aplicar)\\b.{0,20}\\b(?:em\\s+)?sublinhado\\b",
-          "\\b(?:sublinhe|sublinhar)\\b.{0,20}\\b(?:isto|isso|este|esta|o\\s+texto|a\\s+sele[cç][aã]o)\\b"
+          "\\b(?:sublinhe|sublinhar)\\b.{0,20}\\b(?:isto|isso|este|esta|o\\s+texto|a\\s+sele[cç][aã]o)\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b.{0,20}\\bsublinhado\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         }
       ],
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_SET_RUN_STYLE",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "style": {
             "underline": true
           }
@@ -737,13 +1090,35 @@
         "regex_any": [
           "\\b(?:mude|mudar|altere|alterar|coloque|colocar|deixe|deixar)\\b.{0,20}\\b(?:a\\s+)?cor\\b",
           "\\b(?:deixe|coloque|fa[cç]a)\\b.{0,20}\\b(?:vermelho|azul|verde|preto|branco|cinza|amarelo|laranja|roxo|rosa)\\b",
-          "\\b(?:cor)\\b.{0,20}\\b(?:do\\s+texto|da\\s+fonte)\\b.{0,20}\\bpara\\b"
+          "\\b(?:cor)\\b.{0,20}\\b(?:do\\s+texto|da\\s+fonte)\\b.{0,20}\\bpara\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b.{0,20}\\bcor\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         },
         {
           "type": "COLOR",
@@ -754,12 +1129,15 @@
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_SET_RUN_STYLE",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "style": {
             "color": "$color"
           }
@@ -797,13 +1175,35 @@
         "regex_any": [
           "\\b(?:mude|mudar|altere|alterar|troque|trocar)\\b.{0,20}\\b(?:a\\s+)?fonte\\b.{0,20}\\bpara\\b",
           "\\bfonte\\b.{0,20}\\b(?:Arial|Calibri|Times|Helvetica|Verdana|Georgia|Garamond|Cambria|Comic)\\b",
-          "\\b(?:usar|use|aplique)\\b.{0,20}\\b(?:a\\s+)?fonte\\b"
+          "\\b(?:usar|use|aplique)\\b.{0,20}\\b(?:a\\s+)?fonte\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b.{0,20}\\bfonte\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         },
         {
           "type": "FONT_FAMILY",
@@ -814,12 +1214,15 @@
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_SET_RUN_STYLE",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "style": {
             "fontFamily": "$fontFamily"
           }
@@ -857,13 +1260,35 @@
         "regex_any": [
           "\\b(?:mude|mudar|altere|alterar|ajuste|ajustar|defina|definir)\\b.{0,20}\\b(?:o\\s+)?tamanho\\b.{0,20}\\b(?:da\\s+)?fonte\\b",
           "\\b(?:aumente|aumentar|diminua|diminuir)\\b.{0,20}\\b(?:o\\s+)?(?:tamanho|fonte)\\b",
-          "\\b(?:fonte)\\b.{0,20}\\b(?:tamanho|\\d+\\s*(?:pt|pts|pontos))\\b"
+          "\\b(?:fonte)\\b.{0,20}\\b(?:tamanho|\\d+\\s*(?:pt|pts|pontos))\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b.{0,20}\\btamanho\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         },
         {
           "type": "FONT_SIZE",
@@ -873,12 +1298,15 @@
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_SET_RUN_STYLE",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "style": {
             "fontSizePt": "$fontSize"
           }
@@ -909,29 +1337,54 @@
       "id": "docx.format.clear",
       "domain": "docx",
       "lang": "pt",
-      "priority": 74,
+      "priority": 78,
       "triggers": {
         "regex_any": [
           "\\b(?:limpe|limpar|remova|remover|tire|tirar)\\b.{0,20}\\b(?:a\\s+)?formata[cç][aã]o\\b",
           "\\b(?:formata[cç][aã]o)\\b.{0,20}\\b(?:padr[aã]o|limpa|original)\\b",
-          "\\b(?:resetar|redefinir)\\b.{0,20}\\b(?:a\\s+)?formata[cç][aã]o\\b"
+          "\\b(?:resetar|redefinir)\\b.{0,20}\\b(?:a\\s+)?formata[cç][aã]o\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b.{0,20}\\bformata[cç][aã]o\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         }
       ],
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_CLEAR_RUN_STYLE",
-          "targets": "$targets"
+          "targets": [
+            "$target"
+          ]
         }
       ],
       "examples": {
@@ -960,24 +1413,49 @@
         ],
         "regex_any": [
           "\\b(?:centralize|centralizar)\\b",
-          "\\b(?:alinhe|alinhar)\\b.{0,20}\\b(?:ao|no)\\s+centro\\b"
+          "\\b(?:alinhe|alinhar)\\b.{0,20}\\b(?:ao|no)\\s+centro\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b.{0,20}\\b(?:alinh|centr|justific)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         }
       ],
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_SET_ALIGNMENT",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "alignment": "center"
         }
       ],
@@ -1002,24 +1480,49 @@
       "triggers": {
         "regex_any": [
           "\\b(?:alinhe|alinhar)\\b.{0,20}\\b(?:[aà]\\s+)?esquerda\\b",
-          "\\b(?:alinhamento)\\b.{0,20}\\b(?:[aà]\\s+)?esquerda\\b"
+          "\\b(?:alinhamento)\\b.{0,20}\\b(?:[aà]\\s+)?esquerda\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b.{0,20}\\b(?:alinh|centr|justific)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         }
       ],
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_SET_ALIGNMENT",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "alignment": "left"
         }
       ],
@@ -1043,24 +1546,49 @@
       "triggers": {
         "regex_any": [
           "\\b(?:alinhe|alinhar)\\b.{0,20}\\b(?:[aà]\\s+)?direita\\b",
-          "\\b(?:alinhamento)\\b.{0,20}\\b(?:[aà]\\s+)?direita\\b"
+          "\\b(?:alinhamento)\\b.{0,20}\\b(?:[aà]\\s+)?direita\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b.{0,20}\\b(?:alinh|centr|justific)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         }
       ],
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_SET_ALIGNMENT",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "alignment": "right"
         }
       ],
@@ -1089,24 +1617,49 @@
         ],
         "regex_any": [
           "\\b(?:justifique|justificar)\\b",
-          "\\b(?:alinhamento)\\b.{0,20}\\bjustificado\\b"
+          "\\b(?:alinhamento)\\b.{0,20}\\bjustificado\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b.{0,20}\\b(?:alinh|centr|justific)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         }
       ],
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_SET_ALIGNMENT",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "alignment": "justify"
         }
       ],
@@ -1126,19 +1679,41 @@
       "id": "docx.spacing.line",
       "domain": "docx",
       "lang": "pt",
-      "priority": 73,
+      "priority": 72,
       "triggers": {
         "regex_any": [
           "\\b(?:espa[cç]amento)\\b.{0,20}\\b(?:entre|de)\\s+linhas\\b",
           "\\b(?:entrelinhas)\\b",
           "\\b(?:mude|mudar|altere|alterar|ajuste|ajustar|defina|definir)\\b.{0,20}\\b(?:o\\s+)?espa[cç]amento\\s+(?:entre\\s+)?linhas\\b",
-          "\\b(?:aumente|diminua)\\b.{0,20}\\b(?:o\\s+)?espa[cç]amento\\b.{0,15}\\b(?:entre\\s+)?linhas\\b"
+          "\\b(?:aumente|diminua)\\b.{0,20}\\b(?:o\\s+)?espa[cç]amento\\b.{0,15}\\b(?:entre\\s+)?linhas\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b.{0,20}\\bespa[cç]amento\\b.{0,15}\\blinhas\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         },
         {
           "type": "NUMBER_OR_TEXT",
@@ -1148,12 +1723,15 @@
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_SET_LINE_SPACING",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "lineSpacing": "$lineSpacing"
         }
       ],
@@ -1181,18 +1759,40 @@
       "id": "docx.spacing.paragraph",
       "domain": "docx",
       "lang": "pt",
-      "priority": 73,
+      "priority": 72,
       "triggers": {
         "regex_any": [
           "\\b(?:espa[cç]amento)\\b.{0,20}\\b(?:entre|de|do)\\s+par[aá]grafos?\\b",
           "\\b(?:espa[cç]o)\\b.{0,20}\\b(?:antes|depois|entre)\\b.{0,20}\\b(?:do\\s+)?par[aá]grafo\\b",
-          "\\b(?:aumente|diminua|ajuste|defina|mude)\\b.{0,20}\\b(?:o\\s+)?espa[cç]amento\\b.{0,15}\\bpar[aá]grafo\\b"
+          "\\b(?:aumente|diminua|ajuste|defina|mude)\\b.{0,20}\\b(?:o\\s+)?espa[cç]amento\\b.{0,15}\\bpar[aá]grafo\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b.{0,20}\\bespa[cç]amento\\b.{0,15}\\bpar[aá]grafo\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         },
         {
           "type": "NUMBER_OR_TEXT",
@@ -1208,12 +1808,15 @@
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_SET_PARAGRAPH_SPACING",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "beforePt": "$beforePt",
           "afterPt": "$afterPt"
         }
@@ -1234,7 +1837,7 @@
       "id": "docx.format.indent",
       "domain": "docx",
       "lang": "pt",
-      "priority": 73,
+      "priority": 72,
       "triggers": {
         "tokens_any": [
           "recuo",
@@ -1244,13 +1847,35 @@
         "regex_any": [
           "\\b(?:aumente|diminua|ajuste|defina|mude|adicione)\\b.{0,20}\\b(?:o\\s+)?recuo\\b",
           "\\b(?:indentar|indenta[cç][aã]o)\\b",
-          "\\b(?:recuo)\\b.{0,20}\\b(?:[aà]\\s+)?(?:esquerda|direita|primeira\\s+linha)\\b"
+          "\\b(?:recuo)\\b.{0,20}\\b(?:[aà]\\s+)?(?:esquerda|direita|primeira\\s+linha)\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b.{0,20}\\brecuo\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         },
         {
           "type": "NUMBER_OR_TEXT",
@@ -1266,12 +1891,15 @@
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_SET_INDENTATION",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "leftPt": "$leftPt",
           "firstLinePt": "$firstLinePt"
         }
@@ -1294,7 +1922,7 @@
       "id": "docx.list.bullets",
       "domain": "docx",
       "lang": "pt",
-      "priority": 77,
+      "priority": 78,
       "triggers": {
         "tokens_any": [
           "marcadores",
@@ -1304,24 +1932,44 @@
         "regex_any": [
           "\\b(?:adicione|adicionar|aplique|aplicar|coloque|colocar)\\b.{0,20}\\b(?:marcadores|t[oó]picos|bullets)\\b",
           "\\b(?:lista)\\b.{0,20}\\b(?:com\\s+)?(?:marcadores|t[oó]picos|bullets)\\b",
-          "\\b(?:transformar?|converter?|fazer?|tornar?)\\b.{0,30}\\b(?:em|para)\\b.{0,20}\\b(?:marcadores|t[oó]picos|lista\\s+com\\s+marcadores)\\b"
+          "\\b(?:transformar?|converter?|fazer?|tornar?)\\b.{0,30}\\b(?:em|para)\\b.{0,20}\\b(?:marcadores|t[oó]picos|lista\\s+com\\s+marcadores)\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b"
+        ],
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         }
       ],
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_LIST_APPLY_BULLETS",
-          "targets": "$targets"
+          "targets": [
+            "$target"
+          ]
         }
       ],
       "examples": {
@@ -1342,7 +1990,7 @@
       "id": "docx.list.numbering",
       "domain": "docx",
       "lang": "pt",
-      "priority": 77,
+      "priority": 78,
       "triggers": {
         "tokens_any": [
           "numeração",
@@ -1352,24 +2000,44 @@
         "regex_any": [
           "\\b(?:adicione|adicionar|aplique|aplicar|coloque|colocar)\\b.{0,20}\\b(?:numera[cç][aã]o|lista\\s+numerada)\\b",
           "\\b(?:lista)\\b.{0,20}\\bnumerada\\b",
-          "\\b(?:transformar?|converter?|fazer?|tornar?)\\b.{0,30}\\b(?:em|para)\\b.{0,20}\\b(?:lista\\s+numerada|numera[cç][aã]o)\\b"
+          "\\b(?:transformar?|converter?|fazer?|tornar?)\\b.{0,30}\\b(?:em|para)\\b.{0,20}\\b(?:lista\\s+numerada|numera[cç][aã]o)\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b"
+        ],
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         }
       ],
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_LIST_APPLY_NUMBERING",
-          "targets": "$targets"
+          "targets": [
+            "$target"
+          ]
         }
       ],
       "examples": {
@@ -1389,28 +2057,48 @@
       "id": "docx.list.remove",
       "domain": "docx",
       "lang": "pt",
-      "priority": 77,
+      "priority": 80,
       "triggers": {
         "regex_any": [
           "\\b(?:remova|remover|tire|tirar|apague|apagar)\\b.{0,20}\\b(?:os\\s+)?(?:marcadores|t[oó]picos|bullets|numera[cç][aã]o)\\b",
-          "\\b(?:sem\\s+marcadores|sem\\s+numera[cç][aã]o|sem\\s+t[oó]picos)\\b"
+          "\\b(?:sem\\s+marcadores|sem\\s+numera[cç][aã]o|sem\\s+t[oó]picos)\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b"
+        ],
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         }
       ],
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_LIST_REMOVE",
-          "targets": "$targets"
+          "targets": [
+            "$target"
+          ]
         }
       ],
       "examples": {
@@ -1436,28 +2124,48 @@
           "\\b(?:promova|promover)\\b.{0,20}\\b(?:o\\s+)?(?:item|t[oó]pico|n[ií]vel)\\b.{0,20}\\b(?:da\\s+)?lista\\b",
           "\\b(?:rebaixe|rebaixar)\\b.{0,20}\\b(?:o\\s+)?(?:item|t[oó]pico|n[ií]vel)\\b.{0,20}\\b(?:da\\s+)?lista\\b",
           "\\b(?:aumente|diminua)\\b.{0,20}\\b(?:o\\s+)?n[ií]vel\\b.{0,20}\\b(?:da\\s+)?lista\\b",
-          "\\b(?:subn[ií]vel|sub-n[ií]vel)\\b"
+          "\\b(?:subn[ií]vel|sub-n[ií]vel)\\b",
+          "\\b(?:todos\\s+os\\s+selecionados|sele[cç][aã]o\\s+m[uú]ltipla)\\b"
+        ],
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         },
         {
-          "type": "LOCATOR_TEXT",
+          "type": "DIRECTION",
           "out": "direction"
         }
       ],
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
           "op": "DOCX_LIST_PROMOTE_DEMOTE",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "direction": "$direction"
         }
       ],
@@ -1479,7 +2187,7 @@
       "id": "docx.list.convert_to_paragraphs",
       "domain": "docx",
       "lang": "pt",
-      "priority": 79,
+      "priority": 82,
       "triggers": {
         "regex_any": [
           "\\b(?:converta|converter|transforme|transformar)\\b.{0,30}\\b(?:os\\s+)?(?:t[oó]picos|marcadores|bullets|itens|lista)\\b.{0,20}\\b(?:em|para)\\b.{0,20}\\b(?:par[aá]grafos?|texto\\s+corrido)\\b",
@@ -1490,7 +2198,7 @@
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         }
       ],
       "scopeRules": {
@@ -1501,7 +2209,9 @@
       "planTemplate": [
         {
           "op": "DOCX_LIST_REMOVE",
-          "targets": "$targets"
+          "targets": [
+            "$target"
+          ]
         },
         {
           "op": "DOCX_MERGE_PARAGRAPHS",
@@ -1524,7 +2234,7 @@
       "id": "docx.heading.set",
       "domain": "docx",
       "lang": "pt",
-      "priority": 78,
+      "priority": 80,
       "triggers": {
         "tokens_any": [
           "título"
@@ -1534,12 +2244,20 @@
           "\\b(?:fa[cç]a|fazer|aplique|aplicar|coloque|colocar|defina|definir)\\b.{0,20}\\b(?:como\\s+)?t[ií]tulo\\b",
           "\\b(?:transforme|transformar)\\b.{0,20}\\b(?:em|para)\\s+t[ií]tulo\\b",
           "\\b(?:estilo\\s+)?(?:heading|t[ií]tulo)\\s*(?:1|2|3|4|5|6)\\b"
+        ],
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "itálico",
+          "negrito",
+          "sublinhado",
+          "tamanho"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         },
         {
           "type": "HEADING_LEVEL",
@@ -1550,13 +2268,16 @@
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": true,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
-          "op": "DOCX_SET_PARAGRAPH_STYLE",
-          "targets": "$targets",
-          "styleName": "Heading $headingLevel"
+          "op": "DOCX_SET_HEADING_LEVEL",
+          "targets": [
+            "$target"
+          ],
+          "headingLevel": "$headingLevel"
         }
       ],
       "examples": {
@@ -1571,37 +2292,59 @@
           "Remova o título",
           "Volte ao normal"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
       "id": "docx.heading.normal",
       "domain": "docx",
       "lang": "pt",
-      "priority": 78,
+      "priority": 80,
       "triggers": {
         "regex_any": [
           "\\b(?:volte|voltar)\\b.{0,20}\\b(?:ao|para\\s+o)\\s+normal\\b",
           "\\b(?:remova|remover|tire|tirar)\\b.{0,20}\\b(?:o\\s+)?t[ií]tulo\\b",
           "\\b(?:estilo)\\b.{0,20}\\bnormal\\b",
           "\\b(?:par[aá]grafo)\\b.{0,20}\\bnormal\\b"
+        ],
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "itálico",
+          "negrito",
+          "sublinhado",
+          "tamanho"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         }
       ],
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": true,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
-          "op": "DOCX_SET_PARAGRAPH_STYLE",
-          "targets": "$targets",
-          "styleName": "Normal"
+          "op": "DOCX_SET_HEADING_LEVEL",
+          "targets": [
+            "$target"
+          ],
+          "headingLevel": 0
         }
       ],
       "examples": {
@@ -1616,18 +2359,45 @@
           "Faça um título",
           "Aplique título 1"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
       "id": "docx.insert.after",
       "domain": "docx",
       "lang": "pt",
-      "priority": 76,
+      "priority": 74,
       "triggers": {
         "regex_any": [
           "\\b(?:insira|inserir|adicione|adicionar)\\b.{0,30}\\b(?:um\\s+)?par[aá]grafo\\b.{0,20}\\b(?:depois|ap[oó]s|abaixo)\\b",
           "\\b(?:adicione|adicionar)\\b.{0,20}\\b(?:texto|par[aá]grafo)\\b.{0,20}\\b(?:depois|ap[oó]s|abaixo)\\b",
           "\\b(?:novo\\s+par[aá]grafo)\\b.{0,20}\\b(?:depois|ap[oó]s|abaixo)\\b"
+        ],
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
         ]
       },
       "slotExtractors": [
@@ -1670,18 +2440,45 @@
           "Insira parágrafo antes",
           "Exclua o parágrafo"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
       "id": "docx.insert.before",
       "domain": "docx",
       "lang": "pt",
-      "priority": 76,
+      "priority": 74,
       "triggers": {
         "regex_any": [
           "\\b(?:insira|inserir|adicione|adicionar)\\b.{0,30}\\b(?:um\\s+)?par[aá]grafo\\b.{0,20}\\b(?:antes|acima)\\b",
           "\\b(?:adicione|adicionar)\\b.{0,20}\\b(?:texto|par[aá]grafo)\\b.{0,20}\\b(?:antes|acima)\\b",
           "\\b(?:novo\\s+par[aá]grafo)\\b.{0,20}\\b(?:antes|acima)\\b"
+        ],
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
         ]
       },
       "slotExtractors": [
@@ -1724,6 +2521,17 @@
           "Insira parágrafo depois",
           "Exclua o parágrafo"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
@@ -1735,6 +2543,22 @@
         "regex_any": [
           "\\b(?:exclua|excluir|apague|apagar|delete|deletar|remova|remover)\\b.{0,20}\\b(?:o|este|esse|a|esta|essa)?\\s*par[aá]grafo\\b",
           "\\b(?:elimine|eliminar)\\b.{0,20}\\b(?:o|este|esse)?\\s*par[aá]grafo\\b"
+        ],
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
         ]
       },
       "slotExtractors": [
@@ -1765,13 +2589,24 @@
           "Reescreva o parágrafo",
           "Insira um parágrafo"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
       "id": "docx.merge.paragraphs",
       "domain": "docx",
       "lang": "pt",
-      "priority": 76,
+      "priority": 74,
       "triggers": {
         "tokens_any": [
           "mescle",
@@ -1784,12 +2619,28 @@
         "regex_any": [
           "\\b(?:mescle|mesclar|junte|juntar|una|unir)\\b.{0,20}\\b(?:os\\s+)?par[aá]grafos\\b",
           "\\b(?:combinar|combine)\\b.{0,20}\\b(?:os\\s+)?par[aá]grafos\\b"
+        ],
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targetIds"
+          "out": "target"
         }
       ],
       "scopeRules": {
@@ -1800,7 +2651,9 @@
       "planTemplate": [
         {
           "op": "DOCX_MERGE_PARAGRAPHS",
-          "targetIds": "$targetIds"
+          "targetIds": [
+            "$target"
+          ]
         }
       ],
       "examples": {
@@ -1814,13 +2667,24 @@
           "Divida o parágrafo",
           "Exclua o parágrafo"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
       "id": "docx.split.paragraph",
       "domain": "docx",
       "lang": "pt",
-      "priority": 76,
+      "priority": 74,
       "triggers": {
         "tokens_any": [
           "divida",
@@ -1831,6 +2695,22 @@
         "regex_any": [
           "\\b(?:divida|dividir|separe|separar)\\b.{0,20}\\b(?:o|este|esse)?\\s*par[aá]grafo\\b",
           "\\b(?:quebrar?|quebre)\\b.{0,20}\\b(?:o|este|esse)?\\s*par[aá]grafo\\b"
+        ],
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
         ]
       },
       "slotExtractors": [
@@ -1865,13 +2745,24 @@
           "Mescle os parágrafos",
           "Exclua o parágrafo"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
       "id": "docx.style.set",
       "domain": "docx",
       "lang": "pt",
-      "priority": 74,
+      "priority": 70,
       "triggers": {
         "tokens_any": [
           "estilo"
@@ -1880,12 +2771,39 @@
           "\\b(?:aplique|aplicar|defina|definir|use|usar)\\b.{0,20}\\b(?:o\\s+)?estilo\\b",
           "\\b(?:estilo)\\b.{0,20}\\b(?:para|de|do)\\b",
           "\\b(?:mude|mudar|altere|alterar|troque|trocar)\\b.{0,20}\\b(?:o\\s+)?estilo\\b.{0,20}\\bpara\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         },
         {
           "type": "STYLE_NAME",
@@ -1900,7 +2818,9 @@
       "planTemplate": [
         {
           "op": "DOCX_SET_PARAGRAPH_STYLE",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "styleName": "$styleName"
         }
       ],
@@ -1928,18 +2848,45 @@
       "id": "docx.enrich.sources",
       "domain": "docx",
       "lang": "pt",
-      "priority": 80,
+      "priority": 68,
       "triggers": {
         "regex_any": [
           "\\b(?:use|usar|usando)\\b.{0,30}\\b(?:o\\s+)?(?:documento|arquivo|fonte)\\b.{0,30}\\b(?:para\\s+)?(?:melhorar|enriquecer|complementar)\\b",
           "\\b(?:melhorar?|enriquecer?|complementar?)\\b.{0,20}\\b(?:com\\s+)?(?:base\\s+n[oa]|informa[cç][oõ]es\\s+d[oa])\\b.{0,20}\\b(?:documento|arquivo)\\b",
           "\\b(?:incorporar?|incluir?)\\b.{0,20}\\b(?:dados|informa[cç][oõ]es)\\b.{0,20}\\b(?:d[oa]\\s+)?(?:documento|arquivo|fonte)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         },
         {
           "type": "LOCATOR_TEXT",
@@ -1954,7 +2901,9 @@
       "planTemplate": [
         {
           "op": "DOCX_ENRICH_FROM_SOURCES",
-          "targets": "$targets",
+          "targets": [
+            "$target"
+          ],
           "sources": "$sources"
         }
       ],
@@ -1980,6 +2929,33 @@
           "\\b(?:corrija|corrigir|conserte|consertar|arrume|arrumar|repare|reparar)\\b.{0,20}\\b(?:a\\s+)?numera[cç][aã]o\\b",
           "\\b(?:numera[cç][aã]o)\\b.{0,20}\\b(?:errada|incorreta|quebrada|bagun[cç]ada)\\b",
           "\\b(?:renumerar|renumere)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -2022,6 +2998,25 @@
         "regex_any": [
           "\\b(?:deixe|torne|fa[cç]a)\\b.{0,20}\\b(?:mais\\s+)?(?:informal|casual|descontra[ií]do|coloquial)\\b",
           "\\b(?:tom|linguagem)\\b.{0,20}\\b(?:informal|casual|coloquial)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -2054,17 +3049,47 @@
           "Deixe mais formal",
           "Resuma o texto"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
       "id": "docx.rewrite.friendly",
       "domain": "docx",
       "lang": "pt",
-      "priority": 81,
+      "priority": 79,
       "triggers": {
         "regex_any": [
           "\\b(?:deixe|torne|fa[cç]a)\\b.{0,20}\\b(?:mais\\s+)?(?:amig[aá]vel|acess[ií]vel|simp[aá]tico|acolhedor)\\b",
           "\\b(?:tom|linguagem)\\b.{0,20}\\b(?:amig[aá]vel|acess[ií]vel|acolhedor)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -2096,23 +3121,50 @@
           "Deixe mais formal",
           "Deixe mais conciso"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
       "id": "docx.list.restart_numbering",
       "domain": "docx",
       "lang": "pt",
-      "priority": 74,
+      "priority": 76,
       "triggers": {
         "regex_any": [
           "\\b(?:reinicie|reiniciar|recome[cç]e|recome[cç]ar)\\b.{0,20}\\b(?:a\\s+)?numera[cç][aã]o\\b",
           "\\b(?:numera[cç][aã]o)\\b.{0,20}\\b(?:a\\s+partir\\s+de|come[cç]ando\\s+de|recome[cç]ar)\\b.{0,10}\\b1\\b"
+        ],
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "targets"
+          "out": "target"
         }
       ],
       "scopeRules": {
@@ -2123,7 +3175,9 @@
       "planTemplate": [
         {
           "op": "DOCX_LIST_RESTART_NUMBERING",
-          "targets": "$targets"
+          "targets": [
+            "$target"
+          ]
         }
       ],
       "examples": {
@@ -2154,6 +3208,25 @@
           "\\b(?:corrija|corrigir)\\b.{0,20}\\b(?:a\\s+)?(?:gram[aá]tica|ortografia|erros)\\b",
           "\\b(?:revis[aã]o\\s+gramatical|revis[aã]o\\s+ortogr[aá]fica)\\b",
           "\\b(?:corrija|corrigir)\\b.{0,20}\\b(?:os\\s+)?erros\\b.{0,20}\\b(?:d[eo]\\s+)?(?:portugu[eê]s|texto)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -2186,6 +3259,17 @@
           "Reescreva o parágrafo",
           "Melhore o texto"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
@@ -2198,6 +3282,25 @@
           "\\b(?:torne|reescreva|reformule)\\b.*\\b(?:casual|descontraído|coloquial|leve)\\b",
           "\\bmais\\s+(?:casual|descontraído|coloquial|leve)\\b",
           "\\bsuavize\\s+o\\s+tom\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -2229,6 +3332,17 @@
           "Torne mais formal",
           "Resuma o texto"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
@@ -2240,6 +3354,27 @@
         "regex_any": [
           "\\b(?:remover|tirar|desativar|limpar)\\b.*\\bnegrito\\b",
           "\\bnegrito\\b.*\\b(?:remover|tirar|desativar|off)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -2251,7 +3386,8 @@
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
@@ -2285,6 +3421,27 @@
         "regex_any": [
           "\\b(?:remover|tirar|desativar|limpar)\\b.*\\bitálico\\b",
           "\\bitálico\\b.*\\b(?:remover|tirar|desativar|off)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -2296,7 +3453,8 @@
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
@@ -2330,6 +3488,27 @@
         "regex_any": [
           "\\b(?:remover|tirar|desativar|limpar)\\b.*\\bsublinhado\\b",
           "\\bsublinhado\\b.*\\b(?:remover|tirar|desativar|off)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -2341,7 +3520,8 @@
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
@@ -2375,6 +3555,25 @@
         "regex_any": [
           "\\b(?:reescreva|reformule)\\b.*\\b(?:de\\s+forma\\s+que|para\\s+que|de\\s+modo\\s+que|fazendo\\s+com\\s+que)\\b",
           "\\b(?:torne|mude|altere)\\b.*\\b(?:este|o|a)\\b.*\\b(?:de\\s+forma|para\\s+que|mais\\s+parecido)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -2410,6 +3609,17 @@
           "Reescreva este parágrafo",
           "Torne mais formal"
         ]
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
       }
     },
     {
@@ -2422,6 +3632,27 @@
           "\\b(?:iniciais|primeira\\s+letra)\\b.{0,20}\\b(?:mai[uú]sculas?|capitalizar)\\b",
           "\\bcapitalizar\\s+cada\\s+palavra\\b",
           "\\b(?:colocar|deixar|converter|transformar)\\b.{0,30}\\b(?:iniciais\\s+mai[uú]sculas|primeira\\s+letra\\s+mai[uú]scula)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -2433,7 +3664,8 @@
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
@@ -2469,6 +3701,27 @@
         "regex_any": [
           "\\b(?:colocar|deixar|converter|transformar|mudar|alterar)\\b.{0,30}\\b(?:mai[uú]sculas?|caixa\\s+alta)\\b",
           "\\btudo\\s+em\\s+mai[uú]sculas?\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -2480,7 +3733,8 @@
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
@@ -2517,6 +3771,27 @@
         "regex_any": [
           "\\b(?:colocar|deixar|converter|transformar|mudar|alterar)\\b.{0,30}\\b(?:min[uú]sculas?|caixa\\s+baixa)\\b",
           "\\btudo\\s+em\\s+min[uú]sculas?\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -2528,7 +3803,8 @@
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
@@ -2561,6 +3837,27 @@
           "\\bcaixa\\s+de\\s+frase\\b",
           "\\b(?:colocar|deixar|converter)\\b.{0,30}\\bcaixa\\s+de\\s+frase\\b",
           "\\bmai[uú]scula\\s+s[oó]\\s+no\\s+in[ií]cio\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sumário",
+          "transformar",
+          "tópicos"
         ]
       },
       "slotExtractors": [
@@ -2572,7 +3869,8 @@
       "scopeRules": {
         "defaultScope": "selection",
         "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
       },
       "planTemplate": [
         {
@@ -2604,6 +3902,10 @@
           "\\b(?:resumir|resuma|sintetizar|sintetize)\\b.{0,20}\\b(?:em|como|para)\\b.{0,10}\\b(?:t[oó]picos|bullets?|marcadores?)\\b",
           "\\b(?:extrair|extraia)\\b.{0,20}\\b(?:pontos|ideias)\\s+(?:chave|principais)\\b",
           "\\b(?:separar|separe|dividir|divida)\\b.{0,20}\\b(?:pontos|ideias)\\s+(?:chave|principais)\\b.{0,15}\\b(?:em)?\\s*(?:t[oó]picos|bullets?)\\b"
+        ],
+        "tokens_none": [
+          "converter",
+          "transformar"
         ]
       },
       "slotExtractors": [
@@ -2637,6 +3939,594 @@
           "Converta em tópicos",
           "Adicione marcadores",
           "Resuma esta seção em um parágrafo"
+        ]
+      }
+    },
+    {
+      "id": "docx.list.paragraph_to_bullets",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 84,
+      "triggers": {
+        "tokens_any": [
+          "marcadores",
+          "tópicos",
+          "bullets"
+        ],
+        "tokens_all": [
+          "converter",
+          "transformar",
+          "para"
+        ],
+        "tokens_none": [
+          "cor",
+          "excluir",
+          "fonte",
+          "itálico",
+          "limpar",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "numerada",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "remover",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
+        ],
+        "regex_any": [
+          "\\b(?:converter?|transformar?)\\b.*\\b(?:em|para)\\b.*\\b(?:marcadores|tópicos|bullets?)\\b",
+          "\\b(?:criar|adicionar)\\b.*\\b(?:lista\\s+de\\s+)?(?:marcadores|tópicos)\\b.*\\b(?:com|usando|a\\s+partir)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        },
+        {
+          "type": "SCOPE",
+          "out": "scope"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_LIST_APPLY_BULLETS",
+          "targets": [
+            "$target"
+          ]
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Converter este parágrafo em marcadores",
+          "Transformar em lista de tópicos",
+          "Criar marcadores com este texto"
+        ],
+        "negative": [
+          "Remover marcadores",
+          "Converter marcadores em parágrafo",
+          "Adicionar numeração"
+        ]
+      }
+    },
+    {
+      "id": "docx.list.bullets_to_paragraph",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 84,
+      "triggers": {
+        "tokens_none": [
+          "adicionar",
+          "aplicar",
+          "cor",
+          "criar",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
+        ],
+        "regex_any": [
+          "\\b(?:converter?|transformar?)\\b.*\\b(?:marcadores|tópicos|bullets?)\\b.*\\b(?:em|para)\\b.*\\bpar[aá]grafos?\\b",
+          "\\b(?:remover?)\\b.*\\b(?:marcadores|tópicos)\\b.*\\b(?:converter?)\\b.*\\btexto\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_LIST_REMOVE",
+          "targets": [
+            "$target"
+          ]
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Converter marcadores em parágrafos",
+          "Transformar tópicos em texto corrido",
+          "Remover marcadores e deixar como parágrafos"
+        ],
+        "negative": [
+          "Converter parágrafos em marcadores",
+          "Adicionar marcadores"
+        ]
+      }
+    },
+    {
+      "id": "docx.list.numbered_to_bullets",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 85,
+      "triggers": {
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
+        ],
+        "regex_any": [
+          "\\b(?:converter?|transformar?|trocar?)\\b.*\\b(?:numer[aç]|lista\\s+numerada)\\b.*\\b(?:em|para)\\b.*\\b(?:marcadores|tópicos|bullets?)\\b",
+          "\\b(?:mudar?)\\b.*\\b(?:de\\s+)?numer[aç].*\\b(?:para|em)\\b.*\\b(?:marcadores|tópicos)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_LIST_REMOVE",
+          "targets": [
+            "$target"
+          ]
+        },
+        {
+          "op": "DOCX_LIST_APPLY_BULLETS",
+          "targets": [
+            "$target"
+          ]
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Converter numeração em marcadores",
+          "Trocar lista numerada por tópicos",
+          "Mudar de numeração para marcadores"
+        ],
+        "negative": [
+          "Converter marcadores em numeração",
+          "Adicionar numeração"
+        ]
+      }
+    },
+    {
+      "id": "docx.list.bullets_to_numbered",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 85,
+      "triggers": {
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
+        ],
+        "regex_any": [
+          "\\b(?:converter?|transformar?|trocar?)\\b.*\\b(?:marcadores|tópicos|bullets?)\\b.*\\b(?:em|para)\\b.*\\b(?:numer[aç]|lista\\s+numerada|passos)\\b",
+          "\\b(?:mudar?)\\b.*\\b(?:de\\s+)?(?:marcadores|tópicos)\\b.*\\b(?:para|em)\\b.*\\bnumer[aç]\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false,
+        "allowMultiSelection": true
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_LIST_REMOVE",
+          "targets": [
+            "$target"
+          ]
+        },
+        {
+          "op": "DOCX_LIST_APPLY_NUMBERING",
+          "targets": [
+            "$target"
+          ]
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Converter marcadores em numeração",
+          "Trocar tópicos por lista numerada",
+          "Transformar marcadores em passos numerados"
+        ],
+        "negative": [
+          "Converter numeração em marcadores",
+          "Remover marcadores"
+        ]
+      }
+    },
+    {
+      "id": "docx.section.remove",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 80,
+      "triggers": {
+        "tokens_any": [
+          "remover",
+          "excluir",
+          "deletar",
+          "apagar"
+        ],
+        "tokens_all": [
+          "seção",
+          "secao",
+          "seção",
+          "inteira"
+        ],
+        "tokens_none": [
+          "cor",
+          "fonte",
+          "formatação",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "numeração",
+          "parágrafo",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
+        ],
+        "regex_any": [
+          "\\b(?:remov|exclu|delet|apag)[aeiou]*r?\\b.*\\b(?:esta|essa|a)\\b.*\\bse[çc][ãa]o\\b",
+          "\\b(?:remov|exclu|delet|apag)[aeiou]*r?\\b.*\\bse[çc][ãa]o\\b.*\\b(?:inteira|toda|completa)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        },
+        {
+          "type": "SCOPE",
+          "out": "scope",
+          "defaultValue": "section"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "section",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_DELETE_PARAGRAPH",
+          "targetId": "$target",
+          "scope": "$scope"
+        }
+      ],
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
+      },
+      "examples": {
+        "positive": [
+          "Remover esta seção inteira",
+          "Excluir a seção 3",
+          "Apagar toda a seção"
+        ],
+        "negative": [
+          "Remover este parágrafo",
+          "Excluir marcadores"
+        ]
+      }
+    },
+    {
+      "id": "docx.heading.style_apply",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 83,
+      "triggers": {
+        "tokens_none": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover",
+          "sublinhado",
+          "sumário",
+          "tamanho",
+          "transformar",
+          "tópicos"
+        ],
+        "regex_any": [
+          "\\b(?:aplicar?)\\b.*\\b(?:estilo\\s+de\\s+)?(?:t[ií]tulo|heading|cabe[cç]alho)\\b.*\\b(?:em|para|a)\\b.*\\b(?:todos?|todas?)\\b",
+          "\\b(?:formatar?)\\b.*\\b(?:todos?|todas?)\\b.*\\b(?:t[ií]tulos?|headings?)\\b.*\\b(?:como)\\b",
+          "\\b(?:definir?)\\b.*\\b(?:como)\\b.*\\b(?:t[ií]tulo|heading)\\s*[1-6]\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        },
+        {
+          "type": "HEADING_LEVEL",
+          "out": "headingLevel",
+          "defaultValue": 1
+        },
+        {
+          "type": "SCOPE",
+          "out": "scope",
+          "defaultValue": "all_headings"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true,
+        "allowMultiSelection": true
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_HEADING_LEVEL",
+          "targets": [
+            "$target"
+          ],
+          "headingLevel": "$headingLevel"
+        }
+      ],
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
+      },
+      "examples": {
+        "positive": [
+          "Aplicar Título 1 em todos os títulos de seção",
+          "Formatar todos os títulos como Heading 2",
+          "Definir como Título 1"
+        ],
+        "negative": [
+          "Alterar o tamanho da fonte",
+          "Remover título"
+        ]
+      }
+    },
+    {
+      "id": "docx.toc.insert",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "tokens_none": [
+          "atualizar",
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "refazer",
+          "reformular",
+          "reformule",
+          "regenerar",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
+        ],
+        "regex_any": [
+          "\\b(?:inserir?|adicionar?|criar?)\\b.*\\b(?:sum[aá]rio|[ií]ndice|tabela\\s+de\\s+conte[uú]do|TOC)\\b",
+          "\\b(?:sum[aá]rio|[ií]ndice)\\b.*\\b(?:autom[aá]tico)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_INSERT_BEFORE",
+          "targetId": "$target",
+          "afterText": "$llmGenerated",
+          "_hint": "toc_insert"
+        }
+      ],
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
+      },
+      "examples": {
+        "positive": [
+          "Inserir sumário",
+          "Adicionar índice automático",
+          "Criar tabela de conteúdo",
+          "Inserir TOC"
+        ],
+        "negative": [
+          "Remover sumário",
+          "Atualizar índice"
+        ]
+      }
+    },
+    {
+      "id": "docx.toc.update",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "tokens_none": [
+          "adicionar",
+          "cor",
+          "criar",
+          "fonte",
+          "inserir",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir",
+          "sublinhado",
+          "tamanho"
+        ],
+        "regex_any": [
+          "\\b(?:atualizar?)\\b.*\\b(?:sum[aá]rio|[ií]ndice|tabela\\s+de\\s+conte[uú]do|TOC)\\b",
+          "\\b(?:regenerar?|refazer?)\\b.*\\b(?:sum[aá]rio|[ií]ndice)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_REWRITE_SECTION",
+          "sectionId": "$target",
+          "_hint": "toc_update"
+        }
+      ],
+      "resolverHints": {
+        "naturalTargets": [
+          "este título",
+          "a introdução",
+          "seção 4",
+          "o título",
+          "a conclusão",
+          "todos os títulos"
+        ],
+        "ambiguityAction": "clarify"
+      },
+      "examples": {
+        "positive": [
+          "Atualizar sumário",
+          "Regenerar índice",
+          "Atualizar tabela de conteúdo"
+        ],
+        "negative": [
+          "Inserir sumário",
+          "Criar índice"
         ]
       }
     }
