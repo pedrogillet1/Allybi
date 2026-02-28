@@ -1,0 +1,689 @@
+{
+  "_meta": {
+    "id": "legacy_legal_lexicon_en",
+    "version": "2.0.0",
+    "description": "English legal lexicon for detection and extraction anchors.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "language": "en"
+  },
+  "domain": "legal",
+  "terms": [
+    {
+      "id": "legal_lex_en_001",
+      "canonical": "acceptance criteria",
+      "synonyms": [
+        "acceptance criteria",
+        "acceptance criteria clause",
+        "acceptance criteria provision"
+      ],
+      "display": "Acceptance Criteria"
+    },
+    {
+      "id": "legal_lex_en_002",
+      "canonical": "addendum",
+      "synonyms": [
+        "addendum",
+        "addendum clause",
+        "addendum provision"
+      ],
+      "display": "Addendum"
+    },
+    {
+      "id": "legal_lex_en_003",
+      "canonical": "affiliate",
+      "synonyms": [
+        "affiliate",
+        "affiliate clause",
+        "affiliate provision"
+      ],
+      "display": "Affiliate"
+    },
+    {
+      "id": "legal_lex_en_004",
+      "canonical": "amendment",
+      "synonyms": [
+        "amendment",
+        "amendment clause",
+        "amendment provision"
+      ],
+      "display": "Amendment"
+    },
+    {
+      "id": "legal_lex_en_005",
+      "canonical": "arbitration",
+      "synonyms": [
+        "arbitration",
+        "arbitration clause",
+        "arbitration provision"
+      ],
+      "display": "Arbitration"
+    },
+    {
+      "id": "legal_lex_en_006",
+      "canonical": "assignment",
+      "synonyms": [
+        "assignment",
+        "assignment clause",
+        "assignment provision"
+      ],
+      "display": "Assignment"
+    },
+    {
+      "id": "legal_lex_en_007",
+      "canonical": "attestation",
+      "synonyms": [
+        "attestation",
+        "attestation clause",
+        "attestation provision"
+      ],
+      "display": "Attestation"
+    },
+    {
+      "id": "legal_lex_en_008",
+      "canonical": "audit rights",
+      "synonyms": [
+        "audit rights",
+        "audit rights clause",
+        "audit rights provision"
+      ],
+      "display": "Audit Rights"
+    },
+    {
+      "id": "legal_lex_en_009",
+      "canonical": "authorized signatory",
+      "synonyms": [
+        "authorized signatory",
+        "authorized signatory clause",
+        "authorized signatory provision"
+      ],
+      "display": "Authorized Signatory"
+    },
+    {
+      "id": "legal_lex_en_010",
+      "canonical": "breach",
+      "synonyms": [
+        "breach",
+        "breach clause",
+        "breach provision"
+      ],
+      "display": "Breach"
+    },
+    {
+      "id": "legal_lex_en_011",
+      "canonical": "business associate",
+      "synonyms": [
+        "business associate",
+        "business associate clause",
+        "business associate provision"
+      ],
+      "display": "Business Associate"
+    },
+    {
+      "id": "legal_lex_en_012",
+      "canonical": "change order",
+      "synonyms": [
+        "change order",
+        "change order clause",
+        "change order provision"
+      ],
+      "display": "Change Order"
+    },
+    {
+      "id": "legal_lex_en_013",
+      "canonical": "choice of law",
+      "synonyms": [
+        "choice of law",
+        "choice of law clause",
+        "choice of law provision"
+      ],
+      "display": "Choice Of Law"
+    },
+    {
+      "id": "legal_lex_en_014",
+      "canonical": "claim",
+      "synonyms": [
+        "claim",
+        "claim clause",
+        "claim provision"
+      ],
+      "display": "Claim"
+    },
+    {
+      "id": "legal_lex_en_015",
+      "canonical": "clawback",
+      "synonyms": [
+        "clawback",
+        "clawback clause",
+        "clawback provision"
+      ],
+      "display": "Clawback"
+    },
+    {
+      "id": "legal_lex_en_016",
+      "canonical": "confidential information",
+      "synonyms": [
+        "confidential information",
+        "confidential information clause",
+        "confidential information provision"
+      ],
+      "display": "Confidential Information"
+    },
+    {
+      "id": "legal_lex_en_017",
+      "canonical": "consent",
+      "synonyms": [
+        "consent",
+        "consent clause",
+        "consent provision"
+      ],
+      "display": "Consent"
+    },
+    {
+      "id": "legal_lex_en_018",
+      "canonical": "consideration",
+      "synonyms": [
+        "consideration",
+        "consideration clause",
+        "consideration provision"
+      ],
+      "display": "Consideration"
+    },
+    {
+      "id": "legal_lex_en_019",
+      "canonical": "controller",
+      "synonyms": [
+        "controller",
+        "controller clause",
+        "controller provision"
+      ],
+      "display": "Controller"
+    },
+    {
+      "id": "legal_lex_en_020",
+      "canonical": "counterparty",
+      "synonyms": [
+        "counterparty",
+        "counterparty clause",
+        "counterparty provision"
+      ],
+      "display": "Counterparty"
+    },
+    {
+      "id": "legal_lex_en_021",
+      "canonical": "court order",
+      "synonyms": [
+        "court order",
+        "court order clause",
+        "court order provision"
+      ],
+      "display": "Court Order"
+    },
+    {
+      "id": "legal_lex_en_022",
+      "canonical": "cure period",
+      "synonyms": [
+        "cure period",
+        "cure period clause",
+        "cure period provision"
+      ],
+      "display": "Cure Period"
+    },
+    {
+      "id": "legal_lex_en_023",
+      "canonical": "damages",
+      "synonyms": [
+        "damages",
+        "damages clause",
+        "damages provision"
+      ],
+      "display": "Damages"
+    },
+    {
+      "id": "legal_lex_en_024",
+      "canonical": "data retention",
+      "synonyms": [
+        "data retention",
+        "data retention clause",
+        "data retention provision"
+      ],
+      "display": "Data Retention"
+    },
+    {
+      "id": "legal_lex_en_025",
+      "canonical": "data subject",
+      "synonyms": [
+        "data subject",
+        "data subject clause",
+        "data subject provision"
+      ],
+      "display": "Data Subject"
+    },
+    {
+      "id": "legal_lex_en_026",
+      "canonical": "defense obligation",
+      "synonyms": [
+        "defense obligation",
+        "defense obligation clause",
+        "defense obligation provision"
+      ],
+      "display": "Defense Obligation"
+    },
+    {
+      "id": "legal_lex_en_027",
+      "canonical": "defined term",
+      "synonyms": [
+        "defined term",
+        "defined term clause",
+        "defined term provision"
+      ],
+      "display": "Defined Term"
+    },
+    {
+      "id": "legal_lex_en_028",
+      "canonical": "deliverable",
+      "synonyms": [
+        "deliverable",
+        "deliverable clause",
+        "deliverable provision"
+      ],
+      "display": "Deliverable"
+    },
+    {
+      "id": "legal_lex_en_029",
+      "canonical": "dispute resolution",
+      "synonyms": [
+        "dispute resolution",
+        "dispute resolution clause",
+        "dispute resolution provision"
+      ],
+      "display": "Dispute Resolution"
+    },
+    {
+      "id": "legal_lex_en_030",
+      "canonical": "effective date",
+      "synonyms": [
+        "effective date",
+        "effective date clause",
+        "effective date provision"
+      ],
+      "display": "Effective Date"
+    },
+    {
+      "id": "legal_lex_en_031",
+      "canonical": "entire agreement",
+      "synonyms": [
+        "entire agreement",
+        "entire agreement clause",
+        "entire agreement provision"
+      ],
+      "display": "Entire Agreement"
+    },
+    {
+      "id": "legal_lex_en_032",
+      "canonical": "equitable relief",
+      "synonyms": [
+        "equitable relief",
+        "equitable relief clause",
+        "equitable relief provision"
+      ],
+      "display": "Equitable Relief"
+    },
+    {
+      "id": "legal_lex_en_033",
+      "canonical": "exhibit",
+      "synonyms": [
+        "exhibit",
+        "exhibit clause",
+        "exhibit provision"
+      ],
+      "display": "Exhibit"
+    },
+    {
+      "id": "legal_lex_en_034",
+      "canonical": "fee schedule",
+      "synonyms": [
+        "fee schedule",
+        "fee schedule clause",
+        "fee schedule provision"
+      ],
+      "display": "Fee Schedule"
+    },
+    {
+      "id": "legal_lex_en_035",
+      "canonical": "force majeure",
+      "synonyms": [
+        "force majeure",
+        "force majeure clause",
+        "force majeure provision"
+      ],
+      "display": "Force Majeure"
+    },
+    {
+      "id": "legal_lex_en_036",
+      "canonical": "governing law",
+      "synonyms": [
+        "governing law",
+        "governing law clause",
+        "governing law provision"
+      ],
+      "display": "Governing Law"
+    },
+    {
+      "id": "legal_lex_en_037",
+      "canonical": "indemnification",
+      "synonyms": [
+        "indemnification",
+        "indemnification clause",
+        "indemnification provision"
+      ],
+      "display": "Indemnification"
+    },
+    {
+      "id": "legal_lex_en_038",
+      "canonical": "injunctive relief",
+      "synonyms": [
+        "injunctive relief",
+        "injunctive relief clause",
+        "injunctive relief provision"
+      ],
+      "display": "Injunctive Relief"
+    },
+    {
+      "id": "legal_lex_en_039",
+      "canonical": "intellectual property",
+      "synonyms": [
+        "intellectual property",
+        "intellectual property clause",
+        "intellectual property provision"
+      ],
+      "display": "Intellectual Property"
+    },
+    {
+      "id": "legal_lex_en_040",
+      "canonical": "jurisdiction",
+      "synonyms": [
+        "jurisdiction",
+        "jurisdiction clause",
+        "jurisdiction provision"
+      ],
+      "display": "Jurisdiction"
+    },
+    {
+      "id": "legal_lex_en_041",
+      "canonical": "liability cap",
+      "synonyms": [
+        "liability cap",
+        "liability cap clause",
+        "liability cap provision"
+      ],
+      "display": "Liability Cap"
+    },
+    {
+      "id": "legal_lex_en_042",
+      "canonical": "license grant",
+      "synonyms": [
+        "license grant",
+        "license grant clause",
+        "license grant provision"
+      ],
+      "display": "License Grant"
+    },
+    {
+      "id": "legal_lex_en_043",
+      "canonical": "material breach",
+      "synonyms": [
+        "material breach",
+        "material breach clause",
+        "material breach provision"
+      ],
+      "display": "Material Breach"
+    },
+    {
+      "id": "legal_lex_en_044",
+      "canonical": "milestone",
+      "synonyms": [
+        "milestone",
+        "milestone clause",
+        "milestone provision"
+      ],
+      "display": "Milestone"
+    },
+    {
+      "id": "legal_lex_en_045",
+      "canonical": "notice period",
+      "synonyms": [
+        "notice period",
+        "notice period clause",
+        "notice period provision"
+      ],
+      "display": "Notice Period"
+    },
+    {
+      "id": "legal_lex_en_046",
+      "canonical": "obligation",
+      "synonyms": [
+        "obligation",
+        "obligation clause",
+        "obligation provision"
+      ],
+      "display": "Obligation"
+    },
+    {
+      "id": "legal_lex_en_047",
+      "canonical": "order form",
+      "synonyms": [
+        "order form",
+        "order form clause",
+        "order form provision"
+      ],
+      "display": "Order Form"
+    },
+    {
+      "id": "legal_lex_en_048",
+      "canonical": "party",
+      "synonyms": [
+        "party",
+        "party clause",
+        "party provision"
+      ],
+      "display": "Party"
+    },
+    {
+      "id": "legal_lex_en_049",
+      "canonical": "payment terms",
+      "synonyms": [
+        "payment terms",
+        "payment terms clause",
+        "payment terms provision"
+      ],
+      "display": "Payment Terms"
+    },
+    {
+      "id": "legal_lex_en_050",
+      "canonical": "penalty",
+      "synonyms": [
+        "penalty",
+        "penalty clause",
+        "penalty provision"
+      ],
+      "display": "Penalty"
+    },
+    {
+      "id": "legal_lex_en_051",
+      "canonical": "personal data",
+      "synonyms": [
+        "personal data",
+        "personal data clause",
+        "personal data provision"
+      ],
+      "display": "Personal Data"
+    },
+    {
+      "id": "legal_lex_en_052",
+      "canonical": "policy owner",
+      "synonyms": [
+        "policy owner",
+        "policy owner clause",
+        "policy owner provision"
+      ],
+      "display": "Policy Owner"
+    },
+    {
+      "id": "legal_lex_en_053",
+      "canonical": "processor",
+      "synonyms": [
+        "processor",
+        "processor clause",
+        "processor provision"
+      ],
+      "display": "Processor"
+    },
+    {
+      "id": "legal_lex_en_054",
+      "canonical": "prohibited use",
+      "synonyms": [
+        "prohibited use",
+        "prohibited use clause",
+        "prohibited use provision"
+      ],
+      "display": "Prohibited Use"
+    },
+    {
+      "id": "legal_lex_en_055",
+      "canonical": "representations",
+      "synonyms": [
+        "representations",
+        "representations clause",
+        "representations provision"
+      ],
+      "display": "Representations"
+    },
+    {
+      "id": "legal_lex_en_056",
+      "canonical": "reseller",
+      "synonyms": [
+        "reseller",
+        "reseller clause",
+        "reseller provision"
+      ],
+      "display": "Reseller"
+    },
+    {
+      "id": "legal_lex_en_057",
+      "canonical": "retention schedule",
+      "synonyms": [
+        "retention schedule",
+        "retention schedule clause",
+        "retention schedule provision"
+      ],
+      "display": "Retention Schedule"
+    },
+    {
+      "id": "legal_lex_en_058",
+      "canonical": "service credit",
+      "synonyms": [
+        "service credit",
+        "service credit clause",
+        "service credit provision"
+      ],
+      "display": "Service Credit"
+    },
+    {
+      "id": "legal_lex_en_059",
+      "canonical": "service level",
+      "synonyms": [
+        "service level",
+        "service level clause",
+        "service level provision"
+      ],
+      "display": "Service Level"
+    },
+    {
+      "id": "legal_lex_en_060",
+      "canonical": "settlement",
+      "synonyms": [
+        "settlement",
+        "settlement clause",
+        "settlement provision"
+      ],
+      "display": "Settlement"
+    },
+    {
+      "id": "legal_lex_en_061",
+      "canonical": "signature block",
+      "synonyms": [
+        "signature block",
+        "signature block clause",
+        "signature block provision"
+      ],
+      "display": "Signature Block"
+    },
+    {
+      "id": "legal_lex_en_062",
+      "canonical": "sow",
+      "synonyms": [
+        "sow",
+        "sow clause",
+        "sow provision"
+      ],
+      "display": "Sow"
+    },
+    {
+      "id": "legal_lex_en_063",
+      "canonical": "subprocessor",
+      "synonyms": [
+        "subprocessor",
+        "subprocessor clause",
+        "subprocessor provision"
+      ],
+      "display": "Subprocessor"
+    },
+    {
+      "id": "legal_lex_en_064",
+      "canonical": "survival",
+      "synonyms": [
+        "survival",
+        "survival clause",
+        "survival provision"
+      ],
+      "display": "Survival"
+    },
+    {
+      "id": "legal_lex_en_065",
+      "canonical": "termination",
+      "synonyms": [
+        "termination",
+        "termination clause",
+        "termination provision"
+      ],
+      "display": "Termination"
+    },
+    {
+      "id": "legal_lex_en_066",
+      "canonical": "territory",
+      "synonyms": [
+        "territory",
+        "territory clause",
+        "territory provision"
+      ],
+      "display": "Territory"
+    },
+    {
+      "id": "legal_lex_en_067",
+      "canonical": "warranty",
+      "synonyms": [
+        "warranty",
+        "warranty clause",
+        "warranty provision"
+      ],
+      "display": "Warranty"
+    }
+  ]
+}

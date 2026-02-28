@@ -72,7 +72,7 @@ describe("EvidenceValidator", () => {
     expect(scoped.scopeEnforced).toBe(true);
   });
 
-  test("keeps soft-pass provenance valid when scoped sources remain", () => {
+  test("fails when scoped sources remain but provenance refs are missing", () => {
     const validator = new EvidenceValidator();
     const result = baseResult({
       sources: [
@@ -90,9 +90,10 @@ describe("EvidenceValidator", () => {
 
     const scoped = validator.enforceScope(result, ["doc-1"]);
     expect(scoped.sources?.length).toBe(1);
-    expect(scoped.status).toBe("success");
-    expect(scoped.provenance?.validated).toBe(true);
-    expect(scoped.provenance?.failureCode).toBeNull();
+    expect(scoped.status).toBe("partial");
+    expect(scoped.failureCode).toBe("missing_provenance");
+    expect(scoped.provenance?.validated).toBe(false);
+    expect(scoped.provenance?.failureCode).toBe("out_of_scope_provenance");
   });
 
   test("returns input unchanged when no allowed scope is provided", () => {

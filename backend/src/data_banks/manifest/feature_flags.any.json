@@ -112,6 +112,71 @@
       "riskLevel": "high"
     },
     {
+      "id": "ff.strict_provenance_v2",
+      "description": "Enable strict provenance v2 enforcement (per-ref thresholds, mode thresholds, no seeded provenance refs).",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": ["provenance", "response_contract_enforcer"],
+      "riskLevel": "high"
+    },
+    {
+      "id": "ff.quality_gates_enforcing",
+      "description": "Allow configured blocking quality gate failures to fail-close answer finalization.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": ["quality_gates", "answer_finalization"],
+      "riskLevel": "high"
+    },
+    {
+      "id": "ff.language_contract_v2",
+      "description": "Enable language contract v2 heuristic detection + fail-closed fallback replacement on confident mismatch only.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": ["language_contract", "answer_finalization"],
+      "riskLevel": "medium"
+    },
+    {
+      "id": "ff.recent_history_order_v2",
+      "description": "Use most recent conversation turns for LLM context window (descending query + chronological restore).",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": ["conversation_memory", "chat_runtime"],
+      "riskLevel": "medium"
+    },
+    {
+      "id": "ff.prompt_mode_coverage_strict",
+      "description": "Fail compose prompt construction when strict document modes do not map to explicit task templates.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": ["prompt_registry", "answer_composition"],
+      "riskLevel": "high"
+    },
+    {
       "id": "ff.emit_gate_trace",
       "description": "Emit quality gate trace to logs for debugging; never user-visible.",
       "type": "boolean",

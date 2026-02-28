@@ -122,6 +122,8 @@ export interface ChatProvenanceSnippetRefDTO {
   locationKey: string;
   snippetHash: string;
   coverageScore: number;
+  anchorCoverage?: number;
+  semanticCoverage?: number;
 }
 
 export interface ChatProvenanceDTO {
@@ -133,6 +135,20 @@ export interface ChatProvenanceDTO {
   sourceDocumentIds: string[];
   snippetRefs: ChatProvenanceSnippetRefDTO[];
   coverageScore: number;
+  anchorCoverage?: number;
+  semanticCoverage?: number;
+  minimumCoverage?: number;
+}
+
+export interface ChatQualityGateFailure {
+  gateName: string;
+  severity: "warn" | "block";
+  reason?: string | null;
+}
+
+export interface ChatQualityGateState {
+  allPassed: boolean;
+  failed: ChatQualityGateFailure[];
 }
 
 export interface ChatResult {
@@ -177,6 +193,7 @@ export interface ChatResult {
   completion?: ChatCompletionState;
   truncation?: ChatTruncationState;
   evidence?: ChatEvidenceState;
+  qualityGates?: ChatQualityGateState;
 }
 
 export interface ChatEngine {

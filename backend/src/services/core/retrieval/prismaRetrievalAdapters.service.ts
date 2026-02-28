@@ -1,6 +1,14 @@
 import { Prisma } from "@prisma/client";
 
 import prisma from "../../../config/database";
+import { DocumentCryptoService } from "../../documents/documentCrypto.service";
+import { DocumentKeyService } from "../../documents/documentKey.service";
+import { EmbeddingsService } from "../../retrieval/embedding.service";
+import { ChunkCryptoService } from "../../retrieval/chunkCrypto.service";
+import pineconeService from "../../retrieval/pinecone.service";
+import { EncryptionService } from "../../security/encryption.service";
+import { EnvelopeService } from "../../security/envelope.service";
+import { TenantKeyService } from "../../security/tenantKey.service";
 import type {
   ChunkLocation,
   DocMeta,
@@ -25,6 +33,7 @@ type ChunkWithDocument = {
   documentId: string;
   chunkIndex: number;
   text: string | null;
+  textEncrypted?: string | null;
   page: number | null;
   document: {
     id: string;
@@ -36,6 +45,107 @@ type ChunkWithDocument = {
     updatedAt: Date;
   };
 };
+
+type EmbeddingWithDocument = {
+  id: string;
+  documentId: string;
+  chunkIndex: number;
+  content: string;
+  pageNumber: number | null;
+  document: {
+    id: string;
+    filename: string | null;
+    displayTitle: string | null;
+    encryptedFilename?: string | null;
+    mimeType: string;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+};
+
+type ChunkRow = {
+  id: string;
+  documentId: string;
+  chunkIndex: number;
+  text: string | null;
+  textEncrypted?: string | null;
+  page: number | null;
+};
+
+let embeddingsServiceSingleton: EmbeddingsService | null | undefined;
+let chunkCryptoServiceSingleton: ChunkCryptoService | null | undefined;
+
+function isRuntimeFlagEnabled(flagName: string, defaultValue: boolean): boolean {
+  const raw = String(process.env[flagName] || "")
+    .trim()
+    .toLowerCase();
+  if (!raw) return defaultValue;
+  if (["1", "true", "yes", "on"].includes(raw)) return true;
+  if (["0", "false", "no", "off"].includes(raw)) return false;
+  return defaultValue;
+}
+
+function parsePositiveNumber(value: unknown, fallback: number): number {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
+  return parsed;
+}
+
+function toSafeInt(value: unknown, fallback: number): number {
+  const parsed = parsePositiveNumber(value, fallback);
+  return Math.floor(parsed);
+}
+
+function parseNullableNumber(value: unknown): number | null {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function uniq(values: string[]): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const value of values) {
+    const normalized = String(value || "").trim();
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    out.push(normalized);
+  }
+  return out;
+}
+
+function getEmbeddingsServiceSafe(): EmbeddingsService | null {
+  if (embeddingsServiceSingleton !== undefined) return embeddingsServiceSingleton;
+  try {
+    embeddingsServiceSingleton = new EmbeddingsService();
+  } catch {
+    embeddingsServiceSingleton = null;
+  }
+  return embeddingsServiceSingleton;
+}
+
+function getChunkCryptoServiceSafe(): ChunkCryptoService | null {
+  if (chunkCryptoServiceSingleton !== undefined) return chunkCryptoServiceSingleton;
+  try {
+    const encryption = new EncryptionService();
+    const envelope = new EnvelopeService(encryption);
+    const tenantKeys = new TenantKeyService(prisma as any, encryption);
+    const docKeys = new DocumentKeyService(
+      prisma as any,
+      encryption,
+      tenantKeys,
+      envelope,
+    );
+    const docCrypto = new DocumentCryptoService(encryption);
+    chunkCryptoServiceSingleton = new ChunkCryptoService(
+      prisma as any,
+      docKeys,
+      docCrypto,
+    );
+  } catch {
+    chunkCryptoServiceSingleton = null;
+  }
+  return chunkCryptoServiceSingleton;
+}
 
 function clamp01(value: number): number {
   if (!Number.isFinite(value)) return 0;
@@ -220,6 +330,25 @@ class PrismaRetrievalUserAdapter
       chunkId?: string;
     }>
   > {
+    const pineconePrimary = isRuntimeFlagEnabled(
+      "RETRIEVAL_SEMANTIC_PINECONE_PRIMARY",
+      true,
+    );
+    const allowDbFallback = isRuntimeFlagEnabled(
+      "RETRIEVAL_SEMANTIC_DB_FALLBACK",
+      true,
+    );
+
+    if (pineconePrimary) {
+      try {
+        const semanticResults = await this.runPineconeSemanticSearch(opts);
+        if (semanticResults.length > 0) return semanticResults;
+      } catch {
+        // Fail closed to DB lexical-semantic fallback for availability.
+      }
+      if (!allowDbFallback) return [];
+    }
+
     return this.runChunkSearch({
       mode: "semantic",
       query: opts.query,
@@ -298,6 +427,13 @@ class PrismaRetrievalUserAdapter
 
     const tokens = tokenizeQuery(query);
     if (!tokens.length) return [];
+    const embeddingBackedLexical = isRuntimeFlagEnabled(
+      "RETRIEVAL_LEXICAL_FROM_EMBEDDINGS",
+      false,
+    );
+    if (embeddingBackedLexical) {
+      return this.runEmbeddingBackedChunkSearch(input, query, tokens);
+    }
 
     const where: Prisma.DocumentChunkWhereInput = {
       text: { not: null },
@@ -333,6 +469,7 @@ class PrismaRetrievalUserAdapter
         },
       },
     })) as unknown as ChunkWithDocument[];
+    const plaintextByChunkId = await this.resolveChunkTexts(rows);
 
     const scored: Array<{
       docId: string;
@@ -346,7 +483,7 @@ class PrismaRetrievalUserAdapter
     }> = [];
 
     for (const row of rows) {
-      const snippet = toSnippet(row.text);
+      const snippet = toSnippet(plaintextByChunkId.get(row.id) ?? row.text);
       if (!snippet) continue;
 
       const score = scoreChunkText(snippet, query, tokens, input.mode);
@@ -424,6 +561,8 @@ class PrismaRetrievalUserAdapter
             },
           },
         })) as unknown as ChunkWithDocument[];
+        const fallbackPlaintextByChunkId =
+          await this.resolveChunkTexts(fallbackRows);
 
         const existingKeys = new Set(scored.map((s) => s.chunkId));
         const backfillPerDoc = new Map<string, number>();
@@ -431,7 +570,9 @@ class PrismaRetrievalUserAdapter
           if (existingKeys.has(row.id)) continue;
           const count = backfillPerDoc.get(row.documentId) ?? 0;
           if (count >= perDocLimit) continue;
-          const snippet = toSnippet(row.text);
+          const snippet = toSnippet(
+            fallbackPlaintextByChunkId.get(row.id) ?? row.text,
+          );
           if (!snippet) continue;
           backfillPerDoc.set(row.documentId, count + 1);
           const label = resolveDocLabel(row.document);
@@ -462,6 +603,367 @@ class PrismaRetrievalUserAdapter
     });
 
     return scored.slice(0, Math.max(1, input.k));
+  }
+
+  private async runEmbeddingBackedChunkSearch(
+    input: { mode: SearchMode; query: string; docIds?: string[]; k: number },
+    query: string,
+    tokens: string[],
+  ): Promise<
+    Array<{
+      docId: string;
+      location: ChunkLocation;
+      snippet: string;
+      score: number;
+      locationKey?: string;
+      chunkId?: string;
+      title?: string | null;
+      filename?: string | null;
+    }>
+  > {
+    const where: Prisma.DocumentEmbeddingWhereInput = {
+      content: { not: "" },
+      document: {
+        userId: this.userId,
+        status: { in: [...READY_DOCUMENT_STATUSES] },
+      },
+      OR: tokens.map((token) => ({
+        content: { contains: token, mode: "insensitive" },
+      })),
+    };
+    if (input.docIds && input.docIds.length > 0) {
+      where.documentId = { in: input.docIds };
+    }
+
+    const rows = (await prisma.documentEmbedding.findMany({
+      where,
+      take: Math.max(input.k * 8, 80),
+      orderBy: [{ documentId: "asc" }, { chunkIndex: "asc" }, { id: "asc" }],
+      include: {
+        document: {
+          select: {
+            id: true,
+            filename: true,
+            displayTitle: true,
+            encryptedFilename: true,
+            mimeType: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
+    })) as unknown as EmbeddingWithDocument[];
+
+    const scored: Array<{
+      docId: string;
+      title: string | null;
+      filename: string | null;
+      location: ChunkLocation;
+      locationKey: string;
+      snippet: string;
+      score: number;
+      chunkId: string;
+    }> = [];
+    for (const row of rows) {
+      const snippet = toSnippet(row.content);
+      if (!snippet) continue;
+      const score = scoreChunkText(snippet, query, tokens, input.mode);
+      if (score <= 0) continue;
+      const label = resolveDocLabel(row.document);
+      scored.push({
+        docId: row.documentId,
+        title: label.title,
+        filename: label.filename,
+        location: { page: row.pageNumber ?? null } as ChunkLocation,
+        locationKey: toLocationKey(
+          row.documentId,
+          row.pageNumber ?? null,
+          row.chunkIndex,
+        ),
+        snippet,
+        score,
+        chunkId: `${row.documentId}:${row.chunkIndex}`,
+      });
+    }
+
+    scored.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      if (a.docId !== b.docId) return a.docId.localeCompare(b.docId);
+      if (a.locationKey !== b.locationKey)
+        return a.locationKey.localeCompare(b.locationKey);
+      return a.chunkId.localeCompare(b.chunkId);
+    });
+
+    return scored.slice(0, Math.max(1, input.k));
+  }
+
+  private async runPineconeSemanticSearch(opts: {
+    query: string;
+    docIds?: string[];
+    k: number;
+  }): Promise<
+    Array<{
+      docId: string;
+      location: ChunkLocation;
+      snippet: string;
+      score: number;
+      locationKey?: string;
+      chunkId?: string;
+      title?: string | null;
+      filename?: string | null;
+    }>
+  > {
+    const query = String(opts.query || "").trim();
+    if (!query) return [];
+    if (!pineconeService.isAvailable()) return [];
+
+    const embeddingsService = getEmbeddingsServiceSafe();
+    if (!embeddingsService) return [];
+
+    const requestedK = Math.max(1, toSafeInt(opts.k, 10));
+    const effectiveTopK = Math.max(requestedK * 4, 24);
+    const minSimilarity = parsePositiveNumber(
+      process.env.RETRIEVAL_SEMANTIC_PINECONE_MIN_SIMILARITY,
+      0.2,
+    );
+    const requestedDocIds = uniq(Array.isArray(opts.docIds) ? opts.docIds : []);
+
+    const queryEmbedding = (
+      await embeddingsService.generateQueryEmbedding(query)
+    ).embedding;
+
+    let hits: Array<{
+      documentId: string;
+      chunkIndex: number;
+      content: string;
+      similarity: number;
+      metadata: Record<string, any>;
+      document: {
+        id: string;
+        filename: string;
+        mimeType: string;
+        createdAt: string;
+        status: string;
+        folderId?: string;
+        folderPath?: string;
+        categoryId?: string;
+      };
+    }> = [];
+
+    if (requestedDocIds.length === 1) {
+      hits = await pineconeService.searchSimilarChunks(
+        queryEmbedding,
+        this.userId,
+        effectiveTopK,
+        minSimilarity,
+        requestedDocIds[0],
+      );
+    } else if (requestedDocIds.length > 1) {
+      const perDocTopK = Math.max(Math.ceil(effectiveTopK / requestedDocIds.length), 6);
+      const grouped = await Promise.all(
+        requestedDocIds.map((docId) =>
+          pineconeService.searchSimilarChunks(
+            queryEmbedding,
+            this.userId,
+            perDocTopK,
+            minSimilarity,
+            docId,
+          ),
+        ),
+      );
+      hits = grouped.flat();
+    } else {
+      hits = await pineconeService.searchSimilarChunks(
+        queryEmbedding,
+        this.userId,
+        effectiveTopK,
+        minSimilarity,
+      );
+    }
+
+    const filteredHits =
+      requestedDocIds.length > 0
+        ? hits.filter((hit) => requestedDocIds.includes(hit.documentId))
+        : hits;
+
+    const deduped = new Map<string, (typeof filteredHits)[number]>();
+    for (const hit of filteredHits) {
+      const key = `${hit.documentId}:${hit.chunkIndex}`;
+      const prev = deduped.get(key);
+      if (!prev || hit.similarity > prev.similarity) deduped.set(key, hit);
+    }
+    const semanticHydrated = await this.resolveSemanticFallbackChunks(
+      [...deduped.values()],
+    );
+
+    const normalized = [...deduped.values()]
+      .map((hit) => {
+        const md = (hit.metadata || {}) as Record<string, unknown>;
+        const page = parseNullableNumber(md.page ?? md.pageNumber);
+        const slide = parseNullableNumber(md.slide ?? md.slideNumber);
+        const chunkIndex = Number(hit.chunkIndex ?? md.chunkIndex ?? -1);
+        const semanticKey = `${hit.documentId}:${chunkIndex}`;
+        const hydrated = semanticHydrated.get(semanticKey);
+        const fallbackPage = hydrated?.page ?? null;
+        const locationKey =
+          String(md.locationKey || "").trim() ||
+          toLocationKey(hit.documentId, page ?? fallbackPage, chunkIndex);
+        const title = String(md.title || "").trim() || null;
+        const filename =
+          String(hit.document?.filename || md.filename || "").trim() || null;
+        const snippet = toSnippet(
+          hit.content || String(md.content || "") || hydrated?.text || "",
+        );
+
+        return {
+          docId: hit.documentId,
+          title,
+          filename,
+          location: {
+            page: page ?? fallbackPage,
+            slide,
+            sheet:
+              typeof md.sheet === "string"
+                ? String(md.sheet)
+                : typeof md.sheetName === "string"
+                  ? String(md.sheetName)
+                  : null,
+            sectionKey:
+              typeof md.sectionKey === "string" ? String(md.sectionKey) : null,
+          } as ChunkLocation,
+          snippet,
+          score: clamp01(Number(hit.similarity || 0)),
+          locationKey,
+          chunkId: hydrated?.chunkId || `${hit.documentId}:${chunkIndex}`,
+        };
+      })
+      .filter((item) => item.snippet.length > 0);
+
+    normalized.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      if (a.docId !== b.docId) return a.docId.localeCompare(b.docId);
+      const ak = String(a.locationKey || "");
+      const bk = String(b.locationKey || "");
+      if (ak !== bk) return ak.localeCompare(bk);
+      return String(a.chunkId || "").localeCompare(String(b.chunkId || ""));
+    });
+
+    return normalized.slice(0, requestedK);
+  }
+
+  private async resolveChunkTexts(rows: ChunkRow[]): Promise<Map<string, string>> {
+    const out = new Map<string, string>();
+    if (!rows.length) return out;
+
+    const toDecryptByDoc = new Map<string, string[]>();
+    for (const row of rows) {
+      const plain = String(row.text || "").trim();
+      if (plain) {
+        out.set(row.id, plain);
+        continue;
+      }
+      const encrypted = String(row.textEncrypted || "").trim();
+      if (!encrypted) continue;
+      const list = toDecryptByDoc.get(row.documentId) || [];
+      list.push(row.id);
+      toDecryptByDoc.set(row.documentId, list);
+    }
+    if (toDecryptByDoc.size === 0) return out;
+
+    const chunkCrypto = getChunkCryptoServiceSafe();
+    if (!chunkCrypto) return out;
+
+    const docs = [...toDecryptByDoc.keys()].sort((a, b) => a.localeCompare(b));
+    for (const docId of docs) {
+      const chunkIds = uniq((toDecryptByDoc.get(docId) || []).sort());
+      if (!chunkIds.length) continue;
+      try {
+        const decrypted = await chunkCrypto.decryptChunksBatch(
+          this.userId,
+          docId,
+          chunkIds,
+        );
+        for (const chunkId of chunkIds) {
+          const text = String(decrypted.get(chunkId) || "").trim();
+          if (!text) continue;
+          out.set(chunkId, text);
+        }
+      } catch {
+        // Decryption is best-effort; callers skip empty snippets.
+      }
+    }
+
+    return out;
+  }
+
+  private async resolveSemanticFallbackChunks(
+    hits: Array<{
+      documentId: string;
+      chunkIndex: number;
+      content: string;
+      metadata: Record<string, any>;
+    }>,
+  ): Promise<Map<string, { chunkId: string; text: string; page: number | null }>> {
+    const needsHydration = new Map<string, number[]>();
+    for (const hit of hits) {
+      const md = (hit.metadata || {}) as Record<string, unknown>;
+      const existing = toSnippet(hit.content || String(md.content || ""));
+      if (existing) continue;
+      const idx = Number(hit.chunkIndex ?? md.chunkIndex ?? -1);
+      if (!Number.isFinite(idx) || idx < 0) continue;
+      const arr = needsHydration.get(hit.documentId) || [];
+      arr.push(idx);
+      needsHydration.set(hit.documentId, arr);
+    }
+    if (needsHydration.size === 0) return new Map();
+
+    const ors = [...needsHydration.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([docId, chunkIndexes]) => ({
+        documentId: docId,
+        chunkIndex: { in: [...new Set(chunkIndexes)].sort((a, b) => a - b) },
+      }));
+    if (!ors.length) return new Map();
+
+    const rows = (await prisma.documentChunk.findMany({
+      where: {
+        OR: ors,
+        document: {
+          userId: this.userId,
+          status: { in: [...READY_DOCUMENT_STATUSES] },
+        },
+      },
+      select: {
+        id: true,
+        documentId: true,
+        chunkIndex: true,
+        text: true,
+        textEncrypted: true,
+        page: true,
+      },
+      orderBy: [{ documentId: "asc" }, { chunkIndex: "asc" }, { id: "asc" }],
+      take: Math.max(ors.length * 12, 120),
+    })) as unknown as ChunkRow[];
+
+    if (!rows.length) return new Map();
+    const plaintextByChunkId = await this.resolveChunkTexts(rows);
+    const out = new Map<
+      string,
+      { chunkId: string; text: string; page: number | null }
+    >();
+    for (const row of rows) {
+      const snippet = toSnippet(plaintextByChunkId.get(row.id) ?? row.text);
+      if (!snippet) continue;
+      const key = `${row.documentId}:${row.chunkIndex}`;
+      if (!out.has(key)) {
+        out.set(key, {
+          chunkId: row.id,
+          text: snippet,
+          page: row.page ?? null,
+        });
+      }
+    }
+    return out;
   }
 }
 

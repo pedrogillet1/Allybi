@@ -24,6 +24,11 @@
         "documents"
       ],
       "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "compare",
+        "evaluate",
         "advise"
       ],
       "domains": [
@@ -51,7 +56,9 @@
         "requireDomainMatch": true,
         "domains": [
           "legal"
-        ]
+        ],
+        "requireNoExplicitDocTypes": true,
+        "requireNoExplicitDocIds": true
       },
       "negativePatterns": [],
       "requireContextAny": [],
@@ -632,7 +639,15 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "disclosure",
+        "agreement",
+        "contract",
+        "clause",
+        "liability",
+        "obligation",
+        "termination"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -670,7 +685,16 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "data",
+        "processing",
+        "agreement",
+        "contract",
+        "clause",
+        "liability",
+        "obligation",
+        "termination"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -682,6 +706,10 @@
         "documents"
       ],
       "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "compare",
         "monitor"
       ],
       "domains": [
@@ -705,10 +733,21 @@
         "requireDomainMatch": true,
         "domains": [
           "legal"
-        ]
+        ],
+        "requireNoExplicitDocTypes": true,
+        "requireNoExplicitDocIds": true
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "master",
+        "service",
+        "agreement",
+        "contract",
+        "clause",
+        "liability",
+        "obligation",
+        "termination"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -746,7 +785,16 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "statement",
+        "work",
+        "agreement",
+        "contract",
+        "clause",
+        "liability",
+        "obligation",
+        "termination"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },

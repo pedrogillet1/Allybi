@@ -1,6 +1,7 @@
 import type {
   ChatCompletionState,
   ChatEvidenceState,
+  ChatQualityGateState,
   ChatResult,
   ChatResultStatus,
   ChatTruncationState,
@@ -57,6 +58,10 @@ export class ContractNormalizer {
       provided: sources.length > 0,
       sourceIds: sources.map((s) => s.documentId),
     };
+    const qualityGates: ChatQualityGateState = input.qualityGates || {
+      allPassed: true,
+      failed: [],
+    };
 
     let status = inferStatus(input);
     let failureCode = input.failureCode || null;
@@ -86,6 +91,14 @@ export class ContractNormalizer {
       // failureCode that would render as a warning badge in the UI.
     }
 
+    const hasBlockingQualityGate =
+      Array.isArray(qualityGates.failed) &&
+      qualityGates.failed.some((gate) => gate.severity === "block");
+    if (status === "success" && hasBlockingQualityGate) {
+      status = "partial";
+      failureCode = failureCode || "quality_gate_blocked";
+    }
+
     return {
       ...input,
       sources,
@@ -95,6 +108,7 @@ export class ContractNormalizer {
       completion,
       truncation: normalizedTruncation,
       evidence,
+      qualityGates,
     };
   }
 }

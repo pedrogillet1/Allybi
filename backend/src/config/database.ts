@@ -15,9 +15,16 @@ if (process.env.NODE_ENV !== "production") {
   console.log(`[Database] Prisma connecting to: ${host}`);
 }
 
+const nodeEnv = String(process.env.NODE_ENV || "").toLowerCase();
+
 const prisma = new PrismaClient({
   datasources: { db: { url: dbUrl } },
-  log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+  log:
+    nodeEnv === "test"
+      ? []
+      : nodeEnv === "development"
+        ? ["error", "warn"]
+        : ["error"],
 });
 
 export default prisma;

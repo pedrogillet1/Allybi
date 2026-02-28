@@ -92,4 +92,24 @@ describe("ContractNormalizer", () => {
     expect(normalized.status).toBe("failed");
     expect(normalized.failureCode).toBe("EMPTY_ANSWER");
   });
+
+  test("downgrades to partial when blocking quality gates are present", () => {
+    const normalizer = new ContractNormalizer();
+    const normalized = normalizer.normalize(
+      mkResult({
+        qualityGates: {
+          allPassed: false,
+          failed: [
+            {
+              gateName: "no_raw_json",
+              severity: "block",
+              reason: "Response appears to be raw JSON output",
+            },
+          ],
+        },
+      }),
+    );
+    expect(normalized.status).toBe("partial");
+    expect(normalized.failureCode).toBe("quality_gate_blocked");
+  });
 });

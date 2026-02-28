@@ -527,9 +527,12 @@ async function main() {
 
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
+        const preferredLanguage = 'pt';
         const body = {
           message: query,
-          language: 'pt',
+          preferredLanguage,
+          language: preferredLanguage,
+          locale: preferredLanguage,
           attachedDocuments,
           documentIds,
         };

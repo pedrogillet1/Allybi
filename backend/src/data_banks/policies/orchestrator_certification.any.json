@@ -161,7 +161,7 @@
         "src/services/chat/turnRouter.service.test.ts",
         "src/services/chat/guardrails/editorMode.guard.test.ts",
         "src/services/core/banks/runtimeWiringIntegrity.service.test.ts",
-        "src/services/core/retrieval/evidenceGate.service.test.ts",
+        "src/services/core/retrieval/retrievalEngine.scope-lock.test.ts",
         "src/services/editing/editOrchestrator.proof.test.ts",
         "src/services/editing/editOrchestrator.stalePlan.test.ts",
         "src/services/editing/editOrchestrator.coverage.test.ts",

@@ -549,19 +549,69 @@ export class PineconeService {
         }
       : { documentId: { $eq: documentId } };
 
-    const res = await index.query({
-      vector: this.makeDummyNonZeroVector(),
-      topK: 10000,
-      includeMetadata: false,
-      filter,
-    } as any);
+    for (let pass = 0; pass < 25; pass += 1) {
+      const res = await index.query({
+        vector: this.makeDummyNonZeroVector(),
+        topK: 10000,
+        includeMetadata: false,
+        filter,
+      } as any);
 
-    const ids = (res?.matches || [])
-      .map((m: any) => String(m?.id))
-      .filter(Boolean);
-    if (ids.length === 0) return;
+      const ids = [...new Set((res?.matches || []).map((m: any) => String(m?.id)))]
+        .filter(Boolean);
+      if (ids.length === 0) return;
+      await this.deleteIdsInBatches(index, ids);
+      if (ids.length < 10000) return;
+    }
+  }
 
-    await this.deleteIdsInBatches(index, ids);
+  async deleteEmbeddingsByOperationId(
+    documentId: string,
+    operationId: string,
+    opts?: { userId?: string },
+  ): Promise<number> {
+    await this.ensureInit();
+    if (!this.isAvailable()) return 0;
+
+    const docId = String(documentId || "").trim();
+    const opId = String(operationId || "").trim();
+    if (!docId || !opId) return 0;
+
+    const index = this.getIndex();
+    const filter = opts?.userId
+      ? {
+          $and: [
+            { userId: { $eq: opts.userId } },
+            { documentId: { $eq: docId } },
+            { operationId: { $eq: opId } },
+          ],
+        }
+      : {
+          $and: [
+            { documentId: { $eq: docId } },
+            { operationId: { $eq: opId } },
+          ],
+        };
+
+    let deleted = 0;
+    for (let pass = 0; pass < 25; pass += 1) {
+      const res = await index.query({
+        vector: this.makeDummyNonZeroVector(),
+        topK: 10000,
+        includeMetadata: false,
+        filter,
+      } as any);
+
+      const ids = [...new Set((res?.matches || []).map((m: any) => String(m?.id)))]
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b));
+      if (!ids.length) return deleted;
+
+      await this.deleteIdsInBatches(index, ids);
+      deleted += ids.length;
+      if (ids.length < 10000) return deleted;
+    }
+    return deleted;
   }
 
   async deleteMultipleDocumentEmbeddings(
@@ -623,7 +673,12 @@ export class PineconeService {
 
   async verifyDocumentEmbeddings(
     documentId: string,
-    opts?: { userId?: string; minCount?: number },
+    opts?: {
+      userId?: string;
+      minCount?: number;
+      expectedCount?: number;
+      topK?: number;
+    },
   ) {
     await this.ensureInit();
     if (!this.isAvailable()) {
@@ -642,21 +697,30 @@ export class PineconeService {
 
     const res = await index.query({
       vector: this.makeDummyNonZeroVector(),
-      topK: 1000,
+      topK: Math.max(1, Number(opts?.topK || 1000)),
       includeMetadata: true,
       filter,
     } as any);
 
     const count = (res?.matches || []).length;
     const minCount = opts?.minCount ?? 1;
+    const expectedCount =
+      typeof opts?.expectedCount === "number" && opts.expectedCount >= 0
+        ? opts.expectedCount
+        : null;
+    const exactMatchOk = expectedCount == null ? true : count === expectedCount;
+    const minCountOk = count >= minCount;
+    const success = minCountOk && exactMatchOk;
 
     return {
-      success: count >= minCount,
+      success,
       count,
       message:
-        count >= minCount
+        success
           ? `OK: found ${count} vectors`
-          : "No embeddings found in Pinecone",
+          : expectedCount != null && count !== expectedCount
+            ? `Vector count mismatch: found ${count}, expected ${expectedCount}`
+            : "No embeddings found in Pinecone",
     };
   }
 }

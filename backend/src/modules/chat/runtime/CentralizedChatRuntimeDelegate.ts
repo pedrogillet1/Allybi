@@ -19,6 +19,8 @@ import type {
   AnswerMode,
   NavType,
   ChatProvenanceDTO,
+  ChatQualityGateFailure,
+  ChatQualityGateState,
 } from "../domain/chat.contracts";
 import { ConversationNotFoundError } from "../domain/chat.contracts";
 import type { EncryptedChatRepo } from "../../../services/chat/encryptedChatRepo.service";
@@ -30,7 +32,7 @@ import {
   type MemoryPolicyRuntimeConfig,
 } from "../../../services/memory/memoryPolicyEngine.service";
 import { MemoryRedactionService } from "../../../services/memory/memoryRedaction.service";
-import { getBankLoaderInstance } from "../../domain/infra";
+import { getBankLoaderInstance, getOptionalBank } from "../../domain/infra";
 import {
   RetrievalEngineService,
   type EvidencePack,
@@ -63,6 +65,7 @@ import { logger as appLogger } from "../../../utils/logger";
 import {
   QualityGateRunnerService,
   type QualityGateContext,
+  type QualityGateResult,
 } from "../../../services/core/enforcement/qualityGateRunner.service";
 import {
   getResponseContractEnforcer,
@@ -434,6 +437,50 @@ function buildSourcesFromEvidence(evidence: EvidenceItem[]): ChatSourceEntry[] {
   return out;
 }
 
+export function ensureFallbackSourceCoverage(params: {
+  sources: ChatSourceEntry[];
+  answerMode: AnswerMode;
+  attachedDocumentIds: string[];
+  retrievalPack: EvidencePack | null;
+}): ChatSourceEntry[] {
+  if (params.sources.length > 0) return params.sources;
+  if (params.answerMode !== "fallback") return params.sources;
+
+  const attachedDocIds = (params.attachedDocumentIds || [])
+    .map((id) => String(id || "").trim())
+    .filter((id) => id.length > 0);
+  if (attachedDocIds.length === 0) return params.sources;
+
+  const attachedSet = new Set(attachedDocIds);
+  const activeDocId = String(params.retrievalPack?.scope?.activeDocId || "").trim();
+  const candidateDocIds = Array.isArray(params.retrievalPack?.scope?.candidateDocIds)
+    ? params.retrievalPack?.scope?.candidateDocIds
+        .map((id) => String(id || "").trim())
+        .filter((id) => id.length > 0)
+    : [];
+
+  const searchOrder = [activeDocId, ...candidateDocIds, ...attachedDocIds];
+  let selectedDocId = "";
+  for (const docId of searchOrder) {
+    if (!docId || !attachedSet.has(docId)) continue;
+    selectedDocId = docId;
+    break;
+  }
+  if (!selectedDocId) {
+    selectedDocId = attachedDocIds[0];
+  }
+  if (!selectedDocId) return params.sources;
+
+  return [
+    {
+      documentId: selectedDocId,
+      filename: fallbackSourceLabel(selectedDocId),
+      mimeType: null,
+      page: null,
+    },
+  ];
+}
+
 function filterSourcesByProvenance(
   sources: ChatSourceEntry[],
   provenance: ChatProvenanceDTO | undefined,
@@ -589,51 +636,159 @@ function countRegexMatches(text: string, pattern: RegExp): number {
   return matches ? matches.length : 0;
 }
 
-function looksLikelyPortuguese(text: string): boolean {
-  const value = ` ${String(text || "").toLowerCase()} `;
-  const ptWords =
-    countRegexMatches(
-      value,
-      /\b(de|para|com|nao|voce|qual|quais|como|onde|porque|obrigado|resumo|tabela|evidencia|documento|documentos)\b/g,
-    ) +
-    countRegexMatches(value, /[ãõçáàâéêíóôú]/g) * 2;
-  const enWords = countRegexMatches(
-    value,
-    /\b(the|with|this|that|for|from|please|summary|table|evidence|document|documents)\b/g,
-  );
-  return ptWords >= enWords + 2;
+function isRuntimeFlagEnabled(flagName: string, defaultValue = true): boolean {
+  const raw = String(process.env[flagName] || "").trim().toLowerCase();
+  if (!raw) return defaultValue;
+  if (["1", "true", "on", "yes"].includes(raw)) return true;
+  if (["0", "false", "off", "no"].includes(raw)) return false;
+  return defaultValue;
 }
 
-function looksLikelySpanish(text: string): boolean {
-  const value = ` ${String(text || "").toLowerCase()} `;
-  const esWords =
-    countRegexMatches(
-      value,
-      /\b(de|para|con|donde|cual|cuales|gracias|resumen|tabla|evidencia|documento|documentos)\b/g,
-    ) +
-    countRegexMatches(value, /[ñ¿¡]/g) * 2;
-  const enWords = countRegexMatches(
-    value,
-    /\b(the|with|this|that|for|from|please|summary|table|evidence|document|documents)\b/g,
-  );
-  return esWords >= enWords + 2;
+const EN_LANGUAGE_MARKERS =
+  /\b(the|with|this|that|for|from|please|summary|table|evidence|document|documents|according|based|thanks|yes|no)\b/g;
+const PT_LANGUAGE_MARKERS =
+  /\b(nao|não|voce|você|com|como|onde|porque|obrigado|obrigada|resumo|tabela|evidencia|evidência|documento|documentos|sim)\b/g;
+const ES_LANGUAGE_MARKERS =
+  /\b(con|donde|cual|cuál|cuales|cuáles|gracias|resumen|tabla|evidencia|documento|documentos|si|sí)\b/g;
+const ENGLISH_STRUCTURAL_WORDS = /\b(and|or|to|of|in|on|is|are|was|were)\b/g;
+const PORTUGUESE_STRUCTURAL_WORDS = /\b(e|ou|para|de|do|da|dos|das|que|em|ao|aos)\b/g;
+const SPANISH_STRUCTURAL_WORDS = /\b(y|o|para|de|del|la|las|los|que|en|al)\b/g;
+const EN_DISTINCT_LANGUAGE_MARKERS =
+  /\b(the|with|this|that|please|summary|according|based|thanks|answer)\b/g;
+const PT_DISTINCT_LANGUAGE_MARKERS =
+  /\b(nao|não|voce|você|obrigado|obrigada|resumo|portugues|português|resposta|envio)\b/g;
+const ES_DISTINCT_LANGUAGE_MARKERS =
+  /\b(gracias|resumen|respuesta|envio|envío|espanol|español|segun|según)\b/g;
+
+function languageScoreFor(
+  language: "en" | "pt" | "es",
+  scores: { en: number; pt: number; es: number },
+): number {
+  if (language === "pt") return scores.pt;
+  if (language === "es") return scores.es;
+  return scores.en;
 }
 
-function looksLikelyEnglish(text: string): boolean {
+function strongestCompetingLanguageScore(
+  language: "en" | "pt" | "es",
+  scores: { en: number; pt: number; es: number },
+): number {
+  if (language === "en") return Math.max(scores.pt, scores.es);
+  if (language === "pt") return Math.max(scores.en, scores.es);
+  return Math.max(scores.en, scores.pt);
+}
+
+function languageDistinctSignals(text: string): { en: number; pt: number; es: number } {
   const value = ` ${String(text || "").toLowerCase()} `;
-  const enWords = countRegexMatches(
-    value,
-    /\b(the|with|this|that|for|from|please|summary|table|evidence|document|documents|according|based)\b/g,
+  return {
+    en: countRegexMatches(value, EN_DISTINCT_LANGUAGE_MARKERS),
+    pt: countRegexMatches(value, PT_DISTINCT_LANGUAGE_MARKERS),
+    es: countRegexMatches(value, ES_DISTINCT_LANGUAGE_MARKERS),
+  };
+}
+
+function hasStrongMixedLanguageSignal(params: {
+  text: string;
+  preferredLanguage: "en" | "pt" | "es";
+  scores: { en: number; pt: number; es: number };
+}): boolean {
+  const normalized = String(params.text || "").trim();
+  const wordCount = normalized.split(/\s+/).filter(Boolean).length;
+  const longEnough = wordCount >= 12 || normalized.length >= 72;
+  if (!longEnough) return false;
+
+  const primaryScore = languageScoreFor(params.preferredLanguage, params.scores);
+  const competingScore = strongestCompetingLanguageScore(
+    params.preferredLanguage,
+    params.scores,
   );
-  const ptWords = countRegexMatches(
-    value,
-    /\b(de|para|com|nao|voce|qual|quais|como|onde|porque|obrigado|resumo|tabela|evidencia|documento|documentos)\b/g,
+  if (competingScore < 1.6) return false;
+
+  const strongCombinedSignal = primaryScore + competingScore >= 3.4;
+  const nearParity =
+    primaryScore <= 0.1
+      ? competingScore >= 1.8
+      : competingScore >= primaryScore * 0.82;
+
+  const distinct = languageDistinctSignals(normalized);
+  const primaryDistinct = languageScoreFor(params.preferredLanguage, distinct);
+  const competingDistinct = strongestCompetingLanguageScore(
+    params.preferredLanguage,
+    distinct,
   );
-  const esWords = countRegexMatches(
-    value,
-    /\b(de|para|con|donde|cual|cuales|gracias|resumen|tabla|evidencia|documento|documentos)\b/g,
-  );
-  return enWords >= Math.max(ptWords, esWords) + 2;
+  const distinctConflict =
+    competingDistinct >= 2 && competingDistinct >= primaryDistinct + 1;
+
+  return strongCombinedSignal && nearParity && distinctConflict;
+}
+
+function hasSentenceLanguageSwitch(params: {
+  text: string;
+  preferredLanguage: "en" | "pt" | "es";
+}): boolean {
+  const fragments = String(params.text || "")
+    .split(/[.!?]+\s+|\n+/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .filter((part) => part.split(/\s+/).length >= 4);
+  if (fragments.length < 2) return false;
+
+  let hasPreferredSentence = false;
+  let hasCompetingSentence = false;
+  for (const fragment of fragments) {
+    const scores = languageScores(fragment);
+    const entries = [
+      { language: "en", score: scores.en },
+      { language: "pt", score: scores.pt },
+      { language: "es", score: scores.es },
+    ].sort((a, b) => b.score - a.score);
+    if (entries[0].score < 1.2 || entries[0].score < entries[1].score + 0.5) {
+      continue;
+    }
+    if (entries[0].language === params.preferredLanguage) {
+      hasPreferredSentence = true;
+    } else {
+      hasCompetingSentence = true;
+    }
+  }
+
+  return hasPreferredSentence && hasCompetingSentence;
+}
+
+function languageScores(text: string): { en: number; pt: number; es: number } {
+  const value = ` ${String(text || "").toLowerCase()} `;
+  const enMarkers = countRegexMatches(value, EN_LANGUAGE_MARKERS);
+  const ptMarkers = countRegexMatches(value, PT_LANGUAGE_MARKERS);
+  const esMarkers = countRegexMatches(value, ES_LANGUAGE_MARKERS);
+  const enStructure = countRegexMatches(value, ENGLISH_STRUCTURAL_WORDS) * 0.25;
+  const ptStructure =
+    countRegexMatches(value, PORTUGUESE_STRUCTURAL_WORDS) * 0.25;
+  const esStructure = countRegexMatches(value, SPANISH_STRUCTURAL_WORDS) * 0.25;
+  const ptAccents = countRegexMatches(value, /[ãõçâêô]/g) * 0.9;
+  const esSignals =
+    countRegexMatches(value, /[ñ¿¡]/g) * 1.2 +
+    countRegexMatches(value, /(?:\bción\b|\bciones\b)/g) * 0.7;
+  const latinAccentSignal = countRegexMatches(value, /[áéíóú]/g) * 0.25;
+
+  return {
+    en: enMarkers + enStructure,
+    pt: ptMarkers + ptStructure + ptAccents + latinAccentSignal * 0.5,
+    es: esMarkers + esStructure + esSignals + latinAccentSignal * 0.5,
+  };
+}
+
+function isShortNeutralText(text: string): boolean {
+  const normalized = String(text || "").trim();
+  if (!normalized) return true;
+  const words = normalized.split(/\s+/).filter(Boolean);
+  const alphaChars = (normalized.match(/[A-Za-zÀ-ÿ]/g) || []).length;
+  const hasSentenceEnding = /[.!?]$/.test(normalized);
+  return words.length <= 4 && alphaChars <= 24 && hasSentenceEnding;
+}
+
+function hasSubstantialAlphabeticContent(text: string): boolean {
+  const alphaChars = (String(text || "").match(/[A-Za-zÀ-ÿ]/g) || []).length;
+  return alphaChars >= 8;
 }
 
 function buildLanguageContractFallback(language: "en" | "pt" | "es"): string {
@@ -646,19 +801,110 @@ function buildLanguageContractFallback(language: "en" | "pt" | "es"): string {
   return "I could not safely finalize this answer in the requested language. Please retry and I will answer only in English.";
 }
 
-function enforceLanguageContract(params: {
+export function enforceLanguageContract(params: {
   text: string;
   preferredLanguage?: string | null;
 }): { text: string; adjusted: boolean } {
+  if (!isRuntimeFlagEnabled("LANGUAGE_CONTRACT_V2", true)) {
+    return { text: String(params.text || "").trim(), adjusted: false };
+  }
   const normalized = String(params.text || "").trim();
   if (!normalized) return { text: normalized, adjusted: false };
+  if (isShortNeutralText(normalized)) {
+    return { text: normalized, adjusted: false };
+  }
+  if (!hasSubstantialAlphabeticContent(normalized)) {
+    return { text: normalized, adjusted: false };
+  }
+  const scores = languageScores(normalized);
+  const signalStrength = scores.en + scores.pt + scores.es;
+  if (signalStrength < 1.1) {
+    return { text: normalized, adjusted: false };
+  }
   const lang = normalizeChatLanguage(params.preferredLanguage);
+  const langScore = languageScoreFor(lang, scores);
+  const otherTop = strongestCompetingLanguageScore(lang, scores);
   const mismatch =
-    (lang === "en" && !looksLikelyEnglish(normalized)) ||
-    (lang === "pt" && !looksLikelyPortuguese(normalized)) ||
-    (lang === "es" && !looksLikelySpanish(normalized));
+    otherTop >= langScore + 1.2 ||
+    hasStrongMixedLanguageSignal({
+      text: normalized,
+      preferredLanguage: lang,
+      scores,
+    }) ||
+    hasSentenceLanguageSwitch({
+      text: normalized,
+      preferredLanguage: lang,
+    });
   if (!mismatch) return { text: normalized, adjusted: false };
   return { text: buildLanguageContractFallback(lang), adjusted: true };
+}
+
+const DEFAULT_BLOCKING_QUALITY_GATES = new Set<string>([
+  "requested_slot_covered",
+  "forbidden_adjacent_role_absent",
+  "entity_role_consistency",
+  "wrong_doc_lock_enforcement",
+  "source_policy_navigation_mode",
+  "numeric_integrity_totals_reconciliation",
+  "no_raw_json",
+]);
+
+type QualityGatesBank = {
+  config?: {
+    gateSeverityByName?: Record<string, "warn" | "block" | "warning" | "error">;
+  };
+};
+
+function normalizeGateSeverity(
+  value: unknown,
+): "warn" | "block" | null {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "block" || normalized === "error") return "block";
+  if (normalized === "warn" || normalized === "warning") return "warn";
+  return null;
+}
+
+function resolveQualityGateSeverity(
+  gateName: string,
+  severityByName: Record<string, "warn" | "block">,
+): "warn" | "block" {
+  const normalized = String(gateName || "").trim();
+  if (!normalized) return "warn";
+  if (severityByName[normalized]) return severityByName[normalized];
+  if (DEFAULT_BLOCKING_QUALITY_GATES.has(normalized)) return "block";
+  if (normalized.startsWith("redaction_")) return "block";
+  if (normalized.startsWith("medical_")) return "block";
+  return "warn";
+}
+
+function resolveQualityGateSeverityMap(): Record<string, "warn" | "block"> {
+  const out: Record<string, "warn" | "block"> = {};
+  const bank = getOptionalBank<QualityGatesBank>("quality_gates");
+  const map = bank?.config?.gateSeverityByName;
+  if (!map || typeof map !== "object") return out;
+  for (const [gateName, severityRaw] of Object.entries(map)) {
+    const normalized = normalizeGateSeverity(severityRaw);
+    if (!normalized) continue;
+    const key = String(gateName || "").trim();
+    if (!key) continue;
+    out[key] = normalized;
+  }
+  return out;
+}
+
+function toQualityGateFailure(
+  gate: QualityGateResult,
+  severityByName: Record<string, "warn" | "block">,
+): ChatQualityGateFailure {
+  const reason =
+    Array.isArray(gate.issues) && gate.issues.length > 0
+      ? gate.issues.join(" | ")
+      : null;
+  return {
+    gateName: gate.gateName,
+    severity: resolveQualityGateSeverity(gate.gateName, severityByName),
+    reason,
+  };
 }
 
 function toPositiveInt(value: unknown): number | null {
@@ -1376,9 +1622,12 @@ export class CentralizedChatRuntimeDelegate {
         retrievalPack,
         req.preferredLanguage,
       );
-      const sources: ChatSourceEntry[] = buildSourcesFromEvidence(
-        retrievalPack?.evidence ?? [],
-      );
+      const sources: ChatSourceEntry[] = ensureFallbackSourceCoverage({
+        sources: buildSourcesFromEvidence(retrievalPack?.evidence ?? []),
+        answerMode,
+        attachedDocumentIds: req.attachedDocumentIds || [],
+        retrievalPack,
+      });
       const bypass = this.resolveEvidenceGateBypass(
         evidenceGateDecision,
         req.preferredLanguage,
@@ -1603,6 +1852,7 @@ export class CentralizedChatRuntimeDelegate {
             : null,
           enforcement: finalized.enforcement ?? null,
           provenance: finalized.provenance ?? null,
+          qualityGates: finalized.qualityGates,
         },
       });
       this.traceWriter.endSpan(traceId, outputSpanId, {
@@ -1653,6 +1903,7 @@ export class CentralizedChatRuntimeDelegate {
         fallbackReasonCode,
         status,
         failureCode,
+        qualityGates: finalized.qualityGates,
         completion: {
           answered: assistantTextRaw.length > 0,
           missingSlots: [],
@@ -1892,9 +2143,12 @@ export class CentralizedChatRuntimeDelegate {
         retrievalPack,
         req.preferredLanguage,
       );
-      const sources: ChatSourceEntry[] = buildSourcesFromEvidence(
-        retrievalPack?.evidence ?? [],
-      );
+      const sources: ChatSourceEntry[] = ensureFallbackSourceCoverage({
+        sources: buildSourcesFromEvidence(retrievalPack?.evidence ?? []),
+        answerMode,
+        attachedDocumentIds: req.attachedDocumentIds || [],
+        retrievalPack,
+      });
       const bypass = this.resolveEvidenceGateBypass(
         evidenceGateDecision,
         req.preferredLanguage,
@@ -2159,6 +2413,7 @@ export class CentralizedChatRuntimeDelegate {
             : null,
           enforcement: finalized.enforcement ?? null,
           provenance: finalized.provenance ?? null,
+          qualityGates: finalized.qualityGates,
         },
       });
       this.traceWriter.endSpan(traceId, outputSpanId, {
@@ -2209,6 +2464,7 @@ export class CentralizedChatRuntimeDelegate {
         fallbackReasonCode,
         status,
         failureCode,
+        qualityGates: finalized.qualityGates,
         completion: {
           answered: assistantTextRaw.length > 0,
           missingSlots: [],
@@ -2898,6 +3154,7 @@ export class CentralizedChatRuntimeDelegate {
     provenance?: ChatProvenanceDTO;
     failureCode?: string | null;
     qualityGateIssues: string[];
+    qualityGates: ChatQualityGateState;
   }> {
     let text = params.assistantText;
     let failureCode: string | null = null;
@@ -2969,6 +3226,12 @@ export class CentralizedChatRuntimeDelegate {
 
     // 2. Run quality gates (format checks, brevity, markdown sanity)
     let qualityGateIssues: string[] = [];
+    let qualityGates: ChatQualityGateState = { allPassed: true, failed: [] };
+    const enforceQualityGates = isRuntimeFlagEnabled(
+      "QUALITY_GATES_ENFORCING",
+      true,
+    );
+    const qualityGateSeverityByName = resolveQualityGateSeverityMap();
     try {
       const qualityRunner = new QualityGateRunnerService();
       const gateCtx: QualityGateContext = {
@@ -2981,12 +3244,30 @@ export class CentralizedChatRuntimeDelegate {
       };
       const gateResult = await qualityRunner.runGates(text, gateCtx);
       if (!gateResult.allPassed) {
-        qualityGateIssues = gateResult.results
+        const failedGates = gateResult.results
           .filter((r) => !r.passed)
-          .map((r) => r.gateName);
+          .map((gate) => toQualityGateFailure(gate, qualityGateSeverityByName));
+        qualityGateIssues = failedGates.map((gate) => gate.gateName);
+        qualityGates = {
+          allPassed: false,
+          failed: failedGates,
+        };
         appLogger.debug("[finalizeChatTurn] Quality gate issues", {
           issues: qualityGateIssues,
         });
+        if (enforceQualityGates && !failureCode) {
+          const blockingGate = failedGates.find(
+            (gate) => gate.severity === "block",
+          );
+          if (blockingGate) {
+            failureCode = "quality_gate_blocked";
+            text = buildEmptyAssistantText({
+              language: params.req.preferredLanguage,
+              reasonCode: failureCode,
+              seed: `${params.req.userId}:quality_gate:${blockingGate.gateName}`,
+            });
+          }
+        }
       }
     } catch (error) {
       appLogger.warn("[finalizeChatTurn] Quality gate runner error", {
@@ -3088,19 +3369,13 @@ export class CentralizedChatRuntimeDelegate {
         allowedDocumentIds: params.req.attachedDocumentIds || [],
       });
       provenance = {
-        ...provenance,
+        ...revalidatedProvenance,
         validated: revalidated.ok,
         failureCode: revalidated.failureCode,
         sourceDocumentIds:
           revalidatedProvenance.sourceDocumentIds.length > 0
             ? revalidatedProvenance.sourceDocumentIds
-            : provenance.sourceDocumentIds.length > 0
-              ? provenance.sourceDocumentIds
-              : sourceDocumentIdsFromSources,
-        snippetRefs:
-          revalidatedProvenance.snippetRefs.length > 0
-            ? revalidatedProvenance.snippetRefs
-            : provenance.snippetRefs,
+            : sourceDocumentIdsFromSources,
       };
       if (!revalidated.ok) {
         failureCode = revalidated.failureCode;
@@ -3138,6 +3413,7 @@ export class CentralizedChatRuntimeDelegate {
       provenance,
       failureCode,
       qualityGateIssues,
+      qualityGates,
     };
   }
 
@@ -3256,6 +3532,10 @@ export class CentralizedChatRuntimeDelegate {
   ): Promise<Array<{ role: ChatRole; content: string }>> {
     const runtimeCfg = this.getMemoryRuntimeTuning();
     const safeLimit = clampLimit(limit, runtimeCfg.historyClampMax);
+    const useRecentHistoryWindow = isRuntimeFlagEnabled(
+      "RECENT_HISTORY_ORDER_V2",
+      true,
+    );
 
     let recent: Array<{ role: ChatRole; content: string }>;
     if (this.encryptedContext) {
@@ -3263,21 +3543,23 @@ export class CentralizedChatRuntimeDelegate {
         userId,
         conversationId,
         safeLimit,
+        useRecentHistoryWindow,
       );
     } else {
       const rows = await prisma.message.findMany({
         where: { conversationId },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: useRecentHistoryWindow ? "desc" : "asc" },
         take: safeLimit,
         select: {
           role: true,
           content: true,
         },
       });
-      recent = rows.map((row) => ({
-        role: row.role as ChatRole,
-        content: String(row.content ?? ""),
-      }));
+      const orderedRows = useRecentHistoryWindow ? [...rows].reverse() : rows;
+      recent = orderedRows.map((row) => ({
+          role: row.role as ChatRole,
+          content: String(row.content ?? ""),
+        }));
     }
 
     const memoryBlocks = await this.buildMemorySystemBlocks({

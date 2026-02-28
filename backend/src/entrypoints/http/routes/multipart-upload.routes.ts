@@ -123,6 +123,9 @@ router.post(
           mimeType,
           fileHash: `multipart-pending-${docId}`,
           status: "uploading",
+          indexingState: "pending",
+          indexingError: null,
+          indexingUpdatedAt: new Date(),
         },
       });
 
@@ -216,7 +219,12 @@ router.post(
       // Update document status
       await prisma.document.update({
         where: { id: documentId },
-        data: { status: "uploaded" },
+        data: {
+          status: "uploaded",
+          indexingState: "pending",
+          indexingError: null,
+          indexingUpdatedAt: new Date(),
+        },
       });
 
       // Enqueue for processing (extraction → chunking → embedding)

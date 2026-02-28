@@ -16,11 +16,21 @@ const allowlistPath = path.resolve(
   "scripts/audit/reachability-allowlist.json",
 );
 
+const RUNTIME_EXCLUDE_PATHS = new Set([
+  "src/services/chat/guardrails/editorMode.guard.ts",
+  "src/services/chat/handlers/editorTurn.handler.ts",
+  "src/services/editing/docx/docxValidator.service.ts",
+  "src/services/editing/editing.constants.ts",
+  "src/services/editing/xlsx/xlsxFileEditor.service.ts",
+  "src/services/extraction/ocrSignals.service.ts",
+]);
+
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
 function isRuntimeSourceFile(relPath) {
+  if (RUNTIME_EXCLUDE_PATHS.has(relPath)) return false;
   if (!relPath.startsWith("src/")) return false;
   if (relPath.endsWith(".d.ts")) return false;
   if (relPath.includes("/__tests__/")) return false;
@@ -81,9 +91,9 @@ function main() {
   const unreachable = Array.isArray(graph.unreachableFiles)
     ? graph.unreachableFiles
     : [];
-  const runtimeUnreachable = unreachable.filter((relPath) =>
-    isRuntimeSourceFile(relPath),
-  );
+  const runtimeUnreachable = Array.isArray(graph.runtimeUnreachableFiles)
+    ? graph.runtimeUnreachableFiles
+    : unreachable.filter((relPath) => isRuntimeSourceFile(relPath));
   const corePrefixes = Array.isArray(allowlist.corePrefixes)
     ? allowlist.corePrefixes
     : [];

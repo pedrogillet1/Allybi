@@ -203,6 +203,9 @@ describe("ruleInterpreter", () => {
       baseCtx({
         query: "show ap trend",
         normalizedQuery: "show ap trend",
+        explicitDocsCount: 0,
+        explicitDocIds: [],
+        explicitDocTypes: [],
       }),
       rules,
     );
@@ -210,6 +213,9 @@ describe("ruleInterpreter", () => {
       baseCtx({
         query: "show ap trend from accounts payable aging report",
         normalizedQuery: "show ap trend from accounts payable aging report",
+        explicitDocsCount: 0,
+        explicitDocIds: [],
+        explicitDocTypes: [],
       }),
       rules,
     );
@@ -239,5 +245,144 @@ describe("ruleInterpreter", () => {
     );
 
     expect(variants).toHaveLength(0);
+  });
+
+  test("rewrite is suppressed on explicit doc ids unless allowWhenExplicitDocIds is true", () => {
+    const ctx = baseCtx({
+      operator: "extract",
+      intent: "documents",
+      explicitDocsCount: 1,
+      explicitDocIds: ["doc-a"],
+      explicitDocTypes: [],
+      query: "show ap aging",
+      normalizedQuery: "show ap aging",
+    });
+
+    const blocked = applyQueryRewrites(ctx, [
+      {
+        id: "finance_ap_blocked_on_explicit_doc",
+        priority: 100,
+        enabled: true,
+        patterns: ["\\bap\\b"],
+        requireContextAny: ["aging"],
+        rewrites: [{ value: "accounts payable", weight: 1 }],
+        conditions: {
+          requireDomainMatch: true,
+          domains: ["finance"],
+        },
+      },
+    ]);
+    const allowed = applyQueryRewrites(ctx, [
+      {
+        id: "finance_ap_allowed_on_explicit_doc",
+        priority: 100,
+        enabled: true,
+        patterns: ["\\bap\\b"],
+        requireContextAny: ["aging"],
+        rewrites: [{ value: "accounts payable", weight: 1 }],
+        conditions: {
+          requireDomainMatch: true,
+          domains: ["finance"],
+          allowWhenExplicitDocIds: true,
+        },
+      },
+    ]);
+
+    expect(blocked).toHaveLength(0);
+    expect(allowed.length).toBeGreaterThan(0);
+  });
+
+  test("non-acronym rewrites are suppressed when explicit doc types already scope request", () => {
+    const blocked = applyQueryRewrites(
+      baseCtx({
+        operator: "summarize",
+        query: "show gross margin summary",
+        normalizedQuery: "show gross margin summary",
+        explicitDocTypes: ["profit_and_loss"],
+      }),
+      [
+        {
+          id: "finance_gross_margin_synonym",
+          priority: 90,
+          enabled: true,
+          patterns: ["\\bgross margin\\b"],
+          requireContextAny: ["gross margin"],
+          rewrites: [{ value: "gross profit margin", weight: 1 }],
+          conditions: {
+            requireDomainMatch: true,
+            domains: ["finance"],
+          },
+        },
+      ],
+    );
+    const allowedAcronym = applyQueryRewrites(
+      baseCtx({
+        operator: "extract",
+        query: "show ap aging",
+        normalizedQuery: "show ap aging",
+        explicitDocsCount: 0,
+        explicitDocIds: [],
+        explicitDocTypes: ["ap_aging_report"],
+      }),
+      [
+        {
+          id: "finance_ap_acronym",
+          priority: 90,
+          enabled: true,
+          patterns: ["\\bap\\b"],
+          requireContextAny: ["aging"],
+          rewrites: [{ value: "accounts payable", weight: 1 }],
+          conditions: {
+            requireDomainMatch: true,
+            domains: ["finance"],
+            allowWhenExplicitDocTypes: true,
+          },
+        },
+      ],
+    );
+
+    expect(blocked).toHaveLength(0);
+    expect(allowedAcronym.length).toBeGreaterThan(0);
+  });
+
+  test("unguarded short acronym rewrite is blocked without domain context", () => {
+    const rule = {
+      id: "medical_mp_unguarded",
+      priority: 90,
+      enabled: true,
+      domains: ["medical"],
+      patterns: ["\\bmp\\b"],
+      negativePatterns: [],
+      requireContextAny: [],
+      requireContextAll: [],
+      forbidContextAny: [],
+      rewrites: [{ value: "metabolic panel", weight: 1 }],
+    };
+
+    const withoutContext = applyQueryRewrites(
+      baseCtx({
+        domain: "medical",
+        query: "show mp trend",
+        normalizedQuery: "show mp trend",
+        explicitDocsCount: 0,
+        explicitDocIds: [],
+        explicitDocTypes: [],
+      }),
+      [rule],
+    );
+    const withContext = applyQueryRewrites(
+      baseCtx({
+        domain: "medical",
+        query: "show mp trend from metabolic panel results",
+        normalizedQuery: "show mp trend from metabolic panel results",
+        explicitDocsCount: 0,
+        explicitDocIds: [],
+        explicitDocTypes: [],
+      }),
+      [rule],
+    );
+
+    expect(withoutContext).toHaveLength(0);
+    expect(withContext.length).toBeGreaterThan(0);
   });
 });

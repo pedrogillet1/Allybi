@@ -1,0 +1,2381 @@
+{
+  "_meta": {
+    "id": "range_resolution_rules",
+    "version": "1.0.0",
+    "description": "Range resolution rules for header detection, table boundary inference, temporal row selection, named range expansion, and safety constraints in spreadsheet calculation agents.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-28",
+    "owner": "excel-calc-agent"
+  },
+  "config": {
+    "enabled": true,
+    "maxScanRows": 1000,
+    "maxScanCols": 100,
+    "headerScanDepth": 5,
+    "emptyRowThreshold": 3
+  },
+  "rules": [
+    {
+      "id": "agg_scope_by_group",
+      "category": "aggregation_scope",
+      "priority": 70,
+      "description": {
+        "en": "Aggregate within groups defined by a grouping column (e.g., total per department)",
+        "pt": "Agregar dentro de grupos definidos por uma coluna de agrupamento (ex.: total por departamento)"
+      },
+      "condition": {
+        "type": "group_detect",
+        "check": "column_has_repeated_values",
+        "groupColumn": "auto_detect_or_specified",
+        "minGroupSize": 2
+      },
+      "action": {
+        "type": "aggregate_by_group",
+        "groupBy": "matched_column",
+        "aggregation": "specified_function",
+        "outputPerGroup": true
+      },
+      "safetyNotes": "Groups with a single row yield trivial aggregation. Verify the grouping column is categorical, not continuous.",
+      "examples": {
+        "en": ["total per department", "average by category", "sum grouped by region"],
+        "pt": ["total por departamento", "média por categoria", "soma agrupada por região"]
+      }
+    },
+    {
+      "id": "agg_scope_column",
+      "category": "aggregation_scope",
+      "priority": 80,
+      "description": {
+        "en": "Aggregate an entire column of data, excluding header and footer rows",
+        "pt": "Agregar uma coluna inteira de dados, excluindo linhas de cabeçalho e rodapé"
+      },
+      "condition": {
+        "type": "column_scan",
+        "check": "has_numeric_data",
+        "excludeHeader": true,
+        "excludeSummaryRows": true
+      },
+      "action": {
+        "type": "aggregate_column",
+        "scope": "full_column",
+        "excludeRows": ["header", "total", "subtotal"]
+      },
+      "safetyNotes": "Ensure total/subtotal rows are excluded to avoid double-counting. Check column type before numeric aggregation.",
+      "examples": {
+        "en": ["sum the entire column", "total of column D", "average of all values in Revenue"],
+        "pt": ["soma da coluna inteira", "total da coluna D", "média de todos os valores em Receita"]
+      }
+    },
+    {
+      "id": "agg_scope_cross_sheet",
+      "category": "aggregation_scope",
+      "priority": 50,
+      "description": {
+        "en": "Aggregate the same column across multiple sheets with matching structure",
+        "pt": "Agregar a mesma coluna em várias planilhas com estrutura correspondente"
+      },
+      "condition": {
+        "type": "multi_sheet_scan",
+        "check": "same_column_exists",
+        "matchBy": "header_text",
+        "requireStructureMatch": true
+      },
+      "action": {
+        "type": "aggregate_cross_sheet",
+        "combineMethod": "union_rows",
+        "aggregation": "specified_function"
+      },
+      "safetyNotes": "Column position may differ across sheets even if header matches. Always match by header text, not column index.",
+      "examples": {
+        "en": ["sum Revenue across all sheets", "total sales from every month tab"],
+        "pt": ["soma de Receita em todas as planilhas", "total de vendas de cada aba mensal"]
+      }
+    },
+    {
+      "id": "agg_scope_cumulative",
+      "category": "aggregation_scope",
+      "priority": 60,
+      "description": {
+        "en": "Compute running or cumulative aggregation over ordered rows",
+        "pt": "Calcular agregação acumulada ou corrida sobre linhas ordenadas"
+      },
+      "condition": {
+        "type": "order_detect",
+        "check": "rows_ordered_by_column",
+        "orderColumn": "auto_detect_date_or_index",
+        "direction": "ascending"
+      },
+      "action": {
+        "type": "cumulative_aggregate",
+        "method": "running_sum",
+        "orderBy": "detected_order_column",
+        "resetOn": "none"
+      },
+      "safetyNotes": "Cumulative calculations require a well-defined row order. If rows are unordered, results may be meaningless.",
+      "examples": {
+        "en": ["running total", "cumulative sum", "accumulated revenue"],
+        "pt": ["total acumulado", "soma cumulativa", "receita acumulada"]
+      }
+    },
+    {
+      "id": "agg_scope_exclude_outliers",
+      "category": "aggregation_scope",
+      "priority": 40,
+      "description": {
+        "en": "Exclude statistical outliers from aggregation using IQR or z-score method",
+        "pt": "Excluir outliers estatísticos da agregação usando método IQR ou z-score"
+      },
+      "condition": {
+        "type": "statistical_check",
+        "check": "detect_outliers",
+        "method": "iqr",
+        "iqrMultiplier": 1.5,
+        "fallbackMethod": "z_score",
+        "zThreshold": 3
+      },
+      "action": {
+        "type": "filter_outliers",
+        "exclude": true,
+        "reportExcluded": true,
+        "proceedWithFiltered": true
+      },
+      "safetyNotes": "Outlier exclusion can silently remove valid extreme values. Always report how many rows were excluded.",
+      "examples": {
+        "en": ["average excluding outliers", "sum without extreme values", "mean ignoring anomalies"],
+        "pt": ["média excluindo outliers", "soma sem valores extremos", "média ignorando anomalias"]
+      }
+    },
+    {
+      "id": "agg_scope_filtered",
+      "category": "aggregation_scope",
+      "priority": 75,
+      "description": {
+        "en": "Aggregate only visible or filtered rows, respecting active filters",
+        "pt": "Agregar somente linhas visíveis ou filtradas, respeitando filtros ativos"
+      },
+      "condition": {
+        "type": "filter_detect",
+        "check": "has_active_filters",
+        "includeHiddenRows": false
+      },
+      "action": {
+        "type": "aggregate_filtered",
+        "scope": "visible_rows_only",
+        "useSubtotalFunction": true
+      },
+      "safetyNotes": "Hidden rows from manual hide (not autofilter) may be unintentionally excluded. Clarify filter source.",
+      "examples": {
+        "en": ["sum of filtered rows", "total of visible data", "average of shown values"],
+        "pt": ["soma das linhas filtradas", "total dos dados visíveis", "média dos valores exibidos"]
+      }
+    },
+    {
+      "id": "agg_scope_moving_average",
+      "category": "aggregation_scope",
+      "priority": 55,
+      "description": {
+        "en": "Compute moving average over a rolling window of N periods",
+        "pt": "Calcular média móvel sobre uma janela rolante de N períodos"
+      },
+      "condition": {
+        "type": "window_spec",
+        "check": "has_ordered_rows",
+        "windowSize": "user_specified_or_default",
+        "defaultWindow": 3,
+        "orderColumn": "auto_detect"
+      },
+      "action": {
+        "type": "moving_average",
+        "windowSize": "resolved_n",
+        "alignment": "trailing",
+        "minPeriods": 1
+      },
+      "safetyNotes": "First N-1 rows will have partial windows. Decide whether to show partial results or null for incomplete windows.",
+      "examples": {
+        "en": ["3-month moving average", "rolling average of 7 days", "moving mean over 4 quarters"],
+        "pt": ["média móvel de 3 meses", "média rolante de 7 dias", "média móvel de 4 trimestres"]
+      }
+    },
+    {
+      "id": "agg_scope_percentile",
+      "category": "aggregation_scope",
+      "priority": 45,
+      "description": {
+        "en": "Select rows within a percentile-based scope such as top 10% or bottom quartile",
+        "pt": "Selecionar linhas dentro de um escopo baseado em percentil como top 10% ou quartil inferior"
+      },
+      "condition": {
+        "type": "percentile_spec",
+        "check": "column_is_numeric",
+        "percentileType": "user_specified",
+        "supportedTypes": ["top_percent", "bottom_percent", "quartile", "decile"]
+      },
+      "action": {
+        "type": "filter_by_percentile",
+        "percentile": "resolved_value",
+        "inclusive": true,
+        "sortOrder": "descending"
+      },
+      "safetyNotes": "Percentile boundaries may split tied values. Decide on inclusive vs exclusive boundary treatment.",
+      "examples": {
+        "en": ["top 10% of sales", "bottom quartile", "top 25% performers"],
+        "pt": ["top 10% de vendas", "quartil inferior", "top 25% de desempenho"]
+      }
+    },
+    {
+      "id": "agg_scope_selected_range",
+      "category": "aggregation_scope",
+      "priority": 85,
+      "description": {
+        "en": "Aggregate only the user-specified cell range, ignoring broader table context",
+        "pt": "Agregar somente o intervalo de células especificado pelo usuário, ignorando contexto mais amplo da tabela"
+      },
+      "condition": {
+        "type": "explicit_range",
+        "check": "user_specified_range",
+        "format": "A1_notation_or_R1C1",
+        "validate": true
+      },
+      "action": {
+        "type": "aggregate_range",
+        "scope": "exact_specified_range",
+        "ignoreTableContext": true
+      },
+      "safetyNotes": "User-specified ranges may accidentally include header or total rows. Warn if first or last row looks non-data.",
+      "examples": {
+        "en": ["sum of B2:B50", "average of D10:D100", "total of the selected cells"],
+        "pt": ["soma de B2:B50", "média de D10:D100", "total das células selecionadas"]
+      }
+    },
+    {
+      "id": "agg_scope_weighted",
+      "category": "aggregation_scope",
+      "priority": 50,
+      "description": {
+        "en": "Perform weighted aggregation using a specified weight column",
+        "pt": "Realizar agregação ponderada usando uma coluna de peso especificada"
+      },
+      "condition": {
+        "type": "weight_detect",
+        "check": "weight_column_specified_or_detected",
+        "weightColumnHints": ["weight", "peso", "qty", "quantity", "quantidade"],
+        "requireNumeric": true
+      },
+      "action": {
+        "type": "weighted_aggregate",
+        "valueColumn": "specified_value_column",
+        "weightColumn": "resolved_weight_column",
+        "method": "weighted_average"
+      },
+      "safetyNotes": "Zero or negative weights may distort results. Validate weight column contains only positive numbers.",
+      "examples": {
+        "en": ["weighted average price by quantity", "weighted score by credit hours"],
+        "pt": ["preço médio ponderado por quantidade", "nota ponderada por horas de crédito"]
+      }
+    },
+    {
+      "id": "col_select_by_header",
+      "category": "column_selection",
+      "priority": 90,
+      "description": {
+        "en": "Select a column by matching its header text, with fuzzy matching support",
+        "pt": "Selecionar uma coluna correspondendo o texto do cabeçalho, com suporte a correspondência aproximada"
+      },
+      "condition": {
+        "type": "header_match",
+        "check": "header_text_match",
+        "matchStrategy": "exact_then_fuzzy",
+        "fuzzyThreshold": 0.8,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "select_column",
+        "by": "header_text",
+        "returnIndex": true,
+        "returnLetter": true
+      },
+      "safetyNotes": "Fuzzy matching may select wrong column if multiple headers are similar. Prefer exact match when possible.",
+      "examples": {
+        "en": ["column Revenue", "the Sales column", "select Total Amount"],
+        "pt": ["coluna Receita", "a coluna Vendas", "selecionar Valor Total"]
+      }
+    },
+    {
+      "id": "col_select_by_index",
+      "category": "column_selection",
+      "priority": 95,
+      "description": {
+        "en": "Select a column by its letter (A, B, C) or numeric index (1, 2, 3)",
+        "pt": "Selecionar uma coluna pela letra (A, B, C) ou índice numérico (1, 2, 3)"
+      },
+      "condition": {
+        "type": "index_match",
+        "check": "column_reference_is_index_or_letter",
+        "acceptFormats": ["letter", "number", "R1C1"],
+        "validateBounds": true
+      },
+      "action": {
+        "type": "select_column",
+        "by": "index_or_letter",
+        "convertToZeroBased": true
+      },
+      "safetyNotes": "Column index may be off-by-one if user counts from 1 vs 0. Always confirm which convention is intended.",
+      "examples": {
+        "en": ["column C", "the third column", "column number 5"],
+        "pt": ["coluna C", "a terceira coluna", "coluna número 5"]
+      }
+    },
+    {
+      "id": "col_select_by_semantic",
+      "category": "column_selection",
+      "priority": 70,
+      "description": {
+        "en": "Select a column by semantic field id matching (e.g., recognizing 'revenue' maps to a specific column)",
+        "pt": "Selecionar uma coluna por correspondência de campo semântico (ex.: reconhecer que 'receita' mapeia para uma coluna específica)"
+      },
+      "condition": {
+        "type": "semantic_match",
+        "check": "field_id_in_schema",
+        "schemaSource": "table_metadata_or_inference",
+        "confidenceThreshold": 0.75
+      },
+      "action": {
+        "type": "select_column",
+        "by": "semantic_field_id",
+        "resolveToIndex": true
+      },
+      "safetyNotes": "Semantic matching relies on inferred field types. Low-confidence matches should prompt user confirmation.",
+      "examples": {
+        "en": ["the revenue column", "find the date field", "select the amount field"],
+        "pt": ["a coluna de receita", "encontrar o campo de data", "selecionar o campo de valor"]
+      }
+    },
+    {
+      "id": "col_select_by_type",
+      "category": "column_selection",
+      "priority": 60,
+      "description": {
+        "en": "Select all columns of a given data type (numeric, text, date, boolean)",
+        "pt": "Selecionar todas as colunas de um tipo de dado específico (numérico, texto, data, booleano)"
+      },
+      "condition": {
+        "type": "type_scan",
+        "check": "column_dominant_type",
+        "dominanceThreshold": 0.9,
+        "supportedTypes": ["numeric", "text", "date", "boolean", "currency", "percentage"]
+      },
+      "action": {
+        "type": "select_columns_by_type",
+        "matchType": "specified_type",
+        "returnAll": true
+      },
+      "safetyNotes": "Mixed-type columns may be excluded if dominance threshold is strict. Lower threshold for messy data.",
+      "examples": {
+        "en": ["all numeric columns", "select date columns", "find text fields"],
+        "pt": ["todas as colunas numéricas", "selecionar colunas de data", "encontrar campos de texto"]
+      }
+    },
+    {
+      "id": "col_select_exclude",
+      "category": "column_selection",
+      "priority": 55,
+      "description": {
+        "en": "Exclude specific columns from the current selection",
+        "pt": "Excluir colunas específicas da seleção atual"
+      },
+      "condition": {
+        "type": "exclusion_spec",
+        "check": "columns_to_exclude_specified",
+        "matchBy": "header_or_index",
+        "allowMultiple": true
+      },
+      "action": {
+        "type": "exclude_columns",
+        "from": "current_selection_or_all",
+        "excludeList": "resolved_columns"
+      },
+      "safetyNotes": "Excluding all columns is an error. Validate at least one column remains after exclusion.",
+      "examples": {
+        "en": ["all columns except ID", "exclude Notes column", "everything but the first column"],
+        "pt": ["todas as colunas exceto ID", "excluir coluna Notas", "tudo menos a primeira coluna"]
+      }
+    },
+    {
+      "id": "col_select_first_numeric",
+      "category": "column_selection",
+      "priority": 65,
+      "description": {
+        "en": "Select the first column containing numeric data",
+        "pt": "Selecionar a primeira coluna contendo dados numéricos"
+      },
+      "condition": {
+        "type": "type_scan",
+        "check": "first_column_with_type",
+        "targetType": "numeric",
+        "scanDirection": "left_to_right",
+        "skipHeader": true
+      },
+      "action": {
+        "type": "select_column",
+        "by": "first_numeric_match",
+        "returnIndex": true
+      },
+      "safetyNotes": "ID columns are often numeric but not intended for aggregation. Consider skipping first numeric column if it looks like an identifier.",
+      "examples": {
+        "en": ["the first number column", "first numeric field", "find a numeric column"],
+        "pt": ["a primeira coluna numérica", "primeiro campo numérico", "encontrar uma coluna numérica"]
+      }
+    },
+    {
+      "id": "col_select_multiple",
+      "category": "column_selection",
+      "priority": 75,
+      "description": {
+        "en": "Select multiple columns by a list of header names",
+        "pt": "Selecionar múltiplas colunas por uma lista de nomes de cabeçalho"
+      },
+      "condition": {
+        "type": "multi_header_match",
+        "check": "all_headers_found",
+        "matchStrategy": "exact_then_fuzzy",
+        "failOnMissing": false,
+        "warnOnMissing": true
+      },
+      "action": {
+        "type": "select_columns",
+        "by": "header_text_list",
+        "preserveOrder": true,
+        "returnIndices": true
+      },
+      "safetyNotes": "If some headers are not found, warn but proceed with found columns. User may have misspelled a column name.",
+      "examples": {
+        "en": ["columns Name, Date, and Amount", "select Revenue and Cost", "pick Sales and Quantity columns"],
+        "pt": ["colunas Nome, Data e Valor", "selecionar Receita e Custo", "escolher colunas Vendas e Quantidade"]
+      }
+    },
+    {
+      "id": "col_select_range",
+      "category": "column_selection",
+      "priority": 72,
+      "description": {
+        "en": "Select a contiguous range of columns (e.g., columns C through F)",
+        "pt": "Selecionar um intervalo contíguo de colunas (ex.: colunas C até F)"
+      },
+      "condition": {
+        "type": "range_spec",
+        "check": "start_and_end_column_specified",
+        "acceptFormats": ["letter_range", "header_range", "index_range"],
+        "validateBounds": true
+      },
+      "action": {
+        "type": "select_column_range",
+        "from": "resolved_start",
+        "to": "resolved_end",
+        "inclusive": true
+      },
+      "safetyNotes": "Reversed ranges (F:C) should be normalized to (C:F). Warn if range spans more than 20 columns.",
+      "examples": {
+        "en": ["columns C through F", "from Revenue to Profit", "columns 3 to 7"],
+        "pt": ["colunas C até F", "de Receita até Lucro", "colunas 3 a 7"]
+      }
+    },
+    {
+      "id": "dynamic_range_auto_expand",
+      "category": "dynamic_range",
+      "priority": 60,
+      "description": {
+        "en": "Auto-expand range boundaries as new data rows or columns are appended",
+        "pt": "Auto-expandir limites do intervalo conforme novas linhas ou colunas de dados são adicionadas"
+      },
+      "condition": {
+        "type": "growth_detect",
+        "check": "data_extends_beyond_range",
+        "lookAheadRows": 10,
+        "lookAheadCols": 3,
+        "contiguityRequired": true
+      },
+      "action": {
+        "type": "expand_range",
+        "direction": "auto",
+        "expandRows": true,
+        "expandCols": false,
+        "updateReference": true
+      },
+      "safetyNotes": "Auto-expansion could include unintended data. Cap expansion at config maxScanRows to prevent runaway ranges.",
+      "examples": {
+        "en": ["include new rows automatically", "expand range for new data", "auto-extend the table"],
+        "pt": ["incluir novas linhas automaticamente", "expandir intervalo para novos dados", "auto-estender a tabela"]
+      }
+    },
+    {
+      "id": "dynamic_range_contiguous",
+      "category": "dynamic_range",
+      "priority": 70,
+      "description": {
+        "en": "Expand selection to the full contiguous non-empty region from a starting cell",
+        "pt": "Expandir seleção para a região contígua completa não vazia a partir de uma célula inicial"
+      },
+      "condition": {
+        "type": "contiguity_scan",
+        "check": "cells_non_empty",
+        "startCell": "specified_or_A1",
+        "directions": ["down", "right"],
+        "stopOnBlank": true
+      },
+      "action": {
+        "type": "expand_to_contiguous",
+        "from": "start_cell",
+        "includeAllDirections": true,
+        "resultFormat": "A1_range"
+      },
+      "safetyNotes": "A single stray value far from the table can cause unexpected range expansion. Use emptyRowThreshold to limit scan.",
+      "examples": {
+        "en": ["select the whole data region", "expand to all connected cells", "current region"],
+        "pt": ["selecionar toda a região de dados", "expandir para todas as células conectadas", "região atual"]
+      }
+    },
+    {
+      "id": "dynamic_range_spill",
+      "category": "dynamic_range",
+      "priority": 55,
+      "description": {
+        "en": "Handle spill ranges from dynamic array formulas (SEQUENCE, FILTER, SORT, UNIQUE)",
+        "pt": "Tratar intervalos de spill de fórmulas de array dinâmico (SEQUENCE, FILTER, SORT, UNIQUE)"
+      },
+      "condition": {
+        "type": "spill_detect",
+        "check": "cell_has_spill_range",
+        "formulaTypes": ["SEQUENCE", "FILTER", "SORT", "UNIQUE", "SORTBY", "RANDARRAY"],
+        "detectSpillError": true
+      },
+      "action": {
+        "type": "resolve_spill_range",
+        "useSpillOperator": true,
+        "notation": "A1#",
+        "expandToActualSize": true
+      },
+      "safetyNotes": "Spill ranges can change size unpredictably. Always resolve to current actual size, not cached size.",
+      "examples": {
+        "en": ["use the spill range", "include all spilled values", "dynamic array result range"],
+        "pt": ["usar o intervalo de spill", "incluir todos os valores derramados", "intervalo de resultado de array dinâmico"]
+      }
+    },
+    {
+      "id": "header_bold_formatting",
+      "category": "header_detection",
+      "priority": 85,
+      "description": {
+        "en": "Detect header row by identifying rows where all cells have bold font formatting",
+        "pt": "Detectar linha de cabeçalho identificando linhas onde todas as células têm formatação de fonte em negrito"
+      },
+      "condition": {
+        "type": "format_scan",
+        "check": "all_cells_bold",
+        "scanFrom": "top",
+        "maxDepth": 5,
+        "minCellCount": 2
+      },
+      "action": {
+        "type": "mark_header",
+        "headerRow": "matched_row",
+        "dataStartRow": "matched_row + 1",
+        "confidence": "high"
+      },
+      "safetyNotes": "Title rows above the table may also be bold. Prefer rows with multiple cells over single-cell bold rows.",
+      "examples": {
+        "en": ["bold header row", "headers are in bold", "formatted header"],
+        "pt": ["linha de cabeçalho em negrito", "cabeçalhos estão em negrito", "cabeçalho formatado"]
+      }
+    },
+    {
+      "id": "header_border_bottom",
+      "category": "header_detection",
+      "priority": 75,
+      "description": {
+        "en": "Detect header row by identifying a row with a bottom border separating it from data rows",
+        "pt": "Detectar linha de cabeçalho identificando uma linha com borda inferior separando-a das linhas de dados"
+      },
+      "condition": {
+        "type": "border_scan",
+        "check": "row_has_bottom_border",
+        "scanFrom": "top",
+        "maxDepth": 5,
+        "borderStyles": ["thin", "medium", "thick", "double"]
+      },
+      "action": {
+        "type": "mark_header",
+        "headerRow": "matched_row",
+        "dataStartRow": "matched_row + 1",
+        "confidence": "medium"
+      },
+      "safetyNotes": "Summary rows mid-table may also have borders. Only consider borders within headerScanDepth from top.",
+      "examples": {
+        "en": ["header with underline", "bordered header row", "line under headers"],
+        "pt": ["cabeçalho com sublinhado", "linha de cabeçalho com borda", "linha sob os cabeçalhos"]
+      }
+    },
+    {
+      "id": "header_color_background",
+      "category": "header_detection",
+      "priority": 80,
+      "description": {
+        "en": "Detect header row by identifying a row with a distinct background color fill",
+        "pt": "Detectar linha de cabeçalho identificando uma linha com preenchimento de cor de fundo distinta"
+      },
+      "condition": {
+        "type": "color_scan",
+        "check": "row_has_fill_color",
+        "scanFrom": "top",
+        "maxDepth": 5,
+        "excludeWhite": true,
+        "requireUniformColor": true
+      },
+      "action": {
+        "type": "mark_header",
+        "headerRow": "matched_row",
+        "dataStartRow": "matched_row + 1",
+        "confidence": "high"
+      },
+      "safetyNotes": "Alternating row colors (banded rows) can trigger false positives. Verify the colored row is unique, not part of a repeating pattern.",
+      "examples": {
+        "en": ["colored header row", "header with background color", "shaded header"],
+        "pt": ["linha de cabeçalho colorida", "cabeçalho com cor de fundo", "cabeçalho sombreado"]
+      }
+    },
+    {
+      "id": "header_first_row_text",
+      "category": "header_detection",
+      "priority": 100,
+      "description": {
+        "en": "Detect header row as first row containing all text cells",
+        "pt": "Detectar linha de cabeçalho como primeira linha com todas as células de texto"
+      },
+      "condition": {
+        "type": "row_scan",
+        "check": "all_cells_text",
+        "scanFrom": "top",
+        "maxDepth": 5
+      },
+      "action": {
+        "type": "mark_header",
+        "headerRow": "matched_row",
+        "dataStartRow": "matched_row + 1"
+      },
+      "safetyNotes": "May misfire on rows of text-formatted numbers. Cross-check with row below for numeric content.",
+      "examples": {
+        "en": ["first row is header", "top row has column names"],
+        "pt": ["primeira linha é cabeçalho", "linha superior tem nomes de colunas"]
+      }
+    },
+    {
+      "id": "header_frozen_pane",
+      "category": "header_detection",
+      "priority": 90,
+      "description": {
+        "en": "Identify header rows by detecting frozen panes at the top of the sheet",
+        "pt": "Identificar linhas de cabeçalho detectando painéis congelados no topo da planilha"
+      },
+      "condition": {
+        "type": "pane_check",
+        "check": "has_frozen_rows",
+        "frozenPosition": "top",
+        "maxFrozenRows": 3
+      },
+      "action": {
+        "type": "mark_header",
+        "headerRow": "last_frozen_row",
+        "dataStartRow": "last_frozen_row + 1",
+        "confidence": "very_high"
+      },
+      "safetyNotes": "Some sheets freeze multiple rows for titles and headers. The last frozen row is most likely the header, not the first.",
+      "examples": {
+        "en": ["frozen header row", "pinned top rows are headers", "header is frozen"],
+        "pt": ["linha de cabeçalho congelada", "linhas fixas no topo são cabeçalhos", "cabeçalho está congelado"]
+      }
+    },
+    {
+      "id": "header_merged_cells",
+      "category": "header_detection",
+      "priority": 65,
+      "description": {
+        "en": "Detect grouped or hierarchical headers indicated by merged cells in the top rows",
+        "pt": "Detectar cabeçalhos agrupados ou hierárquicos indicados por células mescladas nas linhas superiores"
+      },
+      "condition": {
+        "type": "merge_scan",
+        "check": "has_merged_cells_in_top_rows",
+        "scanFrom": "top",
+        "maxDepth": 5,
+        "mergeDirection": "horizontal"
+      },
+      "action": {
+        "type": "mark_grouped_header",
+        "groupHeaderRow": "merge_row",
+        "subHeaderRow": "merge_row + 1",
+        "dataStartRow": "merge_row + 2"
+      },
+      "safetyNotes": "Merged cells make column indexing ambiguous. Expand merged regions to individual column mappings before processing.",
+      "examples": {
+        "en": ["merged header cells", "grouped column headers", "hierarchical header"],
+        "pt": ["células de cabeçalho mescladas", "cabeçalhos de colunas agrupadas", "cabeçalho hierárquico"]
+      }
+    },
+    {
+      "id": "header_mixed_type_boundary",
+      "category": "header_detection",
+      "priority": 88,
+      "description": {
+        "en": "Detect header boundary where row type transitions from all-text to mixed or numeric content",
+        "pt": "Detectar limite do cabeçalho onde o tipo de linha transiciona de todo-texto para conteúdo misto ou numérico"
+      },
+      "condition": {
+        "type": "type_transition_scan",
+        "check": "text_to_numeric_boundary",
+        "scanFrom": "top",
+        "maxDepth": 5,
+        "transitionThreshold": 0.5
+      },
+      "action": {
+        "type": "mark_header",
+        "headerRow": "last_all_text_row",
+        "dataStartRow": "first_numeric_row",
+        "confidence": "high"
+      },
+      "safetyNotes": "Descriptive text rows above the header (titles, notes) may be caught. Ensure the text row has the same column count as data rows.",
+      "examples": {
+        "en": ["type boundary header detection", "text to number transition"],
+        "pt": ["detecção de cabeçalho por limite de tipo", "transição de texto para número"]
+      }
+    },
+    {
+      "id": "header_multi_row",
+      "category": "header_detection",
+      "priority": 60,
+      "description": {
+        "en": "Detect multi-row headers with hierarchical column names spanning two or more rows",
+        "pt": "Detectar cabeçalhos de múltiplas linhas com nomes de colunas hierárquicos abrangendo duas ou mais linhas"
+      },
+      "condition": {
+        "type": "multi_row_scan",
+        "check": "consecutive_text_rows_at_top",
+        "minRows": 2,
+        "maxRows": 4,
+        "followedByNumeric": true
+      },
+      "action": {
+        "type": "mark_multi_row_header",
+        "headerStartRow": "first_text_row",
+        "headerEndRow": "last_text_row",
+        "dataStartRow": "last_text_row + 1",
+        "concatenateHeaders": true,
+        "separator": " - "
+      },
+      "safetyNotes": "Concatenated multi-row headers may produce long or awkward column names. Truncate if necessary.",
+      "examples": {
+        "en": ["two-row header", "multi-level column names", "hierarchical headers"],
+        "pt": ["cabeçalho de duas linhas", "nomes de colunas multi-nível", "cabeçalhos hierárquicos"]
+      }
+    },
+    {
+      "id": "header_named_table",
+      "category": "header_detection",
+      "priority": 99,
+      "description": {
+        "en": "Use the header row defined by an Excel Table (ListObject) structure",
+        "pt": "Usar a linha de cabeçalho definida por uma estrutura de Tabela Excel (ListObject)"
+      },
+      "condition": {
+        "type": "table_object_check",
+        "check": "is_excel_table",
+        "hasHeaderRow": true
+      },
+      "action": {
+        "type": "mark_header",
+        "headerRow": "table_header_row",
+        "dataStartRow": "table_header_row + 1",
+        "confidence": "definitive"
+      },
+      "safetyNotes": "Table objects are the most reliable header source. Always prefer this over heuristic detection when available.",
+      "examples": {
+        "en": ["Excel table with headers", "structured table header", "ListObject header row"],
+        "pt": ["tabela Excel com cabeçalhos", "cabeçalho de tabela estruturada", "linha de cabeçalho ListObject"]
+      }
+    },
+    {
+      "id": "header_repeated_pattern",
+      "category": "header_detection",
+      "priority": 50,
+      "description": {
+        "en": "Detect header when the same text row pattern repeats across multiple sheets",
+        "pt": "Detectar cabeçalho quando o mesmo padrão de linha de texto se repete em várias planilhas"
+      },
+      "condition": {
+        "type": "cross_sheet_scan",
+        "check": "same_text_row_in_multiple_sheets",
+        "minSheets": 2,
+        "rowPosition": "top",
+        "maxDepth": 3
+      },
+      "action": {
+        "type": "mark_header",
+        "headerRow": "matched_common_row",
+        "dataStartRow": "matched_common_row + 1",
+        "confidence": "high",
+        "applyToAllSheets": true
+      },
+      "safetyNotes": "Sheets may have minor header variations (typos, extra columns). Use fuzzy match for cross-sheet comparison.",
+      "examples": {
+        "en": ["same header across sheets", "repeated header pattern", "consistent headers in all tabs"],
+        "pt": ["mesmo cabeçalho em várias planilhas", "padrão de cabeçalho repetido", "cabeçalhos consistentes em todas as abas"]
+      }
+    },
+    {
+      "id": "header_skip_blank_top",
+      "category": "header_detection",
+      "priority": 95,
+      "description": {
+        "en": "Skip leading blank rows at the top of the sheet before searching for the header row",
+        "pt": "Pular linhas em branco iniciais no topo da planilha antes de procurar a linha de cabeçalho"
+      },
+      "condition": {
+        "type": "blank_row_scan",
+        "check": "leading_blank_rows",
+        "scanFrom": "top",
+        "maxBlankRows": 10,
+        "blankDefinition": "all_cells_empty_or_whitespace"
+      },
+      "action": {
+        "type": "adjust_scan_start",
+        "skipTo": "first_non_blank_row",
+        "thenApply": "header_detection_rules"
+      },
+      "safetyNotes": "Some sheets intentionally start with blank rows for layout. Limit skip to 10 rows to avoid skipping too far.",
+      "examples": {
+        "en": ["skip empty rows at top", "ignore blank leading rows", "find first non-empty row"],
+        "pt": ["pular linhas vazias no topo", "ignorar linhas em branco iniciais", "encontrar primeira linha não vazia"]
+      }
+    },
+    {
+      "id": "header_unique_values",
+      "category": "header_detection",
+      "priority": 82,
+      "description": {
+        "en": "Identify header row as a row where all cell values are unique (no duplicates)",
+        "pt": "Identificar linha de cabeçalho como uma linha onde todos os valores das células são únicos (sem duplicatas)"
+      },
+      "condition": {
+        "type": "uniqueness_check",
+        "check": "all_values_unique",
+        "scanFrom": "top",
+        "maxDepth": 5,
+        "ignoreEmpty": true,
+        "caseSensitive": false
+      },
+      "action": {
+        "type": "mark_header",
+        "headerRow": "matched_row",
+        "dataStartRow": "matched_row + 1",
+        "confidence": "medium"
+      },
+      "safetyNotes": "A data row with all unique values can be mistaken for a header. Combine with type-checking for higher confidence.",
+      "examples": {
+        "en": ["unique header values", "no duplicate column names", "distinct header cells"],
+        "pt": ["valores de cabeçalho únicos", "sem nomes de colunas duplicados", "células de cabeçalho distintas"]
+      }
+    },
+    {
+      "id": "multi_sheet_consolidate",
+      "category": "multi_sheet",
+      "priority": 65,
+      "description": {
+        "en": "Consolidate same-structure tables from multiple sheets into a single unified dataset",
+        "pt": "Consolidar tabelas de mesma estrutura de múltiplas planilhas em um único conjunto de dados unificado"
+      },
+      "condition": {
+        "type": "structure_match",
+        "check": "sheets_have_same_columns",
+        "matchBy": "header_text",
+        "minMatchingSheets": 2,
+        "tolerateMissingColumns": true
+      },
+      "action": {
+        "type": "consolidate",
+        "method": "union_all",
+        "addSheetNameColumn": true,
+        "handleMissingColumns": "fill_null",
+        "deduplicateRows": false
+      },
+      "safetyNotes": "Column order may vary across sheets. Align by header name, not position. Missing columns should be filled with null.",
+      "examples": {
+        "en": ["combine all sheets", "consolidate monthly tabs", "merge sheets into one table"],
+        "pt": ["combinar todas as planilhas", "consolidar abas mensais", "mesclar planilhas em uma tabela"]
+      }
+    },
+    {
+      "id": "multi_sheet_lookup",
+      "category": "multi_sheet",
+      "priority": 55,
+      "description": {
+        "en": "Look up a value by searching a column across multiple sheets",
+        "pt": "Procurar um valor pesquisando uma coluna em múltiplas planilhas"
+      },
+      "condition": {
+        "type": "cross_sheet_search",
+        "check": "value_exists_in_column",
+        "searchColumn": "specified_or_first",
+        "searchAllSheets": true,
+        "stopOnFirstMatch": false
+      },
+      "action": {
+        "type": "cross_sheet_lookup",
+        "returnSheet": true,
+        "returnRow": true,
+        "returnAllMatches": true
+      },
+      "safetyNotes": "Same value may exist in multiple sheets. Return all matches and let the user disambiguate if needed.",
+      "examples": {
+        "en": ["find value across sheets", "lookup in all tabs", "search all sheets for this ID"],
+        "pt": ["encontrar valor em todas as planilhas", "procurar em todas as abas", "pesquisar todas as planilhas por este ID"]
+      }
+    },
+    {
+      "id": "multi_sheet_match_by_name",
+      "category": "multi_sheet",
+      "priority": 70,
+      "description": {
+        "en": "Match and select sheets by name pattern (e.g., 'Jan*', '*2025*', 'Q[1-4]')",
+        "pt": "Corresponder e selecionar planilhas por padrão de nome (ex.: 'Jan*', '*2025*', 'Q[1-4]')"
+      },
+      "condition": {
+        "type": "sheet_name_match",
+        "check": "name_matches_pattern",
+        "patternTypes": ["glob", "regex", "contains"],
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "select_sheets",
+        "by": "name_pattern",
+        "returnMatching": true,
+        "preserveOrder": true
+      },
+      "safetyNotes": "Broad patterns like '*' will match all sheets. Warn the user if more than 10 sheets are matched.",
+      "examples": {
+        "en": ["sheets named Jan through Dec", "all 2025 tabs", "sheets matching Q1 to Q4"],
+        "pt": ["planilhas de Jan a Dez", "todas as abas de 2025", "planilhas correspondendo Q1 a Q4"]
+      }
+    },
+    {
+      "id": "multi_sheet_match_by_tab_color",
+      "category": "multi_sheet",
+      "priority": 40,
+      "description": {
+        "en": "Match and select sheets by their tab color",
+        "pt": "Corresponder e selecionar planilhas pela cor da aba"
+      },
+      "condition": {
+        "type": "tab_color_match",
+        "check": "tab_has_color",
+        "colorMatch": "user_specified_or_auto",
+        "supportedFormats": ["name", "hex", "theme_color"]
+      },
+      "action": {
+        "type": "select_sheets",
+        "by": "tab_color",
+        "returnMatching": true
+      },
+      "safetyNotes": "Tab colors are unreliable metadata. Not all sheets have colors, and color meaning is user-defined. Use as secondary filter.",
+      "examples": {
+        "en": ["blue tabs only", "sheets with green tab color", "colored tabs"],
+        "pt": ["apenas abas azuis", "planilhas com cor de aba verde", "abas coloridas"]
+      }
+    },
+    {
+      "id": "multi_sheet_same_structure",
+      "category": "multi_sheet",
+      "priority": 60,
+      "description": {
+        "en": "Verify that multiple sheets share the same column structure before consolidation",
+        "pt": "Verificar que múltiplas planilhas compartilham a mesma estrutura de colunas antes da consolidação"
+      },
+      "condition": {
+        "type": "structure_compare",
+        "check": "column_headers_match",
+        "compareMethod": "fuzzy_header_text",
+        "fuzzyThreshold": 0.85,
+        "requireSameColumnCount": false
+      },
+      "action": {
+        "type": "validate_structure",
+        "reportMismatches": true,
+        "commonColumns": "intersection",
+        "blockOnMajorDifference": true,
+        "majorDifferenceThreshold": 0.5
+      },
+      "safetyNotes": "Minor header differences (casing, abbreviations) are tolerated. Major structural differences should block consolidation.",
+      "examples": {
+        "en": ["verify sheets match", "check structure across tabs", "confirm same columns in all sheets"],
+        "pt": ["verificar se planilhas correspondem", "checar estrutura nas abas", "confirmar mesmas colunas em todas as planilhas"]
+      }
+    },
+    {
+      "id": "named_range_expand",
+      "category": "named_range",
+      "priority": 85,
+      "description": {
+        "en": "Expand a named range reference to its actual cell coordinates",
+        "pt": "Expandir uma referência de intervalo nomeado para suas coordenadas de célula reais"
+      },
+      "condition": {
+        "type": "named_range_lookup",
+        "check": "name_exists_in_workbook",
+        "searchScope": "workbook_then_sheet",
+        "caseSensitive": false
+      },
+      "action": {
+        "type": "resolve_named_range",
+        "expandTo": "cell_coordinates",
+        "format": "A1_notation",
+        "includeSheet": true
+      },
+      "safetyNotes": "Named ranges can reference other workbooks. Block external references for security.",
+      "examples": {
+        "en": ["use the SalesData range", "expand named range Revenue", "resolve DataTable range"],
+        "pt": ["usar o intervalo DadosVendas", "expandir intervalo nomeado Receita", "resolver intervalo TabelaDados"]
+      }
+    },
+    {
+      "id": "named_range_fuzzy_match",
+      "category": "named_range",
+      "priority": 70,
+      "description": {
+        "en": "Fuzzy match user input text to existing named range names in the workbook",
+        "pt": "Correspondência aproximada do texto do usuário com nomes de intervalos nomeados existentes na pasta de trabalho"
+      },
+      "condition": {
+        "type": "fuzzy_search",
+        "check": "closest_named_range",
+        "algorithm": "levenshtein",
+        "maxDistance": 3,
+        "minSimilarity": 0.7,
+        "candidateSource": "all_named_ranges"
+      },
+      "action": {
+        "type": "suggest_named_range",
+        "returnTopN": 3,
+        "requireConfirmation": true,
+        "autoSelectAbove": 0.95
+      },
+      "safetyNotes": "Fuzzy matches below 0.9 similarity should require user confirmation. Never auto-select ambiguous matches.",
+      "examples": {
+        "en": ["did you mean SalesData?", "similar range: Revenue2024", "closest match: Q1_Totals"],
+        "pt": ["você quis dizer DadosVendas?", "intervalo similar: Receita2024", "correspondência mais próxima: Totais_Q1"]
+      }
+    },
+    {
+      "id": "named_range_prefer_table",
+      "category": "named_range",
+      "priority": 80,
+      "description": {
+        "en": "Prefer Excel table structured references over raw named ranges when both exist",
+        "pt": "Preferir referências estruturadas de tabela Excel sobre intervalos nomeados brutos quando ambos existem"
+      },
+      "condition": {
+        "type": "overlap_check",
+        "check": "named_range_overlaps_table",
+        "preferTable": true,
+        "tableHasPriority": true
+      },
+      "action": {
+        "type": "resolve_to_table",
+        "useTableReference": true,
+        "structuredRefFormat": "Table1[Column]",
+        "fallbackToNamedRange": true
+      },
+      "safetyNotes": "Table references auto-adjust on insert/delete; named ranges may not. Tables are safer for dynamic data.",
+      "examples": {
+        "en": ["use table reference instead", "prefer structured reference", "Table1 over named range"],
+        "pt": ["usar referência de tabela em vez disso", "preferir referência estruturada", "Tabela1 sobre intervalo nomeado"]
+      }
+    },
+    {
+      "id": "named_range_resolve_dynamic",
+      "category": "named_range",
+      "priority": 65,
+      "description": {
+        "en": "Resolve OFFSET/INDEX-based dynamic named ranges to their current cell extent",
+        "pt": "Resolver intervalos nomeados dinâmicos baseados em OFFSET/INDEX para sua extensão de célula atual"
+      },
+      "condition": {
+        "type": "formula_check",
+        "check": "named_range_uses_dynamic_formula",
+        "dynamicFunctions": ["OFFSET", "INDEX", "INDIRECT"],
+        "requireEvaluation": true
+      },
+      "action": {
+        "type": "evaluate_dynamic_range",
+        "evaluateFormula": true,
+        "cacheResult": false,
+        "resultFormat": "A1_range"
+      },
+      "safetyNotes": "Dynamic named ranges depend on volatile functions that recalculate. Always evaluate at query time, never cache.",
+      "examples": {
+        "en": ["resolve dynamic range", "evaluate OFFSET range", "expand INDEX-based range"],
+        "pt": ["resolver intervalo dinâmico", "avaliar intervalo OFFSET", "expandir intervalo baseado em INDEX"]
+      }
+    },
+    {
+      "id": "named_range_scope_sheet",
+      "category": "named_range",
+      "priority": 75,
+      "description": {
+        "en": "Scope named range resolution to the current sheet when duplicate names exist at sheet and workbook level",
+        "pt": "Limitar resolução de intervalo nomeado à planilha atual quando nomes duplicados existem no nível da planilha e da pasta de trabalho"
+      },
+      "condition": {
+        "type": "scope_check",
+        "check": "duplicate_name_exists",
+        "scopes": ["sheet", "workbook"],
+        "preferScope": "sheet"
+      },
+      "action": {
+        "type": "resolve_scoped",
+        "preferSheet": true,
+        "fallbackToWorkbook": true,
+        "reportScopeUsed": true
+      },
+      "safetyNotes": "Sheet-scoped names take precedence over workbook-scoped names in Excel. Follow the same convention.",
+      "examples": {
+        "en": ["use this sheet's range", "local range definition", "sheet-scoped named range"],
+        "pt": ["usar intervalo desta planilha", "definição de intervalo local", "intervalo nomeado com escopo de planilha"]
+      }
+    },
+    {
+      "id": "named_range_validate",
+      "category": "named_range",
+      "priority": 90,
+      "description": {
+        "en": "Validate that a named range still points to valid, non-deleted cells",
+        "pt": "Validar que um intervalo nomeado ainda aponta para células válidas e não excluídas"
+      },
+      "condition": {
+        "type": "validity_check",
+        "check": "range_reference_valid",
+        "detectErrors": ["#REF!", "deleted_sheet", "out_of_bounds"],
+        "checkDataPresence": true
+      },
+      "action": {
+        "type": "validate_and_report",
+        "valid": "proceed",
+        "invalid": "warn_and_suggest_alternative",
+        "empty": "warn_empty_range"
+      },
+      "safetyNotes": "Stale named ranges pointing to #REF! errors are common after structural edits. Always validate before use.",
+      "examples": {
+        "en": ["validate range reference", "check if range is valid", "verify named range exists"],
+        "pt": ["validar referência de intervalo", "verificar se o intervalo é válido", "verificar se o intervalo nomeado existe"]
+      }
+    },
+    {
+      "id": "row_select_all",
+      "category": "row_selection",
+      "priority": 90,
+      "description": {
+        "en": "Select all data rows, excluding the header row and any total/summary rows",
+        "pt": "Selecionar todas as linhas de dados, excluindo a linha de cabeçalho e quaisquer linhas de total/resumo"
+      },
+      "condition": {
+        "type": "boundary_check",
+        "check": "table_bounds_resolved",
+        "requireHeader": true,
+        "excludeSummaryRows": true
+      },
+      "action": {
+        "type": "select_rows",
+        "from": "data_start_row",
+        "to": "last_data_row",
+        "exclude": ["header", "total", "subtotal"]
+      },
+      "safetyNotes": "Ensure table boundary detection has run first. Without boundaries, this may select non-data rows.",
+      "examples": {
+        "en": ["all data rows", "all rows", "every row in the table"],
+        "pt": ["todas as linhas de dados", "todas as linhas", "cada linha na tabela"]
+      }
+    },
+    {
+      "id": "row_select_bottom_n",
+      "category": "row_selection",
+      "priority": 80,
+      "description": {
+        "en": "Select the last N rows from the bottom of the data range",
+        "pt": "Selecionar as últimas N linhas do final do intervalo de dados"
+      },
+      "condition": {
+        "type": "count_spec",
+        "check": "n_specified",
+        "position": "bottom",
+        "excludeSummaryRows": true
+      },
+      "action": {
+        "type": "select_rows",
+        "from": "last_data_row - N + 1",
+        "to": "last_data_row",
+        "count": "N"
+      },
+      "safetyNotes": "If N exceeds total data rows, return all data rows with a warning. Do not include summary rows in the count.",
+      "examples": {
+        "en": ["last 5 rows", "bottom 10 rows", "final 3 entries"],
+        "pt": ["últimas 5 linhas", "10 linhas do final", "últimas 3 entradas"]
+      }
+    },
+    {
+      "id": "row_select_by_date_range",
+      "category": "row_selection",
+      "priority": 75,
+      "description": {
+        "en": "Filter rows by date column within a specified date range",
+        "pt": "Filtrar linhas por coluna de data dentro de um intervalo de datas especificado"
+      },
+      "condition": {
+        "type": "date_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "startDate": "user_specified",
+        "endDate": "user_specified",
+        "inclusive": true
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "dateColumn": "resolved_column",
+        "from": "start_date",
+        "to": "end_date"
+      },
+      "safetyNotes": "Date formats vary widely. Parse dates carefully and handle ambiguous formats (01/02/2025 = Jan 2 or Feb 1?).",
+      "examples": {
+        "en": ["rows from Jan to Mar 2025", "entries between 2024-01-01 and 2024-12-31", "data for March"],
+        "pt": ["linhas de Jan a Mar 2025", "entradas entre 01/01/2024 e 31/12/2024", "dados de março"]
+      }
+    },
+    {
+      "id": "row_select_by_value",
+      "category": "row_selection",
+      "priority": 85,
+      "description": {
+        "en": "Filter rows where a specified column equals or contains a given value",
+        "pt": "Filtrar linhas onde uma coluna especificada é igual ou contém um valor dado"
+      },
+      "condition": {
+        "type": "value_filter",
+        "check": "column_value_match",
+        "matchTypes": ["equals", "contains", "starts_with", "ends_with"],
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "value_match",
+        "column": "specified_column",
+        "value": "specified_value",
+        "matchType": "resolved_type"
+      },
+      "safetyNotes": "Contains matching may return more rows than expected. Prefer exact match when the user is specific.",
+      "examples": {
+        "en": ["rows where Status is Active", "filter by Region = North", "entries containing 'error'"],
+        "pt": ["linhas onde Status é Ativo", "filtrar por Região = Norte", "entradas contendo 'erro'"]
+      }
+    },
+    {
+      "id": "row_select_by_value_range",
+      "category": "row_selection",
+      "priority": 72,
+      "description": {
+        "en": "Filter rows where a column value falls between a minimum and maximum",
+        "pt": "Filtrar linhas onde o valor de uma coluna está entre um mínimo e máximo"
+      },
+      "condition": {
+        "type": "range_filter",
+        "check": "column_is_numeric",
+        "column": "specified_column",
+        "min": "user_specified",
+        "max": "user_specified",
+        "inclusive": true
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "value_range",
+        "column": "specified_column",
+        "min": "resolved_min",
+        "max": "resolved_max"
+      },
+      "safetyNotes": "Ensure min <= max. If reversed, swap values silently. Warn if no rows match the range.",
+      "examples": {
+        "en": ["sales between 100 and 500", "rows where amount is 1000 to 5000", "values from 0 to 100"],
+        "pt": ["vendas entre 100 e 500", "linhas onde valor é de 1000 a 5000", "valores de 0 a 100"]
+      }
+    },
+    {
+      "id": "row_select_distinct",
+      "category": "row_selection",
+      "priority": 55,
+      "description": {
+        "en": "Select only unique or distinct rows, removing duplicates based on all or specified columns",
+        "pt": "Selecionar apenas linhas únicas ou distintas, removendo duplicatas com base em todas ou colunas especificadas"
+      },
+      "condition": {
+        "type": "dedup_spec",
+        "check": "duplicates_exist",
+        "deduplicateBy": "all_columns_or_specified",
+        "keepFirst": true
+      },
+      "action": {
+        "type": "deduplicate_rows",
+        "by": "resolved_columns",
+        "keep": "first",
+        "reportRemovedCount": true
+      },
+      "safetyNotes": "Deduplication on all columns is strict; partial column dedup may remove rows with different values in non-key columns.",
+      "examples": {
+        "en": ["unique rows only", "distinct entries", "remove duplicate rows"],
+        "pt": ["apenas linhas únicas", "entradas distintas", "remover linhas duplicadas"]
+      }
+    },
+    {
+      "id": "row_select_exclude_empty",
+      "category": "row_selection",
+      "priority": 70,
+      "description": {
+        "en": "Skip rows where the target column is empty or blank",
+        "pt": "Pular linhas onde a coluna alvo está vazia ou em branco"
+      },
+      "condition": {
+        "type": "emptiness_check",
+        "check": "target_column_empty",
+        "targetColumn": "specified_or_all",
+        "emptyDefinition": "null_or_blank_or_whitespace"
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "non_empty",
+        "column": "target_column",
+        "exclude": "empty_rows"
+      },
+      "safetyNotes": "Cells containing only spaces or zero-width characters may appear empty but are not. Trim before checking.",
+      "examples": {
+        "en": ["skip empty rows", "exclude blanks", "only rows with data in Amount"],
+        "pt": ["pular linhas vazias", "excluir brancos", "apenas linhas com dados em Valor"]
+      }
+    },
+    {
+      "id": "row_select_exclude_subtotals",
+      "category": "row_selection",
+      "priority": 78,
+      "description": {
+        "en": "Skip subtotal and summary rows that contain aggregated values",
+        "pt": "Pular linhas de subtotal e resumo que contêm valores agregados"
+      },
+      "condition": {
+        "type": "subtotal_detect",
+        "check": "row_is_subtotal",
+        "indicators": ["Total", "Subtotal", "Sum", "Average", "Soma", "Subtotal", "Média"],
+        "formulaCheck": "SUBTOTAL_function",
+        "boldCheck": true
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "exclude_subtotals",
+        "exclude": "detected_subtotal_rows",
+        "reportExcludedCount": true
+      },
+      "safetyNotes": "Subtotal rows may not have explicit labels. Check for SUBTOTAL formulas and bold formatting as additional signals.",
+      "examples": {
+        "en": ["exclude totals", "skip summary rows", "data rows only, no subtotals"],
+        "pt": ["excluir totais", "pular linhas de resumo", "apenas linhas de dados, sem subtotais"]
+      }
+    },
+    {
+      "id": "row_select_first_n",
+      "category": "row_selection",
+      "priority": 82,
+      "description": {
+        "en": "Select the first N rows from the top of the data range",
+        "pt": "Selecionar as primeiras N linhas do topo do intervalo de dados"
+      },
+      "condition": {
+        "type": "count_spec",
+        "check": "n_specified",
+        "position": "top",
+        "excludeHeader": true
+      },
+      "action": {
+        "type": "select_rows",
+        "from": "data_start_row",
+        "to": "data_start_row + N - 1",
+        "count": "N"
+      },
+      "safetyNotes": "If N exceeds available rows, return all rows with a warning. Always exclude header from the count.",
+      "examples": {
+        "en": ["first 10 rows", "top 5 entries", "head 20 rows"],
+        "pt": ["primeiras 10 linhas", "5 primeiras entradas", "20 primeiras linhas"]
+      }
+    },
+    {
+      "id": "row_select_non_zero",
+      "category": "row_selection",
+      "priority": 65,
+      "description": {
+        "en": "Skip rows where the target column contains zero",
+        "pt": "Pular linhas onde a coluna alvo contém zero"
+      },
+      "condition": {
+        "type": "zero_check",
+        "check": "target_column_is_zero",
+        "targetColumn": "specified",
+        "treatBlankAsZero": false
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "non_zero",
+        "column": "target_column",
+        "exclude": "zero_rows"
+      },
+      "safetyNotes": "Zero may be a valid data point in some contexts (e.g., temperature). Only exclude zeros when explicitly requested.",
+      "examples": {
+        "en": ["exclude zero values", "non-zero rows only", "skip rows with zero sales"],
+        "pt": ["excluir valores zero", "apenas linhas não-zero", "pular linhas com vendas zero"]
+      }
+    },
+    {
+      "id": "row_select_nth",
+      "category": "row_selection",
+      "priority": 35,
+      "description": {
+        "en": "Select every Nth row for sampling purposes",
+        "pt": "Selecionar cada N-ésima linha para fins de amostragem"
+      },
+      "condition": {
+        "type": "sampling_spec",
+        "check": "n_specified",
+        "method": "every_nth",
+        "startOffset": 0
+      },
+      "action": {
+        "type": "sample_rows",
+        "method": "every_nth",
+        "n": "specified_n",
+        "startFrom": "data_start_row",
+        "includeFirst": true
+      },
+      "safetyNotes": "Systematic sampling can introduce bias if data has periodic patterns. Consider random sampling for statistical use.",
+      "examples": {
+        "en": ["every 5th row", "sample every 10 rows", "pick every other row"],
+        "pt": ["cada 5ª linha", "amostrar a cada 10 linhas", "selecionar linhas alternadas"]
+      }
+    },
+    {
+      "id": "row_select_top_n",
+      "category": "row_selection",
+      "priority": 83,
+      "description": {
+        "en": "Select top N rows by value in a specified column (highest values)",
+        "pt": "Selecionar as N linhas com maiores valores em uma coluna especificada"
+      },
+      "condition": {
+        "type": "ranking_spec",
+        "check": "column_is_numeric",
+        "rankBy": "specified_column",
+        "order": "descending",
+        "n": "user_specified"
+      },
+      "action": {
+        "type": "select_top_n",
+        "sortBy": "specified_column",
+        "order": "descending",
+        "limit": "N",
+        "handleTies": "include_all_tied"
+      },
+      "safetyNotes": "Ties at the Nth position may return more than N rows. Clarify tie-breaking strategy with the user.",
+      "examples": {
+        "en": ["top 10 by revenue", "highest 5 scores", "top 3 performers"],
+        "pt": ["top 10 por receita", "5 maiores notas", "3 melhores desempenhos"]
+      }
+    },
+    {
+      "id": "safety_circular_reference",
+      "category": "safety_constraint",
+      "priority": 100,
+      "description": {
+        "en": "Detect and block circular references that would cause infinite calculation loops",
+        "pt": "Detectar e bloquear referências circulares que causariam loops infinitos de cálculo"
+      },
+      "condition": {
+        "type": "dependency_check",
+        "check": "formula_references_self",
+        "detectIndirect": true,
+        "maxDepth": 50,
+        "checkAcrossSheets": true
+      },
+      "action": {
+        "type": "block_execution",
+        "reason": "circular_reference_detected",
+        "reportChain": true,
+        "suggestFix": true
+      },
+      "safetyNotes": "Circular references are always blocked. Some users intentionally use iterative calculation, but the agent should not enable it automatically.",
+      "examples": {
+        "en": ["A1 references B1 which references A1", "circular formula detected", "self-referencing cell"],
+        "pt": ["A1 referencia B1 que referencia A1", "fórmula circular detectada", "célula auto-referenciável"]
+      }
+    },
+    {
+      "id": "safety_cross_type_guard",
+      "category": "safety_constraint",
+      "priority": 95,
+      "description": {
+        "en": "Prevent aggregation of columns with mixed types (text and numbers mixed together)",
+        "pt": "Prevenir agregação de colunas com tipos mistos (texto e números misturados)"
+      },
+      "condition": {
+        "type": "type_check",
+        "check": "column_has_mixed_types",
+        "mixThreshold": 0.1,
+        "criticalMix": ["numeric_and_text", "date_and_text"]
+      },
+      "action": {
+        "type": "warn_and_block",
+        "severity": "error",
+        "message": "Cannot aggregate mixed-type column",
+        "suggestCast": true,
+        "suggestFilter": true
+      },
+      "safetyNotes": "A small fraction of text in a numeric column (e.g., 'N/A', '-') is common. Offer to filter or coerce before blocking.",
+      "examples": {
+        "en": ["column has text and numbers", "mixed types in Amount column", "cannot sum text values"],
+        "pt": ["coluna tem texto e números", "tipos mistos na coluna Valor", "não é possível somar valores de texto"]
+      }
+    },
+    {
+      "id": "safety_empty_range_guard",
+      "category": "safety_constraint",
+      "priority": 92,
+      "description": {
+        "en": "Warn when the resolved range contains no data rows after filtering",
+        "pt": "Avisar quando o intervalo resolvido não contém linhas de dados após filtragem"
+      },
+      "condition": {
+        "type": "emptiness_check",
+        "check": "resolved_range_empty",
+        "afterFilters": true,
+        "treatZeroAsEmpty": false
+      },
+      "action": {
+        "type": "warn",
+        "severity": "warning",
+        "message": "Resolved range contains no data",
+        "suggestBroaderFilter": true,
+        "blockAggregation": true
+      },
+      "safetyNotes": "An empty result set after filtering likely means the filter criteria are too narrow. Suggest relaxing conditions.",
+      "examples": {
+        "en": ["no data found in range", "empty result after filter", "no matching rows"],
+        "pt": ["nenhum dado encontrado no intervalo", "resultado vazio após filtro", "nenhuma linha correspondente"]
+      }
+    },
+    {
+      "id": "safety_large_range_warn",
+      "category": "safety_constraint",
+      "priority": 88,
+      "description": {
+        "en": "Warn when the resolved range exceeds the configured maxScanRows limit",
+        "pt": "Avisar quando o intervalo resolvido excede o limite maxScanRows configurado"
+      },
+      "condition": {
+        "type": "size_check",
+        "check": "row_count_exceeds_max",
+        "maxRows": "config.maxScanRows",
+        "countDataRowsOnly": true
+      },
+      "action": {
+        "type": "warn_and_truncate",
+        "severity": "warning",
+        "message": "Range exceeds maximum scan rows",
+        "truncateTo": "config.maxScanRows",
+        "requireConfirmation": true
+      },
+      "safetyNotes": "Large ranges may cause performance issues or timeouts. Truncate with user consent and report how many rows were excluded.",
+      "examples": {
+        "en": ["range has 50000 rows", "too many rows to process", "large dataset warning"],
+        "pt": ["intervalo tem 50000 linhas", "muitas linhas para processar", "aviso de conjunto de dados grande"]
+      }
+    },
+    {
+      "id": "safety_max_columns_guard",
+      "category": "safety_constraint",
+      "priority": 86,
+      "description": {
+        "en": "Prevent selecting more columns than the configured maxScanCols limit",
+        "pt": "Prevenir seleção de mais colunas do que o limite maxScanCols configurado"
+      },
+      "condition": {
+        "type": "size_check",
+        "check": "column_count_exceeds_max",
+        "maxCols": "config.maxScanCols",
+        "countNonEmptyOnly": true
+      },
+      "action": {
+        "type": "warn_and_truncate",
+        "severity": "warning",
+        "message": "Column count exceeds maximum",
+        "truncateTo": "config.maxScanCols",
+        "requireConfirmation": true
+      },
+      "safetyNotes": "Sheets with hundreds of columns are rare but possible. Truncation should be from the right unless user specifies otherwise.",
+      "examples": {
+        "en": ["too many columns selected", "exceeds column limit", "wide table warning"],
+        "pt": ["muitas colunas selecionadas", "excede limite de colunas", "aviso de tabela larga"]
+      }
+    },
+    {
+      "id": "safety_merged_cell_guard",
+      "category": "safety_constraint",
+      "priority": 82,
+      "description": {
+        "en": "Warn when the resolved range intersects merged cell regions that may distort results",
+        "pt": "Avisar quando o intervalo resolvido intercepta regiões de células mescladas que podem distorcer resultados"
+      },
+      "condition": {
+        "type": "merge_check",
+        "check": "range_contains_merged_cells",
+        "mergeTypes": ["horizontal", "vertical", "both"],
+        "threshold": 1
+      },
+      "action": {
+        "type": "warn",
+        "severity": "warning",
+        "message": "Range contains merged cells",
+        "suggestUnmerge": true,
+        "expandMergedValues": true
+      },
+      "safetyNotes": "Merged cells store value only in top-left cell. Other cells in the merge appear empty. Expand values before aggregation.",
+      "examples": {
+        "en": ["merged cells in range", "range spans merged region", "merged cell detected"],
+        "pt": ["células mescladas no intervalo", "intervalo abrange região mesclada", "célula mesclada detectada"]
+      }
+    },
+    {
+      "id": "safety_missing_header_guard",
+      "category": "safety_constraint",
+      "priority": 90,
+      "description": {
+        "en": "Warn when no header row could be detected by any header detection rule",
+        "pt": "Avisar quando nenhuma linha de cabeçalho pôde ser detectada por qualquer regra de detecção de cabeçalho"
+      },
+      "condition": {
+        "type": "header_check",
+        "check": "no_header_detected",
+        "afterAllRules": true,
+        "fallbackToFirstRow": true
+      },
+      "action": {
+        "type": "warn_and_fallback",
+        "severity": "warning",
+        "message": "No header row detected",
+        "fallback": "treat_first_row_as_header",
+        "requireConfirmation": true
+      },
+      "safetyNotes": "Without a header, column references by name are impossible. Fall back to first row but require user confirmation.",
+      "examples": {
+        "en": ["no header found", "cannot detect column names", "headerless data"],
+        "pt": ["nenhum cabeçalho encontrado", "não foi possível detectar nomes de colunas", "dados sem cabeçalho"]
+      }
+    },
+    {
+      "id": "safety_volatile_function_guard",
+      "category": "safety_constraint",
+      "priority": 78,
+      "description": {
+        "en": "Warn when the resolved range contains volatile functions that recalculate on every access",
+        "pt": "Avisar quando o intervalo resolvido contém funções voláteis que recalculam a cada acesso"
+      },
+      "condition": {
+        "type": "formula_scan",
+        "check": "contains_volatile_functions",
+        "volatileFunctions": ["NOW", "TODAY", "RAND", "RANDBETWEEN", "OFFSET", "INDIRECT"],
+        "scanDepth": "all_cells_in_range"
+      },
+      "action": {
+        "type": "warn",
+        "severity": "info",
+        "message": "Range contains volatile functions",
+        "suggestSnapshot": true,
+        "reportVolatileCells": true
+      },
+      "safetyNotes": "Volatile functions cause values to change between reads. Snapshot values at query time if consistent results are needed.",
+      "examples": {
+        "en": ["range has NOW() function", "volatile formula in data", "RAND() in range"],
+        "pt": ["intervalo tem função NOW()", "fórmula volátil nos dados", "RAND() no intervalo"]
+      }
+    },
+    {
+      "id": "table_boundary_blank_column",
+      "category": "table_boundary",
+      "priority": 80,
+      "description": {
+        "en": "Detect the right edge of a table by finding a fully blank column",
+        "pt": "Detectar a borda direita de uma tabela encontrando uma coluna completamente em branco"
+      },
+      "condition": {
+        "type": "column_scan",
+        "check": "column_all_empty",
+        "scanDirection": "left_to_right",
+        "startFrom": "first_data_column",
+        "blankDefinition": "all_cells_empty"
+      },
+      "action": {
+        "type": "set_table_right_edge",
+        "rightEdge": "column_before_blank",
+        "confidence": "high"
+      },
+      "safetyNotes": "A single blank column between data regions may be a separator, not a table edge. Check if data resumes after the gap.",
+      "examples": {
+        "en": ["blank column marks table edge", "empty column boundary", "table ends at blank column"],
+        "pt": ["coluna em branco marca borda da tabela", "limite de coluna vazia", "tabela termina na coluna em branco"]
+      }
+    },
+    {
+      "id": "table_boundary_blank_row",
+      "category": "table_boundary",
+      "priority": 85,
+      "description": {
+        "en": "Detect the bottom of a table by finding consecutive blank rows",
+        "pt": "Detectar o final de uma tabela encontrando linhas em branco consecutivas"
+      },
+      "condition": {
+        "type": "row_scan",
+        "check": "consecutive_blank_rows",
+        "minConsecutive": "config.emptyRowThreshold",
+        "scanFrom": "header_row",
+        "direction": "down"
+      },
+      "action": {
+        "type": "set_table_bottom_edge",
+        "bottomEdge": "row_before_blanks",
+        "confidence": "high"
+      },
+      "safetyNotes": "A single blank row may appear within valid data (e.g., section separator). Require emptyRowThreshold consecutive blanks.",
+      "examples": {
+        "en": ["table ends at blank rows", "empty rows mark table bottom", "gap in data"],
+        "pt": ["tabela termina em linhas em branco", "linhas vazias marcam final da tabela", "lacuna nos dados"]
+      }
+    },
+    {
+      "id": "table_boundary_excel_table",
+      "category": "table_boundary",
+      "priority": 99,
+      "description": {
+        "en": "Use Excel ListObject table boundaries as the definitive table extent",
+        "pt": "Usar limites de tabela ListObject do Excel como extensão definitiva da tabela"
+      },
+      "condition": {
+        "type": "table_object_check",
+        "check": "is_excel_table",
+        "hasDefinedRange": true
+      },
+      "action": {
+        "type": "set_table_bounds",
+        "source": "table_object_range",
+        "includeHeaders": true,
+        "includeTotalsRow": false,
+        "confidence": "definitive"
+      },
+      "safetyNotes": "Excel table objects are the most reliable boundary source. Always prefer over heuristic detection.",
+      "examples": {
+        "en": ["use Excel table range", "ListObject boundary", "structured table extent"],
+        "pt": ["usar intervalo de tabela Excel", "limite ListObject", "extensão de tabela estruturada"]
+      }
+    },
+    {
+      "id": "table_boundary_format_change",
+      "category": "table_boundary",
+      "priority": 60,
+      "description": {
+        "en": "Detect table boundary where cell formatting abruptly changes (font, alignment, number format)",
+        "pt": "Detectar limite de tabela onde a formatação de célula muda abruptamente (fonte, alinhamento, formato numérico)"
+      },
+      "condition": {
+        "type": "format_scan",
+        "check": "format_discontinuity",
+        "properties": ["font", "alignment", "numberFormat", "borders"],
+        "discontinuityThreshold": 0.7,
+        "scanDirection": "down_and_right"
+      },
+      "action": {
+        "type": "set_table_boundary",
+        "edge": "format_change_position",
+        "confidence": "medium"
+      },
+      "safetyNotes": "Format changes can occur within a table (e.g., conditional formatting). Use as a secondary signal alongside other boundary rules.",
+      "examples": {
+        "en": ["formatting changes at row 50", "different format below data", "style boundary"],
+        "pt": ["formatação muda na linha 50", "formato diferente abaixo dos dados", "limite de estilo"]
+      }
+    },
+    {
+      "id": "table_boundary_merged_region",
+      "category": "table_boundary",
+      "priority": 55,
+      "description": {
+        "en": "Use merged cell regions to define sub-table boundaries within a sheet",
+        "pt": "Usar regiões de células mescladas para definir limites de sub-tabelas dentro de uma planilha"
+      },
+      "condition": {
+        "type": "merge_scan",
+        "check": "large_merged_region_exists",
+        "minMergeSize": 3,
+        "position": "left_or_top",
+        "indicatesGrouping": true
+      },
+      "action": {
+        "type": "define_sub_table",
+        "groupedBy": "merged_region",
+        "subTableStart": "merge_end + 1",
+        "subTableEnd": "next_merge_start - 1"
+      },
+      "safetyNotes": "Merged cells as group headers are common in formatted reports. Each merged region may define a separate logical table.",
+      "examples": {
+        "en": ["merged region defines sub-table", "grouped sections by merge", "merged cell boundaries"],
+        "pt": ["região mesclada define sub-tabela", "seções agrupadas por mesclagem", "limites de células mescladas"]
+      }
+    },
+    {
+      "id": "table_boundary_named_range",
+      "category": "table_boundary",
+      "priority": 88,
+      "description": {
+        "en": "Use a named range to define the table extent when available",
+        "pt": "Usar um intervalo nomeado para definir a extensão da tabela quando disponível"
+      },
+      "condition": {
+        "type": "named_range_check",
+        "check": "named_range_covers_data",
+        "preferExact": true,
+        "tolerance": 0
+      },
+      "action": {
+        "type": "set_table_bounds",
+        "source": "named_range",
+        "confidence": "high"
+      },
+      "safetyNotes": "Named ranges may be stale if the sheet has been edited. Validate that the range still contains data.",
+      "examples": {
+        "en": ["use DataRange as boundary", "named range defines table", "range Budget covers the table"],
+        "pt": ["usar IntervalosDados como limite", "intervalo nomeado define tabela", "intervalo Orçamento cobre a tabela"]
+      }
+    },
+    {
+      "id": "table_boundary_print_area",
+      "category": "table_boundary",
+      "priority": 65,
+      "description": {
+        "en": "Use the defined print area as a hint for the intended data region",
+        "pt": "Usar a área de impressão definida como dica da região de dados pretendida"
+      },
+      "condition": {
+        "type": "print_area_check",
+        "check": "print_area_defined",
+        "useAsHint": true,
+        "notDefinitive": true
+      },
+      "action": {
+        "type": "suggest_table_bounds",
+        "source": "print_area",
+        "confidence": "low",
+        "combineWithOtherRules": true
+      },
+      "safetyNotes": "Print area may include titles, footers, and margins beyond the data table. Use only as a supplementary hint.",
+      "examples": {
+        "en": ["print area covers the data", "use print range as boundary hint", "data within print area"],
+        "pt": ["área de impressão cobre os dados", "usar intervalo de impressão como dica de limite", "dados dentro da área de impressão"]
+      }
+    },
+    {
+      "id": "table_boundary_summary_row",
+      "category": "table_boundary",
+      "priority": 82,
+      "description": {
+        "en": "Detect a summary or total row at the bottom of the table and exclude it from data range",
+        "pt": "Detectar uma linha de resumo ou total no final da tabela e excluí-la do intervalo de dados"
+      },
+      "condition": {
+        "type": "summary_scan",
+        "check": "row_contains_aggregate_label",
+        "labels": ["Total", "Subtotal", "Grand Total", "Sum", "Average", "Soma", "Subtotal", "Total Geral", "Média"],
+        "formulaCheck": "SUM_or_SUBTOTAL",
+        "position": "bottom_of_data"
+      },
+      "action": {
+        "type": "mark_summary_row",
+        "exclude": true,
+        "lastDataRow": "summary_row - 1",
+        "confidence": "high"
+      },
+      "safetyNotes": "Multiple summary rows may exist (subtotals + grand total). Detect all of them, not just the last row.",
+      "examples": {
+        "en": ["total row at bottom", "exclude grand total row", "summary row detected"],
+        "pt": ["linha de total no final", "excluir linha de total geral", "linha de resumo detectada"]
+      }
+    },
+    {
+      "id": "table_boundary_type_consistency",
+      "category": "table_boundary",
+      "priority": 70,
+      "description": {
+        "en": "Determine table width by checking column type consistency within data rows",
+        "pt": "Determinar largura da tabela verificando consistência de tipo de coluna dentro das linhas de dados"
+      },
+      "condition": {
+        "type": "type_consistency_scan",
+        "check": "column_type_consistent",
+        "consistencyThreshold": 0.85,
+        "minRows": 5,
+        "scanDirection": "left_to_right"
+      },
+      "action": {
+        "type": "set_table_right_edge",
+        "rightEdge": "last_consistent_column",
+        "confidence": "medium"
+      },
+      "safetyNotes": "Columns with mixed types may still be valid data (e.g., text notes column). Combine with other signals.",
+      "examples": {
+        "en": ["consistent column types define width", "type-based table width", "data type boundary"],
+        "pt": ["tipos de coluna consistentes definem largura", "largura de tabela baseada em tipo", "limite de tipo de dados"]
+      }
+    },
+    {
+      "id": "table_detect_multiple",
+      "category": "table_boundary",
+      "priority": 45,
+      "description": {
+        "en": "Detect multiple separate tables on a single sheet separated by blank rows or columns",
+        "pt": "Detectar múltiplas tabelas separadas em uma única planilha separadas por linhas ou colunas em branco"
+      },
+      "condition": {
+        "type": "multi_table_scan",
+        "check": "multiple_data_regions",
+        "separatorType": "blank_rows_or_columns",
+        "minSeparation": 2,
+        "minTableSize": 3
+      },
+      "action": {
+        "type": "enumerate_tables",
+        "reportCount": true,
+        "labelTables": "Table_1, Table_2, ...",
+        "requireUserSelection": true
+      },
+      "safetyNotes": "Multiple tables on one sheet are ambiguous. Always ask the user which table they mean if more than one is detected.",
+      "examples": {
+        "en": ["two tables on this sheet", "multiple data regions found", "which table do you mean?"],
+        "pt": ["duas tabelas nesta planilha", "múltiplas regiões de dados encontradas", "qual tabela você quer dizer?"]
+      }
+    },
+    {
+      "id": "temporal_current_month",
+      "category": "temporal_range",
+      "priority": 80,
+      "description": {
+        "en": "Filter rows to the current calendar month",
+        "pt": "Filtrar linhas para o mês calendário atual"
+      },
+      "condition": {
+        "type": "temporal_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "period": "current_month",
+        "referenceDate": "today"
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "from": "first_day_of_current_month",
+        "to": "last_day_of_current_month",
+        "inclusive": true
+      },
+      "safetyNotes": "Current month changes at midnight on the 1st. Ensure the reference date is calculated at query time.",
+      "examples": {
+        "en": ["this month", "current month data", "February data"],
+        "pt": ["este mês", "dados do mês atual", "dados de fevereiro"]
+      }
+    },
+    {
+      "id": "temporal_current_quarter",
+      "category": "temporal_range",
+      "priority": 78,
+      "description": {
+        "en": "Filter rows to the current calendar quarter",
+        "pt": "Filtrar linhas para o trimestre calendário atual"
+      },
+      "condition": {
+        "type": "temporal_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "period": "current_quarter",
+        "quarterDefinition": "calendar",
+        "referenceDate": "today"
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "from": "first_day_of_current_quarter",
+        "to": "last_day_of_current_quarter",
+        "inclusive": true
+      },
+      "safetyNotes": "Calendar quarters (Q1=Jan-Mar) may differ from fiscal quarters. Clarify with user if ambiguous.",
+      "examples": {
+        "en": ["this quarter", "Q1 data", "current quarter totals"],
+        "pt": ["este trimestre", "dados do Q1", "totais do trimestre atual"]
+      }
+    },
+    {
+      "id": "temporal_current_year",
+      "category": "temporal_range",
+      "priority": 82,
+      "description": {
+        "en": "Filter rows to the current calendar year",
+        "pt": "Filtrar linhas para o ano calendário atual"
+      },
+      "condition": {
+        "type": "temporal_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "period": "current_year",
+        "referenceDate": "today"
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "from": "january_1_current_year",
+        "to": "december_31_current_year",
+        "inclusive": true
+      },
+      "safetyNotes": "If data only goes up to a past month, the result may be partial. Inform the user of the actual date coverage.",
+      "examples": {
+        "en": ["this year", "2026 data", "current year sales"],
+        "pt": ["este ano", "dados de 2026", "vendas do ano atual"]
+      }
+    },
+    {
+      "id": "temporal_fiscal_year",
+      "category": "temporal_range",
+      "priority": 68,
+      "description": {
+        "en": "Filter rows using fiscal year boundaries that may differ from calendar year",
+        "pt": "Filtrar linhas usando limites de ano fiscal que podem diferir do ano calendário"
+      },
+      "condition": {
+        "type": "temporal_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "period": "fiscal_year",
+        "fiscalYearStart": "user_specified_or_default",
+        "defaultFiscalStart": "april_1"
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "from": "fiscal_year_start",
+        "to": "fiscal_year_end",
+        "inclusive": true
+      },
+      "safetyNotes": "Fiscal year start month varies by company and country (Apr, Jul, Oct are common). Always ask or detect from data context.",
+      "examples": {
+        "en": ["this fiscal year", "FY2025", "current fiscal year data"],
+        "pt": ["este ano fiscal", "AF2025", "dados do ano fiscal atual"]
+      }
+    },
+    {
+      "id": "temporal_last_12_months",
+      "category": "temporal_range",
+      "priority": 72,
+      "description": {
+        "en": "Filter rows to a rolling 12-month window from today",
+        "pt": "Filtrar linhas para uma janela rolante de 12 meses a partir de hoje"
+      },
+      "condition": {
+        "type": "temporal_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "period": "rolling_months",
+        "months": 12,
+        "referenceDate": "today"
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "from": "today_minus_12_months",
+        "to": "today",
+        "inclusive": true
+      },
+      "safetyNotes": "Rolling 12 months from today may not align with calendar months. Clarify if user means 'last 12 complete months'.",
+      "examples": {
+        "en": ["last 12 months", "trailing twelve months", "past year of data"],
+        "pt": ["últimos 12 meses", "doze meses anteriores", "último ano de dados"]
+      }
+    },
+    {
+      "id": "temporal_last_month",
+      "category": "temporal_range",
+      "priority": 83,
+      "description": {
+        "en": "Filter rows to the previous calendar month",
+        "pt": "Filtrar linhas para o mês calendário anterior"
+      },
+      "condition": {
+        "type": "temporal_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "period": "last_month",
+        "referenceDate": "today"
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "from": "first_day_of_last_month",
+        "to": "last_day_of_last_month",
+        "inclusive": true
+      },
+      "safetyNotes": "Last month is always a complete month. On March 1st, last month covers all of February.",
+      "examples": {
+        "en": ["last month", "previous month data", "January data"],
+        "pt": ["mês passado", "dados do mês anterior", "dados de janeiro"]
+      }
+    },
+    {
+      "id": "temporal_last_n_days",
+      "category": "temporal_range",
+      "priority": 76,
+      "description": {
+        "en": "Filter rows to the last N calendar days from today",
+        "pt": "Filtrar linhas para os últimos N dias calendário a partir de hoje"
+      },
+      "condition": {
+        "type": "temporal_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "period": "last_n_days",
+        "n": "user_specified",
+        "referenceDate": "today"
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "from": "today_minus_N_days",
+        "to": "today",
+        "inclusive": true
+      },
+      "safetyNotes": "Last N days includes today. Clarify if user means 'previous N days' (excluding today) or 'last N days' (including today).",
+      "examples": {
+        "en": ["last 30 days", "past 7 days", "last 90 days of data"],
+        "pt": ["últimos 30 dias", "últimos 7 dias", "últimos 90 dias de dados"]
+      }
+    },
+    {
+      "id": "temporal_last_n_months",
+      "category": "temporal_range",
+      "priority": 74,
+      "description": {
+        "en": "Filter rows to the last N calendar months from the current month",
+        "pt": "Filtrar linhas para os últimos N meses calendário a partir do mês atual"
+      },
+      "condition": {
+        "type": "temporal_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "period": "last_n_months",
+        "n": "user_specified",
+        "referenceDate": "today",
+        "includeCurrentMonth": false
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "from": "first_day_of_month_minus_N",
+        "to": "last_day_of_previous_month",
+        "inclusive": true
+      },
+      "safetyNotes": "Ambiguity: 'last 3 months' could mean 3 complete prior months or 3 months including current. Default excludes current month.",
+      "examples": {
+        "en": ["last 3 months", "previous 6 months", "past 2 months of sales"],
+        "pt": ["últimos 3 meses", "6 meses anteriores", "últimos 2 meses de vendas"]
+      }
+    },
+    {
+      "id": "temporal_last_quarter",
+      "category": "temporal_range",
+      "priority": 77,
+      "description": {
+        "en": "Filter rows to the previous calendar quarter",
+        "pt": "Filtrar linhas para o trimestre calendário anterior"
+      },
+      "condition": {
+        "type": "temporal_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "period": "last_quarter",
+        "quarterDefinition": "calendar",
+        "referenceDate": "today"
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "from": "first_day_of_last_quarter",
+        "to": "last_day_of_last_quarter",
+        "inclusive": true
+      },
+      "safetyNotes": "In Q1, last quarter refers to Q4 of the previous year. Handle the year boundary correctly.",
+      "examples": {
+        "en": ["last quarter", "previous quarter data", "Q4 results"],
+        "pt": ["trimestre passado", "dados do trimestre anterior", "resultados do Q4"]
+      }
+    },
+    {
+      "id": "temporal_last_year",
+      "category": "temporal_range",
+      "priority": 81,
+      "description": {
+        "en": "Filter rows to the previous calendar year",
+        "pt": "Filtrar linhas para o ano calendário anterior"
+      },
+      "condition": {
+        "type": "temporal_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "period": "last_year",
+        "referenceDate": "today"
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "from": "january_1_last_year",
+        "to": "december_31_last_year",
+        "inclusive": true
+      },
+      "safetyNotes": "Last year is always a complete calendar year. In 2026, last year covers all of 2025.",
+      "examples": {
+        "en": ["last year", "2025 data", "previous year totals"],
+        "pt": ["ano passado", "dados de 2025", "totais do ano anterior"]
+      }
+    },
+    {
+      "id": "temporal_month_to_date",
+      "category": "temporal_range",
+      "priority": 70,
+      "description": {
+        "en": "Filter rows from the first day of the current month to today (MTD)",
+        "pt": "Filtrar linhas do primeiro dia do mês atual até hoje (acumulado do mês)"
+      },
+      "condition": {
+        "type": "temporal_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "period": "month_to_date",
+        "referenceDate": "today"
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "from": "first_day_of_current_month",
+        "to": "today",
+        "inclusive": true
+      },
+      "safetyNotes": "MTD on the 1st of the month returns only one day of data. Warn if the result seems unusually small.",
+      "examples": {
+        "en": ["month to date", "MTD sales", "this month so far"],
+        "pt": ["acumulado do mês", "vendas MTD", "este mês até agora"]
+      }
+    },
+    {
+      "id": "temporal_quarter_to_date",
+      "category": "temporal_range",
+      "priority": 69,
+      "description": {
+        "en": "Filter rows from the first day of the current quarter to today (QTD)",
+        "pt": "Filtrar linhas do primeiro dia do trimestre atual até hoje (acumulado do trimestre)"
+      },
+      "condition": {
+        "type": "temporal_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "period": "quarter_to_date",
+        "quarterDefinition": "calendar",
+        "referenceDate": "today"
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "from": "first_day_of_current_quarter",
+        "to": "today",
+        "inclusive": true
+      },
+      "safetyNotes": "QTD early in a quarter may return very few rows. Combine with prior quarter comparison for context.",
+      "examples": {
+        "en": ["quarter to date", "QTD revenue", "this quarter so far"],
+        "pt": ["acumulado do trimestre", "receita QTD", "este trimestre até agora"]
+      }
+    },
+    {
+      "id": "temporal_week_to_date",
+      "category": "temporal_range",
+      "priority": 66,
+      "description": {
+        "en": "Filter rows from the start of the current week to today (WTD)",
+        "pt": "Filtrar linhas do início da semana atual até hoje (acumulado da semana)"
+      },
+      "condition": {
+        "type": "temporal_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "period": "week_to_date",
+        "weekStart": "monday",
+        "referenceDate": "today"
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "from": "start_of_current_week",
+        "to": "today",
+        "inclusive": true
+      },
+      "safetyNotes": "Week start day varies by locale (Monday vs Sunday). Default to Monday but allow configuration.",
+      "examples": {
+        "en": ["week to date", "WTD totals", "this week so far"],
+        "pt": ["acumulado da semana", "totais WTD", "esta semana até agora"]
+      }
+    },
+    {
+      "id": "temporal_year_to_date",
+      "category": "temporal_range",
+      "priority": 85,
+      "description": {
+        "en": "Filter rows from January 1st of the current year to today (YTD)",
+        "pt": "Filtrar linhas de 1º de janeiro do ano atual até hoje (acumulado do ano)"
+      },
+      "condition": {
+        "type": "temporal_filter",
+        "check": "date_column_exists",
+        "dateColumn": "auto_detect_or_specified",
+        "period": "year_to_date",
+        "referenceDate": "today"
+      },
+      "action": {
+        "type": "filter_rows",
+        "by": "date_range",
+        "from": "january_1_current_year",
+        "to": "today",
+        "inclusive": true
+      },
+      "safetyNotes": "YTD in January returns only partial data. Compare with prior-year YTD for meaningful analysis.",
+      "examples": {
+        "en": ["year to date", "YTD revenue", "this year so far", "accumulated this year"],
+        "pt": ["acumulado do ano", "receita YTD", "este ano até agora", "acumulado deste ano"]
+      }
+    }
+  ]
+}

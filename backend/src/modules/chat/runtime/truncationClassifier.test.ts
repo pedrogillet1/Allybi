@@ -99,13 +99,15 @@ describe("truncationClassifier", () => {
   });
 
   test("bullet list ending without period is NOT flagged", () => {
-    const text = "Key items:\n- Budget approved\n- Timeline confirmed\n- Resources allocated";
+    const text =
+      "Key items:\n- Budget approved\n- Timeline confirmed\n- Resources allocated";
     const result = classifyWithOverflow(text);
     expect(result.occurred).toBe(false);
   });
 
   test("numbered list ending is NOT flagged", () => {
-    const text = "Steps:\n1. Open the file\n2. Edit the header\n3. Save changes";
+    const text =
+      "Steps:\n1. Open the file\n2. Edit the header\n3. Save changes";
     const result = classifyWithOverflow(text);
     expect(result.occurred).toBe(false);
   });

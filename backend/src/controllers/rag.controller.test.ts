@@ -338,6 +338,26 @@ describe("RagController", () => {
       );
     });
 
+    test("resolves preferredLanguage from preferredLanguage > language > locale > accept-language", async () => {
+      const req = makeReq({
+        body: {
+          query: "Hello",
+          preferredLanguage: "es-MX",
+          language: "pt-BR",
+          locale: "en-US",
+        },
+        headers: { "accept-language": "pt-BR,pt;q=0.9" },
+      });
+      const { res } = makeRes();
+      const next = makeNext();
+
+      await ragController.query(req, res, next);
+
+      expect(mockChatService.chat).toHaveBeenCalledWith(
+        expect.objectContaining({ preferredLanguage: "es" }),
+      );
+    });
+
     test("merges body.documentIds and options.documentIds into deduped attachedDocumentIds", async () => {
       const req = makeReq({
         body: {
@@ -633,6 +653,23 @@ describe("RagController", () => {
       const ids: string[] = call.req.attachedDocumentIds;
       expect(ids).toHaveLength(3);
       expect(ids).toEqual(expect.arrayContaining(["d1", "d2", "d3"]));
+    });
+
+    test("resolves preferredLanguage for stream route from language alias", async () => {
+      const req = makeReq({
+        body: {
+          query: "Analyse this",
+          language: "pt-BR",
+        },
+        headers: { "accept-language": "en-US,en;q=0.9" },
+      });
+      const { res } = makeRes();
+      const next = makeNext();
+
+      await ragController.stream(req, res, next);
+
+      const call: any = (mockChatService.streamChat as any).mock.calls[0][0];
+      expect(call.req.preferredLanguage).toBe("pt");
     });
   });
 });

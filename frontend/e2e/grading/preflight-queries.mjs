@@ -104,11 +104,15 @@ async function main() {
     run('npm', ['run', 'audit:p0:strict'], BACKEND_DIR);
     summary.steps.push({ step: 'backend_audit_p0_strict', status: 'PASS' });
 
-    // 2) Report hygiene
+    // 2) Frontend semantic accessibility regression gate
+    run('node', ['e2e/grading/a11y-semantic-click-audit.mjs', '--max-violations', '225'], FRONTEND_DIR);
+    summary.steps.push({ step: 'frontend_a11y_semantic_click_audit', status: 'PASS' });
+
+    // 3) Report hygiene
     run('node', ['e2e/grading/report-hygiene.mjs', '--prepare', '--reset-latest'], FRONTEND_DIR);
     summary.steps.push({ step: 'report_hygiene_prepare', status: 'PASS' });
 
-    // 3) Pack 40
+    // 4) Pack 40
     run('node', ['e2e/regression-runner.mjs', '--base', API_BASE], FRONTEND_DIR);
     summary.steps.push({ step: 'pack40_run', status: 'PASS' });
 
@@ -117,7 +121,7 @@ async function main() {
     assertGo(score40, 40);
     summary.steps.push({ step: 'pack40_grade', status: 'PASS', score: score40.summary.finalScore });
 
-    // 4) Pack 50
+    // 5) Pack 50
     run('npx', ['playwright', 'test', 'e2e/query-test-50-gate.spec.ts', '--project=chromium'], FRONTEND_DIR);
     summary.steps.push({ step: 'pack50_run', status: 'PASS' });
 
@@ -126,7 +130,7 @@ async function main() {
     assertGo(score50, 50);
     summary.steps.push({ step: 'pack50_grade', status: 'PASS', score: score50.summary.finalScore });
 
-    // 5) Optional pack 100
+    // 6) Optional pack 100
     if (include100) {
       run('npx', ['playwright', 'test', 'e2e/query-test-100.spec.ts', '--project=chromium'], FRONTEND_DIR);
       summary.steps.push({ step: 'pack100_run', status: 'PASS' });
@@ -139,7 +143,7 @@ async function main() {
       summary.steps.push({ step: 'pack100_grade', status: 'PASS', score: score100.summary.finalScore });
     }
 
-    // 6) Report hygiene check (must be canonical)
+    // 7) Report hygiene check (must be canonical)
     run('node', ['e2e/grading/report-hygiene.mjs', '--check'], FRONTEND_DIR);
     summary.steps.push({ step: 'report_hygiene_check', status: 'PASS' });
 

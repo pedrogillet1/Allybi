@@ -316,11 +316,14 @@ async function main() {
     const q = queryRows[idx];
     process.stdout.write(`Q${String(idx + 1).padStart(3, '0')}/${queryRows.length} [${q.language}] ... `);
     const start = Date.now();
+    const preferredLanguage = q.language || 'pt';
     let response;
     try {
       response = await streamChat({
         message: q.text,
-        language: q.language || 'pt',
+        preferredLanguage,
+        language: preferredLanguage,
+        locale: preferredLanguage,
         attachedDocuments: resolvedDocs,
         documentIds,
         ...(conversationId ? { conversationId } : {}),

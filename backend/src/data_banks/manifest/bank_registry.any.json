@@ -32,7 +32,6 @@
     "routing",
     "operators",
     "semantics",
-    "document_intelligence",
     "scope",
     "retrieval",
     "formatting",
@@ -74,7 +73,6 @@
     "lexicons": "bank_schema",
     "parsers": "bank_schema",
     "intent_patterns": "bank_schema",
-    "document_intelligence": "bank_schema",
     "templates": "bank_schema"
   },
   "banks": [
@@ -469,7 +467,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "5fb387b8686dde7bf128711a46992e8a40bdaa228a9d6bf185f9bfefbb00ab7b",
+      "checksumSha256": "d962c041fba83ab46301a2f3e579df98f1e833fe3ac9e75eaaf2de6dc933c07e",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -591,7 +589,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "ca172b713dbfb1eb1ea6efd84a8952e68a2b3e8f427e17a5ed7fd2fe6d328ee8",
+      "checksumSha256": "a766afbc904506dd67a3db14ec7ae73164ab1541d17d533a7d46141b2525b3fa",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -1201,7 +1199,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "7b8ae02108f4ead63d851071c7f288211aee899ce44352dc4c1ab63e9949f90e"
+      "checksumSha256": "e2872cf71c67c156265f2d0bb0b9dd62aff2bbb8f1208d4f084eea493ce49fc2"
     },
     {
       "id": "excel_chart_types_en",
@@ -1503,7 +1501,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "6c434cc16e85b614de7d61944387d9085ec76a804a6d7ff1685192bd4f763b45",
+      "checksumSha256": "1e5e03cf0e2d7255a7bb2ed3e76a83146a9d46bd465de330580b55a3a78cfb46",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -2143,7 +2141,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "9efeafa0e13ead198e348ae140a56b320d5f4c71dd2d020b88e9d3a33035e0f6",
+      "checksumSha256": "e7c804b4d886f812d552af91a8a3ade3f681582073a2c1de7f44c1214b45ce46",
       "lastUpdated": "2026-02-20"
     },
     {
@@ -2184,7 +2182,7 @@
       "version": "3.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "b18e5dd2605f95b12e891a3cbc42f98dec82c22b8f0d70913627e6243c6ffe22"
+      "checksumSha256": "183b587e152f1294b820d06ecef880e7b375d8940a46d346e7c35378a359d4d1"
     },
     {
       "id": "rag_policy",
@@ -2468,7 +2466,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-19",
-      "checksumSha256": "354d77ee67faedc5fb5a4b972575913fcd186aa90a92af5107b37dd63d138f0c"
+      "checksumSha256": "62983505a1f49c43cb804958afd0b42be3169b25252d787817117182d7daa52b"
     },
     {
       "id": "task_plan_generation",
@@ -5217,7 +5215,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "75b729f17f589db6f4bd8a0186b0c35683f9a2a0f5415b1c895137ccf48d66e5",
+      "checksumSha256": "cb43a2b80a58c38f49c0493dbc3d7cf42becee5928715527144a8f269b5f0460",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -5295,7 +5293,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "404b84e244d34405290d83552e4b10dc0ed5d9a30191e517b79fd97ab7c90a4d",
+      "checksumSha256": "f7d62b6770eb47df9cdc88355f24eea00e9c18beb8a8bc7344b1dc8e9fd75986",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -5373,7 +5371,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "eda0709dcfee9035696c9a2b0d83b309b3b475775a6855d665ea4625760e48e5",
+      "checksumSha256": "e94a8d324ffde420aa7c0a03ea0deb6f95099d35f58bc15e7c64770630479f17",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -5451,7 +5449,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "962290de9eca8301defabd492117ab58f19339ca746114175c579a154e82f6a8",
+      "checksumSha256": "ed7ed9c18b12219fb60f2a68ff7880af2a35229c13047c35f47635ae9db152c1",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -5923,52 +5921,6 @@
       "checksumSha256": "ade7c5dd0f97dae8fe65039e7a40ff3211dbfdb5998065495e70e2f9d5e413ff"
     },
     {
-      "id": "bank_audit_report",
-      "category": "manifest",
-      "path": "__bank_audit_report.any.json",
-      "filename": "__bank_audit_report.any.json",
-      "version": "1.0.0",
-      "contentType": "manifest",
-      "schemaId": "bank_schema",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "lastUpdated": "2026-02-28",
-      "checksumSha256": "1c348b800e7ad7e354394c82ab4a85a626b1273e02800dcc845d01c62eb47348"
-    },
-    {
-      "id": "bank_migration_log",
-      "category": "manifest",
-      "path": "__bank_migration_log.any.json",
-      "filename": "__bank_migration_log.any.json",
-      "version": "1.0.0",
-      "contentType": "manifest",
-      "schemaId": "bank_schema",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "lastUpdated": "2026-02-28",
-      "checksumSha256": "e03c2f48d0c762120e26cad6d6229edb9c2a6540dac7dc0f60c7a4edc46087f2"
-    },
-    {
       "id": "document_intelligence_manifest_schema",
       "category": "schemas",
       "path": "schemas/document_intelligence_manifest_schema.any.json",
@@ -6227,7 +6179,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "39ce9fbc7f4927186c960f452cc73693e345e5e083c5436df412240aa491b869",
+      "checksumSha256": "147964fc2dfd5a5e1f10f04732c5839d24096fff15733af169b7b635482f3d7b",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -10517,7 +10469,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "104f84e3f2d5389c481c44bed6bc59a648805aedbb7e91b5eee3b4669dbd9947",
+      "checksumSha256": "3ad3f12d2a224d731fec564a064ccb15bb37295e238c115cf43d54a468cab623",
       "lastUpdated": "2026-02-27"
     },
     {

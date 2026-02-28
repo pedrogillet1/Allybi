@@ -8,22 +8,47 @@ import {
   type ReindexRevisionJobData,
 } from "../queues/edit.queue";
 
-async function runJob(job: Job<ReindexRevisionJobData>): Promise<void> {
-  const targetId = job.data.revisionId || job.data.documentId;
-
-  const doc = await prisma.document.findUnique({
-    where: { id: targetId },
-    select: {
-      id: true,
-      userId: true,
-      encryptedFilename: true,
-      filename: true,
-      mimeType: true,
-    },
-  });
+export async function runJob(job: Job<ReindexRevisionJobData>): Promise<void> {
+  const candidateIds = [
+    String(job.data.documentId || "").trim(),
+    String(job.data.revisionId || "").trim(),
+  ].filter(Boolean);
+  const seen = new Set<string>();
+  let doc:
+    | {
+        id: string;
+        userId: string;
+        encryptedFilename: string | null;
+        filename: string | null;
+        mimeType: string | null;
+      }
+    | null = null;
+  for (const candidateId of candidateIds) {
+    if (seen.has(candidateId)) continue;
+    seen.add(candidateId);
+    doc = await prisma.document.findUnique({
+      where: { id: candidateId },
+      select: {
+        id: true,
+        userId: true,
+        encryptedFilename: true,
+        filename: true,
+        mimeType: true,
+      },
+    });
+    if (doc) break;
+  }
 
   if (!doc) {
-    throw new Error(`Document not found for reindex: ${targetId}`);
+    throw new Error(
+      `Document not found for reindex: ${candidateIds.join(", ") || "none"}`,
+    );
+  }
+  const requestedUserId = String(job.data.userId || "").trim();
+  if (requestedUserId && doc.userId !== requestedUserId) {
+    throw new Error(
+      `Reindex user mismatch for ${doc.id}: expected ${requestedUserId}, found ${doc.userId}`,
+    );
   }
 
   if (!doc.encryptedFilename) {

@@ -702,7 +702,13 @@ router.post(
       // 1) Transition uploading -> uploaded (idempotent: docs not in 'uploading' are left unchanged)
       const updateResult = await prisma.document.updateMany({
         where: { id: { in: documentIds }, userId, status: "uploading" },
-        data: { status: "uploaded", updatedAt: now },
+        data: {
+          status: "uploaded",
+          indexingState: "pending",
+          indexingError: null,
+          indexingUpdatedAt: now,
+          updatedAt: now,
+        },
       });
 
       // 2) Fetch current truth for these docs (covers repeat calls, retries, and partial sessions)
@@ -945,7 +951,12 @@ router.post(
         try {
           const result = await prisma.document.updateMany({
             where: { id: docId, userId, status: "uploading" }, // Only from uploading
-            data: { status: "uploaded" },
+            data: {
+              status: "uploaded",
+              indexingState: "pending",
+              indexingError: null,
+              indexingUpdatedAt: new Date(),
+            },
           });
           if (result.count > 0) {
             confirmed.push(docId); // Only add if actually transitioned
@@ -1075,7 +1086,12 @@ router.post(
       // Update document status
       await prisma.document.update({
         where: { id: documentId },
-        data: { status: "uploaded" },
+        data: {
+          status: "uploaded",
+          indexingState: "pending",
+          indexingError: null,
+          indexingUpdatedAt: new Date(),
+        },
       });
 
       // Queue for processing

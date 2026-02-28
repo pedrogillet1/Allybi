@@ -27,7 +27,13 @@ const SCHEMA_REGISTRY_PATH = path.join(
   "bank_schema_registry.any.json",
 );
 
-const DI_DOMAINS = ["finance", "legal", "medical", "ops", "accounting"] as const;
+const DI_DOMAINS = [
+  "finance",
+  "legal",
+  "medical",
+  "ops",
+  "accounting",
+] as const;
 const DI_BANK_IDS = DI_DOMAINS.flatMap((domain) => [
   `boost_rules_${domain}`,
   `query_rewrites_${domain}`,
@@ -87,7 +93,9 @@ describe("retrieval DI path SSOT", () => {
   });
 
   test("schema registry retrieval path prefixes are canonical", () => {
-    const schemaRegistry = JSON.parse(fs.readFileSync(SCHEMA_REGISTRY_PATH, "utf8"));
+    const schemaRegistry = JSON.parse(
+      fs.readFileSync(SCHEMA_REGISTRY_PATH, "utf8"),
+    );
     const families = Array.isArray(schemaRegistry?.schemaFamilies)
       ? schemaRegistry.schemaFamilies
       : [];

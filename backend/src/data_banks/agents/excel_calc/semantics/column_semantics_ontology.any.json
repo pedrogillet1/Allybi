@@ -1,0 +1,6732 @@
+{
+  "_meta": {
+    "id": "column_semantics_ontology",
+    "version": "1.0.0",
+    "description": "Canonical semantic column ontology with 250+ spreadsheet fields, EN/PT header synonyms, unit hints, and collision-avoidance notes for intelligent column resolution.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28",
+    "owner": "excel-calc-agent"
+  },
+  "config": {
+    "enabled": true,
+    "matchStrategy": "synonym_fuzzy",
+    "minConfidence": 0.65,
+    "caseSensitive": false
+  },
+  "categories": [
+    {
+      "id": "finance_revenue",
+      "label": {
+        "en": "Revenue & Sales",
+        "pt": "Receita & Vendas"
+      }
+    },
+    {
+      "id": "finance_expenses",
+      "label": {
+        "en": "Expenses & Costs",
+        "pt": "Despesas & Custos"
+      }
+    },
+    {
+      "id": "profit_income",
+      "label": {
+        "en": "Profit & Income",
+        "pt": "Lucro & Renda"
+      }
+    },
+    {
+      "id": "cash_flow",
+      "label": {
+        "en": "Cash Flow",
+        "pt": "Fluxo de Caixa"
+      }
+    },
+    {
+      "id": "balance_sheet_assets",
+      "label": {
+        "en": "Assets",
+        "pt": "Ativos"
+      }
+    },
+    {
+      "id": "balance_sheet_liabilities",
+      "label": {
+        "en": "Liabilities",
+        "pt": "Passivos"
+      }
+    },
+    {
+      "id": "balance_sheet_equity",
+      "label": {
+        "en": "Equity",
+        "pt": "Patrimônio Líquido"
+      }
+    },
+    {
+      "id": "tax",
+      "label": {
+        "en": "Tax",
+        "pt": "Impostos"
+      }
+    },
+    {
+      "id": "payroll_hr",
+      "label": {
+        "en": "Payroll & HR",
+        "pt": "Folha & RH"
+      }
+    },
+    {
+      "id": "dates_time",
+      "label": {
+        "en": "Dates & Time",
+        "pt": "Datas & Tempo"
+      }
+    },
+    {
+      "id": "identifiers",
+      "label": {
+        "en": "Identifiers & Codes",
+        "pt": "Identificadores & Códigos"
+      }
+    },
+    {
+      "id": "quantities",
+      "label": {
+        "en": "Quantities & Measures",
+        "pt": "Quantidades & Medidas"
+      }
+    },
+    {
+      "id": "pricing_cost",
+      "label": {
+        "en": "Pricing & Cost",
+        "pt": "Preços & Custos"
+      }
+    },
+    {
+      "id": "customer_contact",
+      "label": {
+        "en": "Customer & Contact",
+        "pt": "Cliente & Contato"
+      }
+    },
+    {
+      "id": "inventory_supply_chain",
+      "label": {
+        "en": "Inventory & Supply Chain",
+        "pt": "Estoque & Cadeia de Suprimentos"
+      }
+    },
+    {
+      "id": "kpi_metrics",
+      "label": {
+        "en": "KPI & Metrics",
+        "pt": "KPI & Métricas"
+      }
+    },
+    {
+      "id": "banking_transactions",
+      "label": {
+        "en": "Banking & Transactions",
+        "pt": "Bancário & Transações"
+      }
+    },
+    {
+      "id": "status_metadata",
+      "label": {
+        "en": "Status & Metadata",
+        "pt": "Status & Metadados"
+      }
+    }
+  ],
+  "fields": [
+    {
+      "id": "account_balance",
+      "canonicalName": {
+        "en": "Account Balance",
+        "pt": "Saldo da Conta"
+      },
+      "synonyms": {
+        "en": [
+          "account balance",
+          "balance",
+          "acct balance",
+          "current balance",
+          "available balance"
+        ],
+        "pt": [
+          "saldo da conta",
+          "saldo",
+          "saldo disponível",
+          "saldo atual"
+        ]
+      },
+      "category": "banking_transactions",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "May collide with 'cash_balance' or 'running_balance'. Account balance is a point-in-time snapshot."
+    },
+    {
+      "id": "account_manager",
+      "canonicalName": {
+        "en": "Account Manager",
+        "pt": "Gerente de Conta"
+      },
+      "synonyms": {
+        "en": [
+          "account manager",
+          "AM",
+          "account executive",
+          "account rep",
+          "relationship manager"
+        ],
+        "pt": [
+          "gerente de conta",
+          "executivo de conta",
+          "gestor de conta",
+          "responsável pela conta"
+        ]
+      },
+      "category": "customer_contact",
+      "unit": "text"
+    },
+    {
+      "id": "account_number",
+      "canonicalName": {
+        "en": "Account Number",
+        "pt": "Número da Conta"
+      },
+      "synonyms": {
+        "en": [
+          "account number",
+          "acct no",
+          "account #",
+          "acct number",
+          "account code"
+        ],
+        "pt": [
+          "número da conta",
+          "nº da conta",
+          "conta nº",
+          "cód da conta"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text",
+      "collisionNotes": "See also 'gl_account' for general ledger and 'customer_id' for CRM context."
+    },
+    {
+      "id": "accounts_payable",
+      "canonicalName": {
+        "en": "Accounts Payable",
+        "pt": "Contas a Pagar"
+      },
+      "synonyms": {
+        "en": [
+          "accounts payable",
+          "AP",
+          "trade payables",
+          "payables",
+          "creditors"
+        ],
+        "pt": [
+          "contas a pagar",
+          "fornecedores",
+          "CP",
+          "duplicatas a pagar",
+          "obrigações com fornecedores"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Current liability. See 'notes_payable' for formal debt instruments."
+    },
+    {
+      "id": "accounts_receivable",
+      "canonicalName": {
+        "en": "Accounts Receivable",
+        "pt": "Contas a Receber"
+      },
+      "synonyms": {
+        "en": [
+          "accounts receivable",
+          "AR",
+          "receivables",
+          "trade receivables",
+          "debtors"
+        ],
+        "pt": [
+          "contas a receber",
+          "CR",
+          "recebíveis",
+          "duplicatas a receber",
+          "clientes"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "See also 'trade_receivables' (subset) and 'notes_receivable' (formal instruments)."
+    },
+    {
+      "id": "accrued_liabilities",
+      "canonicalName": {
+        "en": "Accrued Liabilities",
+        "pt": "Passivos Acumulados"
+      },
+      "synonyms": {
+        "en": [
+          "accrued liabilities",
+          "accrued expenses",
+          "accruals",
+          "accrued obligations"
+        ],
+        "pt": [
+          "passivos acumulados",
+          "despesas acumuladas",
+          "provisões",
+          "obrigações acumuladas"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "accrued_revenue",
+      "canonicalName": {
+        "en": "Accrued Revenue",
+        "pt": "Receita Acumulada"
+      },
+      "synonyms": {
+        "en": [
+          "accrued revenue",
+          "accrued income",
+          "unbilled revenue",
+          "earned but unbilled"
+        ],
+        "pt": [
+          "receita acumulada",
+          "receita a faturar",
+          "receita auferida não faturada"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Revenue earned but not yet invoiced. Opposite of 'deferred_revenue'."
+    },
+    {
+      "id": "accumulated_depreciation",
+      "canonicalName": {
+        "en": "Accumulated Depreciation",
+        "pt": "Depreciação Acumulada"
+      },
+      "synonyms": {
+        "en": [
+          "accumulated depreciation",
+          "accum depreciation",
+          "total depreciation",
+          "AD"
+        ],
+        "pt": [
+          "depreciação acumulada",
+          "depreciação total",
+          "DA",
+          "provisão para depreciação"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Contra-asset account. Reduces gross fixed assets to net fixed assets."
+    },
+    {
+      "id": "accumulated_other_comprehensive_income",
+      "canonicalName": {
+        "en": "Accumulated OCI",
+        "pt": "Outros Resultados Abrangentes Acumulados"
+      },
+      "synonyms": {
+        "en": [
+          "accumulated other comprehensive income",
+          "AOCI",
+          "other comprehensive income",
+          "OCI"
+        ],
+        "pt": [
+          "outros resultados abrangentes acumulados",
+          "ORA",
+          "resultados abrangentes acumulados"
+        ]
+      },
+      "category": "balance_sheet_equity",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "additional_paid_in_capital",
+      "canonicalName": {
+        "en": "Additional Paid-In Capital",
+        "pt": "Ágio na Emissão de Ações"
+      },
+      "synonyms": {
+        "en": [
+          "additional paid-in capital",
+          "APIC",
+          "share premium",
+          "capital surplus",
+          "paid-in surplus"
+        ],
+        "pt": [
+          "ágio na emissão de ações",
+          "reserva de ágio",
+          "capital excedente",
+          "prêmio de emissão"
+        ]
+      },
+      "category": "balance_sheet_equity",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "address",
+      "canonicalName": {
+        "en": "Address",
+        "pt": "Endereço"
+      },
+      "synonyms": {
+        "en": [
+          "address",
+          "street address",
+          "mailing address",
+          "addr",
+          "location"
+        ],
+        "pt": [
+          "endereço",
+          "logradouro",
+          "end.",
+          "endereço completo"
+        ]
+      },
+      "category": "customer_contact",
+      "unit": "text"
+    },
+    {
+      "id": "advertising_expense",
+      "canonicalName": {
+        "en": "Advertising Expense",
+        "pt": "Despesa com Publicidade"
+      },
+      "synonyms": {
+        "en": [
+          "advertising expense",
+          "ad spend",
+          "advertising cost",
+          "media spend",
+          "ad expense"
+        ],
+        "pt": [
+          "despesa com publicidade",
+          "gasto com propaganda",
+          "investimento em mídia",
+          "custo de publicidade"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Subset of 'marketing_expense'. Specifically paid media and ad placements."
+    },
+    {
+      "id": "amortization",
+      "canonicalName": {
+        "en": "Amortization",
+        "pt": "Amortização"
+      },
+      "synonyms": {
+        "en": [
+          "amortization",
+          "intangible amortization",
+          "amort",
+          "writedown of intangibles"
+        ],
+        "pt": [
+          "amortização",
+          "amortização de intangíveis",
+          "amort."
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "For intangible assets. See 'depreciation' for tangible and 'depreciation_and_amortization' for combined."
+    },
+    {
+      "id": "area",
+      "canonicalName": {
+        "en": "Area",
+        "pt": "Área"
+      },
+      "synonyms": {
+        "en": [
+          "area",
+          "surface area",
+          "sq ft",
+          "sq m",
+          "floor area"
+        ],
+        "pt": [
+          "área",
+          "área de superfície",
+          "m²",
+          "área do piso"
+        ]
+      },
+      "category": "quantities",
+      "unit": "text"
+    },
+    {
+      "id": "average_cost",
+      "canonicalName": {
+        "en": "Average Cost",
+        "pt": "Custo Médio"
+      },
+      "synonyms": {
+        "en": [
+          "average cost",
+          "avg cost",
+          "weighted average cost",
+          "mean cost",
+          "AVCO"
+        ],
+        "pt": [
+          "custo médio",
+          "custo médio ponderado",
+          "CMP",
+          "média de custo"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Inventory valuation method. See 'standard_cost' for predetermined and 'landed_cost' for full cost."
+    },
+    {
+      "id": "backorder_quantity",
+      "canonicalName": {
+        "en": "Backorder Quantity",
+        "pt": "Quantidade em Pedido Pendente"
+      },
+      "synonyms": {
+        "en": [
+          "backorder quantity",
+          "backordered qty",
+          "backorder",
+          "outstanding order qty"
+        ],
+        "pt": [
+          "quantidade em pedido pendente",
+          "qtd em atraso",
+          "pedidos pendentes",
+          "qtd backorder"
+        ]
+      },
+      "category": "inventory_supply_chain",
+      "unit": "count",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "base_salary",
+      "canonicalName": {
+        "en": "Base Salary",
+        "pt": "Salário Base"
+      },
+      "synonyms": {
+        "en": [
+          "base salary",
+          "base pay",
+          "basic salary",
+          "base compensation",
+          "base wage"
+        ],
+        "pt": [
+          "salário base",
+          "salário básico",
+          "remuneração base",
+          "piso salarial"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Excludes bonuses, commissions, and benefits. See 'gross_salary' and 'net_salary'."
+    },
+    {
+      "id": "batch_number",
+      "canonicalName": {
+        "en": "Batch Number",
+        "pt": "Número do Lote"
+      },
+      "synonyms": {
+        "en": [
+          "batch number",
+          "batch no",
+          "batch #",
+          "lot no",
+          "batch id"
+        ],
+        "pt": [
+          "número do lote",
+          "nº do lote",
+          "lote nº",
+          "identificação do lote"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text",
+      "collisionNotes": "Manufacturing/inventory batch. See 'lot_number' which is often interchangeable."
+    },
+    {
+      "id": "beginning_cash_balance",
+      "canonicalName": {
+        "en": "Beginning Cash Balance",
+        "pt": "Saldo Inicial de Caixa"
+      },
+      "synonyms": {
+        "en": [
+          "beginning cash balance",
+          "opening balance",
+          "starting balance",
+          "BOP cash",
+          "initial cash"
+        ],
+        "pt": [
+          "saldo inicial de caixa",
+          "saldo de abertura",
+          "caixa inicial",
+          "saldo no início"
+        ]
+      },
+      "category": "cash_flow",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Opening cash for the period. See 'ending_cash_balance' for close."
+    },
+    {
+      "id": "benefits",
+      "canonicalName": {
+        "en": "Benefits",
+        "pt": "Benefícios"
+      },
+      "synonyms": {
+        "en": [
+          "benefits",
+          "employee benefits",
+          "fringe benefits",
+          "perks",
+          "total benefits"
+        ],
+        "pt": [
+          "benefícios",
+          "benefícios do empregado",
+          "vantagens",
+          "pacote de benefícios"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "bin_number",
+      "canonicalName": {
+        "en": "Bin Number",
+        "pt": "Número do Compartimento"
+      },
+      "synonyms": {
+        "en": [
+          "bin number",
+          "bin location",
+          "shelf number",
+          "rack number",
+          "storage bin"
+        ],
+        "pt": [
+          "número do compartimento",
+          "posição de armazenagem",
+          "prateleira nº",
+          "local de estocagem"
+        ]
+      },
+      "category": "inventory_supply_chain",
+      "unit": "text"
+    },
+    {
+      "id": "bonds_payable",
+      "canonicalName": {
+        "en": "Bonds Payable",
+        "pt": "Debêntures a Pagar"
+      },
+      "synonyms": {
+        "en": [
+          "bonds payable",
+          "bonds outstanding",
+          "debentures",
+          "bond liability"
+        ],
+        "pt": [
+          "debêntures a pagar",
+          "obrigações de debêntures",
+          "títulos a pagar"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "bonus",
+      "canonicalName": {
+        "en": "Bonus",
+        "pt": "Bônus"
+      },
+      "synonyms": {
+        "en": [
+          "bonus",
+          "performance bonus",
+          "incentive",
+          "annual bonus",
+          "variable pay"
+        ],
+        "pt": [
+          "bônus",
+          "gratificação",
+          "bonificação",
+          "incentivo",
+          "PLR"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "In Brazil, PLR (Participação nos Lucros e Resultados) is common."
+    },
+    {
+      "id": "capital_expenditure",
+      "canonicalName": {
+        "en": "Capital Expenditure",
+        "pt": "Investimento de Capital"
+      },
+      "synonyms": {
+        "en": [
+          "capital expenditure",
+          "capex",
+          "CAPEX",
+          "capital spending",
+          "capital investment"
+        ],
+        "pt": [
+          "investimento de capital",
+          "CAPEX",
+          "despesa de capital",
+          "investimento em ativos fixos"
+        ]
+      },
+      "category": "cash_flow",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Cash outflow for long-term assets. Key component of free cash flow calculation."
+    },
+    {
+      "id": "cases",
+      "canonicalName": {
+        "en": "Cases",
+        "pt": "Caixas"
+      },
+      "synonyms": {
+        "en": [
+          "cases",
+          "cartons",
+          "boxes",
+          "case count",
+          "case qty"
+        ],
+        "pt": [
+          "caixas",
+          "caixotes",
+          "volumes",
+          "embalagens"
+        ]
+      },
+      "category": "quantities",
+      "unit": "count"
+    },
+    {
+      "id": "cash_and_equivalents",
+      "canonicalName": {
+        "en": "Cash & Equivalents",
+        "pt": "Caixa e Equivalentes"
+      },
+      "synonyms": {
+        "en": [
+          "cash and equivalents",
+          "cash & equivalents",
+          "CCE",
+          "cash and cash equivalents",
+          "liquid assets"
+        ],
+        "pt": [
+          "caixa e equivalentes",
+          "disponibilidades",
+          "caixa e equivalentes de caixa"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Most liquid asset on balance sheet. Includes short-term deposits and money market funds."
+    },
+    {
+      "id": "cash_balance",
+      "canonicalName": {
+        "en": "Cash Balance",
+        "pt": "Saldo de Caixa"
+      },
+      "synonyms": {
+        "en": [
+          "cash balance",
+          "cash on hand",
+          "bank balance",
+          "cash position"
+        ],
+        "pt": [
+          "saldo de caixa",
+          "caixa",
+          "disponível em caixa",
+          "posição de caixa"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Point-in-time cash. See 'cash_and_equivalents' for broader liquid assets."
+    },
+    {
+      "id": "cash_from_financing",
+      "canonicalName": {
+        "en": "Cash from Financing",
+        "pt": "Caixa de Atividades de Financiamento"
+      },
+      "synonyms": {
+        "en": [
+          "cash from financing",
+          "financing activities",
+          "CFF",
+          "financing cash flow"
+        ],
+        "pt": [
+          "caixa de atividades de financiamento",
+          "fluxo de financiamento",
+          "caixa de financiamento"
+        ]
+      },
+      "category": "cash_flow",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "cash_from_investing",
+      "canonicalName": {
+        "en": "Cash from Investing",
+        "pt": "Caixa de Atividades de Investimento"
+      },
+      "synonyms": {
+        "en": [
+          "cash from investing",
+          "investing activities",
+          "CFI",
+          "investing cash flow"
+        ],
+        "pt": [
+          "caixa de atividades de investimento",
+          "fluxo de investimento",
+          "caixa de investimento"
+        ]
+      },
+      "category": "cash_flow",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "cash_from_operations",
+      "canonicalName": {
+        "en": "Cash from Operations",
+        "pt": "Caixa de Operações"
+      },
+      "synonyms": {
+        "en": [
+          "cash from operations",
+          "operating activities",
+          "CFO",
+          "operational cash flow"
+        ],
+        "pt": [
+          "caixa de operações",
+          "fluxo operacional",
+          "caixa das operações"
+        ]
+      },
+      "category": "cash_flow",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "May collide with 'operating_cash_flow'. Typically interchangeable."
+    },
+    {
+      "id": "category",
+      "canonicalName": {
+        "en": "Category",
+        "pt": "Categoria"
+      },
+      "synonyms": {
+        "en": [
+          "category",
+          "cat",
+          "classification",
+          "group",
+          "class"
+        ],
+        "pt": [
+          "categoria",
+          "classificação",
+          "grupo",
+          "classe"
+        ]
+      },
+      "category": "status_metadata",
+      "unit": "text"
+    },
+    {
+      "id": "churn_rate",
+      "canonicalName": {
+        "en": "Churn Rate",
+        "pt": "Taxa de Cancelamento"
+      },
+      "synonyms": {
+        "en": [
+          "churn rate",
+          "attrition rate",
+          "cancellation rate",
+          "customer churn",
+          "turnover rate"
+        ],
+        "pt": [
+          "taxa de cancelamento",
+          "taxa de churn",
+          "taxa de rotatividade",
+          "índice de cancelamento"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "percentage",
+      "direction": "lower_is_better",
+      "collisionNotes": "Inverse of 'retention_rate'. Churn + retention should equal 100%."
+    },
+    {
+      "id": "city",
+      "canonicalName": {
+        "en": "City",
+        "pt": "Cidade"
+      },
+      "synonyms": {
+        "en": [
+          "city",
+          "town",
+          "municipality",
+          "metro area"
+        ],
+        "pt": [
+          "cidade",
+          "município",
+          "localidade",
+          "urbe"
+        ]
+      },
+      "category": "customer_contact",
+      "unit": "text"
+    },
+    {
+      "id": "code",
+      "canonicalName": {
+        "en": "Code",
+        "pt": "Código"
+      },
+      "synonyms": {
+        "en": [
+          "code",
+          "ref code",
+          "identifier code",
+          "lookup code"
+        ],
+        "pt": [
+          "código",
+          "cód",
+          "cód.",
+          "código de referência"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text",
+      "collisionNotes": "Generic code field. Prefer more specific variants like 'sku', 'product_id', 'project_code'."
+    },
+    {
+      "id": "cofins",
+      "canonicalName": {
+        "en": "COFINS",
+        "pt": "COFINS"
+      },
+      "synonyms": {
+        "en": [
+          "COFINS",
+          "contribution for social security financing",
+          "cofins tax",
+          "social security contribution"
+        ],
+        "pt": [
+          "COFINS",
+          "Contribuição para o Financiamento da Seguridade Social",
+          "contribuição COFINS",
+          "cofins federal"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Brazilian federal tax on gross revenue. Often paired with PIS. See also 'pis'."
+    },
+    {
+      "id": "comments",
+      "canonicalName": {
+        "en": "Comments",
+        "pt": "Comentários"
+      },
+      "synonyms": {
+        "en": [
+          "comments",
+          "remarks",
+          "observations",
+          "memo",
+          "annotation"
+        ],
+        "pt": [
+          "comentários",
+          "observações",
+          "notas",
+          "anotações",
+          "obs"
+        ]
+      },
+      "category": "status_metadata",
+      "unit": "text"
+    },
+    {
+      "id": "commission",
+      "canonicalName": {
+        "en": "Commission",
+        "pt": "Comissão"
+      },
+      "synonyms": {
+        "en": [
+          "commission",
+          "sales commission",
+          "commission earned",
+          "comm",
+          "incentive commission"
+        ],
+        "pt": [
+          "comissão",
+          "comissão de vendas",
+          "comissão sobre vendas"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Variable pay based on sales. See 'commission_expense' for the company's cost view."
+    },
+    {
+      "id": "commission_expense",
+      "canonicalName": {
+        "en": "Commission Expense",
+        "pt": "Despesa com Comissão"
+      },
+      "synonyms": {
+        "en": [
+          "commission expense",
+          "sales commission expense",
+          "commission cost",
+          "agent commission"
+        ],
+        "pt": [
+          "despesa com comissão",
+          "custo de comissão",
+          "gasto com comissões"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Company's view of commissions paid. See 'commission' for employee's earned amount."
+    },
+    {
+      "id": "common_stock",
+      "canonicalName": {
+        "en": "Common Stock",
+        "pt": "Ações Ordinárias"
+      },
+      "synonyms": {
+        "en": [
+          "common stock",
+          "common shares",
+          "ordinary shares",
+          "issued shares"
+        ],
+        "pt": [
+          "ações ordinárias",
+          "capital social ordinário",
+          "ações ON"
+        ]
+      },
+      "category": "balance_sheet_equity",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "See 'preferred_stock' for the other class of shares."
+    },
+    {
+      "id": "company_name",
+      "canonicalName": {
+        "en": "Company Name",
+        "pt": "Nome da Empresa"
+      },
+      "synonyms": {
+        "en": [
+          "company name",
+          "business name",
+          "firm name",
+          "organization name",
+          "entity name"
+        ],
+        "pt": [
+          "nome da empresa",
+          "razão social",
+          "nome fantasia",
+          "nome empresarial"
+        ]
+      },
+      "category": "customer_contact",
+      "unit": "text",
+      "collisionNotes": "In Brazil, 'razão social' is the legal name, 'nome fantasia' is the trade name."
+    },
+    {
+      "id": "consulting_fees",
+      "canonicalName": {
+        "en": "Consulting Fees",
+        "pt": "Honorários de Consultoria"
+      },
+      "synonyms": {
+        "en": [
+          "consulting fees",
+          "consultant fees",
+          "advisory fees",
+          "consulting expense"
+        ],
+        "pt": [
+          "honorários de consultoria",
+          "despesa com consultoria",
+          "serviços de consultoria"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Subset of 'professional_fees'. Specifically for consulting engagements."
+    },
+    {
+      "id": "contact_name",
+      "canonicalName": {
+        "en": "Contact Name",
+        "pt": "Nome do Contato"
+      },
+      "synonyms": {
+        "en": [
+          "contact name",
+          "contact person",
+          "point of contact",
+          "POC",
+          "primary contact"
+        ],
+        "pt": [
+          "nome do contato",
+          "pessoa de contato",
+          "contato principal"
+        ]
+      },
+      "category": "customer_contact",
+      "unit": "text"
+    },
+    {
+      "id": "contract_number",
+      "canonicalName": {
+        "en": "Contract Number",
+        "pt": "Número do Contrato"
+      },
+      "synonyms": {
+        "en": [
+          "contract number",
+          "contract no",
+          "contract #",
+          "agreement number",
+          "contract id"
+        ],
+        "pt": [
+          "número do contrato",
+          "nº do contrato",
+          "contrato nº",
+          "identificação do contrato"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text"
+    },
+    {
+      "id": "contribution_margin",
+      "canonicalName": {
+        "en": "Contribution Margin",
+        "pt": "Margem de Contribuição"
+      },
+      "synonyms": {
+        "en": [
+          "contribution margin",
+          "CM",
+          "variable margin",
+          "unit contribution"
+        ],
+        "pt": [
+          "margem de contribuição",
+          "MC",
+          "margem variável"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Revenue minus variable costs. Not the same as 'gross_margin' (which subtracts COGS)."
+    },
+    {
+      "id": "conversion_rate",
+      "canonicalName": {
+        "en": "Conversion Rate",
+        "pt": "Taxa de Conversão"
+      },
+      "synonyms": {
+        "en": [
+          "conversion rate",
+          "CVR",
+          "close rate",
+          "win rate",
+          "conversion %"
+        ],
+        "pt": [
+          "taxa de conversão",
+          "índice de conversão",
+          "taxa de fechamento"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "percentage",
+      "direction": "higher_is_better",
+      "collisionNotes": "Do not confuse with 'exchange_rate' (currency). Context usually disambiguates."
+    },
+    {
+      "id": "cost_center",
+      "canonicalName": {
+        "en": "Cost Center",
+        "pt": "Centro de Custo"
+      },
+      "synonyms": {
+        "en": [
+          "cost center",
+          "CC",
+          "cost centre",
+          "expense center",
+          "responsibility center"
+        ],
+        "pt": [
+          "centro de custo",
+          "CC",
+          "centro de despesa",
+          "centro de responsabilidade"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text"
+    },
+    {
+      "id": "cost_of_goods_sold",
+      "canonicalName": {
+        "en": "Cost of Goods Sold",
+        "pt": "Custo dos Produtos Vendidos"
+      },
+      "synonyms": {
+        "en": [
+          "cost of goods sold",
+          "COGS",
+          "cost of sales",
+          "COS",
+          "cost of merchandise sold"
+        ],
+        "pt": [
+          "custo dos produtos vendidos",
+          "CPV",
+          "CMV",
+          "custo das mercadorias vendidas",
+          "custo de vendas"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Direct production costs. See 'cost_of_revenue' for service businesses."
+    },
+    {
+      "id": "cost_of_revenue",
+      "canonicalName": {
+        "en": "Cost of Revenue",
+        "pt": "Custo da Receita"
+      },
+      "synonyms": {
+        "en": [
+          "cost of revenue",
+          "COR",
+          "cost of services",
+          "direct costs"
+        ],
+        "pt": [
+          "custo da receita",
+          "custo dos serviços",
+          "custos diretos"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Broader than COGS. Includes service delivery costs for non-manufacturing companies."
+    },
+    {
+      "id": "cost_price",
+      "canonicalName": {
+        "en": "Cost Price",
+        "pt": "Preço de Custo"
+      },
+      "synonyms": {
+        "en": [
+          "cost price",
+          "purchase price",
+          "acquisition cost",
+          "buy price",
+          "cost"
+        ],
+        "pt": [
+          "preço de custo",
+          "custo de aquisição",
+          "preço de compra",
+          "valor de custo"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "What the company paid for an item. See 'unit_price' (sale) and 'landed_cost' (full)."
+    },
+    {
+      "id": "count",
+      "canonicalName": {
+        "en": "Count",
+        "pt": "Contagem"
+      },
+      "synonyms": {
+        "en": [
+          "count",
+          "total count",
+          "number of",
+          "cnt",
+          "tally"
+        ],
+        "pt": [
+          "contagem",
+          "quantidade",
+          "total de",
+          "nº de"
+        ]
+      },
+      "category": "quantities",
+      "unit": "count",
+      "collisionNotes": "Generic count. See 'quantity' (order context) and 'units' (inventory context)."
+    },
+    {
+      "id": "country",
+      "canonicalName": {
+        "en": "Country",
+        "pt": "País"
+      },
+      "synonyms": {
+        "en": [
+          "country",
+          "nation",
+          "country code",
+          "country name"
+        ],
+        "pt": [
+          "país",
+          "nação",
+          "código do país",
+          "nome do país"
+        ]
+      },
+      "category": "customer_contact",
+      "unit": "text"
+    },
+    {
+      "id": "created_date",
+      "canonicalName": {
+        "en": "Created Date",
+        "pt": "Data de Criação"
+      },
+      "synonyms": {
+        "en": [
+          "created date",
+          "creation date",
+          "date created",
+          "created on",
+          "date added"
+        ],
+        "pt": [
+          "data de criação",
+          "criado em",
+          "dt criação",
+          "data de cadastro"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "date"
+    },
+    {
+      "id": "credit_amount",
+      "canonicalName": {
+        "en": "Credit Amount",
+        "pt": "Valor de Crédito"
+      },
+      "synonyms": {
+        "en": [
+          "credit amount",
+          "credit",
+          "CR",
+          "credit entry",
+          "credit value"
+        ],
+        "pt": [
+          "valor de crédito",
+          "crédito",
+          "lançamento a crédito",
+          "valor creditado"
+        ]
+      },
+      "category": "banking_transactions",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Accounting credit (right side). Not 'tax_credit'. Context: double-entry bookkeeping."
+    },
+    {
+      "id": "csll",
+      "canonicalName": {
+        "en": "CSLL",
+        "pt": "CSLL"
+      },
+      "synonyms": {
+        "en": [
+          "CSLL",
+          "social contribution on net profit",
+          "csll tax",
+          "corporate social contribution"
+        ],
+        "pt": [
+          "CSLL",
+          "Contribuição Social sobre o Lucro Líquido",
+          "contribuição social",
+          "CS sobre lucro líquido"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Brazilian federal tax on net profit. Often paired with IRPJ. See also 'irpj'."
+    },
+    {
+      "id": "current_assets",
+      "canonicalName": {
+        "en": "Current Assets",
+        "pt": "Ativo Circulante"
+      },
+      "synonyms": {
+        "en": [
+          "current assets",
+          "CA",
+          "short-term assets",
+          "liquid assets"
+        ],
+        "pt": [
+          "ativo circulante",
+          "ativos circulantes",
+          "AC",
+          "ativos de curto prazo"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Assets convertible to cash within one year. See 'non_current_assets' for long-term."
+    },
+    {
+      "id": "current_liabilities",
+      "canonicalName": {
+        "en": "Current Liabilities",
+        "pt": "Passivo Circulante"
+      },
+      "synonyms": {
+        "en": [
+          "current liabilities",
+          "CL",
+          "short-term liabilities",
+          "current obligations"
+        ],
+        "pt": [
+          "passivo circulante",
+          "obrigações circulantes",
+          "PC",
+          "passivos de curto prazo"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Due within one year. See 'non_current_liabilities' for long-term."
+    },
+    {
+      "id": "current_ratio",
+      "canonicalName": {
+        "en": "Current Ratio",
+        "pt": "Índice de Liquidez Corrente"
+      },
+      "synonyms": {
+        "en": [
+          "current ratio",
+          "working capital ratio",
+          "liquidity ratio"
+        ],
+        "pt": [
+          "índice de liquidez corrente",
+          "liquidez corrente",
+          "razão corrente"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "ratio",
+      "direction": "higher_is_better",
+      "collisionNotes": "Current Assets / Current Liabilities. See 'quick_ratio' for stricter measure."
+    },
+    {
+      "id": "customer_id",
+      "canonicalName": {
+        "en": "Customer ID",
+        "pt": "ID do Cliente"
+      },
+      "synonyms": {
+        "en": [
+          "customer id",
+          "cust id",
+          "customer number",
+          "client id",
+          "customer code"
+        ],
+        "pt": [
+          "ID do cliente",
+          "cód do cliente",
+          "código do cliente",
+          "número do cliente"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text"
+    },
+    {
+      "id": "customer_name",
+      "canonicalName": {
+        "en": "Customer Name",
+        "pt": "Nome do Cliente"
+      },
+      "synonyms": {
+        "en": [
+          "customer name",
+          "client name",
+          "buyer name",
+          "cust name",
+          "customer"
+        ],
+        "pt": [
+          "nome do cliente",
+          "cliente",
+          "nome do comprador",
+          "razão social do cliente"
+        ]
+      },
+      "category": "customer_contact",
+      "unit": "text"
+    },
+    {
+      "id": "customer_satisfaction",
+      "canonicalName": {
+        "en": "Customer Satisfaction",
+        "pt": "Satisfação do Cliente"
+      },
+      "synonyms": {
+        "en": [
+          "customer satisfaction",
+          "CSAT",
+          "satisfaction score",
+          "customer happiness"
+        ],
+        "pt": [
+          "satisfação do cliente",
+          "CSAT",
+          "índice de satisfação",
+          "pesquisa de satisfação"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "percentage",
+      "direction": "higher_is_better",
+      "collisionNotes": "See also 'nps_score' which measures recommendation likelihood."
+    },
+    {
+      "id": "date",
+      "canonicalName": {
+        "en": "Date",
+        "pt": "Data"
+      },
+      "synonyms": {
+        "en": [
+          "date",
+          "dt",
+          "the date",
+          "record date",
+          "entry date"
+        ],
+        "pt": [
+          "data",
+          "dt",
+          "data do registro"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "date",
+      "collisionNotes": "Generic date. Prefer specific variants like 'transaction_date', 'invoice_date', etc."
+    },
+    {
+      "id": "days_sales_outstanding",
+      "canonicalName": {
+        "en": "Days Sales Outstanding",
+        "pt": "Prazo Médio de Recebimento"
+      },
+      "synonyms": {
+        "en": [
+          "days sales outstanding",
+          "DSO",
+          "average collection period",
+          "receivable days"
+        ],
+        "pt": [
+          "prazo médio de recebimento",
+          "PMR",
+          "DSO",
+          "dias de vendas a receber"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "days",
+      "direction": "lower_is_better",
+      "collisionNotes": "AR / (Revenue/365). Measures collection efficiency."
+    },
+    {
+      "id": "debit_amount",
+      "canonicalName": {
+        "en": "Debit Amount",
+        "pt": "Valor de Débito"
+      },
+      "synonyms": {
+        "en": [
+          "debit amount",
+          "debit",
+          "DR",
+          "debit entry",
+          "debit value"
+        ],
+        "pt": [
+          "valor de débito",
+          "débito",
+          "lançamento a débito",
+          "valor debitado"
+        ]
+      },
+      "category": "banking_transactions",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Accounting debit (left side). Paired with 'credit_amount' in double-entry."
+    },
+    {
+      "id": "debt_to_equity_ratio",
+      "canonicalName": {
+        "en": "Debt-to-Equity Ratio",
+        "pt": "Índice de Endividamento"
+      },
+      "synonyms": {
+        "en": [
+          "debt-to-equity ratio",
+          "D/E ratio",
+          "leverage ratio",
+          "gearing ratio"
+        ],
+        "pt": [
+          "índice de endividamento",
+          "D/E",
+          "relação dívida/patrimônio",
+          "alavancagem"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "ratio",
+      "direction": "lower_is_better",
+      "collisionNotes": "Total Debt / Total Equity. Higher = more leveraged."
+    },
+    {
+      "id": "deferred_revenue",
+      "canonicalName": {
+        "en": "Deferred Revenue",
+        "pt": "Receita Diferida"
+      },
+      "synonyms": {
+        "en": [
+          "deferred revenue",
+          "unearned revenue",
+          "advance payments",
+          "deferred income"
+        ],
+        "pt": [
+          "receita diferida",
+          "receita antecipada",
+          "adiantamento de clientes",
+          "receita a apropriar"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Cash received but not yet earned. Opposite of 'accrued_revenue'."
+    },
+    {
+      "id": "deferred_tax_asset",
+      "canonicalName": {
+        "en": "Deferred Tax Asset",
+        "pt": "Ativo Fiscal Diferido"
+      },
+      "synonyms": {
+        "en": [
+          "deferred tax asset",
+          "DTA",
+          "future tax benefit"
+        ],
+        "pt": [
+          "ativo fiscal diferido",
+          "crédito tributário diferido",
+          "imposto diferido ativo"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Tax paid in advance. See 'deferred_tax_liability' for the opposite."
+    },
+    {
+      "id": "deferred_tax_liability",
+      "canonicalName": {
+        "en": "Deferred Tax Liability",
+        "pt": "Passivo Fiscal Diferido"
+      },
+      "synonyms": {
+        "en": [
+          "deferred tax liability",
+          "DTL",
+          "future tax obligation"
+        ],
+        "pt": [
+          "passivo fiscal diferido",
+          "obrigação tributária diferida",
+          "imposto diferido passivo"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Tax owed in the future. See 'deferred_tax_asset' for the opposite."
+    },
+    {
+      "id": "department",
+      "canonicalName": {
+        "en": "Department",
+        "pt": "Departamento"
+      },
+      "synonyms": {
+        "en": [
+          "department",
+          "dept",
+          "division",
+          "business unit",
+          "section"
+        ],
+        "pt": [
+          "departamento",
+          "depto",
+          "divisão",
+          "setor",
+          "área"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "text"
+    },
+    {
+      "id": "depreciation",
+      "canonicalName": {
+        "en": "Depreciation",
+        "pt": "Depreciação"
+      },
+      "synonyms": {
+        "en": [
+          "depreciation",
+          "asset depreciation",
+          "depr",
+          "tangible depreciation"
+        ],
+        "pt": [
+          "depreciação",
+          "depreciação de ativos",
+          "depr."
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "For tangible/fixed assets. See 'amortization' for intangibles and 'depreciation_and_amortization' for combined."
+    },
+    {
+      "id": "depreciation_and_amortization",
+      "canonicalName": {
+        "en": "D&A",
+        "pt": "Depreciação e Amortização"
+      },
+      "synonyms": {
+        "en": [
+          "depreciation and amortization",
+          "D&A",
+          "DA",
+          "dep & amort",
+          "total depreciation and amortization"
+        ],
+        "pt": [
+          "depreciação e amortização",
+          "D&A",
+          "DA",
+          "depreciação e amort."
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Combined tangible + intangible write-downs. Key add-back for EBITDA calculation."
+    },
+    {
+      "id": "description",
+      "canonicalName": {
+        "en": "Description",
+        "pt": "Descrição"
+      },
+      "synonyms": {
+        "en": [
+          "description",
+          "desc",
+          "detail",
+          "item description",
+          "narrative"
+        ],
+        "pt": [
+          "descrição",
+          "desc.",
+          "detalhe",
+          "narrativa"
+        ]
+      },
+      "category": "status_metadata",
+      "unit": "text"
+    },
+    {
+      "id": "discount",
+      "canonicalName": {
+        "en": "Discount",
+        "pt": "Desconto"
+      },
+      "synonyms": {
+        "en": [
+          "discount",
+          "rebate",
+          "allowance",
+          "price reduction",
+          "markdown"
+        ],
+        "pt": [
+          "desconto",
+          "abatimento",
+          "redução de preço",
+          "bonificação"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Absolute discount amount. See 'discount_percentage' for relative."
+    },
+    {
+      "id": "discount_percentage",
+      "canonicalName": {
+        "en": "Discount Percentage",
+        "pt": "Percentual de Desconto"
+      },
+      "synonyms": {
+        "en": [
+          "discount percentage",
+          "discount %",
+          "pct discount",
+          "discount rate"
+        ],
+        "pt": [
+          "percentual de desconto",
+          "% de desconto",
+          "taxa de desconto"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "percentage",
+      "direction": "neutral",
+      "collisionNotes": "Relative discount. Do not confuse with financial 'discount rate' (time value of money)."
+    },
+    {
+      "id": "due_date",
+      "canonicalName": {
+        "en": "Due Date",
+        "pt": "Data de Vencimento"
+      },
+      "synonyms": {
+        "en": [
+          "due date",
+          "payment due",
+          "maturity date",
+          "deadline",
+          "due by"
+        ],
+        "pt": [
+          "data de vencimento",
+          "vencimento",
+          "dt vencimento",
+          "prazo"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "date"
+    },
+    {
+      "id": "earnings_per_share",
+      "canonicalName": {
+        "en": "Earnings Per Share",
+        "pt": "Lucro por Ação"
+      },
+      "synonyms": {
+        "en": [
+          "earnings per share",
+          "EPS",
+          "per share earnings",
+          "diluted EPS"
+        ],
+        "pt": [
+          "lucro por ação",
+          "LPA",
+          "EPS",
+          "resultado por ação"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Net Income / Shares Outstanding. Key investor metric."
+    },
+    {
+      "id": "ebit",
+      "canonicalName": {
+        "en": "EBIT",
+        "pt": "EBIT"
+      },
+      "synonyms": {
+        "en": [
+          "EBIT",
+          "earnings before interest and taxes",
+          "operating earnings"
+        ],
+        "pt": [
+          "EBIT",
+          "LAJIR",
+          "lucro antes de juros e impostos",
+          "resultado operacional"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Revenue - COGS - OpEx. See 'ebitda' (adds back D&A) and 'operating_income' (often synonymous)."
+    },
+    {
+      "id": "ebitda",
+      "canonicalName": {
+        "en": "EBITDA",
+        "pt": "EBITDA"
+      },
+      "synonyms": {
+        "en": [
+          "EBITDA",
+          "earnings before interest taxes depreciation amortization",
+          "adjusted EBITDA"
+        ],
+        "pt": [
+          "EBITDA",
+          "LAJIDA",
+          "lucro antes de juros impostos depreciação e amortização"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "EBIT + D&A. Popular valuation metric. See 'ebit' for after depreciation."
+    },
+    {
+      "id": "effective_date",
+      "canonicalName": {
+        "en": "Effective Date",
+        "pt": "Data de Vigência"
+      },
+      "synonyms": {
+        "en": [
+          "effective date",
+          "commencement date",
+          "in-effect date",
+          "valid from"
+        ],
+        "pt": [
+          "data de vigência",
+          "data de início de vigência",
+          "válido a partir de"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "date",
+      "collisionNotes": "When a contract or policy takes effect. See 'start_date' for projects."
+    },
+    {
+      "id": "effective_tax_rate",
+      "canonicalName": {
+        "en": "Effective Tax Rate",
+        "pt": "Taxa Efetiva de Imposto"
+      },
+      "synonyms": {
+        "en": [
+          "effective tax rate",
+          "ETR",
+          "actual tax rate",
+          "blended tax rate"
+        ],
+        "pt": [
+          "taxa efetiva de imposto",
+          "alíquota efetiva",
+          "taxa real de imposto"
+        ]
+      },
+      "category": "tax",
+      "unit": "percentage",
+      "direction": "lower_is_better",
+      "collisionNotes": "Actual tax paid / pretax income. See 'tax_rate' for statutory rate."
+    },
+    {
+      "id": "email",
+      "canonicalName": {
+        "en": "Email",
+        "pt": "E-mail"
+      },
+      "synonyms": {
+        "en": [
+          "email",
+          "email address",
+          "e-mail",
+          "mail",
+          "electronic mail"
+        ],
+        "pt": [
+          "e-mail",
+          "email",
+          "endereço de e-mail",
+          "correio eletrônico"
+        ]
+      },
+      "category": "customer_contact",
+      "unit": "text"
+    },
+    {
+      "id": "employee_id",
+      "canonicalName": {
+        "en": "Employee ID",
+        "pt": "ID do Funcionário"
+      },
+      "synonyms": {
+        "en": [
+          "employee id",
+          "emp id",
+          "employee number",
+          "staff id",
+          "badge number"
+        ],
+        "pt": [
+          "ID do funcionário",
+          "matrícula",
+          "registro do funcionário",
+          "nº do empregado"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text"
+    },
+    {
+      "id": "employee_name",
+      "canonicalName": {
+        "en": "Employee Name",
+        "pt": "Nome do Funcionário"
+      },
+      "synonyms": {
+        "en": [
+          "employee name",
+          "staff name",
+          "worker name",
+          "emp name"
+        ],
+        "pt": [
+          "nome do funcionário",
+          "nome do empregado",
+          "nome do colaborador"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "text"
+    },
+    {
+      "id": "ending_cash_balance",
+      "canonicalName": {
+        "en": "Ending Cash Balance",
+        "pt": "Saldo Final de Caixa"
+      },
+      "synonyms": {
+        "en": [
+          "ending cash balance",
+          "closing balance",
+          "EOP cash",
+          "final cash",
+          "closing cash"
+        ],
+        "pt": [
+          "saldo final de caixa",
+          "saldo de fechamento",
+          "caixa final",
+          "saldo no final"
+        ]
+      },
+      "category": "cash_flow",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Closing cash for the period. See 'beginning_cash_balance' for opening."
+    },
+    {
+      "id": "exchange_rate",
+      "canonicalName": {
+        "en": "Exchange Rate",
+        "pt": "Taxa de Câmbio"
+      },
+      "synonyms": {
+        "en": [
+          "exchange rate",
+          "FX rate",
+          "forex rate",
+          "currency rate",
+          "conversion rate"
+        ],
+        "pt": [
+          "taxa de câmbio",
+          "câmbio",
+          "cotação",
+          "taxa forex"
+        ]
+      },
+      "category": "banking_transactions",
+      "unit": "ratio",
+      "direction": "neutral",
+      "collisionNotes": "Currency conversion rate. Do not confuse with 'conversion_rate' (sales metric)."
+    },
+    {
+      "id": "excise_tax",
+      "canonicalName": {
+        "en": "Excise Tax",
+        "pt": "Imposto Especial"
+      },
+      "synonyms": {
+        "en": [
+          "excise tax",
+          "excise duty",
+          "specific tax",
+          "sin tax"
+        ],
+        "pt": [
+          "imposto especial",
+          "imposto seletivo",
+          "taxa sobre produtos específicos"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "expiration_date",
+      "canonicalName": {
+        "en": "Expiration Date",
+        "pt": "Data de Expiração"
+      },
+      "synonyms": {
+        "en": [
+          "expiration date",
+          "expiry date",
+          "best before",
+          "valid until",
+          "exp date"
+        ],
+        "pt": [
+          "data de expiração",
+          "data de validade",
+          "válido até",
+          "vencimento"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "date",
+      "collisionNotes": "Product shelf life or contract expiry. See 'expiry_date' (inventory-specific)."
+    },
+    {
+      "id": "expiry_date",
+      "canonicalName": {
+        "en": "Expiry Date",
+        "pt": "Data de Validade"
+      },
+      "synonyms": {
+        "en": [
+          "expiry date",
+          "use by date",
+          "best before date",
+          "shelf life date"
+        ],
+        "pt": [
+          "data de validade",
+          "prazo de validade",
+          "dt validade"
+        ]
+      },
+      "category": "inventory_supply_chain",
+      "unit": "date",
+      "collisionNotes": "Inventory-specific. See 'expiration_date' for contracts."
+    },
+    {
+      "id": "extended_price",
+      "canonicalName": {
+        "en": "Extended Price",
+        "pt": "Preço Estendido"
+      },
+      "synonyms": {
+        "en": [
+          "extended price",
+          "line amount",
+          "ext price",
+          "row total"
+        ],
+        "pt": [
+          "preço estendido",
+          "valor da linha",
+          "total da linha",
+          "preço total do item"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Quantity × unit price. Same as 'line_total'."
+    },
+    {
+      "id": "fee_amount",
+      "canonicalName": {
+        "en": "Fee Amount",
+        "pt": "Valor da Taxa"
+      },
+      "synonyms": {
+        "en": [
+          "fee amount",
+          "fee",
+          "service fee",
+          "charge",
+          "fee charged"
+        ],
+        "pt": [
+          "valor da taxa",
+          "taxa",
+          "tarifa",
+          "encargo"
+        ]
+      },
+      "category": "banking_transactions",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "financing_cash_flow",
+      "canonicalName": {
+        "en": "Financing Cash Flow",
+        "pt": "Fluxo de Caixa de Financiamento"
+      },
+      "synonyms": {
+        "en": [
+          "financing cash flow",
+          "financing activities",
+          "CFF"
+        ],
+        "pt": [
+          "fluxo de caixa de financiamento",
+          "caixa de financiamento",
+          "atividades de financiamento"
+        ]
+      },
+      "category": "cash_flow",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "May collide with 'cash_from_financing'. Typically interchangeable."
+    },
+    {
+      "id": "fiscal_quarter",
+      "canonicalName": {
+        "en": "Fiscal Quarter",
+        "pt": "Trimestre Fiscal"
+      },
+      "synonyms": {
+        "en": [
+          "fiscal quarter",
+          "FQ",
+          "reporting quarter",
+          "Q1/Q2/Q3/Q4"
+        ],
+        "pt": [
+          "trimestre fiscal",
+          "TF",
+          "trimestre de referência",
+          "1T/2T/3T/4T"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "text",
+      "collisionNotes": "May not align with calendar quarter. See 'quarter' for calendar-based."
+    },
+    {
+      "id": "fiscal_year",
+      "canonicalName": {
+        "en": "Fiscal Year",
+        "pt": "Ano Fiscal"
+      },
+      "synonyms": {
+        "en": [
+          "fiscal year",
+          "FY",
+          "financial year",
+          "reporting year"
+        ],
+        "pt": [
+          "ano fiscal",
+          "exercício fiscal",
+          "exercício social",
+          "ano financeiro"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "text",
+      "collisionNotes": "May not align with calendar year. Common: FY ending Mar 31, Jun 30, Sep 30."
+    },
+    {
+      "id": "fixed_assets",
+      "canonicalName": {
+        "en": "Fixed Assets",
+        "pt": "Ativo Imobilizado"
+      },
+      "synonyms": {
+        "en": [
+          "fixed assets",
+          "FA",
+          "tangible assets",
+          "PP&E",
+          "capital assets"
+        ],
+        "pt": [
+          "ativo imobilizado",
+          "ativos fixos",
+          "bens do imobilizado",
+          "imobilizado"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "See 'property_plant_equipment' (detailed), 'net_fixed_assets' (after depreciation)."
+    },
+    {
+      "id": "free_cash_flow",
+      "canonicalName": {
+        "en": "Free Cash Flow",
+        "pt": "Fluxo de Caixa Livre"
+      },
+      "synonyms": {
+        "en": [
+          "free cash flow",
+          "FCF",
+          "unlevered free cash flow",
+          "available cash flow"
+        ],
+        "pt": [
+          "fluxo de caixa livre",
+          "FCL",
+          "FCF",
+          "caixa livre"
+        ]
+      },
+      "category": "cash_flow",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Operating cash flow minus capex. Key valuation metric."
+    },
+    {
+      "id": "freight_expense",
+      "canonicalName": {
+        "en": "Freight Expense",
+        "pt": "Despesa de Frete"
+      },
+      "synonyms": {
+        "en": [
+          "freight expense",
+          "shipping cost",
+          "freight cost",
+          "delivery expense",
+          "transportation cost"
+        ],
+        "pt": [
+          "despesa de frete",
+          "custo de frete",
+          "frete",
+          "custo de transporte"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "full_time_equivalent",
+      "canonicalName": {
+        "en": "Full-Time Equivalent",
+        "pt": "Equivalente em Tempo Integral"
+      },
+      "synonyms": {
+        "en": [
+          "full-time equivalent",
+          "FTE",
+          "full time equivalent",
+          "headcount FTE"
+        ],
+        "pt": [
+          "equivalente em tempo integral",
+          "FTE",
+          "equivalente tempo integral"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "count",
+      "direction": "neutral",
+      "collisionNotes": "Normalized headcount. 2 half-time employees = 1.0 FTE. See 'headcount' for raw count."
+    },
+    {
+      "id": "general_and_administrative",
+      "canonicalName": {
+        "en": "General & Administrative",
+        "pt": "Despesas Gerais e Administrativas"
+      },
+      "synonyms": {
+        "en": [
+          "general and administrative",
+          "G&A",
+          "admin expenses",
+          "overhead",
+          "administrative expenses"
+        ],
+        "pt": [
+          "despesas gerais e administrativas",
+          "G&A",
+          "despesas administrativas",
+          "gastos administrativos"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Often combined with selling as SG&A. See 'selling_expenses'."
+    },
+    {
+      "id": "gl_account",
+      "canonicalName": {
+        "en": "GL Account",
+        "pt": "Conta Contábil"
+      },
+      "synonyms": {
+        "en": [
+          "GL account",
+          "general ledger account",
+          "chart of accounts",
+          "ledger account",
+          "COA"
+        ],
+        "pt": [
+          "conta contábil",
+          "conta do razão",
+          "plano de contas",
+          "conta do livro razão"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text",
+      "collisionNotes": "Accounting-specific. See 'account_number' for banking and 'cost_center' for management."
+    },
+    {
+      "id": "goodwill",
+      "canonicalName": {
+        "en": "Goodwill",
+        "pt": "Ágio/Goodwill"
+      },
+      "synonyms": {
+        "en": [
+          "goodwill",
+          "GW",
+          "acquisition goodwill",
+          "purchased goodwill"
+        ],
+        "pt": [
+          "ágio",
+          "goodwill",
+          "fundo de comércio",
+          "ágio por expectativa de rentabilidade futura"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Premium paid in acquisitions above fair value. Subject to impairment testing."
+    },
+    {
+      "id": "gross_margin",
+      "canonicalName": {
+        "en": "Gross Margin",
+        "pt": "Margem Bruta"
+      },
+      "synonyms": {
+        "en": [
+          "gross margin",
+          "GM",
+          "gross profit margin",
+          "gross margin %"
+        ],
+        "pt": [
+          "margem bruta",
+          "MB",
+          "margem de lucro bruto",
+          "margem bruta %"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "percentage",
+      "direction": "higher_is_better",
+      "collisionNotes": "(Revenue - COGS) / Revenue. See 'gross_profit' for the absolute amount."
+    },
+    {
+      "id": "gross_profit",
+      "canonicalName": {
+        "en": "Gross Profit",
+        "pt": "Lucro Bruto"
+      },
+      "synonyms": {
+        "en": [
+          "gross profit",
+          "GP",
+          "gross income",
+          "gross earnings"
+        ],
+        "pt": [
+          "lucro bruto",
+          "LB",
+          "resultado bruto",
+          "receita bruta menos custos"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Revenue minus COGS. See 'gross_margin' for percentage form."
+    },
+    {
+      "id": "gross_revenue",
+      "canonicalName": {
+        "en": "Gross Revenue",
+        "pt": "Receita Bruta"
+      },
+      "synonyms": {
+        "en": [
+          "gross revenue",
+          "total gross",
+          "gross sales",
+          "top line gross"
+        ],
+        "pt": [
+          "receita bruta",
+          "faturamento bruto",
+          "vendas brutas"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Before deductions (returns, discounts). See 'net_revenue' for after deductions."
+    },
+    {
+      "id": "gross_salary",
+      "canonicalName": {
+        "en": "Gross Salary",
+        "pt": "Salário Bruto"
+      },
+      "synonyms": {
+        "en": [
+          "gross salary",
+          "gross pay",
+          "total pay",
+          "gross compensation",
+          "pre-tax salary"
+        ],
+        "pt": [
+          "salário bruto",
+          "remuneração bruta",
+          "pagamento bruto",
+          "salário antes de descontos"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Before deductions (tax, benefits). See 'net_salary' for take-home."
+    },
+    {
+      "id": "growth_rate",
+      "canonicalName": {
+        "en": "Growth Rate",
+        "pt": "Taxa de Crescimento"
+      },
+      "synonyms": {
+        "en": [
+          "growth rate",
+          "YoY growth",
+          "growth %",
+          "annual growth rate",
+          "CAGR"
+        ],
+        "pt": [
+          "taxa de crescimento",
+          "crescimento %",
+          "crescimento anual",
+          "CAGR"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "percentage",
+      "direction": "higher_is_better"
+    },
+    {
+      "id": "headcount",
+      "canonicalName": {
+        "en": "Headcount",
+        "pt": "Número de Funcionários"
+      },
+      "synonyms": {
+        "en": [
+          "headcount",
+          "HC",
+          "employee count",
+          "staff count",
+          "number of employees"
+        ],
+        "pt": [
+          "número de funcionários",
+          "quadro de pessoal",
+          "efetivo",
+          "headcount"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "count",
+      "direction": "neutral",
+      "collisionNotes": "Raw count of employees. See 'full_time_equivalent' for normalized FTE measure."
+    },
+    {
+      "id": "health_insurance_cost",
+      "canonicalName": {
+        "en": "Health Insurance Cost",
+        "pt": "Custo de Plano de Saúde"
+      },
+      "synonyms": {
+        "en": [
+          "health insurance cost",
+          "medical insurance",
+          "health benefits cost",
+          "healthcare cost"
+        ],
+        "pt": [
+          "custo de plano de saúde",
+          "plano de saúde",
+          "convênio médico",
+          "assistência médica"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "height",
+      "canonicalName": {
+        "en": "Height",
+        "pt": "Altura"
+      },
+      "synonyms": {
+        "en": [
+          "height",
+          "ht",
+          "vertical dimension",
+          "elevation"
+        ],
+        "pt": [
+          "altura",
+          "alt.",
+          "dimensão vertical"
+        ]
+      },
+      "category": "quantities",
+      "unit": "text"
+    },
+    {
+      "id": "hire_date",
+      "canonicalName": {
+        "en": "Hire Date",
+        "pt": "Data de Admissão"
+      },
+      "synonyms": {
+        "en": [
+          "hire date",
+          "start date",
+          "date hired",
+          "employment date",
+          "joining date"
+        ],
+        "pt": [
+          "data de admissão",
+          "data de contratação",
+          "dt admissão",
+          "data de início"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "date",
+      "collisionNotes": "May collide with 'start_date'. Hire date is HR-specific; start date is project-specific."
+    },
+    {
+      "id": "hourly_rate",
+      "canonicalName": {
+        "en": "Hourly Rate",
+        "pt": "Taxa Horária"
+      },
+      "synonyms": {
+        "en": [
+          "hourly rate",
+          "pay rate",
+          "rate per hour",
+          "hourly wage",
+          "hr rate"
+        ],
+        "pt": [
+          "taxa horária",
+          "valor hora",
+          "remuneração por hora",
+          "salário hora"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "icms",
+      "canonicalName": {
+        "en": "ICMS",
+        "pt": "ICMS"
+      },
+      "synonyms": {
+        "en": [
+          "ICMS",
+          "state VAT",
+          "state sales tax"
+        ],
+        "pt": [
+          "ICMS",
+          "Imposto sobre Circulação de Mercadorias e Serviços",
+          "imposto estadual ICMS",
+          "ICMS estadual"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Brazilian state-level tax on goods and services. Rates vary by state (7-25%). See also 'vat'."
+    },
+    {
+      "id": "id",
+      "canonicalName": {
+        "en": "ID",
+        "pt": "ID"
+      },
+      "synonyms": {
+        "en": [
+          "id",
+          "identifier",
+          "record id",
+          "row id",
+          "primary key"
+        ],
+        "pt": [
+          "id",
+          "identificador",
+          "chave primária",
+          "código único"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text",
+      "collisionNotes": "Generic identifier. Prefer specific variants like 'customer_id', 'transaction_id', etc."
+    },
+    {
+      "id": "in_transit_quantity",
+      "canonicalName": {
+        "en": "In-Transit Quantity",
+        "pt": "Quantidade em Trânsito"
+      },
+      "synonyms": {
+        "en": [
+          "in-transit quantity",
+          "in transit qty",
+          "goods in transit",
+          "shipment qty"
+        ],
+        "pt": [
+          "quantidade em trânsito",
+          "mercadoria em trânsito",
+          "qtd em transporte"
+        ]
+      },
+      "category": "inventory_supply_chain",
+      "unit": "count",
+      "direction": "neutral"
+    },
+    {
+      "id": "income_tax",
+      "canonicalName": {
+        "en": "Income Tax",
+        "pt": "Imposto de Renda"
+      },
+      "synonyms": {
+        "en": [
+          "income tax",
+          "tax on income",
+          "IT",
+          "corporate income tax",
+          "personal income tax"
+        ],
+        "pt": [
+          "imposto de renda",
+          "IR",
+          "IRPF",
+          "IRPJ",
+          "tributo sobre a renda"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Generic. In Brazil, see 'irpj' (corporate) or IRPF (personal)."
+    },
+    {
+      "id": "industry",
+      "canonicalName": {
+        "en": "Industry",
+        "pt": "Setor"
+      },
+      "synonyms": {
+        "en": [
+          "industry",
+          "sector",
+          "vertical",
+          "market",
+          "business sector"
+        ],
+        "pt": [
+          "setor",
+          "indústria",
+          "segmento",
+          "vertical",
+          "ramo de atividade"
+        ]
+      },
+      "category": "customer_contact",
+      "unit": "text"
+    },
+    {
+      "id": "insurance_expense",
+      "canonicalName": {
+        "en": "Insurance Expense",
+        "pt": "Despesa com Seguro"
+      },
+      "synonyms": {
+        "en": [
+          "insurance expense",
+          "insurance cost",
+          "premium expense",
+          "insurance premium"
+        ],
+        "pt": [
+          "despesa com seguro",
+          "custo de seguro",
+          "prêmio de seguro"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "intangible_assets",
+      "canonicalName": {
+        "en": "Intangible Assets",
+        "pt": "Ativos Intangíveis"
+      },
+      "synonyms": {
+        "en": [
+          "intangible assets",
+          "IA",
+          "intellectual property",
+          "patents and trademarks"
+        ],
+        "pt": [
+          "ativos intangíveis",
+          "propriedade intelectual",
+          "patentes e marcas"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Includes patents, trademarks, software. See 'goodwill' (separate intangible)."
+    },
+    {
+      "id": "interest_expense",
+      "canonicalName": {
+        "en": "Interest Expense",
+        "pt": "Despesa de Juros"
+      },
+      "synonyms": {
+        "en": [
+          "interest expense",
+          "interest cost",
+          "finance cost",
+          "borrowing cost",
+          "debt interest"
+        ],
+        "pt": [
+          "despesa de juros",
+          "juros sobre empréstimos",
+          "custo financeiro",
+          "encargos financeiros"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Cost of debt. See 'interest_income' for the asset side."
+    },
+    {
+      "id": "interest_income",
+      "canonicalName": {
+        "en": "Interest Income",
+        "pt": "Receita de Juros"
+      },
+      "synonyms": {
+        "en": [
+          "interest income",
+          "interest earned",
+          "finance income",
+          "investment income"
+        ],
+        "pt": [
+          "receita de juros",
+          "juros recebidos",
+          "receita financeira",
+          "rendimento de aplicações"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Income from deposits and investments. See 'interest_expense' for the cost side."
+    },
+    {
+      "id": "interest_rate",
+      "canonicalName": {
+        "en": "Interest Rate",
+        "pt": "Taxa de Juros"
+      },
+      "synonyms": {
+        "en": [
+          "interest rate",
+          "rate",
+          "APR",
+          "annual rate",
+          "lending rate"
+        ],
+        "pt": [
+          "taxa de juros",
+          "juros",
+          "taxa anual",
+          "taxa de empréstimo"
+        ]
+      },
+      "category": "banking_transactions",
+      "unit": "percentage",
+      "direction": "neutral",
+      "collisionNotes": "Can be for lending or borrowing. Context determines if lower or higher is better."
+    },
+    {
+      "id": "inventory_turnover",
+      "canonicalName": {
+        "en": "Inventory Turnover",
+        "pt": "Giro de Estoque"
+      },
+      "synonyms": {
+        "en": [
+          "inventory turnover",
+          "stock turnover",
+          "inventory turns",
+          "turnover ratio"
+        ],
+        "pt": [
+          "giro de estoque",
+          "rotatividade de estoque",
+          "giro do inventário"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "ratio",
+      "direction": "higher_is_better",
+      "collisionNotes": "COGS / Average Inventory. Higher = faster-moving inventory."
+    },
+    {
+      "id": "inventory_value",
+      "canonicalName": {
+        "en": "Inventory Value",
+        "pt": "Valor do Estoque"
+      },
+      "synonyms": {
+        "en": [
+          "inventory value",
+          "stock value",
+          "inventory amount",
+          "total inventory"
+        ],
+        "pt": [
+          "valor do estoque",
+          "estoque total",
+          "valor de inventário",
+          "saldo de estoque"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Monetary value of inventory. See 'stock_quantity' for unit count."
+    },
+    {
+      "id": "investing_cash_flow",
+      "canonicalName": {
+        "en": "Investing Cash Flow",
+        "pt": "Fluxo de Caixa de Investimento"
+      },
+      "synonyms": {
+        "en": [
+          "investing cash flow",
+          "investing activities",
+          "CFI"
+        ],
+        "pt": [
+          "fluxo de caixa de investimento",
+          "caixa de investimento",
+          "atividades de investimento"
+        ]
+      },
+      "category": "cash_flow",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "May collide with 'cash_from_investing'. Typically interchangeable."
+    },
+    {
+      "id": "invoice_date",
+      "canonicalName": {
+        "en": "Invoice Date",
+        "pt": "Data da Nota Fiscal"
+      },
+      "synonyms": {
+        "en": [
+          "invoice date",
+          "billing date",
+          "inv date",
+          "date invoiced"
+        ],
+        "pt": [
+          "data da nota fiscal",
+          "data da fatura",
+          "dt NF",
+          "data de faturamento"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "date"
+    },
+    {
+      "id": "invoice_number",
+      "canonicalName": {
+        "en": "Invoice Number",
+        "pt": "Número da Nota Fiscal"
+      },
+      "synonyms": {
+        "en": [
+          "invoice number",
+          "inv no",
+          "invoice #",
+          "bill number",
+          "invoice id"
+        ],
+        "pt": [
+          "número da nota fiscal",
+          "nº NF",
+          "NF-e nº",
+          "fatura nº"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text"
+    },
+    {
+      "id": "ipi",
+      "canonicalName": {
+        "en": "IPI",
+        "pt": "IPI"
+      },
+      "synonyms": {
+        "en": [
+          "IPI",
+          "excise tax on manufactured goods",
+          "industrial products tax",
+          "manufactured goods tax"
+        ],
+        "pt": [
+          "IPI",
+          "Imposto sobre Produtos Industrializados",
+          "imposto IPI",
+          "imposto sobre industrializados"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Brazilian federal excise tax on manufactured products. Rate varies by product."
+    },
+    {
+      "id": "irpj",
+      "canonicalName": {
+        "en": "IRPJ",
+        "pt": "IRPJ"
+      },
+      "synonyms": {
+        "en": [
+          "IRPJ",
+          "corporate income tax Brazil"
+        ],
+        "pt": [
+          "IRPJ",
+          "Imposto de Renda Pessoa Jurídica"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Brazilian corporate income tax. Standard rate 15% + 10% surcharge. See also 'csll'."
+    },
+    {
+      "id": "iss",
+      "canonicalName": {
+        "en": "ISS",
+        "pt": "ISS"
+      },
+      "synonyms": {
+        "en": [
+          "ISS",
+          "service tax",
+          "municipal service tax"
+        ],
+        "pt": [
+          "ISS",
+          "ISSQN",
+          "Imposto sobre Serviços de Qualquer Natureza"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Brazilian municipal tax on services. Rates vary by municipality (2-5%)."
+    },
+    {
+      "id": "job_title",
+      "canonicalName": {
+        "en": "Job Title",
+        "pt": "Cargo"
+      },
+      "synonyms": {
+        "en": [
+          "job title",
+          "position",
+          "role",
+          "designation",
+          "title"
+        ],
+        "pt": [
+          "cargo",
+          "função",
+          "posição",
+          "designação",
+          "título do cargo"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "text"
+    },
+    {
+      "id": "landed_cost",
+      "canonicalName": {
+        "en": "Landed Cost",
+        "pt": "Custo Total de Importação"
+      },
+      "synonyms": {
+        "en": [
+          "landed cost",
+          "total cost",
+          "all-in cost",
+          "delivered cost",
+          "full cost"
+        ],
+        "pt": [
+          "custo total de importação",
+          "custo posto",
+          "custo entregue",
+          "custo landed"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Purchase price + freight + duties + insurance. See 'cost_price' for base and 'average_cost' for weighted."
+    },
+    {
+      "id": "lead_time_days",
+      "canonicalName": {
+        "en": "Lead Time (Days)",
+        "pt": "Prazo de Entrega (Dias)"
+      },
+      "synonyms": {
+        "en": [
+          "lead time days",
+          "lead time",
+          "delivery time",
+          "turnaround days",
+          "LT"
+        ],
+        "pt": [
+          "prazo de entrega",
+          "lead time",
+          "tempo de entrega",
+          "dias de espera"
+        ]
+      },
+      "category": "inventory_supply_chain",
+      "unit": "days",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "lease_obligations",
+      "canonicalName": {
+        "en": "Lease Obligations",
+        "pt": "Obrigações de Arrendamento"
+      },
+      "synonyms": {
+        "en": [
+          "lease obligations",
+          "lease liabilities",
+          "operating leases",
+          "finance leases",
+          "right-of-use liability"
+        ],
+        "pt": [
+          "obrigações de arrendamento",
+          "passivo de leasing",
+          "arrendamento a pagar"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "legal_fees",
+      "canonicalName": {
+        "en": "Legal Fees",
+        "pt": "Honorários Advocatícios"
+      },
+      "synonyms": {
+        "en": [
+          "legal fees",
+          "attorney fees",
+          "legal expense",
+          "law firm fees"
+        ],
+        "pt": [
+          "honorários advocatícios",
+          "despesa jurídica",
+          "custas judiciais",
+          "honorários legais"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Subset of 'professional_fees'. Specifically for legal services."
+    },
+    {
+      "id": "length",
+      "canonicalName": {
+        "en": "Length",
+        "pt": "Comprimento"
+      },
+      "synonyms": {
+        "en": [
+          "length",
+          "len",
+          "linear measure",
+          "long dimension"
+        ],
+        "pt": [
+          "comprimento",
+          "comp.",
+          "medida linear",
+          "extensão"
+        ]
+      },
+      "category": "quantities",
+      "unit": "text"
+    },
+    {
+      "id": "licensing_revenue",
+      "canonicalName": {
+        "en": "Licensing Revenue",
+        "pt": "Receita de Licenciamento"
+      },
+      "synonyms": {
+        "en": [
+          "licensing revenue",
+          "license revenue",
+          "royalty income",
+          "IP revenue"
+        ],
+        "pt": [
+          "receita de licenciamento",
+          "receita de licença",
+          "royalties",
+          "receita de propriedade intelectual"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "higher_is_better"
+    },
+    {
+      "id": "line_total",
+      "canonicalName": {
+        "en": "Line Total",
+        "pt": "Total da Linha"
+      },
+      "synonyms": {
+        "en": [
+          "line total",
+          "row total",
+          "line item total",
+          "line amount"
+        ],
+        "pt": [
+          "total da linha",
+          "total do item",
+          "valor da linha",
+          "subtotal do item"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Quantity × unit price for a single line item. Same concept as 'extended_price'."
+    },
+    {
+      "id": "list_price",
+      "canonicalName": {
+        "en": "List Price",
+        "pt": "Preço de Tabela"
+      },
+      "synonyms": {
+        "en": [
+          "list price",
+          "catalog price",
+          "sticker price",
+          "MSRP",
+          "retail price"
+        ],
+        "pt": [
+          "preço de tabela",
+          "preço de catálogo",
+          "preço sugerido",
+          "preço de lista"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Published/catalog price before discounts. See 'selling_price' for actual transaction price."
+    },
+    {
+      "id": "long_term_debt",
+      "canonicalName": {
+        "en": "Long-Term Debt",
+        "pt": "Dívida de Longo Prazo"
+      },
+      "synonyms": {
+        "en": [
+          "long-term debt",
+          "LTD",
+          "non-current debt",
+          "long-term borrowings"
+        ],
+        "pt": [
+          "dívida de longo prazo",
+          "empréstimos de longo prazo",
+          "dívida LP",
+          "passivo financeiro não circulante"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Debt maturing beyond one year. See 'short_term_debt' for current portion."
+    },
+    {
+      "id": "long_term_investments",
+      "canonicalName": {
+        "en": "Long-Term Investments",
+        "pt": "Investimentos de Longo Prazo"
+      },
+      "synonyms": {
+        "en": [
+          "long-term investments",
+          "LT investments",
+          "strategic investments",
+          "equity investments"
+        ],
+        "pt": [
+          "investimentos de longo prazo",
+          "investimentos LP",
+          "participações societárias"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Investments held beyond one year. See 'short_term_investments' for current."
+    },
+    {
+      "id": "lot_number",
+      "canonicalName": {
+        "en": "Lot Number",
+        "pt": "Número do Lote"
+      },
+      "synonyms": {
+        "en": [
+          "lot number",
+          "lot no",
+          "lot #",
+          "production lot"
+        ],
+        "pt": [
+          "número do lote",
+          "lote nº",
+          "lote de produção"
+        ]
+      },
+      "category": "inventory_supply_chain",
+      "unit": "text",
+      "collisionNotes": "Often interchangeable with 'batch_number'. Lot is common in pharma/food."
+    },
+    {
+      "id": "maintenance_expense",
+      "canonicalName": {
+        "en": "Maintenance Expense",
+        "pt": "Despesa de Manutenção"
+      },
+      "synonyms": {
+        "en": [
+          "maintenance expense",
+          "repairs and maintenance",
+          "R&M",
+          "upkeep cost"
+        ],
+        "pt": [
+          "despesa de manutenção",
+          "manutenção e reparos",
+          "custo de manutenção"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "marketing_expense",
+      "canonicalName": {
+        "en": "Marketing Expense",
+        "pt": "Despesa de Marketing"
+      },
+      "synonyms": {
+        "en": [
+          "marketing expense",
+          "marketing cost",
+          "marketing spend",
+          "marketing budget"
+        ],
+        "pt": [
+          "despesa de marketing",
+          "gasto com marketing",
+          "investimento em marketing"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Broader than 'advertising_expense'. Includes events, content, brand, etc."
+    },
+    {
+      "id": "markup",
+      "canonicalName": {
+        "en": "Markup",
+        "pt": "Markup"
+      },
+      "synonyms": {
+        "en": [
+          "markup",
+          "price markup",
+          "mark-up",
+          "margin added"
+        ],
+        "pt": [
+          "markup",
+          "margem adicionada",
+          "mark-up",
+          "acréscimo"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Absolute markup amount. See 'markup_percentage' for relative."
+    },
+    {
+      "id": "markup_percentage",
+      "canonicalName": {
+        "en": "Markup Percentage",
+        "pt": "Percentual de Markup"
+      },
+      "synonyms": {
+        "en": [
+          "markup percentage",
+          "markup %",
+          "markup rate",
+          "margin %"
+        ],
+        "pt": [
+          "percentual de markup",
+          "% de markup",
+          "margem percentual"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "percentage",
+      "direction": "neutral",
+      "collisionNotes": "(Selling Price - Cost) / Cost. Not the same as margin % which uses selling price as base."
+    },
+    {
+      "id": "minority_interest",
+      "canonicalName": {
+        "en": "Minority Interest",
+        "pt": "Participação Minoritária"
+      },
+      "synonyms": {
+        "en": [
+          "minority interest",
+          "non-controlling interest",
+          "NCI",
+          "minority stake"
+        ],
+        "pt": [
+          "participação minoritária",
+          "interesse minoritário",
+          "participação de não controladores"
+        ]
+      },
+      "category": "balance_sheet_equity",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "month",
+      "canonicalName": {
+        "en": "Month",
+        "pt": "Mês"
+      },
+      "synonyms": {
+        "en": [
+          "month",
+          "mo",
+          "calendar month",
+          "reporting month"
+        ],
+        "pt": [
+          "mês",
+          "mês calendário",
+          "mês de referência",
+          "período mensal"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "text"
+    },
+    {
+      "id": "net_cash_flow",
+      "canonicalName": {
+        "en": "Net Cash Flow",
+        "pt": "Fluxo de Caixa Líquido"
+      },
+      "synonyms": {
+        "en": [
+          "net cash flow",
+          "total cash flow",
+          "cash flow net",
+          "net change in cash"
+        ],
+        "pt": [
+          "fluxo de caixa líquido",
+          "variação líquida de caixa",
+          "fluxo de caixa total"
+        ]
+      },
+      "category": "cash_flow",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Sum of operating + investing + financing cash flows."
+    },
+    {
+      "id": "net_fixed_assets",
+      "canonicalName": {
+        "en": "Net Fixed Assets",
+        "pt": "Ativo Imobilizado Líquido"
+      },
+      "synonyms": {
+        "en": [
+          "net fixed assets",
+          "NFA",
+          "net PP&E",
+          "fixed assets net of depreciation"
+        ],
+        "pt": [
+          "ativo imobilizado líquido",
+          "imobilizado líquido",
+          "ativos fixos líquidos"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Fixed assets minus accumulated depreciation. See 'fixed_assets' for gross."
+    },
+    {
+      "id": "net_income",
+      "canonicalName": {
+        "en": "Net Income",
+        "pt": "Lucro Líquido"
+      },
+      "synonyms": {
+        "en": [
+          "net income",
+          "NI",
+          "bottom line",
+          "net earnings",
+          "profit after tax"
+        ],
+        "pt": [
+          "lucro líquido",
+          "LL",
+          "resultado líquido",
+          "lucro final"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "After all expenses and taxes. Often confused with 'net_profit' (interchangeable) or 'net_revenue' (different concept)."
+    },
+    {
+      "id": "net_margin",
+      "canonicalName": {
+        "en": "Net Margin",
+        "pt": "Margem Líquida"
+      },
+      "synonyms": {
+        "en": [
+          "net margin",
+          "net profit margin",
+          "profit margin",
+          "net margin %"
+        ],
+        "pt": [
+          "margem líquida",
+          "ML",
+          "margem de lucro líquido"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "percentage",
+      "direction": "higher_is_better",
+      "collisionNotes": "Net Income / Revenue. See 'gross_margin' and 'operating_margin' for intermediate margins."
+    },
+    {
+      "id": "net_profit",
+      "canonicalName": {
+        "en": "Net Profit",
+        "pt": "Lucro Líquido"
+      },
+      "synonyms": {
+        "en": [
+          "net profit",
+          "profit after tax",
+          "PAT",
+          "bottom line profit"
+        ],
+        "pt": [
+          "lucro líquido",
+          "resultado líquido",
+          "lucro após impostos"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Interchangeable with 'net_income' in most contexts."
+    },
+    {
+      "id": "net_revenue",
+      "canonicalName": {
+        "en": "Net Revenue",
+        "pt": "Receita Líquida"
+      },
+      "synonyms": {
+        "en": [
+          "net revenue",
+          "net sales",
+          "revenue after deductions",
+          "net turnover"
+        ],
+        "pt": [
+          "receita líquida",
+          "faturamento líquido",
+          "vendas líquidas",
+          "receita após deduções"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "After returns, discounts, allowances. See 'gross_revenue' for before deductions."
+    },
+    {
+      "id": "net_salary",
+      "canonicalName": {
+        "en": "Net Salary",
+        "pt": "Salário Líquido"
+      },
+      "synonyms": {
+        "en": [
+          "net salary",
+          "net pay",
+          "take-home pay",
+          "after-tax salary",
+          "net wage"
+        ],
+        "pt": [
+          "salário líquido",
+          "pagamento líquido",
+          "salário após descontos"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "After deductions (tax, benefits). See 'gross_salary' for before deductions."
+    },
+    {
+      "id": "net_sales",
+      "canonicalName": {
+        "en": "Net Sales",
+        "pt": "Vendas Líquidas"
+      },
+      "synonyms": {
+        "en": [
+          "net sales",
+          "sales after returns",
+          "net revenue",
+          "adjusted sales"
+        ],
+        "pt": [
+          "vendas líquidas",
+          "vendas após devoluções",
+          "faturamento líquido"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Often interchangeable with 'net_revenue'. Some companies use 'sales' for units and 'revenue' for currency."
+    },
+    {
+      "id": "non_current_assets",
+      "canonicalName": {
+        "en": "Non-Current Assets",
+        "pt": "Ativo Não Circulante"
+      },
+      "synonyms": {
+        "en": [
+          "non-current assets",
+          "NCA",
+          "long-term assets",
+          "fixed assets total"
+        ],
+        "pt": [
+          "ativo não circulante",
+          "ativos não circulantes",
+          "ANC",
+          "ativos de longo prazo"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Assets not expected to convert to cash within one year. See 'current_assets'."
+    },
+    {
+      "id": "non_current_liabilities",
+      "canonicalName": {
+        "en": "Non-Current Liabilities",
+        "pt": "Passivo Não Circulante"
+      },
+      "synonyms": {
+        "en": [
+          "non-current liabilities",
+          "NCL",
+          "long-term liabilities",
+          "long-term obligations"
+        ],
+        "pt": [
+          "passivo não circulante",
+          "obrigações não circulantes",
+          "PNC",
+          "passivos de longo prazo"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Due beyond one year. See 'current_liabilities' for short-term."
+    },
+    {
+      "id": "non_recurring_revenue",
+      "canonicalName": {
+        "en": "Non-Recurring Revenue",
+        "pt": "Receita Não Recorrente"
+      },
+      "synonyms": {
+        "en": [
+          "non-recurring revenue",
+          "one-time revenue",
+          "extraordinary revenue",
+          "non-recurring income"
+        ],
+        "pt": [
+          "receita não recorrente",
+          "receita extraordinária",
+          "receita pontual"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "One-time items. See 'recurring_revenue' for the ongoing component."
+    },
+    {
+      "id": "notes",
+      "canonicalName": {
+        "en": "Notes",
+        "pt": "Notas"
+      },
+      "synonyms": {
+        "en": [
+          "notes",
+          "note",
+          "annotation",
+          "remark",
+          "memo"
+        ],
+        "pt": [
+          "notas",
+          "anotações",
+          "observações",
+          "memorando"
+        ]
+      },
+      "category": "status_metadata",
+      "unit": "text"
+    },
+    {
+      "id": "notes_payable",
+      "canonicalName": {
+        "en": "Notes Payable",
+        "pt": "Títulos a Pagar"
+      },
+      "synonyms": {
+        "en": [
+          "notes payable",
+          "promissory notes payable",
+          "NP",
+          "bills payable"
+        ],
+        "pt": [
+          "títulos a pagar",
+          "notas promissórias a pagar",
+          "promissórias a pagar"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Formal written promises to pay. See 'accounts_payable' for trade payables."
+    },
+    {
+      "id": "notes_receivable",
+      "canonicalName": {
+        "en": "Notes Receivable",
+        "pt": "Títulos a Receber"
+      },
+      "synonyms": {
+        "en": [
+          "notes receivable",
+          "promissory notes receivable",
+          "NR",
+          "bills receivable"
+        ],
+        "pt": [
+          "títulos a receber",
+          "notas promissórias a receber",
+          "promissórias a receber"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Formal written promises to receive. See 'accounts_receivable' for trade."
+    },
+    {
+      "id": "nps_score",
+      "canonicalName": {
+        "en": "NPS Score",
+        "pt": "Nota NPS"
+      },
+      "synonyms": {
+        "en": [
+          "NPS score",
+          "net promoter score",
+          "NPS",
+          "promoter score"
+        ],
+        "pt": [
+          "nota NPS",
+          "NPS",
+          "net promoter score",
+          "índice de promotores"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "count",
+      "direction": "higher_is_better",
+      "collisionNotes": "Range: -100 to +100. See 'customer_satisfaction' for CSAT metric."
+    },
+    {
+      "id": "office_supplies",
+      "canonicalName": {
+        "en": "Office Supplies",
+        "pt": "Material de Escritório"
+      },
+      "synonyms": {
+        "en": [
+          "office supplies",
+          "office expense",
+          "stationery",
+          "supplies expense"
+        ],
+        "pt": [
+          "material de escritório",
+          "despesa com escritório",
+          "papelaria",
+          "suprimentos de escritório"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "on_hand_quantity",
+      "canonicalName": {
+        "en": "On-Hand Quantity",
+        "pt": "Quantidade Disponível"
+      },
+      "synonyms": {
+        "en": [
+          "on-hand quantity",
+          "qty on hand",
+          "physical stock",
+          "available qty"
+        ],
+        "pt": [
+          "quantidade disponível",
+          "estoque físico",
+          "qtd em mãos",
+          "saldo físico"
+        ]
+      },
+      "category": "inventory_supply_chain",
+      "unit": "count",
+      "direction": "neutral",
+      "collisionNotes": "Physical count only. See 'stock_quantity' which may include allocated/reserved."
+    },
+    {
+      "id": "operating_cash_flow",
+      "canonicalName": {
+        "en": "Operating Cash Flow",
+        "pt": "Fluxo de Caixa Operacional"
+      },
+      "synonyms": {
+        "en": [
+          "operating cash flow",
+          "OCF",
+          "cash from operations",
+          "operational cash flow"
+        ],
+        "pt": [
+          "fluxo de caixa operacional",
+          "FCO",
+          "caixa operacional",
+          "caixa das operações"
+        ]
+      },
+      "category": "cash_flow",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "May collide with 'cash_from_operations'. Typically interchangeable."
+    },
+    {
+      "id": "operating_expenses",
+      "canonicalName": {
+        "en": "Operating Expenses",
+        "pt": "Despesas Operacionais"
+      },
+      "synonyms": {
+        "en": [
+          "operating expenses",
+          "OpEx",
+          "OPEX",
+          "operating costs",
+          "running costs"
+        ],
+        "pt": [
+          "despesas operacionais",
+          "OPEX",
+          "custos operacionais",
+          "gastos operacionais"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Excludes COGS. Includes SG&A, R&D, D&A. See 'total_expenses' for all-inclusive."
+    },
+    {
+      "id": "operating_income",
+      "canonicalName": {
+        "en": "Operating Income",
+        "pt": "Receita Operacional"
+      },
+      "synonyms": {
+        "en": [
+          "operating income",
+          "OI",
+          "operating profit",
+          "income from operations"
+        ],
+        "pt": [
+          "receita operacional",
+          "lucro operacional",
+          "resultado operacional"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Revenue - COGS - OpEx. Often synonymous with 'ebit'."
+    },
+    {
+      "id": "operating_margin",
+      "canonicalName": {
+        "en": "Operating Margin",
+        "pt": "Margem Operacional"
+      },
+      "synonyms": {
+        "en": [
+          "operating margin",
+          "OM",
+          "operating profit margin",
+          "op margin"
+        ],
+        "pt": [
+          "margem operacional",
+          "MO",
+          "margem de lucro operacional"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "percentage",
+      "direction": "higher_is_better",
+      "collisionNotes": "Operating Income / Revenue. Between gross margin and net margin."
+    },
+    {
+      "id": "order_number",
+      "canonicalName": {
+        "en": "Order Number",
+        "pt": "Número do Pedido"
+      },
+      "synonyms": {
+        "en": [
+          "order number",
+          "order no",
+          "order #",
+          "SO number",
+          "sales order number"
+        ],
+        "pt": [
+          "número do pedido",
+          "nº do pedido",
+          "pedido nº",
+          "ordem de venda nº"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text"
+    },
+    {
+      "id": "other_assets",
+      "canonicalName": {
+        "en": "Other Assets",
+        "pt": "Outros Ativos"
+      },
+      "synonyms": {
+        "en": [
+          "other assets",
+          "miscellaneous assets",
+          "sundry assets"
+        ],
+        "pt": [
+          "outros ativos",
+          "ativos diversos",
+          "demais ativos"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "other_income",
+      "canonicalName": {
+        "en": "Other Income",
+        "pt": "Outras Receitas"
+      },
+      "synonyms": {
+        "en": [
+          "other income",
+          "non-operating income",
+          "sundry income",
+          "miscellaneous income"
+        ],
+        "pt": [
+          "outras receitas",
+          "receitas não operacionais",
+          "receitas diversas"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Income outside core operations. See 'interest_income', 'dividend_income' for specific types."
+    },
+    {
+      "id": "other_liabilities",
+      "canonicalName": {
+        "en": "Other Liabilities",
+        "pt": "Outros Passivos"
+      },
+      "synonyms": {
+        "en": [
+          "other liabilities",
+          "miscellaneous liabilities",
+          "sundry liabilities"
+        ],
+        "pt": [
+          "outros passivos",
+          "passivos diversos",
+          "demais passivos"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "overtime_pay",
+      "canonicalName": {
+        "en": "Overtime Pay",
+        "pt": "Hora Extra"
+      },
+      "synonyms": {
+        "en": [
+          "overtime pay",
+          "OT pay",
+          "overtime",
+          "extra hours pay",
+          "overtime earnings"
+        ],
+        "pt": [
+          "hora extra",
+          "pagamento de horas extras",
+          "HE",
+          "adicional de hora extra"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "pallets",
+      "canonicalName": {
+        "en": "Pallets",
+        "pt": "Paletes"
+      },
+      "synonyms": {
+        "en": [
+          "pallets",
+          "pallet count",
+          "skids",
+          "pallet qty"
+        ],
+        "pt": [
+          "paletes",
+          "pallets",
+          "quantidade de paletes"
+        ]
+      },
+      "category": "quantities",
+      "unit": "count"
+    },
+    {
+      "id": "pay_period",
+      "canonicalName": {
+        "en": "Pay Period",
+        "pt": "Período de Pagamento"
+      },
+      "synonyms": {
+        "en": [
+          "pay period",
+          "payroll period",
+          "pay cycle",
+          "payment period"
+        ],
+        "pt": [
+          "período de pagamento",
+          "período da folha",
+          "ciclo de pagamento"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "text"
+    },
+    {
+      "id": "payment_amount",
+      "canonicalName": {
+        "en": "Payment Amount",
+        "pt": "Valor do Pagamento"
+      },
+      "synonyms": {
+        "en": [
+          "payment amount",
+          "payment",
+          "amount paid",
+          "pmt amount",
+          "disbursement"
+        ],
+        "pt": [
+          "valor do pagamento",
+          "pagamento",
+          "valor pago",
+          "desembolso"
+        ]
+      },
+      "category": "banking_transactions",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Outflow. See 'transaction_amount' (generic) and 'total_amount' (invoice total)."
+    },
+    {
+      "id": "payment_date",
+      "canonicalName": {
+        "en": "Payment Date",
+        "pt": "Data de Pagamento"
+      },
+      "synonyms": {
+        "en": [
+          "payment date",
+          "pay date",
+          "date paid",
+          "settlement date"
+        ],
+        "pt": [
+          "data de pagamento",
+          "data do pagamento",
+          "dt pagamento",
+          "data de quitação"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "date"
+    },
+    {
+      "id": "payroll_tax",
+      "canonicalName": {
+        "en": "Payroll Tax",
+        "pt": "Encargos Sociais"
+      },
+      "synonyms": {
+        "en": [
+          "payroll tax",
+          "employment tax",
+          "FICA",
+          "social security tax",
+          "employer tax"
+        ],
+        "pt": [
+          "encargos sociais",
+          "impostos sobre folha",
+          "contribuição patronal",
+          "INSS patronal"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Employer-side taxes. In Brazil, includes INSS patronal, FGTS, etc."
+    },
+    {
+      "id": "phone",
+      "canonicalName": {
+        "en": "Phone",
+        "pt": "Telefone"
+      },
+      "synonyms": {
+        "en": [
+          "phone",
+          "telephone",
+          "phone number",
+          "tel",
+          "contact number"
+        ],
+        "pt": [
+          "telefone",
+          "tel",
+          "número de telefone",
+          "fone",
+          "contato telefônico"
+        ]
+      },
+      "category": "customer_contact",
+      "unit": "text"
+    },
+    {
+      "id": "pieces",
+      "canonicalName": {
+        "en": "Pieces",
+        "pt": "Peças"
+      },
+      "synonyms": {
+        "en": [
+          "pieces",
+          "pcs",
+          "items",
+          "ea",
+          "each"
+        ],
+        "pt": [
+          "peças",
+          "pçs",
+          "unidades",
+          "itens"
+        ]
+      },
+      "category": "quantities",
+      "unit": "count",
+      "collisionNotes": "Informal count unit. See 'units' (formal) and 'quantity' (order context)."
+    },
+    {
+      "id": "pis",
+      "canonicalName": {
+        "en": "PIS",
+        "pt": "PIS"
+      },
+      "synonyms": {
+        "en": [
+          "PIS",
+          "PIS/PASEP",
+          "Social Integration Program"
+        ],
+        "pt": [
+          "PIS",
+          "PIS/PASEP",
+          "Programa de Integração Social"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Brazilian federal contribution on revenue. Often paired with COFINS. See also 'cofins'."
+    },
+    {
+      "id": "po_number",
+      "canonicalName": {
+        "en": "PO Number",
+        "pt": "Número da OC"
+      },
+      "synonyms": {
+        "en": [
+          "PO number",
+          "purchase order number",
+          "PO #",
+          "PO no"
+        ],
+        "pt": [
+          "número da OC",
+          "nº da ordem de compra",
+          "OC nº",
+          "pedido de compra nº"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text"
+    },
+    {
+      "id": "preferred_stock",
+      "canonicalName": {
+        "en": "Preferred Stock",
+        "pt": "Ações Preferenciais"
+      },
+      "synonyms": {
+        "en": [
+          "preferred stock",
+          "preferred shares",
+          "preference shares"
+        ],
+        "pt": [
+          "ações preferenciais",
+          "capital social preferencial",
+          "ações PN"
+        ]
+      },
+      "category": "balance_sheet_equity",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "See 'common_stock' for the other share class."
+    },
+    {
+      "id": "prepaid_expenses",
+      "canonicalName": {
+        "en": "Prepaid Expenses",
+        "pt": "Despesas Antecipadas"
+      },
+      "synonyms": {
+        "en": [
+          "prepaid expenses",
+          "prepayments",
+          "advance payments",
+          "prepaid"
+        ],
+        "pt": [
+          "despesas antecipadas",
+          "adiantamentos",
+          "pagamentos antecipados"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "pretax_income",
+      "canonicalName": {
+        "en": "Pretax Income",
+        "pt": "Lucro Antes de Impostos"
+      },
+      "synonyms": {
+        "en": [
+          "pretax income",
+          "income before tax",
+          "EBT",
+          "earnings before tax",
+          "pre-tax profit"
+        ],
+        "pt": [
+          "lucro antes de impostos",
+          "LAIR",
+          "resultado antes de impostos",
+          "EBT"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "After interest, before income tax. Same as 'profit_before_tax'."
+    },
+    {
+      "id": "principal_amount",
+      "canonicalName": {
+        "en": "Principal Amount",
+        "pt": "Valor Principal"
+      },
+      "synonyms": {
+        "en": [
+          "principal amount",
+          "principal",
+          "loan principal",
+          "face value",
+          "par value"
+        ],
+        "pt": [
+          "valor principal",
+          "principal",
+          "capital emprestado",
+          "valor nominal"
+        ]
+      },
+      "category": "banking_transactions",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "priority",
+      "canonicalName": {
+        "en": "Priority",
+        "pt": "Prioridade"
+      },
+      "synonyms": {
+        "en": [
+          "priority",
+          "urgency",
+          "importance",
+          "rank",
+          "severity"
+        ],
+        "pt": [
+          "prioridade",
+          "urgência",
+          "importância",
+          "gravidade"
+        ]
+      },
+      "category": "status_metadata",
+      "unit": "text"
+    },
+    {
+      "id": "product_id",
+      "canonicalName": {
+        "en": "Product ID",
+        "pt": "ID do Produto"
+      },
+      "synonyms": {
+        "en": [
+          "product id",
+          "prod id",
+          "product number",
+          "item id",
+          "product code"
+        ],
+        "pt": [
+          "ID do produto",
+          "cód do produto",
+          "código do produto",
+          "número do produto"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text",
+      "collisionNotes": "See also 'sku' which is warehouse/retail-specific."
+    },
+    {
+      "id": "product_revenue",
+      "canonicalName": {
+        "en": "Product Revenue",
+        "pt": "Receita de Produtos"
+      },
+      "synonyms": {
+        "en": [
+          "product revenue",
+          "goods revenue",
+          "merchandise revenue",
+          "product sales"
+        ],
+        "pt": [
+          "receita de produtos",
+          "faturamento de produtos",
+          "vendas de mercadorias"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Revenue from goods. See 'service_revenue' for services."
+    },
+    {
+      "id": "professional_fees",
+      "canonicalName": {
+        "en": "Professional Fees",
+        "pt": "Honorários Profissionais"
+      },
+      "synonyms": {
+        "en": [
+          "professional fees",
+          "professional services",
+          "consulting and legal"
+        ],
+        "pt": [
+          "honorários profissionais",
+          "serviços profissionais",
+          "despesa com terceiros"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Umbrella for 'consulting_fees' and 'legal_fees'."
+    },
+    {
+      "id": "profit_after_tax",
+      "canonicalName": {
+        "en": "Profit After Tax",
+        "pt": "Lucro Após Impostos"
+      },
+      "synonyms": {
+        "en": [
+          "profit after tax",
+          "PAT",
+          "after-tax profit",
+          "post-tax profit"
+        ],
+        "pt": [
+          "lucro após impostos",
+          "LAI",
+          "resultado após impostos"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Same as 'net_income' and 'net_profit'."
+    },
+    {
+      "id": "profit_before_tax",
+      "canonicalName": {
+        "en": "Profit Before Tax",
+        "pt": "Lucro Antes de Impostos"
+      },
+      "synonyms": {
+        "en": [
+          "profit before tax",
+          "PBT",
+          "pre-tax profit",
+          "before-tax profit"
+        ],
+        "pt": [
+          "lucro antes de impostos",
+          "LAIR",
+          "resultado antes de IR"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Same as 'pretax_income'."
+    },
+    {
+      "id": "project_code",
+      "canonicalName": {
+        "en": "Project Code",
+        "pt": "Código do Projeto"
+      },
+      "synonyms": {
+        "en": [
+          "project code",
+          "project id",
+          "project number",
+          "job number",
+          "project #"
+        ],
+        "pt": [
+          "código do projeto",
+          "cód do projeto",
+          "nº do projeto",
+          "identificação do projeto"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text"
+    },
+    {
+      "id": "property_plant_equipment",
+      "canonicalName": {
+        "en": "Property, Plant & Equipment",
+        "pt": "Imobilizado"
+      },
+      "synonyms": {
+        "en": [
+          "property plant and equipment",
+          "PP&E",
+          "PPE",
+          "fixed assets detail"
+        ],
+        "pt": [
+          "imobilizado",
+          "ativo imobilizado",
+          "propriedades plantas e equipamentos",
+          "PP&E"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Detailed view. See 'fixed_assets' (often synonymous) and 'net_fixed_assets' (after depreciation)."
+    },
+    {
+      "id": "property_tax",
+      "canonicalName": {
+        "en": "Property Tax",
+        "pt": "Imposto Predial"
+      },
+      "synonyms": {
+        "en": [
+          "property tax",
+          "real estate tax",
+          "land tax",
+          "council tax"
+        ],
+        "pt": [
+          "imposto predial",
+          "IPTU",
+          "imposto sobre propriedade",
+          "imposto territorial"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "In Brazil, IPTU (urban) and ITR (rural). See also 'excise_tax'."
+    },
+    {
+      "id": "quantity",
+      "canonicalName": {
+        "en": "Quantity",
+        "pt": "Quantidade"
+      },
+      "synonyms": {
+        "en": [
+          "quantity",
+          "qty",
+          "amount",
+          "no of items",
+          "order qty"
+        ],
+        "pt": [
+          "quantidade",
+          "qtd",
+          "qtde",
+          "quant.",
+          "nº de itens"
+        ]
+      },
+      "category": "quantities",
+      "unit": "count",
+      "collisionNotes": "Most common count field in orders/invoices. See 'units' and 'count' for alternatives."
+    },
+    {
+      "id": "quarter",
+      "canonicalName": {
+        "en": "Quarter",
+        "pt": "Trimestre"
+      },
+      "synonyms": {
+        "en": [
+          "quarter",
+          "qtr",
+          "Q1/Q2/Q3/Q4",
+          "calendar quarter"
+        ],
+        "pt": [
+          "trimestre",
+          "trim",
+          "1T/2T/3T/4T",
+          "trimestre calendário"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "text",
+      "collisionNotes": "Calendar quarter. See 'fiscal_quarter' for fiscal year alignment."
+    },
+    {
+      "id": "quick_ratio",
+      "canonicalName": {
+        "en": "Quick Ratio",
+        "pt": "Índice de Liquidez Seca"
+      },
+      "synonyms": {
+        "en": [
+          "quick ratio",
+          "acid-test ratio",
+          "liquid ratio"
+        ],
+        "pt": [
+          "índice de liquidez seca",
+          "liquidez seca",
+          "acid test"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "ratio",
+      "direction": "higher_is_better",
+      "collisionNotes": "(Current Assets - Inventory) / Current Liabilities. Stricter than 'current_ratio'."
+    },
+    {
+      "id": "recurring_revenue",
+      "canonicalName": {
+        "en": "Recurring Revenue",
+        "pt": "Receita Recorrente"
+      },
+      "synonyms": {
+        "en": [
+          "recurring revenue",
+          "RR",
+          "repeat revenue",
+          "ongoing revenue"
+        ],
+        "pt": [
+          "receita recorrente",
+          "RR",
+          "faturamento recorrente"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Revenue expected to continue. See 'subscription_revenue' (subset) and 'non_recurring_revenue'."
+    },
+    {
+      "id": "reference_number",
+      "canonicalName": {
+        "en": "Reference Number",
+        "pt": "Número de Referência"
+      },
+      "synonyms": {
+        "en": [
+          "reference number",
+          "ref no",
+          "ref #",
+          "reference",
+          "ref number"
+        ],
+        "pt": [
+          "número de referência",
+          "nº ref",
+          "referência nº",
+          "cód de referência"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text"
+    },
+    {
+      "id": "region",
+      "canonicalName": {
+        "en": "Region",
+        "pt": "Região"
+      },
+      "synonyms": {
+        "en": [
+          "region",
+          "territory",
+          "geographic region",
+          "sales region",
+          "district"
+        ],
+        "pt": [
+          "região",
+          "território",
+          "região geográfica",
+          "distrito",
+          "zona"
+        ]
+      },
+      "category": "customer_contact",
+      "unit": "text"
+    },
+    {
+      "id": "rent_expense",
+      "canonicalName": {
+        "en": "Rent Expense",
+        "pt": "Despesa de Aluguel"
+      },
+      "synonyms": {
+        "en": [
+          "rent expense",
+          "rental expense",
+          "lease expense",
+          "occupancy cost",
+          "rent"
+        ],
+        "pt": [
+          "despesa de aluguel",
+          "aluguel",
+          "custo de locação",
+          "arrendamento"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "reorder_point",
+      "canonicalName": {
+        "en": "Reorder Point",
+        "pt": "Ponto de Reposição"
+      },
+      "synonyms": {
+        "en": [
+          "reorder point",
+          "ROP",
+          "reorder level",
+          "min stock level"
+        ],
+        "pt": [
+          "ponto de reposição",
+          "ponto de pedido",
+          "nível de reposição",
+          "estoque mínimo para pedido"
+        ]
+      },
+      "category": "inventory_supply_chain",
+      "unit": "count",
+      "direction": "neutral"
+    },
+    {
+      "id": "reorder_quantity",
+      "canonicalName": {
+        "en": "Reorder Quantity",
+        "pt": "Quantidade de Reposição"
+      },
+      "synonyms": {
+        "en": [
+          "reorder quantity",
+          "reorder qty",
+          "EOQ",
+          "order quantity"
+        ],
+        "pt": [
+          "quantidade de reposição",
+          "qtd de reposição",
+          "lote econômico",
+          "qtd de pedido"
+        ]
+      },
+      "category": "inventory_supply_chain",
+      "unit": "count",
+      "direction": "neutral"
+    },
+    {
+      "id": "research_and_development",
+      "canonicalName": {
+        "en": "Research & Development",
+        "pt": "Pesquisa e Desenvolvimento"
+      },
+      "synonyms": {
+        "en": [
+          "research and development",
+          "R&D",
+          "R&D expense",
+          "development costs",
+          "innovation spend"
+        ],
+        "pt": [
+          "pesquisa e desenvolvimento",
+          "P&D",
+          "despesa de P&D",
+          "investimento em pesquisa"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "R&D may be capitalized or expensed depending on accounting standards."
+    },
+    {
+      "id": "retained_earnings",
+      "canonicalName": {
+        "en": "Retained Earnings",
+        "pt": "Lucros Acumulados"
+      },
+      "synonyms": {
+        "en": [
+          "retained earnings",
+          "accumulated earnings",
+          "reinvested earnings",
+          "undistributed profits"
+        ],
+        "pt": [
+          "lucros acumulados",
+          "lucros retidos",
+          "resultados acumulados",
+          "reserva de lucros"
+        ]
+      },
+      "category": "balance_sheet_equity",
+      "unit": "currency",
+      "direction": "higher_is_better"
+    },
+    {
+      "id": "retention_rate",
+      "canonicalName": {
+        "en": "Retention Rate",
+        "pt": "Taxa de Retenção"
+      },
+      "synonyms": {
+        "en": [
+          "retention rate",
+          "customer retention",
+          "renewal rate",
+          "keep rate"
+        ],
+        "pt": [
+          "taxa de retenção",
+          "retenção de clientes",
+          "taxa de renovação",
+          "índice de retenção"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "percentage",
+      "direction": "higher_is_better",
+      "collisionNotes": "Inverse of 'churn_rate'. Retention + churn should sum to 100%."
+    },
+    {
+      "id": "retirement_contribution",
+      "canonicalName": {
+        "en": "Retirement Contribution",
+        "pt": "Contribuição para Aposentadoria"
+      },
+      "synonyms": {
+        "en": [
+          "retirement contribution",
+          "401k contribution",
+          "pension contribution",
+          "retirement savings"
+        ],
+        "pt": [
+          "contribuição para aposentadoria",
+          "contribuição previdenciária",
+          "FGTS",
+          "previdência privada"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "return_on_assets",
+      "canonicalName": {
+        "en": "Return on Assets",
+        "pt": "Retorno sobre Ativos"
+      },
+      "synonyms": {
+        "en": [
+          "return on assets",
+          "ROA",
+          "asset return",
+          "return on total assets"
+        ],
+        "pt": [
+          "retorno sobre ativos",
+          "ROA",
+          "rentabilidade dos ativos",
+          "retorno sobre ativo total"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "percentage",
+      "direction": "higher_is_better",
+      "collisionNotes": "Net Income / Total Assets. Measures asset efficiency."
+    },
+    {
+      "id": "return_on_equity",
+      "canonicalName": {
+        "en": "Return on Equity",
+        "pt": "Retorno sobre Patrimônio Líquido"
+      },
+      "synonyms": {
+        "en": [
+          "return on equity",
+          "ROE",
+          "equity return",
+          "shareholder return"
+        ],
+        "pt": [
+          "retorno sobre patrimônio líquido",
+          "ROE",
+          "rentabilidade do PL",
+          "retorno sobre capital próprio"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "percentage",
+      "direction": "higher_is_better",
+      "collisionNotes": "Net Income / Shareholders Equity. Key investor metric."
+    },
+    {
+      "id": "return_on_investment",
+      "canonicalName": {
+        "en": "Return on Investment",
+        "pt": "Retorno sobre Investimento"
+      },
+      "synonyms": {
+        "en": [
+          "return on investment",
+          "ROI",
+          "investment return",
+          "payback"
+        ],
+        "pt": [
+          "retorno sobre investimento",
+          "ROI",
+          "rentabilidade do investimento"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "percentage",
+      "direction": "higher_is_better",
+      "collisionNotes": "Generic return metric. More specific than ROA or ROE."
+    },
+    {
+      "id": "revenue",
+      "canonicalName": {
+        "en": "Revenue",
+        "pt": "Receita"
+      },
+      "synonyms": {
+        "en": [
+          "revenue",
+          "sales revenue",
+          "total revenue",
+          "top line",
+          "turnover"
+        ],
+        "pt": [
+          "receita",
+          "receita total",
+          "faturamento",
+          "receita bruta",
+          "vendas totais"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Often confused with 'net_revenue' or 'gross_revenue'. Prefer the more specific variant when both exist."
+    },
+    {
+      "id": "running_balance",
+      "canonicalName": {
+        "en": "Running Balance",
+        "pt": "Saldo Acumulado"
+      },
+      "synonyms": {
+        "en": [
+          "running balance",
+          "cumulative balance",
+          "running total",
+          "balance forward"
+        ],
+        "pt": [
+          "saldo acumulado",
+          "saldo corrente",
+          "total acumulado",
+          "saldo progressivo"
+        ]
+      },
+      "category": "banking_transactions",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Progressive ledger balance. Not the same as 'account_balance' (snapshot)."
+    },
+    {
+      "id": "safety_stock",
+      "canonicalName": {
+        "en": "Safety Stock",
+        "pt": "Estoque de Segurança"
+      },
+      "synonyms": {
+        "en": [
+          "safety stock",
+          "buffer stock",
+          "minimum stock",
+          "reserve stock",
+          "safety inventory"
+        ],
+        "pt": [
+          "estoque de segurança",
+          "estoque mínimo",
+          "estoque reserva",
+          "buffer de estoque"
+        ]
+      },
+      "category": "inventory_supply_chain",
+      "unit": "count",
+      "direction": "neutral"
+    },
+    {
+      "id": "salary",
+      "canonicalName": {
+        "en": "Salary",
+        "pt": "Salário"
+      },
+      "synonyms": {
+        "en": [
+          "salary",
+          "wage",
+          "pay",
+          "compensation",
+          "remuneration"
+        ],
+        "pt": [
+          "salário",
+          "remuneração",
+          "vencimento",
+          "pagamento",
+          "ordenado"
+        ]
+      },
+      "category": "payroll_hr",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Generic term. See 'base_salary', 'gross_salary', 'net_salary' for specific variants."
+    },
+    {
+      "id": "sales",
+      "canonicalName": {
+        "en": "Sales",
+        "pt": "Vendas"
+      },
+      "synonyms": {
+        "en": [
+          "sales",
+          "total sales",
+          "sales amount",
+          "sales volume",
+          "net sales amount"
+        ],
+        "pt": [
+          "vendas",
+          "vendas totais",
+          "faturamento",
+          "volume de vendas"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Often interchangeable with 'revenue'. Some companies distinguish: sales = units, revenue = currency."
+    },
+    {
+      "id": "sales_tax",
+      "canonicalName": {
+        "en": "Sales Tax",
+        "pt": "Imposto sobre Vendas"
+      },
+      "synonyms": {
+        "en": [
+          "sales tax",
+          "consumption tax",
+          "retail tax",
+          "state sales tax"
+        ],
+        "pt": [
+          "imposto sobre vendas",
+          "imposto de venda",
+          "tributo sobre vendas"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Generic term. In Brazil, see 'icms' for state-level equivalent."
+    },
+    {
+      "id": "segment",
+      "canonicalName": {
+        "en": "Segment",
+        "pt": "Segmento"
+      },
+      "synonyms": {
+        "en": [
+          "segment",
+          "business segment",
+          "market segment",
+          "reporting segment"
+        ],
+        "pt": [
+          "segmento",
+          "segmento de negócio",
+          "segmento de mercado",
+          "divisão"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text"
+    },
+    {
+      "id": "selling_expenses",
+      "canonicalName": {
+        "en": "Selling Expenses",
+        "pt": "Despesas de Vendas"
+      },
+      "synonyms": {
+        "en": [
+          "selling expenses",
+          "sales expenses",
+          "selling costs",
+          "distribution costs",
+          "S&D expenses"
+        ],
+        "pt": [
+          "despesas de vendas",
+          "custos de vendas",
+          "despesas comerciais",
+          "gastos com vendas"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Often combined with G&A as SG&A. See 'general_and_administrative'."
+    },
+    {
+      "id": "selling_price",
+      "canonicalName": {
+        "en": "Selling Price",
+        "pt": "Preço de Venda"
+      },
+      "synonyms": {
+        "en": [
+          "selling price",
+          "sale price",
+          "transaction price",
+          "actual price",
+          "net price"
+        ],
+        "pt": [
+          "preço de venda",
+          "preço de transação",
+          "preço praticado",
+          "valor de venda"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Actual transaction price. May differ from 'list_price' due to discounts."
+    },
+    {
+      "id": "serial_number",
+      "canonicalName": {
+        "en": "Serial Number",
+        "pt": "Número de Série"
+      },
+      "synonyms": {
+        "en": [
+          "serial number",
+          "serial no",
+          "SN",
+          "serial #",
+          "s/n"
+        ],
+        "pt": [
+          "número de série",
+          "nº de série",
+          "NS",
+          "série nº"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text"
+    },
+    {
+      "id": "service_revenue",
+      "canonicalName": {
+        "en": "Service Revenue",
+        "pt": "Receita de Serviços"
+      },
+      "synonyms": {
+        "en": [
+          "service revenue",
+          "services revenue",
+          "service income",
+          "professional services revenue"
+        ],
+        "pt": [
+          "receita de serviços",
+          "faturamento de serviços",
+          "receita de prestação de serviços"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Revenue from services. See 'product_revenue' for goods."
+    },
+    {
+      "id": "shareholders_equity",
+      "canonicalName": {
+        "en": "Shareholders Equity",
+        "pt": "Patrimônio Líquido"
+      },
+      "synonyms": {
+        "en": [
+          "shareholders equity",
+          "stockholders equity",
+          "owners equity",
+          "net worth",
+          "book value"
+        ],
+        "pt": [
+          "patrimônio líquido",
+          "PL",
+          "capital próprio",
+          "equity",
+          "valor patrimonial"
+        ]
+      },
+      "category": "balance_sheet_equity",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Total Assets minus Total Liabilities. Synonym of 'total_equity'."
+    },
+    {
+      "id": "short_term_debt",
+      "canonicalName": {
+        "en": "Short-Term Debt",
+        "pt": "Dívida de Curto Prazo"
+      },
+      "synonyms": {
+        "en": [
+          "short-term debt",
+          "STD",
+          "current debt",
+          "short-term borrowings",
+          "current portion of debt"
+        ],
+        "pt": [
+          "dívida de curto prazo",
+          "empréstimos de curto prazo",
+          "dívida CP",
+          "passivo financeiro circulante"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Debt maturing within one year. See 'long_term_debt' for non-current."
+    },
+    {
+      "id": "short_term_investments",
+      "canonicalName": {
+        "en": "Short-Term Investments",
+        "pt": "Investimentos de Curto Prazo"
+      },
+      "synonyms": {
+        "en": [
+          "short-term investments",
+          "ST investments",
+          "marketable securities",
+          "temporary investments"
+        ],
+        "pt": [
+          "investimentos de curto prazo",
+          "aplicações financeiras",
+          "investimentos CP",
+          "títulos negociáveis"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Investments maturing within one year. See 'long_term_investments'."
+    },
+    {
+      "id": "sku",
+      "canonicalName": {
+        "en": "SKU",
+        "pt": "SKU"
+      },
+      "synonyms": {
+        "en": [
+          "SKU",
+          "stock keeping unit",
+          "item number",
+          "part number",
+          "item code"
+        ],
+        "pt": [
+          "SKU",
+          "código SKU",
+          "unidade de manutenção de estoque",
+          "código do item"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text",
+      "collisionNotes": "See also 'product_id'. SKU is typically warehouse/retail-specific."
+    },
+    {
+      "id": "standard_cost",
+      "canonicalName": {
+        "en": "Standard Cost",
+        "pt": "Custo Padrão"
+      },
+      "synonyms": {
+        "en": [
+          "standard cost",
+          "std cost",
+          "predetermined cost",
+          "budgeted cost"
+        ],
+        "pt": [
+          "custo padrão",
+          "custo standard",
+          "custo predeterminado",
+          "custo orçado"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Predetermined cost for variance analysis. See 'average_cost' for actual weighted average."
+    },
+    {
+      "id": "start_date",
+      "canonicalName": {
+        "en": "Start Date",
+        "pt": "Data de Início"
+      },
+      "synonyms": {
+        "en": [
+          "start date",
+          "begin date",
+          "commencement date",
+          "kick-off date",
+          "start"
+        ],
+        "pt": [
+          "data de início",
+          "início",
+          "data de começo",
+          "dt início"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "date",
+      "collisionNotes": "Project-specific. May collide with 'effective_date' (contracts) or 'hire_date' (HR)."
+    },
+    {
+      "id": "state",
+      "canonicalName": {
+        "en": "State",
+        "pt": "Estado"
+      },
+      "synonyms": {
+        "en": [
+          "state",
+          "province",
+          "state/province",
+          "region",
+          "territory"
+        ],
+        "pt": [
+          "estado",
+          "UF",
+          "unidade federativa",
+          "província"
+        ]
+      },
+      "category": "customer_contact",
+      "unit": "text"
+    },
+    {
+      "id": "status",
+      "canonicalName": {
+        "en": "Status",
+        "pt": "Status"
+      },
+      "synonyms": {
+        "en": [
+          "status",
+          "state",
+          "condition",
+          "stage",
+          "current status"
+        ],
+        "pt": [
+          "status",
+          "situação",
+          "estado",
+          "condição",
+          "fase"
+        ]
+      },
+      "category": "status_metadata",
+      "unit": "text"
+    },
+    {
+      "id": "stock_quantity",
+      "canonicalName": {
+        "en": "Stock Quantity",
+        "pt": "Quantidade em Estoque"
+      },
+      "synonyms": {
+        "en": [
+          "stock quantity",
+          "stock qty",
+          "inventory qty",
+          "stock level",
+          "qty in stock"
+        ],
+        "pt": [
+          "quantidade em estoque",
+          "nível de estoque",
+          "qtd em estoque",
+          "saldo de estoque"
+        ]
+      },
+      "category": "inventory_supply_chain",
+      "unit": "count",
+      "direction": "neutral",
+      "collisionNotes": "May include allocated/reserved. See 'on_hand_quantity' for physical count."
+    },
+    {
+      "id": "subscription_revenue",
+      "canonicalName": {
+        "en": "Subscription Revenue",
+        "pt": "Receita de Assinatura"
+      },
+      "synonyms": {
+        "en": [
+          "subscription revenue",
+          "SaaS revenue",
+          "subscription income",
+          "recurring subscription"
+        ],
+        "pt": [
+          "receita de assinatura",
+          "receita de assinaturas",
+          "faturamento SaaS"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Subset of 'recurring_revenue'. Specifically subscription-based."
+    },
+    {
+      "id": "subtotal",
+      "canonicalName": {
+        "en": "Subtotal",
+        "pt": "Subtotal"
+      },
+      "synonyms": {
+        "en": [
+          "subtotal",
+          "sub total",
+          "pre-tax total",
+          "amount before tax"
+        ],
+        "pt": [
+          "subtotal",
+          "sub-total",
+          "total parcial",
+          "valor antes de impostos"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Sum before tax. See 'total_amount' for the final figure."
+    },
+    {
+      "id": "tag",
+      "canonicalName": {
+        "en": "Tag",
+        "pt": "Etiqueta"
+      },
+      "synonyms": {
+        "en": [
+          "tag",
+          "label",
+          "marker",
+          "badge",
+          "flag"
+        ],
+        "pt": [
+          "etiqueta",
+          "tag",
+          "marcador",
+          "rótulo"
+        ]
+      },
+      "category": "status_metadata",
+      "unit": "text"
+    },
+    {
+      "id": "tax_credit",
+      "canonicalName": {
+        "en": "Tax Credit",
+        "pt": "Crédito Tributário"
+      },
+      "synonyms": {
+        "en": [
+          "tax credit",
+          "tax offset",
+          "tax reduction",
+          "credit against tax"
+        ],
+        "pt": [
+          "crédito tributário",
+          "crédito fiscal",
+          "compensação tributária"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Reduces tax owed. Not the same as 'credit_amount' (accounting debit/credit)."
+    },
+    {
+      "id": "tax_payable",
+      "canonicalName": {
+        "en": "Tax Payable",
+        "pt": "Imposto a Pagar"
+      },
+      "synonyms": {
+        "en": [
+          "tax payable",
+          "taxes owed",
+          "tax liability",
+          "tax due"
+        ],
+        "pt": [
+          "imposto a pagar",
+          "tributos a pagar",
+          "obrigação tributária"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "tax_provision",
+      "canonicalName": {
+        "en": "Tax Provision",
+        "pt": "Provisão para Impostos"
+      },
+      "synonyms": {
+        "en": [
+          "tax provision",
+          "income tax provision",
+          "provision for taxes",
+          "tax expense"
+        ],
+        "pt": [
+          "provisão para impostos",
+          "provisão tributária",
+          "despesa de IR"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Accrued tax expense on P&L. Not the same as 'tax_payable' (balance sheet)."
+    },
+    {
+      "id": "tax_rate",
+      "canonicalName": {
+        "en": "Tax Rate",
+        "pt": "Alíquota"
+      },
+      "synonyms": {
+        "en": [
+          "tax rate",
+          "statutory rate",
+          "nominal rate",
+          "marginal rate"
+        ],
+        "pt": [
+          "alíquota",
+          "taxa de imposto",
+          "alíquota nominal",
+          "taxa tributária"
+        ]
+      },
+      "category": "tax",
+      "unit": "percentage",
+      "direction": "lower_is_better",
+      "collisionNotes": "Statutory/nominal rate. See 'effective_tax_rate' for actual blended rate."
+    },
+    {
+      "id": "termination_date",
+      "canonicalName": {
+        "en": "Termination Date",
+        "pt": "Data de Demissão"
+      },
+      "synonyms": {
+        "en": [
+          "termination date",
+          "end date",
+          "separation date",
+          "last day",
+          "exit date"
+        ],
+        "pt": [
+          "data de demissão",
+          "data de desligamento",
+          "data de rescisão",
+          "dt saída"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "date"
+    },
+    {
+      "id": "total_amount",
+      "canonicalName": {
+        "en": "Total Amount",
+        "pt": "Valor Total"
+      },
+      "synonyms": {
+        "en": [
+          "total amount",
+          "grand total",
+          "total",
+          "total value",
+          "final amount"
+        ],
+        "pt": [
+          "valor total",
+          "total geral",
+          "montante total",
+          "total final"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Final amount including all taxes. See 'subtotal' for pre-tax."
+    },
+    {
+      "id": "total_assets",
+      "canonicalName": {
+        "en": "Total Assets",
+        "pt": "Ativo Total"
+      },
+      "synonyms": {
+        "en": [
+          "total assets",
+          "TA",
+          "aggregate assets",
+          "assets total"
+        ],
+        "pt": [
+          "ativo total",
+          "total de ativos",
+          "ativos totais",
+          "AT"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Must equal total liabilities + total equity."
+    },
+    {
+      "id": "total_debt",
+      "canonicalName": {
+        "en": "Total Debt",
+        "pt": "Dívida Total"
+      },
+      "synonyms": {
+        "en": [
+          "total debt",
+          "aggregate debt",
+          "gross debt",
+          "total borrowings"
+        ],
+        "pt": [
+          "dívida total",
+          "endividamento total",
+          "dívida bruta"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Short-term + long-term debt. Not the same as 'total_liabilities' (includes non-debt items)."
+    },
+    {
+      "id": "total_equity",
+      "canonicalName": {
+        "en": "Total Equity",
+        "pt": "Patrimônio Líquido Total"
+      },
+      "synonyms": {
+        "en": [
+          "total equity",
+          "total stockholders equity",
+          "net assets",
+          "owners equity total"
+        ],
+        "pt": [
+          "patrimônio líquido total",
+          "PL total",
+          "total do patrimônio"
+        ]
+      },
+      "category": "balance_sheet_equity",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Often interchangeable with 'shareholders_equity'."
+    },
+    {
+      "id": "total_expenses",
+      "canonicalName": {
+        "en": "Total Expenses",
+        "pt": "Despesas Totais"
+      },
+      "synonyms": {
+        "en": [
+          "total expenses",
+          "aggregate expenses",
+          "all expenses",
+          "expense total"
+        ],
+        "pt": [
+          "despesas totais",
+          "total de despesas",
+          "gastos totais"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "total_income",
+      "canonicalName": {
+        "en": "Total Income",
+        "pt": "Renda Total"
+      },
+      "synonyms": {
+        "en": [
+          "total income",
+          "aggregate income",
+          "total revenue and income",
+          "all income"
+        ],
+        "pt": [
+          "renda total",
+          "receita total",
+          "total de receitas",
+          "rendimento total"
+        ]
+      },
+      "category": "profit_income",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "May collide with 'total_revenue'. Total income can include non-operating items."
+    },
+    {
+      "id": "total_liabilities",
+      "canonicalName": {
+        "en": "Total Liabilities",
+        "pt": "Passivo Total"
+      },
+      "synonyms": {
+        "en": [
+          "total liabilities",
+          "TL",
+          "aggregate liabilities",
+          "liabilities total"
+        ],
+        "pt": [
+          "passivo total",
+          "total de passivos",
+          "passivos totais",
+          "obrigações totais"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "lower_is_better",
+      "collisionNotes": "Not the same as 'total_debt' (financial obligations only)."
+    },
+    {
+      "id": "total_revenue",
+      "canonicalName": {
+        "en": "Total Revenue",
+        "pt": "Receita Total"
+      },
+      "synonyms": {
+        "en": [
+          "total revenue",
+          "aggregate revenue",
+          "revenue total",
+          "combined revenue"
+        ],
+        "pt": [
+          "receita total",
+          "faturamento total",
+          "total de receitas"
+        ]
+      },
+      "category": "finance_revenue",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Use when multiple revenue streams are summed. See 'revenue' for generic."
+    },
+    {
+      "id": "total_tax",
+      "canonicalName": {
+        "en": "Total Tax",
+        "pt": "Total de Impostos"
+      },
+      "synonyms": {
+        "en": [
+          "total tax",
+          "aggregate tax",
+          "tax total",
+          "combined tax"
+        ],
+        "pt": [
+          "total de impostos",
+          "impostos totais",
+          "soma dos tributos"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "trade_receivables",
+      "canonicalName": {
+        "en": "Trade Receivables",
+        "pt": "Recebíveis Comerciais"
+      },
+      "synonyms": {
+        "en": [
+          "trade receivables",
+          "customer receivables",
+          "trade debtors"
+        ],
+        "pt": [
+          "recebíveis comerciais",
+          "duplicatas a receber",
+          "clientes"
+        ]
+      },
+      "category": "balance_sheet_assets",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Subset of 'accounts_receivable'. Specifically from trade/customer transactions."
+    },
+    {
+      "id": "training_expense",
+      "canonicalName": {
+        "en": "Training Expense",
+        "pt": "Despesa com Treinamento"
+      },
+      "synonyms": {
+        "en": [
+          "training expense",
+          "training cost",
+          "education expense",
+          "L&D expense"
+        ],
+        "pt": [
+          "despesa com treinamento",
+          "custo de treinamento",
+          "capacitação"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "neutral"
+    },
+    {
+      "id": "transaction_amount",
+      "canonicalName": {
+        "en": "Transaction Amount",
+        "pt": "Valor da Transação"
+      },
+      "synonyms": {
+        "en": [
+          "transaction amount",
+          "txn amount",
+          "amount",
+          "transaction value"
+        ],
+        "pt": [
+          "valor da transação",
+          "montante da transação",
+          "valor do movimento"
+        ]
+      },
+      "category": "banking_transactions",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Generic. See 'payment_amount' (outflow) and 'total_amount' (invoice total)."
+    },
+    {
+      "id": "transaction_date",
+      "canonicalName": {
+        "en": "Transaction Date",
+        "pt": "Data da Transação"
+      },
+      "synonyms": {
+        "en": [
+          "transaction date",
+          "txn date",
+          "posting date",
+          "value date"
+        ],
+        "pt": [
+          "data da transação",
+          "data do movimento",
+          "data de lançamento"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "date"
+    },
+    {
+      "id": "transaction_id",
+      "canonicalName": {
+        "en": "Transaction ID",
+        "pt": "ID da Transação"
+      },
+      "synonyms": {
+        "en": [
+          "transaction id",
+          "txn id",
+          "transaction number",
+          "txn #"
+        ],
+        "pt": [
+          "ID da transação",
+          "nº da transação",
+          "identificação da transação"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text"
+    },
+    {
+      "id": "travel_expense",
+      "canonicalName": {
+        "en": "Travel Expense",
+        "pt": "Despesa de Viagem"
+      },
+      "synonyms": {
+        "en": [
+          "travel expense",
+          "travel cost",
+          "T&E",
+          "business travel"
+        ],
+        "pt": [
+          "despesa de viagem",
+          "custo de viagem",
+          "gastos com viagem",
+          "diárias e passagens"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "treasury_stock",
+      "canonicalName": {
+        "en": "Treasury Stock",
+        "pt": "Ações em Tesouraria"
+      },
+      "synonyms": {
+        "en": [
+          "treasury stock",
+          "treasury shares",
+          "repurchased shares",
+          "buyback shares"
+        ],
+        "pt": [
+          "ações em tesouraria",
+          "ações recompradas",
+          "ações próprias"
+        ]
+      },
+      "category": "balance_sheet_equity",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Contra-equity account. Shares bought back by the company."
+    },
+    {
+      "id": "type",
+      "canonicalName": {
+        "en": "Type",
+        "pt": "Tipo"
+      },
+      "synonyms": {
+        "en": [
+          "type",
+          "kind",
+          "classification",
+          "variety"
+        ],
+        "pt": [
+          "tipo",
+          "espécie",
+          "classificação",
+          "modalidade"
+        ]
+      },
+      "category": "status_metadata",
+      "unit": "text"
+    },
+    {
+      "id": "unit_price",
+      "canonicalName": {
+        "en": "Unit Price",
+        "pt": "Preço Unitário"
+      },
+      "synonyms": {
+        "en": [
+          "unit price",
+          "price per unit",
+          "each price",
+          "per unit cost"
+        ],
+        "pt": [
+          "preço unitário",
+          "valor unitário",
+          "preço por unidade"
+        ]
+      },
+      "category": "pricing_cost",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Price per single unit. See 'list_price' (catalog) and 'selling_price' (transaction)."
+    },
+    {
+      "id": "units",
+      "canonicalName": {
+        "en": "Units",
+        "pt": "Unidades"
+      },
+      "synonyms": {
+        "en": [
+          "units",
+          "unit count",
+          "number of units",
+          "qty units",
+          "UOM"
+        ],
+        "pt": [
+          "unidades",
+          "und",
+          "qtd de unidades",
+          "un."
+        ]
+      },
+      "category": "quantities",
+      "unit": "count",
+      "collisionNotes": "Standard count. See 'pieces' (informal) and 'quantity' (generic)."
+    },
+    {
+      "id": "updated_date",
+      "canonicalName": {
+        "en": "Updated Date",
+        "pt": "Data de Atualização"
+      },
+      "synonyms": {
+        "en": [
+          "updated date",
+          "last modified",
+          "date updated",
+          "modified date"
+        ],
+        "pt": [
+          "data de atualização",
+          "última atualização",
+          "data de modificação"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "date"
+    },
+    {
+      "id": "utilities_expense",
+      "canonicalName": {
+        "en": "Utilities Expense",
+        "pt": "Despesa com Utilidades"
+      },
+      "synonyms": {
+        "en": [
+          "utilities expense",
+          "utility cost",
+          "electricity expense",
+          "water and power"
+        ],
+        "pt": [
+          "despesa com utilidades",
+          "contas de consumo",
+          "energia e água"
+        ]
+      },
+      "category": "finance_expenses",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "vat",
+      "canonicalName": {
+        "en": "VAT",
+        "pt": "IVA"
+      },
+      "synonyms": {
+        "en": [
+          "VAT",
+          "value added tax",
+          "GST",
+          "goods and services tax"
+        ],
+        "pt": [
+          "IVA",
+          "imposto sobre valor agregado",
+          "VAT"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "International term. In Brazil, ICMS serves a similar role at state level."
+    },
+    {
+      "id": "vendor_id",
+      "canonicalName": {
+        "en": "Vendor ID",
+        "pt": "ID do Fornecedor"
+      },
+      "synonyms": {
+        "en": [
+          "vendor id",
+          "supplier id",
+          "vendor number",
+          "vendor code"
+        ],
+        "pt": [
+          "ID do fornecedor",
+          "cód do fornecedor",
+          "código do fornecedor"
+        ]
+      },
+      "category": "identifiers",
+      "unit": "text"
+    },
+    {
+      "id": "volume",
+      "canonicalName": {
+        "en": "Volume",
+        "pt": "Volume"
+      },
+      "synonyms": {
+        "en": [
+          "volume",
+          "vol",
+          "cubic measure",
+          "capacity"
+        ],
+        "pt": [
+          "volume",
+          "vol.",
+          "capacidade",
+          "medida cúbica"
+        ]
+      },
+      "category": "quantities",
+      "unit": "text"
+    },
+    {
+      "id": "wages_payable",
+      "canonicalName": {
+        "en": "Wages Payable",
+        "pt": "Salários a Pagar"
+      },
+      "synonyms": {
+        "en": [
+          "wages payable",
+          "accrued wages",
+          "salaries payable",
+          "accrued payroll"
+        ],
+        "pt": [
+          "salários a pagar",
+          "folha a pagar",
+          "remunerações a pagar"
+        ]
+      },
+      "category": "balance_sheet_liabilities",
+      "unit": "currency",
+      "direction": "lower_is_better"
+    },
+    {
+      "id": "warehouse_location",
+      "canonicalName": {
+        "en": "Warehouse Location",
+        "pt": "Localização do Armazém"
+      },
+      "synonyms": {
+        "en": [
+          "warehouse location",
+          "warehouse",
+          "storage location",
+          "WH location"
+        ],
+        "pt": [
+          "localização do armazém",
+          "armazém",
+          "depósito",
+          "almoxarifado"
+        ]
+      },
+      "category": "inventory_supply_chain",
+      "unit": "text"
+    },
+    {
+      "id": "week_number",
+      "canonicalName": {
+        "en": "Week Number",
+        "pt": "Número da Semana"
+      },
+      "synonyms": {
+        "en": [
+          "week number",
+          "week no",
+          "wk",
+          "calendar week",
+          "ISO week"
+        ],
+        "pt": [
+          "número da semana",
+          "semana nº",
+          "semana",
+          "semana calendário"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "text"
+    },
+    {
+      "id": "weight",
+      "canonicalName": {
+        "en": "Weight",
+        "pt": "Peso"
+      },
+      "synonyms": {
+        "en": [
+          "weight",
+          "wt",
+          "mass",
+          "net weight",
+          "gross weight"
+        ],
+        "pt": [
+          "peso",
+          "massa",
+          "peso líquido",
+          "peso bruto"
+        ]
+      },
+      "category": "quantities",
+      "unit": "text"
+    },
+    {
+      "id": "width",
+      "canonicalName": {
+        "en": "Width",
+        "pt": "Largura"
+      },
+      "synonyms": {
+        "en": [
+          "width",
+          "wd",
+          "breadth",
+          "horizontal dimension"
+        ],
+        "pt": [
+          "largura",
+          "larg.",
+          "dimensão horizontal"
+        ]
+      },
+      "category": "quantities",
+      "unit": "text"
+    },
+    {
+      "id": "withholding_tax",
+      "canonicalName": {
+        "en": "Withholding Tax",
+        "pt": "Imposto Retido na Fonte"
+      },
+      "synonyms": {
+        "en": [
+          "withholding tax",
+          "WHT",
+          "tax withheld",
+          "retention tax"
+        ],
+        "pt": [
+          "imposto retido na fonte",
+          "IRRF",
+          "retenção na fonte",
+          "imposto retido"
+        ]
+      },
+      "category": "tax",
+      "unit": "currency",
+      "direction": "neutral",
+      "collisionNotes": "Tax deducted at source. In Brazil, IRRF is the most common."
+    },
+    {
+      "id": "working_capital",
+      "canonicalName": {
+        "en": "Working Capital",
+        "pt": "Capital de Giro"
+      },
+      "synonyms": {
+        "en": [
+          "working capital",
+          "net working capital",
+          "NWC",
+          "WC"
+        ],
+        "pt": [
+          "capital de giro",
+          "capital circulante líquido",
+          "CCL"
+        ]
+      },
+      "category": "kpi_metrics",
+      "unit": "currency",
+      "direction": "higher_is_better",
+      "collisionNotes": "Current Assets minus Current Liabilities. See 'current_ratio' for ratio form."
+    },
+    {
+      "id": "year",
+      "canonicalName": {
+        "en": "Year",
+        "pt": "Ano"
+      },
+      "synonyms": {
+        "en": [
+          "year",
+          "yr",
+          "calendar year",
+          "reporting year"
+        ],
+        "pt": [
+          "ano",
+          "exercício",
+          "ano calendário",
+          "ano de referência"
+        ]
+      },
+      "category": "dates_time",
+      "unit": "text"
+    },
+    {
+      "id": "zip_code",
+      "canonicalName": {
+        "en": "Zip Code",
+        "pt": "CEP"
+      },
+      "synonyms": {
+        "en": [
+          "zip code",
+          "postal code",
+          "zip",
+          "postcode",
+          "ZIP"
+        ],
+        "pt": [
+          "CEP",
+          "código postal",
+          "código de endereçamento postal"
+        ]
+      },
+      "category": "customer_contact",
+      "unit": "text"
+    }
+  ]
+}

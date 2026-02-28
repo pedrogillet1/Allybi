@@ -14,7 +14,14 @@
  * - Chunk indexes are made deterministic and de-duped to avoid unique conflicts.
  */
 
+import { randomUUID } from "crypto";
+
 import prisma from "../../config/database";
+import { DocumentCryptoService } from "../documents/documentCrypto.service";
+import { DocumentKeyService } from "../documents/documentKey.service";
+import { EncryptionService } from "../security/encryption.service";
+import { EnvelopeService } from "../security/envelope.service";
+import { TenantKeyService } from "../security/tenantKey.service";
 import embeddingService from "./embedding.service";
 import pineconeService from "./pinecone.service";
 
@@ -35,10 +42,57 @@ export interface StoreEmbeddingsOptions {
   verifyAfterStore?: boolean; // default: false (adds latency)
   batchSize?: number; // default: 100
   minContentChars?: number; // default: 8 (skip useless chunks)
+  strictVerify?: boolean; // default: true
+  preDeleteVectors?: boolean; // default: true
+  encryptionMode?: "encrypted_only" | "plaintext";
+}
+
+interface ChunkEncryptionServices {
+  docKeys: DocumentKeyService;
+  docCrypto: DocumentCryptoService;
 }
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
+}
+
+function isFlagEnabled(flagName: string, defaultValue: boolean): boolean {
+  const raw = String(process.env[flagName] || "")
+    .trim()
+    .toLowerCase();
+  if (!raw) return defaultValue;
+  if (["1", "true", "yes", "on"].includes(raw)) return true;
+  if (["0", "false", "no", "off"].includes(raw)) return false;
+  return defaultValue;
+}
+
+function buildEmbeddingOperationId(documentId: string): string {
+  const compactDocId = String(documentId || "").replace(/[^a-zA-Z0-9_-]/g, "");
+  const suffix = Math.random().toString(36).slice(2, 8);
+  return `op_${Date.now().toString(36)}_${compactDocId.slice(0, 12)}_${suffix}`;
+}
+
+let chunkEncryptionServicesSingleton: ChunkEncryptionServices | null | undefined;
+
+function getChunkEncryptionServicesSafe(): ChunkEncryptionServices | null {
+  if (chunkEncryptionServicesSingleton !== undefined)
+    return chunkEncryptionServicesSingleton;
+  try {
+    const encryption = new EncryptionService();
+    const envelope = new EnvelopeService(encryption);
+    const tenantKeys = new TenantKeyService(prisma as any, encryption);
+    const docKeys = new DocumentKeyService(
+      prisma as any,
+      encryption,
+      tenantKeys,
+      envelope,
+    );
+    const docCrypto = new DocumentCryptoService(encryption);
+    chunkEncryptionServicesSingleton = { docKeys, docCrypto };
+  } catch {
+    chunkEncryptionServicesSingleton = null;
+  }
+  return chunkEncryptionServicesSingleton;
 }
 
 /**
@@ -122,11 +176,25 @@ export async function storeDocumentEmbeddings(
     verifyAfterStore = false,
     batchSize = 100,
     minContentChars = 8,
+    strictVerify = isFlagEnabled("INDEXING_STRICT_FAIL_CLOSED", true),
+    preDeleteVectors = true,
+    encryptionMode = isFlagEnabled("INDEXING_ENCRYPTED_CHUNKS_ONLY", true)
+      ? "encrypted_only"
+      : "plaintext",
   } = options;
+  const strictFailClosed = isFlagEnabled("INDEXING_STRICT_FAIL_CLOSED", true);
 
   if (!documentId) throw new Error("documentId is required");
   if (!chunks || chunks.length === 0) {
     throw new Error(`CRITICAL: No chunks provided for document ${documentId}`);
+  }
+
+  const document = await prisma.document.findUnique({
+    where: { id: documentId },
+    include: { folder: true },
+  });
+  if (!document) {
+    throw new Error(`Document not found: ${documentId}`);
   }
 
   // Normalize + drop empty/useless chunks early
@@ -147,6 +215,19 @@ export async function storeDocumentEmbeddings(
   const needsEmbedding = usableChunks.filter(
     (c) => !c.embedding || c.embedding.length === 0,
   );
+  const operationId = buildEmbeddingOperationId(documentId);
+  const indexedAtMs = Date.now();
+
+  await prisma.document.update({
+    where: { id: documentId },
+    data: {
+      indexingState: "running",
+      indexingOperationId: operationId,
+      indexingError: null,
+      indexingUpdatedAt: new Date(indexedAtMs),
+    },
+  });
+
   if (needsEmbedding.length > 0) {
     console.log(
       `🔢 [vectorEmbedding] Generating embeddings for ${needsEmbedding.length}/${usableChunks.length} chunks (doc=${documentId})`,
@@ -154,6 +235,14 @@ export async function storeDocumentEmbeddings(
     // Use true batch API — sends all texts in one OpenAI call (up to 256 per batch)
     const texts = needsEmbedding.map((c) => c.content);
     const batchResult = await embeddingService.generateBatchEmbeddings(texts);
+    if (batchResult.failedCount > 0) {
+      const failClose = isFlagEnabled("EMBEDDING_FAILCLOSE_V1", true);
+      if (failClose) {
+        throw new Error(
+          `Embedding generation failed for ${batchResult.failedCount}/${batchResult.totalProcessed} chunks`,
+        );
+      }
+    }
     for (let j = 0; j < needsEmbedding.length; j++) {
       const emb = batchResult.embeddings[j];
       needsEmbedding[j].embedding = emb?.embedding || [];
@@ -173,21 +262,16 @@ export async function storeDocumentEmbeddings(
         `💾 [vectorEmbedding] Store ${usableChunks.length} chunks for doc=${documentId} (attempt ${attempt}/${maxRetries})`,
       );
 
-      // 1) Fetch document metadata
-      const document = await prisma.document.findUnique({
-        where: { id: documentId },
-        include: { folder: true },
-      });
-
-      if (!document) {
-        throw new Error(`Document not found: ${documentId}`);
-      }
-
-      // 2) Prepare Pinecone vectors (optional)
+      // 1) Prepare Pinecone vectors
       const pineconeAvailable =
         typeof pineconeService.isAvailable === "function"
           ? pineconeService.isAvailable()
-          : true; // fallback if old service
+          : true;
+      if (strictFailClosed && !pineconeAvailable) {
+        throw new Error(
+          "Pinecone unavailable in strict indexing mode; aborting index operation.",
+        );
+      }
 
       const documentMetadata = {
         filename: document.filename ?? "unknown",
@@ -206,74 +290,104 @@ export async function storeDocumentEmbeddings(
         chunkIndex: c.chunkIndex,
         content: c.content,
         embedding: c.embedding || [],
-        metadata: c.metadata || {},
+        metadata: {
+          ...(c.metadata || {}),
+          operationId,
+          indexedAtMs,
+        },
       }));
 
-      // 3) Prepare Postgres records (compute upfront, before async I/O)
+      // 2) Pre-delete old vectors to prevent stale tails after shrink reindex.
+      if (
+        preDeleteVectors &&
+        pineconeAvailable &&
+        typeof pineconeService.deleteDocumentEmbeddings === "function"
+      ) {
+        await pineconeService.deleteDocumentEmbeddings(documentId, {
+          userId: document.userId,
+        });
+      }
+
+      // 3) Prepare Postgres records (compute upfront, before async I/O).
       const embeddingRecords = usableChunks.map((c) => ({
         documentId,
         chunkIndex: c.chunkIndex,
         content: c.content,
         embedding: JSON.stringify(c.embedding || []),
-        metadata: JSON.stringify(c.metadata || {}),
+        userId: document.userId,
+        pageNumber: c.pageNumber ?? c.metadata?.pageNumber ?? null,
+        chunkText: c.content.slice(0, 4000),
+        metadata: JSON.stringify({
+          ...(c.metadata || {}),
+          operationId,
+          indexedAtMs,
+        }),
         chunkType: c.metadata?.chunkType || null,
+        embeddingModel:
+          process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small",
+        updatedAt: new Date(indexedAtMs),
       }));
 
-      const chunkRecords = usableChunks.map((c) => ({
-        documentId,
-        chunkIndex: c.chunkIndex,
-        text: c.content,
-        page: c.pageNumber ?? c.metadata?.pageNumber ?? null,
-        startChar: c.metadata?.startChar ?? null,
-        endChar: c.metadata?.endChar ?? null,
-      }));
-
-      // 4) Run Pinecone upsert and Postgres write IN PARALLEL
-      const pineconePromise = pineconeAvailable
-        ? pineconeService
-            .upsertDocumentEmbeddings(
-              documentId,
+      const chunkEncryptors =
+        encryptionMode === "encrypted_only"
+          ? getChunkEncryptionServicesSafe()
+          : null;
+      if (encryptionMode === "encrypted_only" && !chunkEncryptors) {
+        throw new Error(
+          "Chunk encryption services unavailable while INDEXING_ENCRYPTED_CHUNKS_ONLY is enabled.",
+        );
+      }
+      const documentKey =
+        encryptionMode === "encrypted_only"
+          ? await chunkEncryptors!.docKeys.getDocumentKey(
               document.userId,
-              documentMetadata,
-              pineconeChunks.map((c) => ({
-                chunkIndex: c.chunkIndex,
-                content: c.content,
-                embedding: c.embedding,
-                metadata: sanitizePineconeMetadata(c.metadata || {}),
-              })),
+              documentId,
             )
-            .then(() => {
-              pineconeUpserted = true;
-              console.log(
-                `✅ [vectorEmbedding] Pinecone upsert ok (${usableChunks.length} chunks)`,
-              );
-            })
-        : Promise.resolve().then(() => {
-            console.warn(
-              "⚠️ [vectorEmbedding] Pinecone not available — storing Postgres only",
-            );
-          });
+          : null;
+      const chunkRecords = usableChunks.map((c) => {
+        const id = randomUUID();
+        const plaintext = c.content;
+        const textEncrypted =
+          encryptionMode === "encrypted_only"
+            ? chunkEncryptors!.docCrypto.encryptChunkText(
+                document.userId,
+                documentId,
+                id,
+                plaintext,
+                documentKey!,
+              )
+            : null;
+        return {
+          id,
+          documentId,
+          chunkIndex: c.chunkIndex,
+          text: encryptionMode === "encrypted_only" ? null : plaintext,
+          textEncrypted,
+          page: c.pageNumber ?? c.metadata?.pageNumber ?? null,
+          startChar: c.metadata?.startChar ?? null,
+          endChar: c.metadata?.endChar ?? null,
+        };
+      });
 
       // Transaction timeout configurable via env for VPS deployments (default 2 minutes for large docs)
       const txTimeout = parseInt(
         process.env.PRISMA_TRANSACTION_TIMEOUT || "120000",
         10,
       );
-      const postgresPromise = prisma.$transaction(
+      await prisma.$transaction(
         async (tx) => {
-          // Clear old — parallel deletes (different tables, no lock contention)
+          // Clear old — parallel deletes (different tables, no lock contention).
           await Promise.all([
             tx.documentEmbedding.deleteMany({ where: { documentId } }),
             tx.documentChunk.deleteMany({ where: { documentId } }),
           ]);
 
-          // Insert new — parallel streams for embeddings and chunks
+          // Insert new — parallel streams for embeddings and chunks.
           const embeddingInserts = [];
           for (let i = 0; i < embeddingRecords.length; i += batchSize) {
             embeddingInserts.push(
               tx.documentEmbedding.createMany({
                 data: embeddingRecords.slice(i, i + batchSize),
-                skipDuplicates: true,
               }),
             );
           }
@@ -282,7 +396,6 @@ export async function storeDocumentEmbeddings(
             chunkInserts.push(
               tx.documentChunk.createMany({
                 data: chunkRecords.slice(i, i + batchSize),
-                skipDuplicates: true,
               }),
             );
           }
@@ -291,7 +404,72 @@ export async function storeDocumentEmbeddings(
         { maxWait: 10000, timeout: txTimeout },
       );
 
-      await Promise.all([pineconePromise, postgresPromise]);
+      if (pineconeAvailable) {
+        await pineconeService.upsertDocumentEmbeddings(
+          documentId,
+          document.userId,
+          documentMetadata,
+          pineconeChunks.map((c) => ({
+            chunkIndex: c.chunkIndex,
+            content: c.content,
+            embedding: c.embedding,
+            metadata: sanitizePineconeMetadata(c.metadata || {}),
+          })),
+        );
+        pineconeUpserted = true;
+        console.log(
+          `✅ [vectorEmbedding] Pinecone upsert ok (${usableChunks.length} chunks)`,
+        );
+      }
+
+      if (
+        pineconeAvailable &&
+        (verifyAfterStore || strictVerify) &&
+        typeof pineconeService.verifyDocumentEmbeddings === "function"
+      ) {
+        const verifyResult = await pineconeService.verifyDocumentEmbeddings(
+          documentId,
+          {
+            userId: document.userId,
+            minCount: usableChunks.length,
+            expectedCount: usableChunks.length,
+            topK: Math.max(usableChunks.length + 20, 1000),
+          },
+        );
+        if (!verifyResult.success) {
+          throw new Error(
+            `[vectorEmbedding] verification failed for document ${documentId}: ${verifyResult.message}`,
+          );
+        }
+      }
+
+      if (verifyAfterStore || strictVerify) {
+        const [dbEmbeddingCount, dbChunkCount] = await Promise.all([
+          prisma.documentEmbedding.count({ where: { documentId } }),
+          prisma.documentChunk.count({ where: { documentId } }),
+        ]);
+        if (
+          dbEmbeddingCount !== usableChunks.length ||
+          dbChunkCount !== usableChunks.length
+        ) {
+          throw new Error(
+            `[vectorEmbedding] DB verification mismatch for ${documentId}: embeddings=${dbEmbeddingCount}, chunks=${dbChunkCount}, expected=${usableChunks.length}`,
+          );
+        }
+      }
+
+      await prisma.document.update({
+        where: { id: documentId },
+        data: {
+          status: "indexed",
+          chunksCount: usableChunks.length,
+          embeddingsGenerated: true,
+          indexingState: "indexed",
+          indexingOperationId: operationId,
+          indexingError: null,
+          indexingUpdatedAt: new Date(),
+        },
+      });
 
       console.log(
         `✅ [vectorEmbedding] Postgres ok: embeddings=${embeddingRecords.length}, chunks=${chunkRecords.length}`,
@@ -305,17 +483,27 @@ export async function storeDocumentEmbeddings(
         `❌ [vectorEmbedding] Attempt ${attempt} failed: ${err?.message || err}`,
       );
 
-      // Compensating rollback: if Pinecone succeeded but Postgres failed, delete Pinecone vectors.
-      // (This prevents “search finds doc but DB says missing” drift.)
+      // Compensating rollback: if Pinecone upsert happened in this attempt, remove vectors by op.
       try {
-        if (
-          pineconeUpserted &&
-          typeof pineconeService.deleteDocumentEmbeddings === "function"
-        ) {
+        if (pineconeUpserted) {
           console.warn(
-            `🔄 [vectorEmbedding] Rolling back Pinecone vectors for doc=${documentId}`,
+            `🔄 [vectorEmbedding] Rolling back Pinecone vectors for doc=${documentId} op=${operationId}`,
           );
-          await pineconeService.deleteDocumentEmbeddings(documentId);
+          if (
+            typeof pineconeService.deleteEmbeddingsByOperationId === "function"
+          ) {
+            await pineconeService.deleteEmbeddingsByOperationId(
+              documentId,
+              operationId,
+              { userId: document.userId },
+            );
+          } else if (
+            typeof pineconeService.deleteDocumentEmbeddings === "function"
+          ) {
+            await pineconeService.deleteDocumentEmbeddings(documentId, {
+              userId: document.userId,
+            });
+          }
         }
       } catch (rollbackErr: any) {
         console.error(
@@ -331,8 +519,25 @@ export async function storeDocumentEmbeddings(
     }
   }
 
+  const terminalMessage = String(lastErr?.message || lastErr || "Indexing failed");
+  const failureData: Record<string, unknown> = {
+    indexingState: "failed",
+    indexingOperationId: operationId,
+    indexingError: terminalMessage.slice(0, 500),
+    indexingUpdatedAt: new Date(),
+  };
+  if (strictFailClosed) failureData.status = "failed";
+  try {
+    await prisma.document.update({
+      where: { id: documentId },
+      data: failureData,
+    });
+  } catch {
+    // best effort: document may have been deleted during retries.
+  }
+
   throw new Error(
-    `Failed to store embeddings for document ${documentId} after ${maxRetries} attempts: ${lastErr?.message || lastErr}`,
+    `Failed to store embeddings for document ${documentId} after ${maxRetries} attempts: ${terminalMessage}`,
   );
 }
 

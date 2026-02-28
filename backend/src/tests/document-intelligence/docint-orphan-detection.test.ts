@@ -89,12 +89,18 @@ const schemaRegistryPath = path.join(
   DATA_BANKS_ROOT,
   "document_intelligence/manifest/bank_schema_registry.any.json",
 );
-const registryPath = path.join(DATA_BANKS_ROOT, "manifest/bank_registry.any.json");
+const registryPath = path.join(
+  DATA_BANKS_ROOT,
+  "manifest/bank_registry.any.json",
+);
 const dependenciesPath = path.join(
   DATA_BANKS_ROOT,
   "manifest/bank_dependencies.any.json",
 );
-const aliasesPath = path.join(DATA_BANKS_ROOT, "manifest/bank_aliases.any.json");
+const aliasesPath = path.join(
+  DATA_BANKS_ROOT,
+  "manifest/bank_aliases.any.json",
+);
 const DI_ROOT = path.join(DATA_BANKS_ROOT, "document_intelligence");
 
 const INFRA_RUNTIME_IDS = [
@@ -152,12 +158,16 @@ describe("Document intelligence orphan + runtime wiring detection", () => {
           alias: String(entry?.alias || "").trim(),
           canonicalId: String(entry?.canonicalId || "").trim(),
         }))
-        .filter((entry: any) => entry.alias && entry.alias === entry.canonicalId)
+        .filter(
+          (entry: any) => entry.alias && entry.alias === entry.canonicalId,
+        )
         .map((entry: any) => entry.alias),
     );
 
     const missingRegistry = runtimeIds.filter((id) => !registryIds.has(id));
-    const missingDependencies = runtimeIds.filter((id) => !dependencyIds.has(id));
+    const missingDependencies = runtimeIds.filter(
+      (id) => !dependencyIds.has(id),
+    );
     const missingSelfAlias = runtimeIds.filter((id) => !selfAliases.has(id));
 
     expect(missingRegistry).toEqual([]);
@@ -181,7 +191,12 @@ describe("Document intelligence orphan + runtime wiring detection", () => {
     );
 
     const isAllowlisted = (id: string): boolean =>
-      matchesCoverage(id, allowlistedIds, allowlistedPrefixes, allowlistedPatterns);
+      matchesCoverage(
+        id,
+        allowlistedIds,
+        allowlistedPrefixes,
+        allowlistedPatterns,
+      );
 
     const missing: string[] = [];
     for (const filePath of walkAnyJsonFiles(DI_ROOT)) {

@@ -1,8 +1,8 @@
 # Certification Summary
 
-- Generated: 2026-02-28T03:00:02.886Z
+- Generated: 2026-02-28T18:06:33.320Z
 - Passed: yes
-- Passed gates: 14/14
+- Passed gates: 16/16
 
 | Gate | Passed | Failures |
 |---|---:|---:|
@@ -16,6 +16,8 @@
 | runtime-wiring | yes | 0 |
 | enforcer-failclosed | yes | 0 |
 | evidence-fidelity | yes | 0 |
+| provenance-strictness | yes | 0 |
+| prompt-mode-coverage | yes | 0 |
 | turn-debug-packet | yes | 0 |
 | security-auth | yes | 0 |
 | observability-integrity | yes | 0 |
@@ -59,7 +61,7 @@
 ## runtime-wiring
 - Passed: yes
 - Failures: none
-- Metrics: `{"commandStatus":0,"reachableFiles":410,"reachableRuntimeFiles":381,"runtimeCoverage":0.9922,"missingLocalRefs":0,"legacyRouteWrappers":0,"missingCriticalPaths":0}`
+- Metrics: `{"commandStatus":0,"reachableFiles":410,"reachableRuntimeFiles":381,"runtimeCoverage":1,"missingLocalRefs":0,"legacyRouteWrappers":0,"missingCriticalPaths":0}`
 
 ## enforcer-failclosed
 - Passed: yes
@@ -70,6 +72,16 @@
 - Passed: yes
 - Failures: none
 - Metrics: `{"missingMapBlocked":true,"missingMapReasonCode":"missing_evidence_map","hashMismatchBlocked":true,"hashMismatchReasonCode":"evidence_map_hash_mismatch","validMapPasses":true}`
+
+## provenance-strictness
+- Passed: yes
+- Failures: none
+- Metrics: `{"weakOverlapBlocked":true,"strongOverlapAccepted":true}`
+
+## prompt-mode-coverage
+- Passed: yes
+- Failures: none
+- Metrics: `{"coveredModes":8,"totalModes":8}`
 
 ## turn-debug-packet
 - Passed: yes

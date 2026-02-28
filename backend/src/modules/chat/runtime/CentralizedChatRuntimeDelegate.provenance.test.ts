@@ -63,6 +63,6 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
     expect(finalized.failureCode).toBeTruthy();
     expect(finalized.assistantText).not.toBe(originalText);
     expect(finalized.provenance?.validated).toBe(false);
-    expect(finalized.provenance?.failureCode).toBe("out_of_scope_provenance");
+    expect(finalized.provenance?.failureCode).toBe("missing_provenance");
   });
 });

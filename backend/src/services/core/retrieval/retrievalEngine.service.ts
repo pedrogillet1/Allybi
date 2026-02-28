@@ -619,11 +619,12 @@ export class RetrievalEngineService {
       retrievalRuleEvents.push({ event, payload });
     };
 
+    const compareIntent = this.isCompareIntent(signals, queryNormalized);
     const crossDocDecision = enforceCrossDocPolicy(
       {
         ...ruleCtx,
         candidateDocIds: scope.candidateDocIds,
-        isCompareIntent: this.isCompareIntent(signals, queryNormalized),
+        isCompareIntent: compareIntent,
       },
       crossDocGrounding,
     );
@@ -787,6 +788,20 @@ export class RetrievalEngineService {
 
     // 6) Merge into CandidateChunks with provenance + stable ids
     let candidates = this.mergePhaseCandidates(phaseResults, scope, req);
+    const exploratoryMode = this.isExploratoryRetrievalRequest({
+      compareIntent,
+      queryNormalized,
+      signals,
+      classification,
+      resolvedDocTypes,
+    });
+    candidates = this.applyNonComparePurityPreRank(candidates, {
+      compareIntent,
+      classification,
+      resolvedDocTypes,
+      signals,
+      exploratoryMode,
+    });
     const scopeMetrics: RetrievalScopeMetrics = {
       scopeCandidatesDropped: 0,
       scopeViolationsDetected: 0,
@@ -888,6 +903,10 @@ export class RetrievalEngineService {
         .map((variant) => variant.text)
         .filter((text) => text !== queryNormalized),
       scope,
+      compareIntent,
+      exploratoryMode,
+      classification,
+      resolvedDocTypes,
       phaseCounts,
       scopeMetrics,
     });
@@ -1531,7 +1550,9 @@ export class RetrievalEngineService {
           typeof provider.getDocTypeCatalog === "function"
             ? provider.getDocTypeCatalog(candidateDomain)
             : null;
-        const docTypes = Array.isArray(catalog?.docTypes) ? catalog.docTypes : [];
+        const docTypes = Array.isArray(catalog?.docTypes)
+          ? catalog.docTypes
+          : [];
         const hasDocType = docTypes.some(
           (entry: any) => this.normalizeDocType(entry?.id) === docTypeId,
         );
@@ -1585,8 +1606,8 @@ export class RetrievalEngineService {
       : [];
     const tables = Array.isArray(tablesBank?.tables) ? tablesBank.tables : [];
 
-    const sectionAnchors = sections
-      .map((section: any) => {
+    const sectionAnchors: string[] = sections
+      .map((section: any): { order: number; values: string[] } => {
         const order = safeNumber(section?.order, 9999);
         const sectionId = String(section?.id || "")
           .trim()
@@ -1602,10 +1623,10 @@ export class RetrievalEngineService {
           values: [sectionId, en, pt].filter(Boolean),
         };
       })
-      .sort((a, b) => a.order - b.order)
-      .flatMap((entry) => entry.values);
+      .sort((a: { order: number }, b: { order: number }) => a.order - b.order)
+      .flatMap((entry: { values: string[] }) => entry.values);
 
-    const tableAnchors = [
+    const tableAnchors: string[] = [
       ...tableMappings.flatMap((mapping: any) => [
         String(mapping?.canonicalHeader || "")
           .trim()
@@ -1636,7 +1657,7 @@ export class RetrievalEngineService {
             )
           : []),
       ]),
-    ].filter(Boolean);
+    ].filter((value): value is string => Boolean(value));
 
     const normalizedSectionAnchors = Array.from(new Set(sectionAnchors)).slice(
       0,
@@ -2347,6 +2368,10 @@ export class RetrievalEngineService {
         sheetName?: string | null;
         rangeA1?: string | null;
       };
+      compareIntent: boolean;
+      exploratoryMode: boolean;
+      classification: DocumentClassificationResult;
+      resolvedDocTypes: string[];
       phaseCounts: RetrievalPhaseCounts;
       scopeMetrics: RetrievalScopeMetrics;
     },
@@ -2360,6 +2385,62 @@ export class RetrievalEngineService {
       cfg.actionsContract?.thresholds?.maxEvidencePerDocHard,
       10,
     );
+    const maxDistinctDocsNonCompare = Math.max(
+      1,
+      Math.floor(
+        safeNumber(cfg.actionsContract?.thresholds?.maxDistinctDocsNonCompare, 1),
+      ),
+    );
+    const maxDistinctDocsExploratoryNonCompare = Math.max(
+      maxDistinctDocsNonCompare,
+      Math.floor(
+        safeNumber(
+          cfg.actionsContract?.thresholds?.maxDistinctDocsExploratoryNonCompare,
+          maxDistinctDocsNonCompare,
+        ),
+      ),
+    );
+    const maxPerSectionHard = Math.max(
+      1,
+      Math.floor(safeNumber(cfg.actionsContract?.thresholds?.maxPerSectionHard, 1)),
+    );
+    const maxPerSectionExploratoryHard = Math.max(
+      maxPerSectionHard,
+      Math.floor(
+        safeNumber(
+          cfg.actionsContract?.thresholds?.maxPerSectionExploratoryHard,
+          maxPerSectionHard,
+        ),
+      ),
+    );
+    const maxNearDuplicatesPerDocPackaging = Math.max(
+      1,
+      Math.floor(
+        safeNumber(
+          cfg.actionsContract?.thresholds?.maxNearDuplicatesPerDocPackaging,
+          safeNumber(cfg.actionsContract?.thresholds?.maxNearDuplicatesPerDoc, 1),
+        ),
+      ),
+    );
+    const maxNearDuplicatesExploratoryPerDocPackaging = Math.max(
+      maxNearDuplicatesPerDocPackaging,
+      Math.floor(
+        safeNumber(
+          cfg.actionsContract?.thresholds
+            ?.maxNearDuplicatesExploratoryPerDocPackaging,
+          maxNearDuplicatesPerDocPackaging,
+        ),
+      ),
+    );
+    const effectiveMaxDistinctDocsNonCompare = ctx.exploratoryMode
+      ? maxDistinctDocsExploratoryNonCompare
+      : maxDistinctDocsNonCompare;
+    const effectiveMaxPerSectionHard = ctx.exploratoryMode
+      ? maxPerSectionExploratoryHard
+      : maxPerSectionHard;
+    const effectiveMaxNearDuplicatesPerDocPackaging = ctx.exploratoryMode
+      ? maxNearDuplicatesExploratoryPerDocPackaging
+      : maxNearDuplicatesPerDocPackaging;
     const minFinalScore = safeNumber(
       cfg.actionsContract?.thresholds?.minFinalScore,
       0.58,
@@ -2393,6 +2474,18 @@ export class RetrievalEngineService {
 
     const evidence: EvidenceItem[] = [];
     const perDoc = new Map<string, number>();
+    const selectedDocs = new Set<string>();
+    const perDocSectionCounts = new Map<string, Map<string, number>>();
+    const perDocSnippetHashes = new Map<string, Map<string, number>>();
+    const primaryDocType = this.normalizeDocType(ctx.resolvedDocTypes[0]);
+    const enforceNonComparePurity =
+      !ctx.compareIntent &&
+      !Boolean(signals.corpusSearchAllowed) &&
+      ctx.classification.confidence >= 0.6 &&
+      (Boolean(primaryDocType) ||
+        Boolean(signals.singleDocIntent) ||
+        Boolean(signals.explicitDocLock) ||
+        Boolean(signals.explicitDocRef));
 
     for (const c of candidates) {
       if (!c.provenanceOk) continue;
@@ -2406,10 +2499,48 @@ export class RetrievalEngineService {
             : minFinalScore;
       if (final < effectiveMin) continue;
 
+      if (enforceNonComparePurity) {
+        if (
+          !selectedDocs.has(c.docId) &&
+          selectedDocs.size >= effectiveMaxDistinctDocsNonCompare
+        ) {
+          continue;
+        }
+
+        if (primaryDocType && !ctx.exploratoryMode) {
+          const candidateDocType = this.normalizeDocType(c.docType);
+          if (candidateDocType && candidateDocType !== primaryDocType) continue;
+        }
+
+        const sectionKey = String(c.location?.sectionKey || "__unknown__")
+          .trim()
+          .toLowerCase();
+        const sectionMap = perDocSectionCounts.get(c.docId) ?? new Map<string, number>();
+        const sectionCount = sectionMap.get(sectionKey) ?? 0;
+        if (sectionCount >= effectiveMaxPerSectionHard) continue;
+
+        const snippetHash = crypto
+          .createHash("sha256")
+          .update(this.normalizeForNearDup(c.snippet))
+          .digest("hex")
+          .slice(0, 16);
+        const hashMap = perDocSnippetHashes.get(c.docId) ?? new Map<string, number>();
+        const hashCount = hashMap.get(snippetHash) ?? 0;
+        if (hashCount >= effectiveMaxNearDuplicatesPerDocPackaging) continue;
+
+        sectionMap.set(sectionKey, sectionCount + 1);
+        perDocSectionCounts.set(c.docId, sectionMap);
+        hashMap.set(snippetHash, hashCount + 1);
+        perDocSnippetHashes.set(c.docId, hashMap);
+      }
+
       const n = perDoc.get(c.docId) ?? 0;
       if (n >= maxPerDocHard) continue;
 
       perDoc.set(c.docId, n + 1);
+      if (enforceNonComparePurity) {
+        selectedDocs.add(c.docId);
+      }
 
       evidence.push({
         evidenceType: c.type,
@@ -2488,6 +2619,76 @@ export class RetrievalEngineService {
     };
 
     return pack;
+  }
+
+  private applyNonComparePurityPreRank(
+    candidates: CandidateChunk[],
+    params: {
+      compareIntent: boolean;
+      classification: DocumentClassificationResult;
+      resolvedDocTypes: string[];
+      signals: RetrievalRequest["signals"];
+      exploratoryMode: boolean;
+    },
+  ): CandidateChunk[] {
+    if (params.compareIntent) return candidates;
+    if (params.signals.corpusSearchAllowed) return candidates;
+    if (params.exploratoryMode) return candidates;
+    if (params.classification.confidence < 0.6) return candidates;
+    const primaryDocType = this.normalizeDocType(params.resolvedDocTypes[0]);
+    if (!primaryDocType) return candidates;
+
+    const filtered = candidates.filter((candidate) => {
+      const candidateDocType = this.normalizeDocType(candidate.docType);
+      return candidateDocType === primaryDocType;
+    });
+    if (!filtered.length) return candidates;
+
+    return filtered;
+  }
+
+  private isExploratoryRetrievalRequest(params: {
+    compareIntent: boolean;
+    queryNormalized: string;
+    signals: RetrievalRequest["signals"];
+    classification: DocumentClassificationResult;
+    resolvedDocTypes: string[];
+  }): boolean {
+    if (params.compareIntent) return false;
+    if (params.signals.corpusSearchAllowed) return true;
+    if (
+      params.signals.explicitDocLock ||
+      params.signals.explicitDocRef ||
+      params.signals.singleDocIntent
+    ) {
+      return false;
+    }
+
+    const intentFamily = String(params.signals.intentFamily || "")
+      .trim()
+      .toLowerCase();
+    if (intentFamily === "doc_discovery") return true;
+
+    const operator = String(params.signals.operator || "")
+      .trim()
+      .toLowerCase();
+    if (["locate_docs", "navigate", "list", "monitor"].includes(operator)) {
+      return true;
+    }
+
+    const query = String(params.queryNormalized || "")
+      .trim()
+      .toLowerCase();
+    if (
+      /\b(list|all|which (docs|files)|where else|across (docs|files)|documents? mentioning|files? mentioning)\b/i.test(
+        query,
+      )
+    ) {
+      return true;
+    }
+
+    if (params.classification.confidence < 0.6) return true;
+    return false;
   }
 
   private shouldEnforceScopedDocSet(

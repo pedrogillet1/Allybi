@@ -1,0 +1,215 @@
+{
+  "_meta": {
+    "id": "legacy_medical_abbreviations_pt",
+    "version": "2.0.0",
+    "description": "Portuguese abbreviations for medical extraction.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "language": "pt"
+  },
+  "domain": "medical",
+  "abbreviations": [
+    {
+      "abbr": "2x/dia",
+      "expansion": "Duas vezes ao dia"
+    },
+    {
+      "abbr": "3x/dia",
+      "expansion": "Tres vezes ao dia"
+    },
+    {
+      "abbr": "4x/dia",
+      "expansion": "Quatro vezes ao dia"
+    },
+    {
+      "abbr": "AP",
+      "expansion": "Antecedentes Pessoais"
+    },
+    {
+      "abbr": "Cr",
+      "expansion": "Creatinina"
+    },
+    {
+      "abbr": "Dispneia",
+      "expansion": "Falta de Ar"
+    },
+    {
+      "abbr": "DN",
+      "expansion": "Data de Nascimento"
+    },
+    {
+      "abbr": "DPOC",
+      "expansion": "Doenca Pulmonar Obstrutiva Cronica"
+    },
+    {
+      "abbr": "Dx",
+      "expansion": "Diagnostico Documentado"
+    },
+    {
+      "abbr": "ECG",
+      "expansion": "Eletrocardiograma"
+    },
+    {
+      "abbr": "EF",
+      "expansion": "Exame Fisico"
+    },
+    {
+      "abbr": "FC",
+      "expansion": "Frequencia Cardiaca"
+    },
+    {
+      "abbr": "FR",
+      "expansion": "Frequencia Respiratoria"
+    },
+    {
+      "abbr": "Hb",
+      "expansion": "Hemoglobina"
+    },
+    {
+      "abbr": "HbA1c",
+      "expansion": "Hemoglobina Glicada"
+    },
+    {
+      "abbr": "HDA",
+      "expansion": "Historia da Doenca Atual"
+    },
+    {
+      "abbr": "Hemograma",
+      "expansion": "Hemograma Completo"
+    },
+    {
+      "abbr": "ICC",
+      "expansion": "Insuficiencia Cardiaca Congestiva"
+    },
+    {
+      "abbr": "IM",
+      "expansion": "Intramuscular"
+    },
+    {
+      "abbr": "IMC",
+      "expansion": "Indice de Massa Corporal"
+    },
+    {
+      "abbr": "ITU",
+      "expansion": "Infeccao do Trato Urinario"
+    },
+    {
+      "abbr": "IV",
+      "expansion": "Intravenoso"
+    },
+    {
+      "abbr": "IVAS",
+      "expansion": "Infeccao de Vias Aereas Superiores"
+    },
+    {
+      "abbr": "Jejum",
+      "expansion": "Nada por via oral"
+    },
+    {
+      "abbr": "K",
+      "expansion": "Potassio"
+    },
+    {
+      "abbr": "Leuco",
+      "expansion": "Leucocitos"
+    },
+    {
+      "abbr": "Na",
+      "expansion": "Sodio"
+    },
+    {
+      "abbr": "NPR",
+      "expansion": "Nao Reanimar"
+    },
+    {
+      "abbr": "PA",
+      "expansion": "Pressao Arterial"
+    },
+    {
+      "abbr": "Painel BMP",
+      "expansion": "Painel Metabolico Basico"
+    },
+    {
+      "abbr": "Painel CMP",
+      "expansion": "Painel Metabolico Completo"
+    },
+    {
+      "abbr": "Plaq",
+      "expansion": "Plaquetas"
+    },
+    {
+      "abbr": "Prontuario",
+      "expansion": "Numero de Registro Medico"
+    },
+    {
+      "abbr": "PS",
+      "expansion": "Pronto Socorro"
+    },
+    {
+      "abbr": "RM",
+      "expansion": "Ressonancia Magnetica"
+    },
+    {
+      "abbr": "RS",
+      "expansion": "Revisao de Sistemas"
+    },
+    {
+      "abbr": "Rx",
+      "expansion": "Prescricao"
+    },
+    {
+      "abbr": "RX",
+      "expansion": "Raio-X"
+    },
+    {
+      "abbr": "SC",
+      "expansion": "Subcutaneo"
+    },
+    {
+      "abbr": "Se necessario",
+      "expansion": "Conforme necessario"
+    },
+    {
+      "abbr": "SOAP",
+      "expansion": "Subjetivo Objetivo Avaliacao Plano"
+    },
+    {
+      "abbr": "SpO2",
+      "expansion": "Saturacao Periferica de Oxigenio"
+    },
+    {
+      "abbr": "TC",
+      "expansion": "Tomografia Computadorizada"
+    },
+    {
+      "abbr": "Temp",
+      "expansion": "Temperatura"
+    },
+    {
+      "abbr": "TGO/TGP",
+      "expansion": "Enzimas Hepaticas"
+    },
+    {
+      "abbr": "Ureia",
+      "expansion": "Nitrogenio Ureico"
+    },
+    {
+      "abbr": "USG",
+      "expansion": "Ultrassonografia"
+    },
+    {
+      "abbr": "UTI",
+      "expansion": "Unidade de Terapia Intensiva"
+    },
+    {
+      "abbr": "VO",
+      "expansion": "Via Oral"
+    }
+  ]
+}

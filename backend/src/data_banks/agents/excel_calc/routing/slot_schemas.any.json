@@ -1,0 +1,1874 @@
+{
+  "_meta": {
+    "bankId": "slot_schemas_excel_calc",
+    "version": "1.0.0",
+    "description": "Canonical slot definitions for the Excel Calculation Agent with validation rules, coercion logic, and default values for 68 slot types.",
+    "owner": "excel-calc-agent",
+    "languages": ["any", "en", "pt"],
+    "dependsOn": [],
+    "usedBy": ["calc_task_taxonomy", "calc_intent_patterns_en", "calc_intent_patterns_pt"],
+    "tests": ["slot_schema_validation", "slot_coercion_roundtrip"],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "deterministicSort": true,
+    "caseInsensitiveDedupe": true,
+    "unknownSlotPolicy": "reject",
+    "coercionFailPolicy": "clarify"
+  },
+  "slots": [
+    {
+      "slotId": "allowed_values",
+      "type": "array<string>",
+      "description": "List of allowed values for data validation constraints.",
+      "validation": { "minItems": 1, "maxItems": 500 },
+      "coercion": [
+        { "from": "string", "rule": "split_by_comma_or_semicolon" }
+      ],
+      "examples_en": ["Yes, No, Maybe", "A;B;C"],
+      "examples_pt": ["Sim, Não, Talvez", "A;B;C"]
+    },
+    {
+      "slotId": "alternative_direction",
+      "type": "enum",
+      "description": "Direction of alternative hypothesis in statistical tests.",
+      "validation": { "allowedValues": ["two_sided", "greater", "less"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "two-tailed": "two_sided", "two tailed": "two_sided", "two-sided": "two_sided", "one-tailed greater": "greater", "right": "greater", "right-tailed": "greater", "one-tailed less": "less", "left": "less", "left-tailed": "less", "bilateral": "two_sided", "unilateral direita": "greater", "unilateral esquerda": "less" } }
+      ],
+      "default": "two_sided",
+      "examples_en": ["two-tailed", "greater", "less"],
+      "examples_pt": ["bilateral", "maior", "menor"]
+    },
+    {
+      "slotId": "beginning_value",
+      "type": "number",
+      "description": "Starting value for growth rate / CAGR calculations.",
+      "validation": { "nonZero": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" },
+        { "from": "cell_ref", "rule": "resolve_cell_value" }
+      ],
+      "examples_en": ["1000", "B2"],
+      "examples_pt": ["1000", "B2"]
+    },
+    {
+      "slotId": "beta_coefficient",
+      "type": "number",
+      "description": "Beta coefficient of an asset relative to the market (CAPM).",
+      "validation": { "min": -10, "max": 10 },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["1.2", "0.85"],
+      "examples_pt": ["1,2", "0,85"]
+    },
+    {
+      "slotId": "bin_count",
+      "type": "integer",
+      "description": "Number of bins for histograms or binning operations.",
+      "validation": { "min": 2, "max": 1000 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" },
+        { "from": "float", "rule": "round_to_integer" }
+      ],
+      "default": 10,
+      "examples_en": ["10", "20 bins"],
+      "examples_pt": ["10", "20 faixas"]
+    },
+    {
+      "slotId": "bin_edges",
+      "type": "array<number>",
+      "description": "Custom bin boundary values for discretization.",
+      "validation": { "minItems": 2, "sorted": "ascending" },
+      "coercion": [
+        { "from": "string", "rule": "split_and_parse_numbers" },
+        { "from": "range_ref", "rule": "resolve_range_values" }
+      ],
+      "examples_en": ["0, 10, 20, 50, 100"],
+      "examples_pt": ["0, 10, 20, 50, 100"]
+    },
+    {
+      "slotId": "binning_method",
+      "type": "enum",
+      "description": "Method for creating bins.",
+      "validation": { "allowedValues": ["equal_width", "equal_frequency", "custom"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "equal width": "equal_width", "equal size": "equal_width", "equal freq": "equal_frequency", "quantile": "equal_frequency", "largura igual": "equal_width", "frequência igual": "equal_frequency", "personalizado": "custom" } }
+      ],
+      "default": "equal_width",
+      "examples_en": ["equal width", "quantile"],
+      "examples_pt": ["largura igual", "quantil"]
+    },
+    {
+      "slotId": "cash_flow_range",
+      "type": "range_ref",
+      "description": "Cell range containing a series of cash flows (positive = inflow, negative = outflow).",
+      "validation": { "minCells": 2, "requireNumeric": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_range" },
+        { "from": "array<number>", "rule": "inline_values_to_virtual_range" }
+      ],
+      "examples_en": ["B2:B20", "C3:C15"],
+      "examples_pt": ["B2:B20", "C3:C15"]
+    },
+    {
+      "slotId": "column_input_cell",
+      "type": "cell_ref",
+      "description": "Column input cell for a two-variable data table.",
+      "validation": { "singleCell": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_ref" }
+      ],
+      "examples_en": ["B1", "Sheet1!D5"],
+      "examples_pt": ["B1", "Planilha1!D5"]
+    },
+    {
+      "slotId": "column_values",
+      "type": "array<number>",
+      "description": "Column substitute values for a two-variable data table.",
+      "validation": { "minItems": 2 },
+      "coercion": [
+        { "from": "string", "rule": "split_and_parse_numbers" },
+        { "from": "range_ref", "rule": "resolve_range_values" }
+      ],
+      "examples_en": ["1%, 2%, 3%, 4%, 5%"],
+      "examples_pt": ["1%, 2%, 3%, 4%, 5%"]
+    },
+    {
+      "slotId": "components_count",
+      "type": "integer",
+      "description": "Number of components to retain in decomposition (SVD, PCA).",
+      "validation": { "min": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "examples_en": ["3", "top 5 components"],
+      "examples_pt": ["3", "5 componentes"]
+    },
+    {
+      "slotId": "confidence_level",
+      "type": "number",
+      "description": "Confidence level for intervals and tests (e.g., 0.95 for 95%).",
+      "validation": { "min": 0.5, "max": 0.9999 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" },
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "default": 0.95,
+      "examples_en": ["0.95", "95%", "99%"],
+      "examples_pt": ["0,95", "95%", "99%"]
+    },
+    {
+      "slotId": "constraint_definitions",
+      "type": "array<object>",
+      "description": "Constraint definitions for solver/optimization problems.",
+      "validation": { "minItems": 1, "requiredKeys": ["cell_ref", "operator", "value"] },
+      "coercion": [
+        { "from": "string", "rule": "parse_constraint_expression" }
+      ],
+      "examples_en": ["B2 <= 100", "C3:C5 >= 0"],
+      "examples_pt": ["B2 <= 100", "C3:C5 >= 0"]
+    },
+    {
+      "slotId": "correlation_type",
+      "type": "enum",
+      "description": "Type of correlation to compute.",
+      "validation": { "allowedValues": ["pearson", "spearman", "kendall"] },
+      "coercion": [
+        { "from": "string", "rule": "lowercase_trim" }
+      ],
+      "default": "pearson",
+      "examples_en": ["pearson", "spearman"],
+      "examples_pt": ["pearson", "spearman"]
+    },
+    {
+      "slotId": "coupon_rate",
+      "type": "number",
+      "description": "Annual coupon rate of a bond as a decimal.",
+      "validation": { "min": 0, "max": 1 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "examples_en": ["0.05", "5%"],
+      "examples_pt": ["0,05", "5%"]
+    },
+    {
+      "slotId": "cumulative_flag",
+      "type": "boolean",
+      "description": "Whether to compute the cumulative distribution (CDF) vs the density (PDF/PMF).",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "cumulative": true, "cdf": true, "density": false, "pdf": false, "pmf": false, "acumulada": true, "densidade": false } }
+      ],
+      "default": true,
+      "examples_en": ["cumulative", "density"],
+      "examples_pt": ["acumulada", "densidade"]
+    },
+    {
+      "slotId": "custom_formula",
+      "type": "string",
+      "description": "Custom Excel formula for validation rules.",
+      "validation": { "startsWith": "=", "maxLength": 8192 },
+      "coercion": [],
+      "examples_en": ["=AND(A1>0, A1<100)"],
+      "examples_pt": ["=E(A1>0; A1<100)"]
+    },
+    {
+      "slotId": "date_format",
+      "type": "string",
+      "description": "Date format string for type coercion.",
+      "validation": { "maxLength": 50 },
+      "coercion": [],
+      "default": "YYYY-MM-DD",
+      "examples_en": ["MM/DD/YYYY", "YYYY-MM-DD"],
+      "examples_pt": ["DD/MM/YYYY", "YYYY-MM-DD"]
+    },
+    {
+      "slotId": "date_range",
+      "type": "range_ref",
+      "description": "Cell range containing date values for time series operations.",
+      "validation": { "requireDates": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_range" }
+      ],
+      "examples_en": ["A2:A50"],
+      "examples_pt": ["A2:A50"]
+    },
+    {
+      "slotId": "day_count_convention",
+      "type": "enum",
+      "description": "Day count convention for bond pricing.",
+      "validation": { "allowedValues": ["30_360", "actual_360", "actual_365", "actual_actual"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "30/360": "30_360", "actual/360": "actual_360", "actual/365": "actual_365", "actual/actual": "actual_actual" } }
+      ],
+      "default": "30_360",
+      "examples_en": ["30/360", "actual/365"],
+      "examples_pt": ["30/360", "real/365"]
+    },
+    {
+      "slotId": "debt_cost",
+      "type": "number",
+      "description": "Pre-tax cost of debt for WACC calculation.",
+      "validation": { "min": 0, "max": 1 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "examples_en": ["0.06", "6%"],
+      "examples_pt": ["0,06", "6%"]
+    },
+    {
+      "slotId": "debt_weight",
+      "type": "number",
+      "description": "Proportion of debt in capital structure.",
+      "validation": { "min": 0, "max": 1 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "examples_en": ["0.4", "40%"],
+      "examples_pt": ["0,4", "40%"]
+    },
+    {
+      "slotId": "decimal_separator",
+      "type": "enum",
+      "description": "Decimal separator for number parsing.",
+      "validation": { "allowedValues": ["dot", "comma"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { ".": "dot", ",": "comma", "ponto": "dot", "vírgula": "comma" } }
+      ],
+      "examples_en": ["dot", "comma"],
+      "examples_pt": ["ponto", "vírgula"]
+    },
+    {
+      "slotId": "declining_factor",
+      "type": "number",
+      "description": "Declining balance factor (e.g., 2 for double declining).",
+      "validation": { "min": 1, "max": 4 },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "default": 2,
+      "examples_en": ["2", "1.5"],
+      "examples_pt": ["2", "1,5"]
+    },
+    {
+      "slotId": "decomposition_type",
+      "type": "enum",
+      "description": "Type of seasonal decomposition.",
+      "validation": { "allowedValues": ["additive", "multiplicative"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "add": "additive", "mult": "multiplicative", "aditiva": "additive", "multiplicativa": "multiplicative" } }
+      ],
+      "default": "additive",
+      "examples_en": ["additive", "multiplicative"],
+      "examples_pt": ["aditiva", "multiplicativa"]
+    },
+    {
+      "slotId": "degrees_of_freedom",
+      "type": "integer",
+      "description": "Degrees of freedom for the distribution or test.",
+      "validation": { "min": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" },
+        { "from": "float", "rule": "round_to_integer" }
+      ],
+      "examples_en": ["10", "25 df"],
+      "examples_pt": ["10", "25 gl"]
+    },
+    {
+      "slotId": "degrees_of_freedom_denominator",
+      "type": "integer",
+      "description": "Denominator degrees of freedom (F-distribution).",
+      "validation": { "min": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "examples_en": ["20"],
+      "examples_pt": ["20"]
+    },
+    {
+      "slotId": "degrees_of_freedom_numerator",
+      "type": "integer",
+      "description": "Numerator degrees of freedom (F-distribution).",
+      "validation": { "min": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "examples_en": ["5"],
+      "examples_pt": ["5"]
+    },
+    {
+      "slotId": "dependent_range",
+      "type": "range_ref",
+      "description": "Cell range for the dependent (Y) variable in regression.",
+      "validation": { "minCells": 3, "requireNumeric": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_range" }
+      ],
+      "examples_en": ["B2:B50"],
+      "examples_pt": ["B2:B50"]
+    },
+    {
+      "slotId": "depreciation_cost",
+      "type": "number",
+      "description": "Original cost (basis) of the asset for depreciation.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_currency_amount" }
+      ],
+      "examples_en": ["50000", "$50,000"],
+      "examples_pt": ["50000", "R$ 50.000"]
+    },
+    {
+      "slotId": "discrete_flag",
+      "type": "boolean",
+      "description": "Whether the distribution is discrete (vs continuous).",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "discrete": true, "continuous": false, "discreta": true, "contínua": false } }
+      ],
+      "default": false,
+      "examples_en": ["discrete", "continuous"],
+      "examples_pt": ["discreta", "contínua"]
+    },
+    {
+      "slotId": "distribution_params",
+      "type": "object",
+      "description": "Distribution-specific parameters (passed as key-value pairs).",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_key_value_pairs" }
+      ],
+      "examples_en": ["mean=0, stdev=1"],
+      "examples_pt": ["média=0, desvio=1"]
+    },
+    {
+      "slotId": "distribution_specs",
+      "type": "array<object>",
+      "description": "Distribution specifications for each variable in Monte Carlo simulation.",
+      "validation": { "minItems": 1, "requiredKeys": ["cell_ref", "distribution_type"] },
+      "coercion": [],
+      "examples_en": ["B2: normal(100, 10)"],
+      "examples_pt": ["B2: normal(100, 10)"]
+    },
+    {
+      "slotId": "distribution_type",
+      "type": "enum",
+      "description": "Type of probability distribution.",
+      "validation": { "allowedValues": ["normal", "t", "chi_square", "f", "binomial", "poisson", "exponential", "uniform", "beta", "gamma", "weibull", "lognormal"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "gaussian": "normal", "bell curve": "normal", "student": "t", "student t": "t", "chi-square": "chi_square", "chi squared": "chi_square", "fisher": "f", "log-normal": "lognormal", "log normal": "lognormal" } }
+      ],
+      "examples_en": ["normal", "t", "chi-square"],
+      "examples_pt": ["normal", "t", "qui-quadrado"]
+    },
+    {
+      "slotId": "dividend_yield",
+      "type": "number",
+      "description": "Continuous dividend yield for option pricing.",
+      "validation": { "min": 0, "max": 1 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "default": 0,
+      "examples_en": ["0.02", "2%"],
+      "examples_pt": ["0,02", "2%"]
+    },
+    {
+      "slotId": "effect_size_expected",
+      "type": "number",
+      "description": "Expected effect size for power analysis and sample size estimation.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "small": 0.2, "medium": 0.5, "large": 0.8, "pequeno": 0.2, "médio": 0.5, "grande": 0.8 } }
+      ],
+      "examples_en": ["0.5", "medium", "0.8"],
+      "examples_pt": ["0,5", "médio", "0,8"]
+    },
+    {
+      "slotId": "effect_size_type",
+      "type": "enum",
+      "description": "Type of effect size measure to compute.",
+      "validation": { "allowedValues": ["cohen_d", "hedges_g", "eta_squared", "glass_delta"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "cohen d": "cohen_d", "cohen's d": "cohen_d", "hedges g": "hedges_g", "hedges' g": "hedges_g", "eta squared": "eta_squared", "eta2": "eta_squared", "glass delta": "glass_delta" } }
+      ],
+      "default": "cohen_d",
+      "examples_en": ["cohen d", "hedges g"],
+      "examples_pt": ["d de cohen", "g de hedges"]
+    },
+    {
+      "slotId": "ending_value",
+      "type": "number",
+      "description": "Ending value for CAGR / growth rate calculations.",
+      "validation": { "nonZero": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" },
+        { "from": "cell_ref", "rule": "resolve_cell_value" }
+      ],
+      "examples_en": ["2500", "B10"],
+      "examples_pt": ["2500", "B10"]
+    },
+    {
+      "slotId": "equity_cost",
+      "type": "number",
+      "description": "Cost of equity for WACC calculation.",
+      "validation": { "min": 0, "max": 1 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "examples_en": ["0.12", "12%"],
+      "examples_pt": ["0,12", "12%"]
+    },
+    {
+      "slotId": "equity_weight",
+      "type": "number",
+      "description": "Proportion of equity in capital structure.",
+      "validation": { "min": 0, "max": 1 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "examples_en": ["0.6", "60%"],
+      "examples_pt": ["0,6", "60%"]
+    },
+    {
+      "slotId": "expected_range",
+      "type": "range_ref",
+      "description": "Cell range containing expected frequencies for chi-square goodness of fit.",
+      "validation": { "requireNumeric": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_range" }
+      ],
+      "examples_en": ["C2:C10"],
+      "examples_pt": ["C2:C10"]
+    },
+    {
+      "slotId": "extra_payment_amount",
+      "type": "number",
+      "description": "Extra payment per period in amortization schedules.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_currency_amount" }
+      ],
+      "default": 0,
+      "examples_en": ["500", "$500"],
+      "examples_pt": ["500", "R$ 500"]
+    },
+    {
+      "slotId": "face_value",
+      "type": "number",
+      "description": "Face (par) value of a bond.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_currency_amount" }
+      ],
+      "default": 1000,
+      "examples_en": ["1000", "$1,000"],
+      "examples_pt": ["1000", "R$ 1.000"]
+    },
+    {
+      "slotId": "factor_a_column",
+      "type": "column_ref",
+      "description": "Column containing Factor A levels for two-way ANOVA.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_column_letter_or_index" }
+      ],
+      "examples_en": ["A", "column 1"],
+      "examples_pt": ["A", "coluna 1"]
+    },
+    {
+      "slotId": "factor_b_column",
+      "type": "column_ref",
+      "description": "Column containing Factor B levels for two-way ANOVA.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_column_letter_or_index" }
+      ],
+      "examples_en": ["B", "column 2"],
+      "examples_pt": ["B", "coluna 2"]
+    },
+    {
+      "slotId": "fixed_costs",
+      "type": "number",
+      "description": "Total fixed costs for break-even analysis.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_currency_amount" }
+      ],
+      "examples_en": ["10000", "$10,000"],
+      "examples_pt": ["10000", "R$ 10.000"]
+    },
+    {
+      "slotId": "forecast_method",
+      "type": "enum",
+      "description": "Method for forecasting.",
+      "validation": { "allowedValues": ["linear", "ets", "moving_average", "exponential"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "ets": "ets", "exponential smoothing": "ets", "ma": "moving_average", "exp": "exponential" } }
+      ],
+      "default": "ets",
+      "examples_en": ["linear", "ETS"],
+      "examples_pt": ["linear", "ETS"]
+    },
+    {
+      "slotId": "forecast_periods",
+      "type": "integer",
+      "description": "Number of future periods to forecast.",
+      "validation": { "min": 1, "max": 10000 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "examples_en": ["12", "next 6 months"],
+      "examples_pt": ["12", "próximos 6 meses"]
+    },
+    {
+      "slotId": "formula_cell",
+      "type": "cell_ref",
+      "description": "Cell containing the formula to evaluate or optimize.",
+      "validation": { "singleCell": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_ref" }
+      ],
+      "examples_en": ["D10", "Sheet1!E5"],
+      "examples_pt": ["D10", "Planilha1!E5"]
+    },
+    {
+      "slotId": "group_column",
+      "type": "column_ref",
+      "description": "Column containing group labels for ANOVA or grouped analysis.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_column_letter_or_index" }
+      ],
+      "examples_en": ["A", "group column B"],
+      "examples_pt": ["A", "coluna de grupo B"]
+    },
+    {
+      "slotId": "growth_type",
+      "type": "enum",
+      "description": "Type of growth rate calculation.",
+      "validation": { "allowedValues": ["simple", "logarithmic"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "log": "logarithmic", "ln": "logarithmic", "simples": "simple", "logarítmico": "logarithmic" } }
+      ],
+      "default": "simple",
+      "examples_en": ["simple", "logarithmic"],
+      "examples_pt": ["simples", "logarítmico"]
+    },
+    {
+      "slotId": "guess_rate",
+      "type": "number",
+      "description": "Initial guess for iterative rate calculations (IRR, RATE).",
+      "validation": { "min": -1, "max": 10 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "default": 0.1,
+      "examples_en": ["0.1", "10%"],
+      "examples_pt": ["0,1", "10%"]
+    },
+    {
+      "slotId": "ignore_zeros",
+      "type": "boolean",
+      "description": "Whether to exclude zero values from calculations.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_boolean" }
+      ],
+      "default": false,
+      "examples_en": ["yes", "no"],
+      "examples_pt": ["sim", "não"]
+    },
+    {
+      "slotId": "imputation_method",
+      "type": "enum",
+      "description": "Method for filling missing values.",
+      "validation": { "allowedValues": ["mean", "median", "mode", "forward_fill", "backward_fill", "linear_interpolation", "zero"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "avg": "mean", "average": "mean", "ffill": "forward_fill", "bfill": "backward_fill", "interpolate": "linear_interpolation", "média": "mean", "mediana": "median", "moda": "mode", "avançar": "forward_fill", "recuar": "backward_fill" } }
+      ],
+      "default": "mean",
+      "examples_en": ["mean", "forward fill", "interpolate"],
+      "examples_pt": ["média", "avançar", "interpolar"]
+    },
+    {
+      "slotId": "include_intercept",
+      "type": "boolean",
+      "description": "Whether to include an intercept term in the regression model.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_boolean" }
+      ],
+      "default": true,
+      "examples_en": ["yes", "no intercept"],
+      "examples_pt": ["sim", "sem intercepto"]
+    },
+    {
+      "slotId": "initial_investment",
+      "type": "number",
+      "description": "Initial investment amount (usually negative for outflow).",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_currency_amount" },
+        { "from": "positive_number", "rule": "negate_if_investment_context" }
+      ],
+      "examples_en": ["100000", "$100,000"],
+      "examples_pt": ["100000", "R$ 100.000"]
+    },
+    {
+      "slotId": "input_cell",
+      "type": "cell_ref",
+      "description": "Input cell for one-variable data table.",
+      "validation": { "singleCell": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_ref" }
+      ],
+      "examples_en": ["B1"],
+      "examples_pt": ["B1"]
+    },
+    {
+      "slotId": "input_range",
+      "type": "range_ref",
+      "description": "Primary cell range containing the input data.",
+      "validation": { "minCells": 1, "maxCells": 1048576 },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_range" },
+        { "from": "named_range", "rule": "resolve_named_range" },
+        { "from": "table_ref", "rule": "resolve_table_column" }
+      ],
+      "examples_en": ["A1:A100", "B2:B50", "Sales[Revenue]"],
+      "examples_pt": ["A1:A100", "B2:B50", "Vendas[Receita]"]
+    },
+    {
+      "slotId": "input_range_secondary",
+      "type": "range_ref",
+      "description": "Secondary cell range for two-variable operations (correlation, t-tests, matrix ops).",
+      "validation": { "minCells": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_range" }
+      ],
+      "examples_en": ["C1:C100", "D2:D50"],
+      "examples_pt": ["C1:C100", "D2:D50"]
+    },
+    {
+      "slotId": "interest_rate_value",
+      "type": "number",
+      "description": "Interest/discount rate per period as a decimal.",
+      "validation": { "min": -1, "max": 10 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" },
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["0.05", "5%", "8% annual"],
+      "examples_pt": ["0,05", "5%", "8% ao ano"]
+    },
+    {
+      "slotId": "interpolation_method",
+      "type": "enum",
+      "description": "Method for interpolation.",
+      "validation": { "allowedValues": ["linear", "polynomial", "spline", "nearest"] },
+      "coercion": [
+        { "from": "string", "rule": "lowercase_trim" }
+      ],
+      "default": "linear",
+      "examples_en": ["linear", "spline"],
+      "examples_pt": ["linear", "spline"]
+    },
+    {
+      "slotId": "iterations_count",
+      "type": "integer",
+      "description": "Number of iterations for Monte Carlo or iterative methods.",
+      "validation": { "min": 100, "max": 1000000 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "default": 10000,
+      "examples_en": ["10000", "1000 iterations"],
+      "examples_pt": ["10000", "1000 iterações"]
+    },
+    {
+      "slotId": "keep_strategy",
+      "type": "enum",
+      "description": "Which duplicate to keep during deduplication.",
+      "validation": { "allowedValues": ["first", "last", "none"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "keep first": "first", "keep last": "last", "remove all": "none", "manter primeiro": "first", "manter último": "last", "remover todos": "none" } }
+      ],
+      "default": "first",
+      "examples_en": ["first", "last"],
+      "examples_pt": ["primeiro", "último"]
+    },
+    {
+      "slotId": "key_columns",
+      "type": "array<column_ref>",
+      "description": "Columns to use as deduplication keys.",
+      "validation": { "minItems": 1 },
+      "coercion": [
+        { "from": "string", "rule": "split_and_parse_columns" }
+      ],
+      "examples_en": ["A, B", "columns A and C"],
+      "examples_pt": ["A, B", "colunas A e C"]
+    },
+    {
+      "slotId": "l1_ratio",
+      "type": "number",
+      "description": "L1/L2 mixing ratio for elastic net (0=ridge, 1=lasso).",
+      "validation": { "min": 0, "max": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "default": 0.5,
+      "examples_en": ["0.5", "0.7"],
+      "examples_pt": ["0,5", "0,7"]
+    },
+    {
+      "slotId": "lag_periods",
+      "type": "integer",
+      "description": "Number of lag periods for autocorrelation or lag analysis.",
+      "validation": { "min": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "default": 1,
+      "examples_en": ["1", "3 lags"],
+      "examples_pt": ["1", "3 defasagens"]
+    },
+    {
+      "slotId": "lambda_value",
+      "type": "number",
+      "description": "Lambda (mean rate) parameter for the Poisson distribution.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["5", "3.2"],
+      "examples_pt": ["5", "3,2"]
+    },
+    {
+      "slotId": "log_mean",
+      "type": "number",
+      "description": "Mean of the natural log of the variable (log-normal distribution).",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["0", "2.5"],
+      "examples_pt": ["0", "2,5"]
+    },
+    {
+      "slotId": "log_stdev",
+      "type": "number",
+      "description": "Standard deviation of the natural log of the variable (log-normal distribution).",
+      "validation": { "min": 0, "exclusiveMin": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["1", "0.5"],
+      "examples_pt": ["1", "0,5"]
+    },
+    {
+      "slotId": "market_return",
+      "type": "number",
+      "description": "Expected market return for CAPM.",
+      "validation": { "min": -1, "max": 1 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "examples_en": ["0.10", "10%"],
+      "examples_pt": ["0,10", "10%"]
+    },
+    {
+      "slotId": "maturity_years",
+      "type": "number",
+      "description": "Time to maturity in years for bonds.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["10", "5 years"],
+      "examples_pt": ["10", "5 anos"]
+    },
+    {
+      "slotId": "max_iterations",
+      "type": "integer",
+      "description": "Maximum iterations for goal seek or solver.",
+      "validation": { "min": 1, "max": 1000000 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "default": 1000,
+      "examples_en": ["1000"],
+      "examples_pt": ["1000"]
+    },
+    {
+      "slotId": "max_lag",
+      "type": "integer",
+      "description": "Maximum lag for autocorrelation function.",
+      "validation": { "min": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "examples_en": ["20"],
+      "examples_pt": ["20"]
+    },
+    {
+      "slotId": "max_value",
+      "type": "number",
+      "description": "Maximum allowed value or upper bound.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["100"],
+      "examples_pt": ["100"]
+    },
+    {
+      "slotId": "maximize_flag",
+      "type": "boolean",
+      "description": "Whether to maximize (true) or minimize (false) the objective.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "maximize": true, "max": true, "minimize": false, "min": false, "maximizar": true, "minimizar": false } }
+      ],
+      "default": true,
+      "examples_en": ["maximize", "minimize"],
+      "examples_pt": ["maximizar", "minimizar"]
+    },
+    {
+      "slotId": "min_value",
+      "type": "number",
+      "description": "Minimum allowed value or lower bound.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["0"],
+      "examples_pt": ["0"]
+    },
+    {
+      "slotId": "multi_mode_flag",
+      "type": "boolean",
+      "description": "Whether to return all modes (multi-modal) or just the first.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_boolean" }
+      ],
+      "default": false,
+      "examples_en": ["all modes", "single mode"],
+      "examples_pt": ["todas as modas", "moda única"]
+    },
+    {
+      "slotId": "normalization_method",
+      "type": "enum",
+      "description": "Method for data normalization.",
+      "validation": { "allowedValues": ["min_max", "z_score", "decimal_scaling", "log_transform"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "min-max": "min_max", "minmax": "min_max", "z-score": "z_score", "zscore": "z_score", "decimal": "decimal_scaling", "log": "log_transform" } }
+      ],
+      "default": "min_max",
+      "examples_en": ["min-max", "z-score"],
+      "examples_pt": ["min-max", "z-score"]
+    },
+    {
+      "slotId": "number_of_events",
+      "type": "integer",
+      "description": "Number of events (k) for Poisson probability.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "examples_en": ["3", "5 events"],
+      "examples_pt": ["3", "5 eventos"]
+    },
+    {
+      "slotId": "number_of_periods_value",
+      "type": "number",
+      "description": "Number of periods (NPER) for TVM calculations.",
+      "validation": { "min": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["30", "360 months"],
+      "examples_pt": ["30", "360 meses"]
+    },
+    {
+      "slotId": "number_of_successes",
+      "type": "integer",
+      "description": "Number of successes (k) for binomial probability.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "examples_en": ["7", "3 successes"],
+      "examples_pt": ["7", "3 sucessos"]
+    },
+    {
+      "slotId": "number_of_trials",
+      "type": "integer",
+      "description": "Number of trials (n) for binomial distribution.",
+      "validation": { "min": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "examples_en": ["10", "20 trials"],
+      "examples_pt": ["10", "20 tentativas"]
+    },
+    {
+      "slotId": "objective_cell",
+      "type": "cell_ref",
+      "description": "Cell containing the objective function value to optimize.",
+      "validation": { "singleCell": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_ref" }
+      ],
+      "examples_en": ["F10", "Sheet1!G20"],
+      "examples_pt": ["F10", "Planilha1!G20"]
+    },
+    {
+      "slotId": "observed_range",
+      "type": "range_ref",
+      "description": "Cell range containing observed frequencies for chi-square goodness of fit.",
+      "validation": { "requireNumeric": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_range" }
+      ],
+      "examples_en": ["B2:B10"],
+      "examples_pt": ["B2:B10"]
+    },
+    {
+      "slotId": "option_type",
+      "type": "enum",
+      "description": "Type of option for Black-Scholes pricing.",
+      "validation": { "allowedValues": ["call", "put"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "compra": "call", "venda": "put" } }
+      ],
+      "default": "call",
+      "examples_en": ["call", "put"],
+      "examples_pt": ["compra", "venda"]
+    },
+    {
+      "slotId": "outlier_method",
+      "type": "enum",
+      "description": "Method for outlier detection.",
+      "validation": { "allowedValues": ["iqr", "z_score", "modified_z_score", "percentile"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "iqr fence": "iqr", "z-score": "z_score", "modified z": "modified_z_score", "escore z": "z_score", "iqr modificado": "modified_z_score" } }
+      ],
+      "default": "iqr",
+      "examples_en": ["IQR", "z-score"],
+      "examples_pt": ["IQR", "escore z"]
+    },
+    {
+      "slotId": "output_cell",
+      "type": "cell_ref",
+      "description": "Target cell where the calculation result should be placed.",
+      "validation": { "singleCell": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_ref" }
+      ],
+      "examples_en": ["E1", "Sheet2!A1"],
+      "examples_pt": ["E1", "Planilha2!A1"]
+    },
+    {
+      "slotId": "payment_amount",
+      "type": "number",
+      "description": "Periodic payment amount for TVM calculations.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_currency_amount" }
+      ],
+      "examples_en": ["1000", "$1,000"],
+      "examples_pt": ["1000", "R$ 1.000"]
+    },
+    {
+      "slotId": "payment_frequency",
+      "type": "enum",
+      "description": "Frequency of coupon/payment periods.",
+      "validation": { "allowedValues": ["annual", "semiannual", "quarterly", "monthly"] },
+      "coercion": [
+        { "from": "integer", "rule": "map_frequency_number", "map": { "1": "annual", "2": "semiannual", "4": "quarterly", "12": "monthly" } },
+        { "from": "string", "rule": "map_synonyms", "map": { "yearly": "annual", "semi-annual": "semiannual", "anual": "annual", "semestral": "semiannual", "trimestral": "quarterly", "mensal": "monthly" } }
+      ],
+      "default": "semiannual",
+      "examples_en": ["annual", "semiannual"],
+      "examples_pt": ["anual", "semestral"]
+    },
+    {
+      "slotId": "payment_timing",
+      "type": "enum",
+      "description": "Whether payments occur at the beginning or end of each period.",
+      "validation": { "allowedValues": ["end", "begin"] },
+      "coercion": [
+        { "from": "integer", "rule": "map_timing_number", "map": { "0": "end", "1": "begin" } },
+        { "from": "string", "rule": "map_synonyms", "map": { "beginning": "begin", "start": "begin", "início": "begin", "fim": "end" } }
+      ],
+      "default": "end",
+      "examples_en": ["end", "beginning"],
+      "examples_pt": ["fim", "início"]
+    },
+    {
+      "slotId": "percentile_method",
+      "type": "enum",
+      "description": "Percentile interpolation method (inclusive vs exclusive).",
+      "validation": { "allowedValues": ["inclusive", "exclusive"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "inc": "inclusive", "exc": "exclusive" } }
+      ],
+      "default": "inclusive",
+      "examples_en": ["inclusive", "exclusive"],
+      "examples_pt": ["inclusivo", "exclusivo"]
+    },
+    {
+      "slotId": "percentile_value",
+      "type": "number",
+      "description": "The percentile to compute (0-1 or 0-100).",
+      "validation": { "min": 0, "max": 100 },
+      "coercion": [
+        { "from": "number_gt_1", "rule": "divide_by_100" },
+        { "from": "string", "rule": "strip_percent_and_parse" }
+      ],
+      "examples_en": ["0.9", "90", "90th"],
+      "examples_pt": ["0,9", "90", "percentil 90"]
+    },
+    {
+      "slotId": "period_count",
+      "type": "integer",
+      "description": "Window size (number of periods) for moving average or rolling calculations.",
+      "validation": { "min": 2 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "examples_en": ["7", "30-day window"],
+      "examples_pt": ["7", "janela de 30 dias"]
+    },
+    {
+      "slotId": "period_number",
+      "type": "integer",
+      "description": "Specific period number for depreciation calculation.",
+      "validation": { "min": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "examples_en": ["1", "year 3"],
+      "examples_pt": ["1", "ano 3"]
+    },
+    {
+      "slotId": "period_type",
+      "type": "enum",
+      "description": "Type of period for period-over-period comparison.",
+      "validation": { "allowedValues": ["day", "week", "month", "quarter", "year"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "daily": "day", "weekly": "week", "monthly": "month", "quarterly": "quarter", "yearly": "year", "annual": "year", "diário": "day", "semanal": "week", "mensal": "month", "trimestral": "quarter", "anual": "year" } }
+      ],
+      "examples_en": ["month", "year"],
+      "examples_pt": ["mês", "ano"]
+    },
+    {
+      "slotId": "polynomial_degree",
+      "type": "integer",
+      "description": "Degree of the polynomial for polynomial regression.",
+      "validation": { "min": 2, "max": 10 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" },
+        { "from": "string", "rule": "map_synonyms", "map": { "quadratic": 2, "cubic": 3, "quartic": 4, "quadrática": 2, "cúbica": 3 } }
+      ],
+      "examples_en": ["2", "quadratic", "3"],
+      "examples_pt": ["2", "quadrática", "3"]
+    },
+    {
+      "slotId": "population_mean",
+      "type": "number",
+      "description": "Known or hypothesized population mean for tests.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["100", "0"],
+      "examples_pt": ["100", "0"]
+    },
+    {
+      "slotId": "population_or_sample",
+      "type": "enum",
+      "description": "Whether to compute the population or sample statistic.",
+      "validation": { "allowedValues": ["sample", "population"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "pop": "population", "samp": "sample", "s": "sample", "p": "population", "n": "population", "n-1": "sample", "populacional": "population", "amostral": "sample" } }
+      ],
+      "clarifyIfAmbiguous": true,
+      "examples_en": ["sample", "population"],
+      "examples_pt": ["amostral", "populacional"]
+    },
+    {
+      "slotId": "population_size",
+      "type": "integer",
+      "description": "Total population size for finite population correction.",
+      "validation": { "min": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "examples_en": ["10000"],
+      "examples_pt": ["10000"]
+    },
+    {
+      "slotId": "population_stdev",
+      "type": "number",
+      "description": "Known population standard deviation.",
+      "validation": { "min": 0, "exclusiveMin": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["15", "2.5"],
+      "examples_pt": ["15", "2,5"]
+    },
+    {
+      "slotId": "prediction_x",
+      "type": "number",
+      "description": "X value at which to make a regression prediction.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" },
+        { "from": "cell_ref", "rule": "resolve_cell_value" }
+      ],
+      "examples_en": ["25", "B15"],
+      "examples_pt": ["25", "B15"]
+    },
+    {
+      "slotId": "predictor_count",
+      "type": "integer",
+      "description": "Number of predictor variables for adjusted R-squared.",
+      "validation": { "min": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "examples_en": ["3", "5 predictors"],
+      "examples_pt": ["3", "5 preditores"]
+    },
+    {
+      "slotId": "present_value_amount",
+      "type": "number",
+      "description": "Present value or loan principal for TVM calculations.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_currency_amount" }
+      ],
+      "examples_en": ["100000", "$250,000"],
+      "examples_pt": ["100000", "R$ 250.000"]
+    },
+    {
+      "slotId": "price_per_unit",
+      "type": "number",
+      "description": "Selling price per unit for break-even analysis.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_currency_amount" }
+      ],
+      "examples_en": ["25", "$25"],
+      "examples_pt": ["25", "R$ 25"]
+    },
+    {
+      "slotId": "probability_value",
+      "type": "number",
+      "description": "A probability value between 0 and 1.",
+      "validation": { "min": 0, "max": 1 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" },
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["0.05", "5%"],
+      "examples_pt": ["0,05", "5%"]
+    },
+    {
+      "slotId": "quartile_number",
+      "type": "integer",
+      "description": "Which quartile to compute (1, 2, or 3).",
+      "validation": { "min": 1, "max": 3 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" },
+        { "from": "string", "rule": "map_synonyms", "map": { "first": 1, "second": 2, "third": 3, "q1": 1, "q2": 2, "q3": 3, "primeiro": 1, "segundo": 2, "terceiro": 3 } }
+      ],
+      "examples_en": ["1", "Q3", "third"],
+      "examples_pt": ["1", "Q3", "terceiro"]
+    },
+    {
+      "slotId": "rank_order",
+      "type": "enum",
+      "description": "Rank order direction.",
+      "validation": { "allowedValues": ["ascending", "descending"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "asc": "ascending", "desc": "descending", "smallest first": "ascending", "largest first": "descending", "crescente": "ascending", "decrescente": "descending" } }
+      ],
+      "default": "ascending",
+      "examples_en": ["ascending", "descending"],
+      "examples_pt": ["crescente", "decrescente"]
+    },
+    {
+      "slotId": "rate_parameter",
+      "type": "number",
+      "description": "Rate parameter (λ) for the exponential distribution.",
+      "validation": { "min": 0, "exclusiveMin": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["0.5", "2"],
+      "examples_pt": ["0,5", "2"]
+    },
+    {
+      "slotId": "regularization_alpha",
+      "type": "number",
+      "description": "Regularization strength parameter for ridge/lasso/elastic net.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "default": 1.0,
+      "examples_en": ["1.0", "0.01"],
+      "examples_pt": ["1,0", "0,01"]
+    },
+    {
+      "slotId": "reinvestment_rate",
+      "type": "number",
+      "description": "Reinvestment rate for MIRR calculation.",
+      "validation": { "min": 0, "max": 1 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "examples_en": ["0.08", "8%"],
+      "examples_pt": ["0,08", "8%"]
+    },
+    {
+      "slotId": "reset_condition",
+      "type": "string",
+      "description": "Condition to reset cumulative sum (e.g., per-group or per-period).",
+      "validation": { "maxLength": 200 },
+      "coercion": [],
+      "examples_en": ["per group in column A", "each month"],
+      "examples_pt": ["por grupo na coluna A", "cada mês"]
+    },
+    {
+      "slotId": "result_cells",
+      "type": "range_ref",
+      "description": "Cells containing results to track in scenario analysis.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_range" }
+      ],
+      "examples_en": ["F10:F15"],
+      "examples_pt": ["F10:F15"]
+    },
+    {
+      "slotId": "risk_free_rate",
+      "type": "number",
+      "description": "Risk-free rate of return (e.g., treasury rate).",
+      "validation": { "min": -0.1, "max": 1 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "examples_en": ["0.03", "3%"],
+      "examples_pt": ["0,03", "3%"]
+    },
+    {
+      "slotId": "row_input_cell",
+      "type": "cell_ref",
+      "description": "Row input cell for a two-variable data table.",
+      "validation": { "singleCell": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_ref" }
+      ],
+      "examples_en": ["A1"],
+      "examples_pt": ["A1"]
+    },
+    {
+      "slotId": "row_values",
+      "type": "array<number>",
+      "description": "Row substitute values for a two-variable data table.",
+      "validation": { "minItems": 2 },
+      "coercion": [
+        { "from": "string", "rule": "split_and_parse_numbers" }
+      ],
+      "examples_en": ["10, 20, 30, 40, 50"],
+      "examples_pt": ["10, 20, 30, 40, 50"]
+    },
+    {
+      "slotId": "salvage_value",
+      "type": "number",
+      "description": "Salvage value of an asset at end of useful life.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_currency_amount" }
+      ],
+      "examples_en": ["5000", "$5,000"],
+      "examples_pt": ["5000", "R$ 5.000"]
+    },
+    {
+      "slotId": "sample_size",
+      "type": "integer",
+      "description": "Number of observations or sample size.",
+      "validation": { "min": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "examples_en": ["100", "50 samples"],
+      "examples_pt": ["100", "50 amostras"]
+    },
+    {
+      "slotId": "scale_parameter",
+      "type": "number",
+      "description": "Scale parameter for gamma, Weibull, or other distributions.",
+      "validation": { "min": 0, "exclusiveMin": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["2", "1.5"],
+      "examples_pt": ["2", "1,5"]
+    },
+    {
+      "slotId": "scenario_definitions",
+      "type": "array<object>",
+      "description": "Scenario definitions with names and variable values.",
+      "validation": { "minItems": 2, "requiredKeys": ["name", "values"] },
+      "coercion": [],
+      "examples_en": ["Base: B2=100, B3=5%; Worst: B2=80, B3=8%"],
+      "examples_pt": ["Base: B2=100, B3=5%; Pior: B2=80, B3=8%"]
+    },
+    {
+      "slotId": "seasonal_period",
+      "type": "integer",
+      "description": "Length of the seasonal cycle (e.g., 12 for monthly, 4 for quarterly).",
+      "validation": { "min": 2 },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "monthly": 12, "quarterly": 4, "weekly": 52, "daily": 365, "mensal": 12, "trimestral": 4, "semanal": 52 } }
+      ],
+      "examples_en": ["12", "4", "quarterly"],
+      "examples_pt": ["12", "4", "trimestral"]
+    },
+    {
+      "slotId": "seed_value",
+      "type": "integer",
+      "description": "Random seed for reproducible simulations.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "examples_en": ["42", "12345"],
+      "examples_pt": ["42", "12345"]
+    },
+    {
+      "slotId": "shape_parameter_alpha",
+      "type": "number",
+      "description": "Alpha (shape) parameter for beta, gamma, or Weibull distributions.",
+      "validation": { "min": 0, "exclusiveMin": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["2", "0.5"],
+      "examples_pt": ["2", "0,5"]
+    },
+    {
+      "slotId": "shape_parameter_beta",
+      "type": "number",
+      "description": "Beta (shape) parameter for the beta distribution.",
+      "validation": { "min": 0, "exclusiveMin": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["5", "2"],
+      "examples_pt": ["5", "2"]
+    },
+    {
+      "slotId": "significance_level",
+      "type": "number",
+      "description": "Significance level (alpha) for hypothesis tests.",
+      "validation": { "min": 0.001, "max": 0.5 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" },
+        { "from": "confidence_level", "rule": "subtract_from_1" }
+      ],
+      "default": 0.05,
+      "examples_en": ["0.05", "5%", "1%"],
+      "examples_pt": ["0,05", "5%", "1%"]
+    },
+    {
+      "slotId": "smoothing_alpha",
+      "type": "number",
+      "description": "Smoothing factor (alpha) for exponential smoothing (0 < α ≤ 1).",
+      "validation": { "min": 0, "max": 1, "exclusiveMin": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["0.3", "0.7"],
+      "examples_pt": ["0,3", "0,7"]
+    },
+    {
+      "slotId": "smoothing_beta",
+      "type": "number",
+      "description": "Trend smoothing factor (beta) for double exponential smoothing.",
+      "validation": { "min": 0, "max": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["0.2"],
+      "examples_pt": ["0,2"]
+    },
+    {
+      "slotId": "solver_method",
+      "type": "enum",
+      "description": "Solver algorithm for nonlinear optimization.",
+      "validation": { "allowedValues": ["grg_nonlinear", "evolutionary", "simplex"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "grg": "grg_nonlinear", "genetic": "evolutionary", "evolutivo": "evolutionary" } }
+      ],
+      "default": "grg_nonlinear",
+      "examples_en": ["GRG", "evolutionary"],
+      "examples_pt": ["GRG", "evolutivo"]
+    },
+    {
+      "slotId": "spot_price",
+      "type": "number",
+      "description": "Current spot price of the underlying asset (Black-Scholes).",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_currency_amount" }
+      ],
+      "examples_en": ["105", "$105"],
+      "examples_pt": ["105", "R$ 105"]
+    },
+    {
+      "slotId": "stat_function",
+      "type": "enum",
+      "description": "Statistic to compute in rolling window operations.",
+      "validation": { "allowedValues": ["mean", "stdev", "min", "max", "sum", "median", "count"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "average": "mean", "std": "stdev", "standard deviation": "stdev", "média": "mean", "desvio": "stdev", "soma": "sum", "contagem": "count" } }
+      ],
+      "default": "mean",
+      "examples_en": ["mean", "stdev", "sum"],
+      "examples_pt": ["média", "desvio", "soma"]
+    },
+    {
+      "slotId": "statistical_power",
+      "type": "number",
+      "description": "Desired statistical power (1 - β) for sample size estimation.",
+      "validation": { "min": 0.5, "max": 0.9999 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "default": 0.8,
+      "examples_en": ["0.8", "80%", "0.9"],
+      "examples_pt": ["0,8", "80%", "0,9"]
+    },
+    {
+      "slotId": "step_count",
+      "type": "integer",
+      "description": "Number of steps for sensitivity analysis.",
+      "validation": { "min": 2, "max": 100 },
+      "coercion": [
+        { "from": "string", "rule": "parse_integer" }
+      ],
+      "default": 10,
+      "examples_en": ["10", "20 steps"],
+      "examples_pt": ["10", "20 passos"]
+    },
+    {
+      "slotId": "strike_price",
+      "type": "number",
+      "description": "Strike (exercise) price of an option.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_currency_amount" }
+      ],
+      "examples_en": ["100", "$100"],
+      "examples_pt": ["100", "R$ 100"]
+    },
+    {
+      "slotId": "substitute_values",
+      "type": "array<number>",
+      "description": "Substitute values for what-if / data table analysis.",
+      "validation": { "minItems": 2 },
+      "coercion": [
+        { "from": "string", "rule": "split_and_parse_numbers" },
+        { "from": "range_ref", "rule": "resolve_range_values" }
+      ],
+      "examples_en": ["1%, 2%, 3%, 4%, 5%"],
+      "examples_pt": ["1%, 2%, 3%, 4%, 5%"]
+    },
+    {
+      "slotId": "success_probability",
+      "type": "number",
+      "description": "Probability of success on a single trial (binomial).",
+      "validation": { "min": 0, "max": 1 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "examples_en": ["0.5", "50%", "0.3"],
+      "examples_pt": ["0,5", "50%", "0,3"]
+    },
+    {
+      "slotId": "tail_type",
+      "type": "enum",
+      "description": "Tail type for t-distribution probability.",
+      "validation": { "allowedValues": ["one_tail", "two_tail"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "1": "one_tail", "2": "two_tail", "one": "one_tail", "two": "two_tail", "one-tailed": "one_tail", "two-tailed": "two_tail" } }
+      ],
+      "default": "two_tail",
+      "examples_en": ["one-tailed", "two-tailed"],
+      "examples_pt": ["unicaudal", "bicaudal"]
+    },
+    {
+      "slotId": "target_max",
+      "type": "number",
+      "description": "Target maximum value for normalization.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "default": 1,
+      "examples_en": ["1", "100"],
+      "examples_pt": ["1", "100"]
+    },
+    {
+      "slotId": "target_min",
+      "type": "number",
+      "description": "Target minimum value for normalization.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "default": 0,
+      "examples_en": ["0"],
+      "examples_pt": ["0"]
+    },
+    {
+      "slotId": "target_profit",
+      "type": "number",
+      "description": "Target profit for break-even analysis beyond zero.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_currency_amount" }
+      ],
+      "examples_en": ["5000", "$5,000"],
+      "examples_pt": ["5000", "R$ 5.000"]
+    },
+    {
+      "slotId": "target_return",
+      "type": "number",
+      "description": "Minimum acceptable return for Sortino ratio.",
+      "validation": {},
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "default": 0,
+      "examples_en": ["0", "2%"],
+      "examples_pt": ["0", "2%"]
+    },
+    {
+      "slotId": "target_type",
+      "type": "enum",
+      "description": "Target data type for type coercion.",
+      "validation": { "allowedValues": ["number", "text", "date", "boolean"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "numeric": "number", "string": "text", "bool": "boolean", "número": "number", "texto": "text", "data": "date", "booleano": "boolean" } }
+      ],
+      "examples_en": ["number", "text", "date"],
+      "examples_pt": ["número", "texto", "data"]
+    },
+    {
+      "slotId": "target_value",
+      "type": "number",
+      "description": "Target value for goal seek.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["0", "1000"],
+      "examples_pt": ["0", "1000"]
+    },
+    {
+      "slotId": "target_x",
+      "type": "number",
+      "description": "X value at which to interpolate.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["15.5"],
+      "examples_pt": ["15,5"]
+    },
+    {
+      "slotId": "tax_rate",
+      "type": "number",
+      "description": "Corporate tax rate for WACC calculation.",
+      "validation": { "min": 0, "max": 1 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "examples_en": ["0.21", "21%"],
+      "examples_pt": ["0,21", "21%"]
+    },
+    {
+      "slotId": "test_statistic",
+      "type": "number",
+      "description": "A pre-computed test statistic value for p-value calculation.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["2.45", "-1.96"],
+      "examples_pt": ["2,45", "-1,96"]
+    },
+    {
+      "slotId": "test_type",
+      "type": "enum",
+      "description": "Type of statistical test for power analysis.",
+      "validation": { "allowedValues": ["one_sample_t", "two_sample_t", "paired_t", "anova", "chi_square", "correlation"] },
+      "coercion": [
+        { "from": "string", "rule": "lowercase_trim" }
+      ],
+      "default": "two_sample_t",
+      "examples_en": ["two-sample t", "ANOVA"],
+      "examples_pt": ["teste t para duas amostras", "ANOVA"]
+    },
+    {
+      "slotId": "threshold",
+      "type": "number",
+      "description": "Classification threshold for logistic regression.",
+      "validation": { "min": 0, "max": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "default": 0.5,
+      "examples_en": ["0.5", "0.7"],
+      "examples_pt": ["0,5", "0,7"]
+    },
+    {
+      "slotId": "threshold_value",
+      "type": "number",
+      "description": "Threshold for outlier detection (e.g., z-score cutoff, IQR multiplier).",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "default": 1.5,
+      "examples_en": ["1.5", "3 sigma", "2"],
+      "examples_pt": ["1,5", "3 sigma", "2"]
+    },
+    {
+      "slotId": "tie_method",
+      "type": "enum",
+      "description": "Method for handling tied values in ranking.",
+      "validation": { "allowedValues": ["average", "min", "max", "first", "dense"] },
+      "coercion": [
+        { "from": "string", "rule": "lowercase_trim" }
+      ],
+      "default": "average",
+      "examples_en": ["average", "min"],
+      "examples_pt": ["média", "mínimo"]
+    },
+    {
+      "slotId": "time_to_expiry",
+      "type": "number",
+      "description": "Time to option expiration in years.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "days_string", "rule": "divide_by_365" },
+        { "from": "months_string", "rule": "divide_by_12" }
+      ],
+      "examples_en": ["0.5", "6 months", "180 days"],
+      "examples_pt": ["0,5", "6 meses", "180 dias"]
+    },
+    {
+      "slotId": "tolerance_value",
+      "type": "number",
+      "description": "Convergence tolerance for iterative methods.",
+      "validation": { "min": 0, "exclusiveMin": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "default": 0.0001,
+      "examples_en": ["0.0001", "1e-6"],
+      "examples_pt": ["0,0001", "1e-6"]
+    },
+    {
+      "slotId": "trend_type",
+      "type": "enum",
+      "description": "Type of trend to fit.",
+      "validation": { "allowedValues": ["linear", "polynomial", "exponential", "logarithmic"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "log": "logarithmic", "exp": "exponential", "poly": "polynomial", "exponencial": "exponential", "logarítmico": "logarithmic", "polinomial": "polynomial" } }
+      ],
+      "default": "linear",
+      "examples_en": ["linear", "exponential"],
+      "examples_pt": ["linear", "exponencial"]
+    },
+    {
+      "slotId": "trim_or_winsorize",
+      "type": "enum",
+      "description": "Whether to trim (remove) or winsorize (clamp) extreme values.",
+      "validation": { "allowedValues": ["trim", "winsorize"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "truncate": "trim", "clamp": "winsorize", "cortar": "trim", "limitar": "winsorize" } }
+      ],
+      "default": "trim",
+      "examples_en": ["trim", "winsorize"],
+      "examples_pt": ["cortar", "winsorizar"]
+    },
+    {
+      "slotId": "trim_percent",
+      "type": "number",
+      "description": "Percentage of values to trim from each tail (0 to 0.5).",
+      "validation": { "min": 0, "max": 0.5 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "default": 0.05,
+      "examples_en": ["0.05", "5%", "10%"],
+      "examples_pt": ["0,05", "5%", "10%"]
+    },
+    {
+      "slotId": "useful_life",
+      "type": "number",
+      "description": "Useful life of an asset in periods (years).",
+      "validation": { "min": 1 },
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" }
+      ],
+      "examples_en": ["5", "10 years"],
+      "examples_pt": ["5", "10 anos"]
+    },
+    {
+      "slotId": "validation_type",
+      "type": "enum",
+      "description": "Type of data validation to apply.",
+      "validation": { "allowedValues": ["whole_number", "decimal", "list", "date", "time", "text_length", "custom"] },
+      "coercion": [
+        { "from": "string", "rule": "map_synonyms", "map": { "integer": "whole_number", "number": "decimal", "dropdown": "list", "número inteiro": "whole_number", "decimal": "decimal", "lista": "list", "data": "date" } }
+      ],
+      "examples_en": ["whole number", "list", "decimal"],
+      "examples_pt": ["número inteiro", "lista", "decimal"]
+    },
+    {
+      "slotId": "variable_cell",
+      "type": "cell_ref",
+      "description": "Cell containing the variable to adjust in goal seek.",
+      "validation": { "singleCell": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_ref" }
+      ],
+      "examples_en": ["B2"],
+      "examples_pt": ["B2"]
+    },
+    {
+      "slotId": "variable_cells",
+      "type": "range_ref",
+      "description": "Cells containing decision variables for solver/optimization.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_range" }
+      ],
+      "examples_en": ["B2:B10", "C3:E3"],
+      "examples_pt": ["B2:B10", "C3:E3"]
+    },
+    {
+      "slotId": "variable_cost_per_unit",
+      "type": "number",
+      "description": "Variable cost per unit for break-even analysis.",
+      "validation": { "min": 0 },
+      "coercion": [
+        { "from": "string", "rule": "parse_currency_amount" }
+      ],
+      "examples_en": ["15", "$15"],
+      "examples_pt": ["15", "R$ 15"]
+    },
+    {
+      "slotId": "variation_percent",
+      "type": "number",
+      "description": "Percentage variation for sensitivity analysis (e.g., +/- 10%).",
+      "validation": { "min": 0, "max": 1 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "default": 0.1,
+      "examples_en": ["0.1", "10%", "20%"],
+      "examples_pt": ["0,1", "10%", "20%"]
+    },
+    {
+      "slotId": "volatility",
+      "type": "number",
+      "description": "Annualized volatility (standard deviation of returns) for option pricing.",
+      "validation": { "min": 0, "exclusiveMin": true, "max": 5 },
+      "coercion": [
+        { "from": "percentage_string", "rule": "divide_by_100_if_gt_1" }
+      ],
+      "examples_en": ["0.25", "25%"],
+      "examples_pt": ["0,25", "25%"]
+    },
+    {
+      "slotId": "weight_range",
+      "type": "range_ref",
+      "description": "Cell range containing weights for weighted calculations.",
+      "validation": { "requireNumeric": true },
+      "coercion": [
+        { "from": "string", "rule": "parse_a1_range" }
+      ],
+      "examples_en": ["B1:B10"],
+      "examples_pt": ["B1:B10"]
+    },
+    {
+      "slotId": "x_value",
+      "type": "number",
+      "description": "The x value at which to evaluate a distribution function.",
+      "validation": {},
+      "coercion": [
+        { "from": "string", "rule": "parse_number_locale_aware" },
+        { "from": "cell_ref", "rule": "resolve_cell_value" }
+      ],
+      "examples_en": ["1.96", "2.5"],
+      "examples_pt": ["1,96", "2,5"]
+    }
+  ]
+}

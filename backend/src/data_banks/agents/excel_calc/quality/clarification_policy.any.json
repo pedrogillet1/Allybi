@@ -1,0 +1,414 @@
+{
+  "_meta": {
+    "bankId": "clarification_policy_excel_calc",
+    "version": "1.0.0",
+    "description": "Clarification and disambiguation policy for the Excel Calculation Agent enforcing ASK_ONE_BEST_QUESTION when required slots are missing or ambiguous, with domain-specific disambiguation rules for statistical and financial calculations.",
+    "owner": "excel-calc-agent",
+    "languages": ["any", "en", "pt"],
+    "dependsOn": ["calc_task_taxonomy", "slot_schemas_excel_calc"],
+    "usedBy": ["calc_intent_patterns_en", "calc_intent_patterns_pt"],
+    "tests": ["clarification_policy_single_question", "clarification_policy_never_guess"],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "defaultAction": "ASK_ONE_BEST_QUESTION",
+    "maxQuestionsPerTurn": 1,
+    "neverGuessSlots": [
+      "population_or_sample",
+      "alternative_direction",
+      "confidence_level",
+      "significance_level",
+      "cumulative_flag",
+      "option_type",
+      "payment_timing",
+      "maximize_flag",
+      "decomposition_type"
+    ],
+    "autoFillWhenUnambiguous": true,
+    "redundancyGuards": {
+      "neverAskIfInContext": true,
+      "neverAskIfDefaultSufficient": true,
+      "neverAskSameQuestionWithinTurns": 3,
+      "skipIfUserProvidedExplicitly": true
+    },
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_most_specific_then_apply",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "maxQuestions": 1,
+        "minOptions": 2,
+        "maxOptions": 4,
+        "autopickTopScore": 0.90,
+        "autopickGap": 0.30
+      }
+    }
+  },
+  "policies": {
+    "rules": [
+      {
+        "ruleId": "ask_one_best_question",
+        "severity": "critical",
+        "description": "When required slots are missing, ask exactly ONE question — the most impactful one for disambiguation.",
+        "when": {
+          "all": [
+            { "path": "missingRequiredSlots.length", "op": "gte", "value": 1 }
+          ]
+        },
+        "then": {
+          "action": "clarify",
+          "strategy": "ASK_ONE_BEST_QUESTION",
+          "prioritize": "slot_with_highest_disambiguation_impact",
+          "format": {
+            "maxQuestions": 1,
+            "minOptions": 2,
+            "maxOptions": 4,
+            "includeDefaultHint": true,
+            "tone": "concise_professional"
+          }
+        },
+        "reasonCode": "missing_required_slot"
+      },
+      {
+        "ruleId": "stdev_sample_vs_population",
+        "severity": "critical",
+        "description": "When standard deviation or variance is requested without specifying sample vs population, ALWAYS ask.",
+        "when": {
+          "all": [
+            { "path": "calcFamily", "op": "in", "value": ["standard_deviation", "variance", "z_score", "coefficient_of_variation"] },
+            { "path": "slots.population_or_sample", "op": "eq", "value": null }
+          ]
+        },
+        "then": {
+          "action": "clarify",
+          "strategy": "ASK_ONE_BEST_QUESTION",
+          "question_en": "Should I calculate the **sample** standard deviation (n-1, for a subset of data) or the **population** standard deviation (n, for the entire data set)?",
+          "question_pt": "Devo calcular o desvio padrão **amostral** (n-1, para um subconjunto dos dados) ou o desvio padrão **populacional** (n, para o conjunto completo)?",
+          "options": [
+            { "value": "sample", "label_en": "Sample (n-1)", "label_pt": "Amostral (n-1)", "hint_en": "Most common for real-world data subsets", "hint_pt": "Mais comum para subconjuntos de dados reais" },
+            { "value": "population", "label_en": "Population (n)", "label_pt": "Populacional (n)", "hint_en": "Use when data represents the entire population", "hint_pt": "Use quando os dados representam toda a população" }
+          ]
+        },
+        "reasonCode": "ambiguous_stdev_type"
+      },
+      {
+        "ruleId": "hypothesis_direction",
+        "severity": "critical",
+        "description": "When a hypothesis test is requested without specifying tail direction, ask.",
+        "when": {
+          "all": [
+            { "path": "calcFamily", "op": "in", "value": ["one_sample_t_test", "two_sample_t_test", "paired_t_test", "welch_t_test", "z_test", "mann_whitney_u", "wilcoxon_signed_rank"] },
+            { "path": "slots.alternative_direction", "op": "eq", "value": null }
+          ]
+        },
+        "then": {
+          "action": "clarify",
+          "strategy": "ASK_ONE_BEST_QUESTION",
+          "question_en": "What is the alternative hypothesis direction?",
+          "question_pt": "Qual é a direção da hipótese alternativa?",
+          "options": [
+            { "value": "two_sided", "label_en": "Two-sided (≠)", "label_pt": "Bilateral (≠)", "hint_en": "Test if means are different in either direction", "hint_pt": "Testa se as médias são diferentes em qualquer direção" },
+            { "value": "greater", "label_en": "Greater (>)", "label_pt": "Maior (>)", "hint_en": "Test if the first mean is greater", "hint_pt": "Testa se a primeira média é maior" },
+            { "value": "less", "label_en": "Less (<)", "label_pt": "Menor (<)", "hint_en": "Test if the first mean is less", "hint_pt": "Testa se a primeira média é menor" }
+          ]
+        },
+        "reasonCode": "ambiguous_hypothesis_direction"
+      },
+      {
+        "ruleId": "distribution_cumulative_vs_density",
+        "severity": "warning",
+        "description": "When a distribution probability is requested, clarify if CDF or PDF is needed when ambiguous.",
+        "when": {
+          "all": [
+            { "path": "calcFamily", "op": "in", "value": ["normal_distribution", "t_distribution", "chi_square_distribution", "f_distribution", "exponential_distribution", "beta_distribution", "gamma_distribution", "weibull_distribution", "lognormal_distribution", "poisson_distribution", "binomial_distribution", "uniform_distribution"] },
+            { "path": "slots.cumulative_flag", "op": "eq", "value": null },
+            { "path": "context.userExplicitlyStatedType", "op": "eq", "value": false }
+          ]
+        },
+        "then": {
+          "action": "clarify",
+          "strategy": "ASK_ONE_BEST_QUESTION",
+          "question_en": "Do you want the **cumulative probability** (P(X ≤ x), CDF) or the **probability density/mass** (PDF/PMF)?",
+          "question_pt": "Você quer a **probabilidade acumulada** (P(X ≤ x), CDF) ou a **densidade/massa de probabilidade** (PDF/PMF)?",
+          "options": [
+            { "value": true, "label_en": "Cumulative (CDF)", "label_pt": "Acumulada (CDF)", "hint_en": "Probability of X being at most x", "hint_pt": "Probabilidade de X ser no máximo x" },
+            { "value": false, "label_en": "Density/Mass (PDF/PMF)", "label_pt": "Densidade/Massa (PDF/PMF)", "hint_en": "Probability density at exact point x", "hint_pt": "Densidade de probabilidade no ponto exato x" }
+          ]
+        },
+        "reasonCode": "ambiguous_distribution_mode"
+      },
+      {
+        "ruleId": "option_call_vs_put",
+        "severity": "critical",
+        "description": "When Black-Scholes is requested without specifying call or put, ask.",
+        "when": {
+          "all": [
+            { "path": "calcFamily", "op": "eq", "value": "black_scholes" },
+            { "path": "slots.option_type", "op": "eq", "value": null }
+          ]
+        },
+        "then": {
+          "action": "clarify",
+          "strategy": "ASK_ONE_BEST_QUESTION",
+          "question_en": "Are you pricing a **call** option or a **put** option?",
+          "question_pt": "Você quer precificar uma opção de **compra** (call) ou de **venda** (put)?",
+          "options": [
+            { "value": "call", "label_en": "Call option", "label_pt": "Opção de compra", "hint_en": "Right to buy the underlying asset", "hint_pt": "Direito de comprar o ativo subjacente" },
+            { "value": "put", "label_en": "Put option", "label_pt": "Opção de venda", "hint_en": "Right to sell the underlying asset", "hint_pt": "Direito de vender o ativo subjacente" }
+          ]
+        },
+        "reasonCode": "ambiguous_option_type"
+      },
+      {
+        "ruleId": "payment_begin_vs_end",
+        "severity": "warning",
+        "description": "When TVM calculation doesn't specify payment timing and the result is sensitive to it, ask.",
+        "when": {
+          "all": [
+            { "path": "calcFamily", "op": "in", "value": ["payment_calculation", "future_value", "present_value", "number_of_periods_solve", "amortization_schedule"] },
+            { "path": "slots.payment_timing", "op": "eq", "value": null },
+            { "path": "slots.payment_amount", "op": "neq", "value": null }
+          ]
+        },
+        "then": {
+          "action": "clarify",
+          "strategy": "ASK_ONE_BEST_QUESTION",
+          "question_en": "Are payments made at the **beginning** or **end** of each period?",
+          "question_pt": "Os pagamentos são feitos no **início** ou no **fim** de cada período?",
+          "options": [
+            { "value": "end", "label_en": "End of period (ordinary annuity)", "label_pt": "Fim do período (anuidade ordinária)", "hint_en": "Most common for loans and mortgages", "hint_pt": "Mais comum para empréstimos e hipotecas" },
+            { "value": "begin", "label_en": "Beginning of period (annuity due)", "label_pt": "Início do período (anuidade antecipada)", "hint_en": "Common for leases and insurance premiums", "hint_pt": "Comum para aluguéis e prêmios de seguro" }
+          ]
+        },
+        "reasonCode": "ambiguous_payment_timing"
+      },
+      {
+        "ruleId": "maximize_vs_minimize",
+        "severity": "critical",
+        "description": "When optimization is requested without specifying direction, ask.",
+        "when": {
+          "all": [
+            { "path": "calcFamily", "op": "in", "value": ["solver_linear", "solver_nonlinear"] },
+            { "path": "slots.maximize_flag", "op": "eq", "value": null }
+          ]
+        },
+        "then": {
+          "action": "clarify",
+          "strategy": "ASK_ONE_BEST_QUESTION",
+          "question_en": "Should I **maximize** or **minimize** the objective?",
+          "question_pt": "Devo **maximizar** ou **minimizar** o objetivo?",
+          "options": [
+            { "value": true, "label_en": "Maximize", "label_pt": "Maximizar" },
+            { "value": false, "label_en": "Minimize", "label_pt": "Minimizar" }
+          ]
+        },
+        "reasonCode": "ambiguous_optimization_direction"
+      },
+      {
+        "ruleId": "seasonal_additive_vs_multiplicative",
+        "severity": "warning",
+        "description": "When seasonal decomposition is requested without specifying type, ask.",
+        "when": {
+          "all": [
+            { "path": "calcFamily", "op": "eq", "value": "seasonal_decomposition" },
+            { "path": "slots.decomposition_type", "op": "eq", "value": null }
+          ]
+        },
+        "then": {
+          "action": "clarify",
+          "strategy": "ASK_ONE_BEST_QUESTION",
+          "question_en": "Should the seasonal component be **additive** (constant seasonal effect) or **multiplicative** (seasonal effect proportional to level)?",
+          "question_pt": "O componente sazonal deve ser **aditivo** (efeito sazonal constante) ou **multiplicativo** (efeito sazonal proporcional ao nível)?",
+          "options": [
+            { "value": "additive", "label_en": "Additive", "label_pt": "Aditivo", "hint_en": "Seasonal swings are roughly constant over time", "hint_pt": "Oscilações sazonais aproximadamente constantes" },
+            { "value": "multiplicative", "label_en": "Multiplicative", "label_pt": "Multiplicativo", "hint_en": "Seasonal swings grow with the data level", "hint_pt": "Oscilações sazonais crescem com o nível dos dados" }
+          ]
+        },
+        "reasonCode": "ambiguous_decomposition_type"
+      },
+      {
+        "ruleId": "autopick_when_high_confidence",
+        "severity": "info",
+        "description": "When a single calcFamily matches with very high confidence and no critical ambiguous slots, proceed without asking.",
+        "when": {
+          "all": [
+            { "path": "matchConfidence", "op": "gte", "value": 0.90 },
+            { "path": "missingRequiredSlots.length", "op": "eq", "value": 0 },
+            { "path": "criticalAmbiguousSlots.length", "op": "eq", "value": 0 }
+          ]
+        },
+        "then": {
+          "action": "allow",
+          "transform": [
+            { "type": "autopick_candidate", "notifyUser": false }
+          ]
+        },
+        "reasonCode": "auto_pick_high_confidence"
+      },
+      {
+        "ruleId": "use_default_when_safe",
+        "severity": "info",
+        "description": "When a slot has a well-known default and the user hasn't expressed a preference, use the default silently.",
+        "when": {
+          "all": [
+            { "path": "slot.hasDefault", "op": "eq", "value": true },
+            { "path": "slot.clarifyIfAmbiguous", "op": "neq", "value": true },
+            { "path": "slot.value", "op": "eq", "value": null }
+          ]
+        },
+        "then": {
+          "action": "allow",
+          "transform": [
+            { "type": "apply_default", "notifyUser": true, "notifyFormat": "inline_note" }
+          ]
+        },
+        "reasonCode": "default_applied"
+      },
+      {
+        "ruleId": "missing_input_range",
+        "severity": "critical",
+        "description": "When input_range is required but not provided and no selection context exists, ask.",
+        "when": {
+          "all": [
+            { "path": "slots.input_range", "op": "eq", "value": null },
+            { "path": "context.hasSelection", "op": "eq", "value": false },
+            { "path": "requiredSlots", "op": "contains", "value": "input_range" }
+          ]
+        },
+        "then": {
+          "action": "clarify",
+          "strategy": "ASK_ONE_BEST_QUESTION",
+          "question_en": "Which cell range contains your data?",
+          "question_pt": "Qual intervalo de células contém seus dados?",
+          "freeformInput": true,
+          "placeholder_en": "e.g., A1:A100 or select the range first",
+          "placeholder_pt": "ex.: A1:A100 ou selecione o intervalo primeiro"
+        },
+        "reasonCode": "missing_input_range"
+      },
+      {
+        "ruleId": "family_disambiguation",
+        "severity": "warning",
+        "description": "When multiple calc families match with similar confidence, ask the user to pick.",
+        "when": {
+          "all": [
+            { "path": "candidateFamilies.length", "op": "gte", "value": 2 },
+            { "path": "metrics.scoreGap", "op": "lt", "value": 0.20 }
+          ]
+        },
+        "then": {
+          "action": "clarify",
+          "strategy": "ASK_ONE_BEST_QUESTION",
+          "format": {
+            "maxOptions": 4,
+            "showFamilyDescription": true,
+            "sortByScore": true
+          }
+        },
+        "reasonCode": "ambiguous_calc_family"
+      },
+      {
+        "ruleId": "confidence_level_for_interval",
+        "severity": "warning",
+        "description": "When confidence interval is requested without specifying confidence level, use 95% default but notify.",
+        "when": {
+          "all": [
+            { "path": "calcFamily", "op": "in", "value": ["confidence_interval", "prediction_interval"] },
+            { "path": "slots.confidence_level", "op": "eq", "value": null }
+          ]
+        },
+        "then": {
+          "action": "allow",
+          "transform": [
+            { "type": "apply_default", "slotId": "confidence_level", "value": 0.95, "notifyUser": true, "notifyFormat": "inline_note" }
+          ]
+        },
+        "reasonCode": "default_confidence_level_applied"
+      },
+      {
+        "ruleId": "never_guess_critical_slots",
+        "severity": "critical",
+        "description": "Global guard: never guess values for neverGuessSlots; always ask or use explicit default with notification.",
+        "when": {
+          "all": [
+            { "path": "slot.slotId", "op": "in_config", "configKey": "neverGuessSlots" },
+            { "path": "slot.value", "op": "eq", "value": null },
+            { "path": "slot.hasDefault", "op": "eq", "value": false }
+          ]
+        },
+        "then": {
+          "action": "clarify",
+          "strategy": "ASK_ONE_BEST_QUESTION"
+        },
+        "reasonCode": "never_guess_critical_slot"
+      }
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "CP_001_stdev_asks_sample_or_pop",
+        "input": "calculate the standard deviation of A1:A50",
+        "context": { "calcFamily": "standard_deviation", "slots": { "input_range": "A1:A50", "population_or_sample": null } },
+        "expect": { "action": "clarify", "reasonCode": "ambiguous_stdev_type", "questionCount": 1 }
+      },
+      {
+        "id": "CP_002_stdev_sample_explicit_no_ask",
+        "input": "sample standard deviation of A1:A50",
+        "context": { "calcFamily": "standard_deviation", "slots": { "input_range": "A1:A50", "population_or_sample": "sample" } },
+        "expect": { "action": "allow" }
+      },
+      {
+        "id": "CP_003_hypothesis_asks_direction",
+        "input": "run a t-test on A1:A30 vs B1:B30",
+        "context": { "calcFamily": "two_sample_t_test", "slots": { "input_range": "A1:A30", "input_range_secondary": "B1:B30", "alternative_direction": null } },
+        "expect": { "action": "clarify", "reasonCode": "ambiguous_hypothesis_direction", "questionCount": 1 }
+      },
+      {
+        "id": "CP_004_black_scholes_asks_option_type",
+        "input": "price an option with strike 100, spot 105, 6 months, 25% vol, 3% risk-free",
+        "context": { "calcFamily": "black_scholes", "slots": { "option_type": null } },
+        "expect": { "action": "clarify", "reasonCode": "ambiguous_option_type", "questionCount": 1 }
+      },
+      {
+        "id": "CP_005_ci_uses_default_95",
+        "input": "confidence interval for A1:A50",
+        "context": { "calcFamily": "confidence_interval", "slots": { "input_range": "A1:A50", "confidence_level": null } },
+        "expect": { "action": "allow", "defaultApplied": { "confidence_level": 0.95 }, "notifyUser": true }
+      },
+      {
+        "id": "CP_006_high_confidence_no_ask",
+        "input": "average of A1:A100",
+        "context": { "matchConfidence": 0.98, "missingRequiredSlots": [], "criticalAmbiguousSlots": [] },
+        "expect": { "action": "allow" }
+      },
+      {
+        "id": "CP_007_multiple_families_disambiguate",
+        "input": "analyze the relationship between A and B columns",
+        "context": { "candidateFamilies": ["pearson_correlation", "simple_linear_regression", "spearman_correlation"], "metrics": { "scoreGap": 0.08 } },
+        "expect": { "action": "clarify", "reasonCode": "ambiguous_calc_family", "questionCount": 1 }
+      },
+      {
+        "id": "CP_008_missing_range_asks",
+        "input": "calculate the median",
+        "context": { "calcFamily": "median", "slots": { "input_range": null }, "context": { "hasSelection": false } },
+        "expect": { "action": "clarify", "reasonCode": "missing_input_range" }
+      },
+      {
+        "id": "CP_009_solver_asks_direction",
+        "input": "solve B2:B5 subject to C2 <= 100",
+        "context": { "calcFamily": "solver_linear", "slots": { "maximize_flag": null } },
+        "expect": { "action": "clarify", "reasonCode": "ambiguous_optimization_direction" }
+      },
+      {
+        "id": "CP_010_seasonal_asks_type",
+        "input": "decompose the monthly sales in A1:A60 with period 12",
+        "context": { "calcFamily": "seasonal_decomposition", "slots": { "decomposition_type": null } },
+        "expect": { "action": "clarify", "reasonCode": "ambiguous_decomposition_type" }
+      }
+    ]
+  }
+}

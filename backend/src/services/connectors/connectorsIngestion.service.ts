@@ -2,6 +2,7 @@ import { createHash } from "crypto";
 
 import prisma from "../../config/database";
 import { uploadFile } from "../../config/storage";
+import { splitTextIntoChunks } from "../ingestion/chunking.service";
 import vectorEmbeddingService from "../retrieval/vectorEmbedding.service";
 import type { ConnectorProvider } from "./connectorsRegistry";
 import { documentContentVault } from "../documents/documentContentVault.service";
@@ -103,6 +104,8 @@ export class ConnectorsIngestionService {
               mimeType: "text/plain",
               fileHash,
               status: "uploaded",
+              indexingState: "pending",
+              indexingUpdatedAt: new Date(),
               displayTitle: normalized.title,
               rawText: encryptDocumentText ? null : textContent,
               previewText: encryptDocumentText
@@ -242,7 +245,7 @@ export class ConnectorsIngestionService {
       // Queue unavailable: fallback to inline indexing.
     }
 
-    const chunks = splitIntoChunks(textContent, 1400, 120).map(
+    const chunks = splitTextIntoChunks(textContent).map(
       (content, idx) => ({
         chunkIndex: idx,
         content,
@@ -277,44 +280,6 @@ function deterministicDocumentId(
 
 function wordCount(input: string): number {
   return input.trim() ? input.trim().split(/\s+/).length : 0;
-}
-
-function splitIntoChunks(
-  text: string,
-  size: number,
-  overlap: number,
-): string[] {
-  const clean = text.trim();
-  if (!clean) return [];
-  if (clean.length <= size) return [clean];
-
-  const out: string[] = [];
-  let start = 0;
-
-  while (start < clean.length) {
-    let end = Math.min(clean.length, start + size);
-    if (end < clean.length) {
-      const paragraphBreak = clean.lastIndexOf("\n\n", end);
-      if (paragraphBreak > start + Math.floor(size * 0.5)) {
-        end = paragraphBreak;
-      } else {
-        const sentenceBreak = clean.lastIndexOf(". ", end);
-        if (sentenceBreak > start + Math.floor(size * 0.5)) {
-          end = sentenceBreak + 1;
-        }
-      }
-    }
-
-    const chunk = clean.slice(start, end).trim();
-    if (chunk) out.push(chunk);
-    if (end >= clean.length) break;
-
-    const nextStart = end - overlap;
-    if (nextStart <= start) break;
-    start = nextStart;
-  }
-
-  return out;
 }
 
 export default ConnectorsIngestionService;

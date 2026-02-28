@@ -261,6 +261,12 @@ function makeEngine(): RetrievalEngineService {
             domains: ["finance"],
             requireContextAny: ["aging", "vendor", "payable"],
             rewrites: [{ value: "accounts payable", weight: 1.3 }],
+            conditions: {
+              requireDomainMatch: true,
+              domains: ["finance"],
+              allowWhenExplicitDocIds: true,
+              allowWhenExplicitDocTypes: true,
+            },
           },
         ],
       };

@@ -131,8 +131,18 @@ describe("Certification: persistence restart integrity", () => {
     if (!conversationKeyWrapped) failures.push("CONVERSATION_KEY_NOT_WRAPPED");
 
     // 5. Pagination contract: deterministic ordering across restarts
+    const hasAscQueryOrder = /orderBy:\s*\{\s*createdAt:\s*["']asc["']/.test(
+      chatRepoSource,
+    );
+    const hasLatestWindowOrder =
+      /orderBy:\s*\{\s*createdAt:\s*fromLatest\s*\?\s*["']desc["']\s*:\s*["']asc["']/.test(
+        chatRepoSource,
+      ) &&
+      /orderedRows\s*=\s*fromLatest\s*\?\s*\[\.\.\.rows\]\.reverse\(\)\s*:\s*rows/.test(
+        chatRepoSource,
+      );
     const paginationDeterministic =
-      /orderBy:\s*\{\s*createdAt:\s*["']asc["']/.test(chatRepoSource) &&
+      (hasAscQueryOrder || hasLatestWindowOrder) &&
       /take\b/.test(chatRepoSource);
     if (!paginationDeterministic) failures.push("PAGINATION_NOT_DETERMINISTIC");
 

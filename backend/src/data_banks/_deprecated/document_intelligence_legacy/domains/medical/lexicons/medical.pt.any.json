@@ -1,0 +1,536 @@
+{
+  "_meta": {
+    "id": "legacy_medical_lexicon_pt",
+    "version": "2.0.0",
+    "description": "Portuguese medical lexicon for detection and extraction anchors.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "language": "pt"
+  },
+  "domain": "medical",
+  "terms": [
+    {
+      "id": "medical_lex_pt_001",
+      "canonical": "achado anormal",
+      "synonyms": [
+        "achado anormal",
+        "achado anormal section",
+        "achado anormal value"
+      ],
+      "display": "Achado Anormal",
+      "enRef": "medical_lex_en_001"
+    },
+    {
+      "id": "medical_lex_pt_002",
+      "canonical": "admissao",
+      "synonyms": [
+        "admissao",
+        "admissao section",
+        "admissao value"
+      ],
+      "display": "Admissao",
+      "enRef": "medical_lex_en_002"
+    },
+    {
+      "id": "medical_lex_pt_003",
+      "canonical": "alergia",
+      "synonyms": [
+        "alergia",
+        "alergia section",
+        "alergia value"
+      ],
+      "display": "Alergia",
+      "enRef": "medical_lex_en_003"
+    },
+    {
+      "id": "medical_lex_pt_004",
+      "canonical": "avaliacao",
+      "synonyms": [
+        "avaliacao",
+        "avaliacao section",
+        "avaliacao value"
+      ],
+      "display": "Avaliacao",
+      "enRef": "medical_lex_en_004"
+    },
+    {
+      "id": "medical_lex_pt_005",
+      "canonical": "atestacao",
+      "synonyms": [
+        "atestacao",
+        "atestacao section",
+        "atestacao value"
+      ],
+      "display": "Atestacao",
+      "enRef": "medical_lex_en_005"
+    },
+    {
+      "id": "medical_lex_pt_006",
+      "canonical": "pressao arterial",
+      "synonyms": [
+        "pressao arterial",
+        "pressao arterial section",
+        "pressao arterial value"
+      ],
+      "display": "Pressao Arterial",
+      "enRef": "medical_lex_en_006"
+    },
+    {
+      "id": "medical_lex_pt_007",
+      "canonical": "indice de massa corporal",
+      "synonyms": [
+        "indice de massa corporal",
+        "indice de massa corporal section",
+        "indice de massa corporal value"
+      ],
+      "display": "Indice De Massa Corporal",
+      "enRef": "medical_lex_en_007"
+    },
+    {
+      "id": "medical_lex_pt_008",
+      "canonical": "plano de cuidados",
+      "synonyms": [
+        "plano de cuidados",
+        "plano de cuidados section",
+        "plano de cuidados value"
+      ],
+      "display": "Plano De Cuidados",
+      "enRef": "medical_lex_en_008"
+    },
+    {
+      "id": "medical_lex_pt_009",
+      "canonical": "queixa principal",
+      "synonyms": [
+        "queixa principal",
+        "queixa principal section",
+        "queixa principal value"
+      ],
+      "display": "Queixa Principal",
+      "enRef": "medical_lex_en_009"
+    },
+    {
+      "id": "medical_lex_pt_010",
+      "canonical": "impressao clinica",
+      "synonyms": [
+        "impressao clinica",
+        "impressao clinica section",
+        "impressao clinica value"
+      ],
+      "display": "Impressao Clinica",
+      "enRef": "medical_lex_en_010"
+    },
+    {
+      "id": "medical_lex_pt_011",
+      "canonical": "consulta",
+      "synonyms": [
+        "consulta",
+        "consulta section",
+        "consulta value"
+      ],
+      "display": "Consulta",
+      "enRef": "medical_lex_en_011"
+    },
+    {
+      "id": "medical_lex_pt_012",
+      "canonical": "contraindicacao",
+      "synonyms": [
+        "contraindicacao",
+        "contraindicacao section",
+        "contraindicacao value"
+      ],
+      "display": "Contraindicacao",
+      "enRef": "medical_lex_en_012"
+    },
+    {
+      "id": "medical_lex_pt_013",
+      "canonical": "valor critico",
+      "synonyms": [
+        "valor critico",
+        "valor critico section",
+        "valor critico value"
+      ],
+      "display": "Valor Critico",
+      "enRef": "medical_lex_en_013"
+    },
+    {
+      "id": "medical_lex_pt_014",
+      "canonical": "diagnostico documentado",
+      "synonyms": [
+        "diagnostico documentado",
+        "diagnostico documentado section",
+        "diagnostico documentado value"
+      ],
+      "display": "Diagnostico Documentado",
+      "enRef": "medical_lex_en_014"
+    },
+    {
+      "id": "medical_lex_pt_015",
+      "canonical": "alta",
+      "synonyms": [
+        "alta",
+        "alta section",
+        "alta value"
+      ],
+      "display": "Alta",
+      "enRef": "medical_lex_en_015"
+    },
+    {
+      "id": "medical_lex_pt_016",
+      "canonical": "dose",
+      "synonyms": [
+        "dose",
+        "dose section",
+        "dose value"
+      ],
+      "display": "Dose",
+      "enRef": "medical_lex_en_016"
+    },
+    {
+      "id": "medical_lex_pt_017",
+      "canonical": "eletrocardiograma",
+      "synonyms": [
+        "eletrocardiograma",
+        "eletrocardiograma section",
+        "eletrocardiograma value"
+      ],
+      "display": "Eletrocardiograma",
+      "enRef": "medical_lex_en_017"
+    },
+    {
+      "id": "medical_lex_pt_018",
+      "canonical": "atendimento",
+      "synonyms": [
+        "atendimento",
+        "atendimento section",
+        "atendimento value"
+      ],
+      "display": "Atendimento",
+      "enRef": "medical_lex_en_018"
+    },
+    {
+      "id": "medical_lex_pt_019",
+      "canonical": "acompanhamento",
+      "synonyms": [
+        "acompanhamento",
+        "acompanhamento section",
+        "acompanhamento value"
+      ],
+      "display": "Acompanhamento",
+      "enRef": "medical_lex_en_019"
+    },
+    {
+      "id": "medical_lex_pt_020",
+      "canonical": "frequencia cardiaca",
+      "synonyms": [
+        "frequencia cardiaca",
+        "frequencia cardiaca section",
+        "frequencia cardiaca value"
+      ],
+      "display": "Frequencia Cardiaca",
+      "enRef": "medical_lex_en_020"
+    },
+    {
+      "id": "medical_lex_pt_021",
+      "canonical": "historia da doenca atual",
+      "synonyms": [
+        "historia da doenca atual",
+        "historia da doenca atual section",
+        "historia da doenca atual value"
+      ],
+      "display": "Historia Da Doenca Atual",
+      "enRef": "medical_lex_en_021"
+    },
+    {
+      "id": "medical_lex_pt_022",
+      "canonical": "imagem",
+      "synonyms": [
+        "imagem",
+        "imagem section",
+        "imagem value"
+      ],
+      "display": "Imagem",
+      "enRef": "medical_lex_en_022"
+    },
+    {
+      "id": "medical_lex_pt_023",
+      "canonical": "imunizacao",
+      "synonyms": [
+        "imunizacao",
+        "imunizacao section",
+        "imunizacao value"
+      ],
+      "display": "Imunizacao",
+      "enRef": "medical_lex_en_023"
+    },
+    {
+      "id": "medical_lex_pt_024",
+      "canonical": "impressao",
+      "synonyms": [
+        "impressao",
+        "impressao section",
+        "impressao value"
+      ],
+      "display": "Impressao",
+      "enRef": "medical_lex_en_024"
+    },
+    {
+      "id": "medical_lex_pt_025",
+      "canonical": "resultado laboratorial",
+      "synonyms": [
+        "resultado laboratorial",
+        "resultado laboratorial section",
+        "resultado laboratorial value"
+      ],
+      "display": "Resultado Laboratorial",
+      "enRef": "medical_lex_en_025"
+    },
+    {
+      "id": "medical_lex_pt_026",
+      "canonical": "medicacao",
+      "synonyms": [
+        "medicacao",
+        "medicacao section",
+        "medicacao value"
+      ],
+      "display": "Medicacao",
+      "enRef": "medical_lex_en_026"
+    },
+    {
+      "id": "medical_lex_pt_027",
+      "canonical": "nota",
+      "synonyms": [
+        "nota",
+        "nota section",
+        "nota value"
+      ],
+      "display": "Nota",
+      "enRef": "medical_lex_en_027"
+    },
+    {
+      "id": "medical_lex_pt_028",
+      "canonical": "achados objetivos",
+      "synonyms": [
+        "achados objetivos",
+        "achados objetivos section",
+        "achados objetivos value"
+      ],
+      "display": "Achados Objetivos",
+      "enRef": "medical_lex_en_028"
+    },
+    {
+      "id": "medical_lex_pt_029",
+      "canonical": "saturacao de oxigenio",
+      "synonyms": [
+        "saturacao de oxigenio",
+        "saturacao de oxigenio section",
+        "saturacao de oxigenio value"
+      ],
+      "display": "Saturacao De Oxigenio",
+      "enRef": "medical_lex_en_029"
+    },
+    {
+      "id": "medical_lex_pt_030",
+      "canonical": "patologia",
+      "synonyms": [
+        "patologia",
+        "patologia section",
+        "patologia value"
+      ],
+      "display": "Patologia",
+      "enRef": "medical_lex_en_030"
+    },
+    {
+      "id": "medical_lex_pt_031",
+      "canonical": "plano",
+      "synonyms": [
+        "plano",
+        "plano section",
+        "plano value"
+      ],
+      "display": "Plano",
+      "enRef": "medical_lex_en_031"
+    },
+    {
+      "id": "medical_lex_pt_032",
+      "canonical": "prescricao",
+      "synonyms": [
+        "prescricao",
+        "prescricao section",
+        "prescricao value"
+      ],
+      "display": "Prescricao",
+      "enRef": "medical_lex_en_032"
+    },
+    {
+      "id": "medical_lex_pt_033",
+      "canonical": "lista de problemas",
+      "synonyms": [
+        "lista de problemas",
+        "lista de problemas section",
+        "lista de problemas value"
+      ],
+      "display": "Lista De Problemas",
+      "enRef": "medical_lex_en_033"
+    },
+    {
+      "id": "medical_lex_pt_034",
+      "canonical": "nota de evolucao",
+      "synonyms": [
+        "nota de evolucao",
+        "nota de evolucao section",
+        "nota de evolucao value"
+      ],
+      "display": "Nota De Evolucao",
+      "enRef": "medical_lex_en_034"
+    },
+    {
+      "id": "medical_lex_pt_035",
+      "canonical": "radiologia",
+      "synonyms": [
+        "radiologia",
+        "radiologia section",
+        "radiologia value"
+      ],
+      "display": "Radiologia",
+      "enRef": "medical_lex_en_035"
+    },
+    {
+      "id": "medical_lex_pt_036",
+      "canonical": "intervalo de referencia",
+      "synonyms": [
+        "intervalo de referencia",
+        "intervalo de referencia section",
+        "intervalo de referencia value"
+      ],
+      "display": "Intervalo De Referencia",
+      "enRef": "medical_lex_en_036"
+    },
+    {
+      "id": "medical_lex_pt_037",
+      "canonical": "encaminhamento",
+      "synonyms": [
+        "encaminhamento",
+        "encaminhamento section",
+        "encaminhamento value"
+      ],
+      "display": "Encaminhamento",
+      "enRef": "medical_lex_en_037"
+    },
+    {
+      "id": "medical_lex_pt_038",
+      "canonical": "frequencia respiratoria",
+      "synonyms": [
+        "frequencia respiratoria",
+        "frequencia respiratoria section",
+        "frequencia respiratoria value"
+      ],
+      "display": "Frequencia Respiratoria",
+      "enRef": "medical_lex_en_038"
+    },
+    {
+      "id": "medical_lex_pt_039",
+      "canonical": "via de administracao",
+      "synonyms": [
+        "via de administracao",
+        "via de administracao section",
+        "via de administracao value"
+      ],
+      "display": "Via De Administracao",
+      "enRef": "medical_lex_en_039"
+    },
+    {
+      "id": "medical_lex_pt_040",
+      "canonical": "gravidade",
+      "synonyms": [
+        "gravidade",
+        "gravidade section",
+        "gravidade value"
+      ],
+      "display": "Gravidade",
+      "enRef": "medical_lex_en_040"
+    },
+    {
+      "id": "medical_lex_pt_041",
+      "canonical": "assinatura",
+      "synonyms": [
+        "assinatura",
+        "assinatura section",
+        "assinatura value"
+      ],
+      "display": "Assinatura",
+      "enRef": "medical_lex_en_041"
+    },
+    {
+      "id": "medical_lex_pt_042",
+      "canonical": "soap",
+      "synonyms": [
+        "soap",
+        "soap section",
+        "soap value"
+      ],
+      "display": "Soap",
+      "enRef": "medical_lex_en_042"
+    },
+    {
+      "id": "medical_lex_pt_043",
+      "canonical": "amostra",
+      "synonyms": [
+        "amostra",
+        "amostra section",
+        "amostra value"
+      ],
+      "display": "Amostra",
+      "enRef": "medical_lex_en_043"
+    },
+    {
+      "id": "medical_lex_pt_044",
+      "canonical": "temperatura",
+      "synonyms": [
+        "temperatura",
+        "temperatura section",
+        "temperatura value"
+      ],
+      "display": "Temperatura",
+      "enRef": "medical_lex_en_044"
+    },
+    {
+      "id": "medical_lex_pt_045",
+      "canonical": "triagem",
+      "synonyms": [
+        "triagem",
+        "triagem section",
+        "triagem value"
+      ],
+      "display": "Triagem",
+      "enRef": "medical_lex_en_045"
+    },
+    {
+      "id": "medical_lex_pt_046",
+      "canonical": "unidade",
+      "synonyms": [
+        "unidade",
+        "unidade section",
+        "unidade value"
+      ],
+      "display": "Unidade",
+      "enRef": "medical_lex_en_046"
+    },
+    {
+      "id": "medical_lex_pt_047",
+      "canonical": "sinais vitais",
+      "synonyms": [
+        "sinais vitais",
+        "sinais vitais section",
+        "sinais vitais value"
+      ],
+      "display": "Sinais Vitais",
+      "enRef": "medical_lex_en_047"
+    }
+  ]
+}
