@@ -1,10 +1,10 @@
 {
   "_meta": {
     "id": "intent_patterns_docx_en",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "description": "English intent patterns for DOCX editing operations.",
     "domain": "docx",
-    "lastUpdated": "2026-02-12",
+    "lastUpdated": "2026-02-27",
     "languages": [
       "en"
     ]
@@ -19,66 +19,19 @@
       "lang": "en",
       "priority": 75,
       "triggers": {
-        "tokens_any": [
-          "rewrite",
-          "rephrase",
-          "reword",
-          "polish",
-          "improve",
-          "refine"
-        ],
-        "tokens_none": [
-          "bullets",
-          "numbering",
-          "numbered list",
-          "bullet list",
-          "merge",
-          "split",
-          "combine",
-          "heading",
-          "bold",
-          "italic",
-          "underline",
-          "align",
-          "indent",
-          "translate"
-        ],
+        "tokens_any": ["rewrite", "rephrase", "reword", "polish", "improve", "refine"],
+        "tokens_none": ["bullets", "numbering", "numbered list", "bullet list", "merge", "split", "combine", "heading", "bold", "italic", "underline", "align", "indent", "translate", "convert", "transform", "insert", "delete", "remove", "table of contents", "TOC", "summary"],
         "regex_any": [
           "\\b(?:rewrite|rephrase|reword|polish|improve|refine)\\b.*\\b(?:this|the|selected|paragraph|text|sentence)\\b",
           "\\b(?:make|write)\\b.*\\b(?:better|clearer|nicer|smoother)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$target",
-          "tone": "neutral"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_REWRITE_PARAGRAPH", "targetId": "$target", "tone": "neutral"}],
       "examples": {
-        "positive": [
-          "Rewrite this paragraph",
-          "Rephrase the selected text",
-          "Polish this sentence",
-          "Improve this paragraph",
-          "Reword the introduction"
-        ],
-        "negative": [
-          "Delete this paragraph",
-          "Translate this paragraph to Spanish",
-          "Make this bold"
-        ]
+        "positive": ["Rewrite this paragraph", "Rephrase the selected text", "Polish this sentence", "Improve this paragraph", "Reword the introduction"],
+        "negative": ["Delete this paragraph", "Translate this paragraph to Spanish", "Make this bold"]
       }
     },
     {
@@ -87,42 +40,19 @@
       "lang": "en",
       "priority": 80,
       "triggers": {
+        "tokens_none": ["convert", "transform", "merge", "split", "insert", "delete", "remove", "table of contents", "TOC", "summary"],
         "regex_any": [
           "\\b(?:make|rewrite|rephrase)\\b.*\\b(?:formal|professional|business-like|businesslike)\\b",
           "\\bmore\\s+(?:formal|professional)\\b",
           "\\bformali[sz]e\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$target",
-          "tone": "formal"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_REWRITE_PARAGRAPH", "targetId": "$target", "tone": "formal"}],
       "examples": {
-        "positive": [
-          "Make this more formal",
-          "Rewrite in a professional tone",
-          "Make the paragraph more professional",
-          "Formalize this text"
-        ],
-        "negative": [
-          "Make this more casual",
-          "Shorten this paragraph",
-          "Bold this text"
-        ]
+        "positive": ["Make this more formal", "Rewrite in a professional tone", "Make the paragraph more professional", "Formalize this text"],
+        "negative": ["Make this more casual", "Shorten this paragraph", "Bold this text"]
       }
     },
     {
@@ -131,49 +61,19 @@
       "lang": "en",
       "priority": 80,
       "triggers": {
-        "tokens_any": [
-          "shorten",
-          "concise",
-          "trim",
-          "tighten",
-          "condense",
-          "brevity"
-        ],
+        "tokens_any": ["shorten", "concise", "trim", "tighten", "condense", "brevity"],
+        "tokens_none": ["convert", "transform", "merge", "split", "insert", "delete", "remove", "table of contents", "TOC", "summary"],
         "regex_any": [
           "\\b(?:make|rewrite)\\b.*\\b(?:concise|shorter|brief|succinct|tighter)\\b",
           "\\b(?:shorten|trim|tighten|condense)\\b.*\\b(?:this|the|paragraph|text|sentence)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$target",
-          "tone": "concise"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_REWRITE_PARAGRAPH", "targetId": "$target", "tone": "concise"}],
       "examples": {
-        "positive": [
-          "Make this more concise",
-          "Shorten this paragraph",
-          "Trim the selected text",
-          "Tighten up this section"
-        ],
-        "negative": [
-          "Expand this paragraph",
-          "Add more detail",
-          "Rewrite in formal tone"
-        ]
+        "positive": ["Make this more concise", "Shorten this paragraph", "Trim the selected text", "Tighten up this section"],
+        "negative": ["Expand this paragraph", "Add more detail", "Rewrite in formal tone"]
       }
     },
     {
@@ -182,50 +82,20 @@
       "lang": "en",
       "priority": 80,
       "triggers": {
-        "tokens_any": [
-          "expand",
-          "elaborate",
-          "flesh",
-          "lengthen",
-          "extend"
-        ],
+        "tokens_any": ["expand", "elaborate", "flesh", "lengthen", "extend"],
+        "tokens_none": ["convert", "transform", "merge", "split", "insert", "delete", "remove", "table of contents", "TOC", "summary"],
         "regex_any": [
           "\\b(?:expand|elaborate|lengthen|extend)\\b.*\\b(?:this|the|paragraph|text|on)\\b",
           "\\b(?:add|more)\\b.*\\b(?:detail|details|depth|context)\\b",
           "\\bflesh\\s+out\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$target",
-          "tone": "expanded"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_REWRITE_PARAGRAPH", "targetId": "$target", "tone": "expanded"}],
       "examples": {
-        "positive": [
-          "Expand this paragraph",
-          "Elaborate on this point",
-          "Add more detail to the introduction",
-          "Flesh out this section",
-          "Lengthen this text"
-        ],
-        "negative": [
-          "Shorten this paragraph",
-          "Make this concise",
-          "Delete this paragraph"
-        ]
+        "positive": ["Expand this paragraph", "Elaborate on this point", "Add more detail to the introduction", "Flesh out this section", "Lengthen this text"],
+        "negative": ["Shorten this paragraph", "Make this concise", "Delete this paragraph"]
       }
     },
     {
@@ -241,57 +111,19 @@
         ]
       },
       "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "findText",
-          "regex": "(?:replace|change|swap)\\s+[\"']([^\"']+)[\"']"
-        },
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "replaceText",
-          "regex": "(?:with|by|to)\\s+[\"']([^\"']+)[\"']"
-        }
+        {"type": "LOCATOR_TEXT", "out": "target"},
+        {"type": "LOCATOR_TEXT", "out": "findText", "regex": "(?:replace|change|swap)\\s+[\"']([^\"']+)[\"']"},
+        {"type": "LOCATOR_TEXT", "out": "replaceText", "regex": "(?:with|by|to)\\s+[\"']([^\"']+)[\"']"}
       ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_REPLACE_SPAN",
-          "targetId": "$target",
-          "findText": "$findText",
-          "afterText": "$replaceText"
-        }
-      ],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_REPLACE_SPAN", "targetId": "$target", "findText": "$findText", "afterText": "$replaceText"}],
       "clarifyIfMissing": [
-        {
-          "slot": "findText",
-          "ask_en": "What text should I replace?",
-          "ask_pt": "Qual texto devo substituir?"
-        },
-        {
-          "slot": "replaceText",
-          "ask_en": "What should I replace it with?",
-          "ask_pt": "Com o que devo substituir?"
-        }
+        {"slot": "findText", "ask_en": "What text should I replace?", "ask_pt": "Qual texto devo substituir?"},
+        {"slot": "replaceText", "ask_en": "What should I replace it with?", "ask_pt": "Com o que devo substituir?"}
       ],
       "examples": {
-        "positive": [
-          "Replace \"old text\" with \"new text\"",
-          "Change \"hello\" to \"goodbye\" in this paragraph",
-          "Swap \"draft\" with \"final\""
-        ],
-        "negative": [
-          "Find and replace all occurrences",
-          "Rewrite this paragraph",
-          "Delete this text"
-        ]
+        "positive": ["Replace \"old text\" with \"new text\"", "Change \"hello\" to \"goodbye\" in this paragraph", "Swap \"draft\" with \"final\""],
+        "negative": ["Find and replace all occurrences", "Rewrite this paragraph", "Delete this text"]
       }
     },
     {
@@ -300,40 +132,19 @@
       "lang": "en",
       "priority": 78,
       "triggers": {
+        "tokens_none": ["convert", "transform", "merge", "split", "insert", "delete", "remove", "table of contents", "TOC", "summary"],
         "regex_any": [
           "\\b(?:rewrite|rephrase|redo|revise)\\b.*\\b(?:section|chapter|part)\\b",
           "\\b(?:section|chapter|part)\\b.*\\b(?:rewrite|rephrase|redo|revise)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "sectionId"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "section",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_REWRITE_SECTION",
-          "sectionId": "$sectionId"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "sectionId"}],
+      "scopeRules": {"defaultScope": "section", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "resolverHints": {"naturalTargets": ["this heading", "the introduction", "section 4", "the title", "the conclusion", "all headings"], "ambiguityAction": "clarify"},
+      "planTemplate": [{"op": "DOCX_REWRITE_SECTION", "sectionId": "$sectionId"}],
       "examples": {
-        "positive": [
-          "Rewrite the entire section",
-          "Rephrase this section",
-          "Redo the introduction section",
-          "Revise the conclusion section"
-        ],
-        "negative": [
-          "Rewrite this paragraph",
-          "Delete this section",
-          "Translate this section"
-        ]
+        "positive": ["Rewrite the entire section", "Rephrase this section", "Redo the introduction section", "Revise the conclusion section"],
+        "negative": ["Rewrite this paragraph", "Delete this section", "Translate this section"]
       }
     },
     {
@@ -342,11 +153,7 @@
       "lang": "en",
       "priority": 85,
       "triggers": {
-        "tokens_any": [
-          "find",
-          "replace",
-          "substitute"
-        ],
+        "tokens_any": ["find", "replace", "substitute"],
         "regex_any": [
           "\\bfind\\b.*\\breplace\\b",
           "\\breplace\\s+all\\b",
@@ -355,55 +162,18 @@
         ]
       },
       "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "findText",
-          "regex": "(?:find|replace|substitute)\\s+[\"']([^\"']+)[\"']"
-        },
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "replaceText",
-          "regex": "(?:with|by|to)\\s+[\"']([^\"']+)[\"']"
-        }
+        {"type": "LOCATOR_TEXT", "out": "findText", "regex": "(?:find|replace|substitute)\\s+[\"']([^\"']+)[\"']"},
+        {"type": "LOCATOR_TEXT", "out": "replaceText", "regex": "(?:with|by|to)\\s+[\"']([^\"']+)[\"']"}
       ],
-      "scopeRules": {
-        "defaultScope": "document",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_FIND_REPLACE",
-          "findText": "$findText",
-          "replaceText": "$replaceText",
-          "caseSensitive": false,
-          "scope": "document"
-        }
-      ],
+      "scopeRules": {"defaultScope": "document", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_FIND_REPLACE", "findText": "$findText", "replaceText": "$replaceText", "caseSensitive": false, "scope": "document"}],
       "clarifyIfMissing": [
-        {
-          "slot": "findText",
-          "ask_en": "What text should I find?",
-          "ask_pt": "Qual texto devo procurar?"
-        },
-        {
-          "slot": "replaceText",
-          "ask_en": "What should I replace it with?",
-          "ask_pt": "Com o que devo substituir?"
-        }
+        {"slot": "findText", "ask_en": "What text should I find?", "ask_pt": "Qual texto devo procurar?"},
+        {"slot": "replaceText", "ask_en": "What should I replace it with?", "ask_pt": "Com o que devo substituir?"}
       ],
       "examples": {
-        "positive": [
-          "Find and replace \"draft\" with \"final\"",
-          "Replace all occurrences of \"foo\" with \"bar\"",
-          "Substitute \"old name\" with \"new name\"",
-          "Find \"error\" and replace with \"correction\""
-        ],
-        "negative": [
-          "Replace this specific paragraph",
-          "Rewrite the introduction",
-          "Find the word count"
-        ]
+        "positive": ["Find and replace \"draft\" with \"final\"", "Replace all occurrences of \"foo\" with \"bar\"", "Substitute \"old name\" with \"new name\"", "Find \"error\" and replace with \"correction\""],
+        "negative": ["Replace this specific paragraph", "Rewrite the introduction", "Find the word count"]
       }
     },
     {
@@ -420,54 +190,18 @@
         ]
       },
       "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "findText",
-          "regex": "(?:find|replace)\\s+[\"']([^\"']+)[\"']"
-        },
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "replaceText",
-          "regex": "(?:with|by|to)\\s+[\"']([^\"']+)[\"']"
-        }
+        {"type": "LOCATOR_TEXT", "out": "findText", "regex": "(?:find|replace)\\s+[\"']([^\"']+)[\"']"},
+        {"type": "LOCATOR_TEXT", "out": "replaceText", "regex": "(?:with|by|to)\\s+[\"']([^\"']+)[\"']"}
       ],
-      "scopeRules": {
-        "defaultScope": "document",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_FIND_REPLACE",
-          "findText": "$findText",
-          "replaceText": "$replaceText",
-          "caseSensitive": true,
-          "scope": "document"
-        }
-      ],
+      "scopeRules": {"defaultScope": "document", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_FIND_REPLACE", "findText": "$findText", "replaceText": "$replaceText", "caseSensitive": true, "scope": "document"}],
       "clarifyIfMissing": [
-        {
-          "slot": "findText",
-          "ask_en": "What text should I find (case-sensitive)?",
-          "ask_pt": "Qual texto devo procurar (sensivel a maiusculas)?"
-        },
-        {
-          "slot": "replaceText",
-          "ask_en": "What should I replace it with?",
-          "ask_pt": "Com o que devo substituir?"
-        }
+        {"slot": "findText", "ask_en": "What text should I find (case-sensitive)?", "ask_pt": "Qual texto devo procurar (sensivel a maiusculas)?"},
+        {"slot": "replaceText", "ask_en": "What should I replace it with?", "ask_pt": "Com o que devo substituir?"}
       ],
       "examples": {
-        "positive": [
-          "Case sensitive find and replace \"Name\" with \"FullName\"",
-          "Replace \"ID\" with \"Identifier\" matching exact case",
-          "Find and replace \"API\" with \"Interface\" case sensitive"
-        ],
-        "negative": [
-          "Find and replace all occurrences",
-          "Replace \"hello\" with \"hi\"",
-          "Rewrite the paragraph"
-        ]
+        "positive": ["Case sensitive find and replace \"Name\" with \"FullName\"", "Replace \"ID\" with \"Identifier\" matching exact case", "Find and replace \"API\" with \"Interface\" case sensitive"],
+        "negative": ["Find and replace all occurrences", "Replace \"hello\" with \"hi\"", "Rewrite the paragraph"]
       }
     },
     {
@@ -481,49 +215,13 @@
           "\\b(?:this|the|selected|paragraph|section)\\b.*\\btranslate\\b.*\\b(?:to|into)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "LANGUAGE",
-          "out": "targetLanguage"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_TRANSLATE_SCOPE",
-          "targets": [
-            "$target"
-          ],
-          "targetLanguage": "$targetLanguage"
-        }
-      ],
-      "clarifyIfMissing": [
-        {
-          "slot": "targetLanguage",
-          "ask_en": "What language should I translate to?",
-          "ask_pt": "Para qual idioma devo traduzir?"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "LANGUAGE", "out": "targetLanguage"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_TRANSLATE_SCOPE", "targets": ["$target"], "targetLanguage": "$targetLanguage"}],
+      "clarifyIfMissing": [{"slot": "targetLanguage", "ask_en": "What language should I translate to?", "ask_pt": "Para qual idioma devo traduzir?"}],
       "examples": {
-        "positive": [
-          "Translate this paragraph to Spanish",
-          "Translate the selected text into French",
-          "Translate this section to German",
-          "Convert this paragraph to Portuguese"
-        ],
-        "negative": [
-          "Translate the entire document",
-          "Translate the whole file",
-          "Rewrite this in formal tone"
-        ]
+        "positive": ["Translate this paragraph to Spanish", "Translate the selected text into French", "Translate this section to German", "Convert this paragraph to Portuguese"],
+        "negative": ["Translate the entire document", "Translate the whole file", "Rewrite this in formal tone"]
       }
     },
     {
@@ -537,45 +235,13 @@
           "\\btranslate\\b.*\\b(?:document|file|doc|everything)\\b.*\\b(?:to|into)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LANGUAGE",
-          "out": "targetLanguage"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "document",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_TRANSLATE_SCOPE",
-          "targets": [
-            "__all__"
-          ],
-          "targetLanguage": "$targetLanguage"
-        }
-      ],
-      "clarifyIfMissing": [
-        {
-          "slot": "targetLanguage",
-          "ask_en": "What language should I translate the document to?",
-          "ask_pt": "Para qual idioma devo traduzir o documento?"
-        }
-      ],
+      "slotExtractors": [{"type": "LANGUAGE", "out": "targetLanguage"}],
+      "scopeRules": {"defaultScope": "document", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_TRANSLATE_SCOPE", "targets": ["__all__"], "targetLanguage": "$targetLanguage"}],
+      "clarifyIfMissing": [{"slot": "targetLanguage", "ask_en": "What language should I translate the document to?", "ask_pt": "Para qual idioma devo traduzir o documento?"}],
       "examples": {
-        "positive": [
-          "Translate the entire document to Spanish",
-          "Translate the whole file into French",
-          "Translate everything to Portuguese",
-          "Translate this document to German"
-        ],
-        "negative": [
-          "Translate this paragraph to Spanish",
-          "Translate the selected text",
-          "Rewrite the document"
-        ]
+        "positive": ["Translate the entire document to Spanish", "Translate the whole file into French", "Translate everything to Portuguese", "Translate this document to German"],
+        "negative": ["Translate this paragraph to Spanish", "Translate the selected text", "Rewrite the document"]
       }
     },
     {
@@ -584,48 +250,16 @@
       "lang": "en",
       "priority": 75,
       "triggers": {
-        "tokens_any": [
-          "bold"
-        ],
-        "regex_any": [
-          "\\b(?:make|set|apply)\\b.*\\bbold\\b",
-          "\\bbold\\b.*\\b(?:this|the|selected|text|paragraph|word)\\b"
-        ]
+        "tokens_any": ["bold"],
+        "tokens_none": ["convert", "transform", "merge", "split", "rewrite", "rephrase", "bullets", "numbering"],
+        "regex_any": ["\\b(?:make|set|apply)\\b.*\\bbold\\b", "\\bbold\\b.*\\b(?:this|the|selected|text|paragraph|word)\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_RUN_STYLE",
-          "targets": [
-            "$target"
-          ],
-          "style": {
-            "bold": true
-          }
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_SET_RUN_STYLE", "targets": ["$target"], "style": {"bold": true}}],
       "examples": {
-        "positive": [
-          "Make this bold",
-          "Bold the selected text",
-          "Apply bold to this paragraph",
-          "Make the title bold"
-        ],
-        "negative": [
-          "Remove bold",
-          "Make this italic",
-          "Set value to bold text"
-        ]
+        "positive": ["Make this bold", "Bold the selected text", "Apply bold to this paragraph", "Make the title bold"],
+        "negative": ["Remove bold", "Make this italic", "Set value to bold text"]
       }
     },
     {
@@ -634,51 +268,16 @@
       "lang": "en",
       "priority": 75,
       "triggers": {
-        "tokens_any": [
-          "italic",
-          "italicize",
-          "italicise"
-        ],
-        "regex_any": [
-          "\\b(?:make|set|apply)\\b.*\\bitalic\\b",
-          "\\bitalici[sz]e\\b",
-          "\\bitalic\\b.*\\b(?:this|the|selected|text)\\b"
-        ]
+        "tokens_any": ["italic", "italicize", "italicise"],
+        "tokens_none": ["convert", "transform", "merge", "split", "rewrite", "rephrase", "bullets", "numbering"],
+        "regex_any": ["\\b(?:make|set|apply)\\b.*\\bitalic\\b", "\\bitalici[sz]e\\b", "\\bitalic\\b.*\\b(?:this|the|selected|text)\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_RUN_STYLE",
-          "targets": [
-            "$target"
-          ],
-          "style": {
-            "italic": true
-          }
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_SET_RUN_STYLE", "targets": ["$target"], "style": {"italic": true}}],
       "examples": {
-        "positive": [
-          "Make this italic",
-          "Italicize the selected text",
-          "Apply italic to the title",
-          "Italic this word"
-        ],
-        "negative": [
-          "Make this bold",
-          "Remove italic",
-          "Underline this text"
-        ]
+        "positive": ["Make this italic", "Italicize the selected text", "Apply italic to the title", "Italic this word"],
+        "negative": ["Make this bold", "Remove italic", "Underline this text"]
       }
     },
     {
@@ -687,48 +286,16 @@
       "lang": "en",
       "priority": 75,
       "triggers": {
-        "tokens_any": [
-          "underline"
-        ],
-        "regex_any": [
-          "\\b(?:make|set|apply)\\b.*\\bunderline\\b",
-          "\\bunderline\\b.*\\b(?:this|the|selected|text|paragraph)\\b"
-        ]
+        "tokens_any": ["underline"],
+        "tokens_none": ["convert", "transform", "merge", "split", "rewrite", "rephrase", "bullets", "numbering"],
+        "regex_any": ["\\b(?:make|set|apply)\\b.*\\bunderline\\b", "\\bunderline\\b.*\\b(?:this|the|selected|text|paragraph)\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_RUN_STYLE",
-          "targets": [
-            "$target"
-          ],
-          "style": {
-            "underline": true
-          }
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_SET_RUN_STYLE", "targets": ["$target"], "style": {"underline": true}}],
       "examples": {
-        "positive": [
-          "Underline this text",
-          "Apply underline to the heading",
-          "Make this underlined",
-          "Underline the selected paragraph"
-        ],
-        "negative": [
-          "Remove underline",
-          "Make this bold",
-          "Strikethrough this text"
-        ]
+        "positive": ["Underline this text", "Apply underline to the heading", "Make this underlined", "Underline the selected paragraph"],
+        "negative": ["Remove underline", "Make this bold", "Strikethrough this text"]
       }
     },
     {
@@ -737,62 +304,21 @@
       "lang": "en",
       "priority": 76,
       "triggers": {
-        "tokens_any": [
-          "color",
-          "colour"
-        ],
+        "tokens_any": ["color", "colour"],
+        "tokens_none": ["convert", "transform", "merge", "split", "rewrite", "rephrase", "bullets", "numbering"],
         "regex_any": [
           "\\b(?:make|set|change|apply)\\b.*\\b(?:color|colour|font color)\\b",
           "\\b(?:color|colour)\\b.*\\b(?:to|red|blue|green|black|white|orange|purple|yellow)\\b",
           "\\b(?:make|turn|change)\\b.*\\b(?:red|blue|green|black|white|orange|purple|yellow)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "COLOR",
-          "out": "color",
-          "dictionary": "colors_en"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_RUN_STYLE",
-          "targets": [
-            "$target"
-          ],
-          "style": {
-            "color": "$color"
-          }
-        }
-      ],
-      "clarifyIfMissing": [
-        {
-          "slot": "color",
-          "ask_en": "What color should I apply to the text?",
-          "ask_pt": "Qual cor devo aplicar ao texto?"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "COLOR", "out": "color", "dictionary": "colors_en"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_SET_RUN_STYLE", "targets": ["$target"], "style": {"color": "$color"}}],
+      "clarifyIfMissing": [{"slot": "color", "ask_en": "What color should I apply to the text?", "ask_pt": "Qual cor devo aplicar ao texto?"}],
       "examples": {
-        "positive": [
-          "Change the text color to red",
-          "Make this paragraph blue",
-          "Set font color to green",
-          "Turn the heading purple"
-        ],
-        "negative": [
-          "Change the background color",
-          "Apply color scale formatting",
-          "Make this bold"
-        ]
+        "positive": ["Change the text color to red", "Make this paragraph blue", "Set font color to green", "Turn the heading purple"],
+        "negative": ["Change the background color", "Apply color scale formatting", "Make this bold"]
       }
     },
     {
@@ -801,61 +327,21 @@
       "lang": "en",
       "priority": 76,
       "triggers": {
-        "tokens_any": [
-          "font"
-        ],
+        "tokens_any": ["font"],
+        "tokens_none": ["convert", "transform", "merge", "split", "rewrite", "rephrase", "bullets", "numbering"],
         "regex_any": [
           "\\b(?:change|set|apply|use|switch)\\b.*\\bfont\\b",
           "\\bfont\\b.*\\b(?:to|family)\\b",
           "\\b(?:use|switch to|change to)\\b.*\\b(?:Arial|Calibri|Times|Helvetica|Georgia|Verdana|Garamond|Courier)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "FONT_FAMILY",
-          "out": "fontFamily",
-          "dictionary": "fonts"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_RUN_STYLE",
-          "targets": [
-            "$target"
-          ],
-          "style": {
-            "fontFamily": "$fontFamily"
-          }
-        }
-      ],
-      "clarifyIfMissing": [
-        {
-          "slot": "fontFamily",
-          "ask_en": "Which font should I apply?",
-          "ask_pt": "Qual fonte devo aplicar?"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "FONT_FAMILY", "out": "fontFamily", "dictionary": "fonts"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_SET_RUN_STYLE", "targets": ["$target"], "style": {"fontFamily": "$fontFamily"}}],
+      "clarifyIfMissing": [{"slot": "fontFamily", "ask_en": "Which font should I apply?", "ask_pt": "Qual fonte devo aplicar?"}],
       "examples": {
-        "positive": [
-          "Change font to Arial",
-          "Set the font to Calibri",
-          "Use Times New Roman for this paragraph",
-          "Switch to Helvetica"
-        ],
-        "negative": [
-          "Change font color to red",
-          "Change font size to 14",
-          "Make this bold"
-        ]
+        "positive": ["Change font to Arial", "Set the font to Calibri", "Use Times New Roman for this paragraph", "Switch to Helvetica"],
+        "negative": ["Change font color to red", "Change font size to 14", "Make this bold"]
       }
     },
     {
@@ -864,9 +350,8 @@
       "lang": "en",
       "priority": 76,
       "triggers": {
-        "tokens_any": [
-          "size"
-        ],
+        "tokens_any": ["size"],
+        "tokens_none": ["convert", "transform", "merge", "split", "rewrite", "rephrase", "bullets", "numbering"],
         "regex_any": [
           "\\b(?:change|set|increase|decrease|make)\\b.*\\b(?:font\\s*size|text\\s*size|size)\\b",
           "\\bfont\\s*size\\b.*\\b(?:to|=)\\b",
@@ -874,51 +359,13 @@
           "\\b\\d+\\s*(?:pt|point|points)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "FONT_SIZE",
-          "out": "fontSize"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_RUN_STYLE",
-          "targets": [
-            "$target"
-          ],
-          "style": {
-            "fontSizePt": "$fontSize"
-          }
-        }
-      ],
-      "clarifyIfMissing": [
-        {
-          "slot": "fontSize",
-          "ask_en": "What font size should I set (in points)?",
-          "ask_pt": "Qual tamanho de fonte devo definir (em pontos)?"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "FONT_SIZE", "out": "fontSize"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_SET_RUN_STYLE", "targets": ["$target"], "style": {"fontSizePt": "$fontSize"}}],
+      "clarifyIfMissing": [{"slot": "fontSize", "ask_en": "What font size should I set (in points)?", "ask_pt": "Qual tamanho de fonte devo definir (em pontos)?"}],
       "examples": {
-        "positive": [
-          "Change font size to 14pt",
-          "Set the text size to 12 points",
-          "Make the text bigger",
-          "Increase font size to 18"
-        ],
-        "negative": [
-          "Change font to Arial",
-          "Change font color to red",
-          "Make this bold"
-        ]
+        "positive": ["Change font size to 14pt", "Set the text size to 12 points", "Make the text bigger", "Increase font size to 18"],
+        "negative": ["Change font to Arial", "Change font color to red", "Make this bold"]
       }
     },
     {
@@ -927,43 +374,19 @@
       "lang": "en",
       "priority": 78,
       "triggers": {
+        "tokens_none": ["convert", "transform", "merge", "split", "rewrite", "rephrase", "bullets", "numbering"],
         "regex_any": [
           "\\b(?:clear|remove|strip|reset)\\b.*\\b(?:formatting|format|styles?)\\b",
           "\\b(?:formatting|format)\\b.*\\b(?:clear|remove|strip|reset)\\b",
           "\\bplain\\s*text\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_CLEAR_RUN_STYLE",
-          "targets": [
-            "$target"
-          ]
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_CLEAR_RUN_STYLE", "targets": ["$target"]}],
       "examples": {
-        "positive": [
-          "Clear all formatting",
-          "Remove formatting from this paragraph",
-          "Strip formatting",
-          "Reset to plain text"
-        ],
-        "negative": [
-          "Apply bold formatting",
-          "Make this italic",
-          "Format as heading"
-        ]
+        "positive": ["Clear all formatting", "Remove formatting from this paragraph", "Strip formatting", "Reset to plain text"],
+        "negative": ["Apply bold formatting", "Make this italic", "Format as heading"]
       }
     },
     {
@@ -972,48 +395,15 @@
       "lang": "en",
       "priority": 75,
       "triggers": {
-        "tokens_any": [
-          "center",
-          "centre"
-        ],
-        "regex_any": [
-          "\\b(?:center|centre)\\b.*\\b(?:this|the|text|paragraph|align)\\b",
-          "\\balign\\b.*\\b(?:center|centre)\\b",
-          "\\b(?:center|centre)\\s*align\\b"
-        ]
+        "tokens_any": ["center", "centre"],
+        "regex_any": ["\\b(?:center|centre)\\b.*\\b(?:this|the|text|paragraph|align)\\b", "\\balign\\b.*\\b(?:center|centre)\\b", "\\b(?:center|centre)\\s*align\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_ALIGNMENT",
-          "targets": [
-            "$target"
-          ],
-          "alignment": "center"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_SET_ALIGNMENT", "targets": ["$target"], "alignment": "center"}],
       "examples": {
-        "positive": [
-          "Center this paragraph",
-          "Align center",
-          "Center align the title",
-          "Centre this text"
-        ],
-        "negative": [
-          "Left align",
-          "Right align",
-          "Justify the text"
-        ]
+        "positive": ["Center this paragraph", "Align center", "Center align the title", "Centre this text"],
+        "negative": ["Left align", "Right align", "Justify the text"]
       }
     },
     {
@@ -1022,44 +412,14 @@
       "lang": "en",
       "priority": 75,
       "triggers": {
-        "regex_any": [
-          "\\b(?:left)\\b.*\\balign\\b",
-          "\\balign\\b.*\\bleft\\b",
-          "\\bleft\\s*align\\b",
-          "\\balign\\b.*\\b(?:to the)?\\s*left\\b"
-        ]
+        "regex_any": ["\\b(?:left)\\b.*\\balign\\b", "\\balign\\b.*\\bleft\\b", "\\bleft\\s*align\\b", "\\balign\\b.*\\b(?:to the)?\\s*left\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_ALIGNMENT",
-          "targets": [
-            "$target"
-          ],
-          "alignment": "left"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_SET_ALIGNMENT", "targets": ["$target"], "alignment": "left"}],
       "examples": {
-        "positive": [
-          "Left align this paragraph",
-          "Align left",
-          "Align the text to the left"
-        ],
-        "negative": [
-          "Center this",
-          "Right align",
-          "Justify"
-        ]
+        "positive": ["Left align this paragraph", "Align left", "Align the text to the left"],
+        "negative": ["Center this", "Right align", "Justify"]
       }
     },
     {
@@ -1068,44 +428,14 @@
       "lang": "en",
       "priority": 75,
       "triggers": {
-        "regex_any": [
-          "\\b(?:right)\\b.*\\balign\\b",
-          "\\balign\\b.*\\bright\\b",
-          "\\bright\\s*align\\b",
-          "\\balign\\b.*\\b(?:to the)?\\s*right\\b"
-        ]
+        "regex_any": ["\\b(?:right)\\b.*\\balign\\b", "\\balign\\b.*\\bright\\b", "\\bright\\s*align\\b", "\\balign\\b.*\\b(?:to the)?\\s*right\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_ALIGNMENT",
-          "targets": [
-            "$target"
-          ],
-          "alignment": "right"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_SET_ALIGNMENT", "targets": ["$target"], "alignment": "right"}],
       "examples": {
-        "positive": [
-          "Right align this paragraph",
-          "Align right",
-          "Align the text to the right"
-        ],
-        "negative": [
-          "Center this",
-          "Left align",
-          "Justify"
-        ]
+        "positive": ["Right align this paragraph", "Align right", "Align the text to the right"],
+        "negative": ["Center this", "Left align", "Justify"]
       }
     },
     {
@@ -1114,48 +444,15 @@
       "lang": "en",
       "priority": 75,
       "triggers": {
-        "tokens_any": [
-          "justify",
-          "justified"
-        ],
-        "regex_any": [
-          "\\bjustify\\b.*\\b(?:this|the|text|paragraph)\\b",
-          "\\b(?:make|set)\\b.*\\bjustified\\b",
-          "\\bfull\\s*justif(?:y|ied)\\b"
-        ]
+        "tokens_any": ["justify", "justified"],
+        "regex_any": ["\\bjustify\\b.*\\b(?:this|the|text|paragraph)\\b", "\\b(?:make|set)\\b.*\\bjustified\\b", "\\bfull\\s*justif(?:y|ied)\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_ALIGNMENT",
-          "targets": [
-            "$target"
-          ],
-          "alignment": "both"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_SET_ALIGNMENT", "targets": ["$target"], "alignment": "both"}],
       "examples": {
-        "positive": [
-          "Justify this paragraph",
-          "Full justify the text",
-          "Make this text justified",
-          "Apply justify alignment"
-        ],
-        "negative": [
-          "Center this",
-          "Left align",
-          "Right align"
-        ]
+        "positive": ["Justify this paragraph", "Full justify the text", "Make this text justified", "Apply justify alignment"],
+        "negative": ["Center this", "Left align", "Right align"]
       }
     },
     {
@@ -1164,49 +461,14 @@
       "lang": "en",
       "priority": 72,
       "triggers": {
-        "regex_any": [
-          "\\bline\\s*spacing\\b",
-          "\\b(?:single|double|1\\.5)\\b.*\\bspac(?:ing|ed)\\b",
-          "\\b(?:change|set|increase|decrease)\\b.*\\bline\\s*spacing\\b"
-        ]
+        "regex_any": ["\\bline\\s*spacing\\b", "\\b(?:single|double|1\\.5)\\b.*\\bspac(?:ing|ed)\\b", "\\b(?:change|set|increase|decrease)\\b.*\\bline\\s*spacing\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "NUMBER_OR_TEXT",
-          "out": "lineSpacing",
-          "defaultValue": 1.15
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_LINE_SPACING",
-          "targets": [
-            "$target"
-          ],
-          "lineSpacing": "$lineSpacing"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "NUMBER_OR_TEXT", "out": "lineSpacing", "defaultValue": 1.15}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_SET_LINE_SPACING", "targets": ["$target"], "lineSpacing": "$lineSpacing"}],
       "examples": {
-        "positive": [
-          "Set line spacing to double",
-          "Change line spacing to 1.5",
-          "Single spacing for this paragraph",
-          "Increase the line spacing"
-        ],
-        "negative": [
-          "Increase paragraph spacing",
-          "Add space after paragraph",
-          "Indent the paragraph"
-        ]
+        "positive": ["Set line spacing to double", "Change line spacing to 1.5", "Single spacing for this paragraph", "Increase the line spacing"],
+        "negative": ["Increase paragraph spacing", "Add space after paragraph", "Indent the paragraph"]
       }
     },
     {
@@ -1222,49 +484,12 @@
           "\\b(?:before|after)\\b.*\\bspacing\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "NUMBER_OR_TEXT",
-          "out": "beforePt",
-          "defaultValue": null
-        },
-        {
-          "type": "NUMBER_OR_TEXT",
-          "out": "afterPt",
-          "defaultValue": null
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_PARAGRAPH_SPACING",
-          "targets": [
-            "$target"
-          ],
-          "beforePt": "$beforePt",
-          "afterPt": "$afterPt"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "NUMBER_OR_TEXT", "out": "beforePt", "defaultValue": null}, {"type": "NUMBER_OR_TEXT", "out": "afterPt", "defaultValue": null}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_SET_PARAGRAPH_SPACING", "targets": ["$target"], "beforePt": "$beforePt", "afterPt": "$afterPt"}],
       "examples": {
-        "positive": [
-          "Increase paragraph spacing",
-          "Add space after this paragraph",
-          "Set spacing before paragraph to 12pt",
-          "Decrease spacing between paragraphs"
-        ],
-        "negative": [
-          "Change line spacing",
-          "Double spacing",
-          "Indent this paragraph"
-        ]
+        "positive": ["Increase paragraph spacing", "Add space after this paragraph", "Set spacing before paragraph to 12pt", "Decrease spacing between paragraphs"],
+        "negative": ["Change line spacing", "Double spacing", "Indent this paragraph"]
       }
     },
     {
@@ -1273,52 +498,15 @@
       "lang": "en",
       "priority": 72,
       "triggers": {
-        "tokens_any": [
-          "indent"
-        ],
-        "regex_any": [
-          "\\b(?:increase|decrease|add|remove)\\b.*\\bindent\\b",
-          "\\bindent\\b.*\\b(?:this|the|paragraph|text|more|less)\\b",
-          "\\b(?:first\\s*line\\s*)?indent\\b"
-        ]
+        "tokens_any": ["indent"],
+        "regex_any": ["\\b(?:increase|decrease|add|remove)\\b.*\\bindent\\b", "\\bindent\\b.*\\b(?:this|the|paragraph|text|more|less)\\b", "\\b(?:first\\s*line\\s*)?indent\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "NUMBER_OR_TEXT",
-          "out": "leftPt",
-          "defaultValue": 36
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_INDENTATION",
-          "targets": [
-            "$target"
-          ],
-          "leftPt": "$leftPt"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "NUMBER_OR_TEXT", "out": "leftPt", "defaultValue": 36}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_SET_INDENTATION", "targets": ["$target"], "leftPt": "$leftPt"}],
       "examples": {
-        "positive": [
-          "Indent this paragraph",
-          "Increase indent",
-          "Decrease indent",
-          "Add first line indent"
-        ],
-        "negative": [
-          "Align left",
-          "Center this text",
-          "Add bullet points"
-        ]
+        "positive": ["Indent this paragraph", "Increase indent", "Decrease indent", "Add first line indent"],
+        "negative": ["Align left", "Center this text", "Add bullet points"]
       }
     },
     {
@@ -1327,48 +515,16 @@
       "lang": "en",
       "priority": 78,
       "triggers": {
-        "tokens_any": [
-          "bullet",
-          "bullets",
-          "bulleted"
-        ],
-        "regex_any": [
-          "\\b(?:add|apply|make|convert to|create)\\b.*\\bbullet(?:s|ed)?\\b",
-          "\\bbullet(?:s|ed)?\\s*list\\b",
-          "\\bbullet\\s*points?\\b"
-        ]
+        "tokens_any": ["bullet", "bullets", "bulleted"],
+        "tokens_none": ["bold", "italic", "underline", "color", "font", "size", "align"],
+        "regex_any": ["\\b(?:add|apply|make|convert to|create)\\b.*\\bbullet(?:s|ed)?\\b", "\\bbullet(?:s|ed)?\\s*list\\b", "\\bbullet\\s*points?\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_LIST_APPLY_BULLETS",
-          "targets": [
-            "$target"
-          ]
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_LIST_APPLY_BULLETS", "targets": ["$target"]}],
       "examples": {
-        "positive": [
-          "Add bullets to these paragraphs",
-          "Make this a bulleted list",
-          "Apply bullet points",
-          "Convert to bullet list"
-        ],
-        "negative": [
-          "Add numbering",
-          "Remove bullets",
-          "Make this a numbered list"
-        ]
+        "positive": ["Add bullets to these paragraphs", "Make this a bulleted list", "Apply bullet points", "Convert to bullet list"],
+        "negative": ["Add numbering", "Remove bullets", "Make this a numbered list"]
       }
     },
     {
@@ -1377,49 +533,16 @@
       "lang": "en",
       "priority": 78,
       "triggers": {
-        "tokens_any": [
-          "number",
-          "numbered",
-          "numbering"
-        ],
-        "regex_any": [
-          "\\b(?:add|apply|make|convert to|create)\\b.*\\b(?:number(?:ed|ing)?|ordered)\\b.*\\blist\\b",
-          "\\bnumbered\\s*list\\b",
-          "\\b(?:add|apply)\\b.*\\bnumbering\\b"
-        ]
+        "tokens_any": ["number", "numbered", "numbering"],
+        "tokens_none": ["bold", "italic", "underline", "color", "font", "size", "align"],
+        "regex_any": ["\\b(?:add|apply|make|convert to|create)\\b.*\\b(?:number(?:ed|ing)?|ordered)\\b.*\\blist\\b", "\\bnumbered\\s*list\\b", "\\b(?:add|apply)\\b.*\\bnumbering\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_LIST_APPLY_NUMBERING",
-          "targets": [
-            "$target"
-          ]
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_LIST_APPLY_NUMBERING", "targets": ["$target"]}],
       "examples": {
-        "positive": [
-          "Add numbering to these paragraphs",
-          "Make this a numbered list",
-          "Apply numbering",
-          "Convert to ordered list",
-          "Create a numbered list"
-        ],
-        "negative": [
-          "Add bullets",
-          "Remove numbering",
-          "Fix numbering sequence"
-        ]
+        "positive": ["Add numbering to these paragraphs", "Make this a numbered list", "Apply numbering", "Convert to ordered list", "Create a numbered list"],
+        "negative": ["Add bullets", "Remove numbering", "Fix numbering sequence"]
       }
     },
     {
@@ -1428,43 +551,19 @@
       "lang": "en",
       "priority": 80,
       "triggers": {
+        "tokens_none": ["bold", "italic", "underline", "color", "font", "size", "align"],
         "regex_any": [
           "\\b(?:remove|delete|clear)\\b.*\\b(?:bullets?|numbering|list)\\b",
           "\\b(?:bullets?|numbering|list)\\b.*\\b(?:remove|delete|clear)\\b",
           "\\bconvert\\b.*\\b(?:list|bullets?|numbering)\\b.*\\b(?:to|into)\\b.*\\b(?:paragraph|text|plain)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_LIST_REMOVE",
-          "targets": [
-            "$target"
-          ]
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_LIST_REMOVE", "targets": ["$target"]}],
       "examples": {
-        "positive": [
-          "Remove bullets from the selection",
-          "Remove numbering",
-          "Clear the list formatting",
-          "Delete bullet points"
-        ],
-        "negative": [
-          "Add bullets",
-          "Add numbering",
-          "Delete paragraph"
-        ]
+        "positive": ["Remove bullets from the selection", "Remove numbering", "Clear the list formatting", "Delete bullet points"],
+        "negative": ["Add bullets", "Add numbering", "Delete paragraph"]
       }
     },
     {
@@ -1473,50 +572,19 @@
       "lang": "en",
       "priority": 74,
       "triggers": {
+        "tokens_none": ["bold", "italic", "underline", "color", "font", "size", "align"],
         "regex_any": [
           "\\b(?:promote|demote)\\b.*\\b(?:list|item|bullet|number)\\b",
           "\\b(?:indent|outdent)\\b.*\\b(?:list|item|bullet|number)\\b",
           "\\b(?:increase|decrease)\\b.*\\b(?:list|item)\\b.*\\blevel\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "direction",
-          "regex": "\\b(promote|demote|indent|outdent)\\b",
-          "defaultValue": "promote"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_LIST_PROMOTE_DEMOTE",
-          "targets": [
-            "$target"
-          ],
-          "direction": "$direction"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "LOCATOR_TEXT", "out": "direction", "regex": "\\b(promote|demote|indent|outdent)\\b", "defaultValue": "promote"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_LIST_PROMOTE_DEMOTE", "targets": ["$target"], "direction": "$direction"}],
       "examples": {
-        "positive": [
-          "Promote this list item",
-          "Demote the bullet point",
-          "Indent this list item",
-          "Increase the list level"
-        ],
-        "negative": [
-          "Add bullets",
-          "Remove numbering",
-          "Indent the paragraph"
-        ]
+        "positive": ["Promote this list item", "Demote the bullet point", "Indent this list item", "Increase the list level"],
+        "negative": ["Add bullets", "Remove numbering", "Indent the paragraph"]
       }
     },
     {
@@ -1525,45 +593,100 @@
       "lang": "en",
       "priority": 82,
       "triggers": {
+        "tokens_none": ["bold", "italic", "underline", "color", "font", "size", "align"],
         "regex_any": [
           "\\bconvert\\b.*\\bbullets?\\b.*\\bparagraphs?\\b",
           "\\b(?:convert|turn|change|transform)\\b.*\\bbullets?\\b.*\\b(?:to|into)\\b.*\\bparagraphs?\\b",
           "\\b(?:turn|change|transform)\\b.*\\b(?:bullets?|list)\\b.*\\b(?:into|to)\\b.*\\bparagraphs?\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_LIST_REMOVE",
-          "targets": "$target"
-        },
-        {
-          "op": "DOCX_MERGE_PARAGRAPHS",
-          "targetIds": "$target"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_LIST_REMOVE", "targets": ["$target"]}, {"op": "DOCX_MERGE_PARAGRAPHS", "targetIds": ["$target"]}],
       "examples": {
-        "positive": [
-          "Convert bullets to paragraphs",
-          "Turn the bullet list into regular paragraphs",
-          "Change bullets to paragraphs",
-          "Transform this list into paragraphs"
-        ],
-        "negative": [
-          "Convert paragraphs to bullets",
-          "Add bullet points",
-          "Remove formatting"
+        "positive": ["Convert bullets to paragraphs", "Turn the bullet list into regular paragraphs", "Change bullets to paragraphs", "Transform this list into paragraphs"],
+        "negative": ["Convert paragraphs to bullets", "Add bullet points", "Remove formatting"]
+      }
+    },
+    {
+      "id": "docx.list.paragraph_to_bullets",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 84,
+      "triggers": {
+        "tokens_any": ["bullets", "bullet", "bulleted"],
+        "tokens_none": ["remove", "delete", "clear", "numbering", "numbered", "rewrite", "rephrase", "summarize", "bold", "italic", "underline", "color", "font", "size", "align"],
+        "regex_any": [
+          "\\b(?:convert|turn|change|transform)\\b.*\\b(?:paragraph|text|this)\\b.*\\b(?:to|into)\\b.*\\bbullets?\\b",
+          "\\b(?:make|create)\\b.*\\b(?:this|selected|the)\\b.*\\b(?:a\\s+)?bullet(?:ed)?\\s+list\\b"
         ]
+      },
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "SCOPE", "out": "scope"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_LIST_APPLY_BULLETS", "targets": ["$target"]}],
+      "examples": {
+        "positive": ["Convert this paragraph to bullets", "Turn the text into a bulleted list", "Make this a bullet list"],
+        "negative": ["Remove bullets", "Convert bullets to paragraphs", "Add numbering", "Summarize into bullets"]
+      }
+    },
+    {
+      "id": "docx.list.bullets_to_paragraph",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 84,
+      "triggers": {
+        "tokens_none": ["add", "create", "apply", "numbering", "numbered", "rewrite", "summarize", "bold", "italic", "underline", "color", "font", "size", "align"],
+        "regex_any": [
+          "\\b(?:convert|turn|change|transform)\\b.*\\bbullets?\\b.*\\b(?:to|into)\\b.*\\b(?:paragraph|text|prose|plain)\\b",
+          "\\b(?:remove)\\b.*\\b(?:bullets?|list)\\b.*\\b(?:and\\s+)?(?:convert|make)\\b.*\\bparagraph\\b"
+        ]
+      },
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_LIST_REMOVE", "targets": ["$target"]}],
+      "examples": {
+        "positive": ["Convert bullets to paragraphs", "Turn bullet list into plain text", "Change bullets to regular paragraphs"],
+        "negative": ["Convert paragraphs to bullets", "Add bullet points", "Summarize"]
+      }
+    },
+    {
+      "id": "docx.list.numbered_to_bullets",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 85,
+      "triggers": {
+        "tokens_none": ["bold", "italic", "underline", "color", "font", "size", "align"],
+        "regex_any": [
+          "\\b(?:convert|turn|change|switch)\\b.*\\b(?:number(?:ed|ing)|ordered)\\b.*\\b(?:to|into)\\b.*\\b(?:bullets?|bulleted|unordered)\\b",
+          "\\b(?:change|switch)\\b.*\\b(?:from\\s+)?number(?:ed|ing)\\b.*\\b(?:to|into)\\b.*\\bbullets?\\b"
+        ]
+      },
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_LIST_REMOVE", "targets": ["$target"]}, {"op": "DOCX_LIST_APPLY_BULLETS", "targets": ["$target"]}],
+      "examples": {
+        "positive": ["Convert numbered list to bullets", "Change numbering to bullet points", "Switch from numbered to bulleted list"],
+        "negative": ["Convert bullets to numbering", "Add numbering", "Remove list"]
+      }
+    },
+    {
+      "id": "docx.list.bullets_to_numbered",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 85,
+      "triggers": {
+        "tokens_none": ["bold", "italic", "underline", "color", "font", "size", "align"],
+        "regex_any": [
+          "\\b(?:convert|turn|change|switch)\\b.*\\b(?:bullets?|bulleted|unordered)\\b.*\\b(?:to|into)\\b.*\\b(?:number(?:ed|ing)|ordered|steps)\\b",
+          "\\b(?:change|switch)\\b.*\\b(?:from\\s+)?bullets?\\b.*\\b(?:to|into)\\b.*\\bnumber(?:ed|ing)\\b"
+        ]
+      },
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_LIST_REMOVE", "targets": ["$target"]}, {"op": "DOCX_LIST_APPLY_NUMBERING", "targets": ["$target"]}],
+      "examples": {
+        "positive": ["Convert bullets to numbered list", "Turn bullet points into numbered steps", "Change bullets to numbering"],
+        "negative": ["Convert numbered to bullets", "Remove numbering", "Add bullets"]
       }
     },
     {
@@ -1579,51 +702,14 @@
           "\\bset\\b.*\\b(?:as|to)\\b.*\\b(?:heading|header)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "HEADING_LEVEL",
-          "out": "headingLevel",
-          "defaultValue": 1
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_PARAGRAPH_STYLE",
-          "targets": [
-            "$target"
-          ],
-          "styleName": "Heading $headingLevel"
-        }
-      ],
-      "clarifyIfMissing": [
-        {
-          "slot": "headingLevel",
-          "ask_en": "What heading level? (1-6)",
-          "ask_pt": "Qual nivel de titulo? (1-6)"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "HEADING_LEVEL", "out": "headingLevel", "defaultValue": 1}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "resolverHints": {"naturalTargets": ["this heading", "the introduction", "section 4", "the title", "the conclusion", "all headings"], "ambiguityAction": "clarify"},
+      "planTemplate": [{"op": "DOCX_SET_PARAGRAPH_STYLE", "targets": ["$target"], "styleName": "Heading $headingLevel"}],
+      "clarifyIfMissing": [{"slot": "headingLevel", "ask_en": "What heading level? (1-6)", "ask_pt": "Qual nivel de titulo? (1-6)"}],
       "examples": {
-        "positive": [
-          "Make this a heading 1",
-          "Set as Heading 2",
-          "Apply heading 3 style",
-          "Convert to H1",
-          "Make this a heading"
-        ],
-        "negative": [
-          "Remove heading",
-          "Set to normal style",
-          "Make this bold"
-        ]
+        "positive": ["Make this a heading 1", "Set as Heading 2", "Apply heading 3 style", "Convert to H1", "Make this a heading"],
+        "negative": ["Remove heading", "Set to normal style", "Make this bold"]
       }
     },
     {
@@ -1639,38 +725,34 @@
           "\\b(?:reset|remove)\\b.*\\b(?:heading|title)\\b.*\\bstyle\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_PARAGRAPH_STYLE",
-          "targets": [
-            "$target"
-          ],
-          "styleName": "Normal"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "resolverHints": {"naturalTargets": ["this heading", "the introduction", "section 4", "the title", "the conclusion", "all headings"], "ambiguityAction": "clarify"},
+      "planTemplate": [{"op": "DOCX_SET_PARAGRAPH_STYLE", "targets": ["$target"], "styleName": "Normal"}],
       "examples": {
-        "positive": [
-          "Set to normal style",
-          "Remove heading formatting",
-          "Convert to normal paragraph",
-          "Change from heading to normal text"
-        ],
-        "negative": [
-          "Set as heading 1",
-          "Apply heading style",
-          "Clear all formatting"
+        "positive": ["Set to normal style", "Remove heading formatting", "Convert to normal paragraph", "Change from heading to normal text"],
+        "negative": ["Set as heading 1", "Apply heading style", "Clear all formatting"]
+      }
+    },
+    {
+      "id": "docx.heading.style_apply",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 83,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:apply)\\b.*\\b(?:heading|header)\\s*(?:style)?\\b.*\\b(?:to|for)\\b.*\\b(?:all|every)\\b",
+          "\\b(?:format|set|make)\\b.*\\b(?:all|every)\\b.*\\b(?:section)?\\s*(?:titles?|headings?)\\b.*\\b(?:as|to)\\b.*\\b(?:heading|header)\\b",
+          "\\b(?:set|make)\\b.*\\b(?:this|the)\\b.*\\b(?:heading|title)\\b.*\\b(?:as|to)\\b.*\\bheading\\s*[1-6]\\b"
         ]
+      },
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "HEADING_LEVEL", "out": "headingLevel", "defaultValue": 1}, {"type": "SCOPE", "out": "scope", "defaultValue": "all_headings"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": true, "allowMultiSelection": true},
+      "resolverHints": {"naturalTargets": ["this heading", "the introduction", "section 4", "the title", "the conclusion", "all headings"], "ambiguityAction": "clarify"},
+      "planTemplate": [{"op": "DOCX_SET_HEADING_LEVEL", "targets": ["$target"], "headingLevel": "$headingLevel"}],
+      "examples": {
+        "positive": ["Apply Heading 1 to all section titles", "Format all headings as Heading 2", "Set this heading as Heading 1", "Make all titles Heading 1"],
+        "negative": ["Change font size", "Remove heading", "Make this bold"]
       }
     },
     {
@@ -1679,47 +761,19 @@
       "lang": "en",
       "priority": 74,
       "triggers": {
+        "tokens_none": ["rewrite", "rephrase", "reword", "polish", "improve", "refine", "summarize", "bold", "italic", "color", "font"],
         "regex_any": [
           "\\b(?:insert|add)\\b.*\\bparagraph\\b.*\\b(?:after|below|beneath)\\b",
           "\\b(?:insert|add)\\b.{0,20}\\b(?:a|an|new|blank)\\b.{0,10}\\bparagraph\\b.{0,20}\\b(?:after|below|beneath)\\b",
           "\\b(?:new|add)\\b.*\\bparagraph\\b.*\\b(?:after|below)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "afterText",
-          "defaultValue": ""
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_INSERT_AFTER",
-          "targetId": "$target",
-          "afterText": "$afterText"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "LOCATOR_TEXT", "out": "afterText", "defaultValue": ""}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_INSERT_AFTER", "targetId": "$target", "afterText": "$afterText"}],
       "examples": {
-        "positive": [
-          "Insert a paragraph after this one",
-          "Add a paragraph below",
-          "Insert new paragraph after the introduction",
-          "Add a blank paragraph beneath this"
-        ],
-        "negative": [
-          "Insert paragraph before",
-          "Delete this paragraph",
-          "Rewrite this paragraph"
-        ]
+        "positive": ["Insert a paragraph after this one", "Add a paragraph below", "Insert new paragraph after the introduction", "Add a blank paragraph beneath this"],
+        "negative": ["Insert paragraph before", "Delete this paragraph", "Rewrite this paragraph"]
       }
     },
     {
@@ -1728,47 +782,19 @@
       "lang": "en",
       "priority": 74,
       "triggers": {
+        "tokens_none": ["rewrite", "rephrase", "reword", "polish", "improve", "refine", "summarize", "bold", "italic", "color", "font"],
         "regex_any": [
           "\\b(?:insert|add)\\b.*\\bparagraph\\b.*\\b(?:before|above)\\b",
           "\\b(?:insert|add)\\b.*\\b(?:before|above)\\b.*\\bparagraph\\b",
           "\\b(?:new|add)\\b.*\\bparagraph\\b.*\\b(?:before|above)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "afterText",
-          "defaultValue": ""
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_INSERT_BEFORE",
-          "targetId": "$target",
-          "afterText": "$afterText"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "LOCATOR_TEXT", "out": "afterText", "defaultValue": ""}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_INSERT_BEFORE", "targetId": "$target", "afterText": "$afterText"}],
       "examples": {
-        "positive": [
-          "Insert a paragraph before this one",
-          "Add a paragraph above",
-          "Insert new paragraph before the conclusion",
-          "Add a blank paragraph above this"
-        ],
-        "negative": [
-          "Insert paragraph after",
-          "Delete this paragraph",
-          "Rewrite this paragraph"
-        ]
+        "positive": ["Insert a paragraph before this one", "Add a paragraph above", "Insert new paragraph before the conclusion", "Add a blank paragraph above this"],
+        "negative": ["Insert paragraph after", "Delete this paragraph", "Rewrite this paragraph"]
       }
     },
     {
@@ -1777,40 +803,40 @@
       "lang": "en",
       "priority": 78,
       "triggers": {
+        "tokens_none": ["rewrite", "rephrase", "reword", "polish", "improve", "refine", "summarize", "bold", "italic", "color", "font"],
         "regex_any": [
           "\\b(?:delete|remove|drop)\\b(?!.*\\b(?:format(?:ting)?|style|styles?)\\b).*\\b(?:this|the|selected)?\\s*paragraph\\b",
           "\\bparagraph\\b(?!.*\\b(?:format(?:ting)?|style|styles?)\\b).*\\b(?:delete|remove|drop)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_DELETE_PARAGRAPH",
-          "targetId": "$target"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_DELETE_PARAGRAPH", "targetId": "$target"}],
       "examples": {
-        "positive": [
-          "Delete this paragraph",
-          "Remove the selected paragraph",
-          "Drop this paragraph",
-          "Delete the paragraph above"
-        ],
-        "negative": [
-          "Rewrite this paragraph",
-          "Insert paragraph",
-          "Merge paragraphs"
+        "positive": ["Delete this paragraph", "Remove the selected paragraph", "Drop this paragraph", "Delete the paragraph above"],
+        "negative": ["Rewrite this paragraph", "Insert paragraph", "Merge paragraphs"]
+      }
+    },
+    {
+      "id": "docx.section.remove",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 80,
+      "triggers": {
+        "tokens_any": ["remove", "delete", "drop"],
+        "tokens_none": ["paragraph", "bullets", "numbering", "formatting", "bold", "italic", "list", "rewrite", "rephrase", "reword", "polish", "improve", "refine", "summarize", "color", "font"],
+        "regex_any": [
+          "\\b(?:remove|delete|drop)\\b.*\\b(?:this|the|entire)\\b.*\\bsection\\b",
+          "\\b(?:remove|delete|drop)\\b.*\\bsection\\b.*\\b(?:entirely|completely|whole)\\b"
         ]
+      },
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "SCOPE", "out": "scope", "defaultValue": "section"}],
+      "scopeRules": {"defaultScope": "section", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "resolverHints": {"naturalTargets": ["this heading", "the introduction", "section 4", "the title", "the conclusion", "all headings"], "ambiguityAction": "clarify"},
+      "planTemplate": [{"op": "DOCX_DELETE_PARAGRAPH", "targetId": "$target", "scope": "$scope"}],
+      "examples": {
+        "positive": ["Remove this entire section", "Delete the conclusion section", "Drop section 3"],
+        "negative": ["Remove this paragraph", "Delete the bullets", "Remove formatting"]
       }
     },
     {
@@ -1819,42 +845,15 @@
       "lang": "en",
       "priority": 74,
       "triggers": {
-        "regex_any": [
-          "\\bmerge\\b.*\\bparagraphs?\\b",
-          "\\bcombine\\b.*\\bparagraphs?\\b",
-          "\\bjoin\\b.*\\bparagraphs?\\b",
-          "\\bparagraphs?\\b.*\\b(?:merge|combine|join)\\b"
-        ]
+        "tokens_none": ["rewrite", "rephrase", "reword", "polish", "improve", "refine", "summarize", "bold", "italic", "color", "font"],
+        "regex_any": ["\\bmerge\\b.*\\bparagraphs?\\b", "\\bcombine\\b.*\\bparagraphs?\\b", "\\bjoin\\b.*\\bparagraphs?\\b", "\\bparagraphs?\\b.*\\b(?:merge|combine|join)\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "targets"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_MERGE_PARAGRAPHS",
-          "targetIds": "$targets"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_MERGE_PARAGRAPHS", "targetIds": ["$target"]}],
       "examples": {
-        "positive": [
-          "Merge these paragraphs",
-          "Combine the selected paragraphs",
-          "Join these two paragraphs",
-          "Merge paragraphs into one"
-        ],
-        "negative": [
-          "Split paragraph",
-          "Delete paragraph",
-          "Merge cells"
-        ]
+        "positive": ["Merge these paragraphs", "Combine the selected paragraphs", "Join these two paragraphs", "Merge paragraphs into one"],
+        "negative": ["Split paragraph", "Delete paragraph", "Merge cells"]
       }
     },
     {
@@ -1863,47 +862,15 @@
       "lang": "en",
       "priority": 74,
       "triggers": {
-        "regex_any": [
-          "\\bsplit\\b.*\\bparagraph\\b",
-          "\\bbreak\\b.*\\b(?:into|in)\\b.*\\btwo\\b",
-          "\\bparagraph\\b.*\\bsplit\\b",
-          "\\bdivide\\b.*\\bparagraph\\b"
-        ]
+        "tokens_none": ["rewrite", "rephrase", "reword", "polish", "improve", "refine", "summarize", "bold", "italic", "color", "font"],
+        "regex_any": ["\\bsplit\\b.*\\bparagraph\\b", "\\bbreak\\b.*\\b(?:into|in)\\b.*\\btwo\\b", "\\bparagraph\\b.*\\bsplit\\b", "\\bdivide\\b.*\\bparagraph\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "NUMBER_OR_TEXT",
-          "out": "splitAt"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SPLIT_PARAGRAPH",
-          "targetId": "$target",
-          "splitAt": "$splitAt"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "NUMBER_OR_TEXT", "out": "splitAt"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_SPLIT_PARAGRAPH", "targetId": "$target", "splitAt": "$splitAt"}],
       "examples": {
-        "positive": [
-          "Split this paragraph",
-          "Break this paragraph into two",
-          "Split the paragraph at the cursor",
-          "Divide this paragraph in half"
-        ],
-        "negative": [
-          "Merge paragraphs",
-          "Delete paragraph",
-          "Insert paragraph"
-        ]
+        "positive": ["Split this paragraph", "Break this paragraph into two", "Split the paragraph at the cursor", "Divide this paragraph in half"],
+        "negative": ["Merge paragraphs", "Delete paragraph", "Insert paragraph"]
       }
     },
     {
@@ -1918,49 +885,13 @@
           "\\bapply\\b.*\\b(?:Title|Subtitle|Quote|Intense Quote|No Spacing|List Paragraph)\\b.*\\bstyle\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "STYLE_NAME",
-          "out": "styleName"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_PARAGRAPH_STYLE",
-          "targets": [
-            "$target"
-          ],
-          "styleName": "$styleName"
-        }
-      ],
-      "clarifyIfMissing": [
-        {
-          "slot": "styleName",
-          "ask_en": "Which style should I apply?",
-          "ask_pt": "Qual estilo devo aplicar?"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "STYLE_NAME", "out": "styleName"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_SET_PARAGRAPH_STYLE", "targets": ["$target"], "styleName": "$styleName"}],
+      "clarifyIfMissing": [{"slot": "styleName", "ask_en": "Which style should I apply?", "ask_pt": "Qual estilo devo aplicar?"}],
       "examples": {
-        "positive": [
-          "Apply the Title style",
-          "Set style to Quote",
-          "Use the Subtitle style",
-          "Change paragraph style to No Spacing"
-        ],
-        "negative": [
-          "Set heading 1",
-          "Make this bold",
-          "Clear formatting"
-        ]
+        "positive": ["Apply the Title style", "Set style to Quote", "Use the Subtitle style", "Change paragraph style to No Spacing"],
+        "negative": ["Set heading 1", "Make this bold", "Clear formatting"]
       }
     },
     {
@@ -1975,51 +906,13 @@
           "\\bincorporate\\b.*\\b(?:data|info|information|content)\\b.*\\bfrom\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "sources"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_ENRICH_FROM_SOURCES",
-          "targets": [
-            "$target"
-          ],
-          "sources": [
-            "$sources"
-          ]
-        }
-      ],
-      "clarifyIfMissing": [
-        {
-          "slot": "sources",
-          "ask_en": "Which document(s) should I use as a source?",
-          "ask_pt": "Qual(is) documento(s) devo usar como fonte?"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "LOCATOR_TEXT", "out": "sources"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_ENRICH_FROM_SOURCES", "targets": ["$target"], "sources": ["$sources"]}],
+      "clarifyIfMissing": [{"slot": "sources", "ask_en": "Which document(s) should I use as a source?", "ask_pt": "Qual(is) documento(s) devo usar como fonte?"}],
       "examples": {
-        "positive": [
-          "Use document X to improve this paragraph",
-          "Enrich from the research report",
-          "Incorporate data from the source file",
-          "Improve this section using the reference document"
-        ],
-        "negative": [
-          "Rewrite this paragraph",
-          "Translate this section",
-          "Delete this paragraph"
-        ]
+        "positive": ["Use document X to improve this paragraph", "Enrich from the research report", "Incorporate data from the source file", "Improve this section using the reference document"],
+        "negative": ["Rewrite this paragraph", "Translate this section", "Delete this paragraph"]
       }
     },
     {
@@ -2028,42 +921,19 @@
       "lang": "en",
       "priority": 80,
       "triggers": {
+        "tokens_none": ["convert", "transform", "merge", "split", "insert", "delete", "remove", "table of contents", "TOC", "summary"],
         "regex_any": [
           "\\b(?:make|rewrite|rephrase)\\b.*\\b(?:casual|informal|friendly|conversational|relaxed)\\b",
           "\\bmore\\s+(?:casual|informal|friendly|conversational)\\b",
           "\\btone\\s+down\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$target",
-          "tone": "casual"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_REWRITE_PARAGRAPH", "targetId": "$target", "tone": "casual"}],
       "examples": {
-        "positive": [
-          "Make this more casual",
-          "Rewrite in a friendlier tone",
-          "Make the text more conversational",
-          "Tone down this paragraph"
-        ],
-        "negative": [
-          "Make this more formal",
-          "Make this concise",
-          "Bold this text"
-        ]
+        "positive": ["Make this more casual", "Rewrite in a friendlier tone", "Make the text more conversational", "Tone down this paragraph"],
+        "negative": ["Make this more formal", "Make this concise", "Bold this text"]
       }
     },
     {
@@ -2072,45 +942,15 @@
       "lang": "en",
       "priority": 78,
       "triggers": {
-        "regex_any": [
-          "\\b(?:remove|clear|undo|turn off)\\b.*\\bbold\\b",
-          "\\bunbold\\b",
-          "\\bbold\\b.*\\b(?:off|remove|clear)\\b"
-        ]
+        "tokens_none": ["convert", "transform", "merge", "split", "rewrite", "rephrase", "bullets", "numbering"],
+        "regex_any": ["\\b(?:remove|clear|undo|turn off)\\b.*\\bbold\\b", "\\bunbold\\b", "\\bbold\\b.*\\b(?:off|remove|clear)\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_RUN_STYLE",
-          "targets": [
-            "$target"
-          ],
-          "style": {
-            "bold": false
-          }
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_SET_RUN_STYLE", "targets": ["$target"], "style": {"bold": false}}],
       "examples": {
-        "positive": [
-          "Remove bold from this text",
-          "Unbold the selected text",
-          "Turn off bold"
-        ],
-        "negative": [
-          "Make this bold",
-          "Remove italic",
-          "Clear all formatting"
-        ]
+        "positive": ["Remove bold from this text", "Unbold the selected text", "Turn off bold"],
+        "negative": ["Make this bold", "Remove italic", "Clear all formatting"]
       }
     },
     {
@@ -2119,45 +959,15 @@
       "lang": "en",
       "priority": 78,
       "triggers": {
-        "regex_any": [
-          "\\b(?:remove|clear|undo|turn off)\\b.*\\bitalic\\b",
-          "\\bunitalic(?:ize)?\\b",
-          "\\bitalic\\b.*\\b(?:off|remove|clear)\\b"
-        ]
+        "tokens_none": ["convert", "transform", "merge", "split", "rewrite", "rephrase", "bullets", "numbering"],
+        "regex_any": ["\\b(?:remove|clear|undo|turn off)\\b.*\\bitalic\\b", "\\bunitalic(?:ize)?\\b", "\\bitalic\\b.*\\b(?:off|remove|clear)\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_RUN_STYLE",
-          "targets": [
-            "$target"
-          ],
-          "style": {
-            "italic": false
-          }
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_SET_RUN_STYLE", "targets": ["$target"], "style": {"italic": false}}],
       "examples": {
-        "positive": [
-          "Remove italic from this text",
-          "Turn off italic",
-          "Clear italic formatting"
-        ],
-        "negative": [
-          "Make this italic",
-          "Remove bold",
-          "Clear formatting"
-        ]
+        "positive": ["Remove italic from this text", "Turn off italic", "Clear italic formatting"],
+        "negative": ["Make this italic", "Remove bold", "Clear formatting"]
       }
     },
     {
@@ -2166,44 +976,15 @@
       "lang": "en",
       "priority": 78,
       "triggers": {
-        "regex_any": [
-          "\\b(?:remove|clear|undo|turn off)\\b.*\\bunderline\\b",
-          "\\bunderline\\b.*\\b(?:off|remove|clear)\\b"
-        ]
+        "tokens_none": ["convert", "transform", "merge", "split", "rewrite", "rephrase", "bullets", "numbering"],
+        "regex_any": ["\\b(?:remove|clear|undo|turn off)\\b.*\\bunderline\\b", "\\bunderline\\b.*\\b(?:off|remove|clear)\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_RUN_STYLE",
-          "targets": [
-            "$target"
-          ],
-          "style": {
-            "underline": false
-          }
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_SET_RUN_STYLE", "targets": ["$target"], "style": {"underline": false}}],
       "examples": {
-        "positive": [
-          "Remove underline from this text",
-          "Turn off underline",
-          "Clear underline formatting"
-        ],
-        "negative": [
-          "Underline this text",
-          "Remove bold",
-          "Clear formatting"
-        ]
+        "positive": ["Remove underline from this text", "Turn off underline", "Clear underline formatting"],
+        "negative": ["Underline this text", "Remove bold", "Clear formatting"]
       }
     },
     {
@@ -2212,46 +993,18 @@
       "lang": "en",
       "priority": 70,
       "triggers": {
+        "tokens_none": ["convert", "transform", "merge", "split", "insert", "delete", "remove", "table of contents", "TOC", "summary"],
         "regex_any": [
           "\\b(?:rewrite|rephrase|reword)\\b.*\\b(?:so that|such that|to make it|to sound|making it)\\b",
           "\\b(?:make|change)\\b.*\\b(?:this|the|paragraph|text)\\b.*\\b(?:so that|to sound|more like)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        },
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "instructions"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$target",
-          "tone": "custom",
-          "instructions": "$instructions"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}, {"type": "LOCATOR_TEXT", "out": "instructions"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_REWRITE_PARAGRAPH", "targetId": "$target", "tone": "custom", "instructions": "$instructions"}],
       "examples": {
-        "positive": [
-          "Rewrite this paragraph so that it sounds more persuasive",
-          "Rephrase to make it more suitable for a legal audience",
-          "Reword the text to sound more optimistic",
-          "Change this paragraph to make it more action-oriented"
-        ],
-        "negative": [
-          "Rewrite this paragraph",
-          "Make this more formal",
-          "Translate this to Spanish"
-        ]
+        "positive": ["Rewrite this paragraph so that it sounds more persuasive", "Rephrase to make it more suitable for a legal audience", "Reword the text to sound more optimistic", "Change this paragraph to make it more action-oriented"],
+        "negative": ["Rewrite this paragraph", "Make this more formal", "Translate this to Spanish"]
       }
     },
     {
@@ -2260,43 +1013,19 @@
       "lang": "en",
       "priority": 76,
       "triggers": {
+        "tokens_none": ["bold", "italic", "underline", "color", "font", "size", "align"],
         "regex_any": [
           "\\brestart\\b.*\\b(?:list|numbering)\\b.*\\b(?:at|from|to)\\b",
           "\\b(?:reset|start)\\b.*\\b(?:list|numbering)\\b.*\\b(?:at|from)\\b\\s*\\d",
           "\\bnumbering\\b.*\\b(?:restart|start over)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_LIST_RESTART_NUMBERING",
-          "targets": [
-            "$target"
-          ]
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "planTemplate": [{"op": "DOCX_LIST_RESTART_NUMBERING", "targets": ["$target"]}],
       "examples": {
-        "positive": [
-          "Restart numbering at 1",
-          "Reset the list numbering from 1",
-          "Start the numbering over",
-          "Restart this numbered list"
-        ],
-        "negative": [
-          "Fix numbering",
-          "Remove numbering",
-          "Add numbering"
-        ]
+        "positive": ["Restart numbering at 1", "Reset the list numbering from 1", "Start the numbering over", "Restart this numbered list"],
+        "negative": ["Fix numbering", "Remove numbering", "Add numbering"]
       }
     },
     {
@@ -2305,42 +1034,14 @@
       "lang": "en",
       "priority": 72,
       "triggers": {
-        "regex_any": [
-          "\\b(?:fix|repair|correct)\\b.*\\bnumbering\\b",
-          "\\bnumbering\\b.*\\b(?:fix|repair|broken|wrong|incorrect)\\b",
-          "\\b(?:renumber|re-number)\\b"
-        ]
+        "regex_any": ["\\b(?:fix|repair|correct)\\b.*\\bnumbering\\b", "\\bnumbering\\b.*\\b(?:fix|repair|broken|wrong|incorrect)\\b", "\\b(?:renumber|re-number)\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "scope",
-          "defaultValue": "document"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "document",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_NUMBERING_REPAIR",
-          "scope": "$scope"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "scope", "defaultValue": "document"}],
+      "scopeRules": {"defaultScope": "document", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_NUMBERING_REPAIR", "scope": "$scope"}],
       "examples": {
-        "positive": [
-          "Fix the numbering",
-          "Repair the broken numbering",
-          "Correct the numbered list sequence",
-          "Renumber this section"
-        ],
-        "negative": [
-          "Add numbering",
-          "Remove numbering",
-          "Change to bullets"
-        ]
+        "positive": ["Fix the numbering", "Repair the broken numbering", "Correct the numbered list sequence", "Renumber this section"],
+        "negative": ["Add numbering", "Remove numbering", "Change to bullets"]
       }
     },
     {
@@ -2349,47 +1050,20 @@
       "lang": "en",
       "priority": 83,
       "triggers": {
-        "tokens_any": [
-          "grammar",
-          "spelling",
-          "proofread"
-        ],
+        "tokens_any": ["grammar", "spelling", "proofread"],
+        "tokens_none": ["convert", "transform", "merge", "split", "insert", "delete", "remove", "table of contents", "TOC", "summary"],
         "regex_any": [
           "\\b(?:fix|correct|check|repair)\\b.{0,20}\\b(?:grammar|spelling|typos?)\\b",
           "\\b(?:grammar|spelling)\\b.{0,20}\\b(?:fix|correct|check)\\b",
           "\\bproofread\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$target",
-          "afterText": "$llmGenerated",
-          "tone": "grammar_fix"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_REWRITE_PARAGRAPH", "targetId": "$target", "afterText": "$llmGenerated", "tone": "grammar_fix"}],
       "examples": {
-        "positive": [
-          "Fix the grammar",
-          "Correct spelling errors",
-          "Proofread this paragraph",
-          "Check grammar and spelling"
-        ],
-        "negative": [
-          "Rewrite the paragraph",
-          "Improve the text"
-        ]
+        "positive": ["Fix the grammar", "Correct spelling errors", "Proofread this paragraph", "Check grammar and spelling"],
+        "negative": ["Rewrite the paragraph", "Improve the text"]
       }
     },
     {
@@ -2398,39 +1072,18 @@
       "lang": "en",
       "priority": 79,
       "triggers": {
+        "tokens_none": ["convert", "transform", "merge", "split", "insert", "delete", "remove", "table of contents", "TOC", "summary"],
         "regex_any": [
           "\\b(?:make|rewrite|rephrase)\\b.*\\b(?:friendly|warm|welcoming|approachable)\\b",
           "\\bmore\\s+(?:friendly|warm|welcoming|approachable)\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_REWRITE_PARAGRAPH",
-          "targetId": "$target",
-          "tone": "friendly"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_REWRITE_PARAGRAPH", "targetId": "$target", "tone": "friendly"}],
       "examples": {
-        "positive": [
-          "Make this friendlier",
-          "Rewrite in a warmer tone",
-          "Make the text more welcoming"
-        ],
-        "negative": [
-          "Make this formal",
-          "Make this concise"
-        ]
+        "positive": ["Make this friendlier", "Rewrite in a warmer tone", "Make the text more welcoming"],
+        "negative": ["Make this formal", "Make this concise"]
       }
     },
     {
@@ -2439,47 +1092,16 @@
       "lang": "en",
       "priority": 82,
       "triggers": {
-        "tokens_any": [
-          "title case"
-        ],
-        "regex_any": [
-          "\\btitle\\s*case\\b",
-          "\\bcapitali[sz]e\\s+each\\s+word\\b",
-          "\\b(?:make|set|apply|convert)\\b.{0,30}\\btitle\\s*case\\b"
-        ]
+        "tokens_any": ["title case"],
+        "regex_any": ["\\btitle\\s*case\\b", "\\bcapitali[sz]e\\s+each\\s+word\\b", "\\b(?:make|set|apply|convert)\\b.{0,30}\\btitle\\s*case\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_TEXT_CASE",
-          "targets": [
-            "$target"
-          ],
-          "targetCase": "title_case"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "resolverHints": {"naturalTargets": ["this heading", "the introduction", "section 4", "the title", "the conclusion", "all headings"], "ambiguityAction": "clarify"},
+      "planTemplate": [{"op": "DOCX_SET_TEXT_CASE", "targets": ["$target"], "targetCase": "title_case"}],
       "examples": {
-        "positive": [
-          "Make all headings title case",
-          "Title case this paragraph",
-          "Capitalize each word",
-          "Apply title case to the heading"
-        ],
-        "negative": [
-          "Make this uppercase",
-          "Make this bold",
-          "Capitalize the first letter"
-        ]
+        "positive": ["Make all headings title case", "Title case this paragraph", "Capitalize each word", "Apply title case to the heading"],
+        "negative": ["Make this uppercase", "Make this bold", "Capitalize the first letter"]
       }
     },
     {
@@ -2488,48 +1110,16 @@
       "lang": "en",
       "priority": 82,
       "triggers": {
-        "tokens_any": [
-          "uppercase",
-          "upper case"
-        ],
-        "regex_any": [
-          "\\b(?:upper\\s*case|uppercase)\\b",
-          "\\ball\\s+caps\\b",
-          "\\b(?:make|set|convert|change)\\b.{0,30}\\b(?:upper\\s*case|uppercase|all\\s+caps)\\b"
-        ]
+        "tokens_any": ["uppercase", "upper case"],
+        "regex_any": ["\\b(?:upper\\s*case|uppercase)\\b", "\\ball\\s+caps\\b", "\\b(?:make|set|convert|change)\\b.{0,30}\\b(?:upper\\s*case|uppercase|all\\s+caps)\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_TEXT_CASE",
-          "targets": [
-            "$target"
-          ],
-          "targetCase": "uppercase"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "resolverHints": {"naturalTargets": ["this heading", "the introduction", "section 4", "the title", "the conclusion", "all headings"], "ambiguityAction": "clarify"},
+      "planTemplate": [{"op": "DOCX_SET_TEXT_CASE", "targets": ["$target"], "targetCase": "uppercase"}],
       "examples": {
-        "positive": [
-          "Make this uppercase",
-          "Convert to all caps",
-          "UPPERCASE this heading",
-          "Make selected text uppercase"
-        ],
-        "negative": [
-          "Make this lowercase",
-          "Title case",
-          "Make this bold"
-        ]
+        "positive": ["Make this uppercase", "Convert to all caps", "UPPERCASE this heading", "Make selected text uppercase"],
+        "negative": ["Make this lowercase", "Title case", "Make this bold"]
       }
     },
     {
@@ -2538,47 +1128,16 @@
       "lang": "en",
       "priority": 82,
       "triggers": {
-        "tokens_any": [
-          "lowercase",
-          "lower case"
-        ],
-        "regex_any": [
-          "\\b(?:lower\\s*case|lowercase)\\b",
-          "\\b(?:make|set|convert|change)\\b.{0,30}\\b(?:lower\\s*case|lowercase)\\b"
-        ]
+        "tokens_any": ["lowercase", "lower case"],
+        "regex_any": ["\\b(?:lower\\s*case|lowercase)\\b", "\\b(?:make|set|convert|change)\\b.{0,30}\\b(?:lower\\s*case|lowercase)\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_TEXT_CASE",
-          "targets": [
-            "$target"
-          ],
-          "targetCase": "lowercase"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "resolverHints": {"naturalTargets": ["this heading", "the introduction", "section 4", "the title", "the conclusion", "all headings"], "ambiguityAction": "clarify"},
+      "planTemplate": [{"op": "DOCX_SET_TEXT_CASE", "targets": ["$target"], "targetCase": "lowercase"}],
       "examples": {
-        "positive": [
-          "Make this lowercase",
-          "Convert to lowercase",
-          "Lowercase this text",
-          "Change to lower case"
-        ],
-        "negative": [
-          "Make this uppercase",
-          "Title case",
-          "Make this bold"
-        ]
+        "positive": ["Make this lowercase", "Convert to lowercase", "Lowercase this text", "Change to lower case"],
+        "negative": ["Make this uppercase", "Title case", "Make this bold"]
       }
     },
     {
@@ -2587,42 +1146,15 @@
       "lang": "en",
       "priority": 82,
       "triggers": {
-        "regex_any": [
-          "\\bsentence\\s*case\\b",
-          "\\b(?:make|set|convert|change)\\b.{0,30}\\bsentence\\s*case\\b"
-        ]
+        "regex_any": ["\\bsentence\\s*case\\b", "\\b(?:make|set|convert|change)\\b.{0,30}\\bsentence\\s*case\\b"]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_SET_TEXT_CASE",
-          "targets": [
-            "$target"
-          ],
-          "targetCase": "sentence_case"
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false, "allowMultiSelection": true},
+      "resolverHints": {"naturalTargets": ["this heading", "the introduction", "section 4", "the title", "the conclusion", "all headings"], "ambiguityAction": "clarify"},
+      "planTemplate": [{"op": "DOCX_SET_TEXT_CASE", "targets": ["$target"], "targetCase": "sentence_case"}],
       "examples": {
-        "positive": [
-          "Make this sentence case",
-          "Convert to sentence case",
-          "Apply sentence case"
-        ],
-        "negative": [
-          "Make this uppercase",
-          "Title case this",
-          "Rewrite this sentence"
-        ]
+        "positive": ["Make this sentence case", "Convert to sentence case", "Apply sentence case"],
+        "negative": ["Make this uppercase", "Title case this", "Rewrite this sentence"]
       }
     },
     {
@@ -2631,44 +1163,59 @@
       "lang": "en",
       "priority": 83,
       "triggers": {
+        "tokens_none": ["convert", "transform", "change"],
         "regex_any": [
           "\\b(?:summarize|summarise)\\b.{0,20}\\b(?:into|as|to)\\b.{0,10}\\bbullet(?:s|\\s+points?)?\\b",
           "\\b(?:break\\s+down|extract)\\b.{0,20}\\b(?:key|main)\\s+points?\\b.{0,15}\\b(?:as|into)?\\s*bullets?\\b",
           "\\bextract\\b.{0,15}\\bkey\\s+points?\\b"
         ]
       },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_LIST_APPLY_BULLETS",
-          "targets": [
-            "$target"
-          ],
-          "summarize": true
-        }
-      ],
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "selection", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": false},
+      "planTemplate": [{"op": "DOCX_LIST_APPLY_BULLETS", "targets": ["$target"], "summarize": true}],
       "examples": {
-        "positive": [
-          "Summarize into bullet points",
-          "Summarize this paragraph into bullets",
-          "Extract key points as bullets",
-          "Break down into key points as bullets"
-        ],
-        "negative": [
-          "Convert to bullet points",
-          "Add bullets",
-          "Summarize this section into one paragraph"
+        "positive": ["Summarize into bullet points", "Summarize this paragraph into bullets", "Extract key points as bullets", "Break down into key points as bullets"],
+        "negative": ["Convert to bullet points", "Add bullets", "Summarize this section into one paragraph"]
+      }
+    },
+    {
+      "id": "docx.toc.insert",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 78,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:insert|add|create|generate)\\b.*\\b(?:table\\s+of\\s+contents?|TOC|toc)\\b",
+          "\\b(?:table\\s+of\\s+contents?|TOC)\\b.*\\b(?:automatic|auto)\\b"
         ]
+      },
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "document", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": true},
+      "resolverHints": {"naturalTargets": ["this heading", "the introduction", "section 4", "the title", "the conclusion", "all headings"], "ambiguityAction": "clarify"},
+      "planTemplate": [{"op": "DOCX_INSERT_BEFORE", "targetId": "$target", "afterText": "$llmGenerated", "_hint": "toc_insert"}],
+      "examples": {
+        "positive": ["Insert a table of contents", "Add TOC", "Create a table of contents", "Generate automatic TOC"],
+        "negative": ["Update table of contents", "Remove TOC"]
+      }
+    },
+    {
+      "id": "docx.toc.update",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 78,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:update|refresh|regenerate|rebuild)\\b.*\\b(?:table\\s+of\\s+contents?|TOC|toc)\\b",
+          "\\b(?:table\\s+of\\s+contents?)\\b.*\\b(?:update|refresh|regenerate)\\b"
+        ]
+      },
+      "slotExtractors": [{"type": "LOCATOR_TEXT", "out": "target"}],
+      "scopeRules": {"defaultScope": "document", "allowScopeOverrideByExplicitRange": false, "allowNoSelectionIfRangeProvided": true},
+      "resolverHints": {"naturalTargets": ["this heading", "the introduction", "section 4", "the title", "the conclusion", "all headings"], "ambiguityAction": "clarify"},
+      "planTemplate": [{"op": "DOCX_REWRITE_SECTION", "sectionId": "$target", "_hint": "toc_update"}],
+      "examples": {
+        "positive": ["Update the table of contents", "Refresh the TOC", "Regenerate table of contents"],
+        "negative": ["Insert a table of contents", "Delete TOC"]
       }
     }
   ]
