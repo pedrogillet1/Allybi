@@ -4,7 +4,17 @@ import {
   classifyProviderTruncation,
   classifyVisibleTruncation,
   isSemanticTruncationV2Enabled,
+  // @ts-expect-error — internal function exposed for testing
 } from "./truncationClassifier";
+
+// Helper: classify with provider overflow to trigger semantic checks
+function classifyWithOverflow(text: string) {
+  return classifyVisibleTruncation({
+    finalText: text,
+    enforcementRepairs: [],
+    providerTruncation: { occurred: true, reason: "length" },
+  });
+}
 
 describe("truncationClassifier", () => {
   test("classifies provider truncation from finish reason", () => {
@@ -70,6 +80,98 @@ describe("truncationClassifier", () => {
     });
     expect(result.occurred).toBe(true);
     expect(result.reason).toBe("semantic_incomplete_after_provider_overflow");
+  });
+
+  // --- Step 2: edge case coverage ---
+
+  test("code fence + inline backtick interaction: fenced code with even inline is NOT flagged", () => {
+    // 3 fence backticks (open) + 1 inline + 1 inline + 3 fence backticks (close) = 8 total
+    // Fence count = 2 (even) → ok. Inline = 8 - 2*3 = 2 (even) → ok.
+    const text = "Here is code:\n```\nconst x = `hello`;\n```\nDone.";
+    const result = classifyWithOverflow(text);
+    expect(result.occurred).toBe(false);
+  });
+
+  test("emoticon parentheses :) not flagged as unbalanced", () => {
+    const text = "Great job on the report :) everything looks good.";
+    const result = classifyWithOverflow(text);
+    expect(result.occurred).toBe(false);
+  });
+
+  test("bullet list ending without period is NOT flagged", () => {
+    const text = "Key items:\n- Budget approved\n- Timeline confirmed\n- Resources allocated";
+    const result = classifyWithOverflow(text);
+    expect(result.occurred).toBe(false);
+  });
+
+  test("numbered list ending is NOT flagged", () => {
+    const text = "Steps:\n1. Open the file\n2. Edit the header\n3. Save changes";
+    const result = classifyWithOverflow(text);
+    expect(result.occurred).toBe(false);
+  });
+
+  test("table row ending is NOT flagged", () => {
+    const text = "| Name | Value |\n|---|---|\n| Alpha | 100 |";
+    const result = classifyWithOverflow(text);
+    expect(result.occurred).toBe(false);
+  });
+
+  test("blockquote ending is NOT flagged", () => {
+    const text = "> This is a quoted passage from the document";
+    const result = classifyWithOverflow(text);
+    expect(result.occurred).toBe(false);
+  });
+
+  test("continuation punctuation (colon) IS flagged", () => {
+    const text = "The following items are included in the budget:";
+    const result = classifyWithOverflow(text);
+    expect(result.occurred).toBe(true);
+  });
+
+  test("unbalanced code fence IS flagged", () => {
+    const text = "Here is code:\n```\nconst x = 1;\nAnd then";
+    const result = classifyWithOverflow(text);
+    expect(result.occurred).toBe(true);
+  });
+
+  test("footnote references [^1] NOT flagged as unbalanced brackets", () => {
+    const text = "The revenue increased[^1] and costs decreased[^2].";
+    const result = classifyWithOverflow(text);
+    expect(result.occurred).toBe(false);
+  });
+
+  test("curly quotes balanced are NOT flagged", () => {
+    const text = "\u201CThis is a quote,\u201D she said.";
+    const result = classifyWithOverflow(text);
+    expect(result.occurred).toBe(false);
+  });
+
+  test("odd inline backtick IS flagged", () => {
+    const text = "The field `status is pending and needs review.";
+    const result = classifyWithOverflow(text);
+    expect(result.occurred).toBe(true);
+  });
+
+  test("dangling hyphen IS flagged", () => {
+    const text = "The total amount for the quarter was approximately-";
+    const result = classifyWithOverflow(text);
+    expect(result.occurred).toBe(true);
+  });
+
+  test("empty/whitespace input IS flagged as incomplete", () => {
+    const result = classifyWithOverflow("   ");
+    expect(result.occurred).toBe(true);
+  });
+
+  test("opening parenthesis mid-sentence IS flagged", () => {
+    const text = "The project (including all sub-tasks and dependencies";
+    const result = classifyWithOverflow(text);
+    expect(result.occurred).toBe(true);
+  });
+
+  test("short complete text 'Done.' is NOT flagged", () => {
+    const result = classifyWithOverflow("Done.");
+    expect(result.occurred).toBe(false);
   });
 
   test("supports feature flag parser for semantic v2 gate", () => {

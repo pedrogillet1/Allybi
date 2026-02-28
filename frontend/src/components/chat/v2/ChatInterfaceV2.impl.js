@@ -3011,7 +3011,7 @@ export default function ChatInterface({
   const streamNewResponse = useCallback(async (
     messageText,
     docAttachments = [],
-    { isRegenerate = false, ignoreViewerSelection = false, viewerSelectionOverride = null } = {},
+    { isRegenerate = false, ignoreViewerSelection = false, viewerSelectionOverride = null, truncationRetry = false } = {},
   ) => {
     setStreamError(null);
     setIsStreaming(true);
@@ -3176,6 +3176,7 @@ export default function ChatInterface({
       language: effectiveLang,
       client: { wantsStreaming: true },
       ...(isRegenerate ? { isRegenerate: true } : {}),
+      ...(truncationRetry ? { truncationRetry: true } : {}),
       ...(meta ? { meta } : {}),
       context: {
         slidesDeck: {
@@ -5416,7 +5417,35 @@ export default function ChatInterface({
                                   }}
                                   isRegenerating={isStreaming && m.id === lastAssistant?.id}
                                 />
-                                {m.truncation?.occurred && <span style={{ display: 'block', fontSize: 12, color: '#888', marginTop: 4 }}>(Response was truncated)</span>}
+                                {m.truncation?.occurred && (
+                                  <span style={{ display: 'block', fontSize: 12, color: '#888', marginTop: 4 }}>
+                                    (Response was truncated)
+                                    {!isStreaming && (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const userMsg = messages.find(
+                                            (u) => u.role === 'user' && messages.indexOf(u) < messages.indexOf(m)
+                                          );
+                                          if (!userMsg?.content) return;
+                                          streamNewResponse(userMsg.content, attachedDocs, { truncationRetry: true });
+                                        }}
+                                        style={{
+                                          marginLeft: 8,
+                                          background: 'none',
+                                          border: 'none',
+                                          color: '#5b6ef5',
+                                          cursor: 'pointer',
+                                          fontSize: 12,
+                                          textDecoration: 'underline',
+                                          padding: 0,
+                                        }}
+                                      >
+                                        Resend as bullets
+                                      </button>
+                                    )}
+                                  </span>
+                                )}
                                 {m.failureCode && m.failureCode !== 'none' && <span style={{ display: 'block', fontSize: 12, color: '#c9760c', marginTop: 4 }}>Warning: {m.failureCode}</span>}
                                 {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded')) || m.answerMode === 'action_receipt') ? renderSources(m) : null}
                               </div>

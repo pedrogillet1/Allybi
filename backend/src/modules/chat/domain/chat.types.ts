@@ -15,6 +15,7 @@ export interface ChatRequest {
   context?: Record<string, unknown>;
   meta?: Record<string, unknown>;
   isRegenerate?: boolean;
+  truncationRetry?: boolean;
   connectorContext?: {
     activeProvider?: "gmail" | "outlook" | "slack" | null;
     gmail?: { connected: boolean; canSend?: boolean };

@@ -2690,6 +2690,7 @@ export class CentralizedChatRuntimeDelegate {
     text: string,
     telemetry?: Record<string, unknown> | null,
     preferredLanguage?: string | null,
+    enforcementRepairs?: string[] | null,
   ): string {
     const finishReason = normalizeFinishReason(
       telemetry && typeof telemetry === "object"
@@ -2708,7 +2709,7 @@ export class CentralizedChatRuntimeDelegate {
       .filter(Boolean);
     const semantic = classifyVisibleTruncation({
       finalText: value,
-      enforcementRepairs: [],
+      enforcementRepairs: enforcementRepairs ?? [],
       providerTruncation: { occurred: true, reason: finishReason },
     });
     if (!semantic.occurred) return text;
@@ -2716,6 +2717,31 @@ export class CentralizedChatRuntimeDelegate {
     const tableLines = lines.filter((line) => line.includes("|"));
     if (!tableLines.length) {
       const lang = normalizeChatLanguage(preferredLanguage);
+
+      // Detect truncated bullet lists
+      const bulletLines = lines.filter((line) => /^[-*]\s+/.test(line));
+      if (bulletLines.length >= 2) {
+        if (lang === "pt") {
+          return "A lista foi cortada antes de concluir. Posso reenviar de forma mais concisa para garantir completude.";
+        }
+        if (lang === "es") {
+          return "La lista se interrumpió antes de terminar. Puedo reenviarla de forma más concisa para garantizar completitud.";
+        }
+        return "The list was cut before completion. I can resend it more concisely to guarantee completeness.";
+      }
+
+      // Detect truncated numbered lists
+      const numberedLines = lines.filter((line) => /^\d+\.\s+/.test(line));
+      if (numberedLines.length >= 2) {
+        if (lang === "pt") {
+          return "A lista numerada foi cortada antes de concluir. Posso reenviar de forma mais concisa para garantir completude.";
+        }
+        if (lang === "es") {
+          return "La lista numerada se interrumpió antes de terminar. Puedo reenviarla de forma más concisa para garantizar completitud.";
+        }
+        return "The numbered list was cut before completion. I can resend it more concisely to guarantee completeness.";
+      }
+
       if (lang === "pt") {
         return "A resposta foi interrompida antes de concluir. Posso reenviar em bullets para garantir completude.";
       }
@@ -2871,6 +2897,7 @@ export class CentralizedChatRuntimeDelegate {
     enforcement?: { repairs: string[]; warnings: string[] };
     provenance?: ChatProvenanceDTO;
     failureCode?: string | null;
+    qualityGateIssues: string[];
   }> {
     let text = params.assistantText;
     let failureCode: string | null = null;
@@ -2941,6 +2968,7 @@ export class CentralizedChatRuntimeDelegate {
     };
 
     // 2. Run quality gates (format checks, brevity, markdown sanity)
+    let qualityGateIssues: string[] = [];
     try {
       const qualityRunner = new QualityGateRunnerService();
       const gateCtx: QualityGateContext = {
@@ -2953,10 +2981,11 @@ export class CentralizedChatRuntimeDelegate {
       };
       const gateResult = await qualityRunner.runGates(text, gateCtx);
       if (!gateResult.allPassed) {
+        qualityGateIssues = gateResult.results
+          .filter((r) => !r.passed)
+          .map((r) => r.gateName);
         appLogger.debug("[finalizeChatTurn] Quality gate issues", {
-          issues: gateResult.results
-            .filter((r) => !r.passed)
-            .map((r) => r.gateName),
+          issues: qualityGateIssues,
         });
       }
     } catch (error) {
@@ -2984,6 +3013,7 @@ export class CentralizedChatRuntimeDelegate {
             ? Math.ceil(requestedMaxOutputTokens * 1.25)
             : undefined,
           expectedOutputTokens: observedOutputTokens ?? undefined,
+          userRequestedShort: params.req.truncationRetry === true || undefined,
         },
       };
       const enforced = enforcer.enforce(
@@ -3043,6 +3073,7 @@ export class CentralizedChatRuntimeDelegate {
         text,
         (params.telemetry as Record<string, unknown>) ?? null,
         params.req.preferredLanguage,
+        enforcement?.repairs ?? null,
       );
       const revalidatedProvenance = buildChatProvenance({
         answerText: text,
@@ -3106,6 +3137,7 @@ export class CentralizedChatRuntimeDelegate {
       enforcement,
       provenance,
       failureCode,
+      qualityGateIssues,
     };
   }
 

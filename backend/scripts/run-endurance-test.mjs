@@ -669,6 +669,28 @@ async function main() {
       `\n⚠️  ${truncated} response(s) were truncated — investigate token limits.`,
     );
   }
+
+  // Truncation rate gates
+  const totalQueries = allResults.length;
+  if (totalQueries > 0) {
+    const truncationRate = truncated / totalQueries;
+    if (truncationRate > 0.05) {
+      console.log(
+        `\n❌ FAIL: Truncation rate ${(truncationRate * 100).toFixed(1)}% exceeds 5% threshold (${truncated}/${totalQueries}).`,
+      );
+      process.exit(1);
+    }
+
+    const providerTruncated = allResults.filter((r) => r.providerTruncation).length;
+    const providerTruncationRate = providerTruncated / totalQueries;
+    if (providerTruncationRate > 0.10) {
+      console.log(
+        `\n❌ FAIL: Provider truncation rate ${(providerTruncationRate * 100).toFixed(1)}% exceeds 10% threshold (${providerTruncated}/${totalQueries}).`,
+      );
+      process.exit(1);
+    }
+  }
+
   console.log(`\nDone!`);
 }
 

@@ -321,7 +321,9 @@ export class TurnRouterService {
       discoveryQuery:
         contextSignals.discoveryQuery === true || isDiscoveryQuery(query),
       navQuery: contextSignals.navQuery === true || isNavQuery(query),
-      userRequestedShort: contextSignals.userRequestedShort === true,
+      userRequestedShort:
+        contextSignals.userRequestedShort === true ||
+        ctx.request.truncationRetry === true,
       userRequestedDetailed: contextSignals.userRequestedDetailed === true,
       userSaidPickForMe: contextSignals.userSaidPickForMe === true,
     };

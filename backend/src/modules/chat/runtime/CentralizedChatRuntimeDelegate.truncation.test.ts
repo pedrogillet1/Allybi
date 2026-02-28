@@ -65,6 +65,79 @@ describe("CentralizedChatRuntimeDelegate provider overflow repair", () => {
       "A resposta foi interrompida antes de concluir. Posso reenviar em bullets para garantir completude.",
     );
   });
+
+  test("does NOT replace enforcer-trimmed text that ends cleanly", () => {
+    const delegate = Object.create(
+      CentralizedChatRuntimeDelegate.prototype,
+    ) as CentralizedChatRuntimeDelegate;
+
+    const cleanText =
+      "The budget was approved and all items were allocated correctly.";
+    const repaired = (delegate as any).repairProviderOverflowStructuredOutput(
+      cleanText,
+      { finishReason: "length" },
+      "en",
+      ["SOFT_MAX_TOKENS_TRIMMED"],
+    );
+
+    // When enforcementRepairs are passed, the classifier sees the trim repair
+    // and recognizes the text ends cleanly — so it should NOT be replaced.
+    expect(repaired).toBe(cleanText);
+  });
+
+  test("truncated bullet list returns list-specific fallback", () => {
+    const delegate = Object.create(
+      CentralizedChatRuntimeDelegate.prototype,
+    ) as CentralizedChatRuntimeDelegate;
+
+    // Text ends mid-sentence after bullet items (not on a clean bullet line)
+    const bulletText =
+      "Key findings:\n- Revenue increased by 15%\n- Costs decreased by 8%\nThe margin improved but the detailed breakdown shows that";
+    const repaired = (delegate as any).repairProviderOverflowStructuredOutput(
+      bulletText,
+      { finishReason: "length" },
+      "en",
+    );
+
+    expect(repaired).toContain("list was cut");
+  });
+
+  test("truncated numbered list returns numbered-list-specific fallback", () => {
+    const delegate = Object.create(
+      CentralizedChatRuntimeDelegate.prototype,
+    ) as CentralizedChatRuntimeDelegate;
+
+    // Text ends mid-sentence after numbered items (not on a clean list line)
+    const numberedText =
+      "Steps to complete:\n1. Open the dashboard\n2. Navigate to settings\nUpdate the configuration for the";
+    const repaired = (delegate as any).repairProviderOverflowStructuredOutput(
+      numberedText,
+      { finishReason: "length" },
+      "en",
+    );
+
+    expect(repaired).toContain("numbered list was cut");
+  });
+
+  test("enforcer-trimmed text with surviving unclosed backtick takes enforcer path", () => {
+    const delegate = Object.create(
+      CentralizedChatRuntimeDelegate.prototype,
+    ) as CentralizedChatRuntimeDelegate;
+
+    // Enforcer trimmed text that still has an unclosed backtick
+    const incompleteText = "The field `status is pending and the";
+    const repaired = (delegate as any).repairProviderOverflowStructuredOutput(
+      incompleteText,
+      { finishReason: "length" },
+      "en",
+      ["HARD_MAX_TOKENS_TRIMMED"],
+    );
+
+    // The classifier detects enforcer trim + semantic incompleteness
+    // and returns occurred:true with reason "enforcer_trimmed".
+    // Since semantic truncation occurred, the overflow repair DOES fire.
+    expect(repaired).not.toBe(incompleteText);
+  });
 });
 
 describe("CentralizedChatRuntimeDelegate answer mode routing", () => {

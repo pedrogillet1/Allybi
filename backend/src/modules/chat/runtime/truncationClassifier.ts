@@ -61,15 +61,21 @@ function hasUnbalancedMarkdownOrDelimiters(text: string): boolean {
   const codeFenceCount = (text.match(/```/g) || []).length;
   if (codeFenceCount % 2 !== 0) return true;
 
-  const inlineBacktickCount = (text.match(/`/g) || []).length;
+  // Subtract fence backticks from total count before checking inline parity
+  const totalBackticks = (text.match(/`/g) || []).length;
+  const inlineBacktickCount = totalBackticks - codeFenceCount * 3;
   if (inlineBacktickCount % 2 !== 0) return true;
 
-  const parensOpen = (text.match(/\(/g) || []).length;
-  const parensClose = (text.match(/\)/g) || []).length;
+  // Strip common emoticon patterns before counting parentheses
+  const noEmoticons = text.replace(/[:;][''"]?[)(DP]/g, "");
+  const parensOpen = (noEmoticons.match(/\(/g) || []).length;
+  const parensClose = (noEmoticons.match(/\)/g) || []).length;
   if (parensOpen !== parensClose) return true;
 
-  const bracketsOpen = (text.match(/\[/g) || []).length;
-  const bracketsClose = (text.match(/\]/g) || []).length;
+  // Strip footnote references [^N] before counting brackets
+  const noFootnotes = text.replace(/\[\^\w+\]/g, "");
+  const bracketsOpen = (noFootnotes.match(/\[/g) || []).length;
+  const bracketsClose = (noFootnotes.match(/\]/g) || []).length;
   if (bracketsOpen !== bracketsClose) return true;
 
   const doubleQuotes = (text.match(/"/g) || []).length;
